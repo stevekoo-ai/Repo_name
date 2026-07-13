@@ -39,11 +39,16 @@ tags: [sk-hynix, semiconductor, stock]
 종목이다. 오늘(2026-07-13) 본주 -16.15% 급락은 포트폴리오 평가금액에도 직접
 영향을 준다.
 
+또한 [사용자](user-profile.md)는 SK하이닉스 재직자로 고소득 중 PS(성과급)
+비중이 커서, 투자자산뿐 아니라 소득도 이 회사 실적에 연동되어 있다 —
+투자·고용 이중 집중 리스크.
+
 ## Sources
 
 - [SK하이닉스 반등 전망 분석 (2026-07-13)](../summaries/sk-hynix-rebound-analysis-2026-07-13.md)
 - [SK하이닉스 본주·ADR 차트 비교 (2026-07-13)](../summaries/sk-hynix-adr-krw-chart-comparison-2026-07-13.md)
 - [나의 투자 포트폴리오](my-portfolio.md)
+- [사용자 프로필](user-profile.md)
 - [sources/sk-hynix-rebound-analysis-2026-07-13.md](../../sources/sk-hynix-rebound-analysis-2026-07-13.md)
 - [sources/sk-hynix-krw-chart-2026-07-13.png](../../sources/sk-hynix-krw-chart-2026-07-13.png)
 - [sources/sk-hynix-adr-chart-2026-07-13.png](../../sources/sk-hynix-adr-chart-2026-07-13.png)

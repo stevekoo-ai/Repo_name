@@ -13,6 +13,7 @@ Catalog of every page in the wiki. See `../CLAUDE.md` for conventions.
 
 - [SK하이닉스](entities/sk-hynix.md) — 반도체 종목, 2026-07-13 기준 단기 반등 가능성 분석
 - [나의 투자 포트폴리오](entities/my-portfolio.md) — 4개 계좌 총 4.5억원, SK하이닉스가 약 65% 차지하는 집중 포지션
+- [사용자 프로필](entities/user-profile.md) — SK하이닉스 재직/고소득, 장기투자 성향, 용인 수지구 거주 및 플랫폼시티 공공분양 대기
 
 ### concepts
 

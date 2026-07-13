@@ -31,7 +31,13 @@ DC(퇴직연금), IRP, ISA, 일반 4개 계좌로 구성된 개인 투자 포트
 전체 33개 보유 종목의 상세 수치는
 [계좌 현황 스냅샷 (2026-07-13)](../summaries/portfolio-holdings-2026-07-13.md) 참고.
 
+[사용자](user-profile.md)는 SK하이닉스 재직자이자 고소득의 상당 부분이
+PS(성과급)에서 나오는 구조라, 위 SK하이닉스 집중 리스크는 투자자산에 그치지
+않고 소득 측면과도 겹친다 — 회사 실적이 흔들리면 자산과 소득이 동시에 영향을
+받는 구조.
+
 ## Sources
 
 - [계좌 현황 스냅샷 (2026-07-13)](../summaries/portfolio-holdings-2026-07-13.md)
+- [사용자 프로필](user-profile.md)
 - [sources/portfolio-holdings-2026-07-13.md](../../sources/portfolio-holdings-2026-07-13.md)
