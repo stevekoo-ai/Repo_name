@@ -24,3 +24,6 @@ You curate sources and ask questions; the agent does the bookkeeping.
   pages, and missing cross-references
 
 See `CLAUDE.md` for the full schema these commands follow.
+
+New to Claude Code or GitHub? See [USAGE.md](USAGE.md) for a beginner-friendly,
+step-by-step guide (Korean).
