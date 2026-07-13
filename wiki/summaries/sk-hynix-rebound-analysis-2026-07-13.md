@@ -28,6 +28,10 @@ tags: [sk-hynix, stock, market-analysis]
 - 낙폭이 이미 과대해 투매·손절은 실익이 없다는 의견 우세, 펀더멘탈은 견조하다고 봄
 - 반등이 유의미하려면 최소 3% 이상 상승이 장중 내내 유지되어야 함
 
+See also: [SK하이닉스 본주·ADR 차트 비교 (2026-07-13)](sk-hynix-adr-krw-chart-comparison-2026-07-13.md)
+— 차트 실측 결과 ADR도 동반 급락 중이어서 위 "ADR 괴리율 해소" 논리에 대한
+반증이 발견되었다.
+
 ## Sources
 
 - [sources/sk-hynix-rebound-analysis-2026-07-13.md](../../sources/sk-hynix-rebound-analysis-2026-07-13.md)

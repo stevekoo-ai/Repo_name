@@ -19,7 +19,23 @@ tags: [sk-hynix, semiconductor, stock]
 늘리는 기회로 삼으라고 권고한다. 근거 상세는
 [SK하이닉스 반등 전망 분석 (2026-07-13)](../summaries/sk-hynix-rebound-analysis-2026-07-13.md) 참고.
 
+### 차트 실측 업데이트 (2026-07-13)
+
+증권 앱 차트 확인 결과, 본주는 종가 1,828,000원(-16.15%)으로 최근 고점
+3,002,000원(26.06.23) 대비 약 -39% 조정. RSI 34.32, Stochastic %K 1.15로
+과매도 근접/진입은 위 분석과 일치한다.
+
+다만 **ADR(SKHY)도 같은 기간 동반 급락 중**이다 — 07/10 고가 177.00달러에서
+07/13 종가 157.25달러(-6.40%)로 3거래일 만에 -11% 하락. ADR이 프리미엄을
+유지한 채 본주만 뒤처진 게 아니라 본주·ADR이 함께 빠지는 국면이어서, "ADR
+괴리율 해소가 곧 본주 반등"이라는 위 논리는 근거가 약해진 것으로 보인다.
+정확한 원/달러 기준 괴리율은 ADR 비율·환율 정보가 없어 미검증 상태. 상세는
+[SK하이닉스 본주·ADR 차트 비교 (2026-07-13)](../summaries/sk-hynix-adr-krw-chart-comparison-2026-07-13.md) 참고.
+
 ## Sources
 
 - [SK하이닉스 반등 전망 분석 (2026-07-13)](../summaries/sk-hynix-rebound-analysis-2026-07-13.md)
+- [SK하이닉스 본주·ADR 차트 비교 (2026-07-13)](../summaries/sk-hynix-adr-krw-chart-comparison-2026-07-13.md)
 - [sources/sk-hynix-rebound-analysis-2026-07-13.md](../../sources/sk-hynix-rebound-analysis-2026-07-13.md)
+- [sources/sk-hynix-krw-chart-2026-07-13.png](../../sources/sk-hynix-krw-chart-2026-07-13.png)
+- [sources/sk-hynix-adr-chart-2026-07-13.png](../../sources/sk-hynix-adr-chart-2026-07-13.png)
