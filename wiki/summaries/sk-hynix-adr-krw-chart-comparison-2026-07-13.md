@@ -2,7 +2,7 @@
 title: SK하이닉스 본주·ADR 차트 비교 (2026-07-13)
 created: 2026-07-13
 updated: 2026-07-13
-tags: [sk-hynix, stock, adr, chart, market-analysis]
+tags: [sk-hynix, stock, adr, chart, market-analysis, updated]
 ---
 
 증권 앱 차트 캡처 2건(본주 일봉, ADR 일봉)을 근거로 한 실측 데이터 정리.
@@ -35,8 +35,29 @@ ADR이 안정적인 프리미엄을 유지한 채 본주만 뒤처진 상황이 
 ADR 비율(ADR 1주당 본주 환산 비율)이 필요한데, 이번 캡처만으로는 확인되지 않아
 검증이 필요한 항목으로 남겨둔다.
 
+### 업데이트 — ADR 추가 하락 (같은 날 08:0x 재확인)
+
+같은 날 새로 확인한 차트 기준, ADR은 처음 확인했을 때(종가 $157.25, -6.40%)보다
+더 밀렸다.
+
+- 현재가 $150.2649, 전일대비 -$17.7451(**-10.56%**), 거래량 37,087,659주
+- 고점($177.00, 07/10) 대비 현재가는 **약 -15.1%** 하락 — 처음 확인했던 시점의
+  -11.2%보다 낙폭이 더 커짐
+- 인트라데이(10분봉) 기준 저점은 $150.00(07/13 17:00)까지 찍었다가 $150.30
+  안팎에서 보합 중; 07/11 고점 $173.70 대비로는 -13.5% 수준
+- 하락 구간에서 거래량이 크게 튀는 구간이 관측되어(10분봉 차트), 매도 압력이
+  일시적 되돌림이 아니라 이어지는 흐름으로 보임
+
+**해석**: [SK하이닉스 반등 전망 분석](sk-hynix-rebound-analysis-2026-07-13.md)이
+근거로 든 "ADR 프리미엄 → 본주 반등" 논리, 그리고 "외국인 선물 순매수 전환 →
+7/14 반등 확률 70%+" 전망 모두, ADR이 오히려 계속 밀리고 있다는 이번 업데이트로
+추가로 약화된다. ADR은 프리미엄을 지키기는커녕 본주보다 더 가파르게 빠지는
+모습에 가깝다.
+
 ## Sources
 
 - [sources/sk-hynix-krw-chart-2026-07-13.png](../../sources/sk-hynix-krw-chart-2026-07-13.png)
 - [sources/sk-hynix-adr-chart-2026-07-13.png](../../sources/sk-hynix-adr-chart-2026-07-13.png)
+- [sources/sk-hynix-adr-chart-daily-2026-07-13-0807.png](../../sources/sk-hynix-adr-chart-daily-2026-07-13-0807.png)
+- [sources/sk-hynix-adr-chart-intraday-2026-07-13-0806.png](../../sources/sk-hynix-adr-chart-intraday-2026-07-13-0806.png)
 - [SK하이닉스 반등 전망 분석 (2026-07-13)](sk-hynix-rebound-analysis-2026-07-13.md)
