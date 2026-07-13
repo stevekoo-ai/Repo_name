@@ -5,13 +5,78 @@
 <title>Macro Investment Clock</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
-  body { font-family: -apple-system, "Segoe UI", sans-serif; max-width: 700px; margin: 4rem auto; padding: 0 1rem; color: #1a1a1a; }
+  body { font-family: -apple-system, "Segoe UI", sans-serif; max-width: 900px; margin: 2rem auto; padding: 0 1rem; color: #1a1a1a; background:#fafafa; }
+  h1 { font-size: 1.4rem; }
+  .updated { color: #666; font-size: 0.85rem; margin-bottom: 1.5rem; }
+  .phase-banner { padding: 1rem; border-radius: 10px; background: #C44E5222; border: 2px solid #C44E52; margin-bottom: 1.5rem; }
+  .phase-banner b { color: #C44E52; }
+  img { max-width: 100%; height: auto; border-radius: 8px; }
+  .grid { display: flex; gap: 1.5rem; flex-wrap: wrap; }
+  .grid > div { flex: 1 1 320px; }
+  table { border-collapse: collapse; width: 100%; font-size: 0.85rem; margin-top: 1rem; }
+  th, td { border: 1px solid #ddd; padding: 6px 10px; text-align: right; }
+  th { background: #f0f0f0; }
+  td:first-child, th:first-child { text-align: left; }
+  footer { margin-top: 2rem; color: #888; font-size: 0.8rem; }
 </style>
 </head>
 <body>
 <h1>거시경제 투자 시계 (Macro Investment Clock)</h1>
-<p>첫 GitHub Actions 실행 후 이 페이지가 자동으로 대시보드로 교체됩니다.
-   <code>.github/workflows/daily-clock-report.yml</code>이 main 브랜치에 병합되고 최초 1회 실행되면
-   시계 이미지, 트렌드 차트, 히스토리 테이블이 여기에 표시됩니다.</p>
+<p class="updated">Last updated: 2026-07-13 (data as of 2026-05-01)</p>
+
+<div class="phase-banner">
+  현재 국면: <b>Overheat (과열)</b> &mdash; 유리한 자산군: <b>Commodities (원자재)</b><br>
+  성장 모멘텀: rising (3개월 변화 +0.37) · 물가(CPI YoY) 모멘텀: rising (3개월 변화 +1.61%p)
+</div>
+
+<div class="grid">
+  <div><h3>Clock</h3><img src="clock.png" alt="investment clock"></div>
+  <div>
+    <h3>Context</h3>
+    <ul>
+      <li>CPI YoY: 4.27%</li>
+      <li>Core CPI YoY: 2.96</li>
+      <li>10Y-2Y Treasury spread: 0.35</li>
+      <li>Unemployment rate: 4.20</li>
+    </ul>
+  </div>
+</div>
+
+<h3>Trend</h3>
+<div class="grid">
+  <div><img src="trend_growth.png" alt="growth trend"></div>
+  <div><img src="trend_inflation.png" alt="inflation trend"></div>
+</div>
+
+<h3>History (last 30 runs)</h3>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th>data_asof</th>
+      <th>growth_value</th>
+      <th>growth_signal</th>
+      <th>inflation_yoy</th>
+      <th>inflation_signal</th>
+      <th>phase</th>
+      <th>asset</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>2026-05-01</td>
+      <td>101.02</td>
+      <td>rising</td>
+      <td>4.27</td>
+      <td>rising</td>
+      <td>Overheat</td>
+      <td>Commodities</td>
+    </tr>
+  </tbody>
+</table>
+
+<footer>
+  Model: Merrill Lynch Investment Clock (growth vs. inflation momentum, 2-axis / 4-phase).
+  Data: FRED (OECD CLI, CPI, Industrial Production, Treasury spread, unemployment). Auto-generated, not investment advice.
+</footer>
 </body>
 </html>
