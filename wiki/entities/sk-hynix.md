@@ -32,10 +32,18 @@ tags: [sk-hynix, semiconductor, stock]
 정확한 원/달러 기준 괴리율은 ADR 비율·환율 정보가 없어 미검증 상태. 상세는
 [SK하이닉스 본주·ADR 차트 비교 (2026-07-13)](../summaries/sk-hynix-adr-krw-chart-comparison-2026-07-13.md) 참고.
 
+### 개인 보유 현황
+
+[나의 투자 포트폴리오](my-portfolio.md)의 ISA(19주) + 일반(117주) = 136주를
+보유 중이며, 평가금액 기준 전체 포트폴리오의 약 65%를 차지하는 최대 비중
+종목이다. 오늘(2026-07-13) 본주 -16.15% 급락은 포트폴리오 평가금액에도 직접
+영향을 준다.
+
 ## Sources
 
 - [SK하이닉스 반등 전망 분석 (2026-07-13)](../summaries/sk-hynix-rebound-analysis-2026-07-13.md)
 - [SK하이닉스 본주·ADR 차트 비교 (2026-07-13)](../summaries/sk-hynix-adr-krw-chart-comparison-2026-07-13.md)
+- [나의 투자 포트폴리오](my-portfolio.md)
 - [sources/sk-hynix-rebound-analysis-2026-07-13.md](../../sources/sk-hynix-rebound-analysis-2026-07-13.md)
 - [sources/sk-hynix-krw-chart-2026-07-13.png](../../sources/sk-hynix-krw-chart-2026-07-13.png)
 - [sources/sk-hynix-adr-chart-2026-07-13.png](../../sources/sk-hynix-adr-chart-2026-07-13.png)
