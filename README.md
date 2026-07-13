@@ -27,3 +27,7 @@ See `CLAUDE.md` for the full schema these commands follow.
 
 New to Claude Code or GitHub? See [USAGE.md](USAGE.md) for a beginner-friendly,
 step-by-step guide (Korean).
+
+Evaluating this system with a different AI tool? See
+[SYSTEM-OVERVIEW.md](SYSTEM-OVERVIEW.md) for a vendor-neutral architecture
+writeup (Korean).
