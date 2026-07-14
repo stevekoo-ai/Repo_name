@@ -33,7 +33,17 @@
         "direction": "n/a"
       }
     ],
-    "us_investment_clock": null,
+    "us_investment_clock": {
+      "phase": "Overheat",
+      "phase_kr": "과열",
+      "favored_asset": "Commodities",
+      "favored_asset_kr": "원자재",
+      "growth_signal": "rising",
+      "inflation_signal": "rising",
+      "as_of": "2026-05-01",
+      "source": "stale_history",
+      "note": "실시간 조회 불가 — 2026-07-14 실행분(마지막 저장값) 사용. GitHub Pages 활성화 시 https://<github계정>.github.io/<저장소명>/ 에서 매일 갱신되는 대시보드로 확인 가능"
+    },
     "readings": {
       "gdp": {
         "value": null,
@@ -156,5 +166,5 @@
     }
   },
   "month": "2026-07",
-  "saved_at": "2026-07-14T15:08:53.778508+00:00"
+  "saved_at": "2026-07-14T15:20:05.188737+00:00"
 }

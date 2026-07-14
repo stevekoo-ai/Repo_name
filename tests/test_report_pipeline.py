@@ -14,6 +14,7 @@ from core.models import DataPoint, DataStatus
 from engine.macro import indicators as indicators_mod
 from engine.macro import snapshot as snapshot_mod
 from engine.report import payload as payload_mod
+from engine.report.html import render_html
 from engine.report.markdown import render_markdown
 
 
@@ -58,6 +59,16 @@ def test_full_pipeline_produces_a_readable_report():
     assert markdown.startswith("# 월간 PEOS 리포트 - 1999-01")
     for heading in ("Executive Summary", "Macro Dashboard", "Action Plan", "Personal Executive Brief"):
         assert heading in markdown
+
+    assert isinstance(payload["discussion_points"], list)
+    for point in payload["discussion_points"]:
+        assert point["topic"] and point["context"] and point["question"]
+
+    html_doc = render_html(payload)
+    assert html_doc.startswith("<!doctype html>")
+    assert html_doc.count("<section") == html_doc.count("</section>")
+    for heading in ("Executive Summary", "Macro Dashboard", "Action Plan", "논의가 필요한 결정 사항"):
+        assert heading in html_doc
 
 
 def test_pipeline_marks_missing_indicators_as_pending_not_guessed():

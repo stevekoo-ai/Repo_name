@@ -16,6 +16,7 @@ from engine.action import engine as action_engine
 from engine.macro import engine as macro_engine
 from engine.macro import snapshot as macro_snapshot
 from engine.personal import mapping
+from . import discussion as discussion_mod
 from . import scenario as scenario_mod
 
 INDICATOR_ORDER = [
@@ -101,6 +102,7 @@ def build_report_payload(month_key: str | None = None) -> dict:
         personal["fx"], personal["housing"], personal["travel"], personal["calendar"],
     )
     scenarios = scenario_mod.compute_scenarios(macro, personal["semiconductor"], personal["investment"])
+    discussion_points = discussion_mod.generate_discussion_points(personal)
 
     core10_complete = all(
         r.get("status") == DataStatus.OK.value for r in macro["readings"].values()
@@ -144,6 +146,7 @@ def build_report_payload(month_key: str | None = None) -> dict:
         "travel": personal["travel"],
         "scenarios": scenarios,
         "actions": actions,
+        "discussion_points": discussion_points,
         "calendar": personal["calendar"],
         "personal_executive_brief": _executive_brief(macro, personal, actions),
         "appendix": _appendix(macro),

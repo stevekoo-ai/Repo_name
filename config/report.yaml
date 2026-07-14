@@ -1,10 +1,11 @@
 # PEOS report template configuration (Master Instruction 16, 25).
 # Section order and output formats are externalized so the report builder
-# never hardcodes structure. Markdown is the only fully implemented
-# renderer for this MVP (24.3); pdf/excel are prepared extension points
-# (engine/report/exporters.py) per 18.1's "PDF/Excel export 준비".
+# never hardcodes structure. Markdown and HTML are both fully implemented
+# (engine/report/markdown.py, engine/report/html.py); pdf/excel are
+# prepared extension points (engine/report/exporters.py) per 18.1's
+# "PDF/Excel export 준비".
 
-output_formats: [markdown, json]
+output_formats: [markdown, html, json]
 
 sections:
   - executive_summary
@@ -15,6 +16,7 @@ sections:
   - personal_analysis
   - asset_impact
   - scenario_analysis
+  - discussion_points
   - action_plan
   - economic_calendar
   - personal_executive_brief

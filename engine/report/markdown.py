@@ -76,9 +76,18 @@ def _regime_judgement(payload: dict) -> str:
         f"일관성 {macro['confidence_components']['indicator_consistency']}, 안정성 {macro['confidence_components']['trend_stability']})",
         "- Warning: " + (", ".join(macro["warnings"]) if macro["warnings"] else "없음"),
     ]
-    if macro.get("us_investment_clock"):
-        c = macro["us_investment_clock"]
-        lines.append(f"- 참고(미국 Investment Clock): {c['phase_kr']} — 유리 자산군 {c['favored_asset_kr']}")
+    clock = macro.get("us_investment_clock")
+    if clock:
+        staleness = " (실시간)" if clock.get("source") == "live" else " (최근 저장값, 실시간 조회 불가)"
+        lines.append(
+            f"- 참고(미국 Investment Clock{staleness}): **{clock['phase_kr']}** 국면 — "
+            f"유리 자산군 **{clock['favored_asset_kr']}** (기준일 {clock['as_of']}, "
+            f"성장 {clock['growth_signal']} / 물가 {clock['inflation_signal']})"
+        )
+        if clock.get("note"):
+            lines.append(f"  - {clock['note']}")
+    else:
+        lines.append("- 참고(미국 Investment Clock): 데이터 없음 (Pending)")
     return "\n".join(lines)
 
 
@@ -94,7 +103,7 @@ def _indicator_deep_dive(payload: dict) -> str:
         trend_word = {1: "개선", 0: "보합", -1: "악화"}.get(row["score"], "N/A")
         lines.append(f"- [사실] 현재 값 {_fmt(row['current'])} (출처: {row['source']}).")
         lines.append(f"- [해석] 전월 대비 추세는 '{trend_word}'이며 규칙엔진 점수는 {row['score']}이다.")
-        lines.append("- [행동] Action Plan 항목 참고 — 관련 조치가 있으면 9절에 반영됨.")
+        lines.append("- [행동] Action Plan 항목 참고 — 관련 조치가 있으면 10절에 반영됨.")
     return "\n".join(lines)
 
 
@@ -116,7 +125,7 @@ def _personal_analysis(payload: dict) -> str:
         f"- 채권 관점: Bond Score {_fmt(p['bond_score'], '점')}.",
         f"- 환율 관점: FX Score {_fmt(p['fx_score'], '점')}.",
         f"- 공공분양 관점: Housing Readiness {_fmt(p['housing_readiness_score'], '점')}.",
-        "- 출장/여행 관점: 9절 경제 캘린더 및 Action Plan의 환전 관련 항목 참고.",
+        "- 출장/여행 관점: 11절 경제 캘린더 및 Action Plan의 환전 관련 항목 참고.",
     ]
     return "\n".join(lines)
 
@@ -149,8 +158,21 @@ def _scenario_analysis(payload: dict) -> str:
     return "\n".join(lines)
 
 
+def _discussion_points(payload: dict) -> str:
+    points = payload.get("discussion_points", [])
+    lines = ["## 9. 논의가 필요한 결정 사항"]
+    if not points:
+        lines.append("- 이번 달은 별도로 논의가 필요한 항목이 없습니다.")
+        return "\n".join(lines)
+    for p in points:
+        lines.append(f"### {p['topic']}")
+        lines.append(f"- [사실] {p['context']}")
+        lines.append(f"- [질문] {p['question']}")
+    return "\n".join(lines)
+
+
 def _action_plan(payload: dict) -> str:
-    lines = ["## 9. 이번 달 Action Plan"]
+    lines = ["## 10. 이번 달 Action Plan"]
     tiers = [
         (5, "★★★★★ 반드시 확인 / 실행"), (4, "★★★★☆ 검토"), (3, "★★★☆☆ 관찰"),
         (2, "★★☆☆☆ 참고"), (1, "보류"),
@@ -175,7 +197,7 @@ def _action_plan(payload: dict) -> str:
 
 
 def _calendar(payload: dict) -> str:
-    lines = ["## 10. 경제 캘린더", "", "| 날짜 | 이벤트 | 중요도 | 사용자 영향 |", "|---|---|---|---|"]
+    lines = ["## 11. 경제 캘린더", "", "| 날짜 | 이벤트 | 중요도 | 사용자 영향 |", "|---|---|---|---|"]
     for ev in payload["calendar"]:
         lines.append(f"| {ev['date']} | {ev['name']} | {ev['importance_label']} | {ev['priority_score']}점 |")
     if not payload["calendar"]:
@@ -186,7 +208,7 @@ def _calendar(payload: dict) -> str:
 def _personal_brief(payload: dict) -> str:
     b = payload["personal_executive_brief"]
     lines = [
-        "## 11. Personal Executive Brief",
+        "## 12. Personal Executive Brief",
         f"- 이번 달 한 줄 진단: {b['one_line_diagnosis']}",
         "- 자산별 영향 요약: " + ", ".join(f"{k}={v}" for k, v in b["asset_summary"].items() if v),
         "- 중요한 이벤트 TOP 5: " + ("; ".join(b["top_events"]) if b["top_events"] else "없음"),
@@ -209,7 +231,7 @@ def render_markdown(payload: dict) -> str:
     sections = [
         _executive_summary(payload), _monthly_key_changes(payload), _macro_dashboard(payload),
         _regime_judgement(payload), _indicator_deep_dive(payload), _personal_analysis(payload),
-        _asset_impact(payload), _scenario_analysis(payload), _action_plan(payload),
-        _calendar(payload), _personal_brief(payload), _appendix(payload),
+        _asset_impact(payload), _scenario_analysis(payload), _discussion_points(payload),
+        _action_plan(payload), _calendar(payload), _personal_brief(payload), _appendix(payload),
     ]
     return header + "\n\n" + "\n\n".join(sections) + "\n"
