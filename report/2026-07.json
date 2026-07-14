@@ -2,21 +2,23 @@
   "report_month": "2026-07",
   "report_readiness": "insufficient",
   "macro": {
-    "regime": "Early Expansion",
+    "regime": "Expansion",
     "previous_regime": "Early Expansion",
-    "transition": null,
-    "score": 1,
-    "weighted_score": 1.5,
+    "transition": "downgrade",
+    "score": 2,
+    "weighted_score": 2.3,
     "score_band": "unbalanced_expansion",
     "score_band_label": "불균형 확장",
-    "confidence": 70.0,
+    "confidence": 74.0,
     "confidence_components": {
-      "data_freshness": 20.0,
+      "data_freshness": 50.0,
       "source_quality": 100.0,
-      "indicator_consistency": 100.0,
+      "indicator_consistency": 80.0,
       "trend_stability": 70.0
     },
-    "warnings": [],
+    "warnings": [
+      "장단기 금리 역전 심화"
+    ],
     "changes": [
       {
         "indicator": "all",
@@ -31,9 +33,9 @@
       "favored_asset_kr": "원자재",
       "growth_signal": "rising",
       "inflation_signal": "rising",
-      "as_of": "2026-05-01",
-      "source": "stale_history",
-      "note": "실시간 조회 불가 — 2026-07-14 실행분(마지막 저장값) 사용. GitHub Pages 활성화 시 https://<github계정>.github.io/<저장소명>/ 에서 매일 갱신되는 대시보드로 확인 가능"
+      "as_of": "2026-06-01",
+      "source": "live",
+      "note": "GitHub Pages 활성화 시 https://<github계정>.github.io/<저장소명>/ 에서 매일 갱신되는 대시보드로 확인 가능"
     }
   },
   "macro_dashboard": [
@@ -43,7 +45,7 @@
       "previous": null,
       "trend": "N/A",
       "score": null,
-      "status": "pending",
+      "status": "source_error",
       "source": null
     },
     {
@@ -52,7 +54,7 @@
       "previous": null,
       "trend": "N/A",
       "score": null,
-      "status": "pending",
+      "status": "source_error",
       "source": null
     },
     {
@@ -61,7 +63,7 @@
       "previous": null,
       "trend": "N/A",
       "score": null,
-      "status": "pending",
+      "status": "source_error",
       "source": null
     },
     {
@@ -84,12 +86,12 @@
     },
     {
       "indicator": "경상수지 (3개월 평균, 억달러)",
-      "current": null,
+      "current": 38607.4,
       "previous": null,
-      "trend": "N/A",
-      "score": null,
-      "status": "pending",
-      "source": null
+      "trend": "▲",
+      "score": 1,
+      "status": "ok",
+      "source": "한국은행 ECOS"
     },
     {
       "indicator": "CPI",
@@ -97,17 +99,17 @@
       "previous": null,
       "trend": "N/A",
       "score": null,
-      "status": "pending",
+      "status": "source_error",
       "source": null
     },
     {
       "indicator": "PPI",
-      "current": null,
+      "current": 129.82,
       "previous": null,
-      "trend": "N/A",
-      "score": null,
-      "status": "pending",
-      "source": null
+      "trend": "▼",
+      "score": -1,
+      "status": "ok",
+      "source": "한국은행 ECOS"
     },
     {
       "indicator": "한국 실업률 (3개월 평균 변화, %p)",
@@ -115,88 +117,88 @@
       "previous": null,
       "trend": "N/A",
       "score": null,
-      "status": "pending",
+      "status": "source_error",
       "source": null
     },
     {
       "indicator": "미국 고용 + 글로벌 경기 (composite -1~+1)",
-      "current": null,
+      "current": 1.0,
       "previous": null,
-      "trend": "N/A",
-      "score": null,
-      "status": "pending",
+      "trend": "▲",
+      "score": 1,
+      "status": "ok",
       "source": "FRED"
     }
   ],
   "personal": {
-    "investment_environment_score": 73.1,
+    "investment_environment_score": 60.7,
     "investment_biases": {
-      "stock_bias": "확대",
-      "etf_bias": "확대",
+      "stock_bias": "소폭 확대",
+      "etf_bias": "소폭 확대",
       "bond_bias": "축소/방어",
       "cash_bias": "축소/방어"
     },
     "semiconductor_score": 79.6,
     "semiconductor_band": "긍정",
-    "bond_score": 45.0,
-    "fx_score": null,
+    "bond_score": 25.9,
+    "fx_score": 39.9,
     "housing_readiness_score": 60.4,
     "etf_fit": [
       {
         "ticker": "0183J0.KS",
         "name": "TIGER 미국우주테크",
         "bucket": "space_tech",
-        "fit_score": 64.4,
+        "fit_score": 48.7,
         "data_status": "ok"
       },
       {
         "ticker": "371460.KS",
         "name": "TIGER 차이나전기차SOLACTIVE",
         "bucket": "ev_china",
-        "fit_score": 64.4,
+        "fit_score": 48.7,
         "data_status": "ok"
       },
       {
         "ticker": "411060.KS",
         "name": "ACE KRX금현물",
         "bucket": "gold",
-        "fit_score": 64.4,
+        "fit_score": 48.7,
         "data_status": "ok"
       },
       {
         "ticker": "455850.KS",
         "name": "SOL AI반도체소부장",
         "bucket": "semiconductor",
-        "fit_score": 75.5,
+        "fit_score": 57.6,
         "data_status": "ok"
       },
       {
         "ticker": "469150.KS",
         "name": "ACE AI반도체TOP3+",
         "bucket": "semiconductor",
-        "fit_score": 75.5,
+        "fit_score": 57.6,
         "data_status": "ok"
       },
       {
         "ticker": "475380.KS",
         "name": "RISE 글로벌리얼티인컴",
         "bucket": "reit_income",
-        "fit_score": 64.4,
+        "fit_score": 48.7,
         "data_status": "ok"
       },
       {
         "ticker": "476070.KS",
         "name": "KODEX 글로벌비만치료제TOP2 Plus",
         "bucket": "healthcare_theme",
-        "fit_score": 64.4,
+        "fit_score": 48.7,
         "data_status": "ok"
       }
     ]
   },
   "assets": {
     "stocks": {
-      "score": 74.5,
-      "stars": "★★★★☆",
+      "score": 64.8,
+      "stars": "★★★☆☆",
       "data_status": "ok",
       "detail": [
         "SK하이닉스",
@@ -209,64 +211,64 @@
       ]
     },
     "etf": {
-      "score": 67.6,
-      "stars": "★★★☆☆",
+      "score": 51.2,
+      "stars": "★★☆☆☆",
       "data_status": "ok",
       "detail": [
         {
           "ticker": "0183J0.KS",
           "name": "TIGER 미국우주테크",
           "bucket": "space_tech",
-          "fit_score": 64.4,
+          "fit_score": 48.7,
           "data_status": "ok"
         },
         {
           "ticker": "371460.KS",
           "name": "TIGER 차이나전기차SOLACTIVE",
           "bucket": "ev_china",
-          "fit_score": 64.4,
+          "fit_score": 48.7,
           "data_status": "ok"
         },
         {
           "ticker": "411060.KS",
           "name": "ACE KRX금현물",
           "bucket": "gold",
-          "fit_score": 64.4,
+          "fit_score": 48.7,
           "data_status": "ok"
         },
         {
           "ticker": "455850.KS",
           "name": "SOL AI반도체소부장",
           "bucket": "semiconductor",
-          "fit_score": 75.5,
+          "fit_score": 57.6,
           "data_status": "ok"
         },
         {
           "ticker": "469150.KS",
           "name": "ACE AI반도체TOP3+",
           "bucket": "semiconductor",
-          "fit_score": 75.5,
+          "fit_score": 57.6,
           "data_status": "ok"
         },
         {
           "ticker": "475380.KS",
           "name": "RISE 글로벌리얼티인컴",
           "bucket": "reit_income",
-          "fit_score": 64.4,
+          "fit_score": 48.7,
           "data_status": "ok"
         },
         {
           "ticker": "476070.KS",
           "name": "KODEX 글로벌비만치료제TOP2 Plus",
           "bucket": "healthcare_theme",
-          "fit_score": 64.4,
+          "fit_score": 48.7,
           "data_status": "ok"
         }
       ]
     },
     "bond": {
-      "score": 45.0,
-      "stars": "★★☆☆☆",
+      "score": 25.9,
+      "stars": "★☆☆☆☆",
       "data_status": "ok",
       "detail": [
         {
@@ -279,8 +281,8 @@
       ]
     },
     "cash": {
-      "score": 100.0,
-      "stars": "★★★★★",
+      "score": 55.0,
+      "stars": "★★★☆☆",
       "data_status": "ok",
       "detail": {
         "krw": 20000000,
@@ -328,14 +330,14 @@
       ]
     },
     "fx_exposure": {
-      "score": null,
-      "stars": null,
-      "data_status": "pending",
+      "score": 39.9,
+      "stars": "★☆☆☆☆",
+      "data_status": "ok",
       "detail": {
-        "usdkrw_change_pct_3m": null,
-        "dollar_index_change_pct_3m": null,
-        "kr_us_rate_differential_pct": null,
-        "us_fed_funds_change_bp_3m": null
+        "usdkrw_change_pct_3m": 1.61,
+        "dollar_index_change_pct_3m": 1.35,
+        "kr_us_rate_differential_pct": -1.13,
+        "us_fed_funds_change_bp_3m": -1.0
       }
     }
   },
@@ -385,9 +387,9 @@
         "destination_country": "US",
         "departure_date": "2026-09-15",
         "score_kind": "trip_readiness",
-        "score": 80.0,
+        "score": 55.3,
         "factors": {
-          "fx_favorability": null,
+          "fx_favorability": 39.9,
           "cost_risk_inverse": null,
           "lead_time_readiness": 80.0
         },
@@ -399,9 +401,9 @@
         "destination_country": "JP",
         "departure_date": "2026-10-03",
         "score_kind": "travel_timing",
-        "score": 70.0,
+        "score": 51.2,
         "factors": {
-          "fx_favorability": null,
+          "fx_favorability": 39.9,
           "season_favorability": 70.0,
           "airfare_hotel_trend": null
         },
@@ -412,20 +414,20 @@
   },
   "scenarios": {
     "base": {
-      "probability": 55,
-      "premise": "현재 국면(Early Expansion)과 반도체 업황(긍정)의 추세가 유지된다.",
+      "probability": 35,
+      "premise": "현재 국면(Expansion)과 반도체 업황(긍정)의 추세가 유지된다.",
       "expected_change": "지표가 현재 범위 내에서 등락하며 국면 전환 신호는 제한적.",
-      "user_impact": "Investment Environment Score 73.1점 수준의 배분 유지가 합리적."
+      "user_impact": "Investment Environment Score 60.7점 수준의 배분 유지가 합리적."
     },
     "bull": {
-      "probability": 25,
-      "premise": "상향 신호(semiconductor_strong)가 강화된다.",
+      "probability": 30,
+      "premise": "상향 신호(semiconductor_strong, us_employment_improving)가 강화된다.",
       "expected_change": "수출/반도체 개선과 물가 안정이 동반되며 국면이 한 단계 상향될 가능성.",
       "user_impact": "주식/ETF 비중 확대, 반도체/AI 인프라 비중 우선순위 상향을 검토할 수 있다."
     },
     "bear": {
-      "probability": 20,
-      "premise": "하향/경고 신호(잠재 리스크)가 현실화된다.",
+      "probability": 35,
+      "premise": "하향/경고 신호(ppi_sustained_high, rates_rising, 장단기 금리 역전 심화)가 현실화된다.",
       "expected_change": "수출 둔화 또는 물가 재상승으로 국면이 한 단계 하향될 가능성.",
       "user_impact": "현금/채권 비중 확대, 청약·출장 자금 유동성 우선 확보가 합리적."
     },
@@ -448,6 +450,28 @@
       "invalid_condition": "공고가 취소되거나 자금 목표가 조정되면 보류.",
       "recheck": "2026-08-11 1개월 전.",
       "category": "liquidity_survival",
+      "conflict_note": null
+    },
+    {
+      "priority": 4,
+      "priority_label": "★★★★☆ 검토 필요",
+      "priority_score": 74.2,
+      "title": "경기 국면 강등 배경 점검 (Early Expansion → Expansion)",
+      "reason": "11.8 강등 규칙 조건이 2개 이상 충족되어 국면이 한 단계 하향되었다.",
+      "invalid_condition": "다음 달 상향 조건(11.10) 충족 시 판단 재검토.",
+      "recheck": "다음 정기 리포트.",
+      "category": "macro_risk",
+      "conflict_note": null
+    },
+    {
+      "priority": 4,
+      "priority_label": "★★★★☆ 검토 필요",
+      "priority_score": 73.0,
+      "title": "장단기 금리 역전 심화 관련 지표 재확인",
+      "reason": "11.9 즉시 경고 규칙에 해당하는 신호(장단기 금리 역전 심화)가 감지되었다.",
+      "invalid_condition": "다음 달 지표에서 해당 신호가 해소되면 경고 해제.",
+      "recheck": "다음 정기 리포트(익월) 또는 관련 지표 발표 직후.",
+      "category": "macro_risk",
       "conflict_note": null
     },
     {
@@ -510,7 +534,7 @@
       "priority_label": "★★★☆☆ 관찰 필요",
       "priority_score": 58.8,
       "title": "주식/ETF 비중 확대 검토",
-      "reason": "Investment Environment Score 73.1점 — 거시/반도체 환경이 우호적.",
+      "reason": "Investment Environment Score 60.7점 — 거시/반도체 환경이 우호적.",
       "invalid_condition": "Investment Environment Score가 20점 이상 하락하면 보류.",
       "recheck": "다음 정기 리포트.",
       "category": "investment_opportunity",
@@ -530,6 +554,28 @@
     {
       "priority": 2,
       "priority_label": "★★☆☆☆ 참고",
+      "priority_score": 52.8,
+      "title": "미국 출장 (EXAMPLE) 분할 환전 검토",
+      "reason": "미국 출장 (EXAMPLE): 환전 유리도 55.3점으로 낮지만 일정이 확정되어 있어 환전을 전면 보류하기보다 분할 환전으로 리스크를 분산하는 것이 합리적이다.",
+      "invalid_condition": "출국일 이전 환율이 추가로 5% 이상 불리하게 움직이면 재검토.",
+      "recheck": "2026-09-15 2주 전.",
+      "category": "liquidity_survival",
+      "conflict_note": null
+    },
+    {
+      "priority": 2,
+      "priority_label": "★★☆☆☆ 참고",
+      "priority_score": 52.8,
+      "title": "일본 여행 (EXAMPLE) 분할 환전 검토",
+      "reason": "일본 여행 (EXAMPLE): 환전 유리도 51.2점으로 낮지만 일정이 확정되어 있어 환전을 전면 보류하기보다 분할 환전으로 리스크를 분산하는 것이 합리적이다.",
+      "invalid_condition": "출국일 이전 환율이 추가로 5% 이상 불리하게 움직이면 재검토.",
+      "recheck": "2026-10-03 2주 전.",
+      "category": "travel_discretionary",
+      "conflict_note": null
+    },
+    {
+      "priority": 2,
+      "priority_label": "★★☆☆☆ 참고",
       "priority_score": 52.2,
       "title": "미국 비농업 고용(NFP) 발표 확인 (2026-08-07)",
       "reason": "우선순위 점수 62.2점, ★★★★☆ — D-24.",
@@ -541,23 +587,12 @@
     {
       "priority": 2,
       "priority_label": "★★☆☆☆ 참고",
-      "priority_score": 46.8,
-      "title": "미국 출장 (EXAMPLE) 환전 실행 검토",
-      "reason": "미국 출장 (EXAMPLE): 환전 유리도 80.0점 — 현재 환율/시점이 상대적으로 유리.",
-      "invalid_condition": "출국일 이전 환율이 추가로 5% 이상 불리하게 움직이면 재검토.",
-      "recheck": "2026-09-15 2주 전.",
-      "category": "liquidity_survival",
-      "conflict_note": null
-    },
-    {
-      "priority": 2,
-      "priority_label": "★★☆☆☆ 참고",
-      "priority_score": 46.8,
-      "title": "일본 여행 (EXAMPLE) 환전 실행 검토",
-      "reason": "일본 여행 (EXAMPLE): 환전 유리도 70.0점 — 현재 환율/시점이 상대적으로 유리.",
-      "invalid_condition": "출국일 이전 환율이 추가로 5% 이상 불리하게 움직이면 재검토.",
-      "recheck": "2026-10-03 2주 전.",
-      "category": "travel_discretionary",
+      "priority_score": 44.8,
+      "title": "채권 신규 매수 보류 및 만기 재투자 방식 재검토",
+      "reason": "Bond Score 25.9점 — 금리/실질금리 매력도가 낮은 국면.",
+      "invalid_condition": "실질금리 매력도 회복 또는 성장 둔화 신호 확산 시 재검토.",
+      "recheck": "다음 금통위/FOMC 이후.",
+      "category": "investment_opportunity",
       "conflict_note": null
     }
   ],
@@ -654,14 +689,14 @@
     }
   ],
   "personal_executive_brief": {
-    "one_line_diagnosis": "Early Expansion 국면(총점 1, 신뢰도 70.0점) — 반도체 긍정",
+    "one_line_diagnosis": "Expansion 국면(총점 2, 신뢰도 74.0점) — 반도체 긍정",
     "asset_summary": {
-      "stocks": "★★★★☆",
-      "etf": "★★★☆☆",
-      "bond": "★★☆☆☆",
-      "cash": "★★★★★",
+      "stocks": "★★★☆☆",
+      "etf": "★★☆☆☆",
+      "bond": "★☆☆☆☆",
+      "cash": "★★★☆☆",
       "subscription_fund": "★★★☆☆",
-      "fx_exposure": null
+      "fx_exposure": "★☆☆☆☆"
     },
     "top_events": [
       "SK hynix / Micron 실적발표 (2026-07-24)",
@@ -675,7 +710,8 @@
   "appendix": {
     "sources": [
       "FRED",
-      "산업통상자원부 (수동 입력)"
+      "산업통상자원부 (수동 입력)",
+      "한국은행 ECOS"
     ],
     "glossary": {
       "Regime": "경기 국면 — Recovery/Early Expansion/Expansion/Late Expansion/Slowdown/Recession 순환.",
