@@ -32,6 +32,10 @@ See also: [SK하이닉스 본주·ADR 차트 비교 (2026-07-13)](sk-hynix-adr-k
 — 차트 실측 결과 ADR도 동반 급락 중이어서 위 "ADR 괴리율 해소" 논리에 대한
 반증이 발견되었다.
 
+이 자료가 말하는 "펀더멘탈은 탄탄한데 하락은 수급 요인" 구도는
+[펀더멘털 불변 vs 심리·수급발 디레이팅](../concepts/fundamentals-vs-sentiment-derating.md)
+개념 페이지로 별도 정리했다.
+
 ## Sources
 
 - [sources/sk-hynix-rebound-analysis-2026-07-13.md](../../sources/sk-hynix-rebound-analysis-2026-07-13.md)

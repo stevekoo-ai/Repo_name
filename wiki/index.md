@@ -17,4 +17,4 @@ Catalog of every page in the wiki. See `../CLAUDE.md` for conventions.
 
 ### concepts
 
-(none yet)
+- [펀더멘털 불변 vs 심리·수급발 디레이팅](concepts/fundamentals-vs-sentiment-derating.md) — 실적은 멀쩡한데 주가만 심리·수급으로 눌리는 패턴, SK하이닉스가 현재진행형 사례

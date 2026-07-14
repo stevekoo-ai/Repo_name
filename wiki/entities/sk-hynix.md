@@ -45,10 +45,15 @@ tags: [sk-hynix, semiconductor, stock, adr]
 비중이 커서, 투자자산뿐 아니라 소득도 이 회사 실적에 연동되어 있다 —
 투자·고용 이중 집중 리스크.
 
+이 하락은 실적 훼손이 아니라 심리·수급 요인이 주도하는 것으로 진단되고 있어,
+[펀더멘털 불변 vs 심리·수급발 디레이팅](../concepts/fundamentals-vs-sentiment-derating.md)
+개념의 현재 진행형 사례로 볼 수 있다.
+
 ## Sources
 
 - [SK하이닉스 반등 전망 분석 (2026-07-13)](../summaries/sk-hynix-rebound-analysis-2026-07-13.md)
 - [SK하이닉스 본주·ADR 차트 비교 (2026-07-13)](../summaries/sk-hynix-adr-krw-chart-comparison-2026-07-13.md)
+- [펀더멘털 불변 vs 심리·수급발 디레이팅](../concepts/fundamentals-vs-sentiment-derating.md)
 - [나의 투자 포트폴리오](my-portfolio.md)
 - [사용자 프로필](user-profile.md)
 - [sources/sk-hynix-rebound-analysis-2026-07-13.md](../../sources/sk-hynix-rebound-analysis-2026-07-13.md)
