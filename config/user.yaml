@@ -44,7 +44,7 @@ housing:
   target_type: public_sale
   preferred_size: "84m2+"
   priority_regions: ["세종 (플랫폼시티)", "성남/판교", "위례"]  # EXAMPLE — 실제 희망 지역으로 교체
-  subscription_account_start: "2015-01-01"  # EXAMPLE — 실제 청약저축 가입일로 교체
+  subscription_account_start: "2005-11-03"  # REAL — 국민은행, config/portfolio.yaml subscription_savings와 동일
   subscription_priority_strategy: "일반공급 무주택 회차 우선, 국민주택 84㎡ 이상 목표"  # EXAMPLE
   moveout_deadline: null  # EXAMPLE — 확정되면 날짜 입력
 

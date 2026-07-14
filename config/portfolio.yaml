@@ -191,7 +191,14 @@ bonds:
     face_value: 10000000     # EXAMPLE
     maturity: "2033-06-30"
 
+# 주택청약종합저축 — REAL, 2026-07-14 기준 (config/user.yaml
+# housing.subscription_account_start와 account_start 동일하게 유지할 것).
 subscription_savings:
-  balance_krw: 15000000       # EXAMPLE — 주택청약종합저축 잔액
-  monthly_contribution_krw: 250000  # EXAMPLE
-  account_start: "2015-01-01"       # EXAMPLE, config/user.yaml housing.subscription_account_start와 동일 유지
+  bank: "국민은행"
+  account_start: "2005-11-03"
+  balance_krw: 28050000
+  monthly_contribution_krw: 250000        # 납입인정 최고금액
+  contribution_count: 249                 # 2026-07 납입분까지 누적 회차
+  contribution_count_as_of: "2026-07"
+  max_recognized_payment: true
+  rate_increased_from: "2024-11"          # 229회차부터 25만원으로 상향
