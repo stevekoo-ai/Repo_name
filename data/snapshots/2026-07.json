@@ -1,0 +1,170 @@
+{
+  "macro": {
+    "regime": "Early Expansion",
+    "previous_regime": "Early Expansion",
+    "transition": null,
+    "score_band": "unbalanced_expansion",
+    "score_band_label": "불균형 확장",
+    "scores": {
+      "raw_score": 1,
+      "weighted_score": 1.5,
+      "scored_count": 2,
+      "total_count": 10,
+      "coverage_pct": 20.0
+    },
+    "confidence": {
+      "confidence": 70.0,
+      "components": {
+        "data_freshness": 20.0,
+        "source_quality": 100.0,
+        "indicator_consistency": 100.0,
+        "trend_stability": 70.0
+      }
+    },
+    "warnings_kr": [],
+    "downgrade_signals": [],
+    "upgrade_signals": [
+      "semiconductor_strong"
+    ],
+    "changes": [
+      {
+        "indicator": "all",
+        "message": "이전 스냅샷 없음 — 이번 달이 최초 기록",
+        "direction": "n/a"
+      }
+    ],
+    "us_investment_clock": {
+      "phase": "Overheat",
+      "phase_kr": "과열",
+      "favored_asset": "Commodities",
+      "favored_asset_kr": "원자재",
+      "growth_signal": "rising",
+      "inflation_signal": "rising",
+      "as_of": "2026-05-01",
+      "source": "stale_history",
+      "note": "실시간 조회 불가 — 2026-07-14 실행분(마지막 저장값) 사용. GitHub Pages 활성화 시 https://<github계정>.github.io/<저장소명>/ 에서 매일 갱신되는 대시보드로 확인 가능"
+    },
+    "readings": {
+      "gdp": {
+        "value": null,
+        "score": null,
+        "weight": 1.0,
+        "status": "pending",
+        "label": "실질 GDP 성장률",
+        "source": null,
+        "fields": {
+          "qoq": null
+        },
+        "note": "ECOS_API_KEY not set — register a free key at ecos.bok.or.kr"
+      },
+      "industrial_production": {
+        "value": null,
+        "score": null,
+        "weight": 1.0,
+        "status": "pending",
+        "label": "전산업생산지수",
+        "source": null,
+        "fields": {
+          "mom": null
+        },
+        "note": "KOSIS_API_KEY not set — register a free key at kosis.kr/openapi"
+      },
+      "retail_sales": {
+        "value": null,
+        "score": null,
+        "weight": 0.8,
+        "status": "pending",
+        "label": "소매판매",
+        "source": null,
+        "fields": {
+          "mom": null
+        },
+        "note": "KOSIS_API_KEY not set — register a free key at kosis.kr/openapi"
+      },
+      "exports": {
+        "value": 9.1,
+        "score": 0,
+        "weight": 1.0,
+        "status": "ok",
+        "label": "총수출 증가율",
+        "source": "산업통상자원부 (수동 입력)",
+        "fields": {
+          "yoy": 9.1
+        },
+        "note": null
+      },
+      "semiconductor_exports": {
+        "value": 24.7,
+        "score": 1,
+        "weight": 1.5,
+        "status": "ok",
+        "label": "반도체 수출 증가율",
+        "source": "산업통상자원부 (수동 입력)",
+        "fields": {
+          "yoy": 24.7
+        },
+        "note": null
+      },
+      "current_account": {
+        "value": null,
+        "score": null,
+        "weight": 0.8,
+        "status": "pending",
+        "label": "경상수지 (3개월 평균, 억달러)",
+        "source": null,
+        "fields": {
+          "avg_3m": null
+        },
+        "note": "ECOS_API_KEY not set — register a free key at ecos.bok.or.kr"
+      },
+      "cpi": {
+        "value": null,
+        "score": null,
+        "weight": 1.0,
+        "status": "pending",
+        "label": "CPI",
+        "source": null,
+        "fields": {
+          "yoy": null
+        },
+        "note": "KOSIS_API_KEY not set — register a free key at kosis.kr/openapi"
+      },
+      "ppi": {
+        "value": null,
+        "score": null,
+        "weight": 1.0,
+        "status": "pending",
+        "label": "PPI",
+        "source": null,
+        "fields": {
+          "yoy": null
+        },
+        "note": "ECOS_API_KEY not set — register a free key at ecos.bok.or.kr"
+      },
+      "unemployment": {
+        "value": null,
+        "score": null,
+        "weight": 0.8,
+        "status": "pending",
+        "label": "한국 실업률 (3개월 평균 변화, %p)",
+        "source": null,
+        "fields": {
+          "avg_3m_change": null
+        },
+        "note": "KOSIS_API_KEY not set — register a free key at kosis.kr/openapi"
+      },
+      "us_global": {
+        "value": null,
+        "score": null,
+        "weight": 1.0,
+        "status": "pending",
+        "label": "미국 고용 + 글로벌 경기 (composite -1~+1)",
+        "source": "FRED",
+        "fields": {},
+        "note": null
+      }
+    }
+  },
+  "month": "2026-07",
+  "saved_at": "2026-07-14T15:20:05.188737+00:00"
+}

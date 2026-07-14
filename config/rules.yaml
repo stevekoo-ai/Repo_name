@@ -1,0 +1,228 @@
+# PEOS Rule configuration (Master Instruction 10, 11, 12, 13, 15).
+# All indicator score thresholds and engine weights live here so the code
+# never hardcodes a magic number (24.1/24.2). Calibrate this file, not the
+# engine modules, when tuning behavior.
+
+# ---------------------------------------------------------------------------
+# 11.4 Macro Core 10 — each indicator scores -1 / 0 / +1 from one computed
+# field (yoy / mom / qoq / avg_3m / composite). `weight` feeds 11.5's
+# Macro Weighted Score = Σ(indicator_score × weight).
+# ---------------------------------------------------------------------------
+macro:
+  gdp:
+    label: "실질 GDP 성장률"
+    weight: 1.0
+    field: qoq
+    fallback_field: yoy
+    positive: { gte: 0.8 }
+    neutral: { between: [0.0, 0.7] }
+    negative: { lt: 0.0 }
+
+  industrial_production:
+    label: "전산업생산지수"
+    weight: 1.0
+    field: mom
+    positive: { gte: 0.3 }
+    neutral: { between: [-0.2, 0.2] }
+    negative: { lte: -0.3 }
+
+  retail_sales:
+    label: "소매판매"
+    weight: 0.8
+    field: mom
+    positive: { gte: 0.3 }
+    neutral: { between: [-0.2, 0.2] }
+    negative: { lte: -0.3 }
+
+  exports:
+    label: "총수출 증가율"
+    weight: 1.0
+    field: yoy
+    positive: { gte: 10.0 }
+    neutral: { between: [0.0, 10.0] }
+    negative: { lt: 0.0 }
+
+  semiconductor_exports:
+    label: "반도체 수출 증가율"
+    weight: 1.5
+    field: yoy
+    positive: { gte: 20.0 }
+    neutral: { between: [0.0, 20.0] }
+    negative: { lt: 0.0 }
+
+  current_account:
+    label: "경상수지 (3개월 평균, 억달러)"
+    weight: 0.8
+    field: avg_3m
+    positive: { gte: 50 }
+    neutral: { between: [0.0, 50] }
+    negative: { lt: 0.0 }
+
+  cpi:
+    label: "CPI"
+    weight: 1.0
+    field: yoy
+    positive: { between: [1.5, 2.5] }
+    neutral: { between: [2.6, 3.0] }
+    negative: { gte: 3.1 }
+
+  ppi:
+    label: "PPI"
+    weight: 1.0
+    field: yoy
+    positive: { between: [0.0, 4.0] }
+    neutral: { between: [4.0, 6.0] }
+    negative: { gte: 6.0 }
+
+  unemployment:
+    label: "한국 실업률 (3개월 평균 변화, %p)"
+    weight: 0.8
+    field: avg_3m_change
+    positive: { lte: -0.05 }
+    neutral: { between: [-0.05, 0.15] }
+    negative: { gte: 0.2 }
+
+  us_global:
+    label: "미국 고용 + 글로벌 경기 (composite -1~+1)"
+    weight: 1.0
+    field: composite
+    positive: { gte: 0.34 }
+    neutral: { between: [-0.33, 0.33] }
+    negative: { lte: -0.34 }
+
+# 11.6 총점 기반 1차 판정 구간 (score bands) -> config/thresholds.yaml (score_bands)
+
+# 11.7 Regime cycle order, and the score-band -> regime starting point used
+# the first time a regime is initialized (no prior snapshot to transition from).
+regime:
+  cycle: [Recovery, "Early Expansion", Expansion, "Late Expansion", Slowdown, Recession]
+  persistence_months_required: 2
+  score_band_seed:
+    strong_expansion: "Late Expansion"
+    expansion: Expansion
+    unbalanced_expansion: "Early Expansion"
+    early_slowdown: Slowdown
+    slowdown: Slowdown
+    recession_warning: Recession
+
+  # 11.8 강등 규칙: 2개 이상 발생 시 1단계 강등
+  downgrade:
+    trigger_count: 2
+    signals: [export_slump, semiconductor_export_slump, industrial_production_decline_2m,
+              cpi_reaccelerating, ppi_sustained_high, fx_surge, rates_rising]
+
+  # 11.9 즉시 경고: 1개만 발생해도 Warning
+  warning:
+    trigger_count: 1
+    signals: [exports_negative, semiconductor_exports_negative, unemployment_surge,
+              current_account_deficit, us_employment_cooling, yield_curve_inversion_deepening]
+
+  # 11.10 상향 규칙: 3개 이상 만족 시 1단계 상향
+  upgrade:
+    trigger_count: 3
+    signals: [gdp_strong, exports_strong, semiconductor_strong, cpi_stable,
+              ppi_easing, rates_easing, us_employment_improving]
+
+# 11.11 Confidence Score 가중치
+confidence:
+  weights:
+    data_freshness: 0.30
+    source_quality: 0.25
+    indicator_consistency: 0.25
+    trend_stability: 0.20
+
+# ---------------------------------------------------------------------------
+# 12.4 Semiconductor Engine 가중치
+# ---------------------------------------------------------------------------
+semiconductor:
+  memory_cycle_score:
+    dram_price_trend: 0.30
+    nand_price_trend: 0.15
+    semiconductor_exports: 0.25
+    guidance_signal: 0.15
+    inventory_supply_signal: 0.15
+  ai_infrastructure_score:
+    ai_leader_earnings: 0.25   # NVIDIA / Broadcom 실적·가이던스
+    gpu_shipment: 0.20
+    ai_server_shipment: 0.20
+    csp_capex: 0.20
+    hbm_signal: 0.15
+  semiconductor_score:
+    memory_cycle_score: 0.50
+    ai_infrastructure_score: 0.30
+    kr_semiconductor_export_trend: 0.20
+
+# ---------------------------------------------------------------------------
+# 13.4 Investment Environment Score
+# ---------------------------------------------------------------------------
+investment_environment:
+  macro_score_normalized: 0.35
+  semiconductor_score: 0.35
+  liquidity_rate_condition: 0.15
+  risk_penalty_inverse: 0.15
+
+# 13.6 Bond Score
+bond:
+  rate_direction: 0.40
+  real_rate_attractiveness: 0.25
+  inflation_slowdown_signal: 0.20
+  growth_slowdown_signal: 0.15
+
+# 13.5 ETF Fit 평가 항목 가중치 (버킷별 적합도 산출에 사용)
+etf_fit:
+  cycle_sensitivity_fit: 0.30
+  semiconductor_ai_exposure_fit: 0.30
+  rate_sensitivity_fit: 0.20
+  defensive_need_fit: 0.20
+
+# 13.7 FX Score
+fx:
+  usdkrw_trend: 0.35
+  dollar_index_trend: 0.25
+  kr_us_rate_differential: 0.25
+  us_rate_direction: 0.15
+
+# 13.8 Housing Readiness Score
+housing:
+  eligibility_fit: 0.30
+  funding_readiness: 0.25
+  region_type_match: 0.20
+  timing_readiness: 0.15
+  competition_adjustment_inverse: 0.10
+
+# 13.10 Trip Readiness / 13.11 Travel Timing
+travel:
+  trip_readiness:
+    fx_favorability: 0.40
+    cost_risk_inverse: 0.35
+    lead_time_readiness: 0.25
+  travel_timing:
+    fx_favorability: 0.50
+    season_favorability: 0.30
+    airfare_hotel_trend: 0.20
+
+# 13.12 경제 일정 우선순위 계산 가중치
+calendar_priority:
+  user_relevance: 0.30
+  market_impact: 0.25
+  industry_impact: 0.20
+  time_urgency: 0.15
+  portfolio_impact: 0.10
+
+# ---------------------------------------------------------------------------
+# 15.3 Action Priority Score
+# ---------------------------------------------------------------------------
+action_priority:
+  user_relevance: 0.30
+  risk_level: 0.25
+  time_urgency: 0.20
+  portfolio_impact: 0.15
+  event_significance: 0.10
+
+# 15.6 Conflict Resolver 우선순위 (숫자가 낮을수록 우선)
+conflict_resolver_priority:
+  - liquidity_survival        # 현금/필수자금/청약자금/급한 환전
+  - macro_risk
+  - industry_cycle
+  - investment_opportunity
+  - travel_discretionary

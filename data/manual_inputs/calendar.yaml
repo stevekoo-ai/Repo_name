@@ -1,0 +1,59 @@
+# EXAMPLE economic calendar input (Master Instruction 13.12, 16.12).
+# Release *dates* for major indicators are public knowledge (BLS/BOK/FOMC
+# publish annual schedules) but there is no single free official calendar
+# API aggregating them across sources, so entries are curated here.
+# user_relevance/market_impact/industry_impact/portfolio_impact are
+# analyst-assigned importance in [0,100] reflecting this user's profile
+# (semiconductor/AI infra/memory focus, long-horizon macro-driven investor)
+# — recalibrate them if the persona changes.
+
+events:
+  - name: "미국 CPI 발표"
+    date: "2026-08-12"          # EXAMPLE
+    category: us_inflation
+    user_relevance: 90
+    market_impact: 95
+    industry_impact: 40
+    portfolio_impact: 80
+  - name: "FOMC 정례회의"
+    date: "2026-07-29"          # EXAMPLE
+    category: us_policy
+    user_relevance: 85
+    market_impact: 95
+    industry_impact: 40
+    portfolio_impact: 85
+  - name: "한국 수출입 동향 (반도체 포함)"
+    date: "2026-08-01"          # EXAMPLE
+    category: kr_trade
+    user_relevance: 100
+    market_impact: 70
+    industry_impact: 100
+    portfolio_impact: 90
+  - name: "한국은행 금융통화위원회"
+    date: "2026-08-14"          # EXAMPLE
+    category: kr_policy
+    user_relevance: 80
+    market_impact: 75
+    industry_impact: 30
+    portfolio_impact: 70
+  - name: "한국 CPI 발표"
+    date: "2026-08-05"          # EXAMPLE
+    category: kr_inflation
+    user_relevance: 75
+    market_impact: 70
+    industry_impact: 30
+    portfolio_impact: 65
+  - name: "미국 비농업 고용(NFP) 발표"
+    date: "2026-08-07"          # EXAMPLE
+    category: us_employment
+    user_relevance: 70
+    market_impact: 85
+    industry_impact: 35
+    portfolio_impact: 70
+  - name: "SK hynix / Micron 실적발표"
+    date: "2026-07-24"          # EXAMPLE
+    category: semiconductor_earnings
+    user_relevance: 100
+    market_impact: 60
+    industry_impact: 100
+    portfolio_impact: 95

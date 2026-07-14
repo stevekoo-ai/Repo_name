@@ -1,0 +1,71 @@
+# PEOS user_profile (Master Instruction 3.3).
+# Fields grounded in the persona description (3.1) are filled in directly.
+# Fields with no value given in the master instruction are filled with
+# clearly marked EXAMPLE placeholders so the schema is complete and the
+# pipeline is runnable end-to-end; replace the `# EXAMPLE` lines with real
+# values whenever you're ready — nothing else needs to change.
+#
+# This file is tracked in the (public) repo, so it intentionally holds only
+# non-identifying preference/strategy data. Identity-level PII (실명,
+# 생년월일, 거주지 주소, 자녀 학교명 등) lives in
+# data/manual_inputs/user_identity.yaml instead, which is gitignored —
+# see that file for the private profile detail and why it's split this way.
+
+profile_version: 1
+updated_at: "2026-07-14T00:00:00"
+
+job:
+  title: "반도체 기업 엔지니어"
+  company: "SK하이닉스"
+  industry: "semiconductor"
+  domains: ["차세대 메모리", "CXL", "AI Infrastructure", "Memory System"]
+  income_cycle_sensitivity: high
+  bonus_cycle_sensitivity: high
+  income_level: "high_ps_driven"   # 고소득, 성과급(PS) 영향 큼
+
+investment_style:
+  horizon: long_term
+  macro_driven: true
+  cycle_driven: true
+  data_driven: true
+  risk_tolerance: medium
+  rebalancing_rule: "분기 1회 점검, Investment Environment Score 20점 이상 변동 시 리밸런싱 검토"
+
+interest_priority:
+  semiconductor: 1.0
+  ai_infrastructure: 0.95
+  memory: 1.0
+  cxl: 0.85
+  cloud: 0.7
+  data_center: 0.75
+  etf: 0.6
+  bond: 0.6
+  housing: 0.7
+  fx: 0.65
+
+assets:
+  holdings_enabled: true
+  cash_tracking_enabled: true
+  portfolio_source: yaml   # see config/portfolio.yaml
+
+housing:
+  target_type: public_sale
+  target_complex: "플랫폼시티 공공분양"
+  status: waiting_for_announcement
+  preferred_size: "84m2+"
+  income_cap_preference: none          # 소득제한 없는 유형 우선
+  priority_regions: ["세종 플랫폼시티"]  # data/manual_inputs/subscription_notices.yaml의 region 표기와 동일하게 유지 (문자열 매칭용)
+  subscription_account_start: "2005-11-03"  # REAL — 국민은행, config/portfolio.yaml subscription_savings와 동일
+  subscription_priority_strategy: "저축총액(납입총액) 기준 경쟁 — 85㎡ 초과 일반공급, 소득제한 없는 84㎡ 이상 우선"
+  moveout_deadline: "2027-02-22"       # 현 거주지 전세 계약 만료일(갱신청구권 이미 사용) — 입주 전 임시 거주 필요
+
+travel:
+  business_trip_enabled: true
+  business_trip_regions: ["US", "JP"]  # EXAMPLE — 실제 출장 권역으로 교체
+  leisure_travel_enabled: true
+  fx_sensitivity: high
+
+reporting:
+  report_day: 1
+  alert_time: "08:00"
+  preferred_output: [markdown, dashboard]

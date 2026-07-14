@@ -1,0 +1,61 @@
+name: Monthly PEOS Report
+
+on:
+  schedule:
+    # 05일 08:00 KST 근처 실행 (config/schedule.yaml monthly_report과 동일)
+    - cron: "0 23 5 * *"
+  workflow_dispatch:
+    inputs:
+      month:
+        description: "리포트 대상 월 (YYYY-MM). 비워두면 실행 시점의 이번 달."
+        required: false
+        default: ""
+
+permissions:
+  contents: write
+
+concurrency:
+  group: monthly-peos-report
+  cancel-in-progress: false
+
+jobs:
+  run-peos:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run PEOS pipeline
+        env:
+          ECOS_API_KEY: ${{ secrets.ECOS_API_KEY }}
+          KOSIS_API_KEY: ${{ secrets.KOSIS_API_KEY }}
+          FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
+          BLS_API_KEY: ${{ secrets.BLS_API_KEY }}
+        run: |
+          if [ -n "${{ github.event.inputs.month }}" ]; then
+            python -m engine.report.run --month "${{ github.event.inputs.month }}"
+          else
+            python -m engine.report.run
+          fi
+
+      - name: Commit updated report and snapshot
+        run: |
+          git config user.name "peos-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add report/ data/snapshots/
+          if git diff --cached --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "chore: monthly PEOS report $(date -u +%Y-%m)"
+            git push
+          fi

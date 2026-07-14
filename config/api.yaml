@@ -1,0 +1,89 @@
+# PEOS data source registry (Master Instruction 8, 18.2).
+# No secrets live here — only which env var holds each source's key, and
+# where/how often to fetch. Missing keys degrade a source to Pending, they
+# never block the pipeline (7.9, 19.2).
+
+sources:
+  fred:
+    label: "FRED (Federal Reserve Economic Data)"
+    reliability_grade: 5
+    official: true
+    requires_key: false
+    env_key: FRED_API_KEY   # optional: only used as a fallback if the free CSV endpoint is blocked
+    base_url: "https://fred.stlouisfed.org/graph/fredgraph.csv"
+    api_url: "https://api.stlouisfed.org/fred/series/observations"
+
+  ecos:
+    label: "한국은행 ECOS"
+    reliability_grade: 5
+    official: true
+    requires_key: true
+    env_key: ECOS_API_KEY
+    base_url: "https://ecos.bok.or.kr/api"
+
+  kosis:
+    label: "통계청 KOSIS"
+    reliability_grade: 5
+    official: true
+    requires_key: true
+    env_key: KOSIS_API_KEY
+    base_url: "https://kosis.kr/openapi"
+
+  bls:
+    label: "US Bureau of Labor Statistics"
+    reliability_grade: 5
+    official: true
+    requires_key: false   # public v1 API works keyless at low rate limits
+    env_key: BLS_API_KEY  # optional v2 key raises the rate limit
+    base_url: "https://api.bls.gov/publicAPI/v2/timeseries/data"
+
+  motie:
+    label: "산업통상자원부 수출입 동향"
+    reliability_grade: 5
+    official: true
+    requires_key: false
+    env_key: null
+    base_url: null
+    note: "공식 API 미공개. 보도자료/K-stat 수치를 수동 입력(data/raw/motie)으로 반영."
+    manual_input: true
+
+  imf:
+    label: "IMF World Economic Outlook"
+    reliability_grade: 5
+    official: true
+    requires_key: false
+    env_key: null
+    base_url: "https://www.imf.org/external/datamapper/api/v1"
+
+  oecd:
+    label: "OECD Composite Leading Indicators"
+    reliability_grade: 5
+    official: true
+    requires_key: false
+    env_key: null
+    base_url: "https://sdmx.oecd.org/public/rest/data"
+
+  semiconductor_manual:
+    label: "반도체 가격/실적 수동 입력 (DRAM/NAND/HBM, Micron/SK hynix/TSMC IR 등)"
+    reliability_grade: 3
+    official: false
+    requires_key: false
+    manual_input: true
+    note: "7.3 반도체 특화 데이터 예외 정책 적용 — 공식성 한계를 메타데이터에 명시."
+
+  subscription_manual:
+    label: "청약홈/LH/GH/SH 공고 수동 입력"
+    reliability_grade: 4
+    official: true
+    requires_key: false
+    manual_input: true
+    note: "개인 대상 공식 API 미제공. 공고 정보는 data/raw/subscription 수동 입력."
+
+# Master Instruction 18.2 cache windows, in seconds.
+cache_ttl_seconds:
+  realtime_fx: 1800
+  bond_yield: 1800
+  market_price: 300
+  monthly_macro: 86400
+  quarterly_macro: 86400
+  default: 86400
