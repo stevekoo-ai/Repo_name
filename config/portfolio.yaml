@@ -1,7 +1,16 @@
 # PEOS portfolio holdings (Master Instruction 14.2, 13.4-13.9).
-# EXAMPLE values throughout — replace with real holdings. Structure and
-# field names must stay stable since engine/personal/portfolio.py reads
+# Structure and field names must stay stable since engine/personal reads
 # these keys directly.
+#
+# stocks/etf are REAL holdings as of 2026-07-14, provided directly by the
+# user from two brokerage accounts (일반 주식 계좌 + ISP 계좌). Tickers held
+# in both accounts (SK하이닉스, 삼성전자) are merged into one position here
+# (quantity summed, avg_price recomputed from combined purchase amount) —
+# PEOS scores total exposure per ticker, not per-account lots.
+# retirement_accounts (IRP/DC) are also REAL, kept in their own section
+# since they're locked until retirement (see that section's own note).
+# cash/bonds/subscription_savings below are still EXAMPLE placeholders —
+# not part of what was provided.
 
 portfolio_version: 1
 updated_at: "2026-07-14T00:00:00"
@@ -13,31 +22,151 @@ cash:
 stocks:
   - ticker: "000660.KS"
     name: "SK하이닉스"
-    quantity: 50            # EXAMPLE
-    avg_price: 180000
+    quantity: 138               # 일반계좌 119 + ISP 19
+    avg_price: 368804            # combined purchase amount 50,895,000 / 138
     sector: semiconductor_memory
   - ticker: "005930.KS"
     name: "삼성전자"
-    quantity: 30            # EXAMPLE
-    avg_price: 70000
+    quantity: 108                # ISP 계좌
+    avg_price: 187911
     sector: semiconductor_memory
+  - ticker: "080220.KQ"
+    name: "제주반도체"
+    quantity: 20                 # 일반계좌
+    avg_price: 91725
+    sector: semiconductor_memory
+  - ticker: "089860.KS"
+    name: "롯데렌탈"
+    quantity: 4                  # 일반계좌
+    avg_price: 59000
+    sector: consumer_services
+  - ticker: "316140.KS"
+    name: "우리금융지주"
+    quantity: 4                  # 일반계좌
+    avg_price: 26100
+    sector: financials
+  - ticker: "344860"             # 거래소 접미사(.KS/.KQ) 확인 필요
+    name: "이노진"
+    quantity: 615                # ISP 계좌
+    avg_price: 1613
+    sector: unclassified         # 업종 미확인 — 추측하지 않음, 필요 시 알려주세요
+  - ticker: "417010"             # 거래소 접미사(.KS/.KQ) 확인 필요
+    name: "나노팀"
+    quantity: 166                # ISP 계좌
+    avg_price: 6820
+    sector: unclassified         # 업종 미확인 — 추측하지 않음, 필요 시 알려주세요
 
 etf:
-  - ticker: "091160.KS"
-    name: "KODEX 반도체"
-    quantity: 100            # EXAMPLE
-    avg_price: 30000
+  - ticker: "0183J0.KS"
+    name: "TIGER 미국우주테크"
+    quantity: 225                # ISP 계좌
+    avg_price: 14064
+    bucket: space_tech
+  - ticker: "371460.KS"
+    name: "TIGER 차이나전기차SOLACTIVE"
+    quantity: 202                # ISP 계좌
+    avg_price: 10443
+    bucket: ev_china
+  - ticker: "411060.KS"
+    name: "ACE KRX금현물"
+    quantity: 113                # ISP 계좌
+    avg_price: 28916
+    bucket: gold
+  - ticker: "455850.KS"
+    name: "SOL AI반도체소부장"
+    quantity: 100                # ISP 계좌
+    avg_price: 27321
     bucket: semiconductor
-  - ticker: "SOXX"
-    name: "iShares Semiconductor ETF"
-    quantity: 10             # EXAMPLE
-    avg_price: 200
-    bucket: semiconductor_global
-  - ticker: "133690.KS"
-    name: "KODEX 미국나스닥100"
-    quantity: 40              # EXAMPLE
-    avg_price: 15000
-    bucket: ai_infrastructure
+  - ticker: "469150.KS"
+    name: "ACE AI반도체TOP3+"
+    quantity: 297                # ISP 계좌
+    avg_price: 17793
+    bucket: semiconductor
+  - ticker: "475380.KS"
+    name: "RISE 글로벌리얼티인컴"
+    quantity: 70                 # ISP 계좌
+    avg_price: 9978
+    bucket: reit_income
+  - ticker: "476070.KS"
+    name: "KODEX 글로벌비만치료제TOP2 Plus"
+    quantity: 440                # ISP 계좌
+    avg_price: 9341
+    bucket: healthcare_theme
+
+# 퇴직연금 계좌 (IRP/DC) — REAL 잔고, 2026-07-14 기준. 인출 제한(퇴직 시까지 잠김)이
+# 있어 stocks/etf(자유 매매 가능 자산)와 분리 보관한다. engine/personal/portfolio_impact.py는
+# 아직 이 섹션을 스코어링에 반영하지 않는다 — 데이터만 우선 저장, 반영 방식은 사용자 확인 후 결정.
+retirement_accounts:
+  irp:
+    account_type: "개인형퇴직연금(IRP)"
+    liquidity: locked_until_retirement
+    cash_like_balance_krw: 7399193
+    holdings:
+      - name: "TIME 글로벌탑픽액티브"
+        balance_units: 100
+        valuation_krw: 1268000
+        purchase_principal_krw: 992500
+        bucket: thematic_growth
+      - name: "SOL 미국넥스트테크TOP10액티브"
+        balance_units: 265
+        valuation_krw: 3125675
+        purchase_principal_krw: 2408775
+        bucket: ai_infrastructure
+      - name: "KIWOOM 삼성전자&SK하이닉스채권혼합50"
+        balance_units: 100
+        valuation_krw: 1198000
+        purchase_principal_krw: 1025000
+        bucket: semiconductor_bond_mixed
+      - name: "TIGER 차이나전기차SOLACTIVE"
+        balance_units: 50
+        valuation_krw: 560500
+        purchase_principal_krw: 650000
+        bucket: ev_china
+      - name: "ACE KRX금현물"
+        balance_units: 20
+        valuation_krw: 535300
+        purchase_principal_krw: 545800
+        bucket: gold
+      - name: "KODEX 인도Nifty50"
+        balance_units: 544
+        valuation_krw: 6854400
+        purchase_principal_krw: 7257810
+        bucket: india_equity
+      - name: "KODEX 미국AI전력핵심인프라"
+        balance_units: 134
+        valuation_krw: 3142970
+        purchase_principal_krw: 2030403
+        bucket: ai_infrastructure
+  dc:
+    account_type: "확정기여형 퇴직연금(DC)"
+    liquidity: locked_until_retirement
+    cash_like_balance_krw: 11617659
+    holdings:
+      - name: "TIME 글로벌탑픽액티브"
+        balance_units: 300
+        valuation_krw: 3804000
+        purchase_principal_krw: 3380500
+        bucket: thematic_growth
+      - name: "TIME 코스피액티브"
+        balance_units: 203
+        valuation_krw: 5257700
+        purchase_principal_krw: 4289290
+        bucket: korea_equity
+      - name: "TIME 미국S&P500액티브"
+        balance_units: 105
+        valuation_krw: 3644025
+        purchase_principal_krw: 2986250
+        bucket: us_equity
+      - name: "TIME Korea플러스배당액티브"
+        balance_units: 157
+        valuation_krw: 4644060
+        purchase_principal_krw: 4066500
+        bucket: korea_dividend
+      - name: "TIME 코리아밸류업액티브"
+        balance_units: 100
+        valuation_krw: 3070000
+        purchase_principal_krw: 2450000
+        bucket: korea_value_up
 
 bonds:
   - name: "국고채 10년"
