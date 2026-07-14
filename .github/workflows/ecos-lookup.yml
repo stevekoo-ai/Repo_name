@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       keyword:
-        description: "ECOS 통계표명에서 검색할 키워드 (예: 경제성장률)"
+        description: "검색어. 표 검색: '경제성장률' / 항목 검색: '--items 902Y015 한국'"
         required: true
         default: "경제성장률"
 
@@ -26,4 +26,6 @@ jobs:
       - name: Look up ECOS statistic tables
         env:
           ECOS_API_KEY: ${{ secrets.ECOS_API_KEY }}
-        run: python -m scripts.ecos_lookup "${{ github.event.inputs.keyword }}"
+        # Intentionally unquoted so a "--items <code> <keyword>" input word-splits into
+        # separate argv entries; this is a manually-dispatched diagnostic tool only.
+        run: python -m scripts.ecos_lookup ${{ github.event.inputs.keyword }}
