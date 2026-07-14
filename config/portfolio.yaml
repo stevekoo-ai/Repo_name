@@ -29,6 +29,16 @@ stocks:
     quantity: 248               # 한국투자증권 일반계좌 119 + 한국투자증권 ISP 19 + 하나증권 110
     avg_price: 477365            # combined purchase amount 118,386,456 / 248
     sector: semiconductor_memory
+    # 하나증권 계좌 보유분 110주 중 67주는 락업/마크업 조건부 물량 — 액션/현금
+    # 유동성 판단 시 이 67주는 만기 전까지 매도 후보에서 제외해야 한다.
+    # (engine/personal/portfolio_impact.py, engine/action은 아직 이 필드를
+    # 읽지 않음 — 우선 기록만, 반영 여부는 필요 시 별도 요청)
+    lockups:
+      - broker: "하나증권"
+        quantity: 67
+        lock_until: "2027-02-11"
+        markup_krw: 8791650
+        condition: "2027-02-11까지 매도하지 않고 보유 시 8,791,650원 마크업 지급. 만기 전 매도 시 마크업 소멸."
   - ticker: "005930.KS"
     name: "삼성전자"
     quantity: 108                # 한국투자증권 ISP 계좌
