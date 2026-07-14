@@ -6,18 +6,18 @@
     "score_band": "unbalanced_expansion",
     "score_band_label": "불균형 확장",
     "scores": {
-      "raw_score": 2,
-      "weighted_score": 2.3,
-      "scored_count": 5,
+      "raw_score": 3,
+      "weighted_score": 3.3,
+      "scored_count": 6,
       "total_count": 10,
-      "coverage_pct": 50.0
+      "coverage_pct": 60.0
     },
     "confidence": {
-      "confidence": 74.0,
+      "confidence": 77.8,
       "components": {
-        "data_freshness": 50.0,
+        "data_freshness": 60.0,
         "source_quality": 100.0,
-        "indicator_consistency": 80.0,
+        "indicator_consistency": 83.3,
         "trend_stability": 70.0
       }
     },
@@ -29,6 +29,7 @@
       "rates_rising"
     ],
     "upgrade_signals": [
+      "gdp_strong",
       "semiconductor_strong",
       "us_employment_improving"
     ],
@@ -52,16 +53,16 @@
     },
     "readings": {
       "gdp": {
-        "value": null,
-        "score": null,
+        "value": 1.831,
+        "score": 1,
         "weight": 1.0,
-        "status": "source_error",
+        "status": "ok",
         "label": "실질 GDP 성장률",
-        "source": null,
+        "source": "한국은행 ECOS",
         "fields": {
-          "qoq": null
+          "qoq": 1.831
         },
-        "note": "ECOS unreachable and no cache available"
+        "note": null
       },
       "industrial_production": {
         "value": null,
@@ -172,5 +173,5 @@
     }
   },
   "month": "2026-07",
-  "saved_at": "2026-07-14T16:25:48.024591+00:00"
+  "saved_at": "2026-07-14T22:25:26.654370+00:00"
 }

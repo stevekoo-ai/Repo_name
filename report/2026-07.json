@@ -5,15 +5,15 @@
     "regime": "Expansion",
     "previous_regime": "Early Expansion",
     "transition": "downgrade",
-    "score": 2,
-    "weighted_score": 2.3,
+    "score": 3,
+    "weighted_score": 3.3,
     "score_band": "unbalanced_expansion",
     "score_band_label": "불균형 확장",
-    "confidence": 74.0,
+    "confidence": 77.8,
     "confidence_components": {
-      "data_freshness": 50.0,
+      "data_freshness": 60.0,
       "source_quality": 100.0,
-      "indicator_consistency": 80.0,
+      "indicator_consistency": 83.3,
       "trend_stability": 70.0
     },
     "warnings": [
@@ -41,12 +41,12 @@
   "macro_dashboard": [
     {
       "indicator": "실질 GDP 성장률",
-      "current": null,
+      "current": 1.831,
       "previous": null,
-      "trend": "N/A",
-      "score": null,
-      "status": "source_error",
-      "source": null
+      "trend": "▲",
+      "score": 1,
+      "status": "ok",
+      "source": "한국은행 ECOS"
     },
     {
       "indicator": "전산업생산지수",
@@ -131,7 +131,7 @@
     }
   ],
   "personal": {
-    "investment_environment_score": 60.7,
+    "investment_environment_score": 62.4,
     "investment_biases": {
       "stock_bias": "소폭 확대",
       "etf_bias": "소폭 확대",
@@ -140,7 +140,7 @@
     },
     "semiconductor_score": 79.6,
     "semiconductor_band": "긍정",
-    "bond_score": 25.9,
+    "bond_score": 24.9,
     "fx_score": 39.9,
     "housing_readiness_score": 60.4,
     "etf_fit": [
@@ -148,56 +148,56 @@
         "ticker": "0183J0.KS",
         "name": "TIGER 미국우주테크",
         "bucket": "space_tech",
-        "fit_score": 48.7,
+        "fit_score": 50.2,
         "data_status": "ok"
       },
       {
         "ticker": "371460.KS",
         "name": "TIGER 차이나전기차SOLACTIVE",
         "bucket": "ev_china",
-        "fit_score": 48.7,
+        "fit_score": 50.2,
         "data_status": "ok"
       },
       {
         "ticker": "411060.KS",
         "name": "ACE KRX금현물",
         "bucket": "gold",
-        "fit_score": 48.7,
+        "fit_score": 50.2,
         "data_status": "ok"
       },
       {
         "ticker": "455850.KS",
         "name": "SOL AI반도체소부장",
         "bucket": "semiconductor",
-        "fit_score": 57.6,
+        "fit_score": 59.1,
         "data_status": "ok"
       },
       {
         "ticker": "469150.KS",
         "name": "ACE AI반도체TOP3+",
         "bucket": "semiconductor",
-        "fit_score": 57.6,
+        "fit_score": 59.1,
         "data_status": "ok"
       },
       {
         "ticker": "475380.KS",
         "name": "RISE 글로벌리얼티인컴",
         "bucket": "reit_income",
-        "fit_score": 48.7,
+        "fit_score": 50.2,
         "data_status": "ok"
       },
       {
         "ticker": "476070.KS",
         "name": "KODEX 글로벌비만치료제TOP2 Plus",
         "bucket": "healthcare_theme",
-        "fit_score": 48.7,
+        "fit_score": 50.2,
         "data_status": "ok"
       }
     ]
   },
   "assets": {
     "stocks": {
-      "score": 64.8,
+      "score": 66.1,
       "stars": "★★★☆☆",
       "data_status": "ok",
       "detail": [
@@ -211,7 +211,7 @@
       ]
     },
     "etf": {
-      "score": 51.2,
+      "score": 52.7,
       "stars": "★★☆☆☆",
       "data_status": "ok",
       "detail": [
@@ -219,55 +219,55 @@
           "ticker": "0183J0.KS",
           "name": "TIGER 미국우주테크",
           "bucket": "space_tech",
-          "fit_score": 48.7,
+          "fit_score": 50.2,
           "data_status": "ok"
         },
         {
           "ticker": "371460.KS",
           "name": "TIGER 차이나전기차SOLACTIVE",
           "bucket": "ev_china",
-          "fit_score": 48.7,
+          "fit_score": 50.2,
           "data_status": "ok"
         },
         {
           "ticker": "411060.KS",
           "name": "ACE KRX금현물",
           "bucket": "gold",
-          "fit_score": 48.7,
+          "fit_score": 50.2,
           "data_status": "ok"
         },
         {
           "ticker": "455850.KS",
           "name": "SOL AI반도체소부장",
           "bucket": "semiconductor",
-          "fit_score": 57.6,
+          "fit_score": 59.1,
           "data_status": "ok"
         },
         {
           "ticker": "469150.KS",
           "name": "ACE AI반도체TOP3+",
           "bucket": "semiconductor",
-          "fit_score": 57.6,
+          "fit_score": 59.1,
           "data_status": "ok"
         },
         {
           "ticker": "475380.KS",
           "name": "RISE 글로벌리얼티인컴",
           "bucket": "reit_income",
-          "fit_score": 48.7,
+          "fit_score": 50.2,
           "data_status": "ok"
         },
         {
           "ticker": "476070.KS",
           "name": "KODEX 글로벌비만치료제TOP2 Plus",
           "bucket": "healthcare_theme",
-          "fit_score": 48.7,
+          "fit_score": 50.2,
           "data_status": "ok"
         }
       ]
     },
     "bond": {
-      "score": 25.9,
+      "score": 24.9,
       "stars": "★☆☆☆☆",
       "data_status": "ok",
       "detail": [
@@ -414,14 +414,14 @@
   },
   "scenarios": {
     "base": {
-      "probability": 35,
+      "probability": 30,
       "premise": "현재 국면(Expansion)과 반도체 업황(긍정)의 추세가 유지된다.",
       "expected_change": "지표가 현재 범위 내에서 등락하며 국면 전환 신호는 제한적.",
-      "user_impact": "Investment Environment Score 60.7점 수준의 배분 유지가 합리적."
+      "user_impact": "Investment Environment Score 62.4점 수준의 배분 유지가 합리적."
     },
     "bull": {
-      "probability": 30,
-      "premise": "상향 신호(semiconductor_strong, us_employment_improving)가 강화된다.",
+      "probability": 35,
+      "premise": "상향 신호(gdp_strong, semiconductor_strong, us_employment_improving)가 강화된다.",
       "expected_change": "수출/반도체 개선과 물가 안정이 동반되며 국면이 한 단계 상향될 가능성.",
       "user_impact": "주식/ETF 비중 확대, 반도체/AI 인프라 비중 우선순위 상향을 검토할 수 있다."
     },
@@ -534,7 +534,7 @@
       "priority_label": "★★★☆☆ 관찰 필요",
       "priority_score": 58.8,
       "title": "주식/ETF 비중 확대 검토",
-      "reason": "Investment Environment Score 60.7점 — 거시/반도체 환경이 우호적.",
+      "reason": "Investment Environment Score 62.4점 — 거시/반도체 환경이 우호적.",
       "invalid_condition": "Investment Environment Score가 20점 이상 하락하면 보류.",
       "recheck": "다음 정기 리포트.",
       "category": "investment_opportunity",
@@ -589,7 +589,7 @@
       "priority_label": "★★☆☆☆ 참고",
       "priority_score": 44.8,
       "title": "채권 신규 매수 보류 및 만기 재투자 방식 재검토",
-      "reason": "Bond Score 25.9점 — 금리/실질금리 매력도가 낮은 국면.",
+      "reason": "Bond Score 24.9점 — 금리/실질금리 매력도가 낮은 국면.",
       "invalid_condition": "실질금리 매력도 회복 또는 성장 둔화 신호 확산 시 재검토.",
       "recheck": "다음 금통위/FOMC 이후.",
       "category": "investment_opportunity",
@@ -689,7 +689,7 @@
     }
   ],
   "personal_executive_brief": {
-    "one_line_diagnosis": "Expansion 국면(총점 2, 신뢰도 74.0점) — 반도체 긍정",
+    "one_line_diagnosis": "Expansion 국면(총점 3, 신뢰도 77.8점) — 반도체 긍정",
     "asset_summary": {
       "stocks": "★★★☆☆",
       "etf": "★★☆☆☆",
