@@ -22,12 +22,10 @@ from core.models import DataPoint, DataStatus, Frequency, Metadata
 from . import base
 
 ECOS_SERIES: dict[str, dict] = {
-    # 2026-07-14 GitHub Actions 실행에서 "해당하는 데이터가 없습니다" 응답 — 통계코드가
-    # 틀림. 901Y009(100대 통계지표)/1400(GDP성장률) 조합으로 교체 시도 — 이것도
-    # 확인되지 않았으니 다음 실행 로그를 다시 확인할 것.
     "gdp_growth_qoq": {
-        "stat_code": "901Y009", "cycle": "Q", "item_code1": "1400",
-        "unit": "%", "note": "실질 GDP 성장률(전기비) — 통계코드 재확인 필요 (기존 200Y002/10111는 데이터 없음 응답 확인됨)",
+        "stat_code": "902Y015", "cycle": "Q", "item_code1": "KOR",
+        "unit": "%", "note": "실질 GDP 성장률(전기비, 계절조정) — 9.1.4.1 국제 주요국 경제성장률, item KOR. "
+                              "scripts/ecos_lookup.py (StatisticTableList/StatisticItemList)로 2026-07-14 확인됨.",
     },
     "ppi_yoy_level": {
         "stat_code": "404Y014", "cycle": "M", "item_code1": "*AA",
