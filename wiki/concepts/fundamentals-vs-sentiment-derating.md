@@ -1,7 +1,7 @@
 ---
 title: 펀더멘털 불변 vs 심리·수급발 디레이팅
 created: 2026-07-13
-updated: 2026-07-13
+updated: 2026-07-14
 tags: [concept, market-psychology, valuation, risk]
 ---
 
@@ -20,6 +20,18 @@ tags: [concept, market-psychology, valuation, risk]
 확인된 ADR의 계속된 추가 하락(고점 대비 -11% → -15.1%)은 이 디레이팅이
 하루 만에 반전되지 않고 이어지고 있음을 보여준다. 자세한 건
 [SK하이닉스](../entities/sk-hynix.md) 참고.
+
+**주의할 점**: [7월 실적-주가 괴리 원인 정리](../summaries/sk-hynix-earnings-price-divergence-2026-07-14.md)에서
+확인했듯, ADR(SKHY)은 2026-07-10에 막 상장한 신규주라 그 급락분 중 일부는
+"신규 IPO 데뷔 팝이 공모가로 식는" 별개의 현상과 섞여 있을 수 있다 — 디레이팅
+사례를 볼 때 대상 자산이 신규 상장물인지 아닌지를 먼저 구분해야 오판을 줄일
+수 있다는 교훈.
+
+**결과 업데이트(2026-07-14)**: 실제로 7/14 개장 전후 본주는 저점 1,718,000원
+→ 1,923,000원(+11.9%)으로 기술적 반등이 나왔다(RSI 34→81). 즉 이번 SK하이닉스
+사례는 "펀더멘털 불변 + 과매도 → 기술적 반등"까지는 예측대로 흘렀고, 다만
+그것이 전고점을 넘어서는 진짜 추세 전환인지는 여전히 미확정이다. 상세는
+[SK하이닉스](../entities/sk-hynix.md)의 "예측 검증" 섹션 참고.
 
 ### 일반적으로 알려진 사례 (⚠ 위키 소스로 검증되지 않음, 일반 시장 상식·참고용)
 
@@ -40,5 +52,6 @@ tags: [concept, market-psychology, valuation, risk]
 
 - [SK하이닉스 반등 전망 분석 (2026-07-13)](../summaries/sk-hynix-rebound-analysis-2026-07-13.md)
 - [SK하이닉스 본주·ADR 차트 비교 (2026-07-13)](../summaries/sk-hynix-adr-krw-chart-comparison-2026-07-13.md)
+- [7월 실적-주가 괴리 원인 정리 (2026-07-14)](../summaries/sk-hynix-earnings-price-divergence-2026-07-14.md)
 - [SK하이닉스](../entities/sk-hynix.md)
 - 일반 사례 목록: 별도 소스 없음 — 일반 지식, 재검증 필요

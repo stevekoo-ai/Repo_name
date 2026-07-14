@@ -1,7 +1,7 @@
 ---
 title: SK하이닉스
 created: 2026-07-13
-updated: 2026-07-13
+updated: 2026-07-14
 tags: [sk-hynix, semiconductor, stock, adr]
 ---
 
@@ -34,6 +34,32 @@ tags: [sk-hynix, semiconductor, stock, adr]
 괴리율은 ADR 비율·환율 정보가 없어 미검증 상태. 상세는
 [SK하이닉스 본주·ADR 차트 비교 (2026-07-13)](../summaries/sk-hynix-adr-krw-chart-comparison-2026-07-13.md) 참고.
 
+**정정(2026-07-14)**: 언론 보도로 교차 검증한 결과 SKHY는 2026-07-10에 막
+상장한 신규 ADR(공모가 $149, 데뷔 첫날 종가 $168.01, $265억 조달)이다. $177
+고점 → $150대 하락은 뜨거웠던 IPO 데뷔 팝이 공모가 쪽으로 식는 흔한 신규상장주
+패턴일 가능성이 있어, 위 "ADR 급락이 반등 논리를 반증한다"는 해석은 완전한
+반증이 아니라 주의가 필요한 요인 정도로 완화해서 읽어야 한다. 상세는
+[7월 실적-주가 괴리 원인 정리 (2026-07-14)](../summaries/sk-hynix-earnings-price-divergence-2026-07-14.md) 참고.
+
+또한 이 소스는 하락의 새로운 수급 메커니즘도 제시한다 — 주가가 단기간 4배
+넘게 급등하면서 **기관·외국인 투자자의 종목별 투자 한도를 초과, 이를 맞추기
+위한 기계적 강제매도**가 발생했다는 것 (기존에 기록된 "레버리지 ETF 수급
+꼬임"과는 별개의 메커니즘). 추가 촉매로 메타의 클라우드 진출 뉴스(AI 인프라
+수요 둔화 우려), 거시 요인으로 미 연준의 매파적 기조·6월 CPI/FOMC·미·이란
+지정학 리스크가 거론된다.
+
+### 예측 검증 (2026-07-14 개장)
+
+7/14 개장 전후 실제 흐름: 08:11 저점 1,718,000원까지 추가 급락(전일 종가
+대비 더 밀림) → 10:05 1,923,000원(+4.23%)까지 반등, 저점 대비 **+11.9%**.
+RSI(14)는 전일 34.32(과매도)에서 81.37(과매수)로 하루 만에 급반전.
+
+이는 [SK하이닉스 반등 전망 분석](../summaries/sk-hynix-rebound-analysis-2026-07-13.md)이
+예측했던 "외국인 선물 매수 전환 → 7/14 반등 확률 70%+"와 과매도 기술적
+반등 시나리오가 실제로 들어맞은 사례로 볼 수 있다. 다만 이 반등을 촉발한
+구체적 단일 뉴스는 검색으로 특정하지 못했다 — 과매도 되돌림과 전반적으로
+우호적인 HBM/AI 수요 분위기가 배경으로 추정된다는 정도까지만 확인됨.
+
 ### 개인 보유 현황
 
 [나의 투자 포트폴리오](my-portfolio.md)의 ISA(19주) + 일반(117주) = 136주를
@@ -53,9 +79,13 @@ tags: [sk-hynix, semiconductor, stock, adr]
 
 - [SK하이닉스 반등 전망 분석 (2026-07-13)](../summaries/sk-hynix-rebound-analysis-2026-07-13.md)
 - [SK하이닉스 본주·ADR 차트 비교 (2026-07-13)](../summaries/sk-hynix-adr-krw-chart-comparison-2026-07-13.md)
+- [7월 실적-주가 괴리 원인 정리 (2026-07-14)](../summaries/sk-hynix-earnings-price-divergence-2026-07-14.md)
 - [펀더멘털 불변 vs 심리·수급발 디레이팅](../concepts/fundamentals-vs-sentiment-derating.md)
 - [나의 투자 포트폴리오](my-portfolio.md)
 - [사용자 프로필](user-profile.md)
 - [sources/sk-hynix-rebound-analysis-2026-07-13.md](../../sources/sk-hynix-rebound-analysis-2026-07-13.md)
 - [sources/sk-hynix-krw-chart-2026-07-13.png](../../sources/sk-hynix-krw-chart-2026-07-13.png)
 - [sources/sk-hynix-adr-chart-2026-07-13.png](../../sources/sk-hynix-adr-chart-2026-07-13.png)
+- [sources/sk-hynix-krw-chart-2026-07-14-rebound.png](../../sources/sk-hynix-krw-chart-2026-07-14-rebound.png)
+- [sources/sk-hynix-earnings-price-divergence-2026-07-14.md](../../sources/sk-hynix-earnings-price-divergence-2026-07-14.md)
+- [sources/websearch-sk-hynix-adr-ipo-2026-07-14.md](../../sources/websearch-sk-hynix-adr-ipo-2026-07-14.md)
