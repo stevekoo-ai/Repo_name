@@ -130,65 +130,126 @@
     "semiconductor_band": "긍정",
     "bond_score": 45.0,
     "fx_score": null,
-    "housing_readiness_score": 49.3,
+    "housing_readiness_score": 52.6,
     "etf_fit": [
       {
-        "ticker": "091160.KS",
-        "name": "KODEX 반도체",
+        "ticker": "0183J0.KS",
+        "name": "TIGER 미국우주테크",
+        "bucket": "space_tech",
+        "fit_score": 64.4,
+        "data_status": "ok"
+      },
+      {
+        "ticker": "371460.KS",
+        "name": "TIGER 차이나전기차SOLACTIVE",
+        "bucket": "ev_china",
+        "fit_score": 64.4,
+        "data_status": "ok"
+      },
+      {
+        "ticker": "411060.KS",
+        "name": "ACE KRX금현물",
+        "bucket": "gold",
+        "fit_score": 64.4,
+        "data_status": "ok"
+      },
+      {
+        "ticker": "455850.KS",
+        "name": "SOL AI반도체소부장",
         "bucket": "semiconductor",
         "fit_score": 75.5,
         "data_status": "ok"
       },
       {
-        "ticker": "SOXX",
-        "name": "iShares Semiconductor ETF",
-        "bucket": "semiconductor_global",
+        "ticker": "469150.KS",
+        "name": "ACE AI반도체TOP3+",
+        "bucket": "semiconductor",
         "fit_score": 75.5,
         "data_status": "ok"
       },
       {
-        "ticker": "133690.KS",
-        "name": "KODEX 미국나스닥100",
-        "bucket": "ai_infrastructure",
-        "fit_score": 75.5,
+        "ticker": "475380.KS",
+        "name": "RISE 글로벌리얼티인컴",
+        "bucket": "reit_income",
+        "fit_score": 64.4,
+        "data_status": "ok"
+      },
+      {
+        "ticker": "476070.KS",
+        "name": "KODEX 글로벌비만치료제TOP2 Plus",
+        "bucket": "healthcare_theme",
+        "fit_score": 64.4,
         "data_status": "ok"
       }
     ]
   },
   "assets": {
     "stocks": {
-      "score": 76.3,
+      "score": 74.5,
       "stars": "★★★★☆",
       "data_status": "ok",
       "detail": [
         "SK하이닉스",
-        "삼성전자"
+        "삼성전자",
+        "제주반도체",
+        "롯데렌탈",
+        "우리금융지주",
+        "이노진",
+        "나노팀"
       ]
     },
     "etf": {
-      "score": 75.5,
-      "stars": "★★★★☆",
+      "score": 67.6,
+      "stars": "★★★☆☆",
       "data_status": "ok",
       "detail": [
         {
-          "ticker": "091160.KS",
-          "name": "KODEX 반도체",
+          "ticker": "0183J0.KS",
+          "name": "TIGER 미국우주테크",
+          "bucket": "space_tech",
+          "fit_score": 64.4,
+          "data_status": "ok"
+        },
+        {
+          "ticker": "371460.KS",
+          "name": "TIGER 차이나전기차SOLACTIVE",
+          "bucket": "ev_china",
+          "fit_score": 64.4,
+          "data_status": "ok"
+        },
+        {
+          "ticker": "411060.KS",
+          "name": "ACE KRX금현물",
+          "bucket": "gold",
+          "fit_score": 64.4,
+          "data_status": "ok"
+        },
+        {
+          "ticker": "455850.KS",
+          "name": "SOL AI반도체소부장",
           "bucket": "semiconductor",
           "fit_score": 75.5,
           "data_status": "ok"
         },
         {
-          "ticker": "SOXX",
-          "name": "iShares Semiconductor ETF",
-          "bucket": "semiconductor_global",
+          "ticker": "469150.KS",
+          "name": "ACE AI반도체TOP3+",
+          "bucket": "semiconductor",
           "fit_score": 75.5,
           "data_status": "ok"
         },
         {
-          "ticker": "133690.KS",
-          "name": "KODEX 미국나스닥100",
-          "bucket": "ai_infrastructure",
-          "fit_score": 75.5,
+          "ticker": "475380.KS",
+          "name": "RISE 글로벌리얼티인컴",
+          "bucket": "reit_income",
+          "fit_score": 64.4,
+          "data_status": "ok"
+        },
+        {
+          "ticker": "476070.KS",
+          "name": "KODEX 글로벌비만치료제TOP2 Plus",
+          "bucket": "healthcare_theme",
+          "fit_score": 64.4,
           "data_status": "ok"
         }
       ]
@@ -217,7 +278,7 @@
       }
     },
     "subscription_fund": {
-      "score": 49.3,
+      "score": 52.6,
       "stars": "★★☆☆☆",
       "data_status": "ok",
       "detail": [
@@ -225,10 +286,10 @@
           "name": "세종 5-1생활권 공공분양 (EXAMPLE)",
           "agency": "LH",
           "region": "세종 플랫폼시티",
-          "readiness_score": 49.3,
+          "readiness_score": 52.6,
           "factors": {
             "eligibility_fit": 100.0,
-            "funding_readiness": 13.6,
+            "funding_readiness": 25.5,
             "region_type_match": 25.0,
             "timing_readiness": 40.0,
             "competition_adjustment_inverse": null
@@ -245,9 +306,9 @@
               "application_end": "2026-08-12"
             },
             "expected_price_krw": 550000000,
-            "funding_gap_krw": 95000000.0,
+            "funding_gap_krw": 81950000.0,
             "expected_competition_ratio": null,
-            "user_fit_score": 49.3,
+            "user_fit_score": 52.6,
             "risk_notes": [
               "예상 경쟁률 미확정 — 청약홈 공고 확정 후 재평가 필요",
               "자금조달 갭 발생 시 채권/현금 배분 조정 필요 (Action Engine 충돌 조정 대상)"
@@ -274,10 +335,10 @@
         "name": "세종 5-1생활권 공공분양 (EXAMPLE)",
         "agency": "LH",
         "region": "세종 플랫폼시티",
-        "readiness_score": 49.3,
+        "readiness_score": 52.6,
         "factors": {
           "eligibility_fit": 100.0,
-          "funding_readiness": 13.6,
+          "funding_readiness": 25.5,
           "region_type_match": 25.0,
           "timing_readiness": 40.0,
           "competition_adjustment_inverse": null
@@ -294,9 +355,9 @@
             "application_end": "2026-08-12"
           },
           "expected_price_krw": 550000000,
-          "funding_gap_krw": 95000000.0,
+          "funding_gap_krw": 81950000.0,
           "expected_competition_ratio": null,
-          "user_fit_score": 49.3,
+          "user_fit_score": 52.6,
           "risk_notes": [
             "예상 경쟁률 미확정 — 청약홈 공고 확정 후 재평가 필요",
             "자금조달 갭 발생 시 채권/현금 배분 조정 필요 (Action Engine 충돌 조정 대상)"
@@ -372,7 +433,7 @@
       "priority": 4,
       "priority_label": "★★★★☆ 검토 필요",
       "priority_score": 80.5,
-      "title": "세종 5-1생활권 공공분양 (EXAMPLE) 자금 갭 95,000,000원 확보 계획 수립",
+      "title": "세종 5-1생활권 공공분양 (EXAMPLE) 자금 갭 81,950,000원 확보 계획 수립",
       "reason": "목표 자금 대비 현재 청약저축/현금 잔액이 부족하다.",
       "invalid_condition": "공고가 취소되거나 자금 목표가 조정되면 보류.",
       "recheck": "2026-08-11 1개월 전.",
@@ -395,7 +456,7 @@
       "priority_label": "★★★★☆ 검토 필요",
       "priority_score": 71.0,
       "title": "세종 5-1생활권 공공분양 (EXAMPLE) 청약 자격/자금 점검",
-      "reason": "청약 준비도 49.3점 — 신청 전 자격/자금 요건 재확인 필요.",
+      "reason": "청약 준비도 52.6점 — 신청 전 자격/자금 요건 재확인 필요.",
       "invalid_condition": "공고가 취소되거나 자격 요건 미충족이 확인되면 보류.",
       "recheck": "2026-08-11 1주 전.",
       "category": "liquidity_survival",
@@ -559,7 +620,7 @@
     "one_line_diagnosis": "Early Expansion 국면(총점 1, 신뢰도 70.0점) — 반도체 긍정",
     "asset_summary": {
       "stocks": "★★★★☆",
-      "etf": "★★★★☆",
+      "etf": "★★★☆☆",
       "bond": "★★☆☆☆",
       "cash": "★★★★★",
       "subscription_fund": "★★☆☆☆",
@@ -572,7 +633,7 @@
       "미국 CPI 발표 (2026-08-12)",
       "미국 비농업 고용(NFP) 발표 (2026-08-07)"
     ],
-    "final_suggestion": "세종 5-1생활권 공공분양 (EXAMPLE) 자금 갭 95,000,000원 확보 계획 수립"
+    "final_suggestion": "세종 5-1생활권 공공분양 (EXAMPLE) 자금 갭 81,950,000원 확보 계획 수립"
   },
   "appendix": {
     "sources": [
