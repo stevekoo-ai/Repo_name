@@ -3,13 +3,16 @@
 # these keys directly.
 #
 # stocks/etf are REAL holdings as of 2026-07-14, provided directly by the
-# user from three brokerage accounts (일반 주식 계좌 + ISP 계좌 + 하나증권
-# 계좌). Tickers held in multiple accounts (SK하이닉스: all three; 삼성전자:
-# ISP) are merged into one position here (quantity summed, avg_price
-# recomputed from combined purchase amount) — PEOS scores total exposure
-# per ticker, not per-account lots.
-# retirement_accounts (IRP/DC) are also REAL, kept in their own section
-# since they're locked until retirement (see that section's own note).
+# user across two brokers:
+#   - 한국투자증권: 일반 주식 계좌 + ISP 계좌 (+ IRP/DC 퇴직연금, see below)
+#   - 하나증권: 하나증권 계좌 (SK하이닉스 110주)
+# Tickers held in multiple accounts (SK하이닉스: 한국투자증권 일반+ISP +
+# 하나증권; 삼성전자: 한국투자증권 ISP) are merged into one position here
+# (quantity summed, avg_price recomputed from combined purchase amount) —
+# PEOS scores total exposure per ticker, not per-account/per-broker lots.
+# retirement_accounts (IRP/DC, 한국투자증권) are also REAL, kept in their
+# own section since they're locked until retirement (see that section's
+# own note).
 # cash/bonds/subscription_savings below are still EXAMPLE placeholders —
 # not part of what was provided.
 
@@ -23,74 +26,74 @@ cash:
 stocks:
   - ticker: "000660.KS"
     name: "SK하이닉스"
-    quantity: 248               # 일반계좌 119 + ISP 19 + 하나증권 110
+    quantity: 248               # 한국투자증권 일반계좌 119 + 한국투자증권 ISP 19 + 하나증권 110
     avg_price: 477365            # combined purchase amount 118,386,456 / 248
     sector: semiconductor_memory
   - ticker: "005930.KS"
     name: "삼성전자"
-    quantity: 108                # ISP 계좌
+    quantity: 108                # 한국투자증권 ISP 계좌
     avg_price: 187911
     sector: semiconductor_memory
   - ticker: "080220.KQ"
     name: "제주반도체"
-    quantity: 20                 # 일반계좌
+    quantity: 20                 # 한국투자증권 일반계좌
     avg_price: 91725
     sector: semiconductor_memory
   - ticker: "089860.KS"
     name: "롯데렌탈"
-    quantity: 4                  # 일반계좌
+    quantity: 4                  # 한국투자증권 일반계좌
     avg_price: 59000
     sector: consumer_services
   - ticker: "316140.KS"
     name: "우리금융지주"
-    quantity: 4                  # 일반계좌
+    quantity: 4                  # 한국투자증권 일반계좌
     avg_price: 26100
     sector: financials
   - ticker: "344860"             # 거래소 접미사(.KS/.KQ) 확인 필요
     name: "이노진"
-    quantity: 615                # ISP 계좌
+    quantity: 615                # 한국투자증권 ISP 계좌
     avg_price: 1613
     sector: unclassified         # 업종 미확인 — 추측하지 않음, 필요 시 알려주세요
   - ticker: "417010"             # 거래소 접미사(.KS/.KQ) 확인 필요
     name: "나노팀"
-    quantity: 166                # ISP 계좌
+    quantity: 166                # 한국투자증권 ISP 계좌
     avg_price: 6820
     sector: unclassified         # 업종 미확인 — 추측하지 않음, 필요 시 알려주세요
 
 etf:
   - ticker: "0183J0.KS"
     name: "TIGER 미국우주테크"
-    quantity: 225                # ISP 계좌
+    quantity: 225                # 한국투자증권 ISP 계좌
     avg_price: 14064
     bucket: space_tech
   - ticker: "371460.KS"
     name: "TIGER 차이나전기차SOLACTIVE"
-    quantity: 202                # ISP 계좌
+    quantity: 202                # 한국투자증권 ISP 계좌
     avg_price: 10443
     bucket: ev_china
   - ticker: "411060.KS"
     name: "ACE KRX금현물"
-    quantity: 113                # ISP 계좌
+    quantity: 113                # 한국투자증권 ISP 계좌
     avg_price: 28916
     bucket: gold
   - ticker: "455850.KS"
     name: "SOL AI반도체소부장"
-    quantity: 100                # ISP 계좌
+    quantity: 100                # 한국투자증권 ISP 계좌
     avg_price: 27321
     bucket: semiconductor
   - ticker: "469150.KS"
     name: "ACE AI반도체TOP3+"
-    quantity: 297                # ISP 계좌
+    quantity: 297                # 한국투자증권 ISP 계좌
     avg_price: 17793
     bucket: semiconductor
   - ticker: "475380.KS"
     name: "RISE 글로벌리얼티인컴"
-    quantity: 70                 # ISP 계좌
+    quantity: 70                 # 한국투자증권 ISP 계좌
     avg_price: 9978
     bucket: reit_income
   - ticker: "476070.KS"
     name: "KODEX 글로벌비만치료제TOP2 Plus"
-    quantity: 440                # ISP 계좌
+    quantity: 440                # 한국투자증권 ISP 계좌
     avg_price: 9341
     bucket: healthcare_theme
 
@@ -100,6 +103,7 @@ etf:
 retirement_accounts:
   irp:
     account_type: "개인형퇴직연금(IRP)"
+    broker: "한국투자증권"
     liquidity: locked_until_retirement
     cash_like_balance_krw: 7399193
     holdings:
@@ -140,6 +144,7 @@ retirement_accounts:
         bucket: ai_infrastructure
   dc:
     account_type: "확정기여형 퇴직연금(DC)"
+    broker: "한국투자증권"
     liquidity: locked_until_retirement
     cash_like_balance_krw: 11617659
     holdings:
