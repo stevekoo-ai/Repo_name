@@ -24,6 +24,7 @@ def _hour_to_angle_deg(hour: int) -> float:
 
 def draw_clock(reading: ClockReading, out_path: str | Path, size: int = 900) -> Path:
     out_path = Path(out_path)
+    out_path.parent.mkdir(parents=True, exist_ok=True)
     fig, ax = plt.subplots(figsize=(6, 6), dpi=size // 6)
     ax.set_xlim(-1.3, 1.3)
     ax.set_ylim(-1.3, 1.3)
