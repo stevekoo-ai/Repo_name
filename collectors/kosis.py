@@ -8,6 +8,15 @@ each indicator in one place. KOSIS occasionally renumbers table IDs —
 verify against the KOSIS OpenAPI '통계표 검색' console before relying on
 these in production; correcting a code here doesn't require touching the
 fetch logic.
+
+Observed (GitHub Actions, 2026-07-14): every KOSIS call failed with a TCP
+connect timeout to kosis.kr, not an API error — the key and stat codes
+were never actually reached. This looks like an access restriction on
+KOSIS's side (some Korean public-data APIs only answer requests from
+Korean IP ranges) rather than a code bug; retrying harder doesn't help,
+so retries/timeout are kept short here to fail fast instead of burning
+CI time. If this keeps happening, check KOSIS OpenAPI's docs/support for
+an IP allowlist or an alternate access method from outside Korea.
 """
 from __future__ import annotations
 
@@ -40,7 +49,7 @@ KOSIS_SERIES: dict[str, dict] = {
 }
 
 
-def _fetch_table(spec: dict, api_key: str, start: str, end: str, timeout: int = 20) -> list[dict] | None:
+def _fetch_table(spec: dict, api_key: str, start: str, end: str, timeout: int = 10) -> list[dict] | None:
     base_url = api_config()["sources"]["kosis"]["base_url"]
     url = f"{base_url}/Param/statisticsParameterData.do"
     params = {
@@ -79,7 +88,8 @@ def fetch_series(series_key: str) -> DataPoint:
         today = datetime.utcnow()
         start = today.replace(year=today.year - 3).strftime("%Y%m")
         end = today.strftime("%Y%m")
-        rows = base.retry(lambda: _fetch_table(spec, api_key, start, end), label=f"kosis:{series_key}")
+        rows = base.retry(lambda: _fetch_table(spec, api_key, start, end), label=f"kosis:{series_key}",
+                           attempts=2, backoff_seconds=1.5)
         if rows:
             cache_mod.set(f"kosis:{series_key}", rows)
 
