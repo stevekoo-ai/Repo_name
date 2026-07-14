@@ -3,10 +3,11 @@
 # these keys directly.
 #
 # stocks/etf are REAL holdings as of 2026-07-14, provided directly by the
-# user from two brokerage accounts (일반 주식 계좌 + ISP 계좌). Tickers held
-# in both accounts (SK하이닉스, 삼성전자) are merged into one position here
-# (quantity summed, avg_price recomputed from combined purchase amount) —
-# PEOS scores total exposure per ticker, not per-account lots.
+# user from three brokerage accounts (일반 주식 계좌 + ISP 계좌 + 하나증권
+# 계좌). Tickers held in multiple accounts (SK하이닉스: all three; 삼성전자:
+# ISP) are merged into one position here (quantity summed, avg_price
+# recomputed from combined purchase amount) — PEOS scores total exposure
+# per ticker, not per-account lots.
 # retirement_accounts (IRP/DC) are also REAL, kept in their own section
 # since they're locked until retirement (see that section's own note).
 # cash/bonds/subscription_savings below are still EXAMPLE placeholders —
@@ -22,8 +23,8 @@ cash:
 stocks:
   - ticker: "000660.KS"
     name: "SK하이닉스"
-    quantity: 138               # 일반계좌 119 + ISP 19
-    avg_price: 368804            # combined purchase amount 50,895,000 / 138
+    quantity: 248               # 일반계좌 119 + ISP 19 + 하나증권 110
+    avg_price: 477365            # combined purchase amount 118,386,456 / 248
     sector: semiconductor_memory
   - ticker: "005930.KS"
     name: "삼성전자"
