@@ -1,0 +1,20 @@
+# EXAMPLE manual input for 출장/여행 일정 (Master Instruction 13.10, 13.11).
+# No public API exposes an individual's travel calendar or live
+# airfare/hotel pricing at the free tier used here, so trips and (optional)
+# cost-trend estimates are entered by hand. Replace EXAMPLE rows with real
+# plans; leave `cost_trend_signal` null if you have no informed estimate —
+# the engine reports Pending for that factor rather than guessing.
+
+trips:
+  - name: "미국 출장 (EXAMPLE)"
+    type: business
+    destination_country: "US"
+    departure_date: "2026-09-15"   # EXAMPLE
+    return_date: "2026-09-20"      # EXAMPLE
+    cost_trend_signal: null        # -1(비용 상승 추세) ~ +1(비용 하락 추세), 모르면 null
+  - name: "일본 여행 (EXAMPLE)"
+    type: leisure
+    destination_country: "JP"
+    departure_date: "2026-10-03"   # EXAMPLE
+    return_date: "2026-10-07"      # EXAMPLE
+    cost_trend_signal: null

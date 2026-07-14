@@ -1,0 +1,589 @@
+{
+  "report_month": "2026-07",
+  "report_readiness": "insufficient",
+  "macro": {
+    "regime": "Early Expansion",
+    "previous_regime": "Early Expansion",
+    "transition": null,
+    "score": 1,
+    "weighted_score": 1.5,
+    "score_band": "unbalanced_expansion",
+    "score_band_label": "불균형 확장",
+    "confidence": 70.0,
+    "confidence_components": {
+      "data_freshness": 20.0,
+      "source_quality": 100.0,
+      "indicator_consistency": 100.0,
+      "trend_stability": 70.0
+    },
+    "warnings": [],
+    "changes": [
+      {
+        "indicator": "all",
+        "message": "이전 스냅샷 없음 — 이번 달이 최초 기록",
+        "direction": "n/a"
+      }
+    ],
+    "us_investment_clock": null
+  },
+  "macro_dashboard": [
+    {
+      "indicator": "실질 GDP 성장률",
+      "current": null,
+      "previous": null,
+      "trend": "N/A",
+      "score": null,
+      "status": "pending",
+      "source": null
+    },
+    {
+      "indicator": "전산업생산지수",
+      "current": null,
+      "previous": null,
+      "trend": "N/A",
+      "score": null,
+      "status": "pending",
+      "source": null
+    },
+    {
+      "indicator": "소매판매",
+      "current": null,
+      "previous": null,
+      "trend": "N/A",
+      "score": null,
+      "status": "pending",
+      "source": null
+    },
+    {
+      "indicator": "총수출 증가율",
+      "current": 9.1,
+      "previous": null,
+      "trend": "→",
+      "score": 0,
+      "status": "ok",
+      "source": "산업통상자원부 (수동 입력)"
+    },
+    {
+      "indicator": "반도체 수출 증가율",
+      "current": 24.7,
+      "previous": null,
+      "trend": "▲",
+      "score": 1,
+      "status": "ok",
+      "source": "산업통상자원부 (수동 입력)"
+    },
+    {
+      "indicator": "경상수지 (3개월 평균, 억달러)",
+      "current": null,
+      "previous": null,
+      "trend": "N/A",
+      "score": null,
+      "status": "pending",
+      "source": null
+    },
+    {
+      "indicator": "CPI",
+      "current": null,
+      "previous": null,
+      "trend": "N/A",
+      "score": null,
+      "status": "pending",
+      "source": null
+    },
+    {
+      "indicator": "PPI",
+      "current": null,
+      "previous": null,
+      "trend": "N/A",
+      "score": null,
+      "status": "pending",
+      "source": null
+    },
+    {
+      "indicator": "한국 실업률 (3개월 평균 변화, %p)",
+      "current": null,
+      "previous": null,
+      "trend": "N/A",
+      "score": null,
+      "status": "pending",
+      "source": null
+    },
+    {
+      "indicator": "미국 고용 + 글로벌 경기 (composite -1~+1)",
+      "current": null,
+      "previous": null,
+      "trend": "N/A",
+      "score": null,
+      "status": "pending",
+      "source": "FRED"
+    }
+  ],
+  "personal": {
+    "investment_environment_score": 73.1,
+    "investment_biases": {
+      "stock_bias": "확대",
+      "etf_bias": "확대",
+      "bond_bias": "축소/방어",
+      "cash_bias": "축소/방어"
+    },
+    "semiconductor_score": 79.6,
+    "semiconductor_band": "긍정",
+    "bond_score": 45.0,
+    "fx_score": null,
+    "housing_readiness_score": 49.3,
+    "etf_fit": [
+      {
+        "ticker": "091160.KS",
+        "name": "KODEX 반도체",
+        "bucket": "semiconductor",
+        "fit_score": 75.5,
+        "data_status": "ok"
+      },
+      {
+        "ticker": "SOXX",
+        "name": "iShares Semiconductor ETF",
+        "bucket": "semiconductor_global",
+        "fit_score": 75.5,
+        "data_status": "ok"
+      },
+      {
+        "ticker": "133690.KS",
+        "name": "KODEX 미국나스닥100",
+        "bucket": "ai_infrastructure",
+        "fit_score": 75.5,
+        "data_status": "ok"
+      }
+    ]
+  },
+  "assets": {
+    "stocks": {
+      "score": 76.3,
+      "stars": "★★★★☆",
+      "data_status": "ok",
+      "detail": [
+        "SK하이닉스",
+        "삼성전자"
+      ]
+    },
+    "etf": {
+      "score": 75.5,
+      "stars": "★★★★☆",
+      "data_status": "ok",
+      "detail": [
+        {
+          "ticker": "091160.KS",
+          "name": "KODEX 반도체",
+          "bucket": "semiconductor",
+          "fit_score": 75.5,
+          "data_status": "ok"
+        },
+        {
+          "ticker": "SOXX",
+          "name": "iShares Semiconductor ETF",
+          "bucket": "semiconductor_global",
+          "fit_score": 75.5,
+          "data_status": "ok"
+        },
+        {
+          "ticker": "133690.KS",
+          "name": "KODEX 미국나스닥100",
+          "bucket": "ai_infrastructure",
+          "fit_score": 75.5,
+          "data_status": "ok"
+        }
+      ]
+    },
+    "bond": {
+      "score": 45.0,
+      "stars": "★★☆☆☆",
+      "data_status": "ok",
+      "detail": [
+        {
+          "name": "국고채 10년",
+          "type": "government",
+          "currency": "KRW",
+          "face_value": 10000000,
+          "maturity": "2033-06-30"
+        }
+      ]
+    },
+    "cash": {
+      "score": 100.0,
+      "stars": "★★★★★",
+      "data_status": "ok",
+      "detail": {
+        "krw": 20000000,
+        "usd": 2000
+      }
+    },
+    "subscription_fund": {
+      "score": 49.3,
+      "stars": "★★☆☆☆",
+      "data_status": "ok",
+      "detail": [
+        {
+          "name": "세종 5-1생활권 공공분양 (EXAMPLE)",
+          "agency": "LH",
+          "region": "세종 플랫폼시티",
+          "readiness_score": 49.3,
+          "factors": {
+            "eligibility_fit": 100.0,
+            "funding_readiness": 13.6,
+            "region_type_match": 25.0,
+            "timing_readiness": 40.0,
+            "competition_adjustment_inverse": null
+          },
+          "application_start": "2026-08-11",
+          "application_end": "2026-08-12",
+          "data_status": "ok",
+          "platform_city_analysis": {
+            "location": "세종 플랫폼시티",
+            "supply_scale_households": 620,
+            "expected_schedule": {
+              "announce_date": "2026-08-01",
+              "application_start": "2026-08-11",
+              "application_end": "2026-08-12"
+            },
+            "expected_price_krw": 550000000,
+            "funding_gap_krw": 95000000.0,
+            "expected_competition_ratio": null,
+            "user_fit_score": 49.3,
+            "risk_notes": [
+              "예상 경쟁률 미확정 — 청약홈 공고 확정 후 재평가 필요",
+              "자금조달 갭 발생 시 채권/현금 배분 조정 필요 (Action Engine 충돌 조정 대상)"
+            ]
+          }
+        }
+      ]
+    },
+    "fx_exposure": {
+      "score": null,
+      "stars": null,
+      "data_status": "pending",
+      "detail": {
+        "usdkrw_change_pct_3m": null,
+        "dollar_index_change_pct_3m": null,
+        "kr_us_rate_differential_pct": null,
+        "us_fed_funds_change_bp_3m": null
+      }
+    }
+  },
+  "housing": {
+    "notices": [
+      {
+        "name": "세종 5-1생활권 공공분양 (EXAMPLE)",
+        "agency": "LH",
+        "region": "세종 플랫폼시티",
+        "readiness_score": 49.3,
+        "factors": {
+          "eligibility_fit": 100.0,
+          "funding_readiness": 13.6,
+          "region_type_match": 25.0,
+          "timing_readiness": 40.0,
+          "competition_adjustment_inverse": null
+        },
+        "application_start": "2026-08-11",
+        "application_end": "2026-08-12",
+        "data_status": "ok",
+        "platform_city_analysis": {
+          "location": "세종 플랫폼시티",
+          "supply_scale_households": 620,
+          "expected_schedule": {
+            "announce_date": "2026-08-01",
+            "application_start": "2026-08-11",
+            "application_end": "2026-08-12"
+          },
+          "expected_price_krw": 550000000,
+          "funding_gap_krw": 95000000.0,
+          "expected_competition_ratio": null,
+          "user_fit_score": 49.3,
+          "risk_notes": [
+            "예상 경쟁률 미확정 — 청약홈 공고 확정 후 재평가 필요",
+            "자금조달 갭 발생 시 채권/현금 배분 조정 필요 (Action Engine 충돌 조정 대상)"
+          ]
+        }
+      }
+    ],
+    "data_status": "ok"
+  },
+  "travel": {
+    "trips": [
+      {
+        "name": "미국 출장 (EXAMPLE)",
+        "type": "business",
+        "destination_country": "US",
+        "departure_date": "2026-09-15",
+        "score_kind": "trip_readiness",
+        "score": 80.0,
+        "factors": {
+          "fx_favorability": null,
+          "cost_risk_inverse": null,
+          "lead_time_readiness": 80.0
+        },
+        "data_status": "ok"
+      },
+      {
+        "name": "일본 여행 (EXAMPLE)",
+        "type": "leisure",
+        "destination_country": "JP",
+        "departure_date": "2026-10-03",
+        "score_kind": "travel_timing",
+        "score": 70.0,
+        "factors": {
+          "fx_favorability": null,
+          "season_favorability": 70.0,
+          "airfare_hotel_trend": null
+        },
+        "data_status": "ok"
+      }
+    ],
+    "data_status": "ok"
+  },
+  "scenarios": {
+    "base": {
+      "probability": 55,
+      "premise": "현재 국면(Early Expansion)과 반도체 업황(긍정)의 추세가 유지된다.",
+      "expected_change": "지표가 현재 범위 내에서 등락하며 국면 전환 신호는 제한적.",
+      "user_impact": "Investment Environment Score 73.1점 수준의 배분 유지가 합리적."
+    },
+    "bull": {
+      "probability": 25,
+      "premise": "상향 신호(semiconductor_strong)가 강화된다.",
+      "expected_change": "수출/반도체 개선과 물가 안정이 동반되며 국면이 한 단계 상향될 가능성.",
+      "user_impact": "주식/ETF 비중 확대, 반도체/AI 인프라 비중 우선순위 상향을 검토할 수 있다."
+    },
+    "bear": {
+      "probability": 20,
+      "premise": "하향/경고 신호(잠재 리스크)가 현실화된다.",
+      "expected_change": "수출 둔화 또는 물가 재상승으로 국면이 한 단계 하향될 가능성.",
+      "user_impact": "현금/채권 비중 확대, 청약·출장 자금 유동성 우선 확보가 합리적."
+    },
+    "invalid_conditions": [
+      "수출 감소 전환",
+      "반도체 수출 감소 전환",
+      "CPI 재상승",
+      "PPI 상승 지속 (6% 이상)",
+      "환율 급등",
+      "미국 고용 지표 악화"
+    ]
+  },
+  "actions": [
+    {
+      "priority": 4,
+      "priority_label": "★★★★☆ 검토 필요",
+      "priority_score": 80.5,
+      "title": "세종 5-1생활권 공공분양 (EXAMPLE) 자금 갭 95,000,000원 확보 계획 수립",
+      "reason": "목표 자금 대비 현재 청약저축/현금 잔액이 부족하다.",
+      "invalid_condition": "공고가 취소되거나 자금 목표가 조정되면 보류.",
+      "recheck": "2026-08-11 1개월 전.",
+      "category": "liquidity_survival",
+      "conflict_note": null
+    },
+    {
+      "priority": 4,
+      "priority_label": "★★★★☆ 검토 필요",
+      "priority_score": 72.2,
+      "title": "SK hynix / Micron 실적발표 확인 (2026-07-24)",
+      "reason": "우선순위 점수 85.8점, ★★★★★ — D-10.",
+      "invalid_condition": "일정이 연기되면 재점검 시점도 함께 조정.",
+      "recheck": "2026-07-24 당일 또는 직후.",
+      "category": "industry_cycle",
+      "conflict_note": null
+    },
+    {
+      "priority": 4,
+      "priority_label": "★★★★☆ 검토 필요",
+      "priority_score": 71.0,
+      "title": "세종 5-1생활권 공공분양 (EXAMPLE) 청약 자격/자금 점검",
+      "reason": "청약 준비도 49.3점 — 신청 전 자격/자금 요건 재확인 필요.",
+      "invalid_condition": "공고가 취소되거나 자격 요건 미충족이 확인되면 보류.",
+      "recheck": "2026-08-11 1주 전.",
+      "category": "liquidity_survival",
+      "conflict_note": null
+    },
+    {
+      "priority": 3,
+      "priority_label": "★★★☆☆ 관찰 필요",
+      "priority_score": 67.6,
+      "title": "한국 수출입 동향 (반도체 포함) 확인 (2026-08-01)",
+      "reason": "우선순위 점수 84.8점, ★★★★★ — D-18.",
+      "invalid_condition": "일정이 연기되면 재점검 시점도 함께 조정.",
+      "recheck": "2026-08-01 당일 또는 직후.",
+      "category": "macro_risk",
+      "conflict_note": null
+    },
+    {
+      "priority": 3,
+      "priority_label": "★★★☆☆ 관찰 필요",
+      "priority_score": 67.2,
+      "title": "메모리/AI 인프라 비중 유지 또는 확대 검토",
+      "reason": "반도체 종합 점수 79.6점(긍정) — 메모리 사이클과 AI 인프라 투자 모두 순풍.",
+      "invalid_condition": "DRAM/NAND 가격 추세 반전 또는 CSP CapEx 가이던스 하향 시 보류.",
+      "recheck": "Micron/SK hynix/TSMC 분기 실적 발표 직후.",
+      "category": "industry_cycle",
+      "conflict_note": null
+    },
+    {
+      "priority": 3,
+      "priority_label": "★★★☆☆ 관찰 필요",
+      "priority_score": 63.8,
+      "title": "FOMC 정례회의 확인 (2026-07-29)",
+      "reason": "우선순위 점수 75.1점, ★★★★☆ — D-15.",
+      "invalid_condition": "일정이 연기되면 재점검 시점도 함께 조정.",
+      "recheck": "2026-07-29 당일 또는 직후.",
+      "category": "macro_risk",
+      "conflict_note": null
+    },
+    {
+      "priority": 3,
+      "priority_label": "★★★☆☆ 관찰 필요",
+      "priority_score": 58.8,
+      "title": "주식/ETF 비중 확대 검토",
+      "reason": "Investment Environment Score 73.1점 — 거시/반도체 환경이 우호적.",
+      "invalid_condition": "Investment Environment Score가 20점 이상 하락하면 보류.",
+      "recheck": "다음 정기 리포트.",
+      "category": "investment_opportunity",
+      "conflict_note": "유동성 우선 원칙(15.6) 적용 — 청약/필수자금 확보가 우선이며, 공격적 매수 확대는 해당 자금 목표 달성 후 재검토한다."
+    },
+    {
+      "priority": 2,
+      "priority_label": "★★☆☆☆ 참고",
+      "priority_score": 54.5,
+      "title": "미국 CPI 발표 확인 (2026-08-12)",
+      "reason": "우선순위 점수 70.9점, ★★★★☆ — D-29.",
+      "invalid_condition": "일정이 연기되면 재점검 시점도 함께 조정.",
+      "recheck": "2026-08-12 당일 또는 직후.",
+      "category": "macro_risk",
+      "conflict_note": null
+    },
+    {
+      "priority": 2,
+      "priority_label": "★★☆☆☆ 참고",
+      "priority_score": 52.2,
+      "title": "미국 비농업 고용(NFP) 발표 확인 (2026-08-07)",
+      "reason": "우선순위 점수 62.2점, ★★★★☆ — D-24.",
+      "invalid_condition": "일정이 연기되면 재점검 시점도 함께 조정.",
+      "recheck": "2026-08-07 당일 또는 직후.",
+      "category": "macro_risk",
+      "conflict_note": null
+    },
+    {
+      "priority": 2,
+      "priority_label": "★★☆☆☆ 참고",
+      "priority_score": 46.8,
+      "title": "미국 출장 (EXAMPLE) 환전 실행 검토",
+      "reason": "미국 출장 (EXAMPLE): 환전 유리도 80.0점 — 현재 환율/시점이 상대적으로 유리.",
+      "invalid_condition": "출국일 이전 환율이 추가로 5% 이상 불리하게 움직이면 재검토.",
+      "recheck": "2026-09-15 2주 전.",
+      "category": "liquidity_survival",
+      "conflict_note": null
+    },
+    {
+      "priority": 2,
+      "priority_label": "★★☆☆☆ 참고",
+      "priority_score": 46.8,
+      "title": "일본 여행 (EXAMPLE) 환전 실행 검토",
+      "reason": "일본 여행 (EXAMPLE): 환전 유리도 70.0점 — 현재 환율/시점이 상대적으로 유리.",
+      "invalid_condition": "출국일 이전 환율이 추가로 5% 이상 불리하게 움직이면 재검토.",
+      "recheck": "2026-10-03 2주 전.",
+      "category": "travel_discretionary",
+      "conflict_note": null
+    }
+  ],
+  "calendar": [
+    {
+      "name": "SK hynix / Micron 실적발표",
+      "date": "2026-07-24",
+      "category": "semiconductor_earnings",
+      "days_until": 10,
+      "priority_score": 85.8,
+      "importance_tier": 5,
+      "importance_label": "★★★★★"
+    },
+    {
+      "name": "한국 수출입 동향 (반도체 포함)",
+      "date": "2026-08-01",
+      "category": "kr_trade",
+      "days_until": 18,
+      "priority_score": 84.8,
+      "importance_tier": 5,
+      "importance_label": "★★★★★"
+    },
+    {
+      "name": "FOMC 정례회의",
+      "date": "2026-07-29",
+      "category": "us_policy",
+      "days_until": 15,
+      "priority_score": 75.1,
+      "importance_tier": 4,
+      "importance_label": "★★★★☆"
+    },
+    {
+      "name": "미국 CPI 발표",
+      "date": "2026-08-12",
+      "category": "us_inflation",
+      "days_until": 29,
+      "priority_score": 70.9,
+      "importance_tier": 4,
+      "importance_label": "★★★★☆"
+    },
+    {
+      "name": "미국 비농업 고용(NFP) 발표",
+      "date": "2026-08-07",
+      "category": "us_employment",
+      "days_until": 24,
+      "priority_score": 62.2,
+      "importance_tier": 4,
+      "importance_label": "★★★★☆"
+    },
+    {
+      "name": "한국 CPI 발표",
+      "date": "2026-08-05",
+      "category": "kr_inflation",
+      "days_until": 22,
+      "priority_score": 59.2,
+      "importance_tier": 3,
+      "importance_label": "★★★☆☆"
+    },
+    {
+      "name": "한국은행 금융통화위원회",
+      "date": "2026-08-14",
+      "category": "kr_policy",
+      "days_until": 31,
+      "priority_score": 59.1,
+      "importance_tier": 3,
+      "importance_label": "★★★☆☆"
+    }
+  ],
+  "personal_executive_brief": {
+    "one_line_diagnosis": "Early Expansion 국면(총점 1, 신뢰도 70.0점) — 반도체 긍정",
+    "asset_summary": {
+      "stocks": "★★★★☆",
+      "etf": "★★★★☆",
+      "bond": "★★☆☆☆",
+      "cash": "★★★★★",
+      "subscription_fund": "★★☆☆☆",
+      "fx_exposure": null
+    },
+    "top_events": [
+      "SK hynix / Micron 실적발표 (2026-07-24)",
+      "한국 수출입 동향 (반도체 포함) (2026-08-01)",
+      "FOMC 정례회의 (2026-07-29)",
+      "미국 CPI 발표 (2026-08-12)",
+      "미국 비농업 고용(NFP) 발표 (2026-08-07)"
+    ],
+    "final_suggestion": "세종 5-1생활권 공공분양 (EXAMPLE) 자금 갭 95,000,000원 확보 계획 수립"
+  },
+  "appendix": {
+    "sources": [
+      "FRED",
+      "산업통상자원부 (수동 입력)"
+    ],
+    "glossary": {
+      "Regime": "경기 국면 — Recovery/Early Expansion/Expansion/Late Expansion/Slowdown/Recession 순환.",
+      "Confidence": "판정 신뢰도(0-100) — 데이터 최신성/출처 품질/지표 일관성/추세 안정성 가중합.",
+      "Investment Environment Score": "거시+반도체+유동성+리스크를 종합한 투자 환경 점수(0-100)."
+    },
+    "previous_month_regime": "Early Expansion"
+  }
+}

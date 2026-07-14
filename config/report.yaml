@@ -1,0 +1,37 @@
+# PEOS report template configuration (Master Instruction 16, 25).
+# Section order and output formats are externalized so the report builder
+# never hardcodes structure. Markdown is the only fully implemented
+# renderer for this MVP (24.3); pdf/excel are prepared extension points
+# (engine/report/exporters.py) per 18.1's "PDF/Excel export 준비".
+
+output_formats: [markdown, json]
+
+sections:
+  - executive_summary
+  - monthly_key_changes
+  - macro_dashboard
+  - regime_judgement
+  - indicator_deep_dive
+  - personal_analysis
+  - asset_impact
+  - scenario_analysis
+  - action_plan
+  - economic_calendar
+  - personal_executive_brief
+  - appendix
+
+action_grade_labels:
+  5: "★★★★★ 반드시 확인 / 반드시 실행"
+  4: "★★★★☆ 검토 필요"
+  3: "★★★☆☆ 관찰 필요"
+  2: "★★☆☆☆ 참고"
+  1: "보류"
+
+calendar_importance_labels:
+  5: "★★★★★ 반드시 확인"
+  4: "★★★★☆ 검토"
+  3: "★★★☆☆ 관찰"
+
+scenario_labels: [base, bull, bear]
+
+output_dir: "report"

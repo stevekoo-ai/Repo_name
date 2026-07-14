@@ -1,0 +1,60 @@
+# PEOS user_profile (Master Instruction 3.3).
+# Fields grounded in the persona description (3.1) are filled in directly.
+# Fields with no value given in the master instruction are filled with
+# clearly marked EXAMPLE placeholders so the schema is complete and the
+# pipeline is runnable end-to-end; replace the `# EXAMPLE` lines with real
+# values whenever you're ready — nothing else needs to change.
+
+profile_version: 1
+updated_at: "2026-07-14T00:00:00"
+
+job:
+  title: "반도체 기업 엔지니어"
+  industry: "semiconductor"
+  domains: ["차세대 메모리", "CXL", "AI Infrastructure", "Memory System"]
+  income_cycle_sensitivity: high
+  bonus_cycle_sensitivity: high
+
+investment_style:
+  horizon: long_term
+  macro_driven: true
+  cycle_driven: true
+  data_driven: true
+  risk_tolerance: medium
+  rebalancing_rule: "분기 1회 점검, Investment Environment Score 20점 이상 변동 시 리밸런싱 검토"
+
+interest_priority:
+  semiconductor: 1.0
+  ai_infrastructure: 0.95
+  memory: 1.0
+  cxl: 0.85
+  cloud: 0.7
+  data_center: 0.75
+  etf: 0.6
+  bond: 0.6
+  housing: 0.7
+  fx: 0.65
+
+assets:
+  holdings_enabled: true
+  cash_tracking_enabled: true
+  portfolio_source: yaml   # see config/portfolio.yaml
+
+housing:
+  target_type: public_sale
+  preferred_size: "84m2+"
+  priority_regions: ["세종 (플랫폼시티)", "성남/판교", "위례"]  # EXAMPLE — 실제 희망 지역으로 교체
+  subscription_account_start: "2015-01-01"  # EXAMPLE — 실제 청약저축 가입일로 교체
+  subscription_priority_strategy: "일반공급 무주택 회차 우선, 국민주택 84㎡ 이상 목표"  # EXAMPLE
+  moveout_deadline: null  # EXAMPLE — 확정되면 날짜 입력
+
+travel:
+  business_trip_enabled: true
+  business_trip_regions: ["US", "JP"]  # EXAMPLE — 실제 출장 권역으로 교체
+  leisure_travel_enabled: true
+  fx_sensitivity: high
+
+reporting:
+  report_day: 1
+  alert_time: "08:00"
+  preferred_output: [markdown, dashboard]

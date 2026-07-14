@@ -1,0 +1,52 @@
+# PEOS portfolio holdings (Master Instruction 14.2, 13.4-13.9).
+# EXAMPLE values throughout — replace with real holdings. Structure and
+# field names must stay stable since engine/personal/portfolio.py reads
+# these keys directly.
+
+portfolio_version: 1
+updated_at: "2026-07-14T00:00:00"
+
+cash:
+  krw: 20000000     # EXAMPLE
+  usd: 2000         # EXAMPLE
+
+stocks:
+  - ticker: "000660.KS"
+    name: "SK하이닉스"
+    quantity: 50            # EXAMPLE
+    avg_price: 180000
+    sector: semiconductor_memory
+  - ticker: "005930.KS"
+    name: "삼성전자"
+    quantity: 30            # EXAMPLE
+    avg_price: 70000
+    sector: semiconductor_memory
+
+etf:
+  - ticker: "091160.KS"
+    name: "KODEX 반도체"
+    quantity: 100            # EXAMPLE
+    avg_price: 30000
+    bucket: semiconductor
+  - ticker: "SOXX"
+    name: "iShares Semiconductor ETF"
+    quantity: 10             # EXAMPLE
+    avg_price: 200
+    bucket: semiconductor_global
+  - ticker: "133690.KS"
+    name: "KODEX 미국나스닥100"
+    quantity: 40              # EXAMPLE
+    avg_price: 15000
+    bucket: ai_infrastructure
+
+bonds:
+  - name: "국고채 10년"
+    type: government
+    currency: KRW
+    face_value: 10000000     # EXAMPLE
+    maturity: "2033-06-30"
+
+subscription_savings:
+  balance_krw: 15000000       # EXAMPLE — 주택청약종합저축 잔액
+  monthly_contribution_krw: 250000  # EXAMPLE
+  account_start: "2015-01-01"       # EXAMPLE, config/user.yaml housing.subscription_account_start와 동일 유지

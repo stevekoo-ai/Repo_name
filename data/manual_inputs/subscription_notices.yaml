@@ -1,0 +1,19 @@
+# EXAMPLE manual input for 공공분양 공고 (Master Instruction 8.1, 13.8, 13.9).
+# 청약홈/LH/GH/SH는 개인 대상 공식 API를 제공하지 않으므로, 공고가 뜨면
+# 이 파일에 직접 입력한다 (reliability grade 4 — 공공기관 공고 원문 기준).
+
+updated_at: "2026-07-14"
+notices:
+  - name: "세종 5-1생활권 공공분양 (EXAMPLE)"
+    agency: "LH"
+    region: "세종 플랫폼시티"
+    is_platform_city: true
+    supply_type: "일반공급"
+    size: "84㎡ 이상"
+    household_count: 620          # EXAMPLE
+    announce_date: "2026-08-01"   # EXAMPLE
+    application_start: "2026-08-11"  # EXAMPLE
+    application_end: "2026-08-12"    # EXAMPLE
+    expected_price_krw: 550000000    # EXAMPLE
+    expected_competition_ratio: null
+    source: "청약홈 (수동 입력)"

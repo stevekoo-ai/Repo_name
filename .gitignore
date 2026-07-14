@@ -2,3 +2,12 @@ __pycache__/
 *.pyc
 .pytest_cache/
 .venv/
+.env
+data/.cache/
+logs/
+
+# Regenerable pipeline intermediates (Level 1/2 storage) — reproducible from
+# manual_inputs/ + live API calls, not meant to be version-controlled.
+data/raw/*/*.json
+data/normalized/*.csv
+!data/raw/*/.gitkeep
