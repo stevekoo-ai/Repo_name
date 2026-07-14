@@ -35,8 +35,8 @@ def _rate_differential_score() -> tuple[float | None, float | None]:
     us_df = collector_base.read_normalized("fred_us_fed_funds_rate")
     if kr_df.empty or us_df.empty:
         return None, None
-    kr_rate = kr_df.sort_values("date")["value"].iloc[-1]
-    us_rate = us_df.sort_values("date")["value"].iloc[-1]
+    kr_rate = float(kr_df.sort_values("date")["value"].iloc[-1])
+    us_rate = float(us_df.sort_values("date")["value"].iloc[-1])
     differential = kr_rate - us_rate
     score = clamp(50 + differential * 20, 0.0, 100.0)  # more negative differential -> less favorable
     return score, round(differential, 2)

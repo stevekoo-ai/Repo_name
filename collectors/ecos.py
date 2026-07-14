@@ -22,29 +22,32 @@ from core.models import DataPoint, DataStatus, Frequency, Metadata
 from . import base
 
 ECOS_SERIES: dict[str, dict] = {
+    # 2026-07-14 GitHub Actions 실행에서 "해당하는 데이터가 없습니다" 응답 — 통계코드가
+    # 틀림. 901Y009(100대 통계지표)/1400(GDP성장률) 조합으로 교체 시도 — 이것도
+    # 확인되지 않았으니 다음 실행 로그를 다시 확인할 것.
     "gdp_growth_qoq": {
-        "stat_code": "200Y002", "cycle": "Q", "item_code1": "10111",
-        "unit": "%", "note": "실질 GDP 성장률(전기비, 계절조정) — 통계코드 확인 필요",
+        "stat_code": "901Y009", "cycle": "Q", "item_code1": "1400",
+        "unit": "%", "note": "실질 GDP 성장률(전기비) — 통계코드 재확인 필요 (기존 200Y002/10111는 데이터 없음 응답 확인됨)",
     },
     "ppi_yoy_level": {
         "stat_code": "404Y014", "cycle": "M", "item_code1": "*AA",
-        "unit": "2020=100", "note": "생산자물가지수 총지수 (레벨, YoY는 지표 계층에서 계산) — 통계코드 확인 필요",
+        "unit": "2020=100", "note": "생산자물가지수 총지수 (레벨, YoY는 지표 계층에서 계산) — 2026-07-14 GitHub Actions 실행에서 정상 응답 확인됨",
     },
     "current_account": {
         "stat_code": "301Y013", "cycle": "M", "item_code1": "000000",
-        "unit": "백만달러", "note": "경상수지 — 통계코드 확인 필요",
+        "unit": "백만달러", "note": "경상수지 — 2026-07-14 GitHub Actions 실행에서 정상 응답 확인됨",
     },
     "base_rate": {
         "stat_code": "722Y001", "cycle": "M", "item_code1": "0101000",
-        "unit": "%", "note": "한국은행 기준금리",
+        "unit": "%", "note": "한국은행 기준금리 — 2026-07-14 GitHub Actions 실행에서 정상 응답 확인됨",
     },
     "usdkrw": {
         "stat_code": "731Y001", "cycle": "D", "item_code1": "0000001",
-        "unit": "KRW", "note": "원/달러 매매기준율",
+        "unit": "KRW", "note": "원/달러 매매기준율 — 2026-07-14 GitHub Actions 실행에서 정상 응답 확인됨",
     },
     "kr_3y_yield": {
         "stat_code": "817Y002", "cycle": "D", "item_code1": "010200000",
-        "unit": "%", "note": "국고채 3년물 금리 — 통계코드 확인 필요",
+        "unit": "%", "note": "국고채 3년물 금리 — 2026-07-14 GitHub Actions 실행에서 정상 응답 확인됨",
     },
 }
 
