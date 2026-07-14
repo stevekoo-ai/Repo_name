@@ -4,16 +4,24 @@
 # clearly marked EXAMPLE placeholders so the schema is complete and the
 # pipeline is runnable end-to-end; replace the `# EXAMPLE` lines with real
 # values whenever you're ready — nothing else needs to change.
+#
+# This file is tracked in the (public) repo, so it intentionally holds only
+# non-identifying preference/strategy data. Identity-level PII (실명,
+# 생년월일, 거주지 주소, 자녀 학교명 등) lives in
+# data/manual_inputs/user_identity.yaml instead, which is gitignored —
+# see that file for the private profile detail and why it's split this way.
 
 profile_version: 1
 updated_at: "2026-07-14T00:00:00"
 
 job:
   title: "반도체 기업 엔지니어"
+  company: "SK하이닉스"
   industry: "semiconductor"
   domains: ["차세대 메모리", "CXL", "AI Infrastructure", "Memory System"]
   income_cycle_sensitivity: high
   bonus_cycle_sensitivity: high
+  income_level: "high_ps_driven"   # 고소득, 성과급(PS) 영향 큼
 
 investment_style:
   horizon: long_term
@@ -42,11 +50,14 @@ assets:
 
 housing:
   target_type: public_sale
+  target_complex: "플랫폼시티 공공분양"
+  status: waiting_for_announcement
   preferred_size: "84m2+"
-  priority_regions: ["세종 (플랫폼시티)", "성남/판교", "위례"]  # EXAMPLE — 실제 희망 지역으로 교체
+  income_cap_preference: none          # 소득제한 없는 유형 우선
+  priority_regions: ["플랫폼시티 (세종)"]
   subscription_account_start: "2005-11-03"  # REAL — 국민은행, config/portfolio.yaml subscription_savings와 동일
-  subscription_priority_strategy: "일반공급 무주택 회차 우선, 국민주택 84㎡ 이상 목표"  # EXAMPLE
-  moveout_deadline: null  # EXAMPLE — 확정되면 날짜 입력
+  subscription_priority_strategy: "저축총액(납입총액) 기준 경쟁 — 85㎡ 초과 일반공급, 소득제한 없는 84㎡ 이상 우선"
+  moveout_deadline: "2027-02-22"       # 현 거주지 전세 계약 만료일(갱신청구권 이미 사용) — 입주 전 임시 거주 필요
 
 travel:
   business_trip_enabled: true
