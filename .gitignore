@@ -11,3 +11,7 @@ logs/
 data/raw/*/*.json
 data/normalized/*.csv
 !data/raw/*/.gitkeep
+
+# Private data — never pushed to the shared repo, but still readable by the
+# local pipeline/collectors (19.3: 사용자 개인 데이터는 별도 보호).
+data/manual_inputs/income.yaml
