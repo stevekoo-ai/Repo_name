@@ -20,6 +20,7 @@ CLOCK_IMAGE_PATH = REPO_ROOT / "docs" / "clock.png"
 STATUS_KR = {
     DataStatus.OK.value: "OK", DataStatus.PENDING.value: "Pending",
     DataStatus.NOT_RELEASED.value: "Not Released", DataStatus.SOURCE_ERROR.value: "Source Error",
+    DataStatus.STALE.value: "이전 값 유지",
 }
 
 BAND_TO_BADGE = {
@@ -177,17 +178,23 @@ def _section_investment_clock(payload: dict) -> str:
 def _section_macro_dashboard(payload: dict, dashboard_key: str = "macro_dashboard", title: str = "Macro Dashboard") -> str:
     rows_data = payload[dashboard_key]
     has_fallback_note = any(r.get("previous_source") == "series_history" for r in rows_data)
+    has_stale_note = any(r.get("status") == "stale" for r in rows_data)
     rows = "".join(
         f"""<tr>
-          <td>{_esc(r['indicator'])}</td><td>{_fmt(r['current'])}</td>
+          <td>{_esc(r['indicator'])}</td>
+          <td>{_fmt(r['current'])}{' <sup class="stale-mark" title="오늘 실시간 조회 실패 — 마지막으로 확인된 값 유지 중">‡</sup>' if r.get('status') == 'stale' else ''}</td>
           <td>{_fmt(r['previous'])}{' <sup title="전월 리포트 스냅샷이 아직 없어 원자료 이력의 직전 값을 사용">†</sup>' if r.get('previous_source') == 'series_history' else ''}</td>
           <td>{_esc(r['trend'])}</td><td>{_fmt(r['score'])}</td>
           <td class="spark-cell">{_sparkline_svg(r.get('history') or [], r.get('history_years', 10))}</td>
           <td class="muted">{_esc(r['source'] or STATUS_KR.get(r['status'], r['status']))}</td>
         </tr>""" for r in rows_data
     )
-    footnote = ('<p class="tile-sub">† 전월 PEOS 리포트가 아직 쌓이지 않아, 해당 지표는 원자료(공식 통계) 이력의 '
-                '직전 발표값으로 대체 표시했습니다.</p>') if has_fallback_note else ""
+    footnotes = []
+    if has_stale_note:
+        footnotes.append('‡ 오늘 실시간 조회에 실패한 지표입니다 — 마지막으로 확인된 값을 그대로 유지해 표시했습니다 (추측/대체 데이터 아님).')
+    if has_fallback_note:
+        footnotes.append('† 전월 PEOS 리포트가 아직 쌓이지 않아, 해당 지표는 원자료(공식 통계) 이력의 직전 발표값으로 대체 표시했습니다.')
+    footnote = f'<p class="tile-sub">{" ".join(footnotes)}</p>' if footnotes else ""
     return f"""
     <section class="card">
       <h2>{_esc(title)}</h2>
@@ -262,6 +269,15 @@ def _section_discussion(payload: dict) -> str:
             📋 작성한 답변 전체 복사</button>
           <span class="tile-sub">비워둔 항목은 자동으로 제외됩니다. 복사한 내용은 다음 대화에 붙여넣어 주시면
           반영됩니다. "GitHub Issue로 제출"은 공개 저장소에 남으니, 공개돼도 괜찮은 항목에만 사용해주세요.</span>
+        </div>
+        <div class="copy-output" id="peos-copy-output">
+          <p id="peos-copy-output-msg" class="tile-sub">복사 버튼을 누르면 아래 박스에 결과가 나타납니다. 자동
+          복사가 안 되면, 아래 박스를 <b>먼저 클릭</b>한 다음 Ctrl+A(Mac: Cmd+A)로 전체 선택 →
+          Ctrl+C(Mac: Cmd+C)로 직접 복사해주세요. (자동 선택 기능은 보는 환경에 따라 막힐 수 있어
+          이 방법이 가장 확실합니다.)</p>
+          <textarea id="peos-copy-output-text" readonly rows="6"
+            placeholder="여기에 복사할 내용이 표시됩니다."></textarea>
+          <a id="peos-copy-output-link" href="#" target="_blank" rel="noopener">GitHub 이슈 작성 페이지 열기</a>
         </div>"""
 
     return f"""
@@ -475,6 +491,7 @@ th { color: var(--text-muted); font-weight: 600; font-size: 0.78rem; text-transf
 .spark-labels { display: flex; justify-content: space-between; font-size: 0.68rem; color: var(--text-muted);
   width: 176px; }
 .spark-empty { font-size: 0.78rem; }
+.stale-mark { color: var(--warn); cursor: help; }
 .clock-row { display: flex; gap: 18px; align-items: center; flex-wrap: wrap; }
 .clock-img { width: 180px; height: 180px; border-radius: 10px; flex-shrink: 0;
   background: #ffffff; padding: 6px; border: 1px solid var(--border); }
@@ -496,17 +513,13 @@ th { color: var(--text-muted); font-weight: 600; font-size: 0.78rem; text-transf
 .btn-fb:hover { border-color: var(--accent); }
 .btn-fb:disabled { opacity: 0.7; cursor: default; }
 .btn-fb-primary { background: var(--accent); color: #fff; border-color: var(--accent); }
-.copy-panel { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5);
-  align-items: center; justify-content: center; z-index: 1000; padding: 16px; }
-.copy-panel-box { background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
-  padding: 18px 20px; max-width: 480px; width: 100%; box-shadow: 0 8px 32px rgba(0,0,0,0.3); }
-.copy-panel-box p { margin: 0 0 10px; font-size: 0.9rem; color: var(--text); }
-.copy-panel-box textarea { width: 100%; box-sizing: border-box; padding: 8px 10px; border-radius: 8px;
-  border: 1px solid var(--border); background: var(--surface-2); color: var(--text);
-  font-family: inherit; font-size: 0.82rem; resize: vertical; margin-bottom: 10px; }
-.copy-panel-box a#peos-copy-panel-link { display: none; margin-bottom: 10px; color: var(--accent);
+.copy-output { margin-top: 10px; padding: 12px 14px; background: var(--surface-2);
+  border: 2px dashed var(--accent); border-radius: 10px; }
+.copy-output textarea { width: 100%; box-sizing: border-box; padding: 8px 10px; border-radius: 8px;
+  border: 1px solid var(--border); background: var(--surface); color: var(--text);
+  font-family: inherit; font-size: 0.82rem; resize: vertical; margin-top: 6px; }
+.copy-output a#peos-copy-output-link { display: none; margin-top: 8px; color: var(--accent);
   font-size: 0.88rem; font-weight: 600; }
-.copy-panel-actions { display: flex; justify-content: flex-end; }
 .action-card { border-radius: 10px; border: 1px solid var(--border); padding: 12px 16px; margin: 8px 0 14px; }
 .action-good { border-left: 4px solid var(--good); }
 .action-warn { border-left: 4px solid var(--warn); }
@@ -541,23 +554,20 @@ function peosEntryText(entry) {
 
 // Some viewers (e.g. a preview rendered inside a sandboxed iframe) block
 // navigator.clipboard, document.execCommand('copy'), window.alert, and
-// window.open outright — silently, with no error thrown. Never rely on any
-// of those alone: always fall back to a plain on-page panel (no dialog API)
-// with the text pre-selected in a visible textarea, so a manual Ctrl+C/Cmd+C
-// always works regardless of what the surrounding page blocks.
-function peosShowPanel(message, text, linkUrl) {
-  var panel = document.getElementById('peos-copy-panel');
-  var msgEl = document.getElementById('peos-copy-panel-msg');
-  var taEl = document.getElementById('peos-copy-panel-text');
-  var linkEl = document.getElementById('peos-copy-panel-link');
+// window.open outright — silently, with no error thrown, and even
+// programmatic focus()/select() can land the browser's actual selection
+// somewhere else entirely (that's what copied the whole page once already).
+// So: no modal, no scripted select() the user has to trust blindly. One
+// always-visible, always-in-place output box; the user clicks into it
+// themselves and selects with their own Ctrl+A, which is native browser
+// behavior no page script can misdirect.
+function peosShowOutput(message, text, linkUrl) {
+  var box = document.getElementById('peos-copy-output');
+  var msgEl = document.getElementById('peos-copy-output-msg');
+  var taEl = document.getElementById('peos-copy-output-text');
+  var linkEl = document.getElementById('peos-copy-output-link');
   msgEl.textContent = message;
-  if (text) {
-    taEl.style.display = 'block';
-    taEl.value = text;
-  } else {
-    taEl.style.display = 'none';
-    taEl.value = '';
-  }
+  taEl.value = text || '';
   if (linkUrl) {
     linkEl.style.display = 'inline-block';
     linkEl.href = linkUrl;
@@ -565,47 +575,26 @@ function peosShowPanel(message, text, linkUrl) {
     linkEl.style.display = 'none';
     linkEl.removeAttribute('href');
   }
-  panel.style.display = 'flex';
-  if (text) {
-    taEl.focus();
-    taEl.select();
-  }
-}
-
-function peosClosePanel() {
-  document.getElementById('peos-copy-panel').style.display = 'none';
+  if (box.scrollIntoView) box.scrollIntoView({ behavior: 'smooth', block: 'center' });
 }
 
 function peosCopyText(text, btn) {
-  var copied = false;
+  // Best-effort only — never trusted as the source of truth for whether the
+  // copy actually landed on the system clipboard, since these can silently
+  // no-op or misfire depending on the viewer.
   try {
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(text);
-      copied = true;
-    }
-  } catch (e) { /* fall through to the manual panel below */ }
-  if (!copied) {
-    try {
-      var ta = document.createElement('textarea');
-      ta.value = text;
-      ta.style.position = 'fixed';
-      ta.style.opacity = '0';
-      document.body.appendChild(ta);
-      ta.select();
-      copied = document.execCommand('copy');
-      document.body.removeChild(ta);
-    } catch (e) { /* still fine — the panel below is the guaranteed path */ }
-  }
-  peosShowPanel(
-    copied ? '클립보드에 복사를 시도했습니다. 혹시 붙여넣기가 안 되면, 아래 내용을 직접 선택해서 Ctrl+C(Mac: Cmd+C)로 복사해주세요.'
-           : '이 화면에서는 자동 복사가 막혀 있습니다. 아래 내용이 이미 선택되어 있으니 Ctrl+C(Mac: Cmd+C)로 복사해주세요.',
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text);
+  } catch (e) { /* ignore */ }
+  peosShowOutput(
+    '아래 박스에 복사할 내용을 넣어뒀습니다. 자동 복사를 시도했지만 확실하지 않으니, ' +
+    '박스를 직접 클릭한 뒤 Ctrl+A(Mac: Cmd+A) → Ctrl+C(Mac: Cmd+C)로 복사해주세요.',
     text, null
   );
 }
 
 function peosCopyOne(btn) {
   var entry = peosBuildEntry(peosFindCard(btn));
-  if (!entry) { peosShowPanel('먼저 답변을 입력해주세요.', null, null); return; }
+  if (!entry) { peosShowOutput('먼저 답변을 입력해주세요.', '', null); return; }
   peosCopyText(peosEntryText(entry), btn);
 }
 
@@ -618,25 +607,25 @@ function peosCopyAll(btn) {
     var entry = peosBuildEntry(card);
     if (entry) parts.push(peosEntryText(entry));
   });
-  if (!parts.length) { peosShowPanel('입력한 답변이 없습니다.', null, null); return; }
+  if (!parts.length) { peosShowOutput('입력한 답변이 없습니다.', '', null); return; }
   peosCopyText('PEOS ' + month + ' 리포트 피드백\\n\\n' + parts.join('\\n\\n'), btn);
 }
 
 function peosIssueOne(btn) {
   var card = peosFindCard(btn);
   var entry = peosBuildEntry(card);
-  if (!entry) { peosShowPanel('먼저 답변을 입력해주세요.', null, null); return; }
+  if (!entry) { peosShowOutput('먼저 답변을 입력해주세요.', '', null); return; }
   var section = document.getElementById('discussion-section');
   var repo = section.dataset.repo;
   var month = section.dataset.month;
-  if (!repo) { peosShowPanel('연결된 GitHub 저장소 정보가 없습니다.', null, null); return; }
+  if (!repo) { peosShowOutput('연결된 GitHub 저장소 정보가 없습니다.', '', null); return; }
   var title = encodeURIComponent('[피드백] ' + month + ' - ' + entry.topic);
   var body = encodeURIComponent('**질문**\\n' + entry.question + '\\n\\n**답변**\\n' + entry.answer);
   var url = 'https://github.com/' + repo + '/issues/new?title=' + title + '&body=' + body;
   var opened = null;
   try { opened = window.open(url, '_blank', 'noopener'); } catch (e) { /* blocked — fall through */ }
   if (!opened) {
-    peosShowPanel('이 화면에서는 새 창 열기가 막혀 있습니다. 아래 링크를 눌러 GitHub 이슈 작성 페이지로 이동해주세요.', null, url);
+    peosShowOutput('이 화면에서는 새 창 열기가 막혀 있습니다. 아래 링크를 눌러 GitHub 이슈 작성 페이지로 이동해주세요.', '', url);
   }
 }
 """
@@ -683,16 +672,6 @@ def render_html(payload: dict) -> str:
   {body_sections}
   <footer>PEOS는 공식 데이터와 사용자 자산/목표를 결합해 행동을 제안하는 개인 경제 의사결정 시스템입니다.
   모든 판단은 참고용이며 최종 결정은 사용자에게 있습니다.</footer>
-</div>
-<div id="peos-copy-panel" class="copy-panel">
-  <div class="copy-panel-box">
-    <p id="peos-copy-panel-msg"></p>
-    <textarea id="peos-copy-panel-text" readonly rows="6"></textarea>
-    <a id="peos-copy-panel-link" href="#" target="_blank" rel="noopener">GitHub 이슈 작성 페이지 열기</a>
-    <div class="copy-panel-actions">
-      <button type="button" class="btn-fb" onclick="peosClosePanel()">닫기</button>
-    </div>
-  </div>
 </div>
 <script>{_FEEDBACK_JS}</script>
 </body>

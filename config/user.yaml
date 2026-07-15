@@ -50,11 +50,11 @@ assets:
 
 housing:
   target_type: public_sale
-  target_complex: "플랫폼시티 공공분양"
+  target_complex: "용인 플랫폼시티 공공분양"
   status: waiting_for_announcement
   preferred_size: "84m2+"
   income_cap_preference: none          # 소득제한 없는 유형 우선
-  priority_regions: ["세종 플랫폼시티"]  # data/manual_inputs/subscription_notices.yaml의 region 표기와 동일하게 유지 (문자열 매칭용)
+  priority_regions: ["용인 플랫폼시티"]  # 경기도 용인시 플랫폼시티(기흥구 보정·마북동 일대). data/manual_inputs/subscription_notices.yaml의 region 표기와 동일하게 유지 (문자열 매칭용)
   subscription_account_start: "2005-11-03"  # REAL — 국민은행, config/portfolio.yaml subscription_savings와 동일
   subscription_priority_strategy: "저축총액(납입총액) 기준 경쟁 — 85㎡ 초과 일반공급, 소득제한 없는 84㎡ 이상 우선"
   moveout_deadline: "2027-02-22"       # 현 거주지 전세 계약 만료일(갱신청구권 이미 사용) — 입주 전 임시 거주 필요

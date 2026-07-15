@@ -1,10 +1,9 @@
-name: Monthly PEOS Report
+name: Daily PEOS Report
 
-# Scheduled cron removed — .github/workflows/daily-peos-report.yml (06:00 KST
-# daily) now runs this same pipeline every day, which supersedes the monthly
-# cadence entirely. Kept as workflow_dispatch only, for an on-demand rerun of
-# a specific month.
 on:
+  schedule:
+    # 21:00 UTC = 06:00 KST (next day)
+    - cron: "0 21 * * *"
   workflow_dispatch:
     inputs:
       month:
@@ -16,7 +15,7 @@ permissions:
   contents: write
 
 concurrency:
-  group: monthly-peos-report
+  group: daily-peos-report
   cancel-in-progress: false
 
 jobs:
@@ -49,14 +48,17 @@ jobs:
             python -m engine.report.run
           fi
 
-      - name: Commit updated report and snapshot
+      - name: Regenerate PEOS Daily Dashboard
+        run: python -m engine.report.daily_dashboard
+
+      - name: Commit updated report, history, and dashboard
         run: |
           git config user.name "peos-bot"
           git config user.email "actions@users.noreply.github.com"
-          git add report/ data/snapshots/
+          git add report/ data/snapshots/ data/peos_daily_history.csv docs/peos-daily.html
           if git diff --cached --quiet; then
             echo "No changes to commit"
           else
-            git commit -m "chore: monthly PEOS report $(date -u +%Y-%m)"
+            git commit -m "chore: daily PEOS report $(date -u +%Y-%m-%d)"
             git push
           fi
