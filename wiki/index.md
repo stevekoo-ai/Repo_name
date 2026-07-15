@@ -13,11 +13,11 @@ Catalog of every page in the wiki. See `../CLAUDE.md` for conventions.
 
 ### entities
 
-- [SK하이닉스](entities/sk-hynix.md) — 반도체 종목; 7/13 급락 → 7/15 저항 돌파·ADR +27% 폭등 → 같은 날 밤 섹터 전체 차익실현으로 되돌림, 레버리지 ETF 4종(강세+약세) 신규 상장
+- [SK하이닉스](entities/sk-hynix.md) — 반도체 종목; 7/13 급락 → 7/15 저항 돌파·ADR +27% 폭등 → 같은 날 밤 섹터 전체 차익실현 되돌림. 7/16 ADR 프리미엄 계산 완료(약 30.7%, 훼손 우려 기각)
 - [나의 투자 포트폴리오](entities/my-portfolio.md) — 4개 계좌 총 4.5억원(2026-07-13 기준), SK하이닉스가 약 65% 차지하는 집중 포지션; 7/15 급등으로 큰 폭 회복 추정(재스냅샷 필요)
 - [사용자 프로필](entities/user-profile.md) — SK하이닉스 재직/고소득, 장기투자 성향, 용인 수지구 거주 및 플랫폼시티 공공분양 대기; 청약통장 249회 납입(잔액 28,050,000원), 가입일 불일치 확인중
 
 ### concepts
 
 - [펀더멘털 불변 vs 심리·수급발 디레이팅](concepts/fundamentals-vs-sentiment-derating.md) — 실적은 멀쩡한데 주가만 심리·수급으로 눌리는 패턴, SK하이닉스가 현재진행형 사례
-- [SK하이닉스 목표주가 근거 체크리스트](concepts/sk-hynix-analyst-thesis-checkpoints.md) — 11개 기관 목표가(Barclays 원화환산 약 490만원이 최고치로 갱신, KB 420만 재확인 vs BNK 185만·Morningstar $160), 9개 테마별 신호기준, 데일리 트래커 템플릿
+- [SK하이닉스 목표주가 근거 체크리스트](concepts/sk-hynix-analyst-thesis-checkpoints.md) — 11개 기관 목표가(Barclays 원화환산 약 490만원 최고치, KB 420만 vs BNK 185만·Morningstar $160), ADR 프리미엄 분기점 계산 완료(약 30.7%), 9개 테마별 신호기준

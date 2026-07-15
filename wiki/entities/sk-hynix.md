@@ -1,14 +1,14 @@
 ---
 title: SK하이닉스
 created: 2026-07-13
-updated: 2026-07-15
+updated: 2026-07-16
 tags: [sk-hynix, semiconductor, stock, adr]
 ---
 
 반도체 종목. 주가 동향과 시장 분석을 중심으로 추적한다. 아래는 현재 상태
 요약이며, 시점별 상세 근거는 맨 아래 "히스토리" 링크 참고.
 
-## 현재 상태 (2026-07-15 밤 기준)
+## 현재 상태 (2026-07-16 아침 기준)
 
 7/13 -16.15% 급락 → 7/14 기술적 반등(+11.9%) → 7/15 저항 돌파 + ADR +27%
 폭등(바클레이스 Overweight, 목표가 $330 ≈ 원화환산 약 490만원) → 같은 날
@@ -24,10 +24,13 @@ tags: [sk-hynix, semiconductor, stock, adr]
   밀집(강세) vs BNK 185만원·Morningstar $160(약세) vs Barclays 원화환산
   약 490만원(현재 최고치, 언론 환산·자체 미검증). 9개 체크포인트별 근거는
   [목표주가 근거 체크리스트](../concepts/sk-hynix-analyst-thesis-checkpoints.md) —
-  실제 강세·약세가 정반대로 해석하는 진짜 분기점은 **빅테크 CapEx·ADR
-  프리미엄 2개뿐**
+  진짜 분기점은 **빅테크 CapEx·ADR 프리미엄 2개뿐**
+- **ADR 프리미엄 분기점 계산 완료(7/16)**: 약 30.7%("높음·중립" 구간),
+  정점 51.5%에서 narrowing 중 — "이미 훼손 구간" 우려는 기각됨
 - 레버리지 단일종목 ETF가 이번 주에만 4종(강세 3·약세 1)으로 늘어 양방향
   변동성을 구조적으로 증폭 중
+- 2Q 실적 발표일이 잠정 7/23에서 7/29로 바뀔 가능성(공식 미확정) — 사실이면
+  메타·마이크로소프트와 같은 날
 
 ## 다음에 볼 것
 
@@ -57,4 +60,5 @@ tags: [sk-hynix, semiconductor, stock, adr]
 - [펀더멘털 불변 vs 심리·수급발 디레이팅](../concepts/fundamentals-vs-sentiment-derating.md)
 - [나의 투자 포트폴리오](my-portfolio.md)
 - [사용자 프로필](user-profile.md)
-- [sources/websearch-sk-hynix-pullback-2026-07-15.md](../../sources/websearch-sk-hynix-pullback-2026-07-15.md) (최신 상태 근거; 그 외 원본 소스는 위 히스토리 각 페이지의 Sources 참고)
+- [sources/websearch-sk-hynix-pullback-2026-07-15.md](../../sources/websearch-sk-hynix-pullback-2026-07-15.md)
+- [sources/websearch-sk-hynix-morning-check-2026-07-16.md](../../sources/websearch-sk-hynix-morning-check-2026-07-16.md) (최신 상태 근거; 그 외 원본 소스는 위 히스토리 각 페이지의 Sources 참고)
