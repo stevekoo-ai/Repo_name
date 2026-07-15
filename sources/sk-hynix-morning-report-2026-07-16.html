@@ -1,0 +1,133 @@
+<title>SK하이닉스 아침 체크 — 2026-07-16</title>
+<style>
+  :root {
+    --bg: #f4f5f1; --surface: #ffffff; --surface-2: #eaebe3;
+    --ink: #1e221d; --ink-soft: #565b4e; --ink-faint: #8b9084;
+    --accent: #2f6b5e; --accent-ink: #143a32; --accent-soft: #dce8e2;
+    --border: #d8d9cf;
+    --pos: #2f6b3f; --pos-bg: #e3ecdd;
+    --neu: #96660f; --neu-bg: #f3e8d2;
+    --neg: #a53f3f; --neg-bg: #f4dede;
+    --unk: #6b7066; --unk-bg: #e7e8e1;
+    --shadow: 0 1px 2px rgba(30,34,29,.06), 0 8px 24px -12px rgba(30,34,29,.18);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #14170f; --surface: #1b201a; --surface-2: #212820;
+      --ink: #e9ece4; --ink-soft: #a9ae9e; --ink-faint: #6e7367;
+      --accent: #74c6ae; --accent-ink: #eaf7f2; --accent-soft: #223730;
+      --border: #303830;
+      --pos: #8fd19f; --pos-bg: #1f3324;
+      --neu: #e3b869; --neu-bg: #3a2f18;
+      --neg: #e79b9b; --neg-bg: #3a2222;
+      --unk: #9aa093; --unk-bg: #262b23;
+      --shadow: 0 1px 2px rgba(0,0,0,.4), 0 8px 24px -12px rgba(0,0,0,.6);
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #14170f; --surface: #1b201a; --surface-2: #212820;
+    --ink: #e9ece4; --ink-soft: #a9ae9e; --ink-faint: #6e7367;
+    --accent: #74c6ae; --accent-ink: #eaf7f2; --accent-soft: #223730;
+    --border: #303830;
+    --pos: #8fd19f; --pos-bg: #1f3324;
+    --neu: #e3b869; --neu-bg: #3a2f18;
+    --neg: #e79b9b; --neg-bg: #3a2222;
+    --unk: #9aa093; --unk-bg: #262b23;
+  }
+  :root[data-theme="light"] {
+    --bg: #f4f5f1; --surface: #ffffff; --surface-2: #eaebe3;
+    --ink: #1e221d; --ink-soft: #565b4e; --ink-faint: #8b9084;
+    --accent: #2f6b5e; --accent-ink: #143a32; --accent-soft: #dce8e2;
+    --border: #d8d9cf;
+    --pos: #2f6b3f; --pos-bg: #e3ecdd;
+    --neu: #96660f; --neu-bg: #f3e8d2;
+    --neg: #a53f3f; --neg-bg: #f4dede;
+    --unk: #6b7066; --unk-bg: #e7e8e1;
+  }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--ink); font-family:-apple-system,"Apple SD Gothic Neo","Pretendard","Noto Sans KR",system-ui,sans-serif; line-height:1.65; }
+  .wrap { max-width:52rem; margin:0 auto; padding:2.5rem 1.5rem 5rem; }
+  header { margin-bottom:2rem; }
+  .eyebrow { display:inline-flex; align-items:center; gap:.4rem; font-family:ui-monospace,"SFMono-Regular",Menlo,Consolas,monospace; font-size:.72rem; letter-spacing:.06em; text-transform:uppercase; color:var(--accent-ink); background:var(--accent-soft); border-radius:999px; padding:.28rem .7rem; margin-bottom:1rem; }
+  h1 { font-size:clamp(1.6rem,4.5vw,2.15rem); font-weight:800; letter-spacing:-.01em; margin:0 0 .5rem; text-wrap:balance; }
+  .lede { color:var(--ink-soft); margin:0; font-size:1rem; }
+  section { margin-bottom:2.25rem; }
+  h2 { font-size:1.15rem; font-weight:800; margin:0 0 .9rem; }
+  .card { background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:1.25rem 1.4rem; box-shadow:var(--shadow); margin-bottom:.9rem; }
+  .card-head { display:flex; align-items:center; justify-content:space-between; gap:1rem; margin-bottom:.5rem; flex-wrap:wrap; }
+  .card h3 { margin:0; font-size:1rem; font-weight:700; }
+  .pill { display:inline-flex; align-items:center; gap:.35rem; font-size:.75rem; font-weight:700; padding:.25rem .6rem; border-radius:999px; white-space:nowrap; }
+  .pill.pos { color:var(--pos); background:var(--pos-bg); }
+  .pill.neu { color:var(--neu); background:var(--neu-bg); }
+  .pill.neg { color:var(--neg); background:var(--neg-bg); }
+  .pill.unk { color:var(--unk); background:var(--unk-bg); }
+  .card p { margin:.4rem 0 0; color:var(--ink-soft); font-size:.92rem; }
+  .fork { border-left:3px solid var(--accent); }
+  .table-wrap { overflow-x:auto; border:1px solid var(--border); border-radius:12px; background:var(--surface); box-shadow:var(--shadow); }
+  table { width:100%; border-collapse:collapse; font-size:.86rem; }
+  th, td { text-align:left; padding:.55rem .8rem; border-bottom:1px solid var(--border); vertical-align:top; }
+  th { font-size:.68rem; text-transform:uppercase; letter-spacing:.05em; color:var(--ink-faint); }
+  tr:last-child td { border-bottom:none; }
+  td.num { font-variant-numeric:tabular-nums; }
+  .callout { border-left:3px solid var(--pos); background:var(--pos-bg); color:var(--ink); border-radius:0 10px 10px 0; padding:.9rem 1.1rem; font-size:.88rem; }
+  a { color:var(--accent-ink); } @media (prefers-color-scheme:dark){ a{ color:var(--accent);} }
+  footer { margin-top:3rem; padding-top:1.25rem; border-top:1px solid var(--border); color:var(--ink-faint); font-size:.82rem; }
+</style>
+
+<div class="wrap">
+  <header>
+    <span class="eyebrow">● 아침 체크 · 2026-07-16</span>
+    <h1>ADR 프리미엄 분기점, 드디어 계산 완료</h1>
+    <p class="lede">어제까지 계산이 막혀 있던 ADR 비율이 확인되면서, 9개 체크포인트 중 가장 오래 미해결이었던 항목이 해결됐다.</p>
+  </header>
+
+  <section>
+    <h2>오늘의 핵심 — ADR 프리미엄 ≈ 30.7%</h2>
+    <div class="card fork">
+      <div class="card-head"><h3>⑥ ADR 프리미엄 (분기점)</h3><span class="pill pos">✅ 계산 완료 — 높음·중립</span></div>
+      <p><strong>ADR 비율 확인: 1 ADR = 본주 1/10주.</strong> 7/15 기준
+      SKHY $182.6 vs 본주 2,082,000원(1/10 환산 시 $139.7) → 프리미엄
+      (182.6-139.7)/139.7 <strong>≈ 30.7%</strong>. 판정 기준(10~25% 안정
+      / 25~35% 높음 / 35%+ 훼손)에서 <strong>"높음·중립"</strong> 구간이며,
+      정점이었던 51.5%(훼손권)에서 빠르게 정상화되는 중이다. 며칠간
+      우려했던 "이미 훼손 구간" 가설은 기각.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2>나머지 체크포인트</h2>
+
+    <div class="card fork">
+      <div class="card-head"><h3>③ 빅테크 AI CapEx (분기점)</h3><span class="pill neu">중립·관찰중 — 새 반박 없음</span></div>
+      <p>SK하이닉스·마이크론·삼성 3사 모두 2026년 HBM 생산 물량 완판 재확인
+      (공급타이트 지지). 하이퍼스케일러 CapEx 가이던스 변동 없음. 7/22·29·30
+      실적이 여전히 최종 확인 시점.</p>
+    </div>
+
+    <div class="card">
+      <div class="card-head"><h3>⑨ 실적/마진</h3><span class="pill neu">주의 — 발표일 변경 가능성</span></div>
+      <p>2분기 실적 발표일이 잠정 "7/23"에서 <strong>"7/29"</strong>로 보도되는
+      사례 확인(공식 미확정) — 사실이면 메타·마이크로소프트와 같은 날 겹친다.
+      컨센서스: 매출 84.57조원, 영업이익 64.80조원, OPM 약 76%.</p>
+    </div>
+
+    <div class="card">
+      <div class="card-head"><h3>① DRAM/NAND · ② HBM4 · ④ LTA · ⑤ 주주환원 · ⑦ 중국산DRAM · ⑧ 마이크론대비할인</h3><span class="pill unk">반박 뉴스 없음</span></div>
+      <p>6개 컨센서스 항목 모두 오늘 이를 반박하는 뉴스는 발견되지 않았다.
+      기존 상태 유지.</p>
+    </div>
+  </section>
+
+  <div class="callout">
+    가장 큰 진전은 ADR 프리미엄 계산 완료다 — 30.7%는 우려했던 훼손 구간이
+    아니라 정상화 과정에 있다는 뜻으로, 분기점 2개 중 하나가 강세 쪽으로
+    기우는 신호다. 남은 분기점(빅테크 CapEx)은 7/22 알파벳 실적부터 순차
+    확인 예정.
+  </div>
+
+  <footer>
+    이 리포트는 아침 07:00(KST) Routine이 자동 생성한다. 원문 근거는 위키
+    <code>concepts/sk-hynix-analyst-thesis-checkpoints.md</code> 참고. 투자
+    조언 아님.
+  </footer>
+</div>
