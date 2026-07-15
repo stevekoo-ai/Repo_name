@@ -25,3 +25,4 @@ Append-only. Newest entry at the bottom. See `../CLAUDE.md` for format.
 2026-07-15 00:00 UTC — INGEST sources/sk-hynix-morning-report-2026-07-15.html, sources/sk-hynix-evening-report-2026-07-15.html (발행된 리포트를 RAW로 역보관) → updated concepts/sk-hynix-analyst-thesis-checkpoints.md (자동화 섹션에 리포트 아카이빙 관행 명시, Sources 갱신)
 2026-07-15 00:00 UTC — 빅테크 실적 발표일(알파벳7/22, 메타·MS 7/29, 아마존 7/30) .ics 캘린더 파일 생성해 사용자에게 전달, 직전 CapEx 가이던스·관전포인트 포함 → updated concepts/sk-hynix-analyst-thesis-checkpoints.md (체크포인트 ③에 확인 일정 추가)
 2026-07-15 00:00 UTC — INGEST sources/sk-hynix-120man-clarification-2026-07-15.md → updated concepts/sk-hynix-analyst-thesis-checkpoints.md (120만원은 AI붐 이전 과거 수치로 정정, 유효 목표가 하단은 BNK 185만원으로 확정, 체크리스트에서 제외)
+2026-07-15 00:00 UTC — INGEST sources/subscription-savings-account-2026-07-15.md → updated entities/user-profile.md (청약통장 상세: 국민은행, 잔액 28,050,000원, 249회 납입), updated index.md — 가입일 불일치 발견(기존 2008-11 vs 신규 2005-11-03), config/portfolio.yaml은 이 저장소에 존재하지 않음을 확인·기록
