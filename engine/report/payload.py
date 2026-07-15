@@ -43,6 +43,16 @@ SERIES_FOR_INDICATOR = {
     "unemployment": "kosis_unemployment_rate",
 }
 
+# engine/macro/indicators.py falls back to an OECD-via-FRED mirror when the
+# matching KOSIS series is unreachable — when that happens the fresh data
+# lives under this series id instead, so the sparkline should look here too.
+FALLBACK_SERIES_FOR_INDICATOR = {
+    "industrial_production": "fred_kr_industrial_production_oecd",
+    "retail_sales": "fred_kr_retail_sales_mom_oecd",
+    "cpi": "fred_kr_cpi_oecd",
+    "unemployment": "fred_kr_unemployment_oecd",
+}
+
 TREND_ARROWS = {1: "▲", 0: "→", -1: "▼"}
 
 
@@ -84,6 +94,8 @@ def _macro_dashboard(macro: dict, previous_macro: dict | None) -> list[dict]:
         series_prev_value = None
         if series_id:
             history, series_prev_value = _series_history_and_prev(series_id, years)
+        if not history and key in FALLBACK_SERIES_FOR_INDICATOR:
+            history, series_prev_value = _series_history_and_prev(FALLBACK_SERIES_FOR_INDICATOR[key], years)
 
         previous_value = prev.get("value")
         previous_source = "snapshot" if previous_value is not None else None

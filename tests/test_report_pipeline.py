@@ -32,8 +32,15 @@ def _isolated_storage(tmp_path, monkeypatch):
     # No ECOS/KOSIS keys and no live network in test environments -> collectors
     # already degrade to Pending without a network call. FRED and the folded-in
     # investment-clock context *do* attempt live calls; short-circuit both so
-    # the test doesn't depend on network reachability.
+    # the test doesn't depend on network reachability. fetch_series also needs
+    # stubbing directly — indicators.py's KOSIS-unreachable fallback calls it
+    # (not just fetch_all) to try the OECD-via-FRED mirror.
     monkeypatch.setattr(indicators_mod.fred, "fetch_all", lambda: {})
+    monkeypatch.setattr(
+        indicators_mod.fred, "fetch_series",
+        lambda series_key, ttl_seconds=None: DataPoint(series_id=series_key, status=DataStatus.PENDING,
+                                                         note="network disabled in tests"),
+    )
     monkeypatch.setattr("engine.macro.us_clock.get_investment_clock_context", lambda: None)
     yield
 
