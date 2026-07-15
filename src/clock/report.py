@@ -31,7 +31,8 @@ TEMPLATE = """<!doctype html>
 </head>
 <body>
 <h1>거시경제 투자 시계 (Macro Investment Clock)</h1>
-<p class="updated">Last updated: {updated_at} (data as of {data_asof})</p>
+<p class="updated">Last updated: {updated_at} (data as of {data_asof}) ·
+  <a href="peos-daily.html">PEOS Daily Dashboard 보기</a></p>
 
 <div class="phase-banner">
   현재 국면: <b>{phase_name} ({phase_name_kr})</b> &mdash; 유리한 자산군: <b>{asset} ({asset_kr})</b><br>

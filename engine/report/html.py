@@ -20,6 +20,7 @@ CLOCK_IMAGE_PATH = REPO_ROOT / "docs" / "clock.png"
 STATUS_KR = {
     DataStatus.OK.value: "OK", DataStatus.PENDING.value: "Pending",
     DataStatus.NOT_RELEASED.value: "Not Released", DataStatus.SOURCE_ERROR.value: "Source Error",
+    DataStatus.STALE.value: "이전 값 유지",
 }
 
 BAND_TO_BADGE = {
@@ -177,17 +178,23 @@ def _section_investment_clock(payload: dict) -> str:
 def _section_macro_dashboard(payload: dict, dashboard_key: str = "macro_dashboard", title: str = "Macro Dashboard") -> str:
     rows_data = payload[dashboard_key]
     has_fallback_note = any(r.get("previous_source") == "series_history" for r in rows_data)
+    has_stale_note = any(r.get("status") == "stale" for r in rows_data)
     rows = "".join(
         f"""<tr>
-          <td>{_esc(r['indicator'])}</td><td>{_fmt(r['current'])}</td>
+          <td>{_esc(r['indicator'])}</td>
+          <td>{_fmt(r['current'])}{' <sup class="stale-mark" title="오늘 실시간 조회 실패 — 마지막으로 확인된 값 유지 중">‡</sup>' if r.get('status') == 'stale' else ''}</td>
           <td>{_fmt(r['previous'])}{' <sup title="전월 리포트 스냅샷이 아직 없어 원자료 이력의 직전 값을 사용">†</sup>' if r.get('previous_source') == 'series_history' else ''}</td>
           <td>{_esc(r['trend'])}</td><td>{_fmt(r['score'])}</td>
           <td class="spark-cell">{_sparkline_svg(r.get('history') or [], r.get('history_years', 10))}</td>
           <td class="muted">{_esc(r['source'] or STATUS_KR.get(r['status'], r['status']))}</td>
         </tr>""" for r in rows_data
     )
-    footnote = ('<p class="tile-sub">† 전월 PEOS 리포트가 아직 쌓이지 않아, 해당 지표는 원자료(공식 통계) 이력의 '
-                '직전 발표값으로 대체 표시했습니다.</p>') if has_fallback_note else ""
+    footnotes = []
+    if has_stale_note:
+        footnotes.append('‡ 오늘 실시간 조회에 실패한 지표입니다 — 마지막으로 확인된 값을 그대로 유지해 표시했습니다 (추측/대체 데이터 아님).')
+    if has_fallback_note:
+        footnotes.append('† 전월 PEOS 리포트가 아직 쌓이지 않아, 해당 지표는 원자료(공식 통계) 이력의 직전 발표값으로 대체 표시했습니다.')
+    footnote = f'<p class="tile-sub">{" ".join(footnotes)}</p>' if footnotes else ""
     return f"""
     <section class="card">
       <h2>{_esc(title)}</h2>
@@ -484,6 +491,7 @@ th { color: var(--text-muted); font-weight: 600; font-size: 0.78rem; text-transf
 .spark-labels { display: flex; justify-content: space-between; font-size: 0.68rem; color: var(--text-muted);
   width: 176px; }
 .spark-empty { font-size: 0.78rem; }
+.stale-mark { color: var(--warn); cursor: help; }
 .clock-row { display: flex; gap: 18px; align-items: center; flex-wrap: wrap; }
 .clock-img { width: 180px; height: 180px; border-radius: 10px; flex-shrink: 0;
   background: #ffffff; padding: 6px; border: 1px solid var(--border); }

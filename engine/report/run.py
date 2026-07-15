@@ -14,7 +14,7 @@ from pathlib import Path
 
 from core.config import report_config
 from core.logger import log_event
-from . import exporters, payload as payload_mod
+from . import daily_history, exporters, payload as payload_mod
 from .html import render_html
 from .markdown import render_markdown
 
@@ -33,11 +33,12 @@ def run(month_key: str | None = None) -> dict[str, Path]:
     md_path.write_text(render_markdown(payload), encoding="utf-8")
 
     json_path = exporters.export_json(payload, out_dir / f"{payload['report_month']}.json")
+    history_path = daily_history.append_daily_history(payload)
 
     log_event("pipeline.report_generated", month=payload["report_month"],
               readiness=payload["report_readiness"], html=str(html_path),
               markdown=str(md_path), json=str(json_path))
-    return {"html": html_path, "markdown": md_path, "json": json_path}
+    return {"html": html_path, "markdown": md_path, "json": json_path, "daily_history": history_path}
 
 
 def main() -> None:

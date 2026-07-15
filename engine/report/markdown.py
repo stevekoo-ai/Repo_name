@@ -14,6 +14,7 @@ STATUS_KR = {
     DataStatus.PENDING.value: "Pending",
     DataStatus.NOT_RELEASED.value: "Not Released",
     DataStatus.SOURCE_ERROR.value: "Source Error",
+    DataStatus.STALE.value: "이전 값 유지",
 }
 
 INDICATOR_SECTIONS = [
@@ -31,13 +32,22 @@ def _fmt(value, suffix: str = "") -> str:
     return f"{value}{suffix}"
 
 
-def _us_macro_dashboard(payload: dict) -> str:
-    lines = ["## 1. Macro Dashboard — 미국 (큰 그림)", "", "| 지표 | 현재 | 이전 | 추세 | 점수 | 출처 |", "|---|---|---|---|---|---|"]
-    for row in payload["us_macro_dashboard"]:
+def _macro_dashboard_rows(rows_data: list[dict]) -> list[str]:
+    lines = ["| 지표 | 현재 | 이전 | 추세 | 점수 | 출처 |", "|---|---|---|---|---|---|"]
+    for row in rows_data:
+        current = _fmt(row["current"]) + (" ‡" if row.get("status") == "stale" else "")
         lines.append(
-            f"| {row['indicator']} | {_fmt(row['current'])} | {_fmt(row['previous'])} | "
+            f"| {row['indicator']} | {current} | {_fmt(row['previous'])} | "
             f"{row['trend']} | {_fmt(row['score'])} | {row['source'] or STATUS_KR.get(row['status'], row['status'])} |"
         )
+    if any(r.get("status") == "stale" for r in rows_data):
+        lines.append("")
+        lines.append("‡ 오늘 실시간 조회에 실패한 지표 — 마지막으로 확인된 값을 그대로 유지해 표시 (추측/대체 데이터 아님).")
+    return lines
+
+
+def _us_macro_dashboard(payload: dict) -> str:
+    lines = ["## 1. Macro Dashboard — 미국 (큰 그림)", ""] + _macro_dashboard_rows(payload["us_macro_dashboard"])
     return "\n".join(lines)
 
 
@@ -92,12 +102,7 @@ def _monthly_key_changes(payload: dict) -> str:
 
 
 def _macro_dashboard(payload: dict) -> str:
-    lines = ["## 3. Macro Dashboard — 한국", "", "| 지표 | 현재 | 이전 | 추세 | 점수 | 출처 |", "|---|---|---|---|---|---|"]
-    for row in payload["macro_dashboard"]:
-        lines.append(
-            f"| {row['indicator']} | {_fmt(row['current'])} | {_fmt(row['previous'])} | "
-            f"{row['trend']} | {_fmt(row['score'])} | {row['source'] or STATUS_KR.get(row['status'], row['status'])} |"
-        )
+    lines = ["## 3. Macro Dashboard — 한국", ""] + _macro_dashboard_rows(payload["macro_dashboard"])
     return "\n".join(lines)
 
 
