@@ -42,6 +42,25 @@ def _series_moving_average(series_id: str, periods: int, offset: int = 0) -> flo
     return moving_average(values, periods)
 
 
+def _with_fred_fallback(dp: DataPoint, kosis_series_id: str, fred_series_key: str) -> tuple[DataPoint, str]:
+    """KOSIS has been observed to intermittently time out from GitHub Actions IPs
+    (ECOS too, on other runs) — fred.stlouisfed.org has not failed in any observed
+    run, and mirrors the same Korea indicators via OECD Main Economic Indicators.
+    Falls back only when KOSIS didn't return OK, and never silently — the
+    substitute DataPoint's note/source always say a fallback was used, so a
+    reader (or the report) can tell a domestic-release figure from an OECD-mirrored
+    one (7.9's "never guess" extends to never blending sources without saying so)."""
+    if dp.status == DataStatus.OK:
+        return dp, kosis_series_id
+    fallback_dp = fred.fetch_series(fred_series_key)
+    if fallback_dp.status != DataStatus.OK:
+        return dp, kosis_series_id
+    fallback_dp.note = f"KOSIS 접속 불가로 OECD 대체 데이터 사용 (FRED 경유, {fred_series_key})"
+    if fallback_dp.metadata:
+        fallback_dp.metadata.source = "OECD (FRED 경유) — KOSIS 대체"
+    return fallback_dp, f"fred_{fred_series_key}"
+
+
 def _build_us_global_composite() -> tuple[float | None, dict]:
     """11.4 (10): NFP trend + unemployment trend + OECD CLI/industrial-production trend -> [-1, 1]."""
     detail: dict[str, int] = {}
@@ -99,13 +118,26 @@ def build_core10_readings() -> dict[str, IndicatorReading]:
     readings["gdp"] = _score_indicator("gdp", rules["gdp"], {"qoq": dp.value}, dp)
 
     dp = kosis.fetch_series("industrial_production_index")
-    mom = _series_trend_change("kosis_industrial_production_index", "1m")
+    dp, series_id = _with_fred_fallback(dp, "kosis_industrial_production_index", "kr_industrial_production_oecd")
+    mom = _series_trend_change(series_id, "1m")
     readings["industrial_production"] = _score_indicator(
         "industrial_production", rules["industrial_production"], {"mom": mom}, dp
     )
 
     dp = kosis.fetch_series("retail_sales_index")
-    mom = _series_trend_change("kosis_retail_sales_index", "1m")
+    if dp.status == DataStatus.OK:
+        mom = _series_trend_change("kosis_retail_sales_index", "1m")
+    else:
+        # kr_retail_sales_mom_oecd is already a MoM% growth series (OECD "GPSAM"),
+        # not a level — use its latest value directly instead of trending it.
+        fallback_dp = fred.fetch_series("kr_retail_sales_mom_oecd")
+        if fallback_dp.status == DataStatus.OK:
+            fallback_dp.note = "KOSIS 접속 불가로 OECD 대체 데이터 사용 (FRED 경유, kr_retail_sales_mom_oecd — 이미 계산된 전월비 값)"
+            if fallback_dp.metadata:
+                fallback_dp.metadata.source = "OECD (FRED 경유) — KOSIS 대체"
+            dp, mom = fallback_dp, fallback_dp.value
+        else:
+            mom = None
     readings["retail_sales"] = _score_indicator("retail_sales", rules["retail_sales"], {"mom": mom}, dp)
 
     exports_points = manual.fetch_exports()
@@ -122,7 +154,8 @@ def build_core10_readings() -> dict[str, IndicatorReading]:
     readings["current_account"] = _score_indicator("current_account", rules["current_account"], {"avg_3m": avg3}, dp)
 
     dp = kosis.fetch_series("cpi_index")
-    yoy = _series_trend_change("kosis_cpi_index", "12m")
+    dp, series_id = _with_fred_fallback(dp, "kosis_cpi_index", "kr_cpi_oecd")
+    yoy = _series_trend_change(series_id, "12m")
     readings["cpi"] = _score_indicator("cpi", rules["cpi"], {"yoy": yoy}, dp)
 
     dp = ecos.fetch_series("ppi_yoy_level")
@@ -130,8 +163,9 @@ def build_core10_readings() -> dict[str, IndicatorReading]:
     readings["ppi"] = _score_indicator("ppi", rules["ppi"], {"yoy": yoy}, dp)
 
     dp = kosis.fetch_series("unemployment_rate")
-    avg_now = _series_moving_average("kosis_unemployment_rate", 3)
-    avg_prior = _series_moving_average("kosis_unemployment_rate", 3, offset=3)
+    dp, series_id = _with_fred_fallback(dp, "kosis_unemployment_rate", "kr_unemployment_oecd")
+    avg_now = _series_moving_average(series_id, 3)
+    avg_prior = _series_moving_average(series_id, 3, offset=3)
     avg_change = (avg_now - avg_prior) if (avg_now is not None and avg_prior is not None) else None
     readings["unemployment"] = _score_indicator("unemployment", rules["unemployment"], {"avg_3m_change": avg_change}, dp)
 

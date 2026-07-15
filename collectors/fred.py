@@ -34,6 +34,17 @@ SERIES = {
     "us_industrial_production": "INDPRO",
     "us_dollar_index": "DTWEXBGS",   # Trade Weighted US Dollar Index: Broad, Goods and Services
     "us_fed_funds_rate": "FEDFUNDS",
+
+    # Korea series mirrored from OECD Main Economic Indicators, used as a
+    # fallback when kosis.kr is unreachable (collectors/kosis.py has been
+    # observed to intermittently time out from GitHub Actions IPs — see
+    # engine/macro/indicators.py's fallback wiring). fred.stlouisfed.org has
+    # never failed in any observed run, unlike ECOS/KOSIS, so this is a
+    # meaningfully more reliable path when the primary source is down.
+    "kr_cpi_oecd": "KORCPIALLMINMEI",              # CPI, total, index (OECD)
+    "kr_industrial_production_oecd": "KORPROINDMISMEI",  # Industrial production volume, index (OECD)
+    "kr_unemployment_oecd": "LRHUTTTTKRM156S",     # Unemployment rate, %, 15+ (OECD)
+    "kr_retail_sales_mom_oecd": "KORSLRTTO01GPSAM",  # Retail trade volume, MoM % change SA (OECD) — already a growth rate, not a level
 }
 
 
