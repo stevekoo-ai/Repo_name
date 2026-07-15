@@ -16,7 +16,7 @@ Catalog of every page in the wiki. See `../CLAUDE.md` for conventions.
 
 - [SK하이닉스](entities/sk-hynix.md) — 반도체 종목; 7/13 급락 후 7/15 저항 돌파·ADR +27% 폭등, 바클레이스 목표가 330달러 신규 개시로 리레이팅 국면 가능성
 - [나의 투자 포트폴리오](entities/my-portfolio.md) — 4개 계좌 총 4.5억원(2026-07-13 기준), SK하이닉스가 약 65% 차지하는 집중 포지션; 7/15 급등으로 큰 폭 회복 추정(재스냅샷 필요)
-- [사용자 프로필](entities/user-profile.md) — SK하이닉스 재직/고소득, 장기투자 성향, 용인 수지구 거주 및 플랫폼시티 공공분양 대기; 청약통장 249회 납입(잔액 28,050,000원), 가입일 불일치 확인중
+- [사용자 프로필](entities/user-profile.md) — SK하이닉스 재직/고소득, 장기투자 성향, 용인 수지구 거주(전세만료 2027-02-22, 갱신불가) 및 플랫폼시티 공공분양 대기; 청약통장 249회 납입(잔액 28,050,000원, 가입일 2005-11-03 확정). PEOS `config/user.yaml`과 상호 참조
 
 ### concepts
 

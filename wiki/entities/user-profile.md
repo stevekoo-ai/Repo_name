@@ -19,10 +19,17 @@ tags: [profile, career, housing, investing]
 비중이 약 65%로 큼 — **고용(급여·PS)과 투자자산이 동일 기업에 이중으로 연동된
 집중 리스크** 구조. 회사 실적이 나빠지면 소득과 자산이 동시에 타격받을 수 있음.
 
+이 저장소에서 별도로 운영 중인 **PEOS**(기계가 읽는 프로필, `config/user.yaml`)에 따르면
+투자 원칙은 거시경제·산업 사이클·공식 통계 중심의 데이터 기반 장기투자이며, 리스크
+허용도는 medium, 리밸런싱 규칙은 "분기 1회 점검, Investment Environment Score 20점 이상
+변동 시 검토"로 구체화되어 있다.
+
 ### 주거 현황
 
 - 현재 거주지: 용인 수지구 진산마을푸르지오 (전세)
-- 전세계약 만료 예정: 2027-02
+- 전세계약 만료일: **2027-02-22**, 갱신청구권을 이미 사용해 재연장 불가 — 신규 분양 입주
+  전까지 임시 거주(재계약이든 임차든)를 준비해야 함 (PEOS `config/user.yaml
+  housing.moveout_deadline`로 확인)
 - 자녀 통학거리가 중요한 제약 조건 — 용인시 수지구 문정중학교, 풍천초등학교
   통학 가능 범위를 우선 고려
 
@@ -48,12 +55,24 @@ tags: [profile, career, housing, investing]
 가입 후 20년 8개월, 249회 납입 — 국민주택 청약 시 순위·가점 산정에서
 유리한 위치.
 
-⚠ **가입일 불일치**: 최초 프로필 소스(`sources/user-profile-2026-07-13.md`)에는
-가입일이 "2008-11"로 기록됐으나, 이후 제공된 청약통장 상세 정보(위 표)는
-"2005-11-03"이다. 어느 쪽이 맞는지 확인 전까지는 표의 상세 수치(잔액·회차 등)를
-신뢰도 높은 최신 정보로 우선 사용하되, 두 날짜 모두 남겨둔다.
+**가입일 확정: 2005-11-03.** 최초 프로필 소스(`sources/user-profile-2026-07-13.md`)에는
+가입일이 "2008-11"로 기록되어 위 표(2005-11-03)와 불일치했으나, 이 저장소에 별도로
+존재하는 PEOS 시스템의 `config/portfolio.yaml`(subscription_savings 섹션)이 은행·가입일·
+잔액·월납입액·누적회차·상향시점까지 필드 단위로 완전히 동일한 값을 독립적으로 보유하고
+있어 2005-11-03을 교차 확인했다. "2008-11"은 최초 소스의 부정확한 기억으로 정리.
+
+### PEOS(기계가 읽는 프로필)과의 관계
+
+이 저장소에는 이 위키와 별개로 **PEOS (Personal Economic Operating System)** 가
+`config/user.yaml` / `config/portfolio.yaml`을 단일 정보원으로 여러 엔진에 제공하는
+구조로 함께 운영 중이다(`docs/PEOS_ClaudeCode_Master_Instruction.md` 참고). 이 위키의
+`entities/user-profile.md`는 사람이 읽는 서술형 프로필, PEOS의 config는 기계가 읽는
+값이다 — **같은 사실이 양쪽에 있을 수 있으니, 새 사실을 알게 되면 이 페이지와
+`config/user.yaml`(또는 `config/portfolio.yaml`) 양쪽을 함께 갱신하는 것을 권장**한다.
+한쪽만 갱신됐을 때는 이 섹션에 그 사실을 남겨 다음 세션이 알 수 있게 한다.
 
 ## Sources
 
 - [sources/user-profile-2026-07-13.md](../../sources/user-profile-2026-07-13.md)
 - [sources/subscription-savings-account-2026-07-15.md](../../sources/subscription-savings-account-2026-07-15.md)
+- [sources/peos-user-yaml-2026-07-15.md](../../sources/peos-user-yaml-2026-07-15.md)
