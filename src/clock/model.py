@@ -77,16 +77,19 @@ class ClockReading:
     context: dict
 
 
-def _momentum_signal(df: pd.DataFrame, lookback: int = LOOKBACK_MONTHS) -> Signal:
-    """Rising if the latest value exceeds the value `lookback` periods earlier."""
+def _momentum_series(df: pd.DataFrame, lookback: int = LOOKBACK_MONTHS) -> pd.DataFrame:
+    """date/value/change/label for every row where a `lookback`-period-earlier value exists.
+
+    This is the vectorized form of the "rising if higher than N periods ago"
+    rule, used both for the single latest Signal and for backfilling every
+    historical month at once.
+    """
     df = df.sort_values("date").reset_index(drop=True)
-    if len(df) <= lookback:
-        raise ValueError("not enough history to compute momentum")
-    latest = df.iloc[-1]
-    prior = df.iloc[-1 - lookback]
-    change = latest["value"] - prior["value"]
-    label = "rising" if change > 0 else "falling"
-    return Signal(label=label, value=float(latest["value"]), change=float(change), as_of=latest["date"])
+    out = df.copy()
+    out["change"] = out["value"] - out["value"].shift(lookback)
+    out = out.dropna(subset=["change"]).reset_index(drop=True)
+    out["label"] = out["change"].apply(lambda c: "rising" if c > 0 else "falling")
+    return out[["date", "value", "change", "label"]]
 
 
 def _yoy(df: pd.DataFrame) -> pd.DataFrame:
@@ -97,29 +100,82 @@ def _yoy(df: pd.DataFrame) -> pd.DataFrame:
     return out.dropna(subset=["value"]).reset_index(drop=True)
 
 
-def compute_growth_signal(series: dict[str, pd.DataFrame]) -> Signal:
+def _select_growth_frame(series: dict[str, pd.DataFrame]) -> pd.DataFrame:
     if "growth_primary" in series and len(series["growth_primary"]) > LOOKBACK_MONTHS:
-        return _momentum_signal(series["growth_primary"])
-    return _momentum_signal(_yoy(series["growth_fallback"]))
+        return series["growth_primary"][["date", "value"]]
+    return _yoy(series["growth_fallback"])
+
+
+def _signal_from_momentum(momentum: pd.DataFrame) -> Signal:
+    if momentum.empty:
+        raise ValueError("not enough history to compute momentum")
+    last = momentum.iloc[-1]
+    return Signal(label=last["label"], value=float(last["value"]), change=float(last["change"]), as_of=last["date"])
+
+
+def compute_growth_signal(series: dict[str, pd.DataFrame]) -> Signal:
+    return _signal_from_momentum(_momentum_series(_select_growth_frame(series)))
 
 
 def compute_inflation_signal(series: dict[str, pd.DataFrame]) -> Signal:
-    cpi_yoy = _yoy(series["inflation_primary"])
-    return _momentum_signal(cpi_yoy)
+    return _signal_from_momentum(_momentum_series(_yoy(series["inflation_primary"])))
+
+
+def build_full_history(series: dict[str, pd.DataFrame]) -> pd.DataFrame:
+    """Compute a growth/inflation/phase reading for every historical month.
+
+    Uses the currently-published (revised) FRED series, not real-time
+    vintages, so a month's *retrospective* reading here can differ slightly
+    from what the model would have said if run live back then (data
+    revisions). Good enough for spotting the historical pattern of phases.
+    """
+    growth = _momentum_series(_select_growth_frame(series)).rename(
+        columns={"value": "growth_value", "change": "growth_change_3m", "label": "growth_signal"}
+    )
+    inflation = _momentum_series(_yoy(series["inflation_primary"])).rename(
+        columns={"value": "inflation_yoy", "change": "inflation_change_3m", "label": "inflation_signal"}
+    )
+
+    full = pd.merge(growth, inflation, on="date", how="inner").sort_values("date").reset_index(drop=True)
+    full["phase"] = full.apply(lambda r: PHASES[(r["growth_signal"], r["inflation_signal"])]["name"], axis=1)
+    full["asset"] = full.apply(lambda r: PHASES[(r["growth_signal"], r["inflation_signal"])]["asset"], axis=1)
+
+    if "inflation_confirm" in series and len(series["inflation_confirm"]) > 12:
+        core = _yoy(series["inflation_confirm"]).rename(columns={"value": "core_cpi_yoy"})[["date", "core_cpi_yoy"]]
+        full = pd.merge_asof(full, core.sort_values("date"), on="date", direction="backward")
+    else:
+        full["core_cpi_yoy"] = None
+
+    if "context_yield_curve" in series and not series["context_yield_curve"].empty:
+        yc = series["context_yield_curve"].rename(columns={"value": "yield_curve_10y2y"}).sort_values("date")
+        full = pd.merge_asof(full, yc, on="date", direction="backward")
+    else:
+        full["yield_curve_10y2y"] = None
+
+    if "context_unemployment" in series and not series["context_unemployment"].empty:
+        ur = series["context_unemployment"].rename(columns={"value": "unemployment_rate"}).sort_values("date")
+        full = pd.merge_asof(full, ur, on="date", direction="backward")
+    else:
+        full["unemployment_rate"] = None
+
+    return full.rename(columns={"date": "data_asof"})
 
 
 def read_clock(series: dict[str, pd.DataFrame]) -> ClockReading:
-    growth = compute_growth_signal(series)
-    inflation = compute_inflation_signal(series)
+    full = build_full_history(series)
+    if full.empty:
+        raise ValueError("not enough overlapping history to compute a reading")
+    last = full.iloc[-1]
+
+    growth = Signal(label=last["growth_signal"], value=float(last["growth_value"]),
+                     change=float(last["growth_change_3m"]), as_of=last["data_asof"])
+    inflation = Signal(label=last["inflation_signal"], value=float(last["inflation_yoy"]),
+                        change=float(last["inflation_change_3m"]), as_of=last["data_asof"])
     phase = PHASES[(growth.label, inflation.label)]
 
     context = {}
-    if "context_yield_curve" in series and not series["context_yield_curve"].empty:
-        context["yield_curve_10y2y"] = float(series["context_yield_curve"].sort_values("date").iloc[-1]["value"])
-    if "context_unemployment" in series and not series["context_unemployment"].empty:
-        context["unemployment_rate"] = float(series["context_unemployment"].sort_values("date").iloc[-1]["value"])
-    if "inflation_confirm" in series and len(series["inflation_confirm"]) > 12:
-        core_yoy = _yoy(series["inflation_confirm"])
-        context["core_cpi_yoy"] = float(core_yoy.iloc[-1]["value"])
+    for key in ("core_cpi_yoy", "yield_curve_10y2y", "unemployment_rate"):
+        if pd.notna(last.get(key)):
+            context[key] = float(last[key])
 
     return ClockReading(growth=growth, inflation=inflation, phase=phase, context=context)

@@ -37,7 +37,10 @@ def _from_history() -> dict | None:
         df = pd.read_csv(HISTORY_PATH)
         if df.empty:
             return None
-        latest = df.sort_values("run_date").iloc[-1]
+        # data/history.csv holds one row per historical month (data_asof) as of
+        # the backfill/time-machine upgrade, not one row per daily run — the
+        # last-computed timestamp lives in `last_updated`, not `run_date`.
+        latest = df.sort_values("data_asof").iloc[-1]
         phase = PHASES_BY_NAME(PHASES).get(latest["phase"])
         if phase is None:
             return None
@@ -50,7 +53,7 @@ def _from_history() -> dict | None:
             "inflation_signal": latest["inflation_signal"],
             "as_of": str(latest["data_asof"]),
             "source": "stale_history",
-            "note": f"실시간 조회 불가 — {latest['run_date']} 실행분(마지막 저장값) 사용. {DASHBOARD_URL_HINT}",
+            "note": f"실시간 조회 불가 — {latest['last_updated']} 실행분(마지막 저장값) 사용. {DASHBOARD_URL_HINT}",
         }
     except Exception as exc:
         log_event("us_clock.history_fallback_failed", level="warning", error=str(exc))

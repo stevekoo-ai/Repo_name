@@ -1,0 +1,143 @@
+<title>SK하이닉스 저녁 체크 — 2026-07-15</title>
+<style>
+  :root {
+    --bg: #f4f5f1; --surface: #ffffff; --surface-2: #eaebe3;
+    --ink: #1e221d; --ink-soft: #565b4e; --ink-faint: #8b9084;
+    --accent: #2f6b5e; --accent-ink: #143a32; --accent-soft: #dce8e2;
+    --border: #d8d9cf;
+    --pos: #2f6b3f; --pos-bg: #e3ecdd;
+    --neu: #96660f; --neu-bg: #f3e8d2;
+    --neg: #a53f3f; --neg-bg: #f4dede;
+    --unk: #6b7066; --unk-bg: #e7e8e1;
+    --shadow: 0 1px 2px rgba(30,34,29,.06), 0 8px 24px -12px rgba(30,34,29,.18);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #14170f; --surface: #1b201a; --surface-2: #212820;
+      --ink: #e9ece4; --ink-soft: #a9ae9e; --ink-faint: #6e7367;
+      --accent: #74c6ae; --accent-ink: #eaf7f2; --accent-soft: #223730;
+      --border: #303830;
+      --pos: #8fd19f; --pos-bg: #1f3324;
+      --neu: #e3b869; --neu-bg: #3a2f18;
+      --neg: #e79b9b; --neg-bg: #3a2222;
+      --unk: #9aa093; --unk-bg: #262b23;
+      --shadow: 0 1px 2px rgba(0,0,0,.4), 0 8px 24px -12px rgba(0,0,0,.6);
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #14170f; --surface: #1b201a; --surface-2: #212820;
+    --ink: #e9ece4; --ink-soft: #a9ae9e; --ink-faint: #6e7367;
+    --accent: #74c6ae; --accent-ink: #eaf7f2; --accent-soft: #223730;
+    --border: #303830;
+    --pos: #8fd19f; --pos-bg: #1f3324;
+    --neu: #e3b869; --neu-bg: #3a2f18;
+    --neg: #e79b9b; --neg-bg: #3a2222;
+    --unk: #9aa093; --unk-bg: #262b23;
+  }
+  :root[data-theme="light"] {
+    --bg: #f4f5f1; --surface: #ffffff; --surface-2: #eaebe3;
+    --ink: #1e221d; --ink-soft: #565b4e; --ink-faint: #8b9084;
+    --accent: #2f6b5e; --accent-ink: #143a32; --accent-soft: #dce8e2;
+    --border: #d8d9cf;
+    --pos: #2f6b3f; --pos-bg: #e3ecdd;
+    --neu: #96660f; --neu-bg: #f3e8d2;
+    --neg: #a53f3f; --neg-bg: #f4dede;
+    --unk: #6b7066; --unk-bg: #e7e8e1;
+  }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--ink); font-family:-apple-system,"Apple SD Gothic Neo","Pretendard","Noto Sans KR",system-ui,sans-serif; line-height:1.65; }
+  .wrap { max-width:52rem; margin:0 auto; padding:2.5rem 1.5rem 5rem; }
+  header { margin-bottom:2rem; }
+  .eyebrow { display:inline-flex; align-items:center; gap:.4rem; font-family:ui-monospace,"SFMono-Regular",Menlo,Consolas,monospace; font-size:.72rem; letter-spacing:.06em; text-transform:uppercase; color:var(--accent-ink); background:var(--accent-soft); border-radius:999px; padding:.28rem .7rem; margin-bottom:1rem; }
+  h1 { font-size:clamp(1.6rem,4.5vw,2.15rem); font-weight:800; letter-spacing:-.01em; margin:0 0 .5rem; text-wrap:balance; }
+  .lede { color:var(--ink-soft); margin:0; font-size:1rem; }
+  section { margin-bottom:2.25rem; }
+  h2 { font-size:1.15rem; font-weight:800; margin:0 0 .9rem; }
+  .card { background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:1.25rem 1.4rem; box-shadow:var(--shadow); margin-bottom:.9rem; }
+  .card-head { display:flex; align-items:center; justify-content:space-between; gap:1rem; margin-bottom:.5rem; flex-wrap:wrap; }
+  .card h3 { margin:0; font-size:1rem; font-weight:700; }
+  .pill { display:inline-flex; align-items:center; gap:.35rem; font-size:.75rem; font-weight:700; padding:.25rem .6rem; border-radius:999px; white-space:nowrap; }
+  .pill.pos { color:var(--pos); background:var(--pos-bg); }
+  .pill.neu { color:var(--neu); background:var(--neu-bg); }
+  .pill.neg { color:var(--neg); background:var(--neg-bg); }
+  .pill.unk { color:var(--unk); background:var(--unk-bg); }
+  .card p { margin:.4rem 0 0; color:var(--ink-soft); font-size:.92rem; }
+  .new { border-left:3px solid var(--accent); }
+  .fixed { border-left:3px solid var(--pos); }
+  .table-wrap { overflow-x:auto; border:1px solid var(--border); border-radius:12px; background:var(--surface); box-shadow:var(--shadow); }
+  table { width:100%; border-collapse:collapse; font-size:.86rem; }
+  th, td { text-align:left; padding:.55rem .8rem; border-bottom:1px solid var(--border); vertical-align:top; }
+  th { font-size:.68rem; text-transform:uppercase; letter-spacing:.05em; color:var(--ink-faint); }
+  tr:last-child td { border-bottom:none; }
+  td.num { font-variant-numeric:tabular-nums; text-align:right; }
+  .callout { border-left:3px solid var(--accent); background:var(--accent-soft); color:var(--accent-ink); border-radius:0 10px 10px 0; padding:.9rem 1.1rem; font-size:.9rem; }
+  @media (prefers-color-scheme:dark){ .callout{ color:var(--ink);} }
+  a { color:var(--accent-ink); } @media (prefers-color-scheme:dark){ a{ color:var(--accent);} }
+  footer { margin-top:3rem; padding-top:1.25rem; border-top:1px solid var(--border); color:var(--ink-faint); font-size:.82rem; }
+</style>
+
+<div class="wrap">
+  <header>
+    <span class="eyebrow">● 저녁 체크 · 2026-07-15</span>
+    <h1>SK하이닉스 신규 근거 스캔</h1>
+    <p class="lede">오늘 아침 체크 이후 새로 나온 목표가·리포트를 확인. 오늘의 핵심은 Barclays 목표가의 원화 환산치가 처음 확인됐다는 것.</p>
+  </header>
+
+  <section>
+    <h2>오늘 새로 발견한 것</h2>
+
+    <div class="card new">
+      <div class="card-head"><h3>Barclays $330의 원화 환산치 확인 — 약 490만원</h3><span class="pill pos">신규 — 최고치 갱신</span></div>
+      <p>국내 언론이 Barclays ADR 목표가($330)를 본주 기준으로 환산해 <strong>약
+      490만원</strong>이라고 보도. 이는 지금까지 확인된 목표가 중
+      <strong>가장 높은 수치(KB증권 420만원보다 위)</strong>다. 다만 이건 언론
+      환산치를 그대로 인용한 것으로, ADR 비율·환율을 우리가 직접 재계산해
+      검증한 값은 아니다 — 참고용으로 다루되 과신은 금물.</p>
+    </div>
+
+    <div class="card new">
+      <div class="card-head"><h3>KB증권, 목표가 420만원 재확인</h3><span class="pill pos">재확인 (신규 아님)</span></div>
+      <p>"주가 하락은 매수 기회"라는 논조로 420만원 유지. 근거를 "공급부족
+      최소 2028년까지 지속"으로 좀 더 구체화했다.</p>
+    </div>
+
+    <div class="card fixed">
+      <div class="card-head"><h3>정정 — 어제 발견한 "최저 120만원"은 옛날 수치</h3><span class="pill pos">해결됨</span></div>
+      <p>어제 저녁 체크에서 37개 기관 집계 중 최저 120만원을 제시한 미상
+      기관을 다음 확인 과제로 남겨뒀는데, 사용자가 확인해준 바로는 이 값이
+      <strong>AI 반도체 붐 이전의 과거 수치</strong>였다. 애그리게이터가
+      오래된 리포트를 그대로 집계에 남겨둔 것 — 현재 유효한 하단은 여전히
+      BNK투자증권 185만원이다.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2>기존 11개 기관 대비 변동사항</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>기관</th><th>목표가</th><th>오늘 상태</th></tr></thead>
+        <tbody>
+          <tr><td>Barclays</td><td class="num">$330 (원화환산 약 490만원)</td><td>환산치 신규 확인</td></tr>
+          <tr><td>KB증권</td><td class="num">420만원</td><td>재확인("하락은 매수기회")</td></tr>
+          <tr><td>NH / IBK / SK증권 / 대신 / 한투 / 신한</td><td class="num">380만~410만원</td><td>변동 없음</td></tr>
+          <tr><td>HSBC</td><td>Top Pick(비공개)</td><td>변동 없음</td></tr>
+          <tr><td>BNK투자증권</td><td class="num">185만원</td><td>변동 없음 (유효 하단)</td></tr>
+          <tr><td>Morningstar</td><td class="num">$160</td><td>변동 없음</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <div class="callout">
+    새로운(12번째) 기관의 신규 커버리지 개시는 오늘도 확인되지 않았다. 대신
+    기존 최고치가 KB 420만원 → Barclays 환산 약 490만원으로 갱신됐고, 어제
+    미해결이었던 120만원 미스터리는 해결됐다. 다음 체크 우선순위는 Barclays
+    환산치를 직접 재계산해 검증하는 것.
+  </div>
+
+  <footer>
+    이 리포트는 저녁 19:00(KST) Routine이 자동 생성한다. 원문 근거는 위키
+    <code>concepts/sk-hynix-analyst-thesis-checkpoints.md</code> 참고. 투자
+    조언 아님.
+  </footer>
+</div>

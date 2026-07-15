@@ -108,3 +108,21 @@ PEOS의 미국/글로벌 입력 소스로 흡수**했습니다: `engine/macro/us
 ```bash
 python -m src.clock.main   # 단독 실행
 ```
+
+## 지식베이스 (Wiki) — 여러 세션·프로젝트가 공유하는 정보 풀
+
+이 저장소는 [Andrej Karpathy의 "LLM Wiki" 패턴](https://gist.github.com/karpathy/442a6bf555914893e9891c11519de94f)도
+함께 운영합니다: 사람이 원본 자료(뉴스, 메모, 스크린샷, 프로필 등)를 `sources/`에 넣으면, LLM이 그걸 읽고
+`wiki/`에 지속적으로 갱신되는 지식베이스를 만듭니다. **PEOS의 `config/user.yaml`이 엔진이 소비하는
+"기계가 읽는" 프로필이라면, 이 위키는 사람이 읽고 검색하는 "서술형" 프로필/리서치 노트**입니다 —
+같은 사실이 양쪽에 있을 수 있으니 새 사실은 두 곳 다 갱신하거나, 최소한 위키에 어느 쪽이 최신인지
+남겨두세요.
+
+- `CLAUDE.md` — 스키마/워크플로우 정의 (구조를 바꿀 때만 사람이 직접 수정)
+- `sources/` — 원본, 불변 (뉴스 요약, 계좌 스냅샷, 프로필 등)
+- `wiki/index.md` — 전체 페이지 카탈로그, `wiki/entities/user-profile.md`에 사용자 프로필
+- 사용법: `/ingest <자료>`, `/query <질문>`, `/lint` (3개 슬래시 커맨드). 처음 쓰신다면 [USAGE.md](USAGE.md) 참고,
+  다른 AI 도구로 이 구조를 옮기고 싶다면 [SYSTEM-OVERVIEW.md](SYSTEM-OVERVIEW.md) 참고.
+
+> **주의**: `sources/`, `wiki/`에는 실명 수준은 아니지만 주소·자녀 학교·계좌 잔액 등 민감정보가
+> 평문으로 들어있고, 이 저장소는 public입니다 (2026-07-15 사용자 확인·승인됨).
