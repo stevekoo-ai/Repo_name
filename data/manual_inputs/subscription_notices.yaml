@@ -1,19 +1,12 @@
-# EXAMPLE manual input for 공공분양 공고 (Master Instruction 8.1, 13.8, 13.9).
+# 공공분양 공고 (Master Instruction 8.1, 13.8, 13.9).
 # 청약홈/LH/GH/SH는 개인 대상 공식 API를 제공하지 않으므로, 공고가 뜨면
 # 이 파일에 직접 입력한다 (reliability grade 4 — 공공기관 공고 원문 기준).
+#
+# 실제 목표는 경기도 용인시 플랫폼시티(config/user.yaml housing.priority_regions
+# 참고)이지만, 그동안 이 파일에는 세종 5-1생활권을 가리키는 EXAMPLE 플레이스홀더
+# 공고만 있었다 — 실제 공고가 아니었으므로 제거함(7.9: 데이터 없으면 Pending,
+# 추측/대체 데이터로 채우지 않음). 용인 플랫폼시티 실제 공고가 나오면 아래
+# notices 목록에 위 EXAMPLE과 같은 형식으로 추가한다.
 
-updated_at: "2026-07-14"
-notices:
-  - name: "세종 5-1생활권 공공분양 (EXAMPLE)"
-    agency: "LH"
-    region: "세종 플랫폼시티"
-    is_platform_city: true
-    supply_type: "일반공급"
-    size: "84㎡ 이상"
-    household_count: 620          # EXAMPLE
-    announce_date: "2026-08-01"   # EXAMPLE
-    application_start: "2026-08-11"  # EXAMPLE
-    application_end: "2026-08-12"    # EXAMPLE
-    expected_price_krw: 550000000    # EXAMPLE
-    expected_competition_ratio: null
-    source: "청약홈 (수동 입력)"
+updated_at: "2026-07-15"
+notices: []
