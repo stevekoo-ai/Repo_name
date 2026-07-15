@@ -1,7 +1,7 @@
 ---
 title: 펀더멘털 불변 vs 심리·수급발 디레이팅
 created: 2026-07-13
-updated: 2026-07-14
+updated: 2026-07-15
 tags: [concept, market-psychology, valuation, risk]
 ---
 
@@ -33,6 +33,18 @@ tags: [concept, market-psychology, valuation, risk]
 그것이 전고점을 넘어서는 진짜 추세 전환인지는 여전히 미확정이다. 상세는
 [SK하이닉스](../entities/sk-hynix.md)의 "예측 검증" 섹션 참고.
 
+### 디레이팅 → 리레이팅 전환 신호 (2026-07-15 추가)
+
+이 개념의 반대 방향도 SK하이닉스 사례에서 관찰됐다. 7/15
+[저항 돌파 및 ADR 폭등](../summaries/sk-hynix-adr-surge-breakout-2026-07-15.md)은
+단순 수급 반등이 아니라 **바클레이스의 신규 Overweight 개시·목표가 330달러
+(+117%)** — 즉 애널리스트가 펀더멘털(공급 부족 심화 전망)을 근거로 밸류에이션을
+재산정한 것이 트리거였다. 디레이팅이 "펀더멘털은 그대로인데 배수만 눌리는
+것"이라면, **리레이팅은 그 역방향으로 배수가 다시 올라붙는 것**이며 이번
+사례처럼 애널리스트의 펀더멘털 재해석이 계기가 될 수 있다. 다만 목표가 하나로
+국면 전환을 단정하기는 이르고, 다른 하우스의 후속 반응을 지켜봐야 한다는 게
+현재 판단.
+
 ### 일반적으로 알려진 사례 (⚠ 위키 소스로 검증되지 않음, 일반 시장 상식·참고용)
 
 아래는 어떤 소스에서 `/ingest` 된 것이 아니라 일반 지식으로 정리한 것이며,
@@ -53,5 +65,6 @@ tags: [concept, market-psychology, valuation, risk]
 - [SK하이닉스 반등 전망 분석 (2026-07-13)](../summaries/sk-hynix-rebound-analysis-2026-07-13.md)
 - [SK하이닉스 본주·ADR 차트 비교 (2026-07-13)](../summaries/sk-hynix-adr-krw-chart-comparison-2026-07-13.md)
 - [7월 실적-주가 괴리 원인 정리 (2026-07-14)](../summaries/sk-hynix-earnings-price-divergence-2026-07-14.md)
+- [SK하이닉스 저항 돌파 및 ADR 폭등 (2026-07-15)](../summaries/sk-hynix-adr-surge-breakout-2026-07-15.md)
 - [SK하이닉스](../entities/sk-hynix.md)
 - 일반 사례 목록: 별도 소스 없음 — 일반 지식, 재검증 필요

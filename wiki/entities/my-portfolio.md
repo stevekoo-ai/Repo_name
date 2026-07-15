@@ -1,7 +1,7 @@
 ---
 title: 나의 투자 포트폴리오
 created: 2026-07-13
-updated: 2026-07-13
+updated: 2026-07-15
 tags: [portfolio, accounts]
 ---
 
@@ -31,6 +31,13 @@ DC(퇴직연금), IRP, ISA, 일반 4개 계좌로 구성된 개인 투자 포트
 전체 33개 보유 종목의 상세 수치는
 [계좌 현황 스냅샷 (2026-07-13)](../summaries/portfolio-holdings-2026-07-13.md) 참고.
 
+**업데이트(2026-07-15)**: SK하이닉스가 7/13 -16.15% 급락 이후 7/15
++10.93%~+12.02%까지 [급등](../summaries/sk-hynix-adr-surge-breakout-2026-07-15.md)하며
+136주 평가금액도 그만큼 크게 되돌아왔을 것으로 추정된다 (정확한 갱신 금액은
+새 계좌 스냅샷을 넣어야 확정 가능 — 아직 반영 전). 이번처럼 유리한 방향으로
+크게 흔들렸다는 사실 자체가, 집중도가 높은 포트폴리오는 등락 폭도 그만큼
+크다는 걸 보여주는 사례다.
+
 [사용자](user-profile.md)는 SK하이닉스 재직자이자 고소득의 상당 부분이
 PS(성과급)에서 나오는 구조라, 위 SK하이닉스 집중 리스크는 투자자산에 그치지
 않고 소득 측면과도 겹친다 — 회사 실적이 흔들리면 자산과 소득이 동시에 영향을
@@ -39,5 +46,6 @@ PS(성과급)에서 나오는 구조라, 위 SK하이닉스 집중 리스크는 
 ## Sources
 
 - [계좌 현황 스냅샷 (2026-07-13)](../summaries/portfolio-holdings-2026-07-13.md)
+- [SK하이닉스 저항 돌파 및 ADR 폭등 (2026-07-15)](../summaries/sk-hynix-adr-surge-breakout-2026-07-15.md)
 - [사용자 프로필](user-profile.md)
 - [sources/portfolio-holdings-2026-07-13.md](../../sources/portfolio-holdings-2026-07-13.md)
