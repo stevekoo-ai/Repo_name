@@ -31,6 +31,10 @@ tags: [sk-hynix, semiconductor, stock, adr]
   변동성을 구조적으로 증폭 중
 - 2Q 실적 발표일이 잠정 7/23에서 7/29로 바뀔 가능성(공식 미확정) — 사실이면
   메타·마이크로소프트와 같은 날
+- 오늘(7/16) **한국은행 금리 결정**(예상 2.50%→2.75% 인상) 대기 중 — 실현 시
+  국내발 긴축 신호로 코스피 밸류에이션에 부담 가능. 이 항목을 포함한 거시
+  지표는 이제 [매크로 지표 트렌드 추적](../concepts/macro-indicators.md)에서
+  시계열로 누적 기록한다.
 
 ## 다음에 볼 것
 
@@ -57,6 +61,7 @@ tags: [sk-hynix, semiconductor, stock, adr]
 ## Sources
 
 - [SK하이닉스 목표주가 근거 체크리스트](../concepts/sk-hynix-analyst-thesis-checkpoints.md)
+- [매크로 지표 트렌드 추적](../concepts/macro-indicators.md)
 - [펀더멘털 불변 vs 심리·수급발 디레이팅](../concepts/fundamentals-vs-sentiment-derating.md)
 - [나의 투자 포트폴리오](my-portfolio.md)
 - [사용자 프로필](user-profile.md)

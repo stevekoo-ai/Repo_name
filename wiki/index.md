@@ -21,3 +21,4 @@ Catalog of every page in the wiki. See `../CLAUDE.md` for conventions.
 
 - [펀더멘털 불변 vs 심리·수급발 디레이팅](concepts/fundamentals-vs-sentiment-derating.md) — 실적은 멀쩡한데 주가만 심리·수급으로 눌리는 패턴, SK하이닉스가 현재진행형 사례
 - [SK하이닉스 목표주가 근거 체크리스트](concepts/sk-hynix-analyst-thesis-checkpoints.md) — 11개 기관 목표가(Barclays 원화환산 약 490만원 최고치, KB 420만 vs BNK 185만·Morningstar $160), ADR 프리미엄 분기점 계산 완료(약 30.7%), 9개 테마별 신호기준
+- [매크로 지표 트렌드 추적](concepts/macro-indicators.md) — 금리 결정·물가·소매판매 등 경제 캘린더를 시계열로 누적 기록, 2026-07-16 한국은행 금리 결정(인상 유력)부터 시작

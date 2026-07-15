@@ -231,6 +231,7 @@ DRAM 뉴스·판정(긍정/중립/훼손)·메모 컬럼으로 구성됨. 원본
 
 ## Sources
 
+- [매크로 지표 트렌드 추적](macro-indicators.md) (거시 요인은 이제 여기서 시계열로 관리)
 - [sources/sk-hynix-120man-clarification-2026-07-15.md](../../sources/sk-hynix-120man-clarification-2026-07-15.md)
 - [sources/websearch-sk-hynix-morning-check-2026-07-16.md](../../sources/websearch-sk-hynix-morning-check-2026-07-16.md)
 - [sources/websearch-sk-hynix-evening-check-2026-07-15b.md](../../sources/websearch-sk-hynix-evening-check-2026-07-15b.md)
