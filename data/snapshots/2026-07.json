@@ -1,8 +1,8 @@
 {
   "macro": {
-    "regime": "Expansion",
+    "regime": "Recovery",
     "previous_regime": "Early Expansion",
-    "transition": "downgrade",
+    "transition": "upgrade",
     "score_band": "unbalanced_expansion",
     "score_band_label": "불균형 확장",
     "scores": {
@@ -25,8 +25,7 @@
       "장단기 금리 역전 심화"
     ],
     "downgrade_signals": [
-      "ppi_sustained_high",
-      "rates_rising"
+      "ppi_sustained_high"
     ],
     "upgrade_signals": [
       "gdp_strong",
@@ -173,5 +172,5 @@
     }
   },
   "month": "2026-07",
-  "saved_at": "2026-07-14T22:25:26.654370+00:00"
+  "saved_at": "2026-07-15T05:22:54.157301+00:00"
 }

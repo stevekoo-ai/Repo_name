@@ -69,6 +69,11 @@ header.masthead .sub { color: var(--text-muted); font-size: 0.9rem; }
 table { border-collapse: collapse; width: 100%; font-size: 0.88rem; }
 th, td { text-align: left; padding: 7px 10px; border-bottom: 1px solid var(--border); white-space: nowrap; }
 th { color: var(--text-muted); font-weight: 600; font-size: 0.78rem; text-transform: uppercase; letter-spacing: .02em; }
+.spark-cell { white-space: normal; }
+.spark { display: block; }
+.spark-labels { display: flex; justify-content: space-between; font-size: 0.68rem; color: var(--text-muted);
+  width: 176px; }
+.spark-empty { font-size: 0.78rem; }
 .clock-row { display: flex; gap: 18px; align-items: center; flex-wrap: wrap; }
 .clock-img { width: 180px; height: 180px; border-radius: 10px; flex-shrink: 0;
   background: #ffffff; padding: 6px; border: 1px solid var(--border); }
@@ -77,6 +82,19 @@ th { color: var(--text-muted); font-weight: 600; font-size: 0.78rem; text-transf
 .discuss-topic { font-weight: 700; margin-bottom: 4px; }
 .discuss-context { color: var(--text-muted); font-size: 0.88rem; margin: 4px 0; }
 .discuss-question { margin: 6px 0 0; font-size: 0.94rem; }
+.discuss-input { width: 100%; margin-top: 10px; padding: 8px 10px; border-radius: 8px;
+  border: 1px solid var(--border); background: var(--surface); color: var(--text);
+  font-family: inherit; font-size: 0.88rem; resize: vertical; box-sizing: border-box; }
+.discuss-input:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+.discuss-actions { display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap; }
+.discuss-toolbar { display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+  padding: 10px 14px; background: var(--surface-2); border-radius: 10px; margin-bottom: 10px; }
+.btn-fb { font-family: inherit; font-size: 0.82rem; font-weight: 600; padding: 6px 12px;
+  border-radius: 8px; border: 1px solid var(--border); background: var(--surface);
+  color: var(--text); cursor: pointer; }
+.btn-fb:hover { border-color: var(--accent); }
+.btn-fb:disabled { opacity: 0.7; cursor: default; }
+.btn-fb-primary { background: var(--accent); color: #fff; border-color: var(--accent); }
 .action-card { border-radius: 10px; border: 1px solid var(--border); padding: 12px 16px; margin: 8px 0 14px; }
 .action-good { border-left: 4px solid var(--good); }
 .action-warn { border-left: 4px solid var(--warn); }
@@ -103,7 +121,7 @@ footer { color: var(--text-muted); font-size: 0.78rem; text-align: center; paddi
   <div class="tile-grid">
     <div class="tile">
       <div class="tile-label"><span class="dot dot-neutral"></span>경기 국면</div>
-      <div class="tile-value">Expansion</div>
+      <div class="tile-value">Recovery</div>
       <div class="tile-sub">불균형 확장</div>
     </div>
     <div class="tile">
@@ -113,7 +131,7 @@ footer { color: var(--text-muted); font-size: 0.78rem; text-align: center; paddi
     </div>
     <div class="tile">
       <div class="tile-label"><span class="dot dot-neutral"></span>Investment Environment</div>
-      <div class="tile-value">62.40점</div>
+      <div class="tile-value">69.10점</div>
       <div class="tile-sub">투자 환경</div>
     </div>
     <div class="tile">
@@ -122,13 +140,13 @@ footer { color: var(--text-muted); font-size: 0.78rem; text-align: center; paddi
       <div class="tile-sub">긍정</div>
     </div>
     <div class="tile">
-      <div class="tile-label"><span class="dot dot-bad"></span>채권</div>
-      <div class="tile-value">24.90점</div>
+      <div class="tile-label"><span class="dot dot-neutral"></span>채권</div>
+      <div class="tile-value">43.40점</div>
       <div class="tile-sub">Bond Score</div>
     </div>
     <div class="tile">
       <div class="tile-label"><span class="dot dot-bad"></span>환율</div>
-      <div class="tile-value">39.90점</div>
+      <div class="tile-value">32.90점</div>
       <div class="tile-sub">FX Score</div>
     </div>
     <div class="tile">
@@ -139,11 +157,11 @@ footer { color: var(--text-muted); font-size: 0.78rem; text-align: center; paddi
     <section class="card">
       <h2>Executive Summary</h2>
       <ul class="kv-list">
-        <li><b>현재 경기 국면</b> Expansion (불균형 확장, 총점 3)</li>
-        <li><b>지난달 대비 변화</b> Early Expansion → Expansion
-            (downgrade)</li>
+        <li><b>현재 경기 국면</b> Recovery (불균형 확장, 총점 3)</li>
+        <li><b>지난달 대비 변화</b> Early Expansion → Recovery
+            (upgrade)</li>
         <li><b>핵심 원인</b> 이전 스냅샷 없음 — 이번 달이 최초 기록</li>
-        <li><b>사용자에게 중요한 의미</b> Expansion 국면(총점 3, 신뢰도 77.8점) — 반도체 긍정</li>
+        <li><b>사용자에게 중요한 의미</b> Recovery 국면(총점 3, 신뢰도 77.8점) — 반도체 긍정</li>
         <li><b>이번 달 핵심 행동</b> [행동] 세종 5-1생활권 공공분양 (EXAMPLE) 자금 갭 81,950,000원 확보 계획 수립</li>
         <li><b>리포트 충족도</b> <span class="badge badge-warn">insufficient</span></li>
       </ul>
@@ -151,49 +169,105 @@ footer { color: var(--text-muted); font-size: 0.78rem; text-align: center; paddi
     <section class="card">
       <h2>Macro Dashboard</h2>
       <div class="table-wrap"><table>
-        <thead><tr><th>지표</th><th>현재</th><th>이전</th><th>추세</th><th>점수</th><th>출처</th></tr></thead>
+        <thead><tr><th>지표</th><th>현재</th><th>이전</th><th>추세</th><th>점수</th><th>10년 추세</th><th>출처</th></tr></thead>
         <tbody><tr>
-          <td>실질 GDP 성장률</td><td>1.83</td><td><span class="pending">Pending</span></td>
+          <td>실질 GDP 성장률</td><td>1.83</td>
+          <td>-0.11 <sup title="전월 리포트 스냅샷이 아직 없어 원자료 이력의 직전 값을 사용">†</sup></td>
           <td>▲</td><td>1</td>
+          <td class="spark-cell"><svg class="spark" viewBox="0 0 176 44" width="176" height="44"
+      role="img" aria-label="2016-10 0.77 → 2026-01 1.83">
+      <title>2016-10 0.77 → 2026-01 1.83</title>
+      <polyline points="4.0,14.9 8.5,12.3 13.1,15.3 17.6,10.5 22.2,22.2 26.7,10.0 31.2,14.8 35.8,16.6 40.3,16.6 44.9,20.4 49.4,10.7 53.9,18.6 58.5,13.6 63.0,30.6 67.6,40.0 72.1,4.0 76.6,9.5 81.2,8.9 85.7,10.6 90.3,20.7 94.8,7.7 99.4,17.2 103.9,13.3 108.4,18.7 113.0,23.5 117.5,19.0 122.1,15.6 126.6,13.6 131.1,15.2 135.7,13.2 140.2,21.7 144.8,20.2 149.3,18.9 153.8,21.9 158.4,15.8 162.9,10.6 167.5,21.4 172.0,7.2" fill="none" stroke="var(--accent)" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round"/>
+      <circle cx="172.0" cy="7.2" r="2.5" fill="var(--accent)"/>
+    </svg>
+    <div class="spark-labels"><span>2016-10·0.8</span><span>2026-01·1.8</span></div></td>
           <td class="muted">한국은행 ECOS</td>
         </tr><tr>
-          <td>전산업생산지수</td><td><span class="pending">Pending</span></td><td><span class="pending">Pending</span></td>
+          <td>전산업생산지수</td><td><span class="pending">Pending</span></td>
+          <td><span class="pending">Pending</span></td>
           <td>N/A</td><td><span class="pending">Pending</span></td>
+          <td class="spark-cell"><span class="muted spark-empty">10년 이력 부족</span></td>
           <td class="muted">Source Error</td>
         </tr><tr>
-          <td>소매판매</td><td><span class="pending">Pending</span></td><td><span class="pending">Pending</span></td>
+          <td>소매판매</td><td><span class="pending">Pending</span></td>
+          <td><span class="pending">Pending</span></td>
           <td>N/A</td><td><span class="pending">Pending</span></td>
+          <td class="spark-cell"><span class="muted spark-empty">10년 이력 부족</span></td>
           <td class="muted">Source Error</td>
         </tr><tr>
-          <td>총수출 증가율</td><td>9.10</td><td><span class="pending">Pending</span></td>
+          <td>총수출 증가율</td><td>9.10</td>
+          <td>8.20 <sup title="전월 리포트 스냅샷이 아직 없어 원자료 이력의 직전 값을 사용">†</sup></td>
           <td>→</td><td>0</td>
+          <td class="spark-cell"><svg class="spark" viewBox="0 0 176 44" width="176" height="44"
+      role="img" aria-label="2026-04 6.80 → 2026-06 9.10">
+      <title>2026-04 6.80 → 2026-06 9.10</title>
+      <polyline points="4.0,40.0 88.0,18.1 172.0,4.0" fill="none" stroke="var(--accent)" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round"/>
+      <circle cx="172.0" cy="4.0" r="2.5" fill="var(--accent)"/>
+    </svg>
+    <div class="spark-labels"><span>2026-04·6.8</span><span>2026-06·9.1</span></div></td>
           <td class="muted">산업통상자원부 (수동 입력)</td>
         </tr><tr>
-          <td>반도체 수출 증가율</td><td>24.70</td><td><span class="pending">Pending</span></td>
+          <td>반도체 수출 증가율</td><td>24.70</td>
+          <td>22.40 <sup title="전월 리포트 스냅샷이 아직 없어 원자료 이력의 직전 값을 사용">†</sup></td>
           <td>▲</td><td>1</td>
+          <td class="spark-cell"><svg class="spark" viewBox="0 0 176 44" width="176" height="44"
+      role="img" aria-label="2026-04 18.90 → 2026-06 24.70">
+      <title>2026-04 18.90 → 2026-06 24.70</title>
+      <polyline points="4.0,40.0 88.0,18.3 172.0,4.0" fill="none" stroke="var(--accent)" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round"/>
+      <circle cx="172.0" cy="4.0" r="2.5" fill="var(--accent)"/>
+    </svg>
+    <div class="spark-labels"><span>2026-04·18.9</span><span>2026-06·24.7</span></div></td>
           <td class="muted">산업통상자원부 (수동 입력)</td>
         </tr><tr>
-          <td>경상수지 (3개월 평균, 억달러)</td><td>38607.40</td><td><span class="pending">Pending</span></td>
+          <td>경상수지 (3개월 평균, 억달러)</td><td>38607.40</td>
+          <td>28292.30 <sup title="전월 리포트 스냅샷이 아직 없어 원자료 이력의 직전 값을 사용">†</sup></td>
           <td>▲</td><td>1</td>
+          <td class="spark-cell"><svg class="spark" viewBox="0 0 176 44" width="176" height="44"
+      role="img" aria-label="2016-08 5410.10 → 2026-05 38607.40">
+      <title>2016-08 5410.10 → 2026-05 38607.40</title>
+      <polyline points="4.0,29.1 5.4,27.5 6.9,27.5 8.3,27.2 9.7,27.6 11.2,30.6 12.6,27.5 14.1,29.3 15.5,30.8 16.9,29.9 18.4,27.9 19.8,27.5 21.2,28.5 22.7,23.8 24.1,28.0 25.5,27.5 27.0,29.8 28.4,31.2 29.8,30.7 31.3,29.2 32.7,32.0 34.2,26.5 35.6,27.1 37.0,26.5 38.5,26.7 39.9,24.7 41.3,26.0 42.8,29.3 44.2,29.4 45.6,31.0 47.1,30.7 48.5,29.9 49.9,33.6 51.4,29.4 52.8,28.5 54.3,27.9 55.7,29.4 57.1,27.1 58.6,27.1 60.0,28.7 61.4,29.7 62.9,32.8 64.3,28.1 65.7,28.7 67.2,36.7 68.6,31.6 70.1,27.9 71.5,27.6 72.9,28.2 74.4,25.0 75.8,23.8 77.2,25.9 78.7,23.9 80.1,28.8 81.5,28.1 83.0,27.7 84.4,33.5 85.8,24.2 87.3,25.7 88.7,27.6 90.2,28.1 91.6,26.1 93.0,27.6 94.5,28.2 95.9,28.9 97.3,31.9 98.8,29.2 100.2,27.8 101.6,33.6 103.1,30.0 104.5,28.6 105.9,31.9 107.4,36.5 108.8,31.8 110.3,32.8 111.7,34.6 113.1,31.8 114.6,40.0 116.0,34.6 117.4,34.1 118.9,35.3 120.3,31.6 121.7,30.2 123.2,30.4 124.6,28.5 126.1,27.5 127.5,26.8 128.9,28.1 130.4,26.4 131.8,30.5 133.2,28.0 134.7,27.2 136.1,32.6 137.5,26.2 139.0,23.0 140.4,26.3 141.8,28.7 143.3,24.6 144.7,25.7 146.2,26.0 147.6,23.5 149.0,31.1 150.5,27.7 151.9,25.9 153.3,29.8 154.8,25.7 156.2,22.6 157.6,24.1 159.1,25.7 160.5,22.4 161.9,27.4 163.4,23.4 164.8,19.0 166.3,23.1 167.7,15.6 169.1,4.5 170.6,11.8 172.0,4.0" fill="none" stroke="var(--accent)" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round"/>
+      <circle cx="172.0" cy="4.0" r="2.5" fill="var(--accent)"/>
+    </svg>
+    <div class="spark-labels"><span>2016-08·5410.1</span><span>2026-05·38607.4</span></div></td>
           <td class="muted">한국은행 ECOS</td>
         </tr><tr>
-          <td>CPI</td><td><span class="pending">Pending</span></td><td><span class="pending">Pending</span></td>
+          <td>CPI</td><td><span class="pending">Pending</span></td>
+          <td><span class="pending">Pending</span></td>
           <td>N/A</td><td><span class="pending">Pending</span></td>
+          <td class="spark-cell"><span class="muted spark-empty">10년 이력 부족</span></td>
           <td class="muted">Source Error</td>
         </tr><tr>
-          <td>PPI</td><td>129.82</td><td><span class="pending">Pending</span></td>
+          <td>PPI</td><td>129.82</td>
+          <td>128.75 <sup title="전월 리포트 스냅샷이 아직 없어 원자료 이력의 직전 값을 사용">†</sup></td>
           <td>▼</td><td>-1</td>
+          <td class="spark-cell"><svg class="spark" viewBox="0 0 176 44" width="176" height="44"
+      role="img" aria-label="2016-08 95.19 → 2026-05 129.82">
+      <title>2016-08 95.19 → 2026-05 129.82</title>
+      <polyline points="4.0,40.0 5.4,39.8 6.9,39.5 8.3,39.0 9.7,38.2 11.2,36.7 12.6,36.3 14.1,36.3 15.5,36.6 16.9,36.8 18.4,37.2 19.8,37.2 21.2,36.7 22.7,36.0 24.1,35.9 25.5,36.0 27.0,35.9 28.4,35.5 29.8,35.1 31.3,35.1 32.7,35.0 34.2,34.7 35.6,34.7 37.0,34.2 38.5,33.7 39.9,33.4 41.3,33.8 42.8,34.5 44.2,35.0 45.6,35.1 47.1,35.0 48.5,34.6 49.9,34.3 51.4,34.2 52.8,34.5 54.3,34.5 55.7,34.3 57.1,34.2 58.6,34.5 60.0,34.6 61.4,34.3 62.9,33.9 64.3,34.3 65.7,35.2 67.2,36.1 68.6,36.1 70.1,35.6 71.5,35.3 72.9,34.8 74.4,34.6 75.8,35.0 77.2,34.9 78.7,34.1 80.1,33.0 81.5,32.1 83.0,31.0 84.4,29.9 85.8,29.3 87.3,28.8 88.7,27.7 90.2,27.1 91.6,26.7 93.0,25.5 94.5,24.7 95.9,24.7 97.3,23.5 98.8,23.0 100.2,21.2 101.6,19.3 103.1,18.4 104.5,17.8 105.9,17.4 107.4,17.9 108.8,17.8 110.3,17.2 111.7,17.6 113.1,18.1 114.6,17.6 116.0,17.4 117.4,17.3 118.9,17.4 120.3,17.8 121.7,18.1 123.2,17.8 124.6,16.8 126.1,16.3 127.5,16.4 128.9,16.9 130.4,16.7 131.8,16.1 133.2,15.7 134.7,15.4 136.1,15.1 137.5,15.0 139.0,15.0 140.4,14.7 141.8,14.9 143.3,15.1 144.7,15.2 146.2,15.1 147.6,14.7 149.0,13.9 150.5,13.9 151.9,13.8 153.3,14.1 154.8,14.6 156.2,14.4 157.6,14.0 159.1,14.1 160.5,13.6 161.9,13.2 163.4,12.8 164.8,12.4 166.3,11.5 167.7,10.8 169.1,8.6 170.6,5.1 172.0,4.0" fill="none" stroke="var(--accent)" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round"/>
+      <circle cx="172.0" cy="4.0" r="2.5" fill="var(--accent)"/>
+    </svg>
+    <div class="spark-labels"><span>2016-08·95.2</span><span>2026-05·129.8</span></div></td>
           <td class="muted">한국은행 ECOS</td>
         </tr><tr>
-          <td>한국 실업률 (3개월 평균 변화, %p)</td><td><span class="pending">Pending</span></td><td><span class="pending">Pending</span></td>
+          <td>한국 실업률 (3개월 평균 변화, %p)</td><td><span class="pending">Pending</span></td>
+          <td><span class="pending">Pending</span></td>
           <td>N/A</td><td><span class="pending">Pending</span></td>
+          <td class="spark-cell"><span class="muted spark-empty">10년 이력 부족</span></td>
           <td class="muted">Source Error</td>
         </tr><tr>
-          <td>미국 고용 + 글로벌 경기 (composite -1~+1)</td><td>1.00</td><td><span class="pending">Pending</span></td>
+          <td>미국 고용 + 글로벌 경기 (composite -1~+1)</td><td>1.00</td>
+          <td><span class="pending">Pending</span></td>
           <td>▲</td><td>1</td>
+          <td class="spark-cell"><span class="muted spark-empty">10년 이력 부족</span></td>
           <td class="muted">FRED</td>
         </tr></tbody>
       </table></div>
+      <p class="tile-sub">† 전월 PEOS 리포트가 아직 쌓이지 않아, 해당 지표는 원자료(공식 통계) 이력의 직전 발표값으로 대체 표시했습니다.</p>
     </section>
     <section class="card">
       <h2>미국 거시경제 참고 — Investment Clock</h2>
@@ -214,31 +288,31 @@ footer { color: var(--text-muted); font-size: 0.78rem; text-align: center; paddi
       <ul class="kv-list">
         <li><b>직업 관점</b> 반도체/AI 인프라 종사자 — 반도체 점수 79.60점
             (긍정)은 업황·성과급 사이클에 직접 연결됩니다.</li>
-        <li><b>투자 관점</b> Investment Environment 62.40점 · 편향: 주식 소폭 확대, ETF 소폭 확대, 채권 축소/방어, 현금 축소/방어</li>
-        <li><b>채권 관점</b> Bond Score 24.90점</li>
-        <li><b>환율 관점</b> FX Score 39.90점</li>
+        <li><b>투자 관점</b> Investment Environment 69.10점 · 편향: 주식 소폭 확대, ETF 소폭 확대, 채권 축소/방어, 현금 축소/방어</li>
+        <li><b>채권 관점</b> Bond Score 43.40점</li>
+        <li><b>환율 관점</b> FX Score 32.90점</li>
         <li><b>공공분양 관점</b> Housing Readiness 60.40점</li>
       </ul>
     </section><section class="card"><h2>자산별 영향 분석</h2><div class="tile-grid">
     <div class="tile">
-      <div class="tile-label"><span class="dot dot-neutral"></span>주식</div>
-      <div class="tile-value">★★★☆☆</div>
-      <div class="tile-sub">66.1점</div>
+      <div class="tile-label"><span class="dot dot-good"></span>주식</div>
+      <div class="tile-value">★★★★☆</div>
+      <div class="tile-sub">71.3점</div>
     </div>
     <div class="tile">
       <div class="tile-label"><span class="dot dot-neutral"></span>ETF</div>
-      <div class="tile-value">★★☆☆☆</div>
-      <div class="tile-sub">52.7점</div>
+      <div class="tile-value">★★★☆☆</div>
+      <div class="tile-sub">61.6점</div>
     </div>
     <div class="tile">
-      <div class="tile-label"><span class="dot dot-bad"></span>채권</div>
-      <div class="tile-value">★☆☆☆☆</div>
-      <div class="tile-sub">24.9점</div>
+      <div class="tile-label"><span class="dot dot-neutral"></span>채권</div>
+      <div class="tile-value">★★☆☆☆</div>
+      <div class="tile-sub">43.4점</div>
     </div>
     <div class="tile">
       <div class="tile-label"><span class="dot dot-neutral"></span>현금</div>
       <div class="tile-value">★★★☆☆</div>
-      <div class="tile-sub">55.0점</div>
+      <div class="tile-sub">65.0점</div>
     </div>
     <div class="tile">
       <div class="tile-label"><span class="dot dot-neutral"></span>청약 자금</div>
@@ -248,16 +322,16 @@ footer { color: var(--text-muted); font-size: 0.78rem; text-align: center; paddi
     <div class="tile">
       <div class="tile-label"><span class="dot dot-bad"></span>환율</div>
       <div class="tile-value">★☆☆☆☆</div>
-      <div class="tile-sub">39.9점</div>
+      <div class="tile-sub">32.9점</div>
     </div></div></section>
     <section class="card">
       <h2>시나리오 분석</h2>
       <div class="scenario-grid">
       <div class="scenario-card scenario-base">
-        <div class="scenario-title">Base <span class="scenario-prob">30%</span></div>
-        <p><b>전제</b> 현재 국면(Expansion)과 반도체 업황(긍정)의 추세가 유지된다.</p>
+        <div class="scenario-title">Base <span class="scenario-prob">35%</span></div>
+        <p><b>전제</b> 현재 국면(Recovery)과 반도체 업황(긍정)의 추세가 유지된다.</p>
         <p><b>기대되는 변화</b> 지표가 현재 범위 내에서 등락하며 국면 전환 신호는 제한적.</p>
-        <p><b>사용자 영향</b> Investment Environment Score 62.4점 수준의 배분 유지가 합리적.</p>
+        <p><b>사용자 영향</b> Investment Environment Score 69.1점 수준의 배분 유지가 합리적.</p>
       </div>
       <div class="scenario-card scenario-bull">
         <div class="scenario-title">Bull <span class="scenario-prob">35%</span></div>
@@ -266,43 +340,85 @@ footer { color: var(--text-muted); font-size: 0.78rem; text-align: center; paddi
         <p><b>사용자 영향</b> 주식/ETF 비중 확대, 반도체/AI 인프라 비중 우선순위 상향을 검토할 수 있다.</p>
       </div>
       <div class="scenario-card scenario-bear">
-        <div class="scenario-title">Bear <span class="scenario-prob">35%</span></div>
-        <p><b>전제</b> 하향/경고 신호(ppi_sustained_high, rates_rising, 장단기 금리 역전 심화)가 현실화된다.</p>
+        <div class="scenario-title">Bear <span class="scenario-prob">30%</span></div>
+        <p><b>전제</b> 하향/경고 신호(ppi_sustained_high, 장단기 금리 역전 심화)가 현실화된다.</p>
         <p><b>기대되는 변화</b> 수출 둔화 또는 물가 재상승으로 국면이 한 단계 하향될 가능성.</p>
         <p><b>사용자 영향</b> 현금/채권 비중 확대, 청약·출장 자금 유동성 우선 확보가 합리적.</p>
       </div></div>
       <h3>깨지는 조건</h3>
       <ul><li>수출 감소 전환</li><li>반도체 수출 감소 전환</li><li>CPI 재상승</li><li>PPI 상승 지속 (6% 이상)</li><li>환율 급등</li><li>미국 고용 지표 악화</li></ul>
     </section>
-    <section class="card">
+    <section class="card" id="discussion-section" data-repo="stevekoo-ai/Repo_name" data-month="2026-07">
       <h2>논의가 필요한 결정 사항</h2>
-      <p class="tile-sub">숫자로 정리되지 않는, 사용자님의 판단이 필요한 지점들입니다. 다음 대화에서
-      답을 주시면 다음 리포트부터 반영합니다.</p>
+      <p class="tile-sub">숫자로 정리되지 않는, 사용자님의 판단이 필요한 지점들입니다. 항목별로 답을
+      적어주시면 다음 리포트부터 반영합니다. 모든 항목에 답하실 필요는 없습니다.</p>
       
-        <div class="discuss-card">
+        <div class="discuss-toolbar">
+          <button type="button" class="btn-fb btn-fb-primary" onclick="peosCopyAll(this)">
+            📋 작성한 답변 전체 복사</button>
+          <span class="tile-sub">비워둔 항목은 자동으로 제외됩니다. 복사한 내용은 다음 대화에 붙여넣어 주시면
+          반영됩니다. "GitHub Issue로 제출"은 공개 저장소에 남으니, 공개돼도 괜찮은 항목에만 사용해주세요.</span>
+        </div>
+      
+        <div class="discuss-card" data-id="stock_concentration" data-topic="SK하이닉스 집중도"
+             data-question="회사 배경과 업황을 잘 아는 종목이라 확신이 있으실 텐데, 그럼에도 이 정도 집중도를 계속 유지하실 건가요, 아니면 일부는 ETF나 다른 종목으로 분산할 계획이 있으신가요?">
           <div class="discuss-topic">💬 SK하이닉스 집중도</div>
           <p class="discuss-context">보유 주식의 매입원가 기준 82.8%가 SK하이닉스 한 종목에 쏠려 있습니다 (주식 계좌 총 매입원가 약 142,979,923원 중).</p>
           <p class="discuss-question">회사 배경과 업황을 잘 아는 종목이라 확신이 있으실 텐데, 그럼에도 이 정도 집중도를 계속 유지하실 건가요, 아니면 일부는 ETF나 다른 종목으로 분산할 계획이 있으신가요?</p>
+          <textarea class="discuss-input" rows="3"
+            placeholder="생각을 적어보세요 (선택 사항 — 비워두면 이 항목은 제출/복사에서 빠집니다)"></textarea>
+          <div class="discuss-actions">
+            <button type="button" class="btn-fb" onclick="peosCopyOne(this)">📋 이 답변 복사</button>
+            <button type="button" class="btn-fb" onclick="peosIssueOne(this)">🔗 GitHub Issue로 제출</button>
+          </div>
         </div>
-        <div class="discuss-card">
+        <div class="discuss-card" data-id="lockup_vs_moveout" data-topic="하나증권 락업주와 이사 시점"
+             data-question="전세 만료 이후 임시 거주(전세/월세) 자금이 필요할 수 있는데, 이 락업주는 자금 계획에서 제외하고 다른 재원으로 임시 거주 비용을 마련하는 쪽으로 생각하고 계신가요?">
           <div class="discuss-topic">💬 하나증권 락업주와 이사 시점</div>
           <p class="discuss-context">SK하이닉스 67주는 2027-02-11까지 보유해야 8,791,650원 마크업을 받습니다. 락업 만기(2027-02-11)가 전세 만료(2027-02-22)보다 빠릅니다 (약 11일 차이).</p>
           <p class="discuss-question">전세 만료 이후 임시 거주(전세/월세) 자금이 필요할 수 있는데, 이 락업주는 자금 계획에서 제외하고 다른 재원으로 임시 거주 비용을 마련하는 쪽으로 생각하고 계신가요?</p>
+          <textarea class="discuss-input" rows="3"
+            placeholder="생각을 적어보세요 (선택 사항 — 비워두면 이 항목은 제출/복사에서 빠집니다)"></textarea>
+          <div class="discuss-actions">
+            <button type="button" class="btn-fb" onclick="peosCopyOne(this)">📋 이 답변 복사</button>
+            <button type="button" class="btn-fb" onclick="peosIssueOne(this)">🔗 GitHub Issue로 제출</button>
+          </div>
         </div>
-        <div class="discuss-card">
+        <div class="discuss-card" data-id="housing_funding_gap" data-topic="청약 자금 갭과 이사 일정"
+             data-question="공공분양 입주 전까지 임시로 다시 전세/월세 계약이 필요한 상황인데, 그 임시 거주 자금과 청약 자금(계약금 등)을 같은 시기에 같이 마련해야 하는 건지, 임시 거주는 월세로 돌려서 목돈 지출을 늦추는 방안도 고려 중이신지 궁금합니다.">
           <div class="discuss-topic">💬 청약 자금 갭과 이사 일정</div>
           <p class="discuss-context">세종 5-1생활권 공공분양 (EXAMPLE) 목표 자금 대비 약 81,950,000원이 부족한 상태이고, 전세 만료일은 2027-02-22입니다.</p>
           <p class="discuss-question">공공분양 입주 전까지 임시로 다시 전세/월세 계약이 필요한 상황인데, 그 임시 거주 자금과 청약 자금(계약금 등)을 같은 시기에 같이 마련해야 하는 건지, 임시 거주는 월세로 돌려서 목돈 지출을 늦추는 방안도 고려 중이신지 궁금합니다.</p>
+          <textarea class="discuss-input" rows="3"
+            placeholder="생각을 적어보세요 (선택 사항 — 비워두면 이 항목은 제출/복사에서 빠집니다)"></textarea>
+          <div class="discuss-actions">
+            <button type="button" class="btn-fb" onclick="peosCopyOne(this)">📋 이 답변 복사</button>
+            <button type="button" class="btn-fb" onclick="peosIssueOne(this)">🔗 GitHub Issue로 제출</button>
+          </div>
         </div>
-        <div class="discuss-card">
+        <div class="discuss-card" data-id="semiconductor_exposure_breadth" data-topic="반도체/AI 익스포저 총량"
+             data-question="업(業)과 투자가 같은 방향으로 겹쳐 있는 상태인데, 이 부분은 의도하신 대로(직업 지식을 활용한 확신 베팅) 유지하는 게 맞을까요, 아니면 커리어 리스크와 투자 리스크가 같이 움직이는 점이 신경 쓰이시나요?">
           <div class="discuss-topic">💬 반도체/AI 익스포저 총량</div>
           <p class="discuss-context">주식 SK하이닉스, 삼성전자, 제주반도체, ETF SOL AI반도체소부장, ACE AI반도체TOP3+까지 합치면 보유 14개 종목/ETF 중 5개가 반도체 테마입니다.</p>
           <p class="discuss-question">업(業)과 투자가 같은 방향으로 겹쳐 있는 상태인데, 이 부분은 의도하신 대로(직업 지식을 활용한 확신 베팅) 유지하는 게 맞을까요, 아니면 커리어 리스크와 투자 리스크가 같이 움직이는 점이 신경 쓰이시나요?</p>
+          <textarea class="discuss-input" rows="3"
+            placeholder="생각을 적어보세요 (선택 사항 — 비워두면 이 항목은 제출/복사에서 빠집니다)"></textarea>
+          <div class="discuss-actions">
+            <button type="button" class="btn-fb" onclick="peosCopyOne(this)">📋 이 답변 복사</button>
+            <button type="button" class="btn-fb" onclick="peosIssueOne(this)">🔗 GitHub Issue로 제출</button>
+          </div>
         </div>
-        <div class="discuss-card">
+        <div class="discuss-card" data-id="retirement_accounts_role" data-topic="퇴직연금(IRP/DC) 자산의 역할"
+             data-question="이 리포트의 &#x27;현금 유동성/자산 배분&#x27; 판단에서 퇴직연금은 계속 완전히 별도로 취급하면 될까요, 아니면 은퇴 시점 목표(예: 조기은퇴 여부)에 따라 리밸런싱 조언에 포함시키길 원하시나요?">
           <div class="discuss-topic">💬 퇴직연금(IRP/DC) 자산의 역할</div>
           <p class="discuss-context">IRP/DC 계좌는 퇴직 시까지 인출이 제한되어 있어, 현재 청약 자금이나 현금 유동성 계산에는 포함하지 않고 있습니다.</p>
           <p class="discuss-question">이 리포트의 &#x27;현금 유동성/자산 배분&#x27; 판단에서 퇴직연금은 계속 완전히 별도로 취급하면 될까요, 아니면 은퇴 시점 목표(예: 조기은퇴 여부)에 따라 리밸런싱 조언에 포함시키길 원하시나요?</p>
+          <textarea class="discuss-input" rows="3"
+            placeholder="생각을 적어보세요 (선택 사항 — 비워두면 이 항목은 제출/복사에서 빠집니다)"></textarea>
+          <div class="discuss-actions">
+            <button type="button" class="btn-fb" onclick="peosCopyOne(this)">📋 이 답변 복사</button>
+            <button type="button" class="btn-fb" onclick="peosIssueOne(this)">🔗 GitHub Issue로 제출</button>
+          </div>
         </div>
     </section>
     <section class="card">
@@ -316,13 +432,6 @@ footer { color: var(--text-muted); font-size: 0.78rem; text-align: center; paddi
           
         </div>
         <div class="action-card action-warn">
-          <div class="action-title">경기 국면 강등 배경 점검 (Early Expansion → Expansion)</div>
-          <div class="action-row"><span class="k">이유</span>11.8 강등 규칙 조건이 2개 이상 충족되어 국면이 한 단계 하향되었다.</div>
-          <div class="action-row"><span class="k">보류 조건</span>다음 달 상향 조건(11.10) 충족 시 판단 재검토.</div>
-          <div class="action-row"><span class="k">재점검</span>다음 정기 리포트.</div>
-          
-        </div>
-        <div class="action-card action-warn">
           <div class="action-title">장단기 금리 역전 심화 관련 지표 재확인</div>
           <div class="action-row"><span class="k">이유</span>11.9 즉시 경고 규칙에 해당하는 신호(장단기 금리 역전 심화)가 감지되었다.</div>
           <div class="action-row"><span class="k">보류 조건</span>다음 달 지표에서 해당 신호가 해소되면 경고 해제.</div>
@@ -331,7 +440,7 @@ footer { color: var(--text-muted); font-size: 0.78rem; text-align: center; paddi
         </div>
         <div class="action-card action-warn">
           <div class="action-title">SK hynix / Micron 실적발표 확인 (2026-07-24)</div>
-          <div class="action-row"><span class="k">이유</span>우선순위 점수 85.8점, ★★★★★ — D-10.</div>
+          <div class="action-row"><span class="k">이유</span>우선순위 점수 86.1점, ★★★★★ — D-9.</div>
           <div class="action-row"><span class="k">보류 조건</span>일정이 연기되면 재점검 시점도 함께 조정.</div>
           <div class="action-row"><span class="k">재점검</span>2026-07-24 당일 또는 직후.</div>
           
@@ -345,7 +454,7 @@ footer { color: var(--text-muted); font-size: 0.78rem; text-align: center; paddi
         </div><h3><span class="badge badge-neutral">★★★☆☆ 관찰</span></h3>
         <div class="action-card action-neutral">
           <div class="action-title">한국 수출입 동향 (반도체 포함) 확인 (2026-08-01)</div>
-          <div class="action-row"><span class="k">이유</span>우선순위 점수 84.8점, ★★★★★ — D-18.</div>
+          <div class="action-row"><span class="k">이유</span>우선순위 점수 85.1점, ★★★★★ — D-17.</div>
           <div class="action-row"><span class="k">보류 조건</span>일정이 연기되면 재점검 시점도 함께 조정.</div>
           <div class="action-row"><span class="k">재점검</span>2026-08-01 당일 또는 직후.</div>
           
@@ -359,51 +468,44 @@ footer { color: var(--text-muted); font-size: 0.78rem; text-align: center; paddi
         </div>
         <div class="action-card action-neutral">
           <div class="action-title">FOMC 정례회의 확인 (2026-07-29)</div>
-          <div class="action-row"><span class="k">이유</span>우선순위 점수 75.1점, ★★★★☆ — D-15.</div>
+          <div class="action-row"><span class="k">이유</span>우선순위 점수 75.5점, ★★★★☆ — D-14.</div>
           <div class="action-row"><span class="k">보류 조건</span>일정이 연기되면 재점검 시점도 함께 조정.</div>
           <div class="action-row"><span class="k">재점검</span>2026-07-29 당일 또는 직후.</div>
           
         </div>
         <div class="action-card action-neutral">
           <div class="action-title">주식/ETF 비중 확대 검토</div>
-          <div class="action-row"><span class="k">이유</span>Investment Environment Score 62.4점 — 거시/반도체 환경이 우호적.</div>
+          <div class="action-row"><span class="k">이유</span>Investment Environment Score 69.1점 — 거시/반도체 환경이 우호적.</div>
           <div class="action-row"><span class="k">보류 조건</span>Investment Environment Score가 20점 이상 하락하면 보류.</div>
           <div class="action-row"><span class="k">재점검</span>다음 정기 리포트.</div>
           <div class="action-row action-conflict"><span class="k">조정</span>유동성 우선 원칙(15.6) 적용 — 청약/필수자금 확보가 우선이며, 공격적 매수 확대는 해당 자금 목표 달성 후 재검토한다.</div>
-        </div><h3><span class="badge badge-neutral">★★☆☆☆ 참고</span></h3>
+        </div>
         <div class="action-card action-neutral">
           <div class="action-title">미국 CPI 발표 확인 (2026-08-12)</div>
-          <div class="action-row"><span class="k">이유</span>우선순위 점수 70.9점, ★★★★☆ — D-29.</div>
+          <div class="action-row"><span class="k">이유</span>우선순위 점수 71.2점, ★★★★☆ — D-28.</div>
           <div class="action-row"><span class="k">보류 조건</span>일정이 연기되면 재점검 시점도 함께 조정.</div>
           <div class="action-row"><span class="k">재점검</span>2026-08-12 당일 또는 직후.</div>
+          
+        </div><h3><span class="badge badge-neutral">★★☆☆☆ 참고</span></h3>
+        <div class="action-card action-neutral">
+          <div class="action-title">미국 비농업 고용(NFP) 발표 확인 (2026-08-07)</div>
+          <div class="action-row"><span class="k">이유</span>우선순위 점수 62.6점, ★★★★☆ — D-23.</div>
+          <div class="action-row"><span class="k">보류 조건</span>일정이 연기되면 재점검 시점도 함께 조정.</div>
+          <div class="action-row"><span class="k">재점검</span>2026-08-07 당일 또는 직후.</div>
           
         </div>
         <div class="action-card action-neutral">
           <div class="action-title">미국 출장 (EXAMPLE) 분할 환전 검토</div>
-          <div class="action-row"><span class="k">이유</span>미국 출장 (EXAMPLE): 환전 유리도 55.3점으로 낮지만 일정이 확정되어 있어 환전을 전면 보류하기보다 분할 환전으로 리스크를 분산하는 것이 합리적이다.</div>
+          <div class="action-row"><span class="k">이유</span>미국 출장 (EXAMPLE): 환전 유리도 51.0점으로 낮지만 일정이 확정되어 있어 환전을 전면 보류하기보다 분할 환전으로 리스크를 분산하는 것이 합리적이다.</div>
           <div class="action-row"><span class="k">보류 조건</span>출국일 이전 환율이 추가로 5% 이상 불리하게 움직이면 재검토.</div>
           <div class="action-row"><span class="k">재점검</span>2026-09-15 2주 전.</div>
           
         </div>
         <div class="action-card action-neutral">
           <div class="action-title">일본 여행 (EXAMPLE) 분할 환전 검토</div>
-          <div class="action-row"><span class="k">이유</span>일본 여행 (EXAMPLE): 환전 유리도 51.2점으로 낮지만 일정이 확정되어 있어 환전을 전면 보류하기보다 분할 환전으로 리스크를 분산하는 것이 합리적이다.</div>
+          <div class="action-row"><span class="k">이유</span>일본 여행 (EXAMPLE): 환전 유리도 46.8점으로 낮지만 일정이 확정되어 있어 환전을 전면 보류하기보다 분할 환전으로 리스크를 분산하는 것이 합리적이다.</div>
           <div class="action-row"><span class="k">보류 조건</span>출국일 이전 환율이 추가로 5% 이상 불리하게 움직이면 재검토.</div>
           <div class="action-row"><span class="k">재점검</span>2026-10-03 2주 전.</div>
-          
-        </div>
-        <div class="action-card action-neutral">
-          <div class="action-title">미국 비농업 고용(NFP) 발표 확인 (2026-08-07)</div>
-          <div class="action-row"><span class="k">이유</span>우선순위 점수 62.2점, ★★★★☆ — D-24.</div>
-          <div class="action-row"><span class="k">보류 조건</span>일정이 연기되면 재점검 시점도 함께 조정.</div>
-          <div class="action-row"><span class="k">재점검</span>2026-08-07 당일 또는 직후.</div>
-          
-        </div>
-        <div class="action-card action-neutral">
-          <div class="action-title">채권 신규 매수 보류 및 만기 재투자 방식 재검토</div>
-          <div class="action-row"><span class="k">이유</span>Bond Score 24.9점 — 금리/실질금리 매력도가 낮은 국면.</div>
-          <div class="action-row"><span class="k">보류 조건</span>실질금리 매력도 회복 또는 성장 둔화 신호 확산 시 재검토.</div>
-          <div class="action-row"><span class="k">재점검</span>다음 금통위/FOMC 이후.</div>
           
         </div>
     </section>
@@ -412,20 +514,20 @@ footer { color: var(--text-muted); font-size: 0.78rem; text-align: center; paddi
       <div class="table-wrap"><table>
         <thead><tr><th>날짜</th><th>이벤트</th><th>중요도</th><th>영향도</th></tr></thead>
         <tbody><tr><td>2026-07-24</td><td>SK hynix / Micron 실적발표</td>
-            <td>★★★★★</td><td>85.8점</td></tr><tr><td>2026-08-01</td><td>한국 수출입 동향 (반도체 포함)</td>
-            <td>★★★★★</td><td>84.8점</td></tr><tr><td>2026-07-29</td><td>FOMC 정례회의</td>
-            <td>★★★★☆</td><td>75.1점</td></tr><tr><td>2026-08-12</td><td>미국 CPI 발표</td>
-            <td>★★★★☆</td><td>70.9점</td></tr><tr><td>2026-08-07</td><td>미국 비농업 고용(NFP) 발표</td>
-            <td>★★★★☆</td><td>62.2점</td></tr><tr><td>2026-08-05</td><td>한국 CPI 발표</td>
-            <td>★★★☆☆</td><td>59.2점</td></tr><tr><td>2026-08-14</td><td>한국은행 금융통화위원회</td>
-            <td>★★★☆☆</td><td>59.1점</td></tr></tbody>
+            <td>★★★★★</td><td>86.1점</td></tr><tr><td>2026-08-01</td><td>한국 수출입 동향 (반도체 포함)</td>
+            <td>★★★★★</td><td>85.1점</td></tr><tr><td>2026-07-29</td><td>FOMC 정례회의</td>
+            <td>★★★★☆</td><td>75.5점</td></tr><tr><td>2026-08-12</td><td>미국 CPI 발표</td>
+            <td>★★★★☆</td><td>71.2점</td></tr><tr><td>2026-08-07</td><td>미국 비농업 고용(NFP) 발표</td>
+            <td>★★★★☆</td><td>62.6점</td></tr><tr><td>2026-08-05</td><td>한국 CPI 발표</td>
+            <td>★★★☆☆</td><td>59.6점</td></tr><tr><td>2026-08-14</td><td>한국은행 금융통화위원회</td>
+            <td>★★★☆☆</td><td>59.5점</td></tr></tbody>
       </table></div>
     </section>
     <section class="card highlight">
       <h2>Personal Executive Brief</h2>
       <ul class="kv-list">
-        <li><b>이번 달 한 줄 진단</b> Expansion 국면(총점 3, 신뢰도 77.8점) — 반도체 긍정</li>
-        <li><b>자산별 영향 요약</b> stocks=★★★☆☆, etf=★★☆☆☆, bond=★☆☆☆☆, cash=★★★☆☆, subscription_fund=★★★☆☆, fx_exposure=★☆☆☆☆</li>
+        <li><b>이번 달 한 줄 진단</b> Recovery 국면(총점 3, 신뢰도 77.8점) — 반도체 긍정</li>
+        <li><b>자산별 영향 요약</b> stocks=★★★★☆, etf=★★★☆☆, bond=★★☆☆☆, cash=★★★☆☆, subscription_fund=★★★☆☆, fx_exposure=★☆☆☆☆</li>
         <li><b>중요한 이벤트 TOP 5</b> SK hynix / Micron 실적발표 (2026-07-24); 한국 수출입 동향 (반도체 포함) (2026-08-01); FOMC 정례회의 (2026-07-29); 미국 CPI 발표 (2026-08-12); 미국 비농업 고용(NFP) 발표 (2026-08-07)</li>
         <li><b>최종 제안</b> [행동] 세종 5-1생활권 공공분양 (EXAMPLE) 자금 갭 81,950,000원 확보 계획 수립</li>
       </ul>
@@ -442,5 +544,85 @@ footer { color: var(--text-muted); font-size: 0.78rem; text-align: center; paddi
   <footer>PEOS는 공식 데이터와 사용자 자산/목표를 결합해 행동을 제안하는 개인 경제 의사결정 시스템입니다.
   모든 판단은 참고용이며 최종 결정은 사용자에게 있습니다.</footer>
 </div>
+<script>
+function peosFindCard(el) { return el.closest('.discuss-card'); }
+
+function peosBuildEntry(card) {
+  var ta = card.querySelector('textarea');
+  var val = (ta.value || '').trim();
+  if (!val) return null;
+  return { topic: card.dataset.topic, question: card.dataset.question, answer: val };
+}
+
+function peosEntryText(entry) {
+  return '### ' + entry.topic + '\n질문: ' + entry.question + '\n답변: ' + entry.answer;
+}
+
+function peosFlash(btn, label) {
+  var orig = btn.textContent;
+  btn.textContent = label;
+  btn.disabled = true;
+  setTimeout(function () { btn.textContent = orig; btn.disabled = false; }, 1600);
+}
+
+function peosFallbackCopy(text, btn) {
+  var ta = document.createElement('textarea');
+  ta.value = text;
+  ta.style.position = 'fixed';
+  ta.style.opacity = '0';
+  document.body.appendChild(ta);
+  ta.select();
+  try {
+    document.execCommand('copy');
+    peosFlash(btn, '복사됨 ✓');
+  } catch (e) {
+    alert('복사에 실패했습니다. 직접 선택해서 복사해주세요.');
+  }
+  document.body.removeChild(ta);
+}
+
+function peosCopyText(text, btn) {
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(function () {
+      peosFlash(btn, '복사됨 ✓');
+    }, function () { peosFallbackCopy(text, btn); });
+  } else {
+    peosFallbackCopy(text, btn);
+  }
+}
+
+function peosCopyOne(btn) {
+  var entry = peosBuildEntry(peosFindCard(btn));
+  if (!entry) { alert('먼저 답변을 입력해주세요.'); return; }
+  peosCopyText(peosEntryText(entry), btn);
+}
+
+function peosCopyAll(btn) {
+  var section = document.getElementById('discussion-section');
+  var month = section.dataset.month;
+  var cards = section.querySelectorAll('.discuss-card');
+  var parts = [];
+  cards.forEach(function (card) {
+    var entry = peosBuildEntry(card);
+    if (entry) parts.push(peosEntryText(entry));
+  });
+  if (!parts.length) { alert('입력한 답변이 없습니다.'); return; }
+  peosCopyText('PEOS ' + month + ' 리포트 피드백\n\n' + parts.join('\n\n'), btn);
+}
+
+function peosIssueOne(btn) {
+  var card = peosFindCard(btn);
+  var entry = peosBuildEntry(card);
+  if (!entry) { alert('먼저 답변을 입력해주세요.'); return; }
+  var section = document.getElementById('discussion-section');
+  var repo = section.dataset.repo;
+  var month = section.dataset.month;
+  if (!repo) { alert('연결된 GitHub 저장소 정보가 없습니다.'); return; }
+  var title = encodeURIComponent('[피드백] ' + month + ' - ' + entry.topic);
+  var body = encodeURIComponent('**질문**\n' + entry.question + '\n\n**답변**\n' + entry.answer);
+  window.open('https://github.com/' + repo + '/issues/new?title=' + title + '&body=' + body,
+    '_blank', 'noopener');
+}
+</script>
 </body>
 </html>
