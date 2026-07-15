@@ -43,7 +43,10 @@ tags: [concept, market-psychology, valuation, risk]
 것"이라면, **리레이팅은 그 역방향으로 배수가 다시 올라붙는 것**이며 이번
 사례처럼 애널리스트의 펀더멘털 재해석이 계기가 될 수 있다. 다만 목표가 하나로
 국면 전환을 단정하기는 이르고, 다른 하우스의 후속 반응을 지켜봐야 한다는 게
-현재 판단.
+현재 판단. 실제로 확인해보니 국내 증권가 목표가는 185만원(BNK, 약세)부터
+420만원(KB증권, 강세)까지 극과 극으로 갈려 있다 — 리레이팅 여부는 아직
+합의된 상태가 아니다. 각 진영의 근거를 개별 체크포인트로 쪼갠
+[SK하이닉스 목표주가 근거 체크리스트](sk-hynix-analyst-thesis-checkpoints.md) 참고.
 
 ### 일반적으로 알려진 사례 (⚠ 위키 소스로 검증되지 않음, 일반 시장 상식·참고용)
 
@@ -66,5 +69,6 @@ tags: [concept, market-psychology, valuation, risk]
 - [SK하이닉스 본주·ADR 차트 비교 (2026-07-13)](../summaries/sk-hynix-adr-krw-chart-comparison-2026-07-13.md)
 - [7월 실적-주가 괴리 원인 정리 (2026-07-14)](../summaries/sk-hynix-earnings-price-divergence-2026-07-14.md)
 - [SK하이닉스 저항 돌파 및 ADR 폭등 (2026-07-15)](../summaries/sk-hynix-adr-surge-breakout-2026-07-15.md)
+- [SK하이닉스 목표주가 근거 체크리스트](sk-hynix-analyst-thesis-checkpoints.md)
 - [SK하이닉스](../entities/sk-hynix.md)
 - 일반 사례 목록: 별도 소스 없음 — 일반 지식, 재검증 필요
