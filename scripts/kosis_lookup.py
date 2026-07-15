@@ -20,6 +20,7 @@ from __future__ import annotations
 
 import os
 import sys
+import time
 from datetime import datetime
 
 import requests
@@ -70,11 +71,23 @@ def main() -> None:
     only = sys.argv[1] if len(sys.argv) > 1 else None
     series_keys = [only] if only else list(CANDIDATES)
 
+    first = True
     for key in series_keys:
         print(f"\n=== {key} ===")
         for org_id, tbl_id in CANDIDATES[key]:
+            # KOSIS appears to rate/burst-limit at the connection level (seen as a
+            # sudden run of TCP connect timeouts to every subsequent call once
+            # tripped) — space calls out and retry once after a longer pause
+            # rather than firing candidates back-to-back.
+            if not first:
+                time.sleep(5)
+            first = False
             print(f"-- orgId={org_id} tblId={tbl_id} (prdSe=M, {start_m}-{end_m})")
             result = _try_candidate(api_key, org_id, tbl_id, start_m, end_m, "M")
+            if not result["ok"] and "timed out" in result["error"]:
+                print(f"   FAILED (timeout, retrying once after 15s): {result['error']}")
+                time.sleep(15)
+                result = _try_candidate(api_key, org_id, tbl_id, start_m, end_m, "M")
             if not result["ok"]:
                 print(f"   FAILED: {result['error']}")
                 continue
