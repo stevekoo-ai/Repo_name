@@ -29,6 +29,8 @@ from core.config import api_config, get_api_key
 from core.models import DataPoint, DataStatus, Frequency, Metadata
 from . import base
 
+_HISTORY_YEARS = 10
+
 KOSIS_SERIES: dict[str, dict] = {
     "cpi_index": {
         "org_id": "101", "tbl_id": "DT_1J17009", "itm_id": "T60", "obj_l1": "0000",
@@ -86,7 +88,7 @@ def fetch_series(series_key: str) -> DataPoint:
     rows = cached
     if rows is None:
         today = datetime.utcnow()
-        start = today.replace(year=today.year - 3).strftime("%Y%m")
+        start = today.replace(year=today.year - _HISTORY_YEARS).strftime("%Y%m")
         end = today.strftime("%Y%m")
         rows = base.retry(lambda: _fetch_table(spec, api_key, start, end), label=f"kosis:{series_key}",
                            attempts=2, backoff_seconds=1.5)

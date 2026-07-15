@@ -83,6 +83,7 @@ def generate_discussion_points(personal: dict) -> list[dict]:
     conc = _stock_concentration()
     if conc and conc["pct"] >= 60:
         points.append({
+            "id": "stock_concentration",
             "topic": "SK하이닉스 집중도",
             "context": (
                 f"보유 주식의 매입원가 기준 {conc['pct']}%가 {conc['name']} 한 종목에 쏠려 있습니다 "
@@ -101,6 +102,7 @@ def generate_discussion_points(personal: dict) -> list[dict]:
             f"{'늦습니다' if lockup['lock_after_moveout'] else '빠릅니다'} (약 {lockup['days_apart']}일 차이)."
         )
         points.append({
+            "id": "lockup_vs_moveout",
             "topic": "하나증권 락업주와 이사 시점",
             "context": (
                 f"{lockup['ticker_name']} {lockup['quantity']}주는 {lockup['lock_until']}까지 보유해야 "
@@ -115,6 +117,7 @@ def generate_discussion_points(personal: dict) -> list[dict]:
     funding = _housing_funding_timeline(personal.get("housing", {}))
     if funding:
         points.append({
+            "id": "housing_funding_gap",
             "topic": "청약 자금 갭과 이사 일정",
             "context": (
                 f"{funding['notice_name']} 목표 자금 대비 약 {funding['funding_gap_krw']:,.0f}원이 부족한 상태이고, "
@@ -130,6 +133,7 @@ def generate_discussion_points(personal: dict) -> list[dict]:
     semi = _semiconductor_exposure_breadth(personal.get("asset_impact", {}))
     if semi and semi["semiconductor_related_count"] >= 3:
         points.append({
+            "id": "semiconductor_exposure_breadth",
             "topic": "반도체/AI 익스포저 총량",
             "context": (
                 f"주식 {', '.join(semi['semiconductor_stocks']) or '없음'}, "
@@ -146,6 +150,7 @@ def generate_discussion_points(personal: dict) -> list[dict]:
 
     if portfolio_config().get("retirement_accounts"):
         points.append({
+            "id": "retirement_accounts_role",
             "topic": "퇴직연금(IRP/DC) 자산의 역할",
             "context": (
                 "IRP/DC 계좌는 퇴직 시까지 인출이 제한되어 있어, 현재 청약 자금이나 현금 유동성 계산에는 "

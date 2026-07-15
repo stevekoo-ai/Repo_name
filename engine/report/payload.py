@@ -9,7 +9,8 @@ from __future__ import annotations
 
 from datetime import date
 
-from core.config import thresholds_config
+from collectors import base as collector_base
+from core.config import report_config, thresholds_config
 from core.logger import log_event
 from core.models import DataStatus
 from engine.action import engine as action_engine
@@ -24,7 +25,41 @@ INDICATOR_ORDER = [
     "current_account", "cpi", "ppi", "unemployment", "us_global",
 ]
 
+# Which normalized-tier series (collectors/base.py) backs each Core-10 indicator's
+# raw value, for trend sparklines and a previous-period fallback that doesn't
+# depend on a prior monthly PEOS snapshot existing (engine/macro/indicators.py
+# is the source of truth for these series ids — kept in sync manually since it's
+# a display-only concern, not a scoring one). us_global has no single backing
+# series (it's a composite of several FRED series) so it's left out of both.
+SERIES_FOR_INDICATOR = {
+    "gdp": "ecos_gdp_growth_qoq",
+    "industrial_production": "kosis_industrial_production_index",
+    "retail_sales": "kosis_retail_sales_index",
+    "exports": "motie_total_exports_yoy",
+    "semiconductor_exports": "motie_semiconductor_exports_yoy",
+    "current_account": "ecos_current_account",
+    "cpi": "kosis_cpi_index",
+    "ppi": "ecos_ppi_yoy_level",
+    "unemployment": "kosis_unemployment_rate",
+}
+
 TREND_ARROWS = {1: "▲", 0: "→", -1: "▼"}
+
+
+def _series_history_and_prev(series_id: str, years: int) -> tuple[list[dict], float | None]:
+    """Long-window history for a sparkline, plus the value one period back —
+    read straight from the raw normalized series so both are available on day
+    one, before a second monthly PEOS snapshot exists to diff against."""
+    df = collector_base.read_normalized(series_id)
+    if df.empty:
+        return [], None
+    df = df.sort_values("date")
+    cutoff = date.today().replace(year=date.today().year - years)
+    hist_df = df[df["date"] >= cutoff]
+    history = [{"date": str(row.date), "value": float(row.value)} for row in hist_df.itertuples()
+               if row.value == row.value]  # drop NaN
+    prev_value = float(df["value"].iloc[-2]) if len(df) >= 2 else None
+    return history, prev_value
 
 
 def _report_readiness(coverage_pct: float, core10_complete: bool) -> str:
@@ -37,19 +72,36 @@ def _report_readiness(coverage_pct: float, core10_complete: bool) -> str:
 
 
 def _macro_dashboard(macro: dict, previous_macro: dict | None) -> list[dict]:
+    years = report_config().get("trend_history_years", 10)
     rows = []
     prev_readings = (previous_macro or {}).get("readings", {})
     for key in INDICATOR_ORDER:
         r = macro["readings"].get(key, {})
         prev = prev_readings.get(key, {})
+
+        series_id = SERIES_FOR_INDICATOR.get(key)
+        history: list[dict] = []
+        series_prev_value = None
+        if series_id:
+            history, series_prev_value = _series_history_and_prev(series_id, years)
+
+        previous_value = prev.get("value")
+        previous_source = "snapshot" if previous_value is not None else None
+        if previous_value is None and series_prev_value is not None:
+            previous_value = series_prev_value
+            previous_source = "series_history"
+
         rows.append({
             "indicator": r.get("label", key),
             "current": r.get("value"),
-            "previous": prev.get("value"),
+            "previous": previous_value,
+            "previous_source": previous_source,
             "trend": TREND_ARROWS.get(r.get("score"), "N/A") if r.get("status") == "ok" else "N/A",
             "score": r.get("score"),
             "status": r.get("status"),
             "source": r.get("source"),
+            "history": history,
+            "history_years": years,
         })
     return rows
 
