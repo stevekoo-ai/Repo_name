@@ -21,4 +21,4 @@ Catalog of every page in the wiki. See `../CLAUDE.md` for conventions.
 ### concepts
 
 - [펀더멘털 불변 vs 심리·수급발 디레이팅](concepts/fundamentals-vs-sentiment-derating.md) — 실적은 멀쩡한데 주가만 심리·수급으로 눌리는 패턴, SK하이닉스가 현재진행형 사례
-- [SK하이닉스 목표주가 근거 체크리스트](concepts/sk-hynix-analyst-thesis-checkpoints.md) — 강세론(KB 420만/Barclays $330)·약세론(BNK 185만) 근거를 항목별로 쪼갠 데일리 체크리스트
+- [SK하이닉스 목표주가 근거 체크리스트](concepts/sk-hynix-analyst-thesis-checkpoints.md) — 11개 기관 목표가(강세 380~420만 밀집 vs BNK 185만·Morningstar $160), 9개 테마별 신호기준, 데일리 트래커 템플릿
