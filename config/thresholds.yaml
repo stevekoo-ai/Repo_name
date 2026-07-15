@@ -57,6 +57,25 @@ regime_signals:
   rates_easing_bp_3m: -25
   us_employment_improving_composite: 0.5
 
+# regime_us signal magnitudes (engine/macro/regime_us.py) — same role as
+# regime_signals above, scaled for US series instead of KR ones.
+regime_signals_us:
+  retail_sales_slump_mom_drop_pp: 1.0     # 전월 대비 소매판매 MoM이 1.0%p 이상 급락
+  ip_consecutive_decline_months: 2
+  cpi_reaccelerating_pp: 0.2
+  ppi_sustained_high_threshold: 4.0
+  ppi_sustained_months: 2
+  yield_curve_inversion_deepening_bp: -10
+  trade_balance_widening_3m_pct: 10.0     # 3개월 평균 적자가 10% 이상 확대(악화)
+  trade_balance_wide_deficit: -100000     # 백만달러, 3개월 평균 적자가 이보다 크면 경고
+  unemployment_surge_pp: 0.2
+  gdp_strong_qoq: 3.0
+  retail_sales_strong_mom: 0.7
+  industrial_production_strong_mom: 0.5
+  cpi_stable_range: [1.5, 2.5]
+  ppi_easing_drop_pp: 0.3
+  unemployment_improving_pp: -0.1
+
 # 11.12 Change Detection (지난달 대비, thresholds externalized)
 change_detection:
   exports_improve_pp: 5.0

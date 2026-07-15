@@ -31,12 +31,48 @@ def _fmt(value, suffix: str = "") -> str:
     return f"{value}{suffix}"
 
 
+def _us_macro_dashboard(payload: dict) -> str:
+    lines = ["## 1. Macro Dashboard — 미국 (큰 그림)", "", "| 지표 | 현재 | 이전 | 추세 | 점수 | 출처 |", "|---|---|---|---|---|---|"]
+    for row in payload["us_macro_dashboard"]:
+        lines.append(
+            f"| {row['indicator']} | {_fmt(row['current'])} | {_fmt(row['previous'])} | "
+            f"{row['trend']} | {_fmt(row['score'])} | {row['source'] or STATUS_KR.get(row['status'], row['status'])} |"
+        )
+    return "\n".join(lines)
+
+
+def _us_regime_judgement(payload: dict) -> str:
+    macro_us = payload["macro_us"]
+    lines = [
+        "## 2. 미국 경기 판정",
+        f"- 총점: {macro_us['score']} (가중 점수 {macro_us['weighted_score']})",
+        f"- Regime: {macro_us['regime']}",
+        f"- Confidence: {macro_us['confidence']}점",
+        "- Warning: " + (", ".join(macro_us["warnings"]) if macro_us["warnings"] else "없음"),
+    ]
+    return "\n".join(lines)
+
+
+def _kr_us_comparison(payload: dict) -> str:
+    cmp_ = payload["kr_us_comparison"]
+    lines = [
+        "## 5. 한국은 미국의 흐름에 실려 있는가",
+        f"- 미국 국면: **{cmp_['us_regime']}** / 한국 국면: **{cmp_['kr_regime']}**",
+        f"- [해석] {cmp_['narrative']}",
+        "", "| 지표 | 한국 점수 | 미국 점수 | 관계 |", "|---|---|---|---|",
+    ]
+    for p in cmp_["indicator_pairs"]:
+        relationship_kr = {"sync": "동조", "diverge": "디커플링", "data_unavailable": "데이터 부족"}.get(p["relationship"], p["relationship"])
+        lines.append(f"| {p['label']} | {_fmt(p['kr_score'])} | {_fmt(p['us_score'])} | {relationship_kr} |")
+    return "\n".join(lines)
+
+
 def _executive_summary(payload: dict) -> str:
     macro = payload["macro"]
     brief = payload["personal_executive_brief"]
     top_action = payload["actions"][0] if payload["actions"] else None
     lines = [
-        "## 1. Executive Summary",
+        "## 6. Executive Summary",
         f"- 현재 경기 국면: **{macro['regime']}** ({macro['score_band_label']}, 총점 {macro['score']})",
         f"- 지난달 대비 변화: {macro['previous_regime']} → {macro['regime']}"
         + (f" ({macro['transition']})" if macro["transition"] else " (변동 없음)"),
@@ -49,14 +85,14 @@ def _executive_summary(payload: dict) -> str:
 
 
 def _monthly_key_changes(payload: dict) -> str:
-    lines = ["## 2. 이번 달 핵심 변화"]
+    lines = ["## 7. 이번 달 핵심 변화"]
     for c in payload["macro"]["changes"]:
         lines.append(f"- [사실] {c['message']}")
     return "\n".join(lines)
 
 
 def _macro_dashboard(payload: dict) -> str:
-    lines = ["## 3. Macro Dashboard", "", "| 지표 | 현재 | 이전 | 추세 | 점수 | 출처 |", "|---|---|---|---|---|---|"]
+    lines = ["## 3. Macro Dashboard — 한국", "", "| 지표 | 현재 | 이전 | 추세 | 점수 | 출처 |", "|---|---|---|---|---|---|"]
     for row in payload["macro_dashboard"]:
         lines.append(
             f"| {row['indicator']} | {_fmt(row['current'])} | {_fmt(row['previous'])} | "
@@ -68,7 +104,7 @@ def _macro_dashboard(payload: dict) -> str:
 def _regime_judgement(payload: dict) -> str:
     macro = payload["macro"]
     lines = [
-        "## 4. 경기 판정",
+        "## 4. 한국 경기 판정",
         f"- 총점: {macro['score']} (가중 점수 {macro['weighted_score']})",
         f"- Regime: {macro['regime']}",
         f"- Confidence: {macro['confidence']}점 "
@@ -92,7 +128,7 @@ def _regime_judgement(payload: dict) -> str:
 
 
 def _indicator_deep_dive(payload: dict) -> str:
-    lines = ["## 5. 지표별 분석"]
+    lines = ["## 8. 지표별 분석"]
     # payload["macro_dashboard"] is built from INDICATOR_ORDER, same order as INDICATOR_SECTIONS.
     readings = payload["macro_dashboard"]
     for row, (_, title) in zip(readings, INDICATOR_SECTIONS):
@@ -103,7 +139,7 @@ def _indicator_deep_dive(payload: dict) -> str:
         trend_word = {1: "개선", 0: "보합", -1: "악화"}.get(row["score"], "N/A")
         lines.append(f"- [사실] 현재 값 {_fmt(row['current'])} (출처: {row['source']}).")
         lines.append(f"- [해석] 전월 대비 추세는 '{trend_word}'이며 규칙엔진 점수는 {row['score']}이다.")
-        lines.append("- [행동] Action Plan 항목 참고 — 관련 조치가 있으면 10절에 반영됨.")
+        lines.append("- [행동] Action Plan 항목 참고 — 관련 조치가 있으면 13절에 반영됨.")
     return "\n".join(lines)
 
 
@@ -118,14 +154,14 @@ def _personal_analysis(payload: dict) -> str:
             f"{_BIAS_LABEL_KR.get(k, k)} {v}" for k, v in p["investment_biases"].items()
         )
     lines = [
-        "## 6. 사용자 맞춤 분석",
+        "## 9. 사용자 맞춤 분석",
         f"- 직업 관점: 반도체/AI 인프라 종사자 — 반도체 점수 {_fmt(p['semiconductor_score'], '점')}"
         f"({p['semiconductor_band']})은 업황과 성과급 사이클에 직접 연결된다.",
         f"- 투자 관점: Investment Environment {_fmt(p['investment_environment_score'], '점')}{bias_text}",
         f"- 채권 관점: Bond Score {_fmt(p['bond_score'], '점')}.",
         f"- 환율 관점: FX Score {_fmt(p['fx_score'], '점')}.",
         f"- 공공분양 관점: Housing Readiness {_fmt(p['housing_readiness_score'], '점')}.",
-        "- 출장/여행 관점: 11절 경제 캘린더 및 Action Plan의 환전 관련 항목 참고.",
+        "- 출장/여행 관점: 14절 경제 캘린더 및 Action Plan의 환전 관련 항목 참고.",
     ]
     return "\n".join(lines)
 
@@ -133,7 +169,7 @@ def _personal_analysis(payload: dict) -> str:
 def _asset_impact(payload: dict) -> str:
     labels = {"stocks": "주식", "etf": "ETF", "bond": "채권", "cash": "현금",
               "subscription_fund": "청약 자금", "fx_exposure": "환율"}
-    lines = ["## 7. 자산별 영향 분석"]
+    lines = ["## 10. 자산별 영향 분석"]
     for key, label in labels.items():
         a = payload["assets"].get(key, {})
         if a.get("score") is None:
@@ -145,7 +181,7 @@ def _asset_impact(payload: dict) -> str:
 
 def _scenario_analysis(payload: dict) -> str:
     s = payload["scenarios"]
-    lines = ["## 8. 시나리오 분석"]
+    lines = ["## 11. 시나리오 분석"]
     for name, label in (("base", "Base"), ("bull", "Bull"), ("bear", "Bear")):
         sc = s[name]
         lines.append(f"### {label} ({sc['probability']}%)")
@@ -160,7 +196,7 @@ def _scenario_analysis(payload: dict) -> str:
 
 def _discussion_points(payload: dict) -> str:
     points = payload.get("discussion_points", [])
-    lines = ["## 9. 논의가 필요한 결정 사항"]
+    lines = ["## 12. 논의가 필요한 결정 사항"]
     if not points:
         lines.append("- 이번 달은 별도로 논의가 필요한 항목이 없습니다.")
         return "\n".join(lines)
@@ -172,7 +208,7 @@ def _discussion_points(payload: dict) -> str:
 
 
 def _action_plan(payload: dict) -> str:
-    lines = ["## 10. 이번 달 Action Plan"]
+    lines = ["## 13. 이번 달 Action Plan"]
     tiers = [
         (5, "★★★★★ 반드시 확인 / 실행"), (4, "★★★★☆ 검토"), (3, "★★★☆☆ 관찰"),
         (2, "★★☆☆☆ 참고"), (1, "보류"),
@@ -197,7 +233,7 @@ def _action_plan(payload: dict) -> str:
 
 
 def _calendar(payload: dict) -> str:
-    lines = ["## 11. 경제 캘린더", "", "| 날짜 | 이벤트 | 중요도 | 사용자 영향 |", "|---|---|---|---|"]
+    lines = ["## 14. 경제 캘린더", "", "| 날짜 | 이벤트 | 중요도 | 사용자 영향 |", "|---|---|---|---|"]
     for ev in payload["calendar"]:
         lines.append(f"| {ev['date']} | {ev['name']} | {ev['importance_label']} | {ev['priority_score']}점 |")
     if not payload["calendar"]:
@@ -208,7 +244,7 @@ def _calendar(payload: dict) -> str:
 def _personal_brief(payload: dict) -> str:
     b = payload["personal_executive_brief"]
     lines = [
-        "## 12. Personal Executive Brief",
+        "## 15. Personal Executive Brief",
         f"- 이번 달 한 줄 진단: {b['one_line_diagnosis']}",
         "- 자산별 영향 요약: " + ", ".join(f"{k}={v}" for k, v in b["asset_summary"].items() if v),
         "- 중요한 이벤트 TOP 5: " + ("; ".join(b["top_events"]) if b["top_events"] else "없음"),
@@ -219,7 +255,7 @@ def _personal_brief(payload: dict) -> str:
 
 def _appendix(payload: dict) -> str:
     a = payload["appendix"]
-    lines = ["## 12. Appendix", "- 데이터 출처: " + (", ".join(a["sources"]) if a["sources"] else "N/A"),
+    lines = ["## 16. Appendix", "- 데이터 출처: " + (", ".join(a["sources"]) if a["sources"] else "N/A"),
               f"- 지난달 Regime: {a['previous_month_regime'] or 'N/A'}", "- 용어 설명:"]
     for term, desc in a["glossary"].items():
         lines.append(f"  - **{term}**: {desc}")
@@ -229,8 +265,10 @@ def _appendix(payload: dict) -> str:
 def render_markdown(payload: dict) -> str:
     header = f"# 월간 PEOS 리포트 - {payload['report_month']}\n"
     sections = [
-        _executive_summary(payload), _monthly_key_changes(payload), _macro_dashboard(payload),
-        _regime_judgement(payload), _indicator_deep_dive(payload), _personal_analysis(payload),
+        _us_macro_dashboard(payload), _us_regime_judgement(payload),
+        _macro_dashboard(payload), _regime_judgement(payload), _kr_us_comparison(payload),
+        _executive_summary(payload), _monthly_key_changes(payload),
+        _indicator_deep_dive(payload), _personal_analysis(payload),
         _asset_impact(payload), _scenario_analysis(payload), _discussion_points(payload),
         _action_plan(payload), _calendar(payload), _personal_brief(payload), _appendix(payload),
     ]

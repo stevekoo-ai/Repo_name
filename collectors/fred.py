@@ -35,6 +35,14 @@ SERIES = {
     "us_dollar_index": "DTWEXBGS",   # Trade Weighted US Dollar Index: Broad, Goods and Services
     "us_fed_funds_rate": "FEDFUNDS",
 
+    # US Core Macro set (engine/macro/indicators_us.py) — the "big picture"
+    # the KR Core-10 is compared against. cpi/unemployment/industrial_production
+    # /yield_curve above are reused directly; these four fill the rest.
+    "us_gdp_qoq": "A191RL1Q225SBEA",   # Real GDP, % change from preceding period, annualized
+    "us_ppi": "PPIACO",                # Producer Price Index by Commodity: All Commodities
+    "us_retail_sales": "RSAFS",        # Advance Retail Sales: Retail Trade and Food Services
+    "us_trade_balance": "BOPGSTB",     # Trade Balance: Goods and Services, Balance of Payments Basis
+
     # Korea series mirrored from OECD Main Economic Indicators, used as a
     # fallback when kosis.kr is unreachable (collectors/kosis.py has been
     # observed to intermittently time out from GitHub Actions IPs — see

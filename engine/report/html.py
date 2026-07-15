@@ -107,9 +107,12 @@ def _clock_image_data_uri() -> str | None:
 
 def _section_stat_tiles(payload: dict) -> str:
     macro = payload["macro"]
+    macro_us = payload["macro_us"]
     p = payload["personal"]
     tiles = [
-        _stat_tile("경기 국면", _esc(macro["regime"]), macro["score_band_label"],
+        _stat_tile("미국 국면", _esc(macro_us["regime"]), macro_us["score_band_label"],
+                   BAND_TO_BADGE.get(macro_us["score_band"], "neutral")),
+        _stat_tile("한국 국면", _esc(macro["regime"]), macro["score_band_label"],
                    BAND_TO_BADGE.get(macro["score_band"], "neutral")),
         _stat_tile("Confidence", f"{macro['confidence']}점", "판정 신뢰도",
                    _score_badge_class(macro["confidence"])),
@@ -171,8 +174,9 @@ def _section_investment_clock(payload: dict) -> str:
     </section>"""
 
 
-def _section_macro_dashboard(payload: dict) -> str:
-    has_fallback_note = any(r.get("previous_source") == "series_history" for r in payload["macro_dashboard"])
+def _section_macro_dashboard(payload: dict, dashboard_key: str = "macro_dashboard", title: str = "Macro Dashboard") -> str:
+    rows_data = payload[dashboard_key]
+    has_fallback_note = any(r.get("previous_source") == "series_history" for r in rows_data)
     rows = "".join(
         f"""<tr>
           <td>{_esc(r['indicator'])}</td><td>{_fmt(r['current'])}</td>
@@ -180,18 +184,53 @@ def _section_macro_dashboard(payload: dict) -> str:
           <td>{_esc(r['trend'])}</td><td>{_fmt(r['score'])}</td>
           <td class="spark-cell">{_sparkline_svg(r.get('history') or [], r.get('history_years', 10))}</td>
           <td class="muted">{_esc(r['source'] or STATUS_KR.get(r['status'], r['status']))}</td>
-        </tr>""" for r in payload["macro_dashboard"]
+        </tr>""" for r in rows_data
     )
     footnote = ('<p class="tile-sub">† 전월 PEOS 리포트가 아직 쌓이지 않아, 해당 지표는 원자료(공식 통계) 이력의 '
                 '직전 발표값으로 대체 표시했습니다.</p>') if has_fallback_note else ""
     return f"""
     <section class="card">
-      <h2>Macro Dashboard</h2>
+      <h2>{_esc(title)}</h2>
       <div class="table-wrap"><table>
         <thead><tr><th>지표</th><th>현재</th><th>이전</th><th>추세</th><th>점수</th><th>10년 추세</th><th>출처</th></tr></thead>
         <tbody>{rows}</tbody>
       </table></div>
       {footnote}
+    </section>"""
+
+
+def _section_us_macro_dashboard(payload: dict) -> str:
+    return _section_macro_dashboard(payload, "us_macro_dashboard", "Macro Dashboard — 미국 (큰 그림)")
+
+
+def _section_regime_comparison(payload: dict) -> str:
+    us, kr, cmp_ = payload["macro_us"], payload["macro"], payload["kr_us_comparison"]
+    alignment_kr = {
+        "sync": "같은 국면", "kr_ahead": "한국이 사이클상 앞섬", "kr_behind": "한국이 사이클상 뒤처짐",
+        "unknown": "판정 불가",
+    }.get(cmp_["alignment"], cmp_["alignment"])
+
+    pair_rows = "".join(f"""<tr>
+        <td>{_esc(p['label'])}</td>
+        <td>{_fmt(p['kr_score'])}</td>
+        <td>{_fmt(p['us_score'])}</td>
+        <td><span class="badge badge-{'good' if p['relationship'] == 'sync' else 'warn' if p['relationship'] == 'diverge' else 'neutral'}">
+          {'동조' if p['relationship'] == 'sync' else '디커플링' if p['relationship'] == 'diverge' else '데이터 부족'}</span></td>
+      </tr>""" for p in cmp_["indicator_pairs"])
+
+    return f"""
+    <section class="card highlight">
+      <h2>한국은 미국의 흐름에 실려 있는가</h2>
+      <div class="tile-grid">
+        {_stat_tile("미국 국면", _esc(us['regime']), us['score_band_label'], BAND_TO_BADGE.get(us['score_band'], 'neutral'))}
+        {_stat_tile("한국 국면", _esc(kr['regime']), kr['score_band_label'], BAND_TO_BADGE.get(kr['score_band'], 'neutral'))}
+        {_stat_tile("정렬 상태", alignment_kr, f"사이클 격차 {cmp_['cycle_gap']}단계" if cmp_['cycle_gap'] is not None else "", "neutral")}
+      </div>
+      <p class="discuss-question">{_esc(cmp_['narrative'])}</p>
+      <div class="table-wrap"><table>
+        <thead><tr><th>지표</th><th>한국 점수</th><th>미국 점수</th><th>관계</th></tr></thead>
+        <tbody>{pair_rows}</tbody>
+      </table></div>
     </section>"""
 
 
@@ -565,9 +604,11 @@ def _section_monthly_changes(payload: dict) -> str:
 def render_html(payload: dict) -> str:
     body_sections = "".join([
         _section_stat_tiles(payload),
+        _section_us_macro_dashboard(payload),
+        _section_macro_dashboard(payload),
+        _section_regime_comparison(payload),
         _section_executive_summary(payload),
         _section_monthly_changes(payload),
-        _section_macro_dashboard(payload),
         _section_investment_clock(payload),
         _section_personal_analysis(payload),
         _section_asset_impact(payload),

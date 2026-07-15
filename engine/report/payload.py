@@ -53,6 +53,22 @@ FALLBACK_SERIES_FOR_INDICATOR = {
     "unemployment": "fred_kr_unemployment_oecd",
 }
 
+US_INDICATOR_ORDER = [
+    "gdp", "industrial_production", "retail_sales", "cpi", "ppi", "unemployment",
+    "trade_balance", "yield_curve",
+]
+
+US_SERIES_FOR_INDICATOR = {
+    "gdp": "fred_us_gdp_qoq",
+    "industrial_production": "fred_us_industrial_production",
+    "retail_sales": "fred_us_retail_sales",
+    "cpi": "fred_us_cpi",
+    "ppi": "fred_us_ppi",
+    "unemployment": "fred_us_unemployment",
+    "trade_balance": "fred_us_trade_balance",
+    "yield_curve": "fred_us_yield_curve_10y2y",
+}
+
 TREND_ARROWS = {1: "▲", 0: "→", -1: "▼"}
 
 
@@ -81,15 +97,18 @@ def _report_readiness(coverage_pct: float, core10_complete: bool) -> str:
     return "insufficient"
 
 
-def _macro_dashboard(macro: dict, previous_macro: dict | None) -> list[dict]:
+def _macro_dashboard(macro: dict, previous_macro: dict | None, indicator_order: list[str] | None = None,
+                      series_for_indicator: dict[str, str] | None = None) -> list[dict]:
+    indicator_order = indicator_order if indicator_order is not None else INDICATOR_ORDER
+    series_for_indicator = series_for_indicator if series_for_indicator is not None else SERIES_FOR_INDICATOR
     years = report_config().get("trend_history_years", 10)
     rows = []
     prev_readings = (previous_macro or {}).get("readings", {})
-    for key in INDICATOR_ORDER:
+    for key in indicator_order:
         r = macro["readings"].get(key, {})
         prev = prev_readings.get(key, {})
 
-        series_id = SERIES_FOR_INDICATOR.get(key)
+        series_id = series_for_indicator.get(key)
         history: list[dict] = []
         series_prev_value = None
         if series_id:
@@ -157,8 +176,11 @@ def build_report_payload(month_key: str | None = None) -> dict:
 
     macro_result = macro_engine.run_macro_engine(month_key=month_key)
     macro = macro_result["macro"]
+    macro_us = macro_result["macro_us"]
+    kr_us_comparison = macro_result["kr_us_comparison"]
     previous_snapshot = macro_snapshot.previous_snapshot(before_month=month_key)
     previous_macro = (previous_snapshot or {}).get("macro")
+    previous_macro_us = (previous_snapshot or {}).get("macro_us")
 
     personal = mapping.run_personal_mapping(macro)
     actions = action_engine.build_action_plan(
@@ -176,6 +198,20 @@ def build_report_payload(month_key: str | None = None) -> dict:
     payload = {
         "report_month": month_key,
         "report_readiness": readiness,
+        "macro_us": {
+            "regime": macro_us["regime"],
+            "previous_regime": macro_us["previous_regime"],
+            "transition": macro_us["transition"],
+            "score": macro_us["scores"]["raw_score"],
+            "weighted_score": macro_us["scores"]["weighted_score"],
+            "score_band": macro_us["score_band"],
+            "score_band_label": macro_us["score_band_label"],
+            "confidence": macro_us["confidence"]["confidence"],
+            "warnings": macro_us["warnings_kr"],
+            "changes": macro_us["changes"],
+        },
+        "us_macro_dashboard": _macro_dashboard(macro_us, previous_macro_us, US_INDICATOR_ORDER, US_SERIES_FOR_INDICATOR),
+        "kr_us_comparison": kr_us_comparison,
         "macro": {
             "regime": macro["regime"],
             "previous_regime": macro["previous_regime"],
