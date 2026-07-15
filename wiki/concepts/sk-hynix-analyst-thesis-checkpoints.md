@@ -10,7 +10,7 @@ tags: [sk-hynix, checkpoints, analyst, daily-tracking]
 요약본(엑셀)과 웹 검색을 교차 검증해 구성했다. 새 뉴스·차트를 `/ingest`
 할 때마다 아래 항목의 상태를 갱신한다. 판단 근거일 뿐 투자 조언이 아니다.
 
-### 자동화 (2026-07-15 설정)
+### 자동화 (2026-07-15 설정, 2026-07-16 리포트 형식 확장)
 
 매일 두 번, 이 페이지를 자동으로 점검·갱신하는 Routine이 등록되어 있다:
 
@@ -18,6 +18,15 @@ tags: [sk-hynix, checkpoints, analyst, daily-tracking]
   살아있는지 점검, 스코어보드 갱신
 - **저녁 19:00(KST)** — 새로 나온 애널리스트 목표가·리포트가 있는지 발굴,
   있으면 표에 추가
+
+**2026-07-16 갱신**: 사용자가 참고한 타 서비스(WarrenAI) 리포트 형식을
+반영해 HTML 리포트에 "목표가와 상승 모멘텀 / 실적·성장률 전망 / 기술적
+신호와 리스크 / 한줄 진단" 섹션을 추가하도록 두 Routine의 프롬프트를
+갱신(재등록, 새 trigger id로 교체 — `update_trigger`는 프롬프트 변경을
+지원하지 않아 삭제 후 재생성함). 단, 그 리포트에 있던 두 수치는 오류로
+확인되어 재사용 금지 처리: "52주 최저가 245,000원"(우리 관측과 명백히
+불일치), "ADR 프리미엄 약 50%"(7/14 정점 때 기사 재활용, 최신 30.7%와
+불일치 — 아래 참고).
 
 각 실행마다 위키를 갱신·커밋하고, HTML 리포트를 Artifact로 재발행(고정 URL)한
 뒤 채팅 요약 + 푸시 알림을 보낸다. Routine 자체는 이 위키 스키마 밖의
@@ -231,6 +240,7 @@ DRAM 뉴스·판정(긍정/중립/훼손)·메모 컬럼으로 구성됨. 원본
 
 ## Sources
 
+- [sources/warrenai-report-2026-07-16.md](../../sources/warrenai-report-2026-07-16.md) (참고 형식 + 오류 2건 검증 메모)
 - [매크로 지표 트렌드 추적](macro-indicators.md) (거시 요인은 이제 여기서 시계열로 관리)
 - [sources/sk-hynix-120man-clarification-2026-07-15.md](../../sources/sk-hynix-120man-clarification-2026-07-15.md)
 - [sources/websearch-sk-hynix-morning-check-2026-07-16.md](../../sources/websearch-sk-hynix-morning-check-2026-07-16.md)
