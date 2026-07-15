@@ -74,6 +74,7 @@ th { color: var(--text-muted); font-weight: 600; font-size: 0.78rem; text-transf
 .spark-labels { display: flex; justify-content: space-between; font-size: 0.68rem; color: var(--text-muted);
   width: 176px; }
 .spark-empty { font-size: 0.78rem; }
+.stale-mark { color: var(--warn); cursor: help; }
 .clock-row { display: flex; gap: 18px; align-items: center; flex-wrap: wrap; }
 .clock-img { width: 180px; height: 180px; border-radius: 10px; flex-shrink: 0;
   background: #ffffff; padding: 6px; border: 1px solid var(--border); }
@@ -95,17 +96,13 @@ th { color: var(--text-muted); font-weight: 600; font-size: 0.78rem; text-transf
 .btn-fb:hover { border-color: var(--accent); }
 .btn-fb:disabled { opacity: 0.7; cursor: default; }
 .btn-fb-primary { background: var(--accent); color: #fff; border-color: var(--accent); }
-.copy-panel { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5);
-  align-items: center; justify-content: center; z-index: 1000; padding: 16px; }
-.copy-panel-box { background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
-  padding: 18px 20px; max-width: 480px; width: 100%; box-shadow: 0 8px 32px rgba(0,0,0,0.3); }
-.copy-panel-box p { margin: 0 0 10px; font-size: 0.9rem; color: var(--text); }
-.copy-panel-box textarea { width: 100%; box-sizing: border-box; padding: 8px 10px; border-radius: 8px;
-  border: 1px solid var(--border); background: var(--surface-2); color: var(--text);
-  font-family: inherit; font-size: 0.82rem; resize: vertical; margin-bottom: 10px; }
-.copy-panel-box a#peos-copy-panel-link { display: none; margin-bottom: 10px; color: var(--accent);
+.copy-output { margin-top: 10px; padding: 12px 14px; background: var(--surface-2);
+  border: 2px dashed var(--accent); border-radius: 10px; }
+.copy-output textarea { width: 100%; box-sizing: border-box; padding: 8px 10px; border-radius: 8px;
+  border: 1px solid var(--border); background: var(--surface); color: var(--text);
+  font-family: inherit; font-size: 0.82rem; resize: vertical; margin-top: 6px; }
+.copy-output a#peos-copy-output-link { display: none; margin-top: 8px; color: var(--accent);
   font-size: 0.88rem; font-weight: 600; }
-.copy-panel-actions { display: flex; justify-content: flex-end; }
 .action-card { border-radius: 10px; border: 1px solid var(--border); padding: 12px 16px; margin: 8px 0 14px; }
 .action-good { border-left: 4px solid var(--good); }
 .action-warn { border-left: 4px solid var(--warn); }
@@ -167,7 +164,7 @@ footer { color: var(--text-muted); font-size: 0.78rem; text-align: center; paddi
     </div>
     <div class="tile">
       <div class="tile-label"><span class="dot dot-neutral"></span>청약 준비도</div>
-      <div class="tile-value">60.40점</div>
+      <div class="tile-value"><span class="pending">Pending</span></div>
       <div class="tile-sub">Housing Readiness</div>
     </div></div>
     <section class="card">
@@ -175,7 +172,8 @@ footer { color: var(--text-muted); font-size: 0.78rem; text-align: center; paddi
       <div class="table-wrap"><table>
         <thead><tr><th>지표</th><th>현재</th><th>이전</th><th>추세</th><th>점수</th><th>10년 추세</th><th>출처</th></tr></thead>
         <tbody><tr>
-          <td>미국 실질 GDP 성장률 (연율화 QoQ)</td><td>2.10</td>
+          <td>미국 실질 GDP 성장률 (연율화 QoQ)</td>
+          <td>2.10</td>
           <td>0.50 <sup title="전월 리포트 스냅샷이 아직 없어 원자료 이력의 직전 값을 사용">†</sup></td>
           <td>→</td><td>0</td>
           <td class="spark-cell"><svg class="spark" viewBox="0 0 176 44" width="176" height="44"
@@ -188,7 +186,8 @@ footer { color: var(--text-muted); font-size: 0.78rem; text-align: center; paddi
     <div class="spark-labels"><span>2016-10·2.2</span><span>2026-01·2.1</span></div></td>
           <td class="muted">FRED</td>
         </tr><tr>
-          <td>미국 산업생산지수</td><td>102.65</td>
+          <td>미국 산업생산지수</td>
+          <td>102.65</td>
           <td>102.51 <sup title="전월 리포트 스냅샷이 아직 없어 원자료 이력의 직전 값을 사용">†</sup></td>
           <td>→</td><td>0</td>
           <td class="spark-cell"><svg class="spark" viewBox="0 0 176 44" width="176" height="44"
@@ -201,7 +200,8 @@ footer { color: var(--text-muted); font-size: 0.78rem; text-align: center; paddi
     <div class="spark-labels"><span>2016-08·98.8</span><span>2026-05·102.6</span></div></td>
           <td class="muted">FRED</td>
         </tr><tr>
-          <td>미국 소매판매</td><td>763705.00</td>
+          <td>미국 소매판매</td>
+          <td>763705.00</td>
           <td>757036.00 <sup title="전월 리포트 스냅샷이 아직 없어 원자료 이력의 직전 값을 사용">†</sup></td>
           <td>▲</td><td>1</td>
           <td class="spark-cell"><svg class="spark" viewBox="0 0 176 44" width="176" height="44"
@@ -214,7 +214,8 @@ footer { color: var(--text-muted); font-size: 0.78rem; text-align: center; paddi
     <div class="spark-labels"><span>2016-08·449946.0</span><span>2026-05·763705.0</span></div></td>
           <td class="muted">FRED</td>
         </tr><tr>
-          <td>미국 CPI</td><td>332.57</td>
+          <td>미국 CPI</td>
+          <td>332.57</td>
           <td>333.98 <sup title="전월 리포트 스냅샷이 아직 없어 원자료 이력의 직전 값을 사용">†</sup></td>
           <td>▼</td><td>-1</td>
           <td class="spark-cell"><svg class="spark" viewBox="0 0 176 44" width="176" height="44"
@@ -227,7 +228,8 @@ footer { color: var(--text-muted); font-size: 0.78rem; text-align: center; paddi
     <div class="spark-labels"><span>2016-08·240.5</span><span>2026-06·332.6</span></div></td>
           <td class="muted">FRED</td>
         </tr><tr>
-          <td>미국 PPI</td><td>286.83</td>
+          <td>미국 PPI</td>
+          <td>286.83</td>
           <td>290.49 <sup title="전월 리포트 스냅샷이 아직 없어 원자료 이력의 직전 값을 사용">†</sup></td>
           <td>▼</td><td>-1</td>
           <td class="spark-cell"><svg class="spark" viewBox="0 0 176 44" width="176" height="44"
@@ -240,7 +242,8 @@ footer { color: var(--text-muted); font-size: 0.78rem; text-align: center; paddi
     <div class="spark-labels"><span>2016-08·186.6</span><span>2026-06·286.8</span></div></td>
           <td class="muted">FRED</td>
         </tr><tr>
-          <td>미국 실업률 (3개월 평균 변화, %p)</td><td>4.20</td>
+          <td>미국 실업률 (3개월 평균 변화, %p)</td>
+          <td>4.20</td>
           <td>4.30 <sup title="전월 리포트 스냅샷이 아직 없어 원자료 이력의 직전 값을 사용">†</sup></td>
           <td>▲</td><td>1</td>
           <td class="spark-cell"><svg class="spark" viewBox="0 0 176 44" width="176" height="44"
@@ -253,7 +256,8 @@ footer { color: var(--text-muted); font-size: 0.78rem; text-align: center; paddi
     <div class="spark-labels"><span>2016-08·4.9</span><span>2026-06·4.2</span></div></td>
           <td class="muted">FRED</td>
         </tr><tr>
-          <td>미국 무역수지 (3개월 평균, 백만달러)</td><td>-77585.00</td>
+          <td>미국 무역수지 (3개월 평균, 백만달러)</td>
+          <td>-77585.00</td>
           <td>-54570.00 <sup title="전월 리포트 스냅샷이 아직 없어 원자료 이력의 직전 값을 사용">†</sup></td>
           <td>→</td><td>0</td>
           <td class="spark-cell"><svg class="spark" viewBox="0 0 176 44" width="176" height="44"
@@ -266,7 +270,8 @@ footer { color: var(--text-muted); font-size: 0.78rem; text-align: center; paddi
     <div class="spark-labels"><span>2016-08·-38623.0</span><span>2026-05·-77585.0</span></div></td>
           <td class="muted">FRED</td>
         </tr><tr>
-          <td>미국 10년-2년 국채 금리차 (%p)</td><td>0.42</td>
+          <td>미국 10년-2년 국채 금리차 (%p)</td>
+          <td>0.42</td>
           <td>0.40 <sup title="전월 리포트 스냅샷이 아직 없어 원자료 이력의 직전 값을 사용">†</sup></td>
           <td>→</td><td>0</td>
           <td class="spark-cell"><svg class="spark" viewBox="0 0 176 44" width="176" height="44"
@@ -287,7 +292,8 @@ footer { color: var(--text-muted); font-size: 0.78rem; text-align: center; paddi
       <div class="table-wrap"><table>
         <thead><tr><th>지표</th><th>현재</th><th>이전</th><th>추세</th><th>점수</th><th>10년 추세</th><th>출처</th></tr></thead>
         <tbody><tr>
-          <td>실질 GDP 성장률</td><td>1.83</td>
+          <td>실질 GDP 성장률</td>
+          <td>1.83</td>
           <td>-0.11 <sup title="전월 리포트 스냅샷이 아직 없어 원자료 이력의 직전 값을 사용">†</sup></td>
           <td>▲</td><td>1</td>
           <td class="spark-cell"><svg class="spark" viewBox="0 0 176 44" width="176" height="44"
@@ -300,7 +306,8 @@ footer { color: var(--text-muted); font-size: 0.78rem; text-align: center; paddi
     <div class="spark-labels"><span>2016-10·0.8</span><span>2026-01·1.8</span></div></td>
           <td class="muted">한국은행 ECOS</td>
         </tr><tr>
-          <td>전산업생산지수</td><td>114.91</td>
+          <td>전산업생산지수</td>
+          <td>114.91</td>
           <td>118.74 <sup title="전월 리포트 스냅샷이 아직 없어 원자료 이력의 직전 값을 사용">†</sup></td>
           <td>▼</td><td>-1</td>
           <td class="spark-cell"><svg class="spark" viewBox="0 0 176 44" width="176" height="44"
@@ -313,7 +320,8 @@ footer { color: var(--text-muted); font-size: 0.78rem; text-align: center; paddi
     <div class="spark-labels"><span>2016-08·100.8</span><span>2024-03·114.9</span></div></td>
           <td class="muted">OECD (FRED 경유) — KOSIS 대체</td>
         </tr><tr>
-          <td>소매판매</td><td>-3.64</td>
+          <td>소매판매</td>
+          <td>-3.64</td>
           <td>1.80 <sup title="전월 리포트 스냅샷이 아직 없어 원자료 이력의 직전 값을 사용">†</sup></td>
           <td>▼</td><td>-1</td>
           <td class="spark-cell"><svg class="spark" viewBox="0 0 176 44" width="176" height="44"
@@ -326,7 +334,8 @@ footer { color: var(--text-muted); font-size: 0.78rem; text-align: center; paddi
     <div class="spark-labels"><span>2016-08·1.5</span><span>2026-04·-3.6</span></div></td>
           <td class="muted">OECD (FRED 경유) — KOSIS 대체</td>
         </tr><tr>
-          <td>총수출 증가율</td><td>9.10</td>
+          <td>총수출 증가율</td>
+          <td>9.10</td>
           <td>8.20 <sup title="전월 리포트 스냅샷이 아직 없어 원자료 이력의 직전 값을 사용">†</sup></td>
           <td>→</td><td>0</td>
           <td class="spark-cell"><svg class="spark" viewBox="0 0 176 44" width="176" height="44"
@@ -339,7 +348,8 @@ footer { color: var(--text-muted); font-size: 0.78rem; text-align: center; paddi
     <div class="spark-labels"><span>2026-04·6.8</span><span>2026-06·9.1</span></div></td>
           <td class="muted">산업통상자원부 (수동 입력)</td>
         </tr><tr>
-          <td>반도체 수출 증가율</td><td>24.70</td>
+          <td>반도체 수출 증가율</td>
+          <td>24.70</td>
           <td>22.40 <sup title="전월 리포트 스냅샷이 아직 없어 원자료 이력의 직전 값을 사용">†</sup></td>
           <td>▲</td><td>1</td>
           <td class="spark-cell"><svg class="spark" viewBox="0 0 176 44" width="176" height="44"
@@ -352,7 +362,8 @@ footer { color: var(--text-muted); font-size: 0.78rem; text-align: center; paddi
     <div class="spark-labels"><span>2026-04·18.9</span><span>2026-06·24.7</span></div></td>
           <td class="muted">산업통상자원부 (수동 입력)</td>
         </tr><tr>
-          <td>경상수지 (3개월 평균, 억달러)</td><td>38607.40</td>
+          <td>경상수지 (3개월 평균, 억달러)</td>
+          <td>38607.40</td>
           <td>28292.30 <sup title="전월 리포트 스냅샷이 아직 없어 원자료 이력의 직전 값을 사용">†</sup></td>
           <td>▲</td><td>1</td>
           <td class="spark-cell"><svg class="spark" viewBox="0 0 176 44" width="176" height="44"
@@ -365,7 +376,8 @@ footer { color: var(--text-muted); font-size: 0.78rem; text-align: center; paddi
     <div class="spark-labels"><span>2016-08·5410.1</span><span>2026-05·38607.4</span></div></td>
           <td class="muted">한국은행 ECOS</td>
         </tr><tr>
-          <td>CPI</td><td>118.85</td>
+          <td>CPI</td>
+          <td>118.85</td>
           <td>119.51 <sup title="전월 리포트 스냅샷이 아직 없어 원자료 이력의 직전 값을 사용">†</sup></td>
           <td>▼</td><td>-1</td>
           <td class="spark-cell"><svg class="spark" viewBox="0 0 176 44" width="176" height="44"
@@ -378,7 +390,8 @@ footer { color: var(--text-muted); font-size: 0.78rem; text-align: center; paddi
     <div class="spark-labels"><span>2016-08·100.9</span><span>2023-11·118.8</span></div></td>
           <td class="muted">OECD (FRED 경유) — KOSIS 대체</td>
         </tr><tr>
-          <td>PPI</td><td>129.82</td>
+          <td>PPI</td>
+          <td>129.82</td>
           <td>128.75 <sup title="전월 리포트 스냅샷이 아직 없어 원자료 이력의 직전 값을 사용">†</sup></td>
           <td>▼</td><td>-1</td>
           <td class="spark-cell"><svg class="spark" viewBox="0 0 176 44" width="176" height="44"
@@ -391,7 +404,8 @@ footer { color: var(--text-muted); font-size: 0.78rem; text-align: center; paddi
     <div class="spark-labels"><span>2016-08·95.2</span><span>2026-05·129.8</span></div></td>
           <td class="muted">한국은행 ECOS</td>
         </tr><tr>
-          <td>한국 실업률 (3개월 평균 변화, %p)</td><td>2.80</td>
+          <td>한국 실업률 (3개월 평균 변화, %p)</td>
+          <td>2.80</td>
           <td>2.70 <sup title="전월 리포트 스냅샷이 아직 없어 원자료 이력의 직전 값을 사용">†</sup></td>
           <td>▲</td><td>1</td>
           <td class="spark-cell"><svg class="spark" viewBox="0 0 176 44" width="176" height="44"
@@ -404,7 +418,8 @@ footer { color: var(--text-muted); font-size: 0.78rem; text-align: center; paddi
     <div class="spark-labels"><span>2016-08·3.9</span><span>2026-04·2.8</span></div></td>
           <td class="muted">OECD (FRED 경유) — KOSIS 대체</td>
         </tr><tr>
-          <td>미국 고용 + 글로벌 경기 (composite -1~+1)</td><td>1.00</td>
+          <td>미국 고용 + 글로벌 경기 (composite -1~+1)</td>
+          <td>1.00</td>
           <td><span class="pending">Pending</span></td>
           <td>▲</td><td>1</td>
           <td class="spark-cell"><span class="muted spark-empty">10년 이력 부족</span></td>
@@ -491,7 +506,7 @@ footer { color: var(--text-muted); font-size: 0.78rem; text-align: center; paddi
             (upgrade)</li>
         <li><b>핵심 원인</b> 이전 스냅샷 없음 — 이번 달이 최초 기록</li>
         <li><b>사용자에게 중요한 의미</b> Recovery 국면(총점 1, 신뢰도 82.0점) — 반도체 긍정</li>
-        <li><b>이번 달 핵심 행동</b> [행동] 세종 5-1생활권 공공분양 (EXAMPLE) 자금 갭 81,950,000원 확보 계획 수립</li>
+        <li><b>이번 달 핵심 행동</b> [행동] SK hynix / Micron 실적발표 확인 (2026-07-24)</li>
         <li><b>리포트 충족도</b> <span class="badge badge-good">final</span></li>
       </ul>
     </section><section class="card"><h2>이번 달 핵심 변화</h2><ul><li>이전 스냅샷 없음 — 이번 달이 최초 기록</li></ul></section>
@@ -517,7 +532,7 @@ footer { color: var(--text-muted); font-size: 0.78rem; text-align: center; paddi
         <li><b>투자 관점</b> Investment Environment 69.30점 · 편향: 주식 소폭 확대, ETF 소폭 확대, 채권 축소/방어, 현금 축소/방어</li>
         <li><b>채권 관점</b> Bond Score 41.30점</li>
         <li><b>환율 관점</b> FX Score 32.90점</li>
-        <li><b>공공분양 관점</b> Housing Readiness 60.40점</li>
+        <li><b>공공분양 관점</b> Housing Readiness <span class="pending">Pending</span></li>
       </ul>
     </section><section class="card"><h2>자산별 영향 분석</h2><div class="tile-grid">
     <div class="tile">
@@ -542,8 +557,8 @@ footer { color: var(--text-muted); font-size: 0.78rem; text-align: center; paddi
     </div>
     <div class="tile">
       <div class="tile-label"><span class="dot dot-neutral"></span>청약 자금</div>
-      <div class="tile-value">★★★☆☆</div>
-      <div class="tile-sub">60.4점</div>
+      <div class="tile-value">Pending</div>
+      <div class="tile-sub">데이터 부족</div>
     </div>
     <div class="tile">
       <div class="tile-label"><span class="dot dot-bad"></span>환율</div>
@@ -585,6 +600,15 @@ footer { color: var(--text-muted); font-size: 0.78rem; text-align: center; paddi
           <span class="tile-sub">비워둔 항목은 자동으로 제외됩니다. 복사한 내용은 다음 대화에 붙여넣어 주시면
           반영됩니다. "GitHub Issue로 제출"은 공개 저장소에 남으니, 공개돼도 괜찮은 항목에만 사용해주세요.</span>
         </div>
+        <div class="copy-output" id="peos-copy-output">
+          <p id="peos-copy-output-msg" class="tile-sub">복사 버튼을 누르면 아래 박스에 결과가 나타납니다. 자동
+          복사가 안 되면, 아래 박스를 <b>먼저 클릭</b>한 다음 Ctrl+A(Mac: Cmd+A)로 전체 선택 →
+          Ctrl+C(Mac: Cmd+C)로 직접 복사해주세요. (자동 선택 기능은 보는 환경에 따라 막힐 수 있어
+          이 방법이 가장 확실합니다.)</p>
+          <textarea id="peos-copy-output-text" readonly rows="6"
+            placeholder="여기에 복사할 내용이 표시됩니다."></textarea>
+          <a id="peos-copy-output-link" href="#" target="_blank" rel="noopener">GitHub 이슈 작성 페이지 열기</a>
+        </div>
       
         <div class="discuss-card" data-id="stock_concentration" data-topic="SK하이닉스 집중도"
              data-question="회사 배경과 업황을 잘 아는 종목이라 확신이 있으실 텐데, 그럼에도 이 정도 집중도를 계속 유지하실 건가요, 아니면 일부는 ETF나 다른 종목으로 분산할 계획이 있으신가요?">
@@ -603,18 +627,6 @@ footer { color: var(--text-muted); font-size: 0.78rem; text-align: center; paddi
           <div class="discuss-topic">💬 하나증권 락업주와 이사 시점</div>
           <p class="discuss-context">SK하이닉스 67주는 2027-02-11까지 보유해야 8,791,650원 마크업을 받습니다. 락업 만기(2027-02-11)가 전세 만료(2027-02-22)보다 빠릅니다 (약 11일 차이).</p>
           <p class="discuss-question">전세 만료 이후 임시 거주(전세/월세) 자금이 필요할 수 있는데, 이 락업주는 자금 계획에서 제외하고 다른 재원으로 임시 거주 비용을 마련하는 쪽으로 생각하고 계신가요?</p>
-          <textarea class="discuss-input" rows="3"
-            placeholder="생각을 적어보세요 (선택 사항 — 비워두면 이 항목은 제출/복사에서 빠집니다)"></textarea>
-          <div class="discuss-actions">
-            <button type="button" class="btn-fb" onclick="peosCopyOne(this)">📋 이 답변 복사</button>
-            <button type="button" class="btn-fb" onclick="peosIssueOne(this)">🔗 GitHub Issue로 제출</button>
-          </div>
-        </div>
-        <div class="discuss-card" data-id="housing_funding_gap" data-topic="청약 자금 갭과 이사 일정"
-             data-question="공공분양 입주 전까지 임시로 다시 전세/월세 계약이 필요한 상황인데, 그 임시 거주 자금과 청약 자금(계약금 등)을 같은 시기에 같이 마련해야 하는 건지, 임시 거주는 월세로 돌려서 목돈 지출을 늦추는 방안도 고려 중이신지 궁금합니다.">
-          <div class="discuss-topic">💬 청약 자금 갭과 이사 일정</div>
-          <p class="discuss-context">세종 5-1생활권 공공분양 (EXAMPLE) 목표 자금 대비 약 81,950,000원이 부족한 상태이고, 전세 만료일은 2027-02-22입니다.</p>
-          <p class="discuss-question">공공분양 입주 전까지 임시로 다시 전세/월세 계약이 필요한 상황인데, 그 임시 거주 자금과 청약 자금(계약금 등)을 같은 시기에 같이 마련해야 하는 건지, 임시 거주는 월세로 돌려서 목돈 지출을 늦추는 방안도 고려 중이신지 궁금합니다.</p>
           <textarea class="discuss-input" rows="3"
             placeholder="생각을 적어보세요 (선택 사항 — 비워두면 이 항목은 제출/복사에서 빠집니다)"></textarea>
           <div class="discuss-actions">
@@ -651,24 +663,10 @@ footer { color: var(--text-muted); font-size: 0.78rem; text-align: center; paddi
       <h2>이번 달 Action Plan</h2>
       <h3><span class="badge badge-warn">★★★★☆ 검토</span></h3>
         <div class="action-card action-warn">
-          <div class="action-title">세종 5-1생활권 공공분양 (EXAMPLE) 자금 갭 81,950,000원 확보 계획 수립</div>
-          <div class="action-row"><span class="k">이유</span>목표 자금 대비 현재 청약저축/현금 잔액이 부족하다.</div>
-          <div class="action-row"><span class="k">보류 조건</span>공고가 취소되거나 자금 목표가 조정되면 보류.</div>
-          <div class="action-row"><span class="k">재점검</span>2026-08-11 1개월 전.</div>
-          
-        </div>
-        <div class="action-card action-warn">
           <div class="action-title">SK hynix / Micron 실적발표 확인 (2026-07-24)</div>
           <div class="action-row"><span class="k">이유</span>우선순위 점수 86.1점, ★★★★★ — D-9.</div>
           <div class="action-row"><span class="k">보류 조건</span>일정이 연기되면 재점검 시점도 함께 조정.</div>
           <div class="action-row"><span class="k">재점검</span>2026-07-24 당일 또는 직후.</div>
-          
-        </div>
-        <div class="action-card action-warn">
-          <div class="action-title">세종 5-1생활권 공공분양 (EXAMPLE) 청약 자격/자금 점검</div>
-          <div class="action-row"><span class="k">이유</span>청약 준비도 60.4점 — 신청 전 자격/자금 요건 재확인 필요.</div>
-          <div class="action-row"><span class="k">보류 조건</span>공고가 취소되거나 자격 요건 미충족이 확인되면 보류.</div>
-          <div class="action-row"><span class="k">재점검</span>2026-08-11 1주 전.</div>
           
         </div><h3><span class="badge badge-neutral">★★★☆☆ 관찰</span></h3>
         <div class="action-card action-neutral">
@@ -746,9 +744,9 @@ footer { color: var(--text-muted); font-size: 0.78rem; text-align: center; paddi
       <h2>Personal Executive Brief</h2>
       <ul class="kv-list">
         <li><b>이번 달 한 줄 진단</b> Recovery 국면(총점 1, 신뢰도 82.0점) — 반도체 긍정</li>
-        <li><b>자산별 영향 요약</b> stocks=★★★★☆, etf=★★★☆☆, bond=★★☆☆☆, cash=★★★★★, subscription_fund=★★★☆☆, fx_exposure=★☆☆☆☆</li>
+        <li><b>자산별 영향 요약</b> stocks=★★★★☆, etf=★★★☆☆, bond=★★☆☆☆, cash=★★★★★, fx_exposure=★☆☆☆☆</li>
         <li><b>중요한 이벤트 TOP 5</b> SK hynix / Micron 실적발표 (2026-07-24); 한국 수출입 동향 (반도체 포함) (2026-08-01); FOMC 정례회의 (2026-07-29); 미국 CPI 발표 (2026-08-12); 미국 비농업 고용(NFP) 발표 (2026-08-07)</li>
-        <li><b>최종 제안</b> [행동] 세종 5-1생활권 공공분양 (EXAMPLE) 자금 갭 81,950,000원 확보 계획 수립</li>
+        <li><b>최종 제안</b> [행동] SK hynix / Micron 실적발표 확인 (2026-07-24)</li>
       </ul>
     </section>
     <section class="card">
@@ -762,16 +760,6 @@ footer { color: var(--text-muted); font-size: 0.78rem; text-align: center; paddi
     </section>
   <footer>PEOS는 공식 데이터와 사용자 자산/목표를 결합해 행동을 제안하는 개인 경제 의사결정 시스템입니다.
   모든 판단은 참고용이며 최종 결정은 사용자에게 있습니다.</footer>
-</div>
-<div id="peos-copy-panel" class="copy-panel">
-  <div class="copy-panel-box">
-    <p id="peos-copy-panel-msg"></p>
-    <textarea id="peos-copy-panel-text" readonly rows="6"></textarea>
-    <a id="peos-copy-panel-link" href="#" target="_blank" rel="noopener">GitHub 이슈 작성 페이지 열기</a>
-    <div class="copy-panel-actions">
-      <button type="button" class="btn-fb" onclick="peosClosePanel()">닫기</button>
-    </div>
-  </div>
 </div>
 <script>
 function peosFindCard(el) { return el.closest('.discuss-card'); }
@@ -789,23 +777,20 @@ function peosEntryText(entry) {
 
 // Some viewers (e.g. a preview rendered inside a sandboxed iframe) block
 // navigator.clipboard, document.execCommand('copy'), window.alert, and
-// window.open outright — silently, with no error thrown. Never rely on any
-// of those alone: always fall back to a plain on-page panel (no dialog API)
-// with the text pre-selected in a visible textarea, so a manual Ctrl+C/Cmd+C
-// always works regardless of what the surrounding page blocks.
-function peosShowPanel(message, text, linkUrl) {
-  var panel = document.getElementById('peos-copy-panel');
-  var msgEl = document.getElementById('peos-copy-panel-msg');
-  var taEl = document.getElementById('peos-copy-panel-text');
-  var linkEl = document.getElementById('peos-copy-panel-link');
+// window.open outright — silently, with no error thrown, and even
+// programmatic focus()/select() can land the browser's actual selection
+// somewhere else entirely (that's what copied the whole page once already).
+// So: no modal, no scripted select() the user has to trust blindly. One
+// always-visible, always-in-place output box; the user clicks into it
+// themselves and selects with their own Ctrl+A, which is native browser
+// behavior no page script can misdirect.
+function peosShowOutput(message, text, linkUrl) {
+  var box = document.getElementById('peos-copy-output');
+  var msgEl = document.getElementById('peos-copy-output-msg');
+  var taEl = document.getElementById('peos-copy-output-text');
+  var linkEl = document.getElementById('peos-copy-output-link');
   msgEl.textContent = message;
-  if (text) {
-    taEl.style.display = 'block';
-    taEl.value = text;
-  } else {
-    taEl.style.display = 'none';
-    taEl.value = '';
-  }
+  taEl.value = text || '';
   if (linkUrl) {
     linkEl.style.display = 'inline-block';
     linkEl.href = linkUrl;
@@ -813,47 +798,26 @@ function peosShowPanel(message, text, linkUrl) {
     linkEl.style.display = 'none';
     linkEl.removeAttribute('href');
   }
-  panel.style.display = 'flex';
-  if (text) {
-    taEl.focus();
-    taEl.select();
-  }
-}
-
-function peosClosePanel() {
-  document.getElementById('peos-copy-panel').style.display = 'none';
+  if (box.scrollIntoView) box.scrollIntoView({ behavior: 'smooth', block: 'center' });
 }
 
 function peosCopyText(text, btn) {
-  var copied = false;
+  // Best-effort only — never trusted as the source of truth for whether the
+  // copy actually landed on the system clipboard, since these can silently
+  // no-op or misfire depending on the viewer.
   try {
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(text);
-      copied = true;
-    }
-  } catch (e) { /* fall through to the manual panel below */ }
-  if (!copied) {
-    try {
-      var ta = document.createElement('textarea');
-      ta.value = text;
-      ta.style.position = 'fixed';
-      ta.style.opacity = '0';
-      document.body.appendChild(ta);
-      ta.select();
-      copied = document.execCommand('copy');
-      document.body.removeChild(ta);
-    } catch (e) { /* still fine — the panel below is the guaranteed path */ }
-  }
-  peosShowPanel(
-    copied ? '클립보드에 복사를 시도했습니다. 혹시 붙여넣기가 안 되면, 아래 내용을 직접 선택해서 Ctrl+C(Mac: Cmd+C)로 복사해주세요.'
-           : '이 화면에서는 자동 복사가 막혀 있습니다. 아래 내용이 이미 선택되어 있으니 Ctrl+C(Mac: Cmd+C)로 복사해주세요.',
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text);
+  } catch (e) { /* ignore */ }
+  peosShowOutput(
+    '아래 박스에 복사할 내용을 넣어뒀습니다. 자동 복사를 시도했지만 확실하지 않으니, ' +
+    '박스를 직접 클릭한 뒤 Ctrl+A(Mac: Cmd+A) → Ctrl+C(Mac: Cmd+C)로 복사해주세요.',
     text, null
   );
 }
 
 function peosCopyOne(btn) {
   var entry = peosBuildEntry(peosFindCard(btn));
-  if (!entry) { peosShowPanel('먼저 답변을 입력해주세요.', null, null); return; }
+  if (!entry) { peosShowOutput('먼저 답변을 입력해주세요.', '', null); return; }
   peosCopyText(peosEntryText(entry), btn);
 }
 
@@ -866,25 +830,25 @@ function peosCopyAll(btn) {
     var entry = peosBuildEntry(card);
     if (entry) parts.push(peosEntryText(entry));
   });
-  if (!parts.length) { peosShowPanel('입력한 답변이 없습니다.', null, null); return; }
+  if (!parts.length) { peosShowOutput('입력한 답변이 없습니다.', '', null); return; }
   peosCopyText('PEOS ' + month + ' 리포트 피드백\n\n' + parts.join('\n\n'), btn);
 }
 
 function peosIssueOne(btn) {
   var card = peosFindCard(btn);
   var entry = peosBuildEntry(card);
-  if (!entry) { peosShowPanel('먼저 답변을 입력해주세요.', null, null); return; }
+  if (!entry) { peosShowOutput('먼저 답변을 입력해주세요.', '', null); return; }
   var section = document.getElementById('discussion-section');
   var repo = section.dataset.repo;
   var month = section.dataset.month;
-  if (!repo) { peosShowPanel('연결된 GitHub 저장소 정보가 없습니다.', null, null); return; }
+  if (!repo) { peosShowOutput('연결된 GitHub 저장소 정보가 없습니다.', '', null); return; }
   var title = encodeURIComponent('[피드백] ' + month + ' - ' + entry.topic);
   var body = encodeURIComponent('**질문**\n' + entry.question + '\n\n**답변**\n' + entry.answer);
   var url = 'https://github.com/' + repo + '/issues/new?title=' + title + '&body=' + body;
   var opened = null;
   try { opened = window.open(url, '_blank', 'noopener'); } catch (e) { /* blocked — fall through */ }
   if (!opened) {
-    peosShowPanel('이 화면에서는 새 창 열기가 막혀 있습니다. 아래 링크를 눌러 GitHub 이슈 작성 페이지로 이동해주세요.', null, url);
+    peosShowOutput('이 화면에서는 새 창 열기가 막혀 있습니다. 아래 링크를 눌러 GitHub 이슈 작성 페이지로 이동해주세요.', '', url);
   }
 }
 </script>

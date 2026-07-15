@@ -21,6 +21,7 @@
   },
   "us_macro_dashboard": [
     {
+      "key": "gdp",
       "indicator": "미국 실질 GDP 성장률 (연율화 QoQ)",
       "current": 2.1,
       "previous": 0.5,
@@ -186,6 +187,7 @@
       "history_years": 10
     },
     {
+      "key": "industrial_production",
       "indicator": "미국 산업생산지수",
       "current": 102.6475,
       "previous": 102.509,
@@ -671,6 +673,7 @@
       "history_years": 10
     },
     {
+      "key": "retail_sales",
       "indicator": "미국 소매판매",
       "current": 763705.0,
       "previous": 757036.0,
@@ -1156,6 +1159,7 @@
       "history_years": 10
     },
     {
+      "key": "cpi",
       "indicator": "미국 CPI",
       "current": 332.568,
       "previous": 333.979,
@@ -1641,6 +1645,7 @@
       "history_years": 10
     },
     {
+      "key": "ppi",
       "indicator": "미국 PPI",
       "current": 286.827,
       "previous": 290.489,
@@ -2130,6 +2135,7 @@
       "history_years": 10
     },
     {
+      "key": "unemployment",
       "indicator": "미국 실업률 (3개월 평균 변화, %p)",
       "current": 4.2,
       "previous": 4.3,
@@ -2615,6 +2621,7 @@
       "history_years": 10
     },
     {
+      "key": "trade_balance",
       "indicator": "미국 무역수지 (3개월 평균, 백만달러)",
       "current": -77585.0,
       "previous": -54570.0,
@@ -3100,6 +3107,7 @@
       "history_years": 10
     },
     {
+      "key": "yield_curve",
       "indicator": "미국 10년-2년 국채 금리차 (%p)",
       "current": 0.42,
       "previous": 0.4,
@@ -13220,6 +13228,7 @@
   },
   "macro_dashboard": [
     {
+      "key": "gdp",
       "indicator": "실질 GDP 성장률",
       "current": 1.831,
       "previous": -0.108,
@@ -13385,6 +13394,7 @@
       "history_years": 10
     },
     {
+      "key": "industrial_production",
       "indicator": "전산업생산지수",
       "current": 114.912,
       "previous": 118.7424,
@@ -13766,6 +13776,7 @@
       "history_years": 10
     },
     {
+      "key": "retail_sales",
       "indicator": "소매판매",
       "current": -3.6380597015,
       "previous": 1.804368471,
@@ -14247,6 +14258,7 @@
       "history_years": 10
     },
     {
+      "key": "exports",
       "indicator": "총수출 증가율",
       "current": 9.1,
       "previous": 8.2,
@@ -14272,6 +14284,7 @@
       "history_years": 10
     },
     {
+      "key": "semiconductor_exports",
       "indicator": "반도체 수출 증가율",
       "current": 24.7,
       "previous": 22.4,
@@ -14297,6 +14310,7 @@
       "history_years": 10
     },
     {
+      "key": "current_account",
       "indicator": "경상수지 (3개월 평균, 억달러)",
       "current": 38607.4,
       "previous": 28292.3,
@@ -14782,6 +14796,7 @@
       "history_years": 10
     },
     {
+      "key": "cpi",
       "indicator": "CPI",
       "current": 118.84768138617,
       "previous": 119.511811590829,
@@ -15147,6 +15162,7 @@
       "history_years": 10
     },
     {
+      "key": "ppi",
       "indicator": "PPI",
       "current": 129.82,
       "previous": 128.75,
@@ -15632,6 +15648,7 @@
       "history_years": 10
     },
     {
+      "key": "unemployment",
       "indicator": "한국 실업률 (3개월 평균 변화, %p)",
       "current": 2.8,
       "previous": 2.7,
@@ -16113,6 +16130,7 @@
       "history_years": 10
     },
     {
+      "key": "us_global",
       "indicator": "미국 고용 + 글로벌 경기 (composite -1~+1)",
       "current": 1.0,
       "previous": null,
@@ -16137,7 +16155,7 @@
     "semiconductor_band": "긍정",
     "bond_score": 41.3,
     "fx_score": 32.9,
-    "housing_readiness_score": 60.4,
+    "housing_readiness_score": null,
     "etf_fit": [
       {
         "ticker": "0183J0.KS",
@@ -16285,44 +16303,10 @@
       }
     },
     "subscription_fund": {
-      "score": 60.4,
-      "stars": "★★★☆☆",
-      "data_status": "ok",
-      "detail": [
-        {
-          "name": "세종 5-1생활권 공공분양 (EXAMPLE)",
-          "agency": "LH",
-          "region": "세종 플랫폼시티",
-          "readiness_score": 60.4,
-          "factors": {
-            "eligibility_fit": 100.0,
-            "funding_readiness": 25.5,
-            "region_type_match": 60.0,
-            "timing_readiness": 40.0,
-            "competition_adjustment_inverse": null
-          },
-          "application_start": "2026-08-11",
-          "application_end": "2026-08-12",
-          "data_status": "ok",
-          "platform_city_analysis": {
-            "location": "세종 플랫폼시티",
-            "supply_scale_households": 620,
-            "expected_schedule": {
-              "announce_date": "2026-08-01",
-              "application_start": "2026-08-11",
-              "application_end": "2026-08-12"
-            },
-            "expected_price_krw": 550000000,
-            "funding_gap_krw": 81950000.0,
-            "expected_competition_ratio": null,
-            "user_fit_score": 60.4,
-            "risk_notes": [
-              "예상 경쟁률 미확정 — 청약홈 공고 확정 후 재평가 필요",
-              "자금조달 갭 발생 시 채권/현금 배분 조정 필요 (Action Engine 충돌 조정 대상)"
-            ]
-          }
-        }
-      ]
+      "score": null,
+      "stars": null,
+      "data_status": "pending",
+      "detail": []
     },
     "fx_exposure": {
       "score": 32.9,
@@ -16337,42 +16321,9 @@
     }
   },
   "housing": {
-    "notices": [
-      {
-        "name": "세종 5-1생활권 공공분양 (EXAMPLE)",
-        "agency": "LH",
-        "region": "세종 플랫폼시티",
-        "readiness_score": 60.4,
-        "factors": {
-          "eligibility_fit": 100.0,
-          "funding_readiness": 25.5,
-          "region_type_match": 60.0,
-          "timing_readiness": 40.0,
-          "competition_adjustment_inverse": null
-        },
-        "application_start": "2026-08-11",
-        "application_end": "2026-08-12",
-        "data_status": "ok",
-        "platform_city_analysis": {
-          "location": "세종 플랫폼시티",
-          "supply_scale_households": 620,
-          "expected_schedule": {
-            "announce_date": "2026-08-01",
-            "application_start": "2026-08-11",
-            "application_end": "2026-08-12"
-          },
-          "expected_price_krw": 550000000,
-          "funding_gap_krw": 81950000.0,
-          "expected_competition_ratio": null,
-          "user_fit_score": 60.4,
-          "risk_notes": [
-            "예상 경쟁률 미확정 — 청약홈 공고 확정 후 재평가 필요",
-            "자금조달 갭 발생 시 채권/현금 배분 조정 필요 (Action Engine 충돌 조정 대상)"
-          ]
-        }
-      }
-    ],
-    "data_status": "ok"
+    "notices": [],
+    "data_status": "pending",
+    "note": "data/manual_inputs/subscription_notices.yaml 에 공고 없음"
   },
   "travel": {
     "trips": [
@@ -16439,34 +16390,12 @@
     {
       "priority": 4,
       "priority_label": "★★★★☆ 검토 필요",
-      "priority_score": 80.5,
-      "title": "세종 5-1생활권 공공분양 (EXAMPLE) 자금 갭 81,950,000원 확보 계획 수립",
-      "reason": "목표 자금 대비 현재 청약저축/현금 잔액이 부족하다.",
-      "invalid_condition": "공고가 취소되거나 자금 목표가 조정되면 보류.",
-      "recheck": "2026-08-11 1개월 전.",
-      "category": "liquidity_survival",
-      "conflict_note": null
-    },
-    {
-      "priority": 4,
-      "priority_label": "★★★★☆ 검토 필요",
       "priority_score": 72.9,
       "title": "SK hynix / Micron 실적발표 확인 (2026-07-24)",
       "reason": "우선순위 점수 86.1점, ★★★★★ — D-9.",
       "invalid_condition": "일정이 연기되면 재점검 시점도 함께 조정.",
       "recheck": "2026-07-24 당일 또는 직후.",
       "category": "industry_cycle",
-      "conflict_note": null
-    },
-    {
-      "priority": 4,
-      "priority_label": "★★★★☆ 검토 필요",
-      "priority_score": 71.0,
-      "title": "세종 5-1생활권 공공분양 (EXAMPLE) 청약 자격/자금 점검",
-      "reason": "청약 준비도 60.4점 — 신청 전 자격/자금 요건 재확인 필요.",
-      "invalid_condition": "공고가 취소되거나 자격 요건 미충족이 확인되면 보류.",
-      "recheck": "2026-08-11 1주 전.",
-      "category": "liquidity_survival",
       "conflict_note": null
     },
     {
@@ -16572,12 +16501,6 @@
       "question": "전세 만료 이후 임시 거주(전세/월세) 자금이 필요할 수 있는데, 이 락업주는 자금 계획에서 제외하고 다른 재원으로 임시 거주 비용을 마련하는 쪽으로 생각하고 계신가요?"
     },
     {
-      "id": "housing_funding_gap",
-      "topic": "청약 자금 갭과 이사 일정",
-      "context": "세종 5-1생활권 공공분양 (EXAMPLE) 목표 자금 대비 약 81,950,000원이 부족한 상태이고, 전세 만료일은 2027-02-22입니다.",
-      "question": "공공분양 입주 전까지 임시로 다시 전세/월세 계약이 필요한 상황인데, 그 임시 거주 자금과 청약 자금(계약금 등)을 같은 시기에 같이 마련해야 하는 건지, 임시 거주는 월세로 돌려서 목돈 지출을 늦추는 방안도 고려 중이신지 궁금합니다."
-    },
-    {
       "id": "semiconductor_exposure_breadth",
       "topic": "반도체/AI 익스포저 총량",
       "context": "주식 SK하이닉스, 삼성전자, 제주반도체, ETF SOL AI반도체소부장, ACE AI반도체TOP3+까지 합치면 보유 14개 종목/ETF 중 5개가 반도체 테마입니다.",
@@ -16662,7 +16585,7 @@
       "etf": "★★★☆☆",
       "bond": "★★☆☆☆",
       "cash": "★★★★★",
-      "subscription_fund": "★★★☆☆",
+      "subscription_fund": null,
       "fx_exposure": "★☆☆☆☆"
     },
     "top_events": [
@@ -16672,7 +16595,7 @@
       "미국 CPI 발표 (2026-08-12)",
       "미국 비농업 고용(NFP) 발표 (2026-08-07)"
     ],
-    "final_suggestion": "세종 5-1생활권 공공분양 (EXAMPLE) 자금 갭 81,950,000원 확보 계획 수립"
+    "final_suggestion": "SK hynix / Micron 실적발표 확인 (2026-07-24)"
   },
   "appendix": {
     "sources": [
