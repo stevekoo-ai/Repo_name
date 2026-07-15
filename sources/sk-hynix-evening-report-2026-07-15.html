@@ -1,0 +1,135 @@
+<title>SK하이닉스 저녁 체크 — 2026-07-15</title>
+<style>
+  :root {
+    --bg: #f4f5f1; --surface: #ffffff; --surface-2: #eaebe3;
+    --ink: #1e221d; --ink-soft: #565b4e; --ink-faint: #8b9084;
+    --accent: #2f6b5e; --accent-ink: #143a32; --accent-soft: #dce8e2;
+    --border: #d8d9cf;
+    --pos: #2f6b3f; --pos-bg: #e3ecdd;
+    --neu: #96660f; --neu-bg: #f3e8d2;
+    --neg: #a53f3f; --neg-bg: #f4dede;
+    --unk: #6b7066; --unk-bg: #e7e8e1;
+    --shadow: 0 1px 2px rgba(30,34,29,.06), 0 8px 24px -12px rgba(30,34,29,.18);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #14170f; --surface: #1b201a; --surface-2: #212820;
+      --ink: #e9ece4; --ink-soft: #a9ae9e; --ink-faint: #6e7367;
+      --accent: #74c6ae; --accent-ink: #eaf7f2; --accent-soft: #223730;
+      --border: #303830;
+      --pos: #8fd19f; --pos-bg: #1f3324;
+      --neu: #e3b869; --neu-bg: #3a2f18;
+      --neg: #e79b9b; --neg-bg: #3a2222;
+      --unk: #9aa093; --unk-bg: #262b23;
+      --shadow: 0 1px 2px rgba(0,0,0,.4), 0 8px 24px -12px rgba(0,0,0,.6);
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #14170f; --surface: #1b201a; --surface-2: #212820;
+    --ink: #e9ece4; --ink-soft: #a9ae9e; --ink-faint: #6e7367;
+    --accent: #74c6ae; --accent-ink: #eaf7f2; --accent-soft: #223730;
+    --border: #303830;
+    --pos: #8fd19f; --pos-bg: #1f3324;
+    --neu: #e3b869; --neu-bg: #3a2f18;
+    --neg: #e79b9b; --neg-bg: #3a2222;
+    --unk: #9aa093; --unk-bg: #262b23;
+  }
+  :root[data-theme="light"] {
+    --bg: #f4f5f1; --surface: #ffffff; --surface-2: #eaebe3;
+    --ink: #1e221d; --ink-soft: #565b4e; --ink-faint: #8b9084;
+    --accent: #2f6b5e; --accent-ink: #143a32; --accent-soft: #dce8e2;
+    --border: #d8d9cf;
+    --pos: #2f6b3f; --pos-bg: #e3ecdd;
+    --neu: #96660f; --neu-bg: #f3e8d2;
+    --neg: #a53f3f; --neg-bg: #f4dede;
+    --unk: #6b7066; --unk-bg: #e7e8e1;
+  }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--ink); font-family:-apple-system,"Apple SD Gothic Neo","Pretendard","Noto Sans KR",system-ui,sans-serif; line-height:1.65; }
+  .wrap { max-width:52rem; margin:0 auto; padding:2.5rem 1.5rem 5rem; }
+  header { margin-bottom:2rem; }
+  .eyebrow { display:inline-flex; align-items:center; gap:.4rem; font-family:ui-monospace,"SFMono-Regular",Menlo,Consolas,monospace; font-size:.72rem; letter-spacing:.06em; text-transform:uppercase; color:var(--accent-ink); background:var(--accent-soft); border-radius:999px; padding:.28rem .7rem; margin-bottom:1rem; }
+  h1 { font-size:clamp(1.6rem,4.5vw,2.15rem); font-weight:800; letter-spacing:-.01em; margin:0 0 .5rem; text-wrap:balance; }
+  .lede { color:var(--ink-soft); margin:0; font-size:1rem; }
+  section { margin-bottom:2.25rem; }
+  h2 { font-size:1.15rem; font-weight:800; margin:0 0 .9rem; }
+  .card { background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:1.25rem 1.4rem; box-shadow:var(--shadow); margin-bottom:.9rem; }
+  .card-head { display:flex; align-items:center; justify-content:space-between; gap:1rem; margin-bottom:.5rem; flex-wrap:wrap; }
+  .card h3 { margin:0; font-size:1rem; font-weight:700; }
+  .pill { display:inline-flex; align-items:center; gap:.35rem; font-size:.75rem; font-weight:700; padding:.25rem .6rem; border-radius:999px; white-space:nowrap; }
+  .pill.pos { color:var(--pos); background:var(--pos-bg); }
+  .pill.neu { color:var(--neu); background:var(--neu-bg); }
+  .pill.neg { color:var(--neg); background:var(--neg-bg); }
+  .pill.unk { color:var(--unk); background:var(--unk-bg); }
+  .card p { margin:.4rem 0 0; color:var(--ink-soft); font-size:.92rem; }
+  .new { border-left:3px solid var(--accent); }
+  .table-wrap { overflow-x:auto; border:1px solid var(--border); border-radius:12px; background:var(--surface); box-shadow:var(--shadow); }
+  table { width:100%; border-collapse:collapse; font-size:.86rem; }
+  th, td { text-align:left; padding:.55rem .8rem; border-bottom:1px solid var(--border); vertical-align:top; }
+  th { font-size:.68rem; text-transform:uppercase; letter-spacing:.05em; color:var(--ink-faint); }
+  tr:last-child td { border-bottom:none; }
+  td.num { font-variant-numeric:tabular-nums; text-align:right; }
+  .callout { border-left:3px solid var(--accent); background:var(--accent-soft); color:var(--accent-ink); border-radius:0 10px 10px 0; padding:.9rem 1.1rem; font-size:.9rem; }
+  @media (prefers-color-scheme:dark){ .callout{ color:var(--ink);} }
+  a { color:var(--accent-ink); } @media (prefers-color-scheme:dark){ a{ color:var(--accent);} }
+  footer { margin-top:3rem; padding-top:1.25rem; border-top:1px solid var(--border); color:var(--ink-faint); font-size:.82rem; }
+</style>
+
+<div class="wrap">
+  <header>
+    <span class="eyebrow">● 저녁 체크 · 2026-07-15</span>
+    <h1>SK하이닉스 신규 근거 스캔</h1>
+    <p class="lede">기존 11개 기관 목록 대비 새로 나온 목표가·리포트가 있는지 확인. 오늘은 새 기관 자체보다 "집계 데이터"와 "기존 목표가 재확인"이 핵심.</p>
+  </header>
+
+  <section>
+    <h2>오늘 발견한 것</h2>
+
+    <div class="card new">
+      <div class="card-head"><h3>애그리게이터 기준 37개 기관 컨센서스 확인</h3><span class="pill unk">참고용 — 개별 출처 미확인</span></div>
+      <p>Investing.com 집계 기준 37개 기관 평균 목표가 <strong>339만원</strong>,
+      최고 <strong>530만원</strong>, 최저 <strong>120만원</strong>. "Strong Buy"
+      (매수 36 · 매도 0 · 보유 1). 우리가 이름을 확인한 건 11개뿐이라, 나머지
+      ~26개 기관 중 특히 <strong>최저 120만원</strong>을 제시한 곳이 BNK(185만원)
+      보다도 더 보수적이라는 점이 눈에 띈다 — 어느 기관인지는 아직 특정 못함,
+      다음 체크에서 출처 확인 필요.</p>
+    </div>
+
+    <div class="card new">
+      <div class="card-head"><h3>한국투자증권, 목표가 380만원 재확인</h3><span class="pill pos">유지(신규 아님, 재확인)</span></div>
+      <p>2분기 영업이익이 컨센서스 대비 8% 하회할 것으로 예상하면서도 목표가는
+      그대로 유지 — "하회 이유가 수요 문제가 아니라 HBM 비중발 믹스 효과"라는
+      기존 논리를 재확인한 것. 새 기관은 아니지만, 실적 우려 속에서도 목표가를
+      지켰다는 점에서 강세 컨센서스의 내구성을 보여주는 신호로 기록.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2>기존 11개 기관 대비 변동사항</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>기관</th><th>기존 목표가</th><th>오늘 변동</th></tr></thead>
+        <tbody>
+          <tr><td>KB / NH / IBK / SK증권 / 대신 / 한투 / 신한</td><td class="num">380만~420만원</td><td>변동 없음 (한투는 재확인)</td></tr>
+          <tr><td>Barclays</td><td class="num">$330</td><td>변동 없음</td></tr>
+          <tr><td>HSBC</td><td>Top Pick(비공개)</td><td>변동 없음</td></tr>
+          <tr><td>BNK투자증권</td><td class="num">185만원</td><td>변동 없음</td></tr>
+          <tr><td>Morningstar</td><td class="num">$160</td><td>변동 없음</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <div class="callout">
+    오늘은 새로운 기관의 신규 커버리지 개시는 확인되지 않았다. 다만 "37개 기관
+    중 최저 120만원"이라는 새 데이터 포인트가 나와, BNK(185만원)가 유일한
+    약세 극단이 아닐 수 있다는 단서를 얻었다 — 이 기관을 특정하는 게 다음
+    저녁 체크의 우선 과제.
+  </div>
+
+  <footer>
+    이 리포트는 저녁 19:00(KST) Routine이 자동 생성한다. 원문 근거는 위키
+    <code>concepts/sk-hynix-analyst-thesis-checkpoints.md</code> 참고. 투자
+    조언 아님.
+  </footer>
+</div>

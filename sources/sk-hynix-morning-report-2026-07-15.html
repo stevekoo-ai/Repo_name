@@ -1,0 +1,167 @@
+<title>SK하이닉스 아침 체크 — 2026-07-15</title>
+<style>
+  :root {
+    --bg: #f4f5f1; --surface: #ffffff; --surface-2: #eaebe3;
+    --ink: #1e221d; --ink-soft: #565b4e; --ink-faint: #8b9084;
+    --accent: #2f6b5e; --accent-ink: #143a32; --accent-soft: #dce8e2;
+    --border: #d8d9cf;
+    --pos: #2f6b3f; --pos-bg: #e3ecdd;
+    --neu: #96660f; --neu-bg: #f3e8d2;
+    --neg: #a53f3f; --neg-bg: #f4dede;
+    --unk: #6b7066; --unk-bg: #e7e8e1;
+    --code-bg: #1b2420; --code-ink: #dce7de;
+    --shadow: 0 1px 2px rgba(30,34,29,.06), 0 8px 24px -12px rgba(30,34,29,.18);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #14170f; --surface: #1b201a; --surface-2: #212820;
+      --ink: #e9ece4; --ink-soft: #a9ae9e; --ink-faint: #6e7367;
+      --accent: #74c6ae; --accent-ink: #eaf7f2; --accent-soft: #223730;
+      --border: #303830;
+      --pos: #8fd19f; --pos-bg: #1f3324;
+      --neu: #e3b869; --neu-bg: #3a2f18;
+      --neg: #e79b9b; --neg-bg: #3a2222;
+      --unk: #9aa093; --unk-bg: #262b23;
+      --shadow: 0 1px 2px rgba(0,0,0,.4), 0 8px 24px -12px rgba(0,0,0,.6);
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #14170f; --surface: #1b201a; --surface-2: #212820;
+    --ink: #e9ece4; --ink-soft: #a9ae9e; --ink-faint: #6e7367;
+    --accent: #74c6ae; --accent-ink: #eaf7f2; --accent-soft: #223730;
+    --border: #303830;
+    --pos: #8fd19f; --pos-bg: #1f3324;
+    --neu: #e3b869; --neu-bg: #3a2f18;
+    --neg: #e79b9b; --neg-bg: #3a2222;
+    --unk: #9aa093; --unk-bg: #262b23;
+  }
+  :root[data-theme="light"] {
+    --bg: #f4f5f1; --surface: #ffffff; --surface-2: #eaebe3;
+    --ink: #1e221d; --ink-soft: #565b4e; --ink-faint: #8b9084;
+    --accent: #2f6b5e; --accent-ink: #143a32; --accent-soft: #dce8e2;
+    --border: #d8d9cf;
+    --pos: #2f6b3f; --pos-bg: #e3ecdd;
+    --neu: #96660f; --neu-bg: #f3e8d2;
+    --neg: #a53f3f; --neg-bg: #f4dede;
+    --unk: #6b7066; --unk-bg: #e7e8e1;
+  }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--ink); font-family:-apple-system,"Apple SD Gothic Neo","Pretendard","Noto Sans KR",system-ui,sans-serif; line-height:1.65; }
+  .wrap { max-width:52rem; margin:0 auto; padding:2.5rem 1.5rem 5rem; }
+  header { margin-bottom:2rem; }
+  .eyebrow { display:inline-flex; align-items:center; gap:.4rem; font-family:ui-monospace,"SFMono-Regular",Menlo,Consolas,monospace; font-size:.72rem; letter-spacing:.06em; text-transform:uppercase; color:var(--accent-ink); background:var(--accent-soft); border-radius:999px; padding:.28rem .7rem; margin-bottom:1rem; }
+  h1 { font-size:clamp(1.6rem,4.5vw,2.15rem); font-weight:800; letter-spacing:-.01em; margin:0 0 .5rem; text-wrap:balance; }
+  .lede { color:var(--ink-soft); margin:0; font-size:1rem; }
+  .snapshot { display:grid; grid-template-columns:repeat(auto-fit,minmax(9.5rem,1fr)); gap:.9rem; margin:1.75rem 0; }
+  .stat { background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:1rem 1.1rem; box-shadow:var(--shadow); }
+  .stat .label { font-size:.72rem; color:var(--ink-faint); text-transform:uppercase; letter-spacing:.05em; margin-bottom:.35rem; }
+  .stat .value { font-family:ui-monospace,"SFMono-Regular",Menlo,Consolas,monospace; font-size:1.25rem; font-weight:700; font-variant-numeric:tabular-nums; }
+  .stat .sub { font-size:.8rem; color:var(--ink-faint); margin-top:.2rem; }
+  .up { color:var(--pos); } .warn-text { color:var(--neu); }
+  section { margin-bottom:2.25rem; }
+  h2 { font-size:1.15rem; font-weight:800; margin:0 0 .9rem; }
+  .card { background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:1.25rem 1.4rem; box-shadow:var(--shadow); margin-bottom:.9rem; }
+  .card-head { display:flex; align-items:center; justify-content:space-between; gap:1rem; margin-bottom:.5rem; flex-wrap:wrap; }
+  .card h3 { margin:0; font-size:1rem; font-weight:700; }
+  .pill { display:inline-flex; align-items:center; gap:.35rem; font-size:.75rem; font-weight:700; padding:.25rem .6rem; border-radius:999px; white-space:nowrap; }
+  .pill.pos { color:var(--pos); background:var(--pos-bg); }
+  .pill.neu { color:var(--neu); background:var(--neu-bg); }
+  .pill.neg { color:var(--neg); background:var(--neg-bg); }
+  .pill.unk { color:var(--unk); background:var(--unk-bg); }
+  .card p { margin:.4rem 0 0; color:var(--ink-soft); font-size:.92rem; }
+  .fork { border-left:3px solid var(--accent); }
+  .table-wrap { overflow-x:auto; border:1px solid var(--border); border-radius:12px; background:var(--surface); box-shadow:var(--shadow); }
+  table { width:100%; border-collapse:collapse; font-size:.86rem; }
+  th, td { text-align:left; padding:.55rem .8rem; border-bottom:1px solid var(--border); vertical-align:top; }
+  th { font-size:.68rem; text-transform:uppercase; letter-spacing:.05em; color:var(--ink-faint); }
+  tr:last-child td { border-bottom:none; }
+  td.num { font-variant-numeric:tabular-nums; }
+  .callout { border-left:3px solid var(--neu); background:var(--neu-bg); color:var(--ink); border-radius:0 10px 10px 0; padding:.9rem 1.1rem; font-size:.88rem; }
+  a { color:var(--accent-ink); } @media (prefers-color-scheme:dark){ a{ color:var(--accent);} }
+  footer { margin-top:3rem; padding-top:1.25rem; border-top:1px solid var(--border); color:var(--ink-faint); font-size:.82rem; }
+</style>
+
+<div class="wrap">
+  <header>
+    <span class="eyebrow">● 아침 체크 · 2026-07-15</span>
+    <h1>SK하이닉스 근거 점검 — 기존 체크포인트가 아직 살아있는가</h1>
+    <p class="lede">9개 체크포인트 중 살아있는지 확인. 분기점 2개(빅테크 CapEx·ADR 프리미엄)를 최우선으로 봤다.</p>
+  </header>
+
+  <div class="snapshot">
+    <div class="stat"><div class="label">본주 000660</div><div class="value">2,101,000<span style="font-size:.7rem;">원</span></div><div class="sub up">전일 대비 +9.8%</div></div>
+    <div class="stat"><div class="label">장중 고점 대비</div><div class="value" style="font-size:1rem;">2,143,000원</div><div class="sub">소폭 되돌림 중</div></div>
+    <div class="stat"><div class="label">ADR(SKHY)</div><div class="value" style="font-size:.95rem;">데이터 불일치</div><div class="sub warn-text">아래 참고</div></div>
+    <div class="stat"><div class="label">2Q 실적 발표</div><div class="value" style="font-size:1rem;">7/23(잠정)</div><div class="sub">미확정</div></div>
+  </div>
+
+  <section>
+    <h2>분기점 (강세·약세 진영이 정반대로 해석하는 항목)</h2>
+
+    <div class="card fork">
+      <div class="card-head"><h3>③ 빅테크 AI CapEx</h3><span class="pill neu">중립 — 관찰 필요</span></div>
+      <p>둔화 신호와 사상 최대 규모 유지 신호가 공존. CapEx/영업현금흐름 비율이 올해 70%→내년 100% 전망(부담 심화), JP모건은 AI 메모리 비중 급증의 지속가능성에 의문 제기. 다만 CSP 수요 자체가 꺾인 건 아니라는 평가도 병존. <strong>진짜 확인 시점은 알파벳(7/22)·메타(7/29)·아마존(7/30) 2분기 실적</strong> — 아직 결론 낼 단계 아님.</p>
+    </div>
+
+    <div class="card fork">
+      <div class="card-head"><h3>⑥ ADR 프리미엄</h3><span class="pill unk">미검증 — 데이터 신뢰 불가</span></div>
+      <p>계산을 시도했으나 검색 결과가 서로 충돌: 한 소스는 SKHY $152.35(전일종가 $168.01)로 나왔는데, 이는 어제 직접 확인한 실제 화면(고점 $194.80, 현재가 $193.92)과 맞지 않는다 — 검색 결과가 급등 반영 전 캐시된 값으로 보인다. 원/달러 환율(약 1,490.6원)도 확보했지만, <strong>ADR 1주당 본주 환산 비율이 아직 미확인</strong>이라 정확한 프리미엄(%)을 계산하지 못했다. 증권 앱에서 ADR 실시간가를 직접 확인해주시면 다음 체크 때 바로 계산하겠다.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2>컨센서스 체크포인트 (대체로 강세 유지)</h2>
+
+    <div class="card">
+      <div class="card-head"><h3>② HBM(4) 인증/출하</h3><span class="pill pos">긍정</span></div>
+      <p>엔비디아가 차세대 가속기 'Rubin'에 HBM4 공식 채택, SK하이닉스는 12-layer HBM4 샘플을 주요 고객에 최초 공급하며 기술 검증 진행 중. 2026년 내 양산 목표 유지.</p>
+    </div>
+
+    <div class="card">
+      <div class="card-head"><h3>⑨ 실적/마진(OPM)</h3><span class="pill neu">주의 — 훼손은 아님</span></div>
+      <p>한국투자증권이 2분기 영업이익을 60.4조원으로, 컨센서스(65.3조원) 대비 8% 하회할 것으로 전망. 다만 원인은 수요 둔화가 아니라 HBM 매출 비중이 높아 범용 메모리 가격 상승 효과가 상대적으로 제한적이기 때문이라 설명하며, <strong>목표가 380만원은 그대로 유지</strong>했다. 실적 발표일(잠정 7/23)이 다음 확인 시점.</p>
+    </div>
+
+    <div class="card">
+      <div class="card-head"><h3>⑦ 중국산 DRAM 채택</h3><span class="pill unk">특이사항 없음</span></div>
+      <p>관련 뉴스 확인되지 않음 — 리스크가 아직 현실화되지 않았다는 뜻으로, 나쁜 소식이 없다는 정도로만 해석.</p>
+    </div>
+
+    <div class="card">
+      <div class="card-head"><h3>① DRAM/NAND 가격 · ④ LTA · ⑤ 주주환원 · ⑧ 마이크론 대비 할인</h3><span class="pill unk">오늘 특이 뉴스 없음</span></div>
+      <p>네 항목 모두 이를 반박하는 뉴스는 없었음. 기존 상태 유지로 판단, 다음 체크에서 계속 관찰.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2>전체 스코어보드</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>#</th><th>체크포인트</th><th>유형</th><th>상태</th></tr></thead>
+        <tbody>
+          <tr><td>①</td><td>DRAM/NAND 가격 모멘텀</td><td>컨센서스</td><td>미확인(반박없음)</td></tr>
+          <tr><td>②</td><td>HBM(4) 인증/출하</td><td>컨센서스</td><td class="up">긍정</td></tr>
+          <tr><td>③</td><td>빅테크 AI CapEx</td><td><strong>분기점</strong></td><td class="warn-text">중립·관찰중</td></tr>
+          <tr><td>④</td><td>LTA 구조</td><td>컨센서스</td><td>미확인(반박없음)</td></tr>
+          <tr><td>⑤</td><td>주주환원</td><td>컨센서스</td><td>미확인(반박없음)</td></tr>
+          <tr><td>⑥</td><td>ADR 프리미엄</td><td><strong>분기점</strong></td><td>미검증(데이터 불일치)</td></tr>
+          <tr><td>⑦</td><td>중국산 DRAM 채택</td><td>공유 리스크</td><td>특이사항 없음</td></tr>
+          <tr><td>⑧</td><td>마이크론 대비 할인</td><td>컨센서스</td><td>미확인(반박없음)</td></tr>
+          <tr><td>⑨</td><td>실적/마진(OPM)</td><td>컨센서스</td><td class="warn-text">주의(2Q 소폭 하회 전망, 목표가는 유지)</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <div class="callout">
+    오늘은 "무너진" 근거는 없지만, 분기점 2개 모두 확정적 결론이 나지 않았다.
+    빅테크 CapEx는 7월 말 실적 시즌이, ADR 프리미엄은 정확한 실시간 데이터
+    확보가 다음 체크의 우선순위.
+  </div>
+
+  <footer>
+    이 리포트는 아침 07:00(KST) Routine이 자동 생성한다. 원문 근거는 위키
+    <code>concepts/sk-hynix-analyst-thesis-checkpoints.md</code> 참고. 투자
+    조언 아님.
+  </footer>
+</div>

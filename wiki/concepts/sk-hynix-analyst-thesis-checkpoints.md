@@ -24,6 +24,13 @@ tags: [sk-hynix, checkpoints, analyst, daily-tracking]
 인프라(계정에 연결된 스케줄러)라 CLAUDE.md에는 기록하지 않지만, 이 페이지가
 자동 갱신 대상이라는 사실은 여기 남겨둔다.
 
+발행된 리포트 자체도 매번 `sources/`에 원문 그대로 보관한다 — 위키가 만든
+산출물이 다시 다음 갱신의 원자료(raw)로 순환되는 구조(예:
+[sources/sk-hynix-morning-report-2026-07-15.html](../../sources/sk-hynix-morning-report-2026-07-15.html),
+[sources/sk-hynix-evening-report-2026-07-15.html](../../sources/sk-hynix-evening-report-2026-07-15.html)).
+이렇게 하면 나중에 "그날 리포트가 실제로 뭐라고 했는지"를 위키 서술과
+별개로 원문 그대로 다시 확인할 수 있다.
+
 ## 목표가 스펙트럼 (11개 기관, 2026-07-15 기준 정리)
 
 | 기관/분석가 | 목표가 | 의견 | 리포트일 | 밸류에이션 근거 |
@@ -190,6 +197,8 @@ DRAM 뉴스·판정(긍정/중립/훼손)·메모 컬럼으로 구성됨. 원본
 
 ## Sources
 
+- [sources/sk-hynix-morning-report-2026-07-15.html](../../sources/sk-hynix-morning-report-2026-07-15.html)
+- [sources/sk-hynix-evening-report-2026-07-15.html](../../sources/sk-hynix-evening-report-2026-07-15.html)
 - [sources/websearch-sk-hynix-daily-check-2026-07-15.md](../../sources/websearch-sk-hynix-daily-check-2026-07-15.md)
 - [sources/websearch-sk-hynix-analyst-targets-2026-07-15.md](../../sources/websearch-sk-hynix-analyst-targets-2026-07-15.md)
 - [sources/sk-hynix-analyst-thesis-daily-check-template-2026-07-15.md](../../sources/sk-hynix-analyst-thesis-daily-check-template-2026-07-15.md)
