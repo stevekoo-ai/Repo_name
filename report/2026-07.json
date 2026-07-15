@@ -2,18 +2,18 @@
   "report_month": "2026-07",
   "report_readiness": "insufficient",
   "macro": {
-    "regime": "Recovery",
+    "regime": "Early Expansion",
     "previous_regime": "Early Expansion",
-    "transition": "upgrade",
-    "score": 3,
-    "weighted_score": 3.3,
+    "transition": null,
+    "score": 2,
+    "weighted_score": 2.5,
     "score_band": "unbalanced_expansion",
     "score_band_label": "불균형 확장",
-    "confidence": 77.8,
+    "confidence": 73.0,
     "confidence_components": {
-      "data_freshness": 60.0,
+      "data_freshness": 30.0,
       "source_quality": 100.0,
-      "indicator_consistency": 83.3,
+      "indicator_consistency": 100.0,
       "trend_stability": 70.0
     },
     "warnings": [
@@ -41,167 +41,14 @@
   "macro_dashboard": [
     {
       "indicator": "실질 GDP 성장률",
-      "current": 1.831,
-      "previous": -0.108,
-      "previous_source": "series_history",
-      "trend": "▲",
-      "score": 1,
-      "status": "ok",
-      "source": "한국은행 ECOS",
-      "history": [
-        {
-          "date": "2016-10-01",
-          "value": 0.77
-        },
-        {
-          "date": "2017-01-01",
-          "value": 1.133
-        },
-        {
-          "date": "2017-04-01",
-          "value": 0.726
-        },
-        {
-          "date": "2017-07-01",
-          "value": 1.372
-        },
-        {
-          "date": "2017-10-01",
-          "value": -0.218
-        },
-        {
-          "date": "2018-01-01",
-          "value": 1.443
-        },
-        {
-          "date": "2018-04-01",
-          "value": 0.789
-        },
-        {
-          "date": "2018-07-01",
-          "value": 0.547
-        },
-        {
-          "date": "2018-10-01",
-          "value": 0.538
-        },
-        {
-          "date": "2019-01-01",
-          "value": 0.033
-        },
-        {
-          "date": "2019-04-01",
-          "value": 1.353
-        },
-        {
-          "date": "2019-07-01",
-          "value": 0.271
-        },
-        {
-          "date": "2019-10-01",
-          "value": 0.955
-        },
-        {
-          "date": "2020-01-01",
-          "value": -1.367
-        },
-        {
-          "date": "2020-04-01",
-          "value": -2.642
-        },
-        {
-          "date": "2020-07-01",
-          "value": 2.26
-        },
-        {
-          "date": "2020-10-01",
-          "value": 1.513
-        },
-        {
-          "date": "2021-01-01",
-          "value": 1.594
-        },
-        {
-          "date": "2021-04-01",
-          "value": 1.356
-        },
-        {
-          "date": "2021-07-01",
-          "value": -0.016
-        },
-        {
-          "date": "2021-10-01",
-          "value": 1.753
-        },
-        {
-          "date": "2022-01-01",
-          "value": 0.467
-        },
-        {
-          "date": "2022-04-01",
-          "value": 0.998
-        },
-        {
-          "date": "2022-07-01",
-          "value": 0.258
-        },
-        {
-          "date": "2022-10-01",
-          "value": -0.4
-        },
-        {
-          "date": "2023-01-01",
-          "value": 0.222
-        },
-        {
-          "date": "2023-04-01",
-          "value": 0.686
-        },
-        {
-          "date": "2023-07-01",
-          "value": 0.956
-        },
-        {
-          "date": "2023-10-01",
-          "value": 0.731
-        },
-        {
-          "date": "2024-01-01",
-          "value": 1.013
-        },
-        {
-          "date": "2024-04-01",
-          "value": -0.151
-        },
-        {
-          "date": "2024-07-01",
-          "value": 0.055
-        },
-        {
-          "date": "2024-10-01",
-          "value": 0.236
-        },
-        {
-          "date": "2025-01-01",
-          "value": -0.172
-        },
-        {
-          "date": "2025-04-01",
-          "value": 0.65
-        },
-        {
-          "date": "2025-07-01",
-          "value": 1.362
-        },
-        {
-          "date": "2025-10-01",
-          "value": -0.108
-        },
-        {
-          "date": "2026-01-01",
-          "value": 1.831
-        }
-      ],
+      "current": null,
+      "previous": null,
+      "previous_source": null,
+      "trend": "N/A",
+      "score": null,
+      "status": "source_error",
+      "source": null,
+      "history": [],
       "history_years": 10
     },
     {
@@ -280,487 +127,14 @@
     },
     {
       "indicator": "경상수지 (3개월 평균, 억달러)",
-      "current": 38607.4,
-      "previous": 28292.3,
-      "previous_source": "series_history",
-      "trend": "▲",
-      "score": 1,
-      "status": "ok",
-      "source": "한국은행 ECOS",
-      "history": [
-        {
-          "date": "2016-08-01",
-          "value": 5410.1
-        },
-        {
-          "date": "2016-09-01",
-          "value": 7517.5
-        },
-        {
-          "date": "2016-10-01",
-          "value": 7476.8
-        },
-        {
-          "date": "2016-11-01",
-          "value": 7873.3
-        },
-        {
-          "date": "2016-12-01",
-          "value": 7361.5
-        },
-        {
-          "date": "2017-01-01",
-          "value": 3401.7
-        },
-        {
-          "date": "2017-02-01",
-          "value": 7438.6
-        },
-        {
-          "date": "2017-03-01",
-          "value": 5140.3
-        },
-        {
-          "date": "2017-04-01",
-          "value": 3184.0
-        },
-        {
-          "date": "2017-05-01",
-          "value": 4262.1
-        },
-        {
-          "date": "2017-06-01",
-          "value": 7008.9
-        },
-        {
-          "date": "2017-07-01",
-          "value": 7467.4
-        },
-        {
-          "date": "2017-08-01",
-          "value": 6139.4
-        },
-        {
-          "date": "2017-09-01",
-          "value": 12337.7
-        },
-        {
-          "date": "2017-10-01",
-          "value": 6890.0
-        },
-        {
-          "date": "2017-11-01",
-          "value": 7474.3
-        },
-        {
-          "date": "2017-12-01",
-          "value": 4486.5
-        },
-        {
-          "date": "2018-01-01",
-          "value": 2556.9
-        },
-        {
-          "date": "2018-02-01",
-          "value": 3226.7
-        },
-        {
-          "date": "2018-03-01",
-          "value": 5210.4
-        },
-        {
-          "date": "2018-04-01",
-          "value": 1490.4
-        },
-        {
-          "date": "2018-05-01",
-          "value": 8792.3
-        },
-        {
-          "date": "2018-06-01",
-          "value": 7980.1
-        },
-        {
-          "date": "2018-07-01",
-          "value": 8874.4
-        },
-        {
-          "date": "2018-08-01",
-          "value": 8581.2
-        },
-        {
-          "date": "2018-09-01",
-          "value": 11235.5
-        },
-        {
-          "date": "2018-10-01",
-          "value": 9473.6
-        },
-        {
-          "date": "2018-11-01",
-          "value": 5130.6
-        },
-        {
-          "date": "2018-12-01",
-          "value": 4914.4
-        },
-        {
-          "date": "2019-01-01",
-          "value": 2894.7
-        },
-        {
-          "date": "2019-02-01",
-          "value": 3308.2
-        },
-        {
-          "date": "2019-03-01",
-          "value": 4347.0
-        },
-        {
-          "date": "2019-04-01",
-          "value": -527.4
-        },
-        {
-          "date": "2019-05-01",
-          "value": 4983.2
-        },
-        {
-          "date": "2019-06-01",
-          "value": 6166.1
-        },
-        {
-          "date": "2019-07-01",
-          "value": 6957.2
-        },
-        {
-          "date": "2019-08-01",
-          "value": 4983.5
-        },
-        {
-          "date": "2019-09-01",
-          "value": 8014.3
-        },
-        {
-          "date": "2019-10-01",
-          "value": 8035.8
-        },
-        {
-          "date": "2019-11-01",
-          "value": 5876.6
-        },
-        {
-          "date": "2019-12-01",
-          "value": 4636.9
-        },
-        {
-          "date": "2020-01-01",
-          "value": 434.3
-        },
-        {
-          "date": "2020-02-01",
-          "value": 6753.5
-        },
-        {
-          "date": "2020-03-01",
-          "value": 5906.9
-        },
-        {
-          "date": "2020-04-01",
-          "value": -4697.5
-        },
-        {
-          "date": "2020-05-01",
-          "value": 2078.1
-        },
-        {
-          "date": "2020-06-01",
-          "value": 6967.5
-        },
-        {
-          "date": "2020-07-01",
-          "value": 7304.6
-        },
-        {
-          "date": "2020-08-01",
-          "value": 6539.2
-        },
-        {
-          "date": "2020-09-01",
-          "value": 10847.1
-        },
-        {
-          "date": "2020-10-01",
-          "value": 12439.9
-        },
-        {
-          "date": "2020-11-01",
-          "value": 9664.9
-        },
-        {
-          "date": "2020-12-01",
-          "value": 12264.9
-        },
-        {
-          "date": "2021-01-01",
-          "value": 5745.1
-        },
-        {
-          "date": "2021-02-01",
-          "value": 6698.6
-        },
-        {
-          "date": "2021-03-01",
-          "value": 7255.4
-        },
-        {
-          "date": "2021-04-01",
-          "value": -493.4
-        },
-        {
-          "date": "2021-05-01",
-          "value": 11856.8
-        },
-        {
-          "date": "2021-06-01",
-          "value": 9930.8
-        },
-        {
-          "date": "2021-07-01",
-          "value": 7324.3
-        },
-        {
-          "date": "2021-08-01",
-          "value": 6671.5
-        },
-        {
-          "date": "2021-09-01",
-          "value": 9308.2
-        },
-        {
-          "date": "2021-10-01",
-          "value": 7357.7
-        },
-        {
-          "date": "2021-11-01",
-          "value": 6534.6
-        },
-        {
-          "date": "2021-12-01",
-          "value": 5689.5
-        },
-        {
-          "date": "2022-01-01",
-          "value": 1646.4
-        },
-        {
-          "date": "2022-02-01",
-          "value": 5263.3
-        },
-        {
-          "date": "2022-03-01",
-          "value": 7131.1
-        },
-        {
-          "date": "2022-04-01",
-          "value": -539.6
-        },
-        {
-          "date": "2022-05-01",
-          "value": 4202.3
-        },
-        {
-          "date": "2022-06-01",
-          "value": 5972.9
-        },
-        {
-          "date": "2022-07-01",
-          "value": 1619.8
-        },
-        {
-          "date": "2022-08-01",
-          "value": -4363.0
-        },
-        {
-          "date": "2022-09-01",
-          "value": 1810.1
-        },
-        {
-          "date": "2022-10-01",
-          "value": 472.9
-        },
-        {
-          "date": "2022-11-01",
-          "value": -1842.5
-        },
-        {
-          "date": "2022-12-01",
-          "value": 1864.7
-        },
-        {
-          "date": "2023-01-01",
-          "value": -9056.0
-        },
-        {
-          "date": "2023-02-01",
-          "value": -1859.9
-        },
-        {
-          "date": "2023-03-01",
-          "value": -1213.5
-        },
-        {
-          "date": "2023-04-01",
-          "value": -2891.1
-        },
-        {
-          "date": "2023-05-01",
-          "value": 2023.6
-        },
-        {
-          "date": "2023-06-01",
-          "value": 3923.7
-        },
-        {
-          "date": "2023-07-01",
-          "value": 3715.3
-        },
-        {
-          "date": "2023-08-01",
-          "value": 6232.9
-        },
-        {
-          "date": "2023-09-01",
-          "value": 7548.7
-        },
-        {
-          "date": "2023-10-01",
-          "value": 8417.3
-        },
-        {
-          "date": "2023-11-01",
-          "value": 6721.2
-        },
-        {
-          "date": "2023-12-01",
-          "value": 8968.0
-        },
-        {
-          "date": "2024-01-01",
-          "value": 3511.9
-        },
-        {
-          "date": "2024-02-01",
-          "value": 6802.1
-        },
-        {
-          "date": "2024-03-01",
-          "value": 7826.8
-        },
-        {
-          "date": "2024-04-01",
-          "value": 773.8
-        },
-        {
-          "date": "2024-05-01",
-          "value": 9277.4
-        },
-        {
-          "date": "2024-06-01",
-          "value": 13431.5
-        },
-        {
-          "date": "2024-07-01",
-          "value": 9022.6
-        },
-        {
-          "date": "2024-08-01",
-          "value": 5899.8
-        },
-        {
-          "date": "2024-09-01",
-          "value": 11368.5
-        },
-        {
-          "date": "2024-10-01",
-          "value": 9861.5
-        },
-        {
-          "date": "2024-11-01",
-          "value": 9456.6
-        },
-        {
-          "date": "2024-12-01",
-          "value": 12741.0
-        },
-        {
-          "date": "2025-01-01",
-          "value": 2678.0
-        },
-        {
-          "date": "2025-02-01",
-          "value": 7225.2
-        },
-        {
-          "date": "2025-03-01",
-          "value": 9583.2
-        },
-        {
-          "date": "2025-04-01",
-          "value": 4510.6
-        },
-        {
-          "date": "2025-05-01",
-          "value": 9906.7
-        },
-        {
-          "date": "2025-06-01",
-          "value": 13968.5
-        },
-        {
-          "date": "2025-07-01",
-          "value": 11945.1
-        },
-        {
-          "date": "2025-08-01",
-          "value": 9848.0
-        },
-        {
-          "date": "2025-09-01",
-          "value": 14220.3
-        },
-        {
-          "date": "2025-10-01",
-          "value": 7567.6
-        },
-        {
-          "date": "2025-11-01",
-          "value": 12898.0
-        },
-        {
-          "date": "2025-12-01",
-          "value": 18702.6
-        },
-        {
-          "date": "2026-01-01",
-          "value": 13259.1
-        },
-        {
-          "date": "2026-02-01",
-          "value": 23192.7
-        },
-        {
-          "date": "2026-03-01",
-          "value": 37928.4
-        },
-        {
-          "date": "2026-04-01",
-          "value": 28292.3
-        },
-        {
-          "date": "2026-05-01",
-          "value": 38607.4
-        }
-      ],
+      "current": null,
+      "previous": null,
+      "previous_source": null,
+      "trend": "N/A",
+      "score": null,
+      "status": "source_error",
+      "source": null,
+      "history": [],
       "history_years": 10
     },
     {
@@ -777,487 +151,14 @@
     },
     {
       "indicator": "PPI",
-      "current": 129.82,
-      "previous": 128.75,
-      "previous_source": "series_history",
-      "trend": "▼",
-      "score": -1,
-      "status": "ok",
-      "source": "한국은행 ECOS",
-      "history": [
-        {
-          "date": "2016-08-01",
-          "value": 95.19
-        },
-        {
-          "date": "2016-09-01",
-          "value": 95.41
-        },
-        {
-          "date": "2016-10-01",
-          "value": 95.69
-        },
-        {
-          "date": "2016-11-01",
-          "value": 96.12
-        },
-        {
-          "date": "2016-12-01",
-          "value": 96.96
-        },
-        {
-          "date": "2017-01-01",
-          "value": 98.37
-        },
-        {
-          "date": "2017-02-01",
-          "value": 98.75
-        },
-        {
-          "date": "2017-03-01",
-          "value": 98.71
-        },
-        {
-          "date": "2017-04-01",
-          "value": 98.5
-        },
-        {
-          "date": "2017-05-01",
-          "value": 98.23
-        },
-        {
-          "date": "2017-06-01",
-          "value": 97.85
-        },
-        {
-          "date": "2017-07-01",
-          "value": 97.92
-        },
-        {
-          "date": "2017-08-01",
-          "value": 98.37
-        },
-        {
-          "date": "2017-09-01",
-          "value": 99.03
-        },
-        {
-          "date": "2017-10-01",
-          "value": 99.14
-        },
-        {
-          "date": "2017-11-01",
-          "value": 99.04
-        },
-        {
-          "date": "2017-12-01",
-          "value": 99.09
-        },
-        {
-          "date": "2018-01-01",
-          "value": 99.5
-        },
-        {
-          "date": "2018-02-01",
-          "value": 99.92
-        },
-        {
-          "date": "2018-03-01",
-          "value": 99.88
-        },
-        {
-          "date": "2018-04-01",
-          "value": 100.01
-        },
-        {
-          "date": "2018-05-01",
-          "value": 100.3
-        },
-        {
-          "date": "2018-06-01",
-          "value": 100.33
-        },
-        {
-          "date": "2018-07-01",
-          "value": 100.8
-        },
-        {
-          "date": "2018-08-01",
-          "value": 101.25
-        },
-        {
-          "date": "2018-09-01",
-          "value": 101.54
-        },
-        {
-          "date": "2018-10-01",
-          "value": 101.19
-        },
-        {
-          "date": "2018-11-01",
-          "value": 100.49
-        },
-        {
-          "date": "2018-12-01",
-          "value": 100.0
-        },
-        {
-          "date": "2019-01-01",
-          "value": 99.89
-        },
-        {
-          "date": "2019-02-01",
-          "value": 99.99
-        },
-        {
-          "date": "2019-03-01",
-          "value": 100.34
-        },
-        {
-          "date": "2019-04-01",
-          "value": 100.63
-        },
-        {
-          "date": "2019-05-01",
-          "value": 100.74
-        },
-        {
-          "date": "2019-06-01",
-          "value": 100.46
-        },
-        {
-          "date": "2019-07-01",
-          "value": 100.46
-        },
-        {
-          "date": "2019-08-01",
-          "value": 100.69
-        },
-        {
-          "date": "2019-09-01",
-          "value": 100.75
-        },
-        {
-          "date": "2019-10-01",
-          "value": 100.51
-        },
-        {
-          "date": "2019-11-01",
-          "value": 100.37
-        },
-        {
-          "date": "2019-12-01",
-          "value": 100.65
-        },
-        {
-          "date": "2020-01-01",
-          "value": 101.02
-        },
-        {
-          "date": "2020-02-01",
-          "value": 100.69
-        },
-        {
-          "date": "2020-03-01",
-          "value": 99.8
-        },
-        {
-          "date": "2020-04-01",
-          "value": 98.93
-        },
-        {
-          "date": "2020-05-01",
-          "value": 98.96
-        },
-        {
-          "date": "2020-06-01",
-          "value": 99.47
-        },
-        {
-          "date": "2020-07-01",
-          "value": 99.69
-        },
-        {
-          "date": "2020-08-01",
-          "value": 100.18
-        },
-        {
-          "date": "2020-09-01",
-          "value": 100.38
-        },
-        {
-          "date": "2020-10-01",
-          "value": 99.98
-        },
-        {
-          "date": "2020-11-01",
-          "value": 100.06
-        },
-        {
-          "date": "2020-12-01",
-          "value": 100.84
-        },
-        {
-          "date": "2021-01-01",
-          "value": 101.96
-        },
-        {
-          "date": "2021-02-01",
-          "value": 102.8
-        },
-        {
-          "date": "2021-03-01",
-          "value": 103.89
-        },
-        {
-          "date": "2021-04-01",
-          "value": 104.88
-        },
-        {
-          "date": "2021-05-01",
-          "value": 105.45
-        },
-        {
-          "date": "2021-06-01",
-          "value": 106.01
-        },
-        {
-          "date": "2021-07-01",
-          "value": 107.04
-        },
-        {
-          "date": "2021-08-01",
-          "value": 107.6
-        },
-        {
-          "date": "2021-09-01",
-          "value": 108.0
-        },
-        {
-          "date": "2021-10-01",
-          "value": 109.12
-        },
-        {
-          "date": "2021-11-01",
-          "value": 109.9
-        },
-        {
-          "date": "2021-12-01",
-          "value": 109.88
-        },
-        {
-          "date": "2022-01-01",
-          "value": 111.04
-        },
-        {
-          "date": "2022-02-01",
-          "value": 111.57
-        },
-        {
-          "date": "2022-03-01",
-          "value": 113.27
-        },
-        {
-          "date": "2022-04-01",
-          "value": 115.1
-        },
-        {
-          "date": "2022-05-01",
-          "value": 115.92
-        },
-        {
-          "date": "2022-06-01",
-          "value": 116.57
-        },
-        {
-          "date": "2022-07-01",
-          "value": 116.9
-        },
-        {
-          "date": "2022-08-01",
-          "value": 116.45
-        },
-        {
-          "date": "2022-09-01",
-          "value": 116.53
-        },
-        {
-          "date": "2022-10-01",
-          "value": 117.13
-        },
-        {
-          "date": "2022-11-01",
-          "value": 116.75
-        },
-        {
-          "date": "2022-12-01",
-          "value": 116.27
-        },
-        {
-          "date": "2023-01-01",
-          "value": 116.69
-        },
-        {
-          "date": "2023-02-01",
-          "value": 116.91
-        },
-        {
-          "date": "2023-03-01",
-          "value": 117.05
-        },
-        {
-          "date": "2023-04-01",
-          "value": 116.96
-        },
-        {
-          "date": "2023-05-01",
-          "value": 116.53
-        },
-        {
-          "date": "2023-06-01",
-          "value": 116.27
-        },
-        {
-          "date": "2023-07-01",
-          "value": 116.53
-        },
-        {
-          "date": "2023-08-01",
-          "value": 117.5
-        },
-        {
-          "date": "2023-09-01",
-          "value": 118.03
-        },
-        {
-          "date": "2023-10-01",
-          "value": 117.86
-        },
-        {
-          "date": "2023-11-01",
-          "value": 117.41
-        },
-        {
-          "date": "2023-12-01",
-          "value": 117.56
-        },
-        {
-          "date": "2024-01-01",
-          "value": 118.19
-        },
-        {
-          "date": "2024-02-01",
-          "value": 118.55
-        },
-        {
-          "date": "2024-03-01",
-          "value": 118.82
-        },
-        {
-          "date": "2024-04-01",
-          "value": 119.16
-        },
-        {
-          "date": "2024-05-01",
-          "value": 119.25
-        },
-        {
-          "date": "2024-06-01",
-          "value": 119.23
-        },
-        {
-          "date": "2024-07-01",
-          "value": 119.56
-        },
-        {
-          "date": "2024-08-01",
-          "value": 119.38
-        },
-        {
-          "date": "2024-09-01",
-          "value": 119.16
-        },
-        {
-          "date": "2024-10-01",
-          "value": 119.01
-        },
-        {
-          "date": "2024-11-01",
-          "value": 119.1
-        },
-        {
-          "date": "2024-12-01",
-          "value": 119.52
-        },
-        {
-          "date": "2025-01-01",
-          "value": 120.27
-        },
-        {
-          "date": "2025-02-01",
-          "value": 120.33
-        },
-        {
-          "date": "2025-03-01",
-          "value": 120.36
-        },
-        {
-          "date": "2025-04-01",
-          "value": 120.14
-        },
-        {
-          "date": "2025-05-01",
-          "value": 119.64
-        },
-        {
-          "date": "2025-06-01",
-          "value": 119.77
-        },
-        {
-          "date": "2025-07-01",
-          "value": 120.19
-        },
-        {
-          "date": "2025-08-01",
-          "value": 120.11
-        },
-        {
-          "date": "2025-09-01",
-          "value": 120.54
-        },
-        {
-          "date": "2025-10-01",
-          "value": 120.94
-        },
-        {
-          "date": "2025-11-01",
-          "value": 121.31
-        },
-        {
-          "date": "2025-12-01",
-          "value": 121.76
-        },
-        {
-          "date": "2026-01-01",
-          "value": 122.56
-        },
-        {
-          "date": "2026-02-01",
-          "value": 123.28
-        },
-        {
-          "date": "2026-03-01",
-          "value": 125.35
-        },
-        {
-          "date": "2026-04-01",
-          "value": 128.75
-        },
-        {
-          "date": "2026-05-01",
-          "value": 129.82
-        }
-      ],
+      "current": null,
+      "previous": null,
+      "previous_source": null,
+      "trend": "N/A",
+      "score": null,
+      "status": "source_error",
+      "source": null,
+      "history": [],
       "history_years": 10
     },
     {
@@ -1286,73 +187,73 @@
     }
   ],
   "personal": {
-    "investment_environment_score": 69.1,
+    "investment_environment_score": 70.7,
     "investment_biases": {
-      "stock_bias": "소폭 확대",
-      "etf_bias": "소폭 확대",
+      "stock_bias": "확대",
+      "etf_bias": "확대",
       "bond_bias": "축소/방어",
       "cash_bias": "축소/방어"
     },
     "semiconductor_score": 79.6,
     "semiconductor_band": "긍정",
-    "bond_score": 43.4,
-    "fx_score": 32.9,
+    "bond_score": 40.0,
+    "fx_score": 46.0,
     "housing_readiness_score": 60.4,
     "etf_fit": [
       {
         "ticker": "0183J0.KS",
         "name": "TIGER 미국우주테크",
         "bucket": "space_tech",
-        "fit_score": 59.1,
+        "fit_score": 60.0,
         "data_status": "ok"
       },
       {
         "ticker": "371460.KS",
         "name": "TIGER 차이나전기차SOLACTIVE",
         "bucket": "ev_china",
-        "fit_score": 59.1,
+        "fit_score": 60.0,
         "data_status": "ok"
       },
       {
         "ticker": "411060.KS",
         "name": "ACE KRX금현물",
         "bucket": "gold",
-        "fit_score": 59.1,
+        "fit_score": 60.0,
         "data_status": "ok"
       },
       {
         "ticker": "455850.KS",
         "name": "SOL AI반도체소부장",
         "bucket": "semiconductor",
-        "fit_score": 68.0,
+        "fit_score": 71.1,
         "data_status": "ok"
       },
       {
         "ticker": "469150.KS",
         "name": "ACE AI반도체TOP3+",
         "bucket": "semiconductor",
-        "fit_score": 68.0,
+        "fit_score": 71.1,
         "data_status": "ok"
       },
       {
         "ticker": "475380.KS",
         "name": "RISE 글로벌리얼티인컴",
         "bucket": "reit_income",
-        "fit_score": 59.1,
+        "fit_score": 60.0,
         "data_status": "ok"
       },
       {
         "ticker": "476070.KS",
         "name": "KODEX 글로벌비만치료제TOP2 Plus",
         "bucket": "healthcare_theme",
-        "fit_score": 59.1,
+        "fit_score": 60.0,
         "data_status": "ok"
       }
     ]
   },
   "assets": {
     "stocks": {
-      "score": 71.3,
+      "score": 72.6,
       "stars": "★★★★☆",
       "data_status": "ok",
       "detail": [
@@ -1366,7 +267,7 @@
       ]
     },
     "etf": {
-      "score": 61.6,
+      "score": 63.2,
       "stars": "★★★☆☆",
       "data_status": "ok",
       "detail": [
@@ -1374,55 +275,55 @@
           "ticker": "0183J0.KS",
           "name": "TIGER 미국우주테크",
           "bucket": "space_tech",
-          "fit_score": 59.1,
+          "fit_score": 60.0,
           "data_status": "ok"
         },
         {
           "ticker": "371460.KS",
           "name": "TIGER 차이나전기차SOLACTIVE",
           "bucket": "ev_china",
-          "fit_score": 59.1,
+          "fit_score": 60.0,
           "data_status": "ok"
         },
         {
           "ticker": "411060.KS",
           "name": "ACE KRX금현물",
           "bucket": "gold",
-          "fit_score": 59.1,
+          "fit_score": 60.0,
           "data_status": "ok"
         },
         {
           "ticker": "455850.KS",
           "name": "SOL AI반도체소부장",
           "bucket": "semiconductor",
-          "fit_score": 68.0,
+          "fit_score": 71.1,
           "data_status": "ok"
         },
         {
           "ticker": "469150.KS",
           "name": "ACE AI반도체TOP3+",
           "bucket": "semiconductor",
-          "fit_score": 68.0,
+          "fit_score": 71.1,
           "data_status": "ok"
         },
         {
           "ticker": "475380.KS",
           "name": "RISE 글로벌리얼티인컴",
           "bucket": "reit_income",
-          "fit_score": 59.1,
+          "fit_score": 60.0,
           "data_status": "ok"
         },
         {
           "ticker": "476070.KS",
           "name": "KODEX 글로벌비만치료제TOP2 Plus",
           "bucket": "healthcare_theme",
-          "fit_score": 59.1,
+          "fit_score": 60.0,
           "data_status": "ok"
         }
       ]
     },
     "bond": {
-      "score": 43.4,
+      "score": 40.0,
       "stars": "★★☆☆☆",
       "data_status": "ok",
       "detail": [
@@ -1436,8 +337,8 @@
       ]
     },
     "cash": {
-      "score": 65.0,
-      "stars": "★★★☆☆",
+      "score": 75.0,
+      "stars": "★★★★☆",
       "data_status": "ok",
       "detail": {
         "krw": 20000000,
@@ -1485,13 +386,13 @@
       ]
     },
     "fx_exposure": {
-      "score": 32.9,
-      "stars": "★☆☆☆☆",
+      "score": 46.0,
+      "stars": "★★☆☆☆",
       "data_status": "ok",
       "detail": {
-        "usdkrw_change_pct_3m": 5.64,
+        "usdkrw_change_pct_3m": null,
         "dollar_index_change_pct_3m": 1.35,
-        "kr_us_rate_differential_pct": -1.13,
+        "kr_us_rate_differential_pct": null,
         "us_fed_funds_change_bp_3m": -1.0
       }
     }
@@ -1542,9 +443,9 @@
         "destination_country": "US",
         "departure_date": "2026-09-15",
         "score_kind": "trip_readiness",
-        "score": 51.0,
+        "score": 59.1,
         "factors": {
-          "fx_favorability": 32.9,
+          "fx_favorability": 46.0,
           "cost_risk_inverse": null,
           "lead_time_readiness": 80.0
         },
@@ -1556,9 +457,9 @@
         "destination_country": "JP",
         "departure_date": "2026-10-03",
         "score_kind": "travel_timing",
-        "score": 46.8,
+        "score": 55.0,
         "factors": {
-          "fx_favorability": 32.9,
+          "fx_favorability": 46.0,
           "season_favorability": 70.0,
           "airfare_hotel_trend": null
         },
@@ -1569,20 +470,20 @@
   },
   "scenarios": {
     "base": {
-      "probability": 35,
-      "premise": "현재 국면(Recovery)과 반도체 업황(긍정)의 추세가 유지된다.",
+      "probability": 45,
+      "premise": "현재 국면(Early Expansion)과 반도체 업황(긍정)의 추세가 유지된다.",
       "expected_change": "지표가 현재 범위 내에서 등락하며 국면 전환 신호는 제한적.",
-      "user_impact": "Investment Environment Score 69.1점 수준의 배분 유지가 합리적."
+      "user_impact": "Investment Environment Score 70.7점 수준의 배분 유지가 합리적."
     },
     "bull": {
-      "probability": 35,
-      "premise": "상향 신호(gdp_strong, semiconductor_strong, us_employment_improving)가 강화된다.",
+      "probability": 30,
+      "premise": "상향 신호(semiconductor_strong, us_employment_improving)가 강화된다.",
       "expected_change": "수출/반도체 개선과 물가 안정이 동반되며 국면이 한 단계 상향될 가능성.",
       "user_impact": "주식/ETF 비중 확대, 반도체/AI 인프라 비중 우선순위 상향을 검토할 수 있다."
     },
     "bear": {
-      "probability": 30,
-      "premise": "하향/경고 신호(ppi_sustained_high, 장단기 금리 역전 심화)가 현실화된다.",
+      "probability": 25,
+      "premise": "하향/경고 신호(장단기 금리 역전 심화)가 현실화된다.",
       "expected_change": "수출 둔화 또는 물가 재상승으로 국면이 한 단계 하향될 가능성.",
       "user_impact": "현금/채권 비중 확대, 청약·출장 자금 유동성 우선 확보가 합리적."
     },
@@ -1678,7 +579,7 @@
       "priority_label": "★★★☆☆ 관찰 필요",
       "priority_score": 58.8,
       "title": "주식/ETF 비중 확대 검토",
-      "reason": "Investment Environment Score 69.1점 — 거시/반도체 환경이 우호적.",
+      "reason": "Investment Environment Score 70.7점 — 거시/반도체 환경이 우호적.",
       "invalid_condition": "Investment Environment Score가 20점 이상 하락하면 보류.",
       "recheck": "다음 정기 리포트.",
       "category": "investment_opportunity",
@@ -1711,7 +612,7 @@
       "priority_label": "★★☆☆☆ 참고",
       "priority_score": 52.8,
       "title": "미국 출장 (EXAMPLE) 분할 환전 검토",
-      "reason": "미국 출장 (EXAMPLE): 환전 유리도 51.0점으로 낮지만 일정이 확정되어 있어 환전을 전면 보류하기보다 분할 환전으로 리스크를 분산하는 것이 합리적이다.",
+      "reason": "미국 출장 (EXAMPLE): 환전 유리도 59.1점으로 낮지만 일정이 확정되어 있어 환전을 전면 보류하기보다 분할 환전으로 리스크를 분산하는 것이 합리적이다.",
       "invalid_condition": "출국일 이전 환율이 추가로 5% 이상 불리하게 움직이면 재검토.",
       "recheck": "2026-09-15 2주 전.",
       "category": "liquidity_survival",
@@ -1722,10 +623,21 @@
       "priority_label": "★★☆☆☆ 참고",
       "priority_score": 52.8,
       "title": "일본 여행 (EXAMPLE) 분할 환전 검토",
-      "reason": "일본 여행 (EXAMPLE): 환전 유리도 46.8점으로 낮지만 일정이 확정되어 있어 환전을 전면 보류하기보다 분할 환전으로 리스크를 분산하는 것이 합리적이다.",
+      "reason": "일본 여행 (EXAMPLE): 환전 유리도 55.0점으로 낮지만 일정이 확정되어 있어 환전을 전면 보류하기보다 분할 환전으로 리스크를 분산하는 것이 합리적이다.",
       "invalid_condition": "출국일 이전 환율이 추가로 5% 이상 불리하게 움직이면 재검토.",
       "recheck": "2026-10-03 2주 전.",
       "category": "travel_discretionary",
+      "conflict_note": null
+    },
+    {
+      "priority": 2,
+      "priority_label": "★★☆☆☆ 참고",
+      "priority_score": 44.8,
+      "title": "채권 신규 매수 보류 및 만기 재투자 방식 재검토",
+      "reason": "Bond Score 40.0점 — 금리/실질금리 매력도가 낮은 국면.",
+      "invalid_condition": "실질금리 매력도 회복 또는 성장 둔화 신호 확산 시 재검토.",
+      "recheck": "다음 금통위/FOMC 이후.",
+      "category": "investment_opportunity",
       "conflict_note": null
     }
   ],
@@ -1827,14 +739,14 @@
     }
   ],
   "personal_executive_brief": {
-    "one_line_diagnosis": "Recovery 국면(총점 3, 신뢰도 77.8점) — 반도체 긍정",
+    "one_line_diagnosis": "Early Expansion 국면(총점 2, 신뢰도 73.0점) — 반도체 긍정",
     "asset_summary": {
       "stocks": "★★★★☆",
       "etf": "★★★☆☆",
       "bond": "★★☆☆☆",
-      "cash": "★★★☆☆",
+      "cash": "★★★★☆",
       "subscription_fund": "★★★☆☆",
-      "fx_exposure": "★☆☆☆☆"
+      "fx_exposure": "★★☆☆☆"
     },
     "top_events": [
       "SK hynix / Micron 실적발표 (2026-07-24)",
@@ -1848,8 +760,7 @@
   "appendix": {
     "sources": [
       "FRED",
-      "산업통상자원부 (수동 입력)",
-      "한국은행 ECOS"
+      "산업통상자원부 (수동 입력)"
     ],
     "glossary": {
       "Regime": "경기 국면 — Recovery/Early Expansion/Expansion/Late Expansion/Slowdown/Recession 순환.",

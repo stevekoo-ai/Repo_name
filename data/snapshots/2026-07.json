@@ -1,34 +1,31 @@
 {
   "macro": {
-    "regime": "Recovery",
+    "regime": "Early Expansion",
     "previous_regime": "Early Expansion",
-    "transition": "upgrade",
+    "transition": null,
     "score_band": "unbalanced_expansion",
     "score_band_label": "불균형 확장",
     "scores": {
-      "raw_score": 3,
-      "weighted_score": 3.3,
-      "scored_count": 6,
+      "raw_score": 2,
+      "weighted_score": 2.5,
+      "scored_count": 3,
       "total_count": 10,
-      "coverage_pct": 60.0
+      "coverage_pct": 30.0
     },
     "confidence": {
-      "confidence": 77.8,
+      "confidence": 73.0,
       "components": {
-        "data_freshness": 60.0,
+        "data_freshness": 30.0,
         "source_quality": 100.0,
-        "indicator_consistency": 83.3,
+        "indicator_consistency": 100.0,
         "trend_stability": 70.0
       }
     },
     "warnings_kr": [
       "장단기 금리 역전 심화"
     ],
-    "downgrade_signals": [
-      "ppi_sustained_high"
-    ],
+    "downgrade_signals": [],
     "upgrade_signals": [
-      "gdp_strong",
       "semiconductor_strong",
       "us_employment_improving"
     ],
@@ -52,16 +49,16 @@
     },
     "readings": {
       "gdp": {
-        "value": 1.831,
-        "score": 1,
+        "value": null,
+        "score": null,
         "weight": 1.0,
-        "status": "ok",
+        "status": "source_error",
         "label": "실질 GDP 성장률",
-        "source": "한국은행 ECOS",
+        "source": null,
         "fields": {
-          "qoq": 1.831
+          "qoq": null
         },
-        "note": null
+        "note": "ECOS unreachable and no cache available"
       },
       "industrial_production": {
         "value": null,
@@ -112,16 +109,16 @@
         "note": null
       },
       "current_account": {
-        "value": 38607.4,
-        "score": 1,
+        "value": null,
+        "score": null,
         "weight": 0.8,
-        "status": "ok",
+        "status": "source_error",
         "label": "경상수지 (3개월 평균, 억달러)",
-        "source": "한국은행 ECOS",
+        "source": null,
         "fields": {
-          "avg_3m": 34942.700000000004
+          "avg_3m": null
         },
-        "note": null
+        "note": "ECOS unreachable and no cache available"
       },
       "cpi": {
         "value": null,
@@ -136,16 +133,16 @@
         "note": "KOSIS unreachable and no cache available"
       },
       "ppi": {
-        "value": 129.82,
-        "score": -1,
+        "value": null,
+        "score": null,
         "weight": 1.0,
-        "status": "ok",
+        "status": "source_error",
         "label": "PPI",
-        "source": "한국은행 ECOS",
+        "source": null,
         "fields": {
-          "yoy": 8.508859913072545
+          "yoy": null
         },
-        "note": null
+        "note": "ECOS unreachable and no cache available"
       },
       "unemployment": {
         "value": null,
@@ -172,5 +169,5 @@
     }
   },
   "month": "2026-07",
-  "saved_at": "2026-07-15T05:22:54.157301+00:00"
+  "saved_at": "2026-07-15T06:06:31.019180+00:00"
 }
