@@ -5,7 +5,7 @@ import pandas as pd
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
-from clock.model import compute_growth_signal, compute_inflation_signal, read_clock  # noqa: E402
+from clock.model import build_full_history, compute_growth_signal, compute_inflation_signal, read_clock  # noqa: E402
 
 
 def _monthly_series(values: list[float], start: str = "2023-01-01") -> pd.DataFrame:
@@ -59,3 +59,34 @@ def test_inflation_signal_reflects_yoy_acceleration():
     series = _series_for(True, True)
     signal = compute_inflation_signal(series)
     assert signal.label == "rising"
+
+
+def test_build_full_history_backfills_every_overlapping_month():
+    # 4 years of growth (sinusoidal-ish via cumulative steps) and steadily
+    # rising CPI so YoY momentum flips sign partway through.
+    n = 48
+    dates = pd.date_range("2020-01-01", periods=n, freq="MS")
+    growth_vals = [100 + 5 * ((-1) ** (i // 6)) * (i % 6) for i in range(n)]
+    growth = pd.DataFrame({"date": dates, "value": growth_vals})
+
+    cpi_vals = [100 * (1.02 ** (i / 12)) * (1 + 0.01 * (i % 5)) for i in range(n)]
+    cpi = pd.DataFrame({"date": dates, "value": cpi_vals})
+
+    series = {"growth_primary": growth, "inflation_primary": cpi}
+    full = build_full_history(series)
+
+    # Growth needs 3 months lookback, inflation needs 12 (YoY) + 3 (momentum) = 15.
+    assert len(full) == n - 15
+    assert set(full["phase"].unique()) <= {"Reflation", "Recovery", "Overheat", "Stagflation"}
+    assert list(full.columns) == [
+        "data_asof", "growth_value", "growth_change_3m", "growth_signal",
+        "inflation_yoy", "inflation_change_3m", "inflation_signal",
+        "phase", "asset", "core_cpi_yoy", "yield_curve_10y2y", "unemployment_rate",
+    ]
+
+    # The last row of the full history must match what read_clock() reports.
+    reading = read_clock(series)
+    last = full.iloc[-1]
+    assert reading.phase["name"] == last["phase"]
+    assert reading.growth.value == last["growth_value"]
+    assert reading.inflation.value == last["inflation_yoy"]

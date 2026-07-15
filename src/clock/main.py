@@ -1,8 +1,9 @@
-"""Entrypoint: fetch -> compute -> store -> render -> report -> notify.
+"""Entrypoint: fetch -> compute full history -> store -> render -> report -> notify.
 
-Run daily (see .github/workflows/daily-clock-report.yml). Safe to re-run
-same-day; storage.append_history replaces today's row instead of
-duplicating it.
+Run daily (see .github/workflows/daily-clock-report.yml). Each run recomputes
+every historical month's reading from FRED's currently published series and
+overwrites data/history.csv, so the first run after this pipeline exists
+backfills the full available history automatically.
 """
 from __future__ import annotations
 
@@ -12,7 +13,7 @@ from pathlib import Path
 import pandas as pd
 
 from . import data_sources, notify, report, storage
-from .model import read_clock
+from .model import build_full_history, read_clock
 from .render import draw_clock, draw_trend_charts
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
@@ -25,9 +26,8 @@ def run(history_path: Path = DEFAULT_HISTORY_PATH, docs_dir: Path = DEFAULT_DOCS
 
     series = data_sources.fetch_all()
     reading = read_clock(series)
-
-    row = storage.reading_to_row(reading, run_date)
-    history = storage.append_history(history_path, row)
+    full_history = build_full_history(series)
+    history = storage.write_full_history(history_path, full_history, run_date)
 
     draw_clock(reading, docs_dir / "clock.png")
     draw_trend_charts(history, docs_dir)
@@ -46,7 +46,8 @@ def run(history_path: Path = DEFAULT_HISTORY_PATH, docs_dir: Path = DEFAULT_DOCS
     )
 
     print(f"Phase: {reading.phase['name']} -> {reading.phase['asset']}")
-    print(f"History rows: {len(history)}; dashboard written to {docs_dir / 'index.html'}")
+    print(f"History rows: {len(history)} (from {history['data_asof'].min()} to {history['data_asof'].max()})")
+    print(f"Dashboard written to {docs_dir / 'index.html'}")
 
 
 def main() -> None:
