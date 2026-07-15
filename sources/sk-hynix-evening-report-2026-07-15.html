@@ -63,6 +63,7 @@
   .pill.unk { color:var(--unk); background:var(--unk-bg); }
   .card p { margin:.4rem 0 0; color:var(--ink-soft); font-size:.92rem; }
   .new { border-left:3px solid var(--accent); }
+  .fixed { border-left:3px solid var(--pos); }
   .table-wrap { overflow-x:auto; border:1px solid var(--border); border-radius:12px; background:var(--surface); box-shadow:var(--shadow); }
   table { width:100%; border-collapse:collapse; font-size:.86rem; }
   th, td { text-align:left; padding:.55rem .8rem; border-bottom:1px solid var(--border); vertical-align:top; }
@@ -79,28 +80,34 @@
   <header>
     <span class="eyebrow">● 저녁 체크 · 2026-07-15</span>
     <h1>SK하이닉스 신규 근거 스캔</h1>
-    <p class="lede">기존 11개 기관 목록 대비 새로 나온 목표가·리포트가 있는지 확인. 오늘은 새 기관 자체보다 "집계 데이터"와 "기존 목표가 재확인"이 핵심.</p>
+    <p class="lede">오늘 아침 체크 이후 새로 나온 목표가·리포트를 확인. 오늘의 핵심은 Barclays 목표가의 원화 환산치가 처음 확인됐다는 것.</p>
   </header>
 
   <section>
-    <h2>오늘 발견한 것</h2>
+    <h2>오늘 새로 발견한 것</h2>
 
     <div class="card new">
-      <div class="card-head"><h3>애그리게이터 기준 37개 기관 컨센서스 확인</h3><span class="pill unk">참고용 — 개별 출처 미확인</span></div>
-      <p>Investing.com 집계 기준 37개 기관 평균 목표가 <strong>339만원</strong>,
-      최고 <strong>530만원</strong>, 최저 <strong>120만원</strong>. "Strong Buy"
-      (매수 36 · 매도 0 · 보유 1). 우리가 이름을 확인한 건 11개뿐이라, 나머지
-      ~26개 기관 중 특히 <strong>최저 120만원</strong>을 제시한 곳이 BNK(185만원)
-      보다도 더 보수적이라는 점이 눈에 띈다 — 어느 기관인지는 아직 특정 못함,
-      다음 체크에서 출처 확인 필요.</p>
+      <div class="card-head"><h3>Barclays $330의 원화 환산치 확인 — 약 490만원</h3><span class="pill pos">신규 — 최고치 갱신</span></div>
+      <p>국내 언론이 Barclays ADR 목표가($330)를 본주 기준으로 환산해 <strong>약
+      490만원</strong>이라고 보도. 이는 지금까지 확인된 목표가 중
+      <strong>가장 높은 수치(KB증권 420만원보다 위)</strong>다. 다만 이건 언론
+      환산치를 그대로 인용한 것으로, ADR 비율·환율을 우리가 직접 재계산해
+      검증한 값은 아니다 — 참고용으로 다루되 과신은 금물.</p>
     </div>
 
     <div class="card new">
-      <div class="card-head"><h3>한국투자증권, 목표가 380만원 재확인</h3><span class="pill pos">유지(신규 아님, 재확인)</span></div>
-      <p>2분기 영업이익이 컨센서스 대비 8% 하회할 것으로 예상하면서도 목표가는
-      그대로 유지 — "하회 이유가 수요 문제가 아니라 HBM 비중발 믹스 효과"라는
-      기존 논리를 재확인한 것. 새 기관은 아니지만, 실적 우려 속에서도 목표가를
-      지켰다는 점에서 강세 컨센서스의 내구성을 보여주는 신호로 기록.</p>
+      <div class="card-head"><h3>KB증권, 목표가 420만원 재확인</h3><span class="pill pos">재확인 (신규 아님)</span></div>
+      <p>"주가 하락은 매수 기회"라는 논조로 420만원 유지. 근거를 "공급부족
+      최소 2028년까지 지속"으로 좀 더 구체화했다.</p>
+    </div>
+
+    <div class="card fixed">
+      <div class="card-head"><h3>정정 — 어제 발견한 "최저 120만원"은 옛날 수치</h3><span class="pill pos">해결됨</span></div>
+      <p>어제 저녁 체크에서 37개 기관 집계 중 최저 120만원을 제시한 미상
+      기관을 다음 확인 과제로 남겨뒀는데, 사용자가 확인해준 바로는 이 값이
+      <strong>AI 반도체 붐 이전의 과거 수치</strong>였다. 애그리게이터가
+      오래된 리포트를 그대로 집계에 남겨둔 것 — 현재 유효한 하단은 여전히
+      BNK투자증권 185만원이다.</p>
     </div>
   </section>
 
@@ -108,12 +115,13 @@
     <h2>기존 11개 기관 대비 변동사항</h2>
     <div class="table-wrap">
       <table>
-        <thead><tr><th>기관</th><th>기존 목표가</th><th>오늘 변동</th></tr></thead>
+        <thead><tr><th>기관</th><th>목표가</th><th>오늘 상태</th></tr></thead>
         <tbody>
-          <tr><td>KB / NH / IBK / SK증권 / 대신 / 한투 / 신한</td><td class="num">380만~420만원</td><td>변동 없음 (한투는 재확인)</td></tr>
-          <tr><td>Barclays</td><td class="num">$330</td><td>변동 없음</td></tr>
+          <tr><td>Barclays</td><td class="num">$330 (원화환산 약 490만원)</td><td>환산치 신규 확인</td></tr>
+          <tr><td>KB증권</td><td class="num">420만원</td><td>재확인("하락은 매수기회")</td></tr>
+          <tr><td>NH / IBK / SK증권 / 대신 / 한투 / 신한</td><td class="num">380만~410만원</td><td>변동 없음</td></tr>
           <tr><td>HSBC</td><td>Top Pick(비공개)</td><td>변동 없음</td></tr>
-          <tr><td>BNK투자증권</td><td class="num">185만원</td><td>변동 없음</td></tr>
+          <tr><td>BNK투자증권</td><td class="num">185만원</td><td>변동 없음 (유효 하단)</td></tr>
           <tr><td>Morningstar</td><td class="num">$160</td><td>변동 없음</td></tr>
         </tbody>
       </table>
@@ -121,10 +129,10 @@
   </section>
 
   <div class="callout">
-    오늘은 새로운 기관의 신규 커버리지 개시는 확인되지 않았다. 다만 "37개 기관
-    중 최저 120만원"이라는 새 데이터 포인트가 나와, BNK(185만원)가 유일한
-    약세 극단이 아닐 수 있다는 단서를 얻었다 — 이 기관을 특정하는 게 다음
-    저녁 체크의 우선 과제.
+    새로운(12번째) 기관의 신규 커버리지 개시는 오늘도 확인되지 않았다. 대신
+    기존 최고치가 KB 420만원 → Barclays 환산 약 490만원으로 갱신됐고, 어제
+    미해결이었던 120만원 미스터리는 해결됐다. 다음 체크 우선순위는 Barclays
+    환산치를 직접 재계산해 검증하는 것.
   </div>
 
   <footer>
