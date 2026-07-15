@@ -8,10 +8,13 @@
 output_formats: [markdown, html, json]
 
 sections:
-  - executive_summary
-  - monthly_key_changes
+  - us_macro_dashboard
+  - us_regime_judgement
   - macro_dashboard
   - regime_judgement
+  - kr_us_comparison
+  - executive_summary
+  - monthly_key_changes
   - indicator_deep_dive
   - personal_analysis
   - asset_impact

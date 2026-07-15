@@ -22,7 +22,7 @@ CORE10_ORDER = [
 ]
 
 
-def _series_trend_change(series_id: str, window: str) -> float | None:
+def series_trend_change(series_id: str, window: str) -> float | None:
     df = collector_base.read_normalized(series_id)
     if df.empty:
         return None
@@ -32,7 +32,7 @@ def _series_trend_change(series_id: str, window: str) -> float | None:
     return tp.change if tp else None
 
 
-def _series_moving_average(series_id: str, periods: int, offset: int = 0) -> float | None:
+def series_moving_average(series_id: str, periods: int, offset: int = 0) -> float | None:
     df = collector_base.read_normalized(series_id)
     if df.empty:
         return None
@@ -66,21 +66,21 @@ def _build_us_global_composite() -> tuple[float | None, dict]:
     detail: dict[str, int] = {}
     signals: list[int] = []
 
-    payroll_change = _series_trend_change("fred_us_nonfarm_payroll", "3m")
+    payroll_change = series_trend_change("fred_us_nonfarm_payroll", "3m")
     if payroll_change is not None:
         s = 1 if payroll_change > 0 else (-1 if payroll_change < 0 else 0)
         signals.append(s)
         detail["payroll_signal"] = s
 
-    unemployment_change = _series_trend_change("fred_us_unemployment", "3m")
+    unemployment_change = series_trend_change("fred_us_unemployment", "3m")
     if unemployment_change is not None:
         s = 1 if unemployment_change < 0 else (-1 if unemployment_change > 0 else 0)
         signals.append(s)
         detail["unemployment_signal"] = s
 
-    cli_change = _series_trend_change("fred_us_oecd_cli", "3m")
+    cli_change = series_trend_change("fred_us_oecd_cli", "3m")
     if cli_change is None:
-        cli_change = _series_trend_change("fred_us_industrial_production", "3m")
+        cli_change = series_trend_change("fred_us_industrial_production", "3m")
     if cli_change is not None:
         s = 1 if cli_change > 0 else (-1 if cli_change < 0 else 0)
         signals.append(s)
@@ -91,7 +91,7 @@ def _build_us_global_composite() -> tuple[float | None, dict]:
     return sum(signals) / len(signals), detail
 
 
-def _score_indicator(key: str, rule_spec: dict, fields: dict, dp: DataPoint) -> IndicatorReading:
+def score_indicator(key: str, rule_spec: dict, fields: dict, dp: DataPoint) -> IndicatorReading:
     reading = IndicatorReading(
         name=key, value=dp.value, status=dp.status, weight=rule_spec["weight"],
         label=rule_spec["label"], source=dp.metadata.source if dp.metadata else None,
@@ -115,18 +115,18 @@ def build_core10_readings() -> dict[str, IndicatorReading]:
     readings: dict[str, IndicatorReading] = {}
 
     dp = ecos.fetch_series("gdp_growth_qoq")
-    readings["gdp"] = _score_indicator("gdp", rules["gdp"], {"qoq": dp.value}, dp)
+    readings["gdp"] = score_indicator("gdp", rules["gdp"], {"qoq": dp.value}, dp)
 
     dp = kosis.fetch_series("industrial_production_index")
     dp, series_id = _with_fred_fallback(dp, "kosis_industrial_production_index", "kr_industrial_production_oecd")
-    mom = _series_trend_change(series_id, "1m")
-    readings["industrial_production"] = _score_indicator(
+    mom = series_trend_change(series_id, "1m")
+    readings["industrial_production"] = score_indicator(
         "industrial_production", rules["industrial_production"], {"mom": mom}, dp
     )
 
     dp = kosis.fetch_series("retail_sales_index")
     if dp.status == DataStatus.OK:
-        mom = _series_trend_change("kosis_retail_sales_index", "1m")
+        mom = series_trend_change("kosis_retail_sales_index", "1m")
     else:
         # kr_retail_sales_mom_oecd is already a MoM% growth series (OECD "GPSAM"),
         # not a level — use its latest value directly instead of trending it.
@@ -138,36 +138,36 @@ def build_core10_readings() -> dict[str, IndicatorReading]:
             dp, mom = fallback_dp, fallback_dp.value
         else:
             mom = None
-    readings["retail_sales"] = _score_indicator("retail_sales", rules["retail_sales"], {"mom": mom}, dp)
+    readings["retail_sales"] = score_indicator("retail_sales", rules["retail_sales"], {"mom": mom}, dp)
 
     exports_points = manual.fetch_exports()
     exp_dp = exports_points["total_exports_yoy"]
-    readings["exports"] = _score_indicator("exports", rules["exports"], {"yoy": exp_dp.value}, exp_dp)
+    readings["exports"] = score_indicator("exports", rules["exports"], {"yoy": exp_dp.value}, exp_dp)
 
     semi_dp = exports_points["semiconductor_exports_yoy"]
-    readings["semiconductor_exports"] = _score_indicator(
+    readings["semiconductor_exports"] = score_indicator(
         "semiconductor_exports", rules["semiconductor_exports"], {"yoy": semi_dp.value}, semi_dp
     )
 
     dp = ecos.fetch_series("current_account")
-    avg3 = _series_moving_average("ecos_current_account", 3)
-    readings["current_account"] = _score_indicator("current_account", rules["current_account"], {"avg_3m": avg3}, dp)
+    avg3 = series_moving_average("ecos_current_account", 3)
+    readings["current_account"] = score_indicator("current_account", rules["current_account"], {"avg_3m": avg3}, dp)
 
     dp = kosis.fetch_series("cpi_index")
     dp, series_id = _with_fred_fallback(dp, "kosis_cpi_index", "kr_cpi_oecd")
-    yoy = _series_trend_change(series_id, "12m")
-    readings["cpi"] = _score_indicator("cpi", rules["cpi"], {"yoy": yoy}, dp)
+    yoy = series_trend_change(series_id, "12m")
+    readings["cpi"] = score_indicator("cpi", rules["cpi"], {"yoy": yoy}, dp)
 
     dp = ecos.fetch_series("ppi_yoy_level")
-    yoy = _series_trend_change("ecos_ppi_yoy_level", "12m")
-    readings["ppi"] = _score_indicator("ppi", rules["ppi"], {"yoy": yoy}, dp)
+    yoy = series_trend_change("ecos_ppi_yoy_level", "12m")
+    readings["ppi"] = score_indicator("ppi", rules["ppi"], {"yoy": yoy}, dp)
 
     dp = kosis.fetch_series("unemployment_rate")
     dp, series_id = _with_fred_fallback(dp, "kosis_unemployment_rate", "kr_unemployment_oecd")
-    avg_now = _series_moving_average(series_id, 3)
-    avg_prior = _series_moving_average(series_id, 3, offset=3)
+    avg_now = series_moving_average(series_id, 3)
+    avg_prior = series_moving_average(series_id, 3, offset=3)
     avg_change = (avg_now - avg_prior) if (avg_now is not None and avg_prior is not None) else None
-    readings["unemployment"] = _score_indicator("unemployment", rules["unemployment"], {"avg_3m_change": avg_change}, dp)
+    readings["unemployment"] = score_indicator("unemployment", rules["unemployment"], {"avg_3m_change": avg_change}, dp)
 
     # Supporting series for regime-signal detection (engine/macro/regime.py) and the
     # Bond/FX personal engines — not Core-10 indicators themselves, but must be

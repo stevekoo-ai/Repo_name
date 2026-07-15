@@ -10,11 +10,11 @@ from core.config import thresholds_config
 from core.models import IndicatorReading
 
 
-def _prev_field(previous_snapshot: dict | None, indicator: str, field: str):
+def _prev_field(previous_snapshot: dict | None, indicator: str, field: str, snapshot_key: str = "macro"):
     if not previous_snapshot:
         return None
     return (
-        previous_snapshot.get("macro", {})
+        previous_snapshot.get(snapshot_key, {})
         .get("readings", {})
         .get(indicator, {})
         .get("fields", {})
@@ -56,6 +56,49 @@ def detect_changes(readings: dict[str, IndicatorReading], previous_snapshot: dic
         delta = ppi_yoy - prev_ppi_yoy
         if delta <= t["ppi_ease_pp"]:
             changes.append({"indicator": "ppi", "message": f"PPI YoY {delta:+.1f}%p 둔화 (완화)",
+                             "direction": "improve", "delta": round(delta, 2)})
+
+    if not changes:
+        changes.append({"indicator": "all", "message": "임계치를 넘는 뚜렷한 변화 없음 (관찰 지속)", "direction": "flat"})
+    return changes
+
+
+def detect_changes_us(readings: dict[str, IndicatorReading], previous_snapshot: dict | None) -> list[dict]:
+    """Same shape as detect_changes(), reused thresholds, US fields/snapshot key."""
+    if not previous_snapshot:
+        return [{"indicator": "all", "message": "이전 스냅샷 없음 — 이번 달이 최초 기록", "direction": "n/a"}]
+
+    t = thresholds_config()["change_detection"]
+    changes: list[dict] = []
+
+    gdp_qoq = readings.get("gdp").detail.get("fields", {}).get("qoq") if "gdp" in readings else None
+    prev_gdp_qoq = _prev_field(previous_snapshot, "gdp", "qoq", "macro_us")
+    if gdp_qoq is not None and prev_gdp_qoq is not None:
+        delta = gdp_qoq - prev_gdp_qoq
+        if abs(delta) >= t["exports_improve_pp"]:
+            direction = "improve" if delta > 0 else "caution"
+            changes.append({"indicator": "gdp", "message": f"미국 GDP 성장률 {delta:+.1f}%p 변화",
+                             "direction": direction, "delta": round(delta, 2)})
+
+    cpi_yoy = readings.get("cpi").detail.get("fields", {}).get("yoy") if "cpi" in readings else None
+    prev_cpi_yoy = _prev_field(previous_snapshot, "cpi", "yoy", "macro_us")
+    if cpi_yoy is not None and prev_cpi_yoy is not None:
+        delta = cpi_yoy - prev_cpi_yoy
+        if delta <= t["cpi_improve_pp"]:
+            changes.append({"indicator": "cpi", "message": f"미국 CPI YoY {delta:+.1f}%p 하락 (개선)",
+                             "direction": "improve", "delta": round(delta, 2)})
+
+    unemployment_change = readings.get("unemployment").detail.get("fields", {}).get("avg_3m_change") if "unemployment" in readings else None
+    if unemployment_change is not None and unemployment_change >= t["unemployment_caution_pp"]:
+        changes.append({"indicator": "unemployment", "message": f"미국 실업률 3개월 평균 {unemployment_change:+.1f}%p 상승 (주의)",
+                         "direction": "caution", "delta": round(unemployment_change, 2)})
+
+    ppi_yoy = readings.get("ppi").detail.get("fields", {}).get("yoy") if "ppi" in readings else None
+    prev_ppi_yoy = _prev_field(previous_snapshot, "ppi", "yoy", "macro_us")
+    if ppi_yoy is not None and prev_ppi_yoy is not None:
+        delta = ppi_yoy - prev_ppi_yoy
+        if delta <= t["ppi_ease_pp"]:
+            changes.append({"indicator": "ppi", "message": f"미국 PPI YoY {delta:+.1f}%p 둔화 (완화)",
                              "direction": "improve", "delta": round(delta, 2)})
 
     if not changes:
