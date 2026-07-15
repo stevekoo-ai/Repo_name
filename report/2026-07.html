@@ -95,6 +95,17 @@ th { color: var(--text-muted); font-weight: 600; font-size: 0.78rem; text-transf
 .btn-fb:hover { border-color: var(--accent); }
 .btn-fb:disabled { opacity: 0.7; cursor: default; }
 .btn-fb-primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+.copy-panel { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5);
+  align-items: center; justify-content: center; z-index: 1000; padding: 16px; }
+.copy-panel-box { background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+  padding: 18px 20px; max-width: 480px; width: 100%; box-shadow: 0 8px 32px rgba(0,0,0,0.3); }
+.copy-panel-box p { margin: 0 0 10px; font-size: 0.9rem; color: var(--text); }
+.copy-panel-box textarea { width: 100%; box-sizing: border-box; padding: 8px 10px; border-radius: 8px;
+  border: 1px solid var(--border); background: var(--surface-2); color: var(--text);
+  font-family: inherit; font-size: 0.82rem; resize: vertical; margin-bottom: 10px; }
+.copy-panel-box a#peos-copy-panel-link { display: none; margin-bottom: 10px; color: var(--accent);
+  font-size: 0.88rem; font-weight: 600; }
+.copy-panel-actions { display: flex; justify-content: flex-end; }
 .action-card { border-radius: 10px; border: 1px solid var(--border); padding: 12px 16px; margin: 8px 0 14px; }
 .action-good { border-left: 4px solid var(--good); }
 .action-warn { border-left: 4px solid var(--warn); }
@@ -759,6 +770,16 @@ footer { color: var(--text-muted); font-size: 0.78rem; text-align: center; paddi
   <footer>PEOS는 공식 데이터와 사용자 자산/목표를 결합해 행동을 제안하는 개인 경제 의사결정 시스템입니다.
   모든 판단은 참고용이며 최종 결정은 사용자에게 있습니다.</footer>
 </div>
+<div id="peos-copy-panel" class="copy-panel">
+  <div class="copy-panel-box">
+    <p id="peos-copy-panel-msg"></p>
+    <textarea id="peos-copy-panel-text" readonly rows="6"></textarea>
+    <a id="peos-copy-panel-link" href="#" target="_blank" rel="noopener">GitHub 이슈 작성 페이지 열기</a>
+    <div class="copy-panel-actions">
+      <button type="button" class="btn-fb" onclick="peosClosePanel()">닫기</button>
+    </div>
+  </div>
+</div>
 <script>
 function peosFindCard(el) { return el.closest('.discuss-card'); }
 
@@ -773,42 +794,73 @@ function peosEntryText(entry) {
   return '### ' + entry.topic + '\n질문: ' + entry.question + '\n답변: ' + entry.answer;
 }
 
-function peosFlash(btn, label) {
-  var orig = btn.textContent;
-  btn.textContent = label;
-  btn.disabled = true;
-  setTimeout(function () { btn.textContent = orig; btn.disabled = false; }, 1600);
+// Some viewers (e.g. a preview rendered inside a sandboxed iframe) block
+// navigator.clipboard, document.execCommand('copy'), window.alert, and
+// window.open outright — silently, with no error thrown. Never rely on any
+// of those alone: always fall back to a plain on-page panel (no dialog API)
+// with the text pre-selected in a visible textarea, so a manual Ctrl+C/Cmd+C
+// always works regardless of what the surrounding page blocks.
+function peosShowPanel(message, text, linkUrl) {
+  var panel = document.getElementById('peos-copy-panel');
+  var msgEl = document.getElementById('peos-copy-panel-msg');
+  var taEl = document.getElementById('peos-copy-panel-text');
+  var linkEl = document.getElementById('peos-copy-panel-link');
+  msgEl.textContent = message;
+  if (text) {
+    taEl.style.display = 'block';
+    taEl.value = text;
+  } else {
+    taEl.style.display = 'none';
+    taEl.value = '';
+  }
+  if (linkUrl) {
+    linkEl.style.display = 'inline-block';
+    linkEl.href = linkUrl;
+  } else {
+    linkEl.style.display = 'none';
+    linkEl.removeAttribute('href');
+  }
+  panel.style.display = 'flex';
+  if (text) {
+    taEl.focus();
+    taEl.select();
+  }
 }
 
-function peosFallbackCopy(text, btn) {
-  var ta = document.createElement('textarea');
-  ta.value = text;
-  ta.style.position = 'fixed';
-  ta.style.opacity = '0';
-  document.body.appendChild(ta);
-  ta.select();
-  try {
-    document.execCommand('copy');
-    peosFlash(btn, '복사됨 ✓');
-  } catch (e) {
-    alert('복사에 실패했습니다. 직접 선택해서 복사해주세요.');
-  }
-  document.body.removeChild(ta);
+function peosClosePanel() {
+  document.getElementById('peos-copy-panel').style.display = 'none';
 }
 
 function peosCopyText(text, btn) {
-  if (navigator.clipboard && navigator.clipboard.writeText) {
-    navigator.clipboard.writeText(text).then(function () {
-      peosFlash(btn, '복사됨 ✓');
-    }, function () { peosFallbackCopy(text, btn); });
-  } else {
-    peosFallbackCopy(text, btn);
+  var copied = false;
+  try {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text);
+      copied = true;
+    }
+  } catch (e) { /* fall through to the manual panel below */ }
+  if (!copied) {
+    try {
+      var ta = document.createElement('textarea');
+      ta.value = text;
+      ta.style.position = 'fixed';
+      ta.style.opacity = '0';
+      document.body.appendChild(ta);
+      ta.select();
+      copied = document.execCommand('copy');
+      document.body.removeChild(ta);
+    } catch (e) { /* still fine — the panel below is the guaranteed path */ }
   }
+  peosShowPanel(
+    copied ? '클립보드에 복사를 시도했습니다. 혹시 붙여넣기가 안 되면, 아래 내용을 직접 선택해서 Ctrl+C(Mac: Cmd+C)로 복사해주세요.'
+           : '이 화면에서는 자동 복사가 막혀 있습니다. 아래 내용이 이미 선택되어 있으니 Ctrl+C(Mac: Cmd+C)로 복사해주세요.',
+    text, null
+  );
 }
 
 function peosCopyOne(btn) {
   var entry = peosBuildEntry(peosFindCard(btn));
-  if (!entry) { alert('먼저 답변을 입력해주세요.'); return; }
+  if (!entry) { peosShowPanel('먼저 답변을 입력해주세요.', null, null); return; }
   peosCopyText(peosEntryText(entry), btn);
 }
 
@@ -821,22 +873,26 @@ function peosCopyAll(btn) {
     var entry = peosBuildEntry(card);
     if (entry) parts.push(peosEntryText(entry));
   });
-  if (!parts.length) { alert('입력한 답변이 없습니다.'); return; }
+  if (!parts.length) { peosShowPanel('입력한 답변이 없습니다.', null, null); return; }
   peosCopyText('PEOS ' + month + ' 리포트 피드백\n\n' + parts.join('\n\n'), btn);
 }
 
 function peosIssueOne(btn) {
   var card = peosFindCard(btn);
   var entry = peosBuildEntry(card);
-  if (!entry) { alert('먼저 답변을 입력해주세요.'); return; }
+  if (!entry) { peosShowPanel('먼저 답변을 입력해주세요.', null, null); return; }
   var section = document.getElementById('discussion-section');
   var repo = section.dataset.repo;
   var month = section.dataset.month;
-  if (!repo) { alert('연결된 GitHub 저장소 정보가 없습니다.'); return; }
+  if (!repo) { peosShowPanel('연결된 GitHub 저장소 정보가 없습니다.', null, null); return; }
   var title = encodeURIComponent('[피드백] ' + month + ' - ' + entry.topic);
   var body = encodeURIComponent('**질문**\n' + entry.question + '\n\n**답변**\n' + entry.answer);
-  window.open('https://github.com/' + repo + '/issues/new?title=' + title + '&body=' + body,
-    '_blank', 'noopener');
+  var url = 'https://github.com/' + repo + '/issues/new?title=' + title + '&body=' + body;
+  var opened = null;
+  try { opened = window.open(url, '_blank', 'noopener'); } catch (e) { /* blocked — fall through */ }
+  if (!opened) {
+    peosShowPanel('이 화면에서는 새 창 열기가 막혀 있습니다. 아래 링크를 눌러 GitHub 이슈 작성 페이지로 이동해주세요.', null, url);
+  }
 }
 </script>
 </body>
