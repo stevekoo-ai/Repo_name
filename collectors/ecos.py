@@ -63,16 +63,19 @@ def _fetch_stat(stat_code: str, cycle: str, item_code1: str, api_key: str,
     return payload["StatisticSearch"].get("row", [])
 
 
+_HISTORY_YEARS = 10
+
+
 def _period_bounds(cycle: str) -> tuple[str, str]:
     today = datetime.utcnow()
     if cycle == "D":
-        return (today.replace(year=today.year - 1)).strftime("%Y%m%d"), today.strftime("%Y%m%d")
+        return (today.replace(year=today.year - _HISTORY_YEARS)).strftime("%Y%m%d"), today.strftime("%Y%m%d")
     if cycle == "M":
-        return (today.replace(year=today.year - 3)).strftime("%Y%m"), today.strftime("%Y%m")
+        return (today.replace(year=today.year - _HISTORY_YEARS)).strftime("%Y%m"), today.strftime("%Y%m")
     if cycle == "Q":
-        y0 = today.year - 3
+        y0 = today.year - _HISTORY_YEARS
         return f"{y0}Q1", f"{today.year}Q{((today.month - 1) // 3) + 1}"
-    return (today.replace(year=today.year - 5)).strftime("%Y"), today.strftime("%Y")
+    return (today.replace(year=today.year - _HISTORY_YEARS)).strftime("%Y"), today.strftime("%Y")
 
 
 def fetch_series(series_key: str) -> DataPoint:

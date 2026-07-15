@@ -11,6 +11,7 @@ import base64
 import html as html_lib
 from pathlib import Path
 
+from core.config import report_config
 from core.models import DataStatus
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
@@ -63,6 +64,38 @@ def _stat_tile(label: str, value: str, sub: str = "", badge: str | None = None) 
       <div class="tile-value">{value}</div>
       {f'<div class="tile-sub">{_esc(sub)}</div>' if sub else ""}
     </div>"""
+
+
+def _sparkline_svg(history: list[dict], years: int, width: int = 176, height: int = 44) -> str:
+    """Self-contained SVG line — single hue (magnitude/trend, not judgment), 2px
+    stroke, rounded ends, direct start/end labels instead of per-point labels,
+    native <title> as the hover layer (no JS chart lib for a table-cell sparkline)."""
+    if len(history) < 2:
+        return f'<span class="muted spark-empty">{years}년 이력 부족</span>'
+    values = [h["value"] for h in history]
+    lo, hi = min(values), max(values)
+    span = (hi - lo) or 1.0
+    pad = 4
+    n = len(values)
+
+    def x(i: int) -> float:
+        return pad + (width - 2 * pad) * i / (n - 1)
+
+    def y(v: float) -> float:
+        return height - pad - (height - 2 * pad) * (v - lo) / span
+
+    points = " ".join(f"{x(i):.1f},{y(v):.1f}" for i, v in enumerate(values))
+    start_date, end_date = history[0]["date"][:7], history[-1]["date"][:7]
+    start_val, end_val = values[0], values[-1]
+    tooltip = _esc(f"{start_date} {start_val:.2f} → {end_date} {end_val:.2f}")
+    return f"""<svg class="spark" viewBox="0 0 {width} {height}" width="{width}" height="{height}"
+      role="img" aria-label="{tooltip}">
+      <title>{tooltip}</title>
+      <polyline points="{points}" fill="none" stroke="var(--accent)" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round"/>
+      <circle cx="{x(n - 1):.1f}" cy="{y(end_val):.1f}" r="2.5" fill="var(--accent)"/>
+    </svg>
+    <div class="spark-labels"><span>{_esc(start_date)}·{start_val:.1f}</span><span>{_esc(end_date)}·{end_val:.1f}</span></div>"""
 
 
 def _clock_image_data_uri() -> str | None:
@@ -139,39 +172,65 @@ def _section_investment_clock(payload: dict) -> str:
 
 
 def _section_macro_dashboard(payload: dict) -> str:
+    has_fallback_note = any(r.get("previous_source") == "series_history" for r in payload["macro_dashboard"])
     rows = "".join(
         f"""<tr>
-          <td>{_esc(r['indicator'])}</td><td>{_fmt(r['current'])}</td><td>{_fmt(r['previous'])}</td>
+          <td>{_esc(r['indicator'])}</td><td>{_fmt(r['current'])}</td>
+          <td>{_fmt(r['previous'])}{' <sup title="전월 리포트 스냅샷이 아직 없어 원자료 이력의 직전 값을 사용">†</sup>' if r.get('previous_source') == 'series_history' else ''}</td>
           <td>{_esc(r['trend'])}</td><td>{_fmt(r['score'])}</td>
+          <td class="spark-cell">{_sparkline_svg(r.get('history') or [], r.get('history_years', 10))}</td>
           <td class="muted">{_esc(r['source'] or STATUS_KR.get(r['status'], r['status']))}</td>
         </tr>""" for r in payload["macro_dashboard"]
     )
+    footnote = ('<p class="tile-sub">† 전월 PEOS 리포트가 아직 쌓이지 않아, 해당 지표는 원자료(공식 통계) 이력의 '
+                '직전 발표값으로 대체 표시했습니다.</p>') if has_fallback_note else ""
     return f"""
     <section class="card">
       <h2>Macro Dashboard</h2>
       <div class="table-wrap"><table>
-        <thead><tr><th>지표</th><th>현재</th><th>이전</th><th>추세</th><th>점수</th><th>출처</th></tr></thead>
+        <thead><tr><th>지표</th><th>현재</th><th>이전</th><th>추세</th><th>점수</th><th>10년 추세</th><th>출처</th></tr></thead>
         <tbody>{rows}</tbody>
       </table></div>
+      {footnote}
     </section>"""
 
 
 def _section_discussion(payload: dict) -> str:
     points = payload.get("discussion_points", [])
+    month = payload["report_month"]
+    github_repo = report_config().get("github_repo", "")
+
     if not points:
         cards = '<p class="tile-sub">이번 달은 별도로 논의가 필요한 항목이 없습니다.</p>'
+        toolbar = ""
     else:
         cards = "".join(f"""
-        <div class="discuss-card">
+        <div class="discuss-card" data-id="{_esc(p['id'])}" data-topic="{_esc(p['topic'])}"
+             data-question="{_esc(p['question'])}">
           <div class="discuss-topic">💬 {_esc(p['topic'])}</div>
           <p class="discuss-context">{_esc(p['context'])}</p>
           <p class="discuss-question">{_esc(p['question'])}</p>
+          <textarea class="discuss-input" rows="3"
+            placeholder="생각을 적어보세요 (선택 사항 — 비워두면 이 항목은 제출/복사에서 빠집니다)"></textarea>
+          <div class="discuss-actions">
+            <button type="button" class="btn-fb" onclick="peosCopyOne(this)">📋 이 답변 복사</button>
+            <button type="button" class="btn-fb" onclick="peosIssueOne(this)">🔗 GitHub Issue로 제출</button>
+          </div>
         </div>""" for p in points)
+        toolbar = """
+        <div class="discuss-toolbar">
+          <button type="button" class="btn-fb btn-fb-primary" onclick="peosCopyAll(this)">
+            📋 작성한 답변 전체 복사</button>
+          <span class="tile-sub">비워둔 항목은 자동으로 제외됩니다. 복사한 내용은 다음 대화에 붙여넣어 주시면
+          반영됩니다. "GitHub Issue로 제출"은 공개 저장소에 남으니, 공개돼도 괜찮은 항목에만 사용해주세요.</span>
+        </div>"""
+
     return f"""
-    <section class="card">
+    <section class="card" id="discussion-section" data-repo="{_esc(github_repo)}" data-month="{_esc(month)}">
       <h2>논의가 필요한 결정 사항</h2>
-      <p class="tile-sub">숫자로 정리되지 않는, 사용자님의 판단이 필요한 지점들입니다. 다음 대화에서
-      답을 주시면 다음 리포트부터 반영합니다.</p>
+      <p class="tile-sub">숫자로 정리되지 않는, 사용자님의 판단이 필요한 지점들입니다. 항목별로 답을
+      적어주시면 다음 리포트부터 반영합니다. 모든 항목에 답하실 필요는 없습니다.</p>
+      {toolbar}
       {cards}
     </section>"""
 
@@ -372,6 +431,11 @@ header.masthead .sub { color: var(--text-muted); font-size: 0.9rem; }
 table { border-collapse: collapse; width: 100%; font-size: 0.88rem; }
 th, td { text-align: left; padding: 7px 10px; border-bottom: 1px solid var(--border); white-space: nowrap; }
 th { color: var(--text-muted); font-weight: 600; font-size: 0.78rem; text-transform: uppercase; letter-spacing: .02em; }
+.spark-cell { white-space: normal; }
+.spark { display: block; }
+.spark-labels { display: flex; justify-content: space-between; font-size: 0.68rem; color: var(--text-muted);
+  width: 176px; }
+.spark-empty { font-size: 0.78rem; }
 .clock-row { display: flex; gap: 18px; align-items: center; flex-wrap: wrap; }
 .clock-img { width: 180px; height: 180px; border-radius: 10px; flex-shrink: 0;
   background: #ffffff; padding: 6px; border: 1px solid var(--border); }
@@ -380,6 +444,19 @@ th { color: var(--text-muted); font-weight: 600; font-size: 0.78rem; text-transf
 .discuss-topic { font-weight: 700; margin-bottom: 4px; }
 .discuss-context { color: var(--text-muted); font-size: 0.88rem; margin: 4px 0; }
 .discuss-question { margin: 6px 0 0; font-size: 0.94rem; }
+.discuss-input { width: 100%; margin-top: 10px; padding: 8px 10px; border-radius: 8px;
+  border: 1px solid var(--border); background: var(--surface); color: var(--text);
+  font-family: inherit; font-size: 0.88rem; resize: vertical; box-sizing: border-box; }
+.discuss-input:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+.discuss-actions { display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap; }
+.discuss-toolbar { display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+  padding: 10px 14px; background: var(--surface-2); border-radius: 10px; margin-bottom: 10px; }
+.btn-fb { font-family: inherit; font-size: 0.82rem; font-weight: 600; padding: 6px 12px;
+  border-radius: 8px; border: 1px solid var(--border); background: var(--surface);
+  color: var(--text); cursor: pointer; }
+.btn-fb:hover { border-color: var(--accent); }
+.btn-fb:disabled { opacity: 0.7; cursor: default; }
+.btn-fb-primary { background: var(--accent); color: #fff; border-color: var(--accent); }
 .action-card { border-radius: 10px; border: 1px solid var(--border); padding: 12px 16px; margin: 8px 0 14px; }
 .action-good { border-left: 4px solid var(--good); }
 .action-warn { border-left: 4px solid var(--warn); }
@@ -395,6 +472,88 @@ th { color: var(--text-muted); font-weight: 600; font-size: 0.78rem; text-transf
 .scenario-prob { color: var(--accent); }
 .scenario-card p { margin: 6px 0; }
 footer { color: var(--text-muted); font-size: 0.78rem; text-align: center; padding-top: 16px; }
+"""
+
+
+_FEEDBACK_JS = """
+function peosFindCard(el) { return el.closest('.discuss-card'); }
+
+function peosBuildEntry(card) {
+  var ta = card.querySelector('textarea');
+  var val = (ta.value || '').trim();
+  if (!val) return null;
+  return { topic: card.dataset.topic, question: card.dataset.question, answer: val };
+}
+
+function peosEntryText(entry) {
+  return '### ' + entry.topic + '\\n질문: ' + entry.question + '\\n답변: ' + entry.answer;
+}
+
+function peosFlash(btn, label) {
+  var orig = btn.textContent;
+  btn.textContent = label;
+  btn.disabled = true;
+  setTimeout(function () { btn.textContent = orig; btn.disabled = false; }, 1600);
+}
+
+function peosFallbackCopy(text, btn) {
+  var ta = document.createElement('textarea');
+  ta.value = text;
+  ta.style.position = 'fixed';
+  ta.style.opacity = '0';
+  document.body.appendChild(ta);
+  ta.select();
+  try {
+    document.execCommand('copy');
+    peosFlash(btn, '복사됨 ✓');
+  } catch (e) {
+    alert('복사에 실패했습니다. 직접 선택해서 복사해주세요.');
+  }
+  document.body.removeChild(ta);
+}
+
+function peosCopyText(text, btn) {
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(function () {
+      peosFlash(btn, '복사됨 ✓');
+    }, function () { peosFallbackCopy(text, btn); });
+  } else {
+    peosFallbackCopy(text, btn);
+  }
+}
+
+function peosCopyOne(btn) {
+  var entry = peosBuildEntry(peosFindCard(btn));
+  if (!entry) { alert('먼저 답변을 입력해주세요.'); return; }
+  peosCopyText(peosEntryText(entry), btn);
+}
+
+function peosCopyAll(btn) {
+  var section = document.getElementById('discussion-section');
+  var month = section.dataset.month;
+  var cards = section.querySelectorAll('.discuss-card');
+  var parts = [];
+  cards.forEach(function (card) {
+    var entry = peosBuildEntry(card);
+    if (entry) parts.push(peosEntryText(entry));
+  });
+  if (!parts.length) { alert('입력한 답변이 없습니다.'); return; }
+  peosCopyText('PEOS ' + month + ' 리포트 피드백\\n\\n' + parts.join('\\n\\n'), btn);
+}
+
+function peosIssueOne(btn) {
+  var card = peosFindCard(btn);
+  var entry = peosBuildEntry(card);
+  if (!entry) { alert('먼저 답변을 입력해주세요.'); return; }
+  var section = document.getElementById('discussion-section');
+  var repo = section.dataset.repo;
+  var month = section.dataset.month;
+  if (!repo) { alert('연결된 GitHub 저장소 정보가 없습니다.'); return; }
+  var title = encodeURIComponent('[피드백] ' + month + ' - ' + entry.topic);
+  var body = encodeURIComponent('**질문**\\n' + entry.question + '\\n\\n**답변**\\n' + entry.answer);
+  window.open('https://github.com/' + repo + '/issues/new?title=' + title + '&body=' + body,
+    '_blank', 'noopener');
+}
 """
 
 
@@ -438,5 +597,6 @@ def render_html(payload: dict) -> str:
   <footer>PEOS는 공식 데이터와 사용자 자산/목표를 결합해 행동을 제안하는 개인 경제 의사결정 시스템입니다.
   모든 판단은 참고용이며 최종 결정은 사용자에게 있습니다.</footer>
 </div>
+<script>{_FEEDBACK_JS}</script>
 </body>
 </html>"""

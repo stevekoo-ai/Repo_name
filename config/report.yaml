@@ -37,3 +37,14 @@ calendar_importance_labels:
 scenario_labels: [base, bull, bear]
 
 output_dir: "report"
+
+# Macro Dashboard trend sparklines (13.x follow-up: raw indicators must show
+# a long enough history to make "직전 대비" meaningful even before multiple
+# monthly PEOS snapshots exist).
+trend_history_years: 10
+
+# Used to build "GitHub Issue로 제출" links in the HTML report's Discussion
+# Points section (engine/report/html.py). Public repo — only non-sensitive
+# feedback should go through this path; the "복사하기" buttons are the
+# private alternative (paste into chat instead).
+github_repo: "stevekoo-ai/Repo_name"

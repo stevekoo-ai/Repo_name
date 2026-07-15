@@ -62,13 +62,37 @@ def test_full_pipeline_produces_a_readable_report():
 
     assert isinstance(payload["discussion_points"], list)
     for point in payload["discussion_points"]:
-        assert point["topic"] and point["context"] and point["question"]
+        assert point["id"] and point["topic"] and point["context"] and point["question"]
 
     html_doc = render_html(payload)
     assert html_doc.startswith("<!doctype html>")
     assert html_doc.count("<section") == html_doc.count("</section>")
     for heading in ("Executive Summary", "Macro Dashboard", "Action Plan", "논의가 필요한 결정 사항"):
         assert heading in html_doc
+
+
+def test_macro_dashboard_renders_10y_trend_and_feedback_ui(tmp_path):
+    import collectors.base as collector_base
+
+    # Simulate 10 years of monthly GDP history already sitting in the
+    # normalized tier (as it would after collectors/ecos.py's widened
+    # 10-year fetch window runs against a live API), independent of whether
+    # a prior monthly PEOS snapshot exists.
+    dates = pd.date_range("2016-07-01", periods=40, freq="QS")
+    rows = [{"date": d.strftime("%Y-%m-%d"), "value": 1.0 + i * 0.05} for i, d in enumerate(dates)]
+    collector_base.append_normalized("ecos_gdp_growth_qoq", rows)
+
+    payload = payload_mod.build_report_payload(month_key="1999-03")
+
+    gdp_row = next(r for r in payload["macro_dashboard"] if r["indicator"] == "실질 GDP 성장률")
+    assert len(gdp_row["history"]) >= 2
+    assert gdp_row["previous"] is not None
+    assert gdp_row["previous_source"] == "series_history"
+
+    html_doc = render_html(payload)
+    assert 'class="spark"' in html_doc
+    assert 'class="discuss-input"' in html_doc or "이번 달은 별도로 논의가 필요한 항목이 없습니다" in html_doc
+    assert "peosCopyOne" in html_doc and "peosIssueOne" in html_doc and "peosCopyAll" in html_doc
 
 
 def test_pipeline_marks_missing_indicators_as_pending_not_guessed():
