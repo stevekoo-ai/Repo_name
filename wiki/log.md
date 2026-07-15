@@ -24,3 +24,4 @@ Append-only. Newest entry at the bottom. See `../CLAUDE.md` for format.
 2026-07-15 00:00 UTC — INGEST sources/websearch-sk-hynix-daily-check-2026-07-15.md (수동 데모 실행, 아침+저녁 통합) → updated concepts/sk-hynix-analyst-thesis-checkpoints.md (스코어보드 9개 항목 갱신, 37개 기관 집계·최저 120만원 발견) — 아침/저녁 HTML 리포트 Artifact 최초 발행
 2026-07-15 00:00 UTC — INGEST sources/sk-hynix-morning-report-2026-07-15.html, sources/sk-hynix-evening-report-2026-07-15.html (발행된 리포트를 RAW로 역보관) → updated concepts/sk-hynix-analyst-thesis-checkpoints.md (자동화 섹션에 리포트 아카이빙 관행 명시, Sources 갱신)
 2026-07-15 00:00 UTC — 빅테크 실적 발표일(알파벳7/22, 메타·MS 7/29, 아마존 7/30) .ics 캘린더 파일 생성해 사용자에게 전달, 직전 CapEx 가이던스·관전포인트 포함 → updated concepts/sk-hynix-analyst-thesis-checkpoints.md (체크포인트 ③에 확인 일정 추가)
+2026-07-15 00:00 UTC — INGEST sources/sk-hynix-120man-clarification-2026-07-15.md → updated concepts/sk-hynix-analyst-thesis-checkpoints.md (120만원은 AI붐 이전 과거 수치로 정정, 유효 목표가 하단은 BNK 185만원으로 확정, 체크리스트에서 제외)
