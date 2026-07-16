@@ -80,6 +80,19 @@ TSMC 2분기 실적이 15:00 KST 컨퍼런스콜에서 발표됨: **매출 396.2
 확정 전까지 어느 것도 확신할 수 없는 상태. 상세는
 [sources/websearch-sk-hynix-tsmc-current-2026-07-16.md](../../sources/websearch-sk-hynix-tsmc-current-2026-07-16.md).
 
+### 저녁 마감 — 신규 약세 기관 3곳, 금리 인상 확정 (2026-07-16)
+
+종가 -10.69%(약 1,859,500원), ADR -9.00%($176.46)로 마감 — 오후 내내 낙폭
+유지. **한국은행 기준금리 2.50%→2.75% 인상 확정**(3년 6개월 만).
+
+저녁 체크에서 **신규 기관 3곳**을 확인: **미래에셋증권**(420만원 유지하되
+2Q 영업이익 추정 -12% 하향), **UBS**(320만원·매수이나 "ADR 매수·본주 매도"
+페어트레이드 권고), **모건스탠리**(메모리 지표 개선 정점 근접·하이퍼스케일러
+투자둔화 우려, 구체 수치 미확인). 키움증권은 삼성전자만 하향 확인, SK하이닉스향
+수치는 미확인. "반도체 피크아웃" 우려가 여러 매체에서 동시 제기되는 분위기.
+상세는
+[목표주가 근거 체크리스트](../concepts/sk-hynix-analyst-thesis-checkpoints.md).
+
 ## 다음에 볼 것
 
 - 2,122,000~2,143,000원대 위에서 지지되는지
@@ -112,4 +125,5 @@ TSMC 2분기 실적이 15:00 KST 컨퍼런스콜에서 발표됨: **매출 396.2
 - [sources/websearch-sk-hynix-pullback-2026-07-15.md](../../sources/websearch-sk-hynix-pullback-2026-07-15.md)
 - [sources/websearch-sk-hynix-morning-check-2026-07-16.md](../../sources/websearch-sk-hynix-morning-check-2026-07-16.md)
 - [sources/websearch-sk-hynix-crash-2026-07-16.md](../../sources/websearch-sk-hynix-crash-2026-07-16.md)
-- [sources/websearch-sk-hynix-tsmc-current-2026-07-16.md](../../sources/websearch-sk-hynix-tsmc-current-2026-07-16.md) (최신 상태 근거; 그 외 원본 소스는 위 히스토리 각 페이지의 Sources 참고)
+- [sources/websearch-sk-hynix-tsmc-current-2026-07-16.md](../../sources/websearch-sk-hynix-tsmc-current-2026-07-16.md)
+- [sources/websearch-sk-hynix-evening-check-2026-07-16.md](../../sources/websearch-sk-hynix-evening-check-2026-07-16.md) (최신 상태 근거; 그 외 원본 소스는 위 히스토리 각 페이지의 Sources 참고)
