@@ -6,139 +6,242 @@
     <title>PEOS 월간 리포트 - 2026-07</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
+
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background: linear-gradient(135deg, #0F172A 0%, #1E293B 100%);
-            color: #E2E8F0;
-            line-height: 1.6;
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+            background: linear-gradient(135deg, #0A0E27 0%, #16213E 50%, #0F3460 100%);
+            color: #E8EEF5;
+            line-height: 1.7;
             min-height: 100vh;
+            position: relative;
         }
-        .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background:
+                radial-gradient(circle at 20% 50%, rgba(16, 185, 129, 0.05) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(59, 130, 246, 0.05) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
         .header {
             text-align: center;
-            padding: 40px 20px;
-            background: rgba(15, 23, 42, 0.5);
-            border-bottom: 2px solid #334155;
-            margin-bottom: 40px;
+            padding: 60px 40px;
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.08) 0%, rgba(59, 130, 246, 0.08) 100%);
+            border-radius: 20px;
+            margin-bottom: 50px;
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            backdrop-filter: blur(20px);
         }
-        .header h1 { font-size: 2.5em; margin-bottom: 10px; color: #F1F5F9; }
-        .header p { color: #CBD5E1; font-size: 1.1em; }
-        .header .date { color: #94A3B8; margin-top: 10px; }
 
-        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-bottom: 40px; }
-        .card {
-            background: rgba(30, 41, 59, 0.8);
-            border: 1px solid #334155;
-            border-radius: 12px;
-            padding: 30px;
-            backdrop-filter: blur(10px);
-            transition: all 0.3s ease;
+        .header h1 {
+            font-size: 3.2em;
+            margin-bottom: 15px;
+            color: #F1F5F9;
+            font-weight: 700;
+            letter-spacing: -0.5px;
         }
-        .card:hover { border-color: #475569; transform: translateY(-2px); }
-        .card h2 { font-size: 1.5em; margin-bottom: 20px; color: #F1F5F9; border-bottom: 2px solid #334155; padding-bottom: 15px; }
+
+        .header p {
+            color: #A0AEC0;
+            font-size: 1.3em;
+            font-weight: 300;
+        }
+
+        .header .date {
+            color: #7C8BA3;
+            margin-top: 15px;
+            font-size: 1em;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            margin-bottom: 50px;
+        }
+
+        .card {
+            background: rgba(20, 33, 61, 0.6);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            border-radius: 16px;
+            padding: 40px;
+            backdrop-filter: blur(20px);
+            transition: all 0.4s cubic-bezier(0.23, 1, 0.320, 1);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .card:hover {
+            border-color: rgba(16, 185, 129, 0.5);
+            transform: translateY(-8px);
+            box-shadow: 0 16px 48px rgba(16, 185, 129, 0.2);
+        }
+
+        .card h2 {
+            font-size: 1.6em;
+            margin-bottom: 25px;
+            color: #F1F5F9;
+            border-bottom: 2px solid rgba(16, 185, 129, 0.3);
+            padding-bottom: 20px;
+            font-weight: 600;
+        }
 
         .metric {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 12px 0;
-            border-bottom: 1px solid #334155;
+            padding: 16px 0;
+            border-bottom: 1px solid rgba(148, 163, 184, 0.1);
         }
+
         .metric:last-child { border-bottom: none; }
-        .metric-label { color: #CBD5E1; }
-        .metric-value { font-size: 1.3em; font-weight: 600; }
+
+        .metric-label {
+            color: #A0AEC0;
+            font-weight: 500;
+        }
+
+        .metric-value {
+            font-size: 1.4em;
+            font-weight: 700;
+            background: linear-gradient(135deg, #10B981, #6EE7B7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
 
         .score-display {
             text-align: center;
-            padding: 20px;
-            background: rgba(0, 0, 0, 0.3);
-            border-radius: 10px;
-            margin: 20px 0;
+            padding: 35px;
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(59, 130, 246, 0.1) 100%);
+            border-radius: 16px;
+            margin: 25px 0;
+            border: 1px solid rgba(16, 185, 129, 0.2);
         }
+
         .score-number {
-            font-size: 3em;
-            font-weight: bold;
-            color: #10B981;
-            text-shadow: 0 0 20px rgba(16, 185, 129, 0.5);
+            font-size: 3.5em;
+            font-weight: 800;
+            background: linear-gradient(135deg, #10B981, #6EE7B7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 0 30px rgba(16, 185, 129, 0.3);
         }
-        .score-text { font-size: 1.2em; color: #CBD5E1; margin-top: 10px; }
+
+        .score-text {
+            font-size: 1.3em;
+            color: #A0AEC0;
+            margin-top: 12px;
+            font-weight: 600;
+        }
 
         .state-badge {
             display: inline-block;
-            padding: 8px 16px;
-            background-color: #10B981;
+            padding: 10px 20px;
+            background: linear-gradient(135deg, #10B981, #059669);
             color: white;
-            border-radius: 20px;
-            font-weight: 600;
-            margin-top: 10px;
+            border-radius: 50px;
+            font-weight: 700;
+            margin-top: 15px;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+            letter-spacing: 0.5px;
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
-            margin: 20px 0;
+            margin: 25px 0;
         }
+
         th {
-            background: rgba(51, 65, 85, 0.5);
-            padding: 12px;
+            background: rgba(16, 185, 129, 0.1);
+            padding: 15px;
             text-align: left;
-            font-weight: 600;
-            border-bottom: 2px solid #475569;
+            font-weight: 700;
+            border-bottom: 2px solid rgba(16, 185, 129, 0.3);
             color: #F1F5F9;
+            letter-spacing: 0.3px;
         }
+
         td {
-            padding: 12px;
-            border-bottom: 1px solid #334155;
+            padding: 15px;
+            border-bottom: 1px solid rgba(148, 163, 184, 0.1);
         }
-        tr:hover { background-color: rgba(51, 65, 85, 0.3); }
+
+        tr:hover {
+            background-color: rgba(16, 185, 129, 0.08);
+            transition: background-color 0.2s ease;
+        }
 
         .portfolio-section {
-            background: rgba(51, 65, 85, 0.2);
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.08) 0%, rgba(16, 185, 129, 0.08) 100%);
             border-left: 4px solid #3B82F6;
-            padding: 20px;
-            margin: 20px 0;
-            border-radius: 6px;
+            padding: 25px;
+            margin: 25px 0;
+            border-radius: 12px;
+            border: 1px solid rgba(59, 130, 246, 0.2);
         }
 
         .action-box {
-            background: rgba(239, 68, 68, 0.1);
-            border: 2px solid #EF4444;
-            padding: 20px;
-            border-radius: 8px;
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.08) 0%, rgba(239, 68, 68, 0.04) 100%);
+            border: 2px solid rgba(239, 68, 68, 0.3);
+            padding: 25px;
+            border-radius: 12px;
             margin: 15px 0;
+            transition: all 0.3s ease;
+        }
+
+        .action-box:hover {
+            border-color: rgba(239, 68, 68, 0.5);
+            box-shadow: 0 8px 24px rgba(239, 68, 68, 0.15);
         }
 
         .action-box.green {
-            background: rgba(16, 185, 129, 0.1);
-            border-color: #10B981;
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.08) 0%, rgba(16, 185, 129, 0.04) 100%);
+            border-color: rgba(16, 185, 129, 0.4);
+        }
+
+        .action-box.green:hover {
+            border-color: rgba(16, 185, 129, 0.6);
+            box-shadow: 0 8px 24px rgba(16, 185, 129, 0.15);
         }
 
         .action-box.yellow {
-            background: rgba(245, 158, 11, 0.1);
-            border-color: #F59E0B;
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.08) 0%, rgba(245, 158, 11, 0.04) 100%);
+            border-color: rgba(245, 158, 11, 0.4);
         }
 
-        .tag {
-            display: inline-block;
-            padding: 4px 12px;
-            background: rgba(59, 130, 246, 0.2);
-            border: 1px solid #3B82F6;
-            border-radius: 4px;
-            font-size: 0.9em;
-            margin: 4px 4px 4px 0;
-            color: #93C5FD;
+        .action-box.yellow:hover {
+            border-color: rgba(245, 158, 11, 0.6);
+            box-shadow: 0 8px 24px rgba(245, 158, 11, 0.15);
         }
 
         .footer {
             text-align: center;
-            padding: 20px;
+            padding: 30px;
             color: #64748B;
-            border-top: 1px solid #334155;
-            margin-top: 40px;
+            border-top: 1px solid rgba(148, 163, 184, 0.1);
+            margin-top: 60px;
+            font-size: 0.95em;
         }
 
         @media (max-width: 900px) {
-            .grid-2 { grid-template-columns: 1fr; }
+            .grid-2 { grid-template-columns: 1fr; gap: 30px; }
+            .header h1 { font-size: 2.2em; }
+            .card { padding: 25px; }
         }
     </style>
 </head>
