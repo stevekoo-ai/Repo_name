@@ -1,0 +1,186 @@
+<title>SK하이닉스 아침 체크 — 2026-07-17</title>
+<style>
+  :root {
+    --bg: #f4f5f1; --surface: #ffffff; --surface-2: #eaebe3;
+    --ink: #1e221d; --ink-soft: #565b4e; --ink-faint: #8b9084;
+    --accent: #2f6b5e; --accent-ink: #143a32; --accent-soft: #dce8e2;
+    --border: #d8d9cf;
+    --pos: #2f6b3f; --pos-bg: #e3ecdd;
+    --neu: #96660f; --neu-bg: #f3e8d2;
+    --neg: #a53f3f; --neg-bg: #f4dede;
+    --unk: #6b7066; --unk-bg: #e7e8e1;
+    --shadow: 0 1px 2px rgba(30,34,29,.06), 0 8px 24px -12px rgba(30,34,29,.18);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #14170f; --surface: #1b201a; --surface-2: #212820;
+      --ink: #e9ece4; --ink-soft: #a9ae9e; --ink-faint: #6e7367;
+      --accent: #74c6ae; --accent-ink: #eaf7f2; --accent-soft: #223730;
+      --border: #303830;
+      --pos: #8fd19f; --pos-bg: #1f3324;
+      --neu: #e3b869; --neu-bg: #3a2f18;
+      --neg: #e79b9b; --neg-bg: #3a2222;
+      --unk: #9aa093; --unk-bg: #262b23;
+      --shadow: 0 1px 2px rgba(0,0,0,.4), 0 8px 24px -12px rgba(0,0,0,.6);
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #14170f; --surface: #1b201a; --surface-2: #212820;
+    --ink: #e9ece4; --ink-soft: #a9ae9e; --ink-faint: #6e7367;
+    --accent: #74c6ae; --accent-ink: #eaf7f2; --accent-soft: #223730;
+    --border: #303830;
+    --pos: #8fd19f; --pos-bg: #1f3324;
+    --neu: #e3b869; --neu-bg: #3a2f18;
+    --neg: #e79b9b; --neg-bg: #3a2222;
+    --unk: #9aa093; --unk-bg: #262b23;
+  }
+  :root[data-theme="light"] {
+    --bg: #f4f5f1; --surface: #ffffff; --surface-2: #eaebe3;
+    --ink: #1e221d; --ink-soft: #565b4e; --ink-faint: #8b9084;
+    --accent: #2f6b5e; --accent-ink: #143a32; --accent-soft: #dce8e2;
+    --border: #d8d9cf;
+    --pos: #2f6b3f; --pos-bg: #e3ecdd;
+    --neu: #96660f; --neu-bg: #f3e8d2;
+    --neg: #a53f3f; --neg-bg: #f4dede;
+    --unk: #6b7066; --unk-bg: #e7e8e1;
+  }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--ink); font-family:-apple-system,"Apple SD Gothic Neo","Pretendard","Noto Sans KR",system-ui,sans-serif; line-height:1.65; }
+  .wrap { max-width:52rem; margin:0 auto; padding:2.5rem 1.5rem 5rem; }
+  header { margin-bottom:2rem; }
+  .eyebrow { display:inline-flex; align-items:center; gap:.4rem; font-family:ui-monospace,"SFMono-Regular",Menlo,Consolas,monospace; font-size:.72rem; letter-spacing:.06em; text-transform:uppercase; color:var(--accent-ink); background:var(--accent-soft); border-radius:999px; padding:.28rem .7rem; margin-bottom:1rem; }
+  h1 { font-size:clamp(1.6rem,4.5vw,2.15rem); font-weight:800; letter-spacing:-.01em; margin:0 0 .5rem; text-wrap:balance; }
+  .lede { color:var(--ink-soft); margin:0; font-size:1rem; }
+  .snapshot { display:grid; grid-template-columns:repeat(auto-fit,minmax(9.5rem,1fr)); gap:.9rem; margin:1.75rem 0; }
+  .stat { background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:1rem 1.1rem; box-shadow:var(--shadow); }
+  .stat .label { font-size:.72rem; color:var(--ink-faint); text-transform:uppercase; letter-spacing:.05em; margin-bottom:.35rem; }
+  .stat .value { font-family:ui-monospace,"SFMono-Regular",Menlo,Consolas,monospace; font-size:1.2rem; font-weight:700; font-variant-numeric:tabular-nums; }
+  .stat .sub { font-size:.8rem; margin-top:.2rem; }
+  .down { color:var(--neg); } .up { color: var(--pos); } .flat { color: var(--unk); }
+  section { margin-bottom:2.25rem; }
+  h2 { font-size:1.15rem; font-weight:800; margin:0 0 .9rem; }
+  .card { background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:1.25rem 1.4rem; box-shadow:var(--shadow); margin-bottom:.9rem; }
+  .card-head { display:flex; align-items:center; justify-content:space-between; gap:1rem; margin-bottom:.5rem; flex-wrap:wrap; }
+  .card h3 { margin:0; font-size:1rem; font-weight:700; }
+  .card p { margin:.4rem 0 0; color:var(--ink-soft); font-size:.9rem; }
+  .pill { display:inline-flex; align-items:center; gap:.35rem; font-size:.75rem; font-weight:700; padding:.25rem .6rem; border-radius:999px; white-space:nowrap; }
+  .pill.pos { color:var(--pos); background:var(--pos-bg); }
+  .pill.neu { color:var(--neu); background:var(--neu-bg); }
+  .pill.neg { color:var(--neg); background:var(--neg-bg); }
+  .pill.unk { color:var(--unk); background:var(--unk-bg); }
+  .new { border-left:3px solid var(--accent); }
+  .table-wrap { overflow-x:auto; border:1px solid var(--border); border-radius:12px; background:var(--surface); box-shadow:var(--shadow); }
+  table { width:100%; border-collapse:collapse; font-size:.85rem; }
+  th, td { text-align:left; padding:.55rem .75rem; border-bottom:1px solid var(--border); vertical-align:top; }
+  th { font-size:.66rem; text-transform:uppercase; letter-spacing:.05em; color:var(--ink-faint); }
+  tr:last-child td { border-bottom:none; }
+  td.num { font-variant-numeric:tabular-nums; text-align:right; white-space:nowrap; }
+  .callout { border-left:3px solid var(--accent); background:var(--accent-soft); color:var(--ink); border-radius:0 10px 10px 0; padding:.9rem 1.1rem; font-size:.88rem; }
+  a { color:var(--accent-ink); } @media (prefers-color-scheme:dark){ a{ color:var(--accent);} }
+  footer { margin-top:3rem; padding-top:1.25rem; border-top:1px solid var(--border); color:var(--ink-faint); font-size:.82rem; }
+</style>
+
+<div class="wrap">
+  <header>
+    <span class="eyebrow">● 아침 체크 · 2026-07-17</span>
+    <h1>실적발표일 7/29 사실상 확정 + LTA·중국산DRAM 신호 갱신</h1>
+    <p class="lede">장 시작 전 체크포인트 9개 재점검. 어제 저녁 리포트 대비 새로 확인된 것 3가지를 먼저 정리.</p>
+  </header>
+
+  <div class="snapshot">
+    <div class="stat"><div class="label">본주 (전일 종가)</div><div class="value">1,859,500<span style="font-size:.65rem;">원</span></div><div class="sub down">-10.69%(7/16)</div></div>
+    <div class="stat"><div class="label">ADR (최근 확인 종가)</div><div class="value">$176.46</div><div class="sub unk">7/15 세션 · 이후 미확인</div></div>
+    <div class="stat"><div class="label">2Q 실적 발표일</div><div class="value">7/29</div><div class="sub">사실상 확정(매체 교차확인)</div></div>
+  </div>
+
+  <section>
+    <h2>🆕 어제 저녁 리포트 대비 새로 추가된 것</h2>
+
+    <div class="card new">
+      <div class="card-head"><h3>실적 발표일 — 7/29로 수렴</h3><span class="pill pos">사실상 확정</span></div>
+      <p>그동안 7/22·23·29 세 후보가 혼재했으나, 복수의 독립 매체가 동일하게
+      "7월 29일 오전 9시 컨퍼런스콜"로 보도 — <strong>메타·마이크로소프트와
+      같은 날</strong>로 재확인됐다. 다만 KIND 공식 공시로 최종 확인된 것은
+      아니다.</p>
+    </div>
+
+    <div class="card new">
+      <div class="card-head"><h3>LTA — 가격 상한선 없음</h3><span class="pill pos">긍정 강화</span></div>
+      <p>SK하이닉스의 장기공급계약(LTA)에는 <strong>가격 상한선이 없다</strong>는
+      점이 확인됨 — 마이크론 등 경쟁사는 상한선을 두는 것과 대비되는 유일한
+      구조. 가격이 계속 오르면 이익 상방이 경쟁사보다 더 크게 열려있다는 의미.</p>
+    </div>
+
+    <div class="card new">
+      <div class="card-head"><h3>중국산 DRAM — 텐센트 공급계약</h3><span class="pill neg">주의로 상향</span></div>
+      <p>CXMT가 텐센트에 <strong>약 4.5조원 규모 서버 D램 공급계약</strong>을
+      체결한 것으로 확인 — 기존 "테스트·소규모" 단계를 넘어 대형 CSP향
+      실공급계약이 처음 포착됐다. HBM 등 최선단 기술 격차(2~3년)는 여전하나,
+      범용 서버 D램 영역의 잠식 시작 신호로 볼 수 있다.</p>
+    </div>
+
+    <div class="card">
+      <div class="card-head"><h3>빅테크 CapEx</h3><span class="pill unk">교차신호, 미확정</span></div>
+      <p>메리츠증권은 "AI 매출이 감가상각을 앞질러 CapEx 축소 압력이
+      낮아졌다"고 분석(긍정)한 반면, 블룸버그는 "AI 투자 흐름이 핵심 신호를
+      잃어가고 있다"고 보도(부정) — 방향은 여전히 미확정. 7/22·29·30 빅테크
+      실적이 최종 확인 시점이라는 기존 결론 유지.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2>🚀 목표가와 상승 모멘텀</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>구간</th><th>목표가</th><th>현재가 대비</th></tr></thead>
+        <tbody>
+          <tr><td>강세 클러스터(KB·미래에셋 등 7개사)</td><td class="num">380만~420만원</td><td class="num up">+104%~+126%</td></tr>
+          <tr><td>Barclays(원화 환산, 언론 보도치)</td><td class="num">약 490만원</td><td class="num up">+163%</td></tr>
+          <tr><td>UBS</td><td class="num">320만원</td><td class="num up">+72%</td></tr>
+          <tr><td>BNK투자증권(약세)</td><td class="num">185만원</td><td class="num down">-0.5% (사실상 도달)</td></tr>
+          <tr><td>Morningstar(ADR, $160)</td><td class="num">$176.46 대비</td><td class="num down">-9.3%(이미 하회)</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p style="color:var(--ink-soft); font-size:.85rem; margin-top:.6rem;">※ "현재가 대비"는 본주 전일 종가 1,859,500원(7/16) 기준 계산. <strong>BNK의 약세 목표가(185만원)는 어제 급락으로 사실상 이미 도달한 수준</strong>이라는 점이 눈에 띈다 — 시장이 이미 상당한 비관을 가격에 반영했다는 뜻일 수 있다.</p>
+  </section>
+
+  <section>
+    <h2>💡 실적·성장률 전망</h2>
+    <div class="card">
+      <p>시장 컨센서스: 2Q 매출 약 83조~84.6조원, 영업이익 약 64조~64.8조원,
+      영업이익률(OPM) 약 76~80%(1분기 72%에서 상승 전망). 전년 동기 대비
+      영업이익 <strong>약 +650%</strong>. 미래에셋증권은 2Q 영업이익 추정을
+      70.7조→62.3조(-12%)로 하향했으나 목표가(420만원)는 유지 — 실적
+      컨센서스가 낮아지는 조짐은 있지만 아직 훼손 단계는 아님. 발표일은
+      7/29로 사실상 확정.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2>📈 기술적 신호와 리스크</h2>
+    <div class="card">
+      <p><strong>52주 고점 3,002,000원(2026-06-23 실측)</strong> 대비 전일
+      종가(1,859,500원)는 <strong class="down">약 -38.1%</strong> — 어제
+      급락으로 고점 대비 낙폭이 기존 -29~30%에서 더 벌어졌다. ADR은 고점
+      $195.67 대비 최근 확인 종가($176.46) 기준 -9.8%(단, 7/16 세션 결과는
+      미확인 상태 — 10:00 장초반 체크에서 갱신 예정). ADR 프리미엄은 7/16
+      계산치(약 30.7%, "높음·중립") 그대로이며 오늘 아침 새 페어 데이터는
+      확보하지 못함.</p>
+    </div>
+  </section>
+
+  <div class="callout">
+    <strong>🧭 한줄 진단</strong> — 강세론의 기초 체력(LTA 상한 없음, 실적
+    발표일 확정으로 불확실성 축소)은 오히려 보강됐지만, 중국산 DRAM의 대형
+    CSP향 실공급이라는 새 리스크도 동시에 등장했다. 무엇보다 현재가가 이미
+    BNK의 약세 목표가에 근접해 있다는 점은 시장이 상당한 비관을 가격에
+    반영했다는 신호로 읽을 수 있다 — 투자 조언 아님, 판단은 각자의 몫.
+  </div>
+
+  <footer>
+    이 리포트는 아침 07:00(KST) Routine이 자동 생성한다. 원문 근거는 위키
+    <code>concepts/sk-hynix-analyst-thesis-checkpoints.md</code> 참고. 투자
+    조언 아님.
+  </footer>
+</div>
