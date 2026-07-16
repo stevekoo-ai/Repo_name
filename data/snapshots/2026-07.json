@@ -50,7 +50,7 @@
           "qoq": 1.831
         },
         "note": null,
-        "last_fresh_at": "2026-07-15T23:25:30.917675+00:00"
+        "last_fresh_at": "2026-07-16T16:26:34.479712+00:00"
       },
       "industrial_production": {
         "value": 114.912,
@@ -63,7 +63,7 @@
           "mom": -3.2258064516129012
         },
         "note": "KOSIS 접속 불가로 OECD 대체 데이터 사용 (FRED 경유, kr_industrial_production_oecd)",
-        "last_fresh_at": "2026-07-15T23:25:30.917675+00:00"
+        "last_fresh_at": "2026-07-16T16:26:34.479712+00:00"
       },
       "retail_sales": {
         "value": -3.6380597015,
@@ -76,7 +76,7 @@
           "mom": -3.6380597015
         },
         "note": "KOSIS 접속 불가로 OECD 대체 데이터 사용 (FRED 경유, kr_retail_sales_mom_oecd — 이미 계산된 전월비 값)",
-        "last_fresh_at": "2026-07-15T23:25:30.917675+00:00"
+        "last_fresh_at": "2026-07-16T16:26:34.479712+00:00"
       },
       "exports": {
         "value": 9.1,
@@ -89,7 +89,7 @@
           "yoy": 9.1
         },
         "note": null,
-        "last_fresh_at": "2026-07-15T23:25:30.917675+00:00"
+        "last_fresh_at": "2026-07-16T16:26:34.479712+00:00"
       },
       "semiconductor_exports": {
         "value": 24.7,
@@ -102,7 +102,7 @@
           "yoy": 24.7
         },
         "note": null,
-        "last_fresh_at": "2026-07-15T23:25:30.917675+00:00"
+        "last_fresh_at": "2026-07-16T16:26:34.479712+00:00"
       },
       "current_account": {
         "value": 38607.4,
@@ -115,7 +115,7 @@
           "avg_3m": 34942.700000000004
         },
         "note": null,
-        "last_fresh_at": "2026-07-15T23:25:30.917675+00:00"
+        "last_fresh_at": "2026-07-16T16:26:34.479712+00:00"
       },
       "cpi": {
         "value": 118.84768138617,
@@ -128,7 +128,7 @@
           "yoy": 3.336388634281018
         },
         "note": "KOSIS 접속 불가로 OECD 대체 데이터 사용 (FRED 경유, kr_cpi_oecd)",
-        "last_fresh_at": "2026-07-15T23:25:30.917675+00:00"
+        "last_fresh_at": "2026-07-16T16:26:34.479712+00:00"
       },
       "ppi": {
         "value": 129.82,
@@ -141,7 +141,7 @@
           "yoy": 8.508859913072545
         },
         "note": null,
-        "last_fresh_at": "2026-07-15T23:25:30.917675+00:00"
+        "last_fresh_at": "2026-07-16T16:26:34.479712+00:00"
       },
       "unemployment": {
         "value": 2.8,
@@ -154,7 +154,7 @@
           "avg_3m_change": -0.23333333333333295
         },
         "note": "KOSIS 접속 불가로 OECD 대체 데이터 사용 (FRED 경유, kr_unemployment_oecd)",
-        "last_fresh_at": "2026-07-15T23:25:30.917675+00:00"
+        "last_fresh_at": "2026-07-16T16:26:34.479712+00:00"
       },
       "us_global": {
         "value": 1.0,
@@ -165,7 +165,7 @@
         "source": "FRED",
         "fields": {},
         "note": null,
-        "last_fresh_at": "2026-07-15T23:25:30.917675+00:00"
+        "last_fresh_at": "2026-07-16T16:26:34.479712+00:00"
       }
     },
     "us_investment_clock": {
@@ -184,21 +184,21 @@
     "regime": "Slowdown",
     "previous_regime": "Slowdown",
     "transition": null,
-    "score_band": "early_slowdown",
-    "score_band_label": "초기 둔화",
+    "score_band": "slowdown",
+    "score_band_label": "둔화",
     "scores": {
-      "raw_score": 0,
-      "weighted_score": 0.0,
+      "raw_score": -1,
+      "weighted_score": -0.8,
       "scored_count": 8,
       "total_count": 8,
       "coverage_pct": 100.0
     },
     "confidence": {
-      "confidence": 94.0,
+      "confidence": 90.9,
       "components": {
         "data_freshness": 100.0,
         "source_quality": 100.0,
-        "indicator_consistency": 100.0,
+        "indicator_consistency": 87.5,
         "trend_stability": 70.0
       }
     },
@@ -208,7 +208,6 @@
       "ppi_sustained_high"
     ],
     "upgrade_signals": [
-      "retail_sales_strong",
       "ppi_easing"
     ],
     "changes": [
@@ -230,7 +229,7 @@
           "qoq": 2.1
         },
         "note": null,
-        "last_fresh_at": "2026-07-15T23:25:30.917675+00:00"
+        "last_fresh_at": "2026-07-16T16:26:34.479712+00:00"
       },
       "industrial_production": {
         "value": 102.6475,
@@ -243,20 +242,20 @@
           "mom": 0.13511008789471501
         },
         "note": null,
-        "last_fresh_at": "2026-07-15T23:25:30.917675+00:00"
+        "last_fresh_at": "2026-07-16T16:26:34.479712+00:00"
       },
       "retail_sales": {
-        "value": 763705.0,
-        "score": 1,
+        "value": 768553.0,
+        "score": 0,
         "weight": 0.8,
         "status": "ok",
         "label": "미국 소매판매",
         "source": "FRED",
         "fields": {
-          "mom": 0.8809356490312217
+          "mom": 0.21867942144492722
         },
         "note": null,
-        "last_fresh_at": "2026-07-15T23:25:30.917675+00:00"
+        "last_fresh_at": "2026-07-16T16:26:34.479712+00:00"
       },
       "cpi": {
         "value": 332.568,
@@ -269,7 +268,7 @@
           "yoy": 3.7265298484186826
         },
         "note": null,
-        "last_fresh_at": "2026-07-15T23:25:30.917675+00:00"
+        "last_fresh_at": "2026-07-16T16:26:34.479712+00:00"
       },
       "ppi": {
         "value": 286.827,
@@ -282,7 +281,7 @@
           "yoy": 10.110138162162997
         },
         "note": null,
-        "last_fresh_at": "2026-07-15T23:25:30.917675+00:00"
+        "last_fresh_at": "2026-07-16T16:26:34.479712+00:00"
       },
       "unemployment": {
         "value": 4.2,
@@ -295,7 +294,7 @@
           "avg_3m_change": -0.06666666666666643
         },
         "note": null,
-        "last_fresh_at": "2026-07-15T23:25:30.917675+00:00"
+        "last_fresh_at": "2026-07-16T16:26:34.479712+00:00"
       },
       "trade_balance": {
         "value": -77585.0,
@@ -308,7 +307,7 @@
           "avg_3m": -62913.333333333336
         },
         "note": null,
-        "last_fresh_at": "2026-07-15T23:25:30.917675+00:00"
+        "last_fresh_at": "2026-07-16T16:26:34.479712+00:00"
       },
       "yield_curve": {
         "value": 0.42,
@@ -321,7 +320,7 @@
           "spread": 0.42
         },
         "note": null,
-        "last_fresh_at": "2026-07-15T23:25:30.917675+00:00"
+        "last_fresh_at": "2026-07-16T16:26:34.479712+00:00"
       }
     }
   },
@@ -329,7 +328,7 @@
     "kr_regime": "Recovery",
     "us_regime": "Slowdown",
     "kr_score_band": "unbalanced_expansion",
-    "us_score_band": "early_slowdown",
+    "us_score_band": "slowdown",
     "cycle_gap": -4,
     "alignment": "kr_behind",
     "indicator_pairs": [
@@ -355,9 +354,9 @@
         "key": "retail_sales",
         "label": "소매판매",
         "kr_score": -1,
-        "us_score": 1,
+        "us_score": 0,
         "kr_value": -3.6380597015,
-        "us_value": 763705.0,
+        "us_value": 768553.0,
         "relationship": "diverge"
       },
       {
@@ -400,5 +399,5 @@
     "narrative": "미국은 현재 Slowdown 국면, 한국은 Recovery 국면입니다. 한국이 사이클상 미국보다 뒤처져 있어, 미국에서 먼저 나타난 흐름이 시차를 두고 한국에 파급될 가능성을 주시할 필요가 있습니다. 비교 가능한 6개 핵심 지표 중 50%가 미국과 같은 방향으로 움직이고 있습니다. 미국과 한국 모두 뚜렷한 경고 신호는 없는 상태입니다. 방향이 엇갈린 지표: GDP 성장, 산업생산, 소매판매 — 이 부분이 한국이 미국과 다르게 가는 지점입니다."
   },
   "month": "2026-07",
-  "saved_at": "2026-07-15T23:27:16.280844+00:00"
+  "saved_at": "2026-07-16T16:26:57.280422+00:00"
 }
