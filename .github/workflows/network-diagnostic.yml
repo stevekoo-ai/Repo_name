@@ -1,0 +1,29 @@
+name: Network diagnostic (subscription sources)
+
+on:
+  workflow_dispatch:
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Probe target hosts
+        run: |
+          hosts=(
+            "https://www.applyhome.co.kr/ai/aib/selectSubscrptCalenderView.do"
+            "https://apply.lh.or.kr/lhapply/apply/wt/wrtanc/selectWrtancList.do"
+            "https://www.gh.or.kr/gh/announcement-of-salerental001.do"
+            "https://housing.seoul.go.kr/site/main/sh/publicSale/01/list"
+            "https://api.odcloud.kr/api"
+            "https://www.data.go.kr"
+          )
+          for h in "${hosts[@]}"; do
+            echo "=== $h ==="
+            code=$(curl -sS -o /tmp/body.html -w "%{http_code}" --max-time 15 -A "Mozilla/5.0 (Windows NT 10.0; Win64; x64)" "$h" || echo "CURL_FAIL")
+            echo "HTTP status: $code"
+            echo "body bytes: $(wc -c < /tmp/body.html 2>/dev/null || echo 0)"
+            echo "first 300 chars:"
+            head -c 300 /tmp/body.html 2>/dev/null
+            echo ""
+            echo ""
+          done
