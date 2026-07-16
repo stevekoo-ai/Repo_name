@@ -258,6 +258,74 @@ def _personal_brief(payload: dict) -> str:
     return "\n".join(lines)
 
 
+def _rate_analysis(payload: dict) -> str:
+    """Render interest rate analysis section (US/KR yield comparison and portfolio strategy)."""
+    if "rate_analysis" not in payload or not payload["rate_analysis"]:
+        return ""
+
+    ra = payload["rate_analysis"]
+    score = ra.get("total_score", 0)
+
+    # Determine score interpretation
+    if score >= 85:
+        interpretation = "극도 완화 (Extreme easing) — 공격적 성장 전략"
+    elif score >= 70:
+        interpretation = "완화 사이클 (Easing) — 성장 지향"
+    elif score >= 55:
+        interpretation = "중립~약한 완화 (Neutral-Accommodative) — 균형 배분"
+    elif score >= 40:
+        interpretation = "긴축 사이클 (Tightening) — 방어적 전략"
+    else:
+        interpretation = "극도 긴축 (Extreme tightening) — 극도 방어적"
+
+    rates = ra.get("current_rates", {})
+    trends = ra.get("trends", {})
+    portfolio = ra.get("portfolio_recommendation", {})
+    hynix = ra.get("sk_hynix_outlook", {})
+
+    lines = [
+        "## 금리 분석 (Interest Rate Environment)",
+        "",
+        f"**금리 점수: {score}/100 ({interpretation})**",
+        "",
+        "### 점수 구성",
+        f"| 항목 | 점수 | 만점 |",
+        "|------|------|------|",
+        f"| 절대 금리 수준 | {ra['score_components'].get('absolute_rates', 0)} | 30 |",
+        f"| 추이 분석 | {ra['score_components'].get('trend_analysis', 0)} | 30 |",
+        f"| Yield Spread | {ra['score_components'].get('spread', 0)} | 25 |",
+        f"| 시장 신호 | {ra['score_components'].get('market_signals', 0)} | 15 |",
+        "",
+        "### 현재 금리 상황",
+        f"- **미국 10Y Treasury**: {_fmt(rates.get('us_10y'), '%')}",
+        f"- **한국 10Y 국고채**: {_fmt(rates.get('kr_10y'), '%')}",
+        f"- **Spread (US-KR)**: {_fmt(rates.get('spread_bp'), 'bp')}",
+        f"  - 기준: 200~250bp | 현재: {('**정상 범위**' if 150 <= rates.get('spread_bp', 0) <= 300 else '**주의 필요**')}",
+        "",
+        "### 추이 신호",
+        f"- **미국 10Y 1개월 변화**: {_fmt(trends.get('us_10y_1m_change_bp'), 'bp')}",
+        f"- **3개월 추세**: {'상승 (긴축)' if trends.get('us_10y_3m_trend') == 'up' else '하강 (완화)'}",
+        "",
+        "### 시장 신호",
+        f"- **역수익 곡선 (10Y-2Y)**: {_fmt(ra.get('market_signal', {}).get('us_10y_2y_spread'), '%')}",
+        f"- **상태**: {'**정상** (경기순환 양호)' if ra.get('market_signal', {}).get('yield_curve_status') == 'normal' else '⚠️ **역수익** (경기약세 경고)'}",
+        "",
+        "### 포트폴리오 전략",
+        f"**권장 자산 배분**: 주식 {portfolio.get('stocks', 50)}% + 채권 {portfolio.get('bonds', 30)}% + 현금 {portfolio.get('cash', 20)}%",
+        f"**기본 원칙**: {portfolio.get('condition', 'N/A')}",
+        f"**리밸런싱 트리거**: 점수 {portfolio.get('rebalance_trigger', 0)}점 이상/이하 변화",
+        "",
+        "### SK Hynix 관점",
+        f"- **3개월 상승 가능성**: {hynix.get('3m_upside_probability', 50)}%",
+        f"- **6개월 상승 가능성**: {hynix.get('6m_upside_probability', 50)}%",
+        f"- **12개월 상승 가능성**: {hynix.get('12m_upside_probability', 50)}%",
+        f"- **근거**: {hynix.get('rationale', 'N/A')}",
+        "",
+    ]
+
+    return "\n".join(lines)
+
+
 def _appendix(payload: dict) -> str:
     a = payload["appendix"]
     lines = ["## 16. Appendix", "- 데이터 출처: " + (", ".join(a["sources"]) if a["sources"] else "N/A"),
@@ -273,6 +341,7 @@ def render_markdown(payload: dict) -> str:
         _us_macro_dashboard(payload), _us_regime_judgement(payload),
         _macro_dashboard(payload), _regime_judgement(payload), _kr_us_comparison(payload),
         _executive_summary(payload), _monthly_key_changes(payload),
+        _rate_analysis(payload),
         _indicator_deep_dive(payload), _personal_analysis(payload),
         _asset_impact(payload), _scenario_analysis(payload), _discussion_points(payload),
         _action_plan(payload), _calendar(payload), _personal_brief(payload), _appendix(payload),

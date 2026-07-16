@@ -17,6 +17,7 @@ from engine.action import engine as action_engine
 from engine.macro import engine as macro_engine
 from engine.macro import snapshot as macro_snapshot
 from engine.personal import mapping
+from engine.rate_analysis import scoring as rate_scoring
 from . import discussion as discussion_mod
 from . import scenario as scenario_mod
 
@@ -253,5 +254,52 @@ def build_report_payload(month_key: str | None = None) -> dict:
         "appendix": _appendix(macro),
     }
 
+    # Add interest rate analysis
+    rate_analysis = _rate_analysis_section()
+    payload["rate_analysis"] = rate_analysis
+
     log_event("report_payload.built", month=month_key, readiness=readiness, action_count=len(actions))
     return payload
+
+
+def _rate_analysis_section() -> dict:
+    """Generate interest rate analysis section (US/KR yield comparison and portfolio impact)."""
+    rate_score_detail = rate_scoring.calculate_rate_score()
+    portfolio_rec = rate_scoring.portfolio_recommendation(rate_score_detail.total_score)
+    sk_hynix_rec = rate_scoring.sk_hynix_outlook(rate_score_detail.total_score, rate_score_detail.spread)
+
+    return {
+        "total_score": rate_score_detail.total_score,
+        "score_components": {
+            "absolute_rates": rate_score_detail.absolute_rate_score,
+            "trend_analysis": rate_score_detail.trend_score,
+            "spread": rate_score_detail.spread_score,
+            "market_signals": rate_score_detail.market_signal_score,
+        },
+        "current_rates": {
+            "us_10y": round(rate_score_detail.us_10y, 2) if rate_score_detail.us_10y else None,
+            "kr_10y": round(rate_score_detail.kr_10y, 2) if rate_score_detail.kr_10y else None,
+            "spread_bp": round(rate_score_detail.spread, 0) if rate_score_detail.spread else None,
+        },
+        "trends": {
+            "us_10y_1m_change_bp": round(rate_score_detail.trend_1m, 1) if rate_score_detail.trend_1m else None,
+            "us_10y_3m_trend": "up" if rate_score_detail.trend_3m and rate_score_detail.trend_3m > 0 else "down",
+        },
+        "market_signal": {
+            "us_10y_2y_spread": round(rate_score_detail.us_10y_2y_spread, 2) if rate_score_detail.us_10y_2y_spread else None,
+            "yield_curve_status": "normal" if rate_score_detail.us_10y_2y_spread and rate_score_detail.us_10y_2y_spread > 0 else "inverted",
+        },
+        "portfolio_recommendation": {
+            "stocks": portfolio_rec["stocks"],
+            "bonds": portfolio_rec["bonds"],
+            "cash": portfolio_rec["cash"],
+            "condition": portfolio_rec["condition"],
+            "rebalance_trigger": portfolio_rec["rebalance_trigger"],
+        },
+        "sk_hynix_outlook": {
+            "3m_upside_probability": sk_hynix_rec["3m_probability"],
+            "6m_upside_probability": sk_hynix_rec["6m_probability"],
+            "12m_upside_probability": sk_hynix_rec["12m_probability"],
+            "rationale": sk_hynix_rec["rationale"],
+        },
+    }
