@@ -41,3 +41,27 @@ jobs:
           echo "--- body ---"
           cat resp_query.json
           echo ""
+
+      - name: Server-side filter test (국민주택, 접수마감 미도래)
+        env:
+          SERVICE_KEY: ${{ secrets.DATA_GO_KR_KEY }}
+        run: |
+          echo "=== cond filter attempt ==="
+          today=$(date -u -d "+9 hours" +%Y-%m-%d)
+          echo "today(KST): $today"
+          code=$(curl -sS -G "https://api.odcloud.kr/api/ApplyhomeInfoDetailSvc/v1/getAPTLttotPblancDetail" \
+            -H "Authorization: Infuser ${SERVICE_KEY}" \
+            --data-urlencode "page=1" \
+            --data-urlencode "perPage=100" \
+            --data-urlencode "cond[HOUSE_DTL_SECD_NM::EQ]=국민" \
+            --data-urlencode "cond[RCEPT_ENDDE::GTE]=${today}" \
+            -o resp_filter.json -w "%{http_code}")
+          echo "HTTP status: $code"
+          echo "--- matchCount/totalCount/currentCount ---"
+          python3 -c "
+import json
+d = json.load(open('resp_filter.json'))
+print('matchCount', d.get('matchCount'), 'totalCount', d.get('totalCount'), 'currentCount', d.get('currentCount'))
+for x in d.get('data', []):
+    print(x.get('HOUSE_NM'), '|', x.get('SUBSCRPT_AREA_CODE_NM'), '|', x.get('HOUSE_DTL_SECD_NM'), '|', x.get('RCEPT_BGNDE'), '~', x.get('RCEPT_ENDDE'))
+"
