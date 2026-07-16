@@ -1,0 +1,165 @@
+<title>SK하이닉스 저녁 체크 — 2026-07-16</title>
+<style>
+  :root {
+    --bg: #f4f5f1; --surface: #ffffff; --surface-2: #eaebe3;
+    --ink: #1e221d; --ink-soft: #565b4e; --ink-faint: #8b9084;
+    --accent: #2f6b5e; --accent-ink: #143a32; --accent-soft: #dce8e2;
+    --border: #d8d9cf;
+    --pos: #2f6b3f; --pos-bg: #e3ecdd;
+    --neu: #96660f; --neu-bg: #f3e8d2;
+    --neg: #a53f3f; --neg-bg: #f4dede;
+    --unk: #6b7066; --unk-bg: #e7e8e1;
+    --shadow: 0 1px 2px rgba(30,34,29,.06), 0 8px 24px -12px rgba(30,34,29,.18);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #14170f; --surface: #1b201a; --surface-2: #212820;
+      --ink: #e9ece4; --ink-soft: #a9ae9e; --ink-faint: #6e7367;
+      --accent: #74c6ae; --accent-ink: #eaf7f2; --accent-soft: #223730;
+      --border: #303830;
+      --pos: #8fd19f; --pos-bg: #1f3324;
+      --neu: #e3b869; --neu-bg: #3a2f18;
+      --neg: #e79b9b; --neg-bg: #3a2222;
+      --unk: #9aa093; --unk-bg: #262b23;
+      --shadow: 0 1px 2px rgba(0,0,0,.4), 0 8px 24px -12px rgba(0,0,0,.6);
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #14170f; --surface: #1b201a; --surface-2: #212820;
+    --ink: #e9ece4; --ink-soft: #a9ae9e; --ink-faint: #6e7367;
+    --accent: #74c6ae; --accent-ink: #eaf7f2; --accent-soft: #223730;
+    --border: #303830;
+    --pos: #8fd19f; --pos-bg: #1f3324;
+    --neu: #e3b869; --neu-bg: #3a2f18;
+    --neg: #e79b9b; --neg-bg: #3a2222;
+    --unk: #9aa093; --unk-bg: #262b23;
+  }
+  :root[data-theme="light"] {
+    --bg: #f4f5f1; --surface: #ffffff; --surface-2: #eaebe3;
+    --ink: #1e221d; --ink-soft: #565b4e; --ink-faint: #8b9084;
+    --accent: #2f6b5e; --accent-ink: #143a32; --accent-soft: #dce8e2;
+    --border: #d8d9cf;
+    --pos: #2f6b3f; --pos-bg: #e3ecdd;
+    --neu: #96660f; --neu-bg: #f3e8d2;
+    --neg: #a53f3f; --neg-bg: #f4dede;
+    --unk: #6b7066; --unk-bg: #e7e8e1;
+  }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--ink); font-family:-apple-system,"Apple SD Gothic Neo","Pretendard","Noto Sans KR",system-ui,sans-serif; line-height:1.65; }
+  .wrap { max-width:52rem; margin:0 auto; padding:2.5rem 1.5rem 5rem; }
+  header { margin-bottom:2rem; }
+  .eyebrow { display:inline-flex; align-items:center; gap:.4rem; font-family:ui-monospace,"SFMono-Regular",Menlo,Consolas,monospace; font-size:.72rem; letter-spacing:.06em; text-transform:uppercase; color:var(--neg); background:var(--neg-bg); border-radius:999px; padding:.28rem .7rem; margin-bottom:1rem; }
+  h1 { font-size:clamp(1.6rem,4.5vw,2.15rem); font-weight:800; letter-spacing:-.01em; margin:0 0 .5rem; text-wrap:balance; }
+  .lede { color:var(--ink-soft); margin:0; font-size:1rem; }
+  .snapshot { display:grid; grid-template-columns:repeat(auto-fit,minmax(9.5rem,1fr)); gap:.9rem; margin:1.75rem 0; }
+  .stat { background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:1rem 1.1rem; box-shadow:var(--shadow); }
+  .stat .label { font-size:.72rem; color:var(--ink-faint); text-transform:uppercase; letter-spacing:.05em; margin-bottom:.35rem; }
+  .stat .value { font-family:ui-monospace,"SFMono-Regular",Menlo,Consolas,monospace; font-size:1.2rem; font-weight:700; font-variant-numeric:tabular-nums; }
+  .stat .sub { font-size:.8rem; margin-top:.2rem; }
+  .down { color:var(--neg); } .up { color: var(--pos); }
+  section { margin-bottom:2.25rem; }
+  h2 { font-size:1.15rem; font-weight:800; margin:0 0 .9rem; }
+  .card { background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:1.25rem 1.4rem; box-shadow:var(--shadow); margin-bottom:.9rem; }
+  .card-head { display:flex; align-items:center; justify-content:space-between; gap:1rem; margin-bottom:.5rem; flex-wrap:wrap; }
+  .card h3 { margin:0; font-size:1rem; font-weight:700; }
+  .card p { margin:.4rem 0 0; color:var(--ink-soft); font-size:.9rem; }
+  .pill { display:inline-flex; align-items:center; gap:.35rem; font-size:.75rem; font-weight:700; padding:.25rem .6rem; border-radius:999px; white-space:nowrap; }
+  .pill.pos { color:var(--pos); background:var(--pos-bg); }
+  .pill.neu { color:var(--neu); background:var(--neu-bg); }
+  .pill.neg { color:var(--neg); background:var(--neg-bg); }
+  .pill.unk { color:var(--unk); background:var(--unk-bg); }
+  .new { border-left:3px solid var(--accent); }
+  .table-wrap { overflow-x:auto; border:1px solid var(--border); border-radius:12px; background:var(--surface); box-shadow:var(--shadow); }
+  table { width:100%; border-collapse:collapse; font-size:.85rem; }
+  th, td { text-align:left; padding:.55rem .75rem; border-bottom:1px solid var(--border); vertical-align:top; }
+  th { font-size:.66rem; text-transform:uppercase; letter-spacing:.05em; color:var(--ink-faint); }
+  tr:last-child td { border-bottom:none; }
+  td.num { font-variant-numeric:tabular-nums; text-align:right; white-space:nowrap; }
+  .callout { border-left:3px solid var(--neg); background:var(--neg-bg); color:var(--ink); border-radius:0 10px 10px 0; padding:.9rem 1.1rem; font-size:.88rem; }
+  a { color:var(--accent-ink); } @media (prefers-color-scheme:dark){ a{ color:var(--accent);} }
+  footer { margin-top:3rem; padding-top:1.25rem; border-top:1px solid var(--border); color:var(--ink-faint); font-size:.82rem; }
+</style>
+
+<div class="wrap">
+  <header>
+    <span class="eyebrow">● 저녁 체크 · 2026-07-16</span>
+    <h1>약세 기관 3곳 신규 등장 + 금리 인상 확정</h1>
+    <p class="lede">오늘 아침 리포트 대비 새로 추가된 것: 미래에셋 실적 하향, UBS 페어트레이드, 모건스탠리 피크아웃 경고.</p>
+  </header>
+
+  <div class="snapshot">
+    <div class="stat"><div class="label">본주 종가</div><div class="value">1,859,500<span style="font-size:.65rem;">원</span></div><div class="sub down">-10.69%</div></div>
+    <div class="stat"><div class="label">ADR 종가</div><div class="value">$176.46</div><div class="sub down">-9.00%</div></div>
+    <div class="stat"><div class="label">한국은행 기준금리</div><div class="value">2.75%</div><div class="sub">2.50%→인상 확정</div></div>
+  </div>
+
+  <section>
+    <h2>🆕 오늘 아침 대비 새로 추가된 것</h2>
+
+    <div class="card new">
+      <div class="card-head"><h3>미래에셋증권</h3><span class="pill neu">목표가 유지, 실적추정 하향</span></div>
+      <p>목표가 420만원·매수 유지하되, 2분기 영업이익 추정을 <strong>70조
+      7,000억원 → 62조 3,000억원(-12%)</strong>으로 하향. 근거는 DRAM/NAND
+      ASP가 예상보다 낮을 것이라는 점. 다만 "최근 조정은 과도, 대외 업황은
+      견조"라며 목표가는 지키는 입장.</p>
+    </div>
+
+    <div class="card new">
+      <div class="card-head"><h3>UBS</h3><span class="pill neu">320만원 · 페어트레이드</span></div>
+      <p>목표가 320만원·매수 유지. 동시에 <strong>"ADR은 매수, 국내 본주는
+      매도"</strong>라는 상대가치 트레이드 권고 — ADR·본주 간 밸류에이션
+      격차(체크포인트 ⑥ADR프리미엄, 현재 약 30.7%)를 활용하려는 전략으로
+      해석됨.</p>
+    </div>
+
+    <div class="card new">
+      <div class="card-head"><h3>모건스탠리</h3><span class="pill neg">피크아웃 우려</span></div>
+      <p>"메모리 업종의 가격 상승률·재고 정상화·실적 추정치 상향 등 개선
+      지표가 정점에 근접"했다고 평가, 하이퍼스케일러 AI 투자 증가 속도
+      둔화 리스크 지적 — BNK와 같은 방향의 새 목소리. 구체적 목표가·등급은
+      원문 미확인.</p>
+    </div>
+
+    <div class="card">
+      <div class="card-head"><h3>키움증권</h3><span class="pill unk">미확인</span></div>
+      <p>삼성전자 목표가는 43만→39만원 하향 확인됐으나, SK하이닉스향
+      구체적 수치는 이번 검색으로 확정하지 못함 — 다음 체크에서 재확인.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2>목표가 스펙트럼 (15개 기관)</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>기관</th><th>목표가</th><th>비고</th></tr></thead>
+        <tbody>
+          <tr><td>KB·미래에셋</td><td class="num">420만원</td><td>매수 유지</td></tr>
+          <tr><td>NH</td><td class="num">410만원</td><td>매수</td></tr>
+          <tr><td>IBK·SK증권</td><td class="num">400만원</td><td>매수</td></tr>
+          <tr><td>대신</td><td class="num">390만원</td><td>매수</td></tr>
+          <tr><td>한투·신한</td><td class="num">380만원</td><td>매수/비중확대</td></tr>
+          <tr><td>Barclays</td><td class="num">$330(≈490만원)</td><td>Overweight</td></tr>
+          <tr><td>UBS</td><td class="num">320만원</td><td>매수, 단 페어트레이드 권고</td></tr>
+          <tr><td>HSBC</td><td>비공개</td><td>Top Pick</td></tr>
+          <tr><td>모건스탠리·키움</td><td>미확인</td><td>하향/신중 성향</td></tr>
+          <tr><td>BNK</td><td class="num">185만원</td><td>보유</td></tr>
+          <tr><td>Morningstar</td><td class="num">$160</td><td>Fairly valued</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <div class="callout">
+    오늘 하루에만 약세·중립 성향 기관이 3곳(미래에셋 실적 하향, UBS
+    페어트레이드, 모건스탠리 피크아웃 경고) 늘었다. 강세 컨센서스(380~420만원
+    클러스터) 자체는 아직 무너지지 않았지만, "반도체 피크아웃" 논쟁이
+    여러 매체에서 동시에 제기되는 걸 보면 시장의 톤이 하루 전보다는
+    조심스러워진 것으로 보인다.
+  </div>
+
+  <footer>
+    이 리포트는 저녁 19:00(KST) Routine이 자동 생성한다. 원문 근거는 위키
+    <code>concepts/sk-hynix-analyst-thesis-checkpoints.md</code> 참고. 투자
+    조언 아님.
+  </footer>
+</div>
