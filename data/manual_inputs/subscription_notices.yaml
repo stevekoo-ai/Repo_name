@@ -1,13 +1,17 @@
 # EXAMPLE manual input for 공공분양 공고 (Master Instruction 8.1, 13.8, 13.9).
 # 청약홈/LH/GH/SH는 개인 대상 공식 API를 제공하지 않으므로, 공고가 뜨면
 # 이 파일에 직접 입력한다 (reliability grade 4 — 공공기관 공고 원문 기준).
+#
+# 주의: 플랫폼시티 프로젝트의 역사적 데이터 분석 결과, 민영 주택으로 분류되어 있음.
+# housing_type 필드: "국민주택" (공공) 또는 "민영" (private). 기본값 없음 — 반드시 명시.
 
-updated_at: "2026-07-14"
+updated_at: "2026-07-16"
 notices:
-  - name: "세종 5-1생활권 공공분양 (EXAMPLE)"
+  - name: "세종 5-1생활권 공공분양 (EXAMPLE - 국민주택)"
     agency: "LH"
     region: "세종 플랫폼시티"
-    is_platform_city: true
+    is_platform_city: false
+    housing_type: "국민주택"
     supply_type: "일반공급"
     size: "84㎡ 이상"
     household_count: 620          # EXAMPLE
@@ -17,3 +21,19 @@ notices:
     expected_price_krw: 550000000    # EXAMPLE
     expected_competition_ratio: null
     source: "청약홈 (수동 입력)"
+
+  # 플랫폼시티가 발표될 경우, 아래 예시처럼 민영 주택으로 입력할 것.
+  # - name: "용인 플랫폼시티 (EXAMPLE - 민영)"
+  #   agency: "플랫폼시티 운영사"
+  #   region: "용인 기흥구"
+  #   is_platform_city: true
+  #   housing_type: "민영"
+  #   supply_type: "일반공급"
+  #   size: "84㎡ 이상"
+  #   household_count: 1500        # EXAMPLE
+  #   announce_date: "2026-09-01"  # EXAMPLE
+  #   application_start: "2026-09-15"
+  #   application_end: "2026-09-20"
+  #   expected_price_krw: 850000000  # EXAMPLE
+  #   expected_competition_ratio: null
+  #   source: "청약홈 (수동 입력)"
