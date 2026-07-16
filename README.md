@@ -62,8 +62,38 @@ tests/       pytest 단위/통합 테스트
 - `exports.yaml` — 총수출/반도체수출 YoY (산업통상자원부 보도자료 기준)
 - `semiconductor.yaml` — DRAM/NAND/HBM/CSP CapEx 등 신호 (기업 IR, TrendForce 등)
 - `subscription_notices.yaml` — 청약홈/LH/GH/SH 공고 (플랫폼시티 포함)
+  - ⚠️ **주의**: 플랫폼시티 역사적 데이터 분석 결과, 민영(private) 주택으로 분류됨
+  - `housing_type` 필드에 `"국민주택"` 또는 `"민영"`을 반드시 명시
+  - 공고 발견 시 `scripts/verify_platform_city_listings.py` 실행하여 검증
 - `trips.yaml` — 출장/여행 일정
 - `calendar.yaml` — 경제 캘린더
+
+### 플랫폼시티 청약 정보 검증
+
+용인 플랫폼시티 청약 정보가 청약홈에서 공고되면, 다음 스크립트로 현황을 확인할 수 있습니다:
+
+```bash
+# 환경변수 설정 (또는 GitHub Actions secrets에서 자동으로 읽음)
+export DATA_GO_KR_KEY="<데이터.go.kr 인증키>"
+
+# 스크립트 실행 — 플랫폼시티 관련 모든 공고 + 주택 유형 분류
+python3 scripts/verify_platform_city_listings.py "$DATA_GO_KR_KEY"
+```
+
+또는 GitHub Actions 워크플로우로 자동 검증:
+
+```bash
+# 워크플로우 트리거 (verify-platform-city.yml)
+# 스크립트 수정 또는 수동 트리거 시 자동 실행
+gh workflow run verify-platform-city.yml
+```
+
+**스크립트 동작 원리**:
+1. 플랫폼시티 이름 직접 검색 (`HOUSE_NM::LIKE=플랫폼시티`)
+2. 용인 지역 주소 검색 (`HSSPLY_ADRES::LIKE=용인`)
+3. 기흥구(플랫폼시티 실제 위치) 주소 검색 (`HSSPLY_ADRES::LIKE=기흥구`)
+4. 결과를 주택 유형별(국민주택/민영)로 분류하여 보고
+5. 현재 시스템 scope 권고 사항 제시
 
 개인 프로필/보유자산은 `config/user.yaml`, `config/portfolio.yaml`에 있습니다 (현재 EXAMPLE 플레이스홀더).
 
