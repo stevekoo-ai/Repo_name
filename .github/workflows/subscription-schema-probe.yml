@@ -58,10 +58,4 @@ jobs:
             -o resp_filter.json -w "%{http_code}")
           echo "HTTP status: $code"
           echo "--- matchCount/totalCount/currentCount ---"
-          python3 -c "
-import json
-d = json.load(open('resp_filter.json'))
-print('matchCount', d.get('matchCount'), 'totalCount', d.get('totalCount'), 'currentCount', d.get('currentCount'))
-for x in d.get('data', []):
-    print(x.get('HOUSE_NM'), '|', x.get('SUBSCRPT_AREA_CODE_NM'), '|', x.get('HOUSE_DTL_SECD_NM'), '|', x.get('RCEPT_BGNDE'), '~', x.get('RCEPT_ENDDE'))
-"
+          python3 -c "import json; d=json.load(open('resp_filter.json')); print('matchCount', d.get('matchCount'), 'totalCount', d.get('totalCount'), 'currentCount', d.get('currentCount')); [print(x.get('HOUSE_NM'), '|', x.get('SUBSCRPT_AREA_CODE_NM'), '|', x.get('HOUSE_DTL_SECD_NM'), '|', x.get('RCEPT_BGNDE'), '~', x.get('RCEPT_ENDDE')) for x in d.get('data', [])]"
