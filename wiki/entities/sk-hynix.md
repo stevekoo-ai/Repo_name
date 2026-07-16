@@ -1,7 +1,7 @@
 ---
 title: SK하이닉스
 created: 2026-07-13
-updated: 2026-07-16
+updated: 2026-07-17
 tags: [sk-hynix, semiconductor, stock, adr]
 ---
 
@@ -29,8 +29,8 @@ tags: [sk-hynix, semiconductor, stock, adr]
   정점 51.5%에서 narrowing 중 — "이미 훼손 구간" 우려는 기각됨
 - 레버리지 단일종목 ETF가 이번 주에만 4종(강세 3·약세 1)으로 늘어 양방향
   변동성을 구조적으로 증폭 중
-- 2Q 실적 발표일이 잠정 7/23에서 7/29로 바뀔 가능성(공식 미확정) — 사실이면
-  메타·마이크로소프트와 같은 날
+- 2Q 실적 발표일 **7/29로 사실상 확정**(복수 매체 일치, 2026-07-17 확인) —
+  메타·마이크로소프트와 같은 날, KIND 공식 공시로 최종 확인은 아직 안 됨
 - 오늘(7/16) **한국은행 금리 결정**(예상 2.50%→2.75% 인상) 대기 중 — 실현 시
   국내발 긴축 신호로 코스피 밸류에이션에 부담 가능. 이 항목을 포함한 거시
   지표는 이제 [매크로 지표 트렌드 추적](../concepts/macro-indicators.md)에서
@@ -80,6 +80,22 @@ TSMC 2분기 실적이 15:00 KST 컨퍼런스콜에서 발표됨: **매출 396.2
 확정 전까지 어느 것도 확신할 수 없는 상태. 상세는
 [sources/websearch-sk-hynix-tsmc-current-2026-07-16.md](../../sources/websearch-sk-hynix-tsmc-current-2026-07-16.md).
 
+### 아침 체크 — 실적발표일 사실상 확정(7/29), 신규 기관/구조 신호 (2026-07-17)
+
+장 시작 전 체크포인트 점검. 새 본주·ADR 종가 페어를 확보하지 못해 어제
+급락(-10.69%) 이후 오늘 아침까지 별다른 신규 가격 변동은 확인되지 않음
+(ADR 7/16 미국 세션 결과도 검색상 미확인 — 10:00 장초반 체크에서 재확인).
+
+핵심 변화 3가지: **① 실적 발표일이 7/22·23·29 세 후보 혼재에서 "7/29"로
+수렴**(복수 매체 일치, 메타·마이크로소프트와 같은 날). **② LTA 긍정
+강화** — SK하이닉스 장기공급계약에 가격 상한선이 없다는 점이 확인돼(경쟁사
+마이크론은 있음) 상방 시나리오가 더 열려있음. **③ 중국산 DRAM 리스크
+상향** — CXMT가 텐센트에 약 4.5조원 규모 서버 D램을 공급하는 계약을
+체결, 기존 "테스트 단계"를 넘어 대형 CSP향 실공급이 처음 확인됨(체크리스트
+⑦ "주의"로 상향). 빅테크 CapEx(③)는 메리츠(긍정)·블룸버그(부정) 신호가
+동시에 나와 방향 여전히 미확정. 상세는
+[목표주가 근거 체크리스트](../concepts/sk-hynix-analyst-thesis-checkpoints.md).
+
 ### 저녁 마감 — 신규 약세 기관 3곳, 금리 인상 확정 (2026-07-16)
 
 종가 -10.69%(약 1,859,500원), ADR -9.00%($176.46)로 마감 — 오후 내내 낙폭
@@ -126,4 +142,5 @@ TSMC 2분기 실적이 15:00 KST 컨퍼런스콜에서 발표됨: **매출 396.2
 - [sources/websearch-sk-hynix-morning-check-2026-07-16.md](../../sources/websearch-sk-hynix-morning-check-2026-07-16.md)
 - [sources/websearch-sk-hynix-crash-2026-07-16.md](../../sources/websearch-sk-hynix-crash-2026-07-16.md)
 - [sources/websearch-sk-hynix-tsmc-current-2026-07-16.md](../../sources/websearch-sk-hynix-tsmc-current-2026-07-16.md)
-- [sources/websearch-sk-hynix-evening-check-2026-07-16.md](../../sources/websearch-sk-hynix-evening-check-2026-07-16.md) (최신 상태 근거; 그 외 원본 소스는 위 히스토리 각 페이지의 Sources 참고)
+- [sources/websearch-sk-hynix-evening-check-2026-07-16.md](../../sources/websearch-sk-hynix-evening-check-2026-07-16.md)
+- [sources/websearch-sk-hynix-morning-check-2026-07-17.md](../../sources/websearch-sk-hynix-morning-check-2026-07-17.md) (최신 상태 근거; 그 외 원본 소스는 위 히스토리 각 페이지의 Sources 참고)
