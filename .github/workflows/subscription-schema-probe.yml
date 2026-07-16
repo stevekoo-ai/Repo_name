@@ -12,106 +12,62 @@ jobs:
   probe:
     runs-on: ubuntu-latest
     steps:
-      - name: Call getAPTLttotPblancDetail (header auth)
+      - name: Smart check - historical 플랫폼시티 naming in HOUSE_NM (all-time, no date filter)
         env:
           SERVICE_KEY: ${{ secrets.DATA_GO_KR_KEY }}
         run: |
-          echo "=== header-auth attempt ==="
+          echo "=== cond[HOUSE_NM::LIKE]=플랫폼시티, no date restriction ==="
           code=$(curl -sS -G "https://api.odcloud.kr/api/ApplyhomeInfoDetailSvc/v1/getAPTLttotPblancDetail" \
             -H "Authorization: Infuser ${SERVICE_KEY}" \
             --data-urlencode "page=1" \
-            --data-urlencode "perPage=5" \
-            -o resp_header.json -w "%{http_code}")
+            --data-urlencode "perPage=50" \
+            --data-urlencode "cond[HOUSE_NM::LIKE]=플랫폼시티" \
+            -o resp_platformcity.json -w "%{http_code}")
           echo "HTTP status: $code"
-          echo "--- body ---"
-          cat resp_header.json
-          echo ""
+          python3 -c "
+import json
+d = json.load(open('resp_platformcity.json'))
+print('matchCount', d.get('matchCount'), 'totalCount', d.get('totalCount'))
+for x in d.get('data', []):
+    print(x.get('HOUSE_NM'), '|', x.get('HOUSE_DTL_SECD_NM'), '|', x.get('SUBSCRPT_AREA_CODE_NM'), '|', x.get('HSSPLY_ADRES'), '|', x.get('RCRIT_PBLANC_DE'))
+"
 
-      - name: Call getAPTLttotPblancDetail (query-param auth, fallback)
+      - name: Smart check - 용인시 listings, any type, all-time (address naming patterns)
         env:
           SERVICE_KEY: ${{ secrets.DATA_GO_KR_KEY }}
         run: |
-          echo "=== query-param-auth attempt ==="
+          echo "=== cond[HSSPLY_ADRES::LIKE]=용인, no date restriction ==="
           code=$(curl -sS -G "https://api.odcloud.kr/api/ApplyhomeInfoDetailSvc/v1/getAPTLttotPblancDetail" \
-            --data-urlencode "serviceKey=${SERVICE_KEY}" \
+            -H "Authorization: Infuser ${SERVICE_KEY}" \
             --data-urlencode "page=1" \
-            --data-urlencode "perPage=5" \
-            -o resp_query.json -w "%{http_code}")
+            --data-urlencode "perPage=50" \
+            --data-urlencode "cond[HSSPLY_ADRES::LIKE]=용인" \
+            -o resp_yongin.json -w "%{http_code}")
           echo "HTTP status: $code"
-          echo "--- body ---"
-          cat resp_query.json
-          echo ""
+          python3 -c "
+import json
+d = json.load(open('resp_yongin.json'))
+print('matchCount', d.get('matchCount'), 'totalCount', d.get('totalCount'))
+for x in d.get('data', []):
+    print(x.get('HOUSE_NM'), '|', x.get('HOUSE_DTL_SECD_NM'), '|', x.get('HSSPLY_ADRES'), '|', x.get('RCRIT_PBLANC_DE'))
+"
 
-      - name: Server-side filter test (국민주택, 접수마감 미도래)
+      - name: Smart check - 기흥구 specifically (플랫폼시티 실제 위치 구)
         env:
           SERVICE_KEY: ${{ secrets.DATA_GO_KR_KEY }}
         run: |
-          echo "=== cond filter attempt ==="
-          today=$(date -u -d "+9 hours" +%Y-%m-%d)
-          echo "today(KST): $today"
+          echo "=== cond[HSSPLY_ADRES::LIKE]=기흥구, no date restriction ==="
           code=$(curl -sS -G "https://api.odcloud.kr/api/ApplyhomeInfoDetailSvc/v1/getAPTLttotPblancDetail" \
             -H "Authorization: Infuser ${SERVICE_KEY}" \
             --data-urlencode "page=1" \
-            --data-urlencode "perPage=100" \
-            --data-urlencode "cond[HOUSE_DTL_SECD_NM::EQ]=국민" \
-            --data-urlencode "cond[RCEPT_ENDDE::GTE]=${today}" \
-            -o resp_filter.json -w "%{http_code}")
+            --data-urlencode "perPage=50" \
+            --data-urlencode "cond[HSSPLY_ADRES::LIKE]=기흥구" \
+            -o resp_giheung.json -w "%{http_code}")
           echo "HTTP status: $code"
-          echo "--- matchCount/totalCount/currentCount ---"
-          python3 -c "import json; d=json.load(open('resp_filter.json')); print('matchCount', d.get('matchCount'), 'totalCount', d.get('totalCount'), 'currentCount', d.get('currentCount')); [print(x.get('HOUSE_NM'), '|', x.get('SUBSCRPT_AREA_CODE_NM'), '|', x.get('HOUSE_DTL_SECD_NM'), '|', x.get('RCEPT_BGNDE'), '~', x.get('RCEPT_ENDDE')) for x in d.get('data', [])]"
-
-      - name: Debug - 국민 only, no date filter
-        env:
-          SERVICE_KEY: ${{ secrets.DATA_GO_KR_KEY }}
-        run: |
-          echo "=== 국민 only (no date filter) ==="
-          code=$(curl -sS -G "https://api.odcloud.kr/api/ApplyhomeInfoDetailSvc/v1/getAPTLttotPblancDetail" \
-            -H "Authorization: Infuser ${SERVICE_KEY}" \
-            --data-urlencode "page=1" \
-            --data-urlencode "perPage=100" \
-            --data-urlencode "cond[HOUSE_DTL_SECD_NM::EQ]=국민" \
-            -o resp_nodatecond.json -w "%{http_code}")
-          echo "HTTP status: $code"
-          python3 -c "import json; d=json.load(open('resp_nodatecond.json')); print('matchCount', d.get('matchCount'), 'totalCount', d.get('totalCount')); [print(x.get('HOUSE_NM'), '|', x.get('SUBSCRPT_AREA_CODE_NM'), '|', repr(x.get('HOUSE_DTL_SECD_NM')), '|', x.get('RCEPT_BGNDE'), '~', x.get('RCEPT_ENDDE')) for x in d.get('data', [])]"
-
-      - name: Debug - print full raw response body
-        env:
-          SERVICE_KEY: ${{ secrets.DATA_GO_KR_KEY }}
-        run: |
-          echo "=== full raw body, no cond at all ==="
-          code=$(curl -sS -G "https://api.odcloud.kr/api/ApplyhomeInfoDetailSvc/v1/getAPTLttotPblancDetail" \
-            -H "Authorization: Infuser ${SERVICE_KEY}" \
-            --data-urlencode "page=1" \
-            --data-urlencode "perPage=1" \
-            -o resp_plain.json -w "%{http_code}")
-          echo "HTTP status: $code"
-          echo "--- raw body ---"
-          cat resp_plain.json
-          echo ""
-          echo "=== full raw body, with RCEPT_ENDDE cond ==="
-          today=$(date -u -d "+9 hours" +%Y-%m-%d)
-          code2=$(curl -sS -G "https://api.odcloud.kr/api/ApplyhomeInfoDetailSvc/v1/getAPTLttotPblancDetail" \
-            -H "Authorization: Infuser ${SERVICE_KEY}" \
-            --data-urlencode "page=1" \
-            --data-urlencode "perPage=1" \
-            --data-urlencode "cond[RCEPT_ENDDE::GTE]=${today}" \
-            -o resp_plain2.json -w "%{http_code}")
-          echo "HTTP status: $code2"
-          echo "--- raw body ---"
-          cat resp_plain2.json
-          echo ""
-
-      - name: Debug - raw recent rows regardless of type
-        env:
-          SERVICE_KEY: ${{ secrets.DATA_GO_KR_KEY }}
-        run: |
-          echo "=== raw recent (no cond at all) ==="
-          today=$(date -u -d "+9 hours" +%Y-%m-%d)
-          code=$(curl -sS -G "https://api.odcloud.kr/api/ApplyhomeInfoDetailSvc/v1/getAPTLttotPblancDetail" \
-            -H "Authorization: Infuser ${SERVICE_KEY}" \
-            --data-urlencode "page=1" \
-            --data-urlencode "perPage=10" \
-            --data-urlencode "cond[RCEPT_ENDDE::GTE]=${today}" \
-            -o resp_raw.json -w "%{http_code}")
-          echo "HTTP status: $code"
-          python3 -c "import json; d=json.load(open('resp_raw.json')); print('matchCount', d.get('matchCount'), 'totalCount', d.get('totalCount')); [print(x.get('HOUSE_NM'), '|', x.get('SUBSCRPT_AREA_CODE_NM'), '|', repr(x.get('HOUSE_DTL_SECD_NM')), '|', x.get('RCEPT_BGNDE'), '~', x.get('RCEPT_ENDDE')) for x in d.get('data', [])]"
+          python3 -c "
+import json
+d = json.load(open('resp_giheung.json'))
+print('matchCount', d.get('matchCount'), 'totalCount', d.get('totalCount'))
+for x in d.get('data', []):
+    print(x.get('HOUSE_NM'), '|', x.get('HOUSE_DTL_SECD_NM'), '|', x.get('HSSPLY_ADRES'), '|', x.get('RCRIT_PBLANC_DE'))
+"
