@@ -1,0 +1,61 @@
+name: Subscription API schema probe
+
+on:
+  push:
+    branches:
+      - claude/yongin-platform-city-subscription-18s8wt
+    paths:
+      - .github/workflows/subscription-schema-probe.yml
+  workflow_dispatch:
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Call getAPTLttotPblancDetail (header auth)
+        env:
+          SERVICE_KEY: ${{ secrets.DATA_GO_KR_KEY }}
+        run: |
+          echo "=== header-auth attempt ==="
+          code=$(curl -sS -G "https://api.odcloud.kr/api/ApplyhomeInfoDetailSvc/v1/getAPTLttotPblancDetail" \
+            -H "Authorization: Infuser ${SERVICE_KEY}" \
+            --data-urlencode "page=1" \
+            --data-urlencode "perPage=5" \
+            -o resp_header.json -w "%{http_code}")
+          echo "HTTP status: $code"
+          echo "--- body ---"
+          cat resp_header.json
+          echo ""
+
+      - name: Call getAPTLttotPblancDetail (query-param auth, fallback)
+        env:
+          SERVICE_KEY: ${{ secrets.DATA_GO_KR_KEY }}
+        run: |
+          echo "=== query-param-auth attempt ==="
+          code=$(curl -sS -G "https://api.odcloud.kr/api/ApplyhomeInfoDetailSvc/v1/getAPTLttotPblancDetail" \
+            --data-urlencode "serviceKey=${SERVICE_KEY}" \
+            --data-urlencode "page=1" \
+            --data-urlencode "perPage=5" \
+            -o resp_query.json -w "%{http_code}")
+          echo "HTTP status: $code"
+          echo "--- body ---"
+          cat resp_query.json
+          echo ""
+
+      - name: Server-side filter test (국민주택, 접수마감 미도래)
+        env:
+          SERVICE_KEY: ${{ secrets.DATA_GO_KR_KEY }}
+        run: |
+          echo "=== cond filter attempt ==="
+          today=$(date -u -d "+9 hours" +%Y-%m-%d)
+          echo "today(KST): $today"
+          code=$(curl -sS -G "https://api.odcloud.kr/api/ApplyhomeInfoDetailSvc/v1/getAPTLttotPblancDetail" \
+            -H "Authorization: Infuser ${SERVICE_KEY}" \
+            --data-urlencode "page=1" \
+            --data-urlencode "perPage=100" \
+            --data-urlencode "cond[HOUSE_DTL_SECD_NM::EQ]=국민" \
+            --data-urlencode "cond[RCEPT_ENDDE::GTE]=${today}" \
+            -o resp_filter.json -w "%{http_code}")
+          echo "HTTP status: $code"
+          echo "--- matchCount/totalCount/currentCount ---"
+          python3 -c "import json; d=json.load(open('resp_filter.json')); print('matchCount', d.get('matchCount'), 'totalCount', d.get('totalCount'), 'currentCount', d.get('currentCount')); [print(x.get('HOUSE_NM'), '|', x.get('SUBSCRPT_AREA_CODE_NM'), '|', x.get('HOUSE_DTL_SECD_NM'), '|', x.get('RCEPT_BGNDE'), '~', x.get('RCEPT_ENDDE')) for x in d.get('data', [])]"
