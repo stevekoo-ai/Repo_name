@@ -2,8 +2,14 @@
 # 청약홈/LH/GH/SH는 개인 대상 공식 API를 제공하지 않으므로, 공고가 뜨면
 # 이 파일에 직접 입력한다 (reliability grade 4 — 공공기관 공고 원문 기준).
 #
+# 📚 Lesson Learned Reference: docs/LESSON_LEARNED_API_DEBUGGING.md
 # 주의: 플랫폼시티 프로젝트의 역사적 데이터 분석 결과, 민영 주택으로 분류되어 있음.
+# - API 검증을 통해 확인된 사실 (Issue 5: 3단계 필터 전략)
+# - 라온프라이빗 아르디에, e편한세상 용인역 플랫폼시티 모두 민영 분류
+# - 따라서 housing_type을 명시적으로 입력해야 정확한 점수 계산 가능
+#
 # housing_type 필드: "국민주택" (공공) 또는 "민영" (private). 기본값 없음 — 반드시 명시.
+# 입력 방법: scripts/verify_platform_city_listings.py로 현재 청약Home 상황을 먼저 확인한 후 입력
 
 updated_at: "2026-07-16"
 notices:

@@ -6,6 +6,14 @@ and historical "플랫폼시티" listings, including their housing types
 (국민주택 vs 민영) to understand the notification scope needed.
 
 Run: python3 scripts/verify_platform_city_listings.py <DATA_GO_KR_KEY>
+
+📚 Lesson Learned Reference:
+   See docs/LESSON_LEARNED_API_DEBUGGING.md for:
+   - CJK character encoding (한글 URL encoding)
+   - API authentication (Authorization header format)
+   - 3-tier validation query strategy
+   - Type mismatch handling
+   - Error diagnosis patterns
 """
 from __future__ import annotations
 

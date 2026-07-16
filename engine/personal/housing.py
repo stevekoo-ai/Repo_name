@@ -7,6 +7,12 @@
 Runs once per notice in data/manual_inputs/subscription_notices.yaml (13.8),
 plus a dedicated 플랫폼시티 breakdown (13.9) when a notice is tagged
 `is_platform_city: true`.
+
+📚 Lesson Learned Reference: docs/LESSON_LEARNED_API_DEBUGGING.md
+   Critical Finding: 역사적 플랫폼시티 프로젝트 = 민영(Private) 주택
+   - Issue 5: 필터 전략 (3단계 검증)으로 역사적 데이터 분석 완료
+   - Issue 6: 데이터 타입 불일치 (경쟁률 float 검증)
+   - Phase 5: 배포 후 모니터링 (housing_type 필드 검증)
 """
 from __future__ import annotations
 

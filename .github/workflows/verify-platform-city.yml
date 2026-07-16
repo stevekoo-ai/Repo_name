@@ -1,3 +1,10 @@
+# 📚 Lesson Learned Reference: docs/LESSON_LEARNED_API_DEBUGGING.md
+# 이 워크플로우는 아래 이슈 해결 경험을 기반으로 설계됨:
+# - Issue 2: Authorization 헤더 형식 ("Infuser" 인증)
+# - Issue 3: CJK 한글 인코딩 (URL encoding 자동화)
+# - Issue 5: 3단계 필터 전략 (다중 조건 검증)
+# - Phase 4: YAML 워크플로우 구현 (단일 라인 스크립트)
+
 name: Verify Yongin Platform City listings
 
 on:

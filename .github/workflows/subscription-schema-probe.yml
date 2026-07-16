@@ -1,3 +1,11 @@
+# 📚 Lesson Learned Reference: docs/LESSON_LEARNED_API_DEBUGGING.md
+# 주요 적용 사항:
+# - YAML 들여쓰기 일관성 (Phase 1)
+# - Authorization 헤더 형식: "Infuser ${SERVICE_KEY}" (Phase 2)
+# - --data-urlencode로 한글 자동 인코딩 (Phase 3)
+# - 단일 라인 Python 필터 (Phase 4)
+# - 3단계 검증 쿼리 전략: 이름 → 시도 → 구 (Issue 5)
+
 name: Subscription API schema probe
 
 on:
