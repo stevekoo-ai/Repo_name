@@ -24,13 +24,7 @@ jobs:
             --data-urlencode "cond[HOUSE_NM::LIKE]=플랫폼시티" \
             -o resp_platformcity.json -w "%{http_code}")
           echo "HTTP status: $code"
-          python3 -c "
-import json
-d = json.load(open('resp_platformcity.json'))
-print('matchCount', d.get('matchCount'), 'totalCount', d.get('totalCount'))
-for x in d.get('data', []):
-    print(x.get('HOUSE_NM'), '|', x.get('HOUSE_DTL_SECD_NM'), '|', x.get('SUBSCRPT_AREA_CODE_NM'), '|', x.get('HSSPLY_ADRES'), '|', x.get('RCRIT_PBLANC_DE'))
-"
+          python3 -c "import json; d=json.load(open('resp_platformcity.json')); print('matchCount', d.get('matchCount'), 'totalCount', d.get('totalCount')); [print(x.get('HOUSE_NM'), '|', x.get('HOUSE_DTL_SECD_NM'), '|', x.get('SUBSCRPT_AREA_CODE_NM'), '|', x.get('HSSPLY_ADRES'), '|', x.get('RCRIT_PBLANC_DE')) for x in d.get('data', [])]"
 
       - name: Smart check - 용인시 listings, any type, all-time (address naming patterns)
         env:
@@ -44,13 +38,7 @@ for x in d.get('data', []):
             --data-urlencode "cond[HSSPLY_ADRES::LIKE]=용인" \
             -o resp_yongin.json -w "%{http_code}")
           echo "HTTP status: $code"
-          python3 -c "
-import json
-d = json.load(open('resp_yongin.json'))
-print('matchCount', d.get('matchCount'), 'totalCount', d.get('totalCount'))
-for x in d.get('data', []):
-    print(x.get('HOUSE_NM'), '|', x.get('HOUSE_DTL_SECD_NM'), '|', x.get('HSSPLY_ADRES'), '|', x.get('RCRIT_PBLANC_DE'))
-"
+          python3 -c "import json; d=json.load(open('resp_yongin.json')); print('matchCount', d.get('matchCount'), 'totalCount', d.get('totalCount')); [print(x.get('HOUSE_NM'), '|', x.get('HOUSE_DTL_SECD_NM'), '|', x.get('HSSPLY_ADRES'), '|', x.get('RCRIT_PBLANC_DE')) for x in d.get('data', [])]"
 
       - name: Smart check - 기흥구 specifically (플랫폼시티 실제 위치 구)
         env:
@@ -64,10 +52,4 @@ for x in d.get('data', []):
             --data-urlencode "cond[HSSPLY_ADRES::LIKE]=기흥구" \
             -o resp_giheung.json -w "%{http_code}")
           echo "HTTP status: $code"
-          python3 -c "
-import json
-d = json.load(open('resp_giheung.json'))
-print('matchCount', d.get('matchCount'), 'totalCount', d.get('totalCount'))
-for x in d.get('data', []):
-    print(x.get('HOUSE_NM'), '|', x.get('HOUSE_DTL_SECD_NM'), '|', x.get('HSSPLY_ADRES'), '|', x.get('RCRIT_PBLANC_DE'))
-"
+          python3 -c "import json; d=json.load(open('resp_giheung.json')); print('matchCount', d.get('matchCount'), 'totalCount', d.get('totalCount')); [print(x.get('HOUSE_NM'), '|', x.get('HOUSE_DTL_SECD_NM'), '|', x.get('HSSPLY_ADRES'), '|', x.get('RCRIT_PBLANC_DE')) for x in d.get('data', [])]"
