@@ -2,7 +2,7 @@ name: Subscription monitor (Seoul/Gyeonggi 국민주택)
 
 on:
   schedule:
-    - cron: "*/5 * * * *"   # every 5 minutes
+    - cron: "17 * * * *"   # hourly - reduced from every 5 min after suspected daily quota exhaustion; raise once quota is confirmed
   workflow_dispatch:
     inputs:
       test_keyword:

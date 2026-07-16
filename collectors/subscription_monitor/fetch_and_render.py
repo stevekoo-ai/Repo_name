@@ -52,6 +52,26 @@ def fetch_all(service_key: str, today: str) -> list[dict]:
     return rows
 
 
+def api_looks_healthy(service_key: str) -> bool:
+    """A bare, unfiltered query against this dataset should always return a large
+    totalCount (thousands, nationwide, all history). If it comes back ~0, the API
+    is very likely rate-limited / quota-exhausted rather than genuinely empty, and
+    we must not let that be mistaken for "confirmed no listings" (which would
+    silently suppress a real 플랫폼시티 match)."""
+    params = {"page": 1, "perPage": 1}
+    url = BASE_URL + "?" + urllib.parse.urlencode(params)
+    req = urllib.request.Request(url, headers={"Authorization": f"Infuser {service_key}"})
+    try:
+        with urllib.request.urlopen(req, timeout=20) as resp:
+            data = json.load(resp)
+    except Exception as e:
+        print(f"health check request failed: {e}")
+        return False
+    total = data.get("totalCount", 0)
+    print(f"health check: unfiltered totalCount={total}")
+    return total > 100
+
+
 def fmt_money(n) -> str:
     try:
         return f"{int(n):,}"
@@ -210,6 +230,17 @@ def main() -> None:
     today = now_kst.strftime("%Y-%m-%d")
 
     all_rows = fetch_all(service_key, today)
+
+    if not all_rows and not api_looks_healthy(service_key):
+        print(
+            "API returned empty results AND the unfiltered health check also came back "
+            "near-empty (likely daily traffic quota exhausted). Skipping this cycle "
+            "entirely so we don't overwrite the page with a false '0 listings' state or "
+            "risk missing a real 플랫폼시티 match. Previous docs/subscription-monitor.html "
+            "and alerted_state.json are left untouched."
+        )
+        return
+
     rows = [r for r in all_rows if r.get("SUBSCRPT_AREA_CODE_NM") in TARGET_REGIONS]
 
     fired = run_alerts(all_rows)
