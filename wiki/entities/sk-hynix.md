@@ -36,6 +36,33 @@ tags: [sk-hynix, semiconductor, stock, adr]
   지표는 이제 [매크로 지표 트렌드 추적](../concepts/macro-indicators.md)에서
   시계열로 누적 기록한다.
 
+### 급락 재개 (2026-07-16 오전)
+
+09:50 기준 본주 -11.14%(1,850,000원), ADR -9.00%, 코스피 -4.45%(6,960선).
+원인: ① 미 반도체 섹터 약세(AI 인프라 투자 둔화 우려) ② 차익실현 ③ **엔비디아향
+HBM4 출하량 20~30% 축소 보도**(신규 반영, 체크포인트 ②를 긍정→중립·주의로
+하향) ④ 한국은행 금리 인상 경계감.
+
+HBM4 축소 건은 원인이 SK하이닉스가 아니라 **엔비디아 자체의 '베라 루빈'
+양산 지연**이며, 축소분은 HBM3E·서버 D램으로 전환되는 것이라 수요 소멸은
+아니다. 다만 이 소재는 **4월부터 있던 오래된 이슈**가 오늘 급락 설명으로
+재인용된 것 — 오늘 새로 터진 속보가 아니다. "계약 파기가 아니라 일정
+조정"이라는 반박 시각도 있어 해석이 갈린다. 상세는
+[sources/websearch-sk-hynix-crash-2026-07-16.md](../../sources/websearch-sk-hynix-crash-2026-07-16.md).
+
+**아침 체크 루틴의 한계 발견**: 이 뉴스를 오늘 아침(07:00) 체크가 놓친 이유는
+(1) 장 시작 전 실행이라 09:50 급락 관련 기사를 원천적으로 못 잡고, (2) 검색어
+자체가 "HBM4 인증" 등 긍정 확증 위주로 설계돼 "축소/하향" 같은 부정 키워드를
+안 썼기 때문. Routine 검색어 개선이 필요(아직 미반영, 체크리스트 자동화
+섹션 참고).
+
+**개인 보유 관련 논의**: 사용자가 이 급락 이후 "TSMC 실적(15:00)이 좋을 테니
+반등할 것 같아 추가 매수" 의향을 물었고, 이미 [포트폴리오의 65%](my-portfolio.md)가
+이 종목에 쏠려있는 데다 오늘 새 악재(HBM4 축소)까지 겹친 시점이라 신중 의견을
+전달함 — TSMC(파운드리)와 SK하이닉스(메모리) 실적의 인과관계가 약하고, 좋은
+실적은 이미 컨센서스에 반영됐을 가능성, 특정 시각(15:00)에 맞춘 베팅은
+방향·타이밍 둘 다 맞아야 하는 구조라는 점을 지적.
+
 ## 다음에 볼 것
 
 - 2,122,000~2,143,000원대 위에서 지지되는지
@@ -66,4 +93,5 @@ tags: [sk-hynix, semiconductor, stock, adr]
 - [나의 투자 포트폴리오](my-portfolio.md)
 - [사용자 프로필](user-profile.md)
 - [sources/websearch-sk-hynix-pullback-2026-07-15.md](../../sources/websearch-sk-hynix-pullback-2026-07-15.md)
-- [sources/websearch-sk-hynix-morning-check-2026-07-16.md](../../sources/websearch-sk-hynix-morning-check-2026-07-16.md) (최신 상태 근거; 그 외 원본 소스는 위 히스토리 각 페이지의 Sources 참고)
+- [sources/websearch-sk-hynix-morning-check-2026-07-16.md](../../sources/websearch-sk-hynix-morning-check-2026-07-16.md)
+- [sources/websearch-sk-hynix-crash-2026-07-16.md](../../sources/websearch-sk-hynix-crash-2026-07-16.md) (최신 상태 근거; 그 외 원본 소스는 위 히스토리 각 페이지의 Sources 참고)
