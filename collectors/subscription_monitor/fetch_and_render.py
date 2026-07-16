@@ -13,7 +13,7 @@ import urllib.parse
 import urllib.request
 from datetime import datetime, timedelta, timezone
 
-from alerts import run_alerts
+from alerts import run_alerts, run_health_monitor
 
 KST = timezone(timedelta(hours=9))
 BASE_URL = "https://api.odcloud.kr/api/ApplyhomeInfoDetailSvc/v1/getAPTLttotPblancDetail"
@@ -215,7 +215,7 @@ def render(rows: list[dict], now_kst: datetime) -> str:
   </section>
 
   <footer>
-    데이터 출처: 한국부동산원 청약Home 분양정보 조회 서비스(공공데이터포털 Open API). 하루 3회(10/14/18시 KST) 자동 갱신됩니다.
+    데이터 출처: 한국부동산원 청약Home 분양정보 조회 서비스(공공데이터포털 Open API). 5분마다 자동 갱신됩니다.
     계약·청약 신청 전 반드시 청약홈 원문 공고를 확인하세요.
   </footer>
 </div>
@@ -239,9 +239,11 @@ def main() -> None:
             "risk missing a real 플랫폼시티 match. Previous docs/subscription-monitor.html "
             "and alerted_state.json are left untouched."
         )
+        run_health_monitor(healthy=False, now_kst=now_kst, seoul_gyeonggi_count=0)
         return
 
     rows = [r for r in all_rows if r.get("SUBSCRPT_AREA_CODE_NM") in TARGET_REGIONS]
+    run_health_monitor(healthy=True, now_kst=now_kst, seoul_gyeonggi_count=len(rows))
 
     fired = run_alerts(all_rows)
     if fired:

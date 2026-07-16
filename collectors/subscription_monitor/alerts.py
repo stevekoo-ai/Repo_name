@@ -13,7 +13,12 @@ import urllib.request
 from email.mime.text import MIMEText
 
 STATE_PATH = os.path.join(os.path.dirname(__file__), "alerted_state.json")
+HEALTH_STATE_PATH = os.path.join(os.path.dirname(__file__), "health_state.json")
 PLATFORM_CITY_KEYWORDS = ["플랫폼시티"]
+DASHBOARD_URL = "https://stevekoo-ai.github.io/Repo_name/subscription-monitor.html"
+
+FAILURE_THRESHOLD = 6  # 6 consecutive 5-minute failures = ~30 minutes of no data
+HEARTBEAT_HOUR_KST = 9  # send the daily "still alive" heartbeat on the first successful run at/after this hour
 
 
 def load_state() -> set:
@@ -134,3 +139,86 @@ def run_alerts(rows: list) -> int:
     state |= {(m.get("HOUSE_MANAGE_NO") or m.get("PBLANC_NO")) for m in new_matches}
     save_state(state)
     return len(new_matches)
+
+
+def load_health_state() -> dict:
+    default = {"consecutive_failures": 0, "outage_alerted": False, "last_heartbeat_date": None}
+    if not os.path.exists(HEALTH_STATE_PATH):
+        save_health_state(default)
+        return default
+    with open(HEALTH_STATE_PATH, "r", encoding="utf-8") as f:
+        data = json.load(f)
+    return {**default, **data}
+
+
+def save_health_state(state: dict) -> None:
+    with open(HEALTH_STATE_PATH, "w", encoding="utf-8") as f:
+        json.dump(state, f, ensure_ascii=False, indent=2)
+
+
+def _notify(title: str, body: str, gh_token, repo_full_name, gmail_addr, gmail_pw, to_addr, also_issue: bool) -> None:
+    if also_issue and gh_token and repo_full_name:
+        try:
+            create_github_issue(repo_full_name, gh_token, title, body)
+            print(f"created github issue: {title}")
+        except Exception as e:
+            print(f"github issue failed: {e}")
+    if gmail_addr and gmail_pw and to_addr:
+        try:
+            send_email(to_addr, gmail_addr, gmail_pw, title, body)
+            print(f"sent email: {title}")
+        except Exception as e:
+            print(f"email failed: {e}")
+
+
+def run_health_monitor(healthy: bool, now_kst, seoul_gyeonggi_count: int) -> None:
+    """Tracks API health across runs and sends:
+    - an outage alert (Issue + email) after FAILURE_THRESHOLD consecutive unhealthy runs
+    - a recovery notice (email) once it comes back
+    - one daily "still alive" heartbeat email regardless of match activity
+    """
+    state = load_health_state()
+    repo_full_name = os.environ.get("GITHUB_REPOSITORY")
+    gh_token = os.environ.get("GITHUB_TOKEN")
+    gmail_addr = os.environ.get("GMAIL_ADDRESS")
+    gmail_pw = os.environ.get("GMAIL_APP_PASSWORD")
+    to_addr = os.environ.get("ALERT_EMAIL_TO") or gmail_addr or ""
+    now_str = now_kst.strftime("%Y-%m-%d %H:%M KST")
+
+    if not healthy:
+        state["consecutive_failures"] += 1
+        if state["consecutive_failures"] >= FAILURE_THRESHOLD and not state["outage_alerted"]:
+            title = "⚠ 청약 모니터 API 응답 이상 지속 중"
+            body = (
+                f"청약Home API가 {FAILURE_THRESHOLD}회 연속(약 30분 이상) 정상 응답하지 않고 있습니다.\n"
+                f"마지막 확인 시각: {now_str}\n\n"
+                f"페이지({DASHBOARD_URL})의 '마지막 갱신' 시각이 이 시점보다 많이 오래됐다면 실제 장애입니다.\n"
+                "data.go.kr 마이페이지에서 활용현황을 확인해보세요."
+            )
+            _notify(title, body, gh_token, repo_full_name, gmail_addr, gmail_pw, to_addr, also_issue=True)
+            state["outage_alerted"] = True
+        save_health_state(state)
+        return
+
+    if state["outage_alerted"]:
+        title = "✅ 청약 모니터 정상 복구됨"
+        body = f"API 응답이 다시 정상화됐습니다.\n복구 확인 시각: {now_str}"
+        _notify(title, body, gh_token, repo_full_name, gmail_addr, gmail_pw, to_addr, also_issue=False)
+
+    state["consecutive_failures"] = 0
+    state["outage_alerted"] = False
+
+    today_str = now_kst.strftime("%Y-%m-%d")
+    if now_kst.hour >= HEARTBEAT_HOUR_KST and state.get("last_heartbeat_date") != today_str:
+        title = f"청약 모니터 정상 작동 중 ({today_str})"
+        body = (
+            "매일 발송되는 상태 확인 메일입니다. 이 메일이 계속 온다면 시스템이 정상 작동 중이라는 뜻입니다.\n\n"
+            f"마지막 갱신: {now_str}\n"
+            f"현재 서울·경기 국민주택 매칭: {seoul_gyeonggi_count}건\n"
+            "플랫폼시티 신규 알림: 있었다면 이미 별도 메일/Issue로 받으셨을 것입니다.\n\n"
+            f"대시보드: {DASHBOARD_URL}"
+        )
+        _notify(title, body, gh_token, repo_full_name, gmail_addr, gmail_pw, to_addr, also_issue=False)
+        state["last_heartbeat_date"] = today_str
+
+    save_health_state(state)

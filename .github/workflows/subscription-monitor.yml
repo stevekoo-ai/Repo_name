@@ -42,7 +42,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add docs/subscription-monitor.html collectors/subscription_monitor/alerted_state.json
+          git add docs/subscription-monitor.html collectors/subscription_monitor/alerted_state.json collectors/subscription_monitor/health_state.json
           if git diff --cached --quiet; then
             echo "no changes"
           else
