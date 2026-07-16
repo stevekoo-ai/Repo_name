@@ -59,3 +59,32 @@ jobs:
           echo "HTTP status: $code"
           echo "--- matchCount/totalCount/currentCount ---"
           python3 -c "import json; d=json.load(open('resp_filter.json')); print('matchCount', d.get('matchCount'), 'totalCount', d.get('totalCount'), 'currentCount', d.get('currentCount')); [print(x.get('HOUSE_NM'), '|', x.get('SUBSCRPT_AREA_CODE_NM'), '|', x.get('HOUSE_DTL_SECD_NM'), '|', x.get('RCEPT_BGNDE'), '~', x.get('RCEPT_ENDDE')) for x in d.get('data', [])]"
+
+      - name: Debug - 국민 only, no date filter
+        env:
+          SERVICE_KEY: ${{ secrets.DATA_GO_KR_KEY }}
+        run: |
+          echo "=== 국민 only (no date filter) ==="
+          code=$(curl -sS -G "https://api.odcloud.kr/api/ApplyhomeInfoDetailSvc/v1/getAPTLttotPblancDetail" \
+            -H "Authorization: Infuser ${SERVICE_KEY}" \
+            --data-urlencode "page=1" \
+            --data-urlencode "perPage=100" \
+            --data-urlencode "cond[HOUSE_DTL_SECD_NM::EQ]=국민" \
+            -o resp_nodatecond.json -w "%{http_code}")
+          echo "HTTP status: $code"
+          python3 -c "import json; d=json.load(open('resp_nodatecond.json')); print('matchCount', d.get('matchCount'), 'totalCount', d.get('totalCount')); [print(x.get('HOUSE_NM'), '|', x.get('SUBSCRPT_AREA_CODE_NM'), '|', repr(x.get('HOUSE_DTL_SECD_NM')), '|', x.get('RCEPT_BGNDE'), '~', x.get('RCEPT_ENDDE')) for x in d.get('data', [])]"
+
+      - name: Debug - raw recent rows regardless of type
+        env:
+          SERVICE_KEY: ${{ secrets.DATA_GO_KR_KEY }}
+        run: |
+          echo "=== raw recent (no cond at all) ==="
+          today=$(date -u -d "+9 hours" +%Y-%m-%d)
+          code=$(curl -sS -G "https://api.odcloud.kr/api/ApplyhomeInfoDetailSvc/v1/getAPTLttotPblancDetail" \
+            -H "Authorization: Infuser ${SERVICE_KEY}" \
+            --data-urlencode "page=1" \
+            --data-urlencode "perPage=10" \
+            --data-urlencode "cond[RCEPT_ENDDE::GTE]=${today}" \
+            -o resp_raw.json -w "%{http_code}")
+          echo "HTTP status: $code"
+          python3 -c "import json; d=json.load(open('resp_raw.json')); print('matchCount', d.get('matchCount'), 'totalCount', d.get('totalCount')); [print(x.get('HOUSE_NM'), '|', x.get('SUBSCRPT_AREA_CODE_NM'), '|', repr(x.get('HOUSE_DTL_SECD_NM')), '|', x.get('RCEPT_BGNDE'), '~', x.get('RCEPT_ENDDE')) for x in d.get('data', [])]"
