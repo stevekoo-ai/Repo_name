@@ -1,0 +1,135 @@
+<title>SK하이닉스 장초반 체크 — 2026-07-16</title>
+<style>
+  :root {
+    --bg: #f4f5f1; --surface: #ffffff; --surface-2: #eaebe3;
+    --ink: #1e221d; --ink-soft: #565b4e; --ink-faint: #8b9084;
+    --accent: #2f6b5e; --accent-ink: #143a32; --accent-soft: #dce8e2;
+    --border: #d8d9cf;
+    --pos: #2f6b3f; --pos-bg: #e3ecdd;
+    --neu: #96660f; --neu-bg: #f3e8d2;
+    --neg: #a53f3f; --neg-bg: #f4dede;
+    --unk: #6b7066; --unk-bg: #e7e8e1;
+    --shadow: 0 1px 2px rgba(30,34,29,.06), 0 8px 24px -12px rgba(30,34,29,.18);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #14170f; --surface: #1b201a; --surface-2: #212820;
+      --ink: #e9ece4; --ink-soft: #a9ae9e; --ink-faint: #6e7367;
+      --accent: #74c6ae; --accent-ink: #eaf7f2; --accent-soft: #223730;
+      --border: #303830;
+      --pos: #8fd19f; --pos-bg: #1f3324;
+      --neu: #e3b869; --neu-bg: #3a2f18;
+      --neg: #e79b9b; --neg-bg: #3a2222;
+      --unk: #9aa093; --unk-bg: #262b23;
+      --shadow: 0 1px 2px rgba(0,0,0,.4), 0 8px 24px -12px rgba(0,0,0,.6);
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #14170f; --surface: #1b201a; --surface-2: #212820;
+    --ink: #e9ece4; --ink-soft: #a9ae9e; --ink-faint: #6e7367;
+    --accent: #74c6ae; --accent-ink: #eaf7f2; --accent-soft: #223730;
+    --border: #303830;
+    --pos: #8fd19f; --pos-bg: #1f3324;
+    --neu: #e3b869; --neu-bg: #3a2f18;
+    --neg: #e79b9b; --neg-bg: #3a2222;
+    --unk: #9aa093; --unk-bg: #262b23;
+  }
+  :root[data-theme="light"] {
+    --bg: #f4f5f1; --surface: #ffffff; --surface-2: #eaebe3;
+    --ink: #1e221d; --ink-soft: #565b4e; --ink-faint: #8b9084;
+    --accent: #2f6b5e; --accent-ink: #143a32; --accent-soft: #dce8e2;
+    --border: #d8d9cf;
+    --pos: #2f6b3f; --pos-bg: #e3ecdd;
+    --neu: #96660f; --neu-bg: #f3e8d2;
+    --neg: #a53f3f; --neg-bg: #f4dede;
+    --unk: #6b7066; --unk-bg: #e7e8e1;
+  }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--ink); font-family:-apple-system,"Apple SD Gothic Neo","Pretendard","Noto Sans KR",system-ui,sans-serif; line-height:1.65; }
+  .wrap { max-width:48rem; margin:0 auto; padding:2.5rem 1.5rem 5rem; }
+  header { margin-bottom:2rem; }
+  .eyebrow { display:inline-flex; align-items:center; gap:.4rem; font-family:ui-monospace,"SFMono-Regular",Menlo,Consolas,monospace; font-size:.72rem; letter-spacing:.06em; text-transform:uppercase; color:var(--neg); background:var(--neg-bg); border-radius:999px; padding:.28rem .7rem; margin-bottom:1rem; }
+  h1 { font-size:clamp(1.5rem,4.5vw,2rem); font-weight:800; letter-spacing:-.01em; margin:0 0 .5rem; text-wrap:balance; }
+  .lede { color:var(--ink-soft); margin:0; font-size:.98rem; }
+  .snapshot { display:grid; grid-template-columns:repeat(auto-fit,minmax(9.5rem,1fr)); gap:.9rem; margin:1.75rem 0; }
+  .stat { background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:1rem 1.1rem; box-shadow:var(--shadow); }
+  .stat .label { font-size:.72rem; color:var(--ink-faint); text-transform:uppercase; letter-spacing:.05em; margin-bottom:.35rem; }
+  .stat .value { font-family:ui-monospace,"SFMono-Regular",Menlo,Consolas,monospace; font-size:1.2rem; font-weight:700; font-variant-numeric:tabular-nums; }
+  .stat .sub { font-size:.8rem; margin-top:.2rem; }
+  .down { color:var(--neg); }
+  section { margin-bottom:2rem; }
+  h2 { font-size:1.1rem; font-weight:800; margin:0 0 .8rem; }
+  .card { background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:1.2rem 1.35rem; box-shadow:var(--shadow); margin-bottom:.8rem; }
+  .card h3 { margin:0 0 .4rem; font-size:.98rem; font-weight:700; }
+  .card p { margin:.3rem 0 0; color:var(--ink-soft); font-size:.9rem; }
+  .pill { display:inline-flex; align-items:center; gap:.35rem; font-size:.72rem; font-weight:700; padding:.22rem .55rem; border-radius:999px; white-space:nowrap; margin-left:.5rem; }
+  .pill.neg { color:var(--neg); background:var(--neg-bg); }
+  .pill.neu { color:var(--neu); background:var(--neu-bg); }
+  .callout { border-left:3px solid var(--neg); background:var(--neg-bg); color:var(--ink); border-radius:0 10px 10px 0; padding:.9rem 1.1rem; font-size:.88rem; }
+  .demo-note { border-left:3px solid var(--accent); background:var(--accent-soft); color:var(--accent-ink); border-radius:0 10px 10px 0; padding:.8rem 1rem; font-size:.85rem; margin-bottom:1.5rem; }
+  @media (prefers-color-scheme:dark){ .demo-note{ color:var(--ink);} }
+  a { color:var(--accent-ink); } @media (prefers-color-scheme:dark){ a{ color:var(--accent);} }
+  footer { margin-top:3rem; padding-top:1.25rem; border-top:1px solid var(--border); color:var(--ink-faint); font-size:.8rem; }
+</style>
+
+<div class="wrap">
+  <div class="demo-note">
+    📋 미리보기: 이 Routine의 첫 정식 실행은 내일(7/17) 10:02 KST입니다.
+    오늘 이미 지나간 09~10시 구간을 오늘 아침 대화에서 실제로 조사한
+    내용으로 채워, 형태만 미리 보여드립니다.
+  </div>
+
+  <header>
+    <span class="eyebrow">● 장초반 체크 · 2026-07-16, 09:50 기준</span>
+    <h1>개장 직후 급락 — HBM4 출하 축소 보도 겹침</h1>
+    <p class="lede">09:00 개장 후 50분 만에 본주 -11%대. 어제 저녁 체크 이후 상태에서 크게 악화.</p>
+  </header>
+
+  <div class="snapshot">
+    <div class="stat"><div class="label">본주 000660</div><div class="value">1,850,000<span style="font-size:.65rem;">원</span></div><div class="sub down">-11.14% (09:50)</div></div>
+    <div class="stat"><div class="label">ADR(SKHY)</div><div class="value" style="font-size:1rem;">동반 하락</div><div class="sub down">-9.00%</div></div>
+    <div class="stat"><div class="label">코스피</div><div class="value">6,960.50</div><div class="sub down">-4.45% (-323.91p)</div></div>
+  </div>
+
+  <section>
+    <h2>왜 빠졌나</h2>
+
+    <div class="card">
+      <h3>① 미국 반도체 섹터 약세</h3>
+      <p>AI 인프라 투자 둔화 우려로 미 반도체 업종 전반 하락, 국내 장에도 전이.</p>
+    </div>
+
+    <div class="card">
+      <h3>② 차익실현</h3>
+      <p>7/15 급등분에 대한 통상적인 되돌림 성격도 일부 포함.</p>
+    </div>
+
+    <div class="card">
+      <h3>③ HBM4 출하량 축소 보도 <span class="pill neg">체크포인트 ②하향</span></h3>
+      <p>엔비디아향 HBM4 출하량을 계획 대비 20~30% 축소한다는 보도. 원인은
+      엔비디아 자체의 '베라 루빈' 양산 지연이며, 축소분은 HBM3E·서버
+      D램으로 전환(수요 소멸 아님). 다만 이 소재는 4월부터 있던 오래된
+      이슈가 오늘 재인용된 것 — 완전히 새로운 속보는 아님. "계약 파기가
+      아니라 일정 조정"이라는 반박 시각도 있어 해석이 갈림.</p>
+    </div>
+
+    <div class="card">
+      <h3>④ 한국은행 금리 결정 경계감 <span class="pill neu">오늘 10:00 발표 예정</span></h3>
+      <p>기준금리 2.50%→2.75% 인상이 유력하다는 전망이 장 초반 경계감으로
+      작용. 결과는 이 리포트 시점(09:50) 기준 아직 미발표.</p>
+    </div>
+  </section>
+
+  <div class="callout">
+    어제 저녁 체크 이후 새로 나온 것은 HBM4 출하 축소 보도뿐이며, 이는
+    엔비디아 쪽 사정(베라 루빈 지연)이 원인이라 SK하이닉스 펀더멘털
+    훼손으로 단정하긴 이르다. 다만 한국은행 금리 결정 결과가 아직
+    안 나온 상태라, 오늘 하루 변동성이 더 남아있을 수 있다.
+  </div>
+
+  <footer>
+    이 리포트는 장초반 10:00(KST) Routine이 자동 생성한다 (오늘은 미리보기).
+    원문 근거는 위키 <code>concepts/sk-hynix-analyst-thesis-checkpoints.md</code>,
+    <code>entities/sk-hynix.md</code> 참고. 투자 조언 아님.
+  </footer>
+</div>
