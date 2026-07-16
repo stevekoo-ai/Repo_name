@@ -1,0 +1,43 @@
+name: Subscription API schema probe
+
+on:
+  push:
+    branches:
+      - claude/yongin-platform-city-subscription-18s8wt
+    paths:
+      - .github/workflows/subscription-schema-probe.yml
+  workflow_dispatch:
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Call getAPTLttotPblancDetail (header auth)
+        env:
+          SERVICE_KEY: ${{ secrets.DATA_GO_KR_KEY }}
+        run: |
+          echo "=== header-auth attempt ==="
+          code=$(curl -sS -G "https://api.odcloud.kr/api/ApplyhomeInfoDetailSvc/v1/getAPTLttotPblancDetail" \
+            -H "Authorization: Infuser ${SERVICE_KEY}" \
+            --data-urlencode "page=1" \
+            --data-urlencode "perPage=5" \
+            -o resp_header.json -w "%{http_code}")
+          echo "HTTP status: $code"
+          echo "--- body ---"
+          cat resp_header.json
+          echo ""
+
+      - name: Call getAPTLttotPblancDetail (query-param auth, fallback)
+        env:
+          SERVICE_KEY: ${{ secrets.DATA_GO_KR_KEY }}
+        run: |
+          echo "=== query-param-auth attempt ==="
+          code=$(curl -sS -G "https://api.odcloud.kr/api/ApplyhomeInfoDetailSvc/v1/getAPTLttotPblancDetail" \
+            --data-urlencode "serviceKey=${SERVICE_KEY}" \
+            --data-urlencode "page=1" \
+            --data-urlencode "perPage=5" \
+            -o resp_query.json -w "%{http_code}")
+          echo "HTTP status: $code"
+          echo "--- body ---"
+          cat resp_query.json
+          echo ""
