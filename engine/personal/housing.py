@@ -89,6 +89,7 @@ def _score_notice(notice: dict, profile: dict, portfolio: dict) -> dict:
         "name": notice.get("name"),
         "agency": notice.get("agency"),
         "region": notice.get("region"),
+        "housing_type": notice.get("housing_type"),
         "readiness_score": readiness_score,
         "factors": {k: (round(v, 1) if v is not None else None) for k, v in factors.items()},
         "application_start": notice.get("application_start"),
