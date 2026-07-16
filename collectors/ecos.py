@@ -47,6 +47,10 @@ ECOS_SERIES: dict[str, dict] = {
         "stat_code": "817Y002", "cycle": "D", "item_code1": "010200000",
         "unit": "%", "note": "국고채 3년물 금리 — 2026-07-14 GitHub Actions 실행에서 정상 응답 확인됨",
     },
+    "kr_10y_yield": {
+        "stat_code": "817Y002", "cycle": "D", "item_code1": "010400000",
+        "unit": "%", "note": "국고채 10년물 금리 — US 10Y와의 비교 분석용",
+    },
 }
 
 

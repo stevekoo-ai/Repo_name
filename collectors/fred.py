@@ -30,6 +30,8 @@ SERIES = {
     "us_unemployment": "UNRATE",
     "us_nonfarm_payroll": "PAYEMS",
     "us_yield_curve_10y2y": "T10Y2Y",
+    "us_10y_treasury": "DGS10",      # 10-Year Treasury Constant Maturity Rate
+    "us_2y_treasury": "DGS2",        # 2-Year Treasury Constant Maturity Rate
     "us_oecd_cli": "USALOLITOAASTSAM",
     "us_industrial_production": "INDPRO",
     "us_dollar_index": "DTWEXBGS",   # Trade Weighted US Dollar Index: Broad, Goods and Services
