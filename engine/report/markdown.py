@@ -335,13 +335,61 @@ def _appendix(payload: dict) -> str:
     return "\n".join(lines)
 
 
+def _cci_analysis(payload: dict) -> str:
+    """Comprehensive Crisis Index analysis with SK Hynix trading signals."""
+    if "cci_analysis" not in payload:
+        return ""
+
+    cci = payload["cci_analysis"]
+    state_emoji = {"GREEN": "🟢", "YELLOW": "🟡", "RED": "🔴"}
+    state = cci["state"]
+    score = cci["total_score"]
+
+    lines = [
+        f"## 위기지수 분석 (Comprehensive Crisis Index)",
+        f"**상태: {state_emoji.get(state, '?')} {state}** | **점수: {score}/100**",
+        "",
+        "| 지표 | 점수 | 해석 |",
+        "|------|------|------|",
+        f"| Sahm Rule (고용 모멘텀) | {cci['score_components']['sahm']}/20 | US 실업률 3개월 MA 추이 |",
+        f"| Yield Curve (수익률곡선) | {cci['score_components']['yield_curve']}/15 | 10Y-2Y, 10Y-3M 스프레드 |",
+        f"| Harvey Filter (3개월 검증) | {cci['score_components']['harvey']}/15 | 장기 수익률곡선 역전 신호 |",
+        f"| Copper-Gold Ratio | {cci['score_components']['copper_gold']}/10 | 산업 수요 vs 안전자산 선호 |",
+        f"| HY Credit OAS | {cci['score_components']['credit_oas']}/15 | 신용 긴축 및 유동성 지수 |",
+        f"| Buffett Indicator | {cci['score_components']['buffett']}/5 | 거시 가치평가 지표 |",
+        f"| Rule of 20 | {cci['score_components']['rule_of_20']}/5 | PER + 인플레이션 조정 |",
+        f"| K-Sahm Rule (한국 고용) | {cci['score_components']['k_sahm']}/5 | 국내 일자리 악화 신호 |",
+        f"| 반도체 산업사이클 | {cci['score_components']['semiconductor']}/10 | 출하-재고 사이클 추이 |",
+        "",
+    ]
+
+    if cci["raw_values"]["ur_ma3"] is not None:
+        lines.append(f"**주요 지표 현황:**")
+        lines.append(f"- 미국 실업률 3M MA: {cci['raw_values']['ur_ma3']}%")
+        lines.append(f"- 10Y-2Y 스프레드: {cci['raw_values']['spread_10y2y']}%p")
+        lines.append(f"- HY OAS: {cci['raw_values']['hy_oas']}%")
+        lines.append("")
+
+    action = cci["sk_hynix_action"]
+    lines.append(f"**SK Hynix 포지션 관리:**")
+    lines.append(f"- **Action**: {action['action']}")
+    lines.append(f"- **Max Weight**: {action['max_weight']}%")
+    lines.append(f"- **Context**: {action['description']}")
+    lines.append(f"- **Signal**: {action['signal']}")
+    lines.append("")
+    lines.append(f"**상태 해석:**")
+    lines.append(f"> {cci['interpretation'][state]}")
+
+    return "\n".join(lines)
+
+
 def render_markdown(payload: dict) -> str:
     header = f"# 월간 PEOS 리포트 - {payload['report_month']}\n"
     sections = [
         _us_macro_dashboard(payload), _us_regime_judgement(payload),
         _macro_dashboard(payload), _regime_judgement(payload), _kr_us_comparison(payload),
         _executive_summary(payload), _monthly_key_changes(payload),
-        _rate_analysis(payload),
+        _rate_analysis(payload), _cci_analysis(payload),
         _indicator_deep_dive(payload), _personal_analysis(payload),
         _asset_impact(payload), _scenario_analysis(payload), _discussion_points(payload),
         _action_plan(payload), _calendar(payload), _personal_brief(payload), _appendix(payload),

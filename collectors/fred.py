@@ -32,6 +32,8 @@ SERIES = {
     "us_yield_curve_10y2y": "T10Y2Y",
     "us_10y_treasury": "DGS10",      # 10-Year Treasury Constant Maturity Rate
     "us_2y_treasury": "DGS2",        # 2-Year Treasury Constant Maturity Rate
+    "us_3m_treasury": "DGS3MO",      # 3-Month Treasury for CCI Harvey filter
+    "us_treasury_3m": "DGS3MO",      # Alias
     "us_oecd_cli": "USALOLITOAASTSAM",
     "us_industrial_production": "INDPRO",
     "us_dollar_index": "DTWEXBGS",   # Trade Weighted US Dollar Index: Broad, Goods and Services
@@ -44,6 +46,9 @@ SERIES = {
     "us_ppi": "PPIACO",                # Producer Price Index by Commodity: All Commodities
     "us_retail_sales": "RSAFS",        # Advance Retail Sales: Retail Trade and Food Services
     "us_trade_balance": "BOPGSTB",     # Trade Balance: Goods and Services, Balance of Payments Basis
+
+    # Crisis indicators
+    "hy_oas": "BAMLH0A0HYM2",          # ICE BofA US High Yield Index Option-Adjusted Spread
 
     # Korea series mirrored from OECD Main Economic Indicators, used as a
     # fallback when kosis.kr is unreachable (collectors/kosis.py has been

@@ -15,7 +15,7 @@ from pathlib import Path
 from core.config import report_config
 from core.logger import log_event
 from . import daily_history, exporters, payload as payload_mod
-from .html import render_html
+from .html_new import render_html
 from .markdown import render_markdown
 
 REPO_ROOT = Path(__file__).resolve().parents[2]

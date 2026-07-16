@@ -48,6 +48,18 @@ KOSIS_SERIES: dict[str, dict] = {
         "org_id": "101", "tbl_id": "DT_1K31009", "itm_id": "13103159999T2A", "obj_l1": "00",
         "cycle": "M", "unit": "2020=100", "note": "소매판매액지수 — 통계표 ID 확인 필요",
     },
+    "k_employed_yoy": {
+        "org_id": "101", "tbl_id": "DT_1DA7001S", "itm_id": "13103005", "obj_l1": "00",
+        "cycle": "M", "unit": "Persons", "note": "취업자 수(YoY 변화) — CCI 모듈 H용",
+    },
+    "semiconductor_shipment_index": {
+        "org_id": "101", "tbl_id": "DT_1E66010", "itm_id": "T10", "obj_l1": "0000",
+        "cycle": "M", "unit": "2020=100", "note": "반도체 산업생산지수(출하) — CCI 모듈 I용",
+    },
+    "semiconductor_inventory_index": {
+        "org_id": "101", "tbl_id": "DT_1E66010", "itm_id": "T30", "obj_l1": "0000",
+        "cycle": "M", "unit": "2020=100", "note": "반도체 산업생산지수(재고) — CCI 모듈 I용",
+    },
 }
 
 

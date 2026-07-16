@@ -18,6 +18,7 @@ from engine.macro import engine as macro_engine
 from engine.macro import snapshot as macro_snapshot
 from engine.personal import mapping
 from engine.rate_analysis import scoring as rate_scoring
+from engine.crisis_analysis import scoring as cci_scoring
 from . import discussion as discussion_mod
 from . import scenario as scenario_mod
 
@@ -258,6 +259,10 @@ def build_report_payload(month_key: str | None = None) -> dict:
     rate_analysis = _rate_analysis_section()
     payload["rate_analysis"] = rate_analysis
 
+    # Add comprehensive crisis index
+    cci_analysis = _cci_section()
+    payload["cci_analysis"] = cci_analysis
+
     log_event("report_payload.built", month=month_key, readiness=readiness, action_count=len(actions))
     return payload
 
@@ -301,5 +306,41 @@ def _rate_analysis_section() -> dict:
             "6m_upside_probability": sk_hynix_rec["6m_probability"],
             "12m_upside_probability": sk_hynix_rec["12m_probability"],
             "rationale": sk_hynix_rec["rationale"],
+        },
+    }
+
+
+def _cci_section() -> dict:
+    """Generate Comprehensive Crisis Index analysis section."""
+    cci_detail = cci_scoring.calculate_cci()
+    sk_hynix_action = cci_scoring.get_sk_hynix_action(cci_detail)
+
+    return {
+        "total_score": cci_detail.total_score,
+        "state": cci_detail.state,
+        "score_components": {
+            "sahm": cci_detail.sahm_score,
+            "yield_curve": cci_detail.yield_curve_score,
+            "harvey": cci_detail.harvey_score,
+            "copper_gold": cci_detail.copper_gold_score,
+            "credit_oas": cci_detail.credit_score,
+            "buffett": cci_detail.buffett_score,
+            "rule_of_20": cci_detail.rule20_score,
+            "k_sahm": cci_detail.k_sahm_score,
+            "semiconductor": cci_detail.semiconductor_score,
+        },
+        "raw_values": {
+            "ur_ma3": round(cci_detail.ur_ma3, 2) if cci_detail.ur_ma3 else None,
+            "ur_min_12m": round(cci_detail.ur_min_12m, 2) if cci_detail.ur_min_12m else None,
+            "spread_10y2y": round(cci_detail.spread_10y2y, 3) if cci_detail.spread_10y2y else None,
+            "spread_10y3m": round(cci_detail.spread_10y3m, 3) if cci_detail.spread_10y3m else None,
+            "hy_oas": round(cci_detail.hy_oas, 2) if cci_detail.hy_oas else None,
+            "k_emp_yoy": round(cci_detail.k_emp_yoy, 0) if cci_detail.k_emp_yoy else None,
+        },
+        "sk_hynix_action": sk_hynix_action,
+        "interpretation": {
+            "GREEN": "Systemic expansion. Capital injection favored. Aggressive growth positioning optimal.",
+            "YELLOW": "Momentum deceleration. Capital hedging recommended. Tactical positioning advised.",
+            "RED": "Systemic invalidation. Capital evacuation urgent. Defensive/short positioning required.",
         },
     }
