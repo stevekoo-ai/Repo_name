@@ -13,6 +13,8 @@ import urllib.parse
 import urllib.request
 from datetime import datetime, timedelta, timezone
 
+from alerts import run_alerts
+
 KST = timezone(timedelta(hours=9))
 BASE_URL = "https://api.odcloud.kr/api/ApplyhomeInfoDetailSvc/v1/getAPTLttotPblancDetail"
 TARGET_REGIONS = {"서울", "경기"}
@@ -209,6 +211,10 @@ def main() -> None:
 
     all_rows = fetch_all(service_key, today)
     rows = [r for r in all_rows if r.get("SUBSCRPT_AREA_CODE_NM") in TARGET_REGIONS]
+
+    fired = run_alerts(all_rows)
+    if fired:
+        print(f"fired {fired} new 플랫폼시티 alert(s)")
 
     html_out = render(rows, now_kst)
     out_path = os.path.normpath(OUTPUT_PATH)
