@@ -15,7 +15,7 @@ Score interpretation:
 """
 from __future__ import annotations
 
-from datetime import datetime, timedelta
+from datetime import timedelta
 from dataclasses import dataclass
 from typing import Optional
 
@@ -60,9 +60,9 @@ def _calculate_rate_change(series_key: str, days: int = 30) -> Optional[float]:
     df = df.sort_values("date")
     current = float(df.iloc[-1]["value"])
 
-    # Find point N days ago
-    target_date = datetime.fromisoformat(df.iloc[-1]["date"]) - timedelta(days=days)
-    past_df = df[df["date"] <= target_date.isoformat()]
+    # Find point N days ago (read_normalized returns "date" as datetime.date objects)
+    target_date = df.iloc[-1]["date"] - timedelta(days=days)
+    past_df = df[df["date"] <= target_date]
 
     if past_df.empty:
         return None

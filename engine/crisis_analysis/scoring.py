@@ -67,8 +67,9 @@ def _get_series_window(series_id: str, days: int) -> list[float]:
     if df.empty:
         return []
     df = df.sort_values("date")
-    cutoff = datetime.now() - timedelta(days=days)
-    window_df = df[df["date"].dt.to_pydatetime() >= cutoff]
+    # read_normalized returns "date" as datetime.date objects
+    cutoff = (datetime.now() - timedelta(days=days)).date()
+    window_df = df[df["date"] >= cutoff]
     return window_df["value"].dropna().tolist()[::-1]
 
 
