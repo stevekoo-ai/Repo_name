@@ -189,8 +189,8 @@
     {
       "key": "industrial_production",
       "indicator": "미국 산업생산지수",
-      "current": 102.6475,
-      "previous": 102.509,
+      "current": 102.6395,
+      "previous": 102.5606,
       "previous_source": "series_history",
       "trend": "→",
       "score": 0,
@@ -651,23 +651,27 @@
         },
         {
           "date": "2026-01-01",
-          "value": 101.1235
+          "value": 101.0388
         },
         {
           "date": "2026-02-01",
-          "value": 101.9493
+          "value": 101.9263
         },
         {
           "date": "2026-03-01",
-          "value": 101.6273
+          "value": 101.6172
         },
         {
           "date": "2026-04-01",
-          "value": 102.509
+          "value": 102.4196
         },
         {
           "date": "2026-05-01",
-          "value": 102.6475
+          "value": 102.5606
+        },
+        {
+          "date": "2026-06-01",
+          "value": 102.6395
         }
       ],
       "history_years": 10
@@ -3113,8 +3117,8 @@
     {
       "key": "yield_curve",
       "indicator": "미국 10년-2년 국채 금리차 (%p)",
-      "current": 0.41,
-      "previous": 0.42,
+      "current": 0.37,
+      "previous": 0.41,
       "previous_source": "series_history",
       "trend": "→",
       "score": 0,
@@ -13116,6 +13120,10 @@
         {
           "date": "2026-07-16",
           "value": 0.41
+        },
+        {
+          "date": "2026-07-17",
+          "value": 0.37
         }
       ],
       "history_years": 10
@@ -13144,7 +13152,7 @@
         "kr_score": -1,
         "us_score": 0,
         "kr_value": 114.912,
-        "us_value": 102.6475,
+        "us_value": 102.6395,
         "relationship": "diverge"
       },
       {
