@@ -80,6 +80,22 @@ TSMC 2분기 실적이 15:00 KST 컨퍼런스콜에서 발표됨: **매출 396.2
 확정 전까지 어느 것도 확신할 수 없는 상태. 상세는
 [sources/websearch-sk-hynix-tsmc-current-2026-07-16.md](../../sources/websearch-sk-hynix-tsmc-current-2026-07-16.md).
 
+### 저녁 체크 — 교보증권 400만원 신규, CXMT 리스크 격상 (2026-07-17)
+
+오늘 본주 종가와 간밤 ADR(7/16 미국 세션)은 **이틀째 검색 실패로 미확정**
+(휴장 아님 — [휴장일 캘린더](../concepts/market-holidays.md) 대조 완료).
+장초반 확인된 코스피 약세(6,820선, -2% 안팎) 이후의 마감 흐름은 다음
+체크에서 재확정 필요.
+
+새로 확인된 것: **① 교보증권이 목표가를 190만→400만원(+110%)으로 상향**
+(16번째 기관, 강세 클러스터 합류 — BPS 739,083원×PBR 5.4배, HBM4 점유율
+60%+ 전망). **② CXMT 리스크 격상** — IPO로 14~15조원 조달 예정, 하반기
+HBM3 시장 진입 계획까지 보도. 7/16 급락 원인에 "CXMT 14조 실탄" 경계감이
+포함돼 있었음도 사후 확인(어제 기록한 4개 원인에 이은 다섯 번째).
+**③ 빅테크 CapEx 둔화 첫 정량화** — 북미 CSP CapEx 증가율 2026년 +83% →
+2027년 +23% 전망. 모건스탠리·키움 목표가는 재확인 시도에도 여전히 미확인.
+상세는 [목표주가 근거 체크리스트](../concepts/sk-hynix-analyst-thesis-checkpoints.md).
+
 ### 아침 체크 — 실적발표일 사실상 확정(7/29), 신규 기관/구조 신호 (2026-07-17)
 
 장 시작 전 체크포인트 점검. 새 본주·ADR 종가 페어를 확보하지 못해 어제
@@ -143,4 +159,5 @@ TSMC 2분기 실적이 15:00 KST 컨퍼런스콜에서 발표됨: **매출 396.2
 - [sources/websearch-sk-hynix-crash-2026-07-16.md](../../sources/websearch-sk-hynix-crash-2026-07-16.md)
 - [sources/websearch-sk-hynix-tsmc-current-2026-07-16.md](../../sources/websearch-sk-hynix-tsmc-current-2026-07-16.md)
 - [sources/websearch-sk-hynix-evening-check-2026-07-16.md](../../sources/websearch-sk-hynix-evening-check-2026-07-16.md)
-- [sources/websearch-sk-hynix-morning-check-2026-07-17.md](../../sources/websearch-sk-hynix-morning-check-2026-07-17.md) (최신 상태 근거; 그 외 원본 소스는 위 히스토리 각 페이지의 Sources 참고)
+- [sources/websearch-sk-hynix-morning-check-2026-07-17.md](../../sources/websearch-sk-hynix-morning-check-2026-07-17.md)
+- [sources/websearch-sk-hynix-evening-check-2026-07-17.md](../../sources/websearch-sk-hynix-evening-check-2026-07-17.md) (최신 상태 근거; 그 외 원본 소스는 위 히스토리 각 페이지의 Sources 참고)
