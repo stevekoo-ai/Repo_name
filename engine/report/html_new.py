@@ -70,11 +70,126 @@ def _render_sk_hynix_action(action: dict) -> str:
     </div>"""
 
 
+_HEAT_COLOR = {"과열": "#F97316", "냉각": "#3B82F6", "보합": "#94A3B8", "데이터 부족": "#64748B"}
+
+
+def _fmt_pct(value) -> str:
+    if value is None:
+        return "N/A"
+    sign = "+" if value > 0 else ""
+    return f"{sign}{value:.2f}%"
+
+
+def _render_tier_card(tier: dict) -> str:
+    """One 서울/수도권/전국 mini-card inside the real-estate section."""
+    if tier.get("data_status") != "ok":
+        return f"""
+        <div style="background: rgba(51, 65, 85, 0.3); padding: 20px; border-radius: 8px;">
+            <div style="font-size: 1.1em; color: #F1F5F9; font-weight: 600; margin-bottom: 10px;">{tier['label']}</div>
+            <div style="color: #94A3B8;">Pending — 데이터 확보 전</div>
+        </div>"""
+
+    heat = tier["market_heat"]
+    heat_color = _HEAT_COLOR.get(heat, "#94A3B8")
+    mom = tier.get("mom_change_pct")
+    mom_color = "#F87171" if (mom or 0) > 0 else "#60A5FA" if (mom or 0) < 0 else "#94A3B8"
+
+    return f"""
+        <div style="background: rgba(51, 65, 85, 0.3); padding: 20px; border-radius: 8px; border-left: 4px solid {heat_color};">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                <div style="font-size: 1.1em; color: #F1F5F9; font-weight: 600;">{tier['label']}</div>
+                <span style="background: {heat_color}33; color: {heat_color}; padding: 3px 10px; border-radius: 12px; font-size: 0.85em; font-weight: 600;">{heat}</span>
+            </div>
+            <div style="font-size: 1.6em; font-weight: bold; color: #F1F5F9;">{_fmt(tier['price_per_pyeong_manwon'])}만원<span style="font-size: 0.5em; color: #94A3B8;">/평</span></div>
+            <div style="margin-top: 8px; color: {mom_color}; font-weight: 600;">MoM {_fmt_pct(mom)}</div>
+            <div style="margin-top: 4px; color: #94A3B8; font-size: 0.9em;">3개월 추세 {_fmt_pct(tier.get('trend_3m_pct'))} · 거래 {_fmt(tier.get('transaction_count'))}건 ({tier.get('reference_month', '')})</div>
+        </div>"""
+
+
+def _fmt(value) -> str:
+    if value is None:
+        return "N/A"
+    if isinstance(value, float):
+        return f"{value:,.0f}"
+    return str(value)
+
+
+def _render_district_movers(movers: dict) -> str:
+    if movers.get("data_status") != "ok":
+        return '<p style="color: #94A3B8;">아직 MoM을 계산할 만큼 이력이 쌓이지 않았습니다 (다음 리포트부터 표시).</p>'
+
+    def _row(items: list[dict], color: str) -> str:
+        if not items:
+            return '<span style="color: #64748B;">데이터 부족</span>'
+        return " · ".join(f"<span style=\"color: {color};\">{i['name']} ({_fmt_pct(i['mom_change_pct'])})</span>" for i in items)
+
+    return f"""
+        <div class="metric"><span class="metric-label">상승 TOP</span><span>{_row(movers['gainers'], '#F87171')}</span></div>
+        <div class="metric"><span class="metric-label">하락 TOP</span><span>{_row(movers['decliners'], '#60A5FA')}</span></div>"""
+
+
+def _render_real_estate_section(re_data: dict) -> str:
+    if not re_data:
+        return ""
+
+    if re_data.get("fetch_status") == "pending":
+        return f"""
+        <div class="card" style="margin-bottom: 30px;">
+            <h2>🏘️ 부동산 실거래가 동향</h2>
+            <p style="color: #94A3B8;">Pending — {re_data.get('fetch_note', 'MOLIT_API_KEY 미설정')}</p>
+        </div>"""
+
+    tiers = re_data.get("tiers", {})
+    any_ok = any(t.get("data_status") == "ok" for t in tiers.values())
+    if not any_ok:
+        return f"""
+        <div class="card" style="margin-bottom: 30px;">
+            <h2>🏘️ 부동산 실거래가 동향</h2>
+            <p style="color: #94A3B8;">Source Error — {re_data.get('fetch_note', '국토교통부 API 응답 없음')}</p>
+        </div>"""
+
+    coverage = re_data.get("regions_covered")
+    total = re_data.get("regions_total")
+    coverage_note = f"조회 지역 {coverage}/{total}개" if coverage is not None and total else ""
+
+    hl = re_data.get("highlight", {})
+    hl_body = ""
+    if hl.get("data_status") == "ok":
+        hl_body = (
+            f"{hl['reference_month']} 기준 평당가 <strong style=\"color:#F1F5F9;\">{_fmt(hl['price_per_pyeong_manwon'])}만원</strong>"
+            f" (MoM {_fmt_pct(hl.get('mom_change_pct'))}), 거래 {_fmt(hl.get('transaction_count'))}건, "
+            f"시장 온도 <span style=\"color:{_HEAT_COLOR.get(hl.get('market_heat'), '#94A3B8')};\">{hl.get('market_heat', 'N/A')}</span>"
+        )
+    else:
+        hl_body = "최근 조회 기간 내 확인된 실거래가 없습니다."
+
+    return f"""
+        <div class="card" style="margin-bottom: 30px;">
+            <h2>🏘️ 부동산 실거래가 동향 (국토교통부 실거래가 공개시스템)</h2>
+            <p style="color: #94A3B8; margin-bottom: 15px;">{coverage_note} · '전국'은 전수조사가 아닌 8개 특·광역시+주요 도청소재지 대표 표본 기준 추정치</p>
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 25px;">
+                {_render_tier_card(tiers.get('seoul', {}))}
+                {_render_tier_card(tiers.get('capital_area', {}))}
+                {_render_tier_card(tiers.get('nationwide', {}))}
+            </div>
+
+            <div class="portfolio-section" style="border-left-color: #A855F7;">
+                <strong style="color: #D8B4FE;">📍 청약 타겟 지역 — {hl.get('region_name', '')}</strong>
+                {f'<div style="color: #94A3B8; font-size: 0.9em; margin-top: 4px;">{hl["note"]}</div>' if hl.get('note') else ''}
+                <div style="margin-top: 10px;">{hl_body}</div>
+            </div>
+
+            <h3 style="margin-top: 25px; margin-bottom: 10px; color: #CBD5E1;">서울 자치구 MoM 상승/하락 TOP</h3>
+            {_render_district_movers(re_data.get('seoul_district_movers', {}))}
+        </div>"""
+
+
 def render_html(payload: dict) -> str:
     """Render comprehensive PEOS report as beautiful, responsive HTML."""
     month = payload["report_month"]
     cci = payload.get("cci_analysis", {})
     rate = payload.get("rate_analysis", {})
+    real_estate = payload.get("real_estate", {})
 
     state_color = {"GREEN": "#10B981", "YELLOW": "#F59E0B", "RED": "#EF4444"}
     cci_state = cci.get("state", "UNKNOWN")
@@ -330,6 +445,9 @@ def render_html(payload: dict) -> str:
             {_render_sk_hynix_action(cci.get('sk_hynix_action', {}))}
         </div>
 
+        <!-- 부동산 실거래가 동향 -->
+        {_render_real_estate_section(real_estate)}
+
         <!-- 포트폴리오 추천 -->
         <div class="card" style="margin-bottom: 30px;">
             <h2>📈 포트폴리오 추천 (Rate 기반)</h2>
@@ -383,70 +501,3 @@ def render_html(payload: dict) -> str:
 </body>
 </html>"""
     return html
-
-
-def _hex_to_rgb(hex_color: str) -> str:
-    """Convert hex color to RGB tuple string."""
-    hex_color = hex_color.lstrip("#")
-    r, g, b = int(hex_color[0:2], 16), int(hex_color[2:4], 16), int(hex_color[4:6], 16)
-    return f"{r}, {g}, {b}"
-
-
-def _state_label(state: str) -> str:
-    """Get human-readable state label."""
-    labels = {
-        "GREEN": "🟢 정상 (확장 모드)",
-        "YELLOW": "🟡 경고 (둔화 모드)",
-        "RED": "🔴 위기 (퇴출 모드)",
-    }
-    return labels.get(state, "? Unknown")
-
-
-def _rate_state_label(score: int) -> str:
-    """Get rate analysis state label."""
-    if score >= 85:
-        return "극도의 완화"
-    elif score >= 70:
-        return "완화 국면"
-    elif score >= 55:
-        return "중립~완화"
-    elif score >= 40:
-        return "긴축 국면"
-    else:
-        return "극도의 긴축"
-
-
-def _render_sk_hynix_action(action: dict) -> str:
-    """Render SK Hynix action box."""
-    if not action:
-        return ""
-
-    state = action.get("state", "UNKNOWN")
-    action_type = action.get("action", "")
-    max_weight = action.get("max_weight", 0)
-    description = action.get("description", "")
-    signal = action.get("signal", "")
-
-    state_class = {"GREEN": "green", "YELLOW": "yellow", "RED": ""}.get(state, "")
-
-    return f"""
-    <div class="action-box {state_class}">
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 15px;">
-            <div>
-                <strong style="color: #CBD5E1;">Action</strong>
-                <div style="font-size: 1.2em; color: #F1F5F9; margin-top: 5px;">{action_type}</div>
-            </div>
-            <div>
-                <strong style="color: #CBD5E1;">Max Weight</strong>
-                <div style="font-size: 1.2em; color: #F1F5F9; margin-top: 5px;">{max_weight}%</div>
-            </div>
-        </div>
-        <div style="margin-bottom: 15px;">
-            <strong style="color: #CBD5E1;">상황:</strong>
-            <p style="margin-top: 8px;">{description}</p>
-        </div>
-        <div>
-            <strong style="color: #CBD5E1;">신호:</strong>
-            <p style="margin-top: 8px;">{signal}</p>
-        </div>
-    </div>"""

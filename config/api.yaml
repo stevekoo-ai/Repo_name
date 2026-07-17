@@ -79,6 +79,15 @@ sources:
     manual_input: true
     note: "개인 대상 공식 API 미제공. 공고 정보는 data/raw/subscription 수동 입력."
 
+  molit:
+    label: "국토교통부 실거래가 공개시스템 (아파트매매 실거래 상세자료)"
+    reliability_grade: 5
+    official: true
+    requires_key: true
+    env_key: MOLIT_API_KEY
+    base_url: "https://apis.data.go.kr/1613000/RTMSDataSvcAptTradeDev/getRTMSDataSvcAptTradeDev"
+    note: "공공데이터포털(data.go.kr)에서 무료 일반 인증키 발급. 원자료가 개별 거래 단위라 지역군별 월 중위가로 집계해 저장."
+
 # Master Instruction 18.2 cache windows, in seconds.
 cache_ttl_seconds:
   realtime_fx: 1800

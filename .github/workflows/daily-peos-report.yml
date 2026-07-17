@@ -41,6 +41,7 @@ jobs:
           KOSIS_API_KEY: ${{ secrets.KOSIS_API_KEY }}
           FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
           BLS_API_KEY: ${{ secrets.BLS_API_KEY }}
+          MOLIT_API_KEY: ${{ secrets.MOLIT_API_KEY }}
         run: |
           if [ -n "${{ github.event.inputs.month }}" ]; then
             python -m engine.report.run --month "${{ github.event.inputs.month }}"

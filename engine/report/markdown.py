@@ -300,7 +300,7 @@ def _rate_analysis(payload: dict) -> str:
         f"- **미국 10Y Treasury**: {_fmt(rates.get('us_10y'), '%')}",
         f"- **한국 10Y 국고채**: {_fmt(rates.get('kr_10y'), '%')}",
         f"- **Spread (US-KR)**: {_fmt(rates.get('spread_bp'), 'bp')}",
-        f"  - 기준: 200~250bp | 현재: {('**정상 범위**' if 150 <= rates.get('spread_bp', 0) <= 300 else '**주의 필요**')}",
+        f"  - 기준: 200~250bp | 현재: {('**정상 범위**' if rates.get('spread_bp') is not None and 150 <= rates['spread_bp'] <= 300 else '**주의 필요**')}",
         "",
         "### 추이 신호",
         f"- **미국 10Y 1개월 변화**: {_fmt(trends.get('us_10y_1m_change_bp'), 'bp')}",
@@ -383,13 +383,81 @@ def _cci_analysis(payload: dict) -> str:
     return "\n".join(lines)
 
 
+def _real_estate_trend(payload: dict) -> str:
+    """국토교통부 실거래가 기반 서울/수도권/전국 가격 추세 + 청약 타겟 지역 하이라이트."""
+    re_data = payload.get("real_estate")
+    if not re_data:
+        return ""
+
+    lines = ["## 부동산 실거래가 동향 (국토교통부 실거래가 공개시스템)", ""]
+
+    if re_data["fetch_status"] == "pending":
+        lines.append(f"- [사실] 데이터 상태: Pending — {re_data.get('fetch_note', 'MOLIT_API_KEY 미설정')}")
+        return "\n".join(lines)
+    if re_data["fetch_status"] == "source_error" and not any(
+        t.get("data_status") == "ok" for t in re_data["tiers"].values()
+    ):
+        lines.append(f"- [사실] 데이터 상태: Source Error — {re_data.get('fetch_note', '국토교통부 API 응답 없음')}")
+        return "\n".join(lines)
+
+    coverage = re_data.get("regions_covered")
+    total = re_data.get("regions_total")
+    if coverage is not None and total:
+        lines.append(f"- [사실] 조회 지역 커버리지: {coverage}/{total}개 지역")
+        lines.append("")
+
+    lines += ["| 지역군 | 기준월 | 평당가(만원) | MoM | 3개월 추세 | 거래량 | 시장 온도 |",
+              "|---|---|---|---|---|---|---|"]
+    for tier in ("seoul", "capital_area", "nationwide"):
+        t = re_data["tiers"][tier]
+        if t.get("data_status") != "ok":
+            lines.append(f"| {_tier_label(tier)} | - | Pending | - | - | - | - |")
+            continue
+        lines.append(
+            f"| {t['label']} | {t['reference_month']} | {_fmt(t['price_per_pyeong_manwon'])} | "
+            f"{_fmt(t['mom_change_pct'], '%')} | {_fmt(t['trend_3m_pct'], '%')} | "
+            f"{_fmt(t['transaction_count'])}건 | {t['market_heat']} |"
+        )
+    lines.append("")
+    lines.append("- [해석] '전국'은 250여개 시군구 전수조사가 아니라 8개 특·광역시 + 주요 도청소재지 대표 도시 표본 기준 추정치.")
+    lines.append("")
+
+    hl = re_data["highlight"]
+    lines.append(f"### 청약 타겟 지역 하이라이트 — {hl['region_name']}")
+    if hl.get("note"):
+        lines.append(f"- [사실] {hl['note']}")
+    if hl.get("data_status") == "ok":
+        lines.append(
+            f"- [사실] {hl['reference_month']} 기준 평당가 {_fmt(hl['price_per_pyeong_manwon'])}만원 "
+            f"(MoM {_fmt(hl.get('mom_change_pct'), '%')}), 거래 {_fmt(hl.get('transaction_count'))}건, "
+            f"시장 온도 {hl.get('market_heat', 'N/A')}"
+        )
+    else:
+        lines.append("- [사실] 데이터 상태: Pending — 최근 조회 기간 내 확인된 실거래 없음")
+    lines.append("")
+
+    movers = re_data.get("seoul_district_movers", {})
+    if movers.get("data_status") == "ok":
+        lines.append("### 서울 자치구 MoM 상승/하락 TOP")
+        gainers = ", ".join(f"{g['name']} ({_fmt(g['mom_change_pct'], '%')})" for g in movers["gainers"])
+        decliners = ", ".join(f"{d['name']} ({_fmt(d['mom_change_pct'], '%')})" for d in movers["decliners"])
+        lines.append(f"- 상승 TOP: {gainers or '데이터 부족'}")
+        lines.append(f"- 하락 TOP: {decliners or '데이터 부족'}")
+
+    return "\n".join(lines)
+
+
+def _tier_label(tier: str) -> str:
+    return {"seoul": "서울", "capital_area": "수도권", "nationwide": "전국(대표표본)"}.get(tier, tier)
+
+
 def render_markdown(payload: dict) -> str:
     header = f"# 월간 PEOS 리포트 - {payload['report_month']}\n"
     sections = [
         _us_macro_dashboard(payload), _us_regime_judgement(payload),
         _macro_dashboard(payload), _regime_judgement(payload), _kr_us_comparison(payload),
         _executive_summary(payload), _monthly_key_changes(payload),
-        _rate_analysis(payload), _cci_analysis(payload),
+        _rate_analysis(payload), _cci_analysis(payload), _real_estate_trend(payload),
         _indicator_deep_dive(payload), _personal_analysis(payload),
         _asset_impact(payload), _scenario_analysis(payload), _discussion_points(payload),
         _action_plan(payload), _calendar(payload), _personal_brief(payload), _appendix(payload),

@@ -19,6 +19,7 @@ from engine.macro import snapshot as macro_snapshot
 from engine.personal import mapping
 from engine.rate_analysis import scoring as rate_scoring
 from engine.crisis_analysis import scoring as cci_scoring
+from engine.real_estate import market_trend as real_estate_trend
 from . import discussion as discussion_mod
 from . import scenario as scenario_mod
 
@@ -262,6 +263,9 @@ def build_report_payload(month_key: str | None = None) -> dict:
     # Add comprehensive crisis index
     cci_analysis = _cci_section()
     payload["cci_analysis"] = cci_analysis
+
+    # Add real estate transaction price trend (서울/수도권/전국)
+    payload["real_estate"] = real_estate_trend.compute_real_estate_trend()
 
     log_event("report_payload.built", month=month_key, readiness=readiness, action_count=len(actions))
     return payload

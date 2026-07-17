@@ -50,11 +50,14 @@ tests/       pytest 단위/통합 테스트
 | FRED (미국/글로벌) | `FRED_API_KEY` | [fred.stlouisfed.org](https://fred.stlouisfed.org/docs/api/api_key.html) | 키 없이도 CSV로 동작, 키는 폴백용 |
 | 한국은행 ECOS | `ECOS_API_KEY` | [ecos.bok.or.kr](https://ecos.bok.or.kr) | GDP/PPI/경상수지/기준금리/환율 |
 | 통계청 KOSIS | `KOSIS_API_KEY` | [kosis.kr/openapi](https://kosis.kr/openapi) | CPI/실업률/산업생산/소매판매 |
+| 국토교통부 실거래가 | `MOLIT_API_KEY` | [data.go.kr](https://www.data.go.kr) "아파트매매 실거래 상세자료" 검색 후 활용신청 | 서울/수도권/전국 아파트 실거래가 트렌드 |
 
 `ECOS_API_KEY`/`KOSIS_API_KEY`가 등록된 통계표 코드는 `collectors/ecos.py`/`collectors/kosis.py`의
 `ECOS_SERIES`/`KOSIS_SERIES` 딕셔너리에 있습니다 — 이 샌드박스는 아웃바운드 네트워크가 정책상 차단되어
 실제 API 호출로 검증하지 못했으므로, 최초 실전 사용 전 ECOS/KOSIS 통계표 검색 콘솔에서 코드가 맞는지
-한 번 확인해 주세요(코드 내 주석에 표시됨).
+한 번 확인해 주세요(코드 내 주석에 표시됨). `MOLIT_API_KEY`가 조회하는 법정동코드 목록은
+`collectors/molit.py`에 있고, 같은 이유로 특정 지역이 계속 빈 데이터만 돌려주면 그 지역 코드만
+[code.go.kr](https://www.code.go.kr) 법정동코드에서 재확인하면 됩니다.
 
 수동 입력이 필요한 항목(공식 API가 없는 반도체 가격·청약 공고·출장/여행 일정·경제 캘린더)은
 `data/manual_inputs/*.yaml`에서 EXAMPLE 값을 실제 값으로 바꾸면 됩니다:
