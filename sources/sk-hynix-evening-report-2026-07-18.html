@@ -1,0 +1,172 @@
+<title>SK하이닉스 저녁 체크 — 2026-07-18 (토)</title>
+<style>
+  :root {
+    --bg: #f4f5f1; --surface: #ffffff; --surface-2: #eaebe3;
+    --ink: #1e221d; --ink-soft: #565b4e; --ink-faint: #8b9084;
+    --accent: #2f6b5e; --accent-ink: #143a32; --accent-soft: #dce8e2;
+    --border: #d8d9cf;
+    --pos: #2f6b3f; --pos-bg: #e3ecdd;
+    --neu: #96660f; --neu-bg: #f3e8d2;
+    --neg: #a53f3f; --neg-bg: #f4dede;
+    --unk: #6b7066; --unk-bg: #e7e8e1;
+    --shadow: 0 1px 2px rgba(30,34,29,.06), 0 8px 24px -12px rgba(30,34,29,.18);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #14170f; --surface: #1b201a; --surface-2: #212820;
+      --ink: #e9ece4; --ink-soft: #a9ae9e; --ink-faint: #6e7367;
+      --accent: #74c6ae; --accent-ink: #eaf7f2; --accent-soft: #223730;
+      --border: #303830;
+      --pos: #8fd19f; --pos-bg: #1f3324;
+      --neu: #e3b869; --neu-bg: #3a2f18;
+      --neg: #e79b9b; --neg-bg: #3a2222;
+      --unk: #9aa093; --unk-bg: #262b23;
+      --shadow: 0 1px 2px rgba(0,0,0,.4), 0 8px 24px -12px rgba(0,0,0,.6);
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #14170f; --surface: #1b201a; --surface-2: #212820;
+    --ink: #e9ece4; --ink-soft: #a9ae9e; --ink-faint: #6e7367;
+    --accent: #74c6ae; --accent-ink: #eaf7f2; --accent-soft: #223730;
+    --border: #303830;
+    --pos: #8fd19f; --pos-bg: #1f3324;
+    --neu: #e3b869; --neu-bg: #3a2f18;
+    --neg: #e79b9b; --neg-bg: #3a2222;
+    --unk: #9aa093; --unk-bg: #262b23;
+  }
+  :root[data-theme="light"] {
+    --bg: #f4f5f1; --surface: #ffffff; --surface-2: #eaebe3;
+    --ink: #1e221d; --ink-soft: #565b4e; --ink-faint: #8b9084;
+    --accent: #2f6b5e; --accent-ink: #143a32; --accent-soft: #dce8e2;
+    --border: #d8d9cf;
+    --pos: #2f6b3f; --pos-bg: #e3ecdd;
+    --neu: #96660f; --neu-bg: #f3e8d2;
+    --neg: #a53f3f; --neg-bg: #f4dede;
+    --unk: #6b7066; --unk-bg: #e7e8e1;
+  }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--ink); font-family:-apple-system,"Apple SD Gothic Neo","Pretendard","Noto Sans KR",system-ui,sans-serif; line-height:1.65; }
+  .wrap { max-width:52rem; margin:0 auto; padding:2.5rem 1.5rem 5rem; }
+  header { margin-bottom:2rem; }
+  .eyebrow { display:inline-flex; align-items:center; gap:.4rem; font-family:ui-monospace,"SFMono-Regular",Menlo,Consolas,monospace; font-size:.72rem; letter-spacing:.06em; text-transform:uppercase; color:var(--neu); background:var(--neu-bg); border-radius:999px; padding:.28rem .7rem; margin-bottom:1rem; }
+  h1 { font-size:clamp(1.6rem,4.5vw,2.15rem); font-weight:800; letter-spacing:-.01em; margin:0 0 .5rem; text-wrap:balance; }
+  .lede { color:var(--ink-soft); margin:0; font-size:1rem; }
+  .snapshot { display:grid; grid-template-columns:repeat(auto-fit,minmax(9.5rem,1fr)); gap:.9rem; margin:1.75rem 0; }
+  .stat { background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:1rem 1.1rem; box-shadow:var(--shadow); }
+  .stat .label { font-size:.72rem; color:var(--ink-faint); text-transform:uppercase; letter-spacing:.05em; margin-bottom:.35rem; }
+  .stat .value { font-family:ui-monospace,"SFMono-Regular",Menlo,Consolas,monospace; font-size:1.2rem; font-weight:700; font-variant-numeric:tabular-nums; }
+  .stat .sub { font-size:.8rem; margin-top:.2rem; }
+  .down { color:var(--neg); } .up { color: var(--pos); } .unkc { color:var(--unk); }
+  section { margin-bottom:2.25rem; }
+  h2 { font-size:1.15rem; font-weight:800; margin:0 0 .9rem; }
+  .card { background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:1.25rem 1.4rem; box-shadow:var(--shadow); margin-bottom:.9rem; }
+  .card-head { display:flex; align-items:center; justify-content:space-between; gap:1rem; margin-bottom:.5rem; flex-wrap:wrap; }
+  .card h3 { margin:0; font-size:1rem; font-weight:700; }
+  .card p { margin:.4rem 0 0; color:var(--ink-soft); font-size:.9rem; }
+  .card p strong { color:var(--ink); }
+  .pill { display:inline-flex; align-items:center; gap:.35rem; font-size:.75rem; font-weight:700; padding:.25rem .6rem; border-radius:999px; white-space:nowrap; }
+  .pill.pos { color:var(--pos); background:var(--pos-bg); }
+  .pill.neu { color:var(--neu); background:var(--neu-bg); }
+  .pill.neg { color:var(--neg); background:var(--neg-bg); }
+  .pill.unk { color:var(--unk); background:var(--unk-bg); }
+  .new { border-left:3px solid var(--accent); }
+  .callout { border-left:3px solid var(--neu); background:var(--neu-bg); color:var(--ink); border-radius:0 10px 10px 0; padding:.9rem 1.1rem; font-size:.88rem; }
+  footer { margin-top:3rem; padding-top:1.25rem; border-top:1px solid var(--border); color:var(--ink-faint); font-size:.82rem; }
+  code { font-family:ui-monospace,Menlo,Consolas,monospace; font-size:.85em; background:var(--surface-2); padding:.1em .35em; border-radius:5px; }
+</style>
+
+<div class="wrap">
+  <header>
+    <span class="eyebrow">● 저녁 체크 · 2026-07-18 (토) · 주말 휴장</span>
+    <h1>"실적 추정 하향 3개사 확산" 트리거 발동 확인</h1>
+    <p class="lede">주말 뉴스 스캔에서 현대차증권(17번째 기관)을 확인하면서, 지난 7/13~14에 이미 트리거 조건이 충족돼 있었음이 드러났다.</p>
+  </header>
+
+  <div class="snapshot">
+    <div class="stat"><div class="label">오늘 거래</div><div class="value">휴장</div><div class="sub">주말 (한·미 모두)</div></div>
+    <div class="stat"><div class="label">추정 하향 기관</div><div class="value">3곳</div><div class="sub neu">트리거 발동 (임계값 3+)</div></div>
+    <div class="stat"><div class="label">7/17 종가 백필</div><div class="value unkc">실패</div><div class="sub">4일째 — 월요일 재시도</div></div>
+  </div>
+
+  <section>
+    <h2>🆕 오늘 새로 연결된 것</h2>
+
+    <div class="card new">
+      <div class="card-head"><h3>⚠ 추정 하향 확산 트리거 — 발동</h3><span class="pill neu">사이클 후반 감시 신호</span></div>
+      <p>종합 전략 검토 보고서(7/17)에서 "실적 추정 하향이 3개사 이상으로
+      확산되면 사이클 후반 신호로 간주"로 정의했던 트리거가 <strong>이미
+      충족된 상태</strong>였다: 미래에셋(2Q 영업익 -12%), <strong>현대차증권
+      (매출/영업익 -3.1%/-1.6%)</strong>, 한국투자(올해/내년 -9%/-11%).
+      기사들은 7/13~14 게재분 — 오늘에서야 점들이 연결됐다.</p>
+      <p><strong>단서(중요):</strong> 세 곳 모두 목표가·매수의견은 유지했고
+      (330만~420만원), 하향 근거는 단기 ASP·비트그로스 조정이다. 2027년
+      영업익 389조(+45.7%) 전망과 LTA 매출 50% 고정 논리는 오히려 재확인 —
+      "사이클 종료 선언"이 아니라 "컨센서스 조정" 성격. 그래도 규칙은 규칙:
+      분할 축소 프레임 재점검 사유에 해당한다.</p>
+    </div>
+
+    <div class="card new">
+      <div class="card-head"><h3>현대차증권 — 17번째 기관</h3><span class="pill pos">330만원 · 매수 유지</span></div>
+      <p>2Q 전망을 하향(87.6조/62.4조)하면서도 목표가 330만원·매수는 유지.
+      "이미 주가 급락, 저점 매수 기회"라는 논조(7/14 보도).</p>
+    </div>
+
+    <div class="card">
+      <div class="card-head"><h3>ADR 격차의 실수급 경로 확인 (체크포인트 ⑥)</h3><span class="pill neu">본주→ADR 이동</span></div>
+      <p>ADR-본주 가격 격차가 벌어지자 <strong>국내 개인 자금이 본주를 팔고
+      ADR로 갈아타는 흐름</strong>이 본주 하락 요인 중 하나로 지목됨 — UBS
+      페어트레이드 권고와 같은 방향의 실제 수급. 프리미엄이 단순 지표가
+      아니라 본주 수급을 직접 움직이는 변수임이 확인된 셈.</p>
+    </div>
+
+    <div class="card">
+      <div class="card-head"><h3>시세 백필 · 미확인 항목</h3><span class="pill unk">지속</span></div>
+      <p>7/17(금) 본주 종가, 7/16·17 미국 ADR 세션: 4일째 검색 실패.
+      "금요일 약 8% 하락" 언급이 있었으나 출처 특정 불가로 미채택 — 확정
+      숫자 없이는 쓰지 않는다. 모건스탠리·키움 목표가도 여전히 미확인.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2>🚀 목표가와 상승 모멘텀</h2>
+    <div class="card">
+      <p>17개 기관: 상단 Barclays 원화환산 약 490만원 — 강세 클러스터
+      380만~420만원(8개사) — 현대차 330만·UBS 320만 — 하단 BNK 185만원·
+      Morningstar $160. 마지막 확정 종가(7/16, 1,859,500원) 기준 강세
+      클러스터까지 +104~126%. 금요일 종가 미확정으로 갱신 불가.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2>💡 실적·성장률 전망</h2>
+    <div class="card">
+      <p>발표일 7/29(사실상 확정), D-11. 컨센서스 매출 약 83조~84.6조원,
+      영업이익 약 62.3조~64.8조원(추정 하향 반영 시 하단 확장), YoY 약
+      +650%. <strong>하향 3개사의 공통 근거는 "예상보다 낮은 ASP·비트그로스"
+      — 업황 방향이 아니라 기울기 조정</strong>이라는 점이 현재까지의 팩트.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2>📈 기술적 신호와 리스크</h2>
+    <div class="card">
+      <p>확정 참조점 유지: 52주 고점 3,002,000원(6/23), 7/14 패닉 저점
+      1,718,000원, 마지막 확정 종가 1,859,500원(7/16, BNK 목표가 근접).
+      ADR 프리미엄 30.7%(7/16 계산) — 월요일 개장 후 새 페어로 재계산 예정.</p>
+    </div>
+  </section>
+
+  <div class="callout">
+    <strong>🧭 한줄 진단</strong> — 이번 주말의 발견은 새 악재가 아니라
+    "이미 있던 신호들이 임계값을 넘었다는 사실"이다. 목표가는 아무도 안
+    내렸지만 추정치는 3곳이 내렸다 — 다음 주 7/22 알파벳, 7/29 실적이 이
+    조정이 "일시 조정"인지 "추세 전환"인지를 가른다. 투자 조언 아님.
+  </div>
+
+  <footer>
+    이 리포트는 저녁 19:00(KST) Routine이 자동 생성한다. 원문 근거는 위키
+    <code>concepts/sk-hynix-analyst-thesis-checkpoints.md</code> 및
+    <code>sources/websearch-sk-hynix-evening-check-2026-07-18.md</code> 참고.
+    투자 조언 아님.
+  </footer>
+</div>
