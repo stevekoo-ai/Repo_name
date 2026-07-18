@@ -80,6 +80,18 @@ TSMC 2분기 실적이 15:00 KST 컨퍼런스콜에서 발표됨: **매출 396.2
 확정 전까지 어느 것도 확신할 수 없는 상태. 상세는
 [sources/websearch-sk-hynix-tsmc-current-2026-07-16.md](../../sources/websearch-sk-hynix-tsmc-current-2026-07-16.md).
 
+### 주말 체크 — 추정 하향 3개사 확산 트리거 발동 확인 (2026-07-18 토)
+
+주말 휴장. 7/17(금) 종가·간밤 ADR 백필은 4일째 실패(인덱싱 지연 지속).
+뉴스 스캔에서 **현대차증권 330만원·매수 유지(17번째 기관)**를 확인했고,
+이로써 **"실적 추정 하향 3개사 확산" 트리거가 발동된 상태**임이 드러났다
+— 미래에셋(-12%)·현대차(-1.6%)·한국투자(올해/내년 -9%/-11%), 기사는
+7/13~14 게재분으로 오늘 점들이 연결된 것. 다만 세 곳 모두 목표가·매수는
+유지했고 2027년 영업익 389조(+45.7%)·LTA 매출 50% 고정 논리는 오히려
+재확인돼, "사이클 종료"가 아닌 "컨센서스 조정" 성격. ADR 격차 확대 시
+개인 자금이 본주→ADR로 이동하는 수급 경로도 하락 요인으로 지목됨.
+상세는 [목표주가 근거 체크리스트](../concepts/sk-hynix-analyst-thesis-checkpoints.md).
+
 ### 저녁 체크 — 교보증권 400만원 신규, CXMT 리스크 격상 (2026-07-17)
 
 오늘 본주 종가와 간밤 ADR(7/16 미국 세션)은 **이틀째 검색 실패로 미확정**
@@ -160,4 +172,5 @@ HBM3 시장 진입 계획까지 보도. 7/16 급락 원인에 "CXMT 14조 실탄
 - [sources/websearch-sk-hynix-tsmc-current-2026-07-16.md](../../sources/websearch-sk-hynix-tsmc-current-2026-07-16.md)
 - [sources/websearch-sk-hynix-evening-check-2026-07-16.md](../../sources/websearch-sk-hynix-evening-check-2026-07-16.md)
 - [sources/websearch-sk-hynix-morning-check-2026-07-17.md](../../sources/websearch-sk-hynix-morning-check-2026-07-17.md)
-- [sources/websearch-sk-hynix-evening-check-2026-07-17.md](../../sources/websearch-sk-hynix-evening-check-2026-07-17.md) (최신 상태 근거; 그 외 원본 소스는 위 히스토리 각 페이지의 Sources 참고)
+- [sources/websearch-sk-hynix-evening-check-2026-07-17.md](../../sources/websearch-sk-hynix-evening-check-2026-07-17.md)
+- [sources/websearch-sk-hynix-evening-check-2026-07-18.md](../../sources/websearch-sk-hynix-evening-check-2026-07-18.md) (최신 상태 근거; 그 외 원본 소스는 위 히스토리 각 페이지의 Sources 참고)
