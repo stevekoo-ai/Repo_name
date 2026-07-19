@@ -1,7 +1,7 @@
 ---
 title: SK하이닉스
 created: 2026-07-13
-updated: 2026-07-17
+updated: 2026-07-20
 tags: [sk-hynix, semiconductor, stock, adr]
 ---
 
@@ -79,6 +79,25 @@ TSMC 2분기 실적이 15:00 KST 컨퍼런스콜에서 발표됨: **매출 396.2
 기존 "7/23 잠정"·"7/29 가능성"에 이어 세 번째 후보가 등장했다 — 공식
 확정 전까지 어느 것도 확신할 수 없는 상태. 상세는
 [sources/websearch-sk-hynix-tsmc-current-2026-07-16.md](../../sources/websearch-sk-hynix-tsmc-current-2026-07-16.md).
+
+### 월요일 아침 — 🔴 정정: 7/17은 제헌절 휴장이었다 (2026-07-20)
+
+**지난 3일간의 "7/17 종가 백필 실패"는 검색 실패가 아니라 세션 부재였다.**
+제헌절이 2026년부터 18년 만에 공휴일로 재지정(2월 법 개정)돼 KRX가 7/17
+휴장했는데, [휴장일 캘린더](../concepts/market-holidays.md)가 이 신규
+공휴일을 누락했던 것 — 캘린더에 정정 기록과 재발 방지 규칙을 남김.
+**최신 확정 본주 종가는 7/16 1,859,500원(-10.69%)으로 종결.**
+
+그 사이 미국은 목·금 거래를 계속했다(비대칭 구간): **7/16(목) 세션 ADR
+$152.31(-13.7%)** 확정 — 나스닥 -1.47%, 필라델피아 반도체지수 -4.27%,
+원인은 "TSMC의 CapEx 상향이 오히려 공급확대 우려로 해석"된 역설적 반응.
+7/17(금) 세션은 아직 미확인이라 **오늘(월) 개장 갭에는 목·금 두 세션이
+한꺼번에 반영**될 전망 — 10:00 장초반 체크가 갭 확인 담당.
+
+이에 따라 **ADR 프리미엄을 동기화 페어로 재계산: 약 21.6%** — 처음으로
+"10~25% 안정" 구간 진입(51.5%→30.7%→21.6%). **실적발표일은 7/29로 공식
+확정**(SEC 6-K 공시 — "사실상 확정"에서 격상). 상세는
+[목표주가 근거 체크리스트](../concepts/sk-hynix-analyst-thesis-checkpoints.md).
 
 ### 주말 체크 — 추정 하향 3개사 확산 트리거 발동 확인 (2026-07-18 토)
 
@@ -173,4 +192,5 @@ HBM3 시장 진입 계획까지 보도. 7/16 급락 원인에 "CXMT 14조 실탄
 - [sources/websearch-sk-hynix-evening-check-2026-07-16.md](../../sources/websearch-sk-hynix-evening-check-2026-07-16.md)
 - [sources/websearch-sk-hynix-morning-check-2026-07-17.md](../../sources/websearch-sk-hynix-morning-check-2026-07-17.md)
 - [sources/websearch-sk-hynix-evening-check-2026-07-17.md](../../sources/websearch-sk-hynix-evening-check-2026-07-17.md)
-- [sources/websearch-sk-hynix-evening-check-2026-07-18.md](../../sources/websearch-sk-hynix-evening-check-2026-07-18.md) (최신 상태 근거; 그 외 원본 소스는 위 히스토리 각 페이지의 Sources 참고)
+- [sources/websearch-sk-hynix-evening-check-2026-07-18.md](../../sources/websearch-sk-hynix-evening-check-2026-07-18.md)
+- [sources/websearch-sk-hynix-morning-check-2026-07-20.md](../../sources/websearch-sk-hynix-morning-check-2026-07-20.md) (최신 상태 근거; 그 외 원본 소스는 위 히스토리 각 페이지의 Sources 참고)
