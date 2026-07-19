@@ -20,6 +20,6 @@ Catalog of every page in the wiki. See `../CLAUDE.md` for conventions.
 ### concepts
 
 - [펀더멘털 불변 vs 심리·수급발 디레이팅](concepts/fundamentals-vs-sentiment-derating.md) — 실적은 멀쩡한데 주가만 심리·수급으로 눌리는 패턴, SK하이닉스가 현재진행형 사례
-- [SK하이닉스 목표주가 근거 체크리스트](concepts/sk-hynix-analyst-thesis-checkpoints.md) — 17개 기관 목표가(Barclays 원화환산 약 490만원 최고치 vs BNK 185만·Morningstar $160, 최신 추가: 교보 400만·현대차 330만), 9개 테마별 신호기준(⑨추정하향 3개사 트리거 발동, ③CapEx 둔화 정량화, ⑦CXMT 감시강화), 하루 3회(07/10/19시 KST) 자동 체크
+- [SK하이닉스 목표주가 근거 체크리스트](concepts/sk-hynix-analyst-thesis-checkpoints.md) — 18개 기관 목표가(국내 최고 한화 430만·해외 Barclays 환산 약 490만 vs BNK 185만·Morningstar $160), 9개 테마별 신호기준(⑨추정하향 3개사 트리거 발동, ③CapEx 둔화 정량화, ⑦CXMT 감시강화), 하루 3회(07/10/19시 KST) 자동 체크
 - [매크로 지표 트렌드 추적](concepts/macro-indicators.md) — 금리 결정·물가·소매판매 등 경제 캘린더를 시계열로 누적 기록, 2026-07-16 한국은행 금리 결정(인상 유력)부터 시작
 - [한국·미국 증시 휴장일 캘린더](concepts/market-holidays.md) — KRX·NYSE/Nasdaq 2026 하반기 휴장일, 자동 체크의 "시세 미확인 vs 휴장" 구분 기준 + 연휴 비대칭 구간(추석 최대)의 ADR 프리미엄 왜곡·갭 리스크 활용법
