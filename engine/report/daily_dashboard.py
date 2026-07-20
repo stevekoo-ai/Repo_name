@@ -18,6 +18,7 @@ from pathlib import Path
 
 import pandas as pd
 
+from collectors import base as collector_base
 from core.config import rules_config
 from . import payload as payload_mod
 from .daily_history import DAILY_HISTORY_PATH
@@ -43,6 +44,36 @@ def _indicator_labels(rules_key: str, order_key: str) -> list[tuple[str, str]]:
     return [(f"{prefix}_{key}", rules.get(key, {}).get("label", key)) for key in order]
 
 
+def _raw_series_id(order_key: str, indicator_key: str) -> str | None:
+    """Which normalized-tier raw series backs a Core-10/Core-Macro indicator, if any."""
+    if order_key == "kr":
+        return payload_mod.SERIES_FOR_INDICATOR.get(indicator_key)
+    return payload_mod.US_SERIES_FOR_INDICATOR.get(indicator_key)
+
+
+def _raw_series_fallback_id(order_key: str, indicator_key: str) -> str | None:
+    if order_key == "kr":
+        return payload_mod.FALLBACK_SERIES_FOR_INDICATOR.get(indicator_key)
+    return None
+
+
+def _deep_series(order_key: str, indicator_key: str) -> dict | None:
+    """Full raw-source history (years, not days) for one indicator, same series ids the
+    monthly report's sparklines use (payload.py's SERIES_FOR_INDICATOR/US_SERIES_FOR_INDICATOR).
+    This is what actually makes 1개월/6개월/1년/전체 period buttons show something different from
+    each other — the daily-computed PEOS score history (below) is, by definition, only as old
+    as this feature is."""
+    series_id = _raw_series_id(order_key, indicator_key)
+    df = collector_base.read_normalized(series_id) if series_id else pd.DataFrame()
+    if df.empty:
+        fallback_id = _raw_series_fallback_id(order_key, indicator_key)
+        df = collector_base.read_normalized(fallback_id) if fallback_id else pd.DataFrame()
+    if df.empty:
+        return None
+    df = df.sort_values("date")
+    return {"dates": [str(d) for d in df["date"]], "values": [float(v) for v in df["value"]]}
+
+
 def _regime_changes(df: pd.DataFrame, column: str) -> list[dict]:
     changes = []
     prev = None
@@ -56,11 +87,13 @@ def _regime_changes(df: pd.DataFrame, column: str) -> list[dict]:
     return changes
 
 
-def _chart_block(chart_id: str, label: str) -> str:
+def _chart_block(chart_id: str, label: str, source_note: str = "") -> str:
+    note_html = f'<div class="daily-chart-source">{_esc(source_note)}</div>' if source_note else ""
     return f"""
     <div class="daily-chart-card">
       <div class="daily-chart-label">{_esc(label)}</div>
       <div class="daily-chart" id="chart-{_esc(chart_id)}"></div>
+      {note_html}
     </div>"""
 
 
@@ -80,18 +113,28 @@ var PEOS_CHART_IDS = __CHART_IDS_JSON__;
 var peosCurrentWindow = 30;
 
 function peosFilterSeries(dates, values, windowDays) {
-  if (windowDays === null) return { dates: dates, values: values };
-  var cutoff = dates.length - windowDays;
-  if (cutoff < 0) cutoff = 0;
-  return { dates: dates.slice(cutoff), values: values.slice(cutoff) };
+  if (windowDays === null || dates.length === 0) return { dates: dates, values: values };
+  // Calendar-day cutoff, not a row-count slice: raw source series (GDP, CPI, ...) are
+  // monthly/quarterly, not daily, so slicing the "last N rows" for a 30-day window would
+  // grab 30 months of data instead of 30 days. Every series carries its own dates array
+  // (see PEOS_DAILY_DATA.series below) precisely so this can filter on real elapsed time.
+  var lastTime = new Date(dates[dates.length - 1]).getTime();
+  var cutoffTime = lastTime - windowDays * 86400000;
+  var outDates = [], outValues = [];
+  for (var i = 0; i < dates.length; i++) {
+    if (new Date(dates[i]).getTime() >= cutoffTime) {
+      outDates.push(dates[i]);
+      outValues.push(values[i]);
+    }
+  }
+  return { dates: outDates, values: outValues };
 }
 
 function peosDrawChart(chartId) {
   var el = document.getElementById('chart-' + chartId);
   if (!el) return;
-  var dates = PEOS_DAILY_DATA.dates;
-  var raw = PEOS_DAILY_DATA.series[chartId] || [];
-  var filtered = peosFilterSeries(dates, raw, peosCurrentWindow);
+  var entry = PEOS_DAILY_DATA.series[chartId] || { dates: [], values: [] };
+  var filtered = peosFilterSeries(entry.dates, entry.values, peosCurrentWindow);
   var pairs = [];
   for (var i = 0; i < filtered.values.length; i++) {
     if (filtered.values[i] !== null && filtered.values[i] !== undefined) {
@@ -149,17 +192,35 @@ def render_daily_dashboard(history_path: Path | None = None) -> str:
 
     dates = df["run_date"].tolist() if not df.empty else []
     numeric_cols = [c for c in df.columns if c not in ("run_date", "kr_regime", "us_regime")]
-    series = {}
+    series: dict[str, dict] = {}
     for col in numeric_cols:
-        series[col] = [None if pd.isna(v) else float(v) for v in df[col]] if not df.empty else []
+        values = [None if pd.isna(v) else float(v) for v in df[col]] if not df.empty else []
+        series[col] = {"dates": dates, "values": values}
 
     latest = df.iloc[-1].to_dict() if not df.empty else {}
     kr_regime_changes = _regime_changes(df, "kr_regime") if not df.empty else []
     us_regime_changes = _regime_changes(df, "us_regime") if not df.empty else []
 
-    headline_charts = "".join(_chart_block(key, label) for key, label in HEADLINE_METRICS)
-    kr_charts = "".join(_chart_block(key, label) for key, label in _indicator_labels("macro", "kr"))
-    us_charts = "".join(_chart_block(key, label) for key, label in _indicator_labels("macro_us", "us"))
+    headline_charts = "".join(
+        _chart_block(key, label, f"PEOS 계산값 · {dates[0]}부터 누적" if dates else "데이터 없음")
+        for key, label in HEADLINE_METRICS
+    )
+
+    def _indicator_chart_group(rules_key: str, order_key: str) -> str:
+        blocks = []
+        for key, label in _indicator_labels(rules_key, order_key):
+            indicator_key = key[len(order_key) + 1:]  # strip "kr_"/"us_" prefix
+            deep = _deep_series(order_key, indicator_key)
+            if deep is not None and deep["dates"]:
+                series[key] = deep
+                note = f"원시 데이터 기준 · {deep['dates'][0]} ~ {deep['dates'][-1]}"
+            else:
+                note = f"PEOS 계산값 · {dates[0]}부터 누적" if dates else "데이터 없음"
+            blocks.append(_chart_block(key, label, note))
+        return "".join(blocks)
+
+    kr_charts = _indicator_chart_group("macro", "kr")
+    us_charts = _indicator_chart_group("macro_us", "us")
 
     period_buttons = "".join(
         f'<button type="button" class="{"active" if days == 30 else ""}" '
@@ -194,6 +255,7 @@ def render_daily_dashboard(history_path: Path | None = None) -> str:
 .daily-chart-grid {{ display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px; }}
 .daily-chart-card {{ background: var(--surface-2); border: 1px solid var(--border); border-radius: 10px; padding: 10px 12px; }}
 .daily-chart-label {{ font-size: 0.82rem; font-weight: 600; color: var(--text-muted); margin-bottom: 4px; }}
+.daily-chart-source {{ font-size: 0.72rem; color: var(--text-muted); opacity: 0.75; margin-top: 4px; }}
 </style>
 </head>
 <body>
@@ -216,7 +278,7 @@ def render_daily_dashboard(history_path: Path | None = None) -> str:
 
   <section class="card">
     <h2>기간 선택</h2>
-    <p class="tile-sub">아래 버튼으로 모든 차트의 기간을 한 번에 바꿀 수 있습니다. 처음 며칠은 데이터가 적어 짧게 보일 수 있고, 매일 쌓일수록 길어집니다.</p>
+    <p class="tile-sub">아래 버튼으로 모든 차트의 기간을 한 번에 바꿀 수 있습니다. 개별 지표 차트는 원천 데이터(FRED/ECOS/KOSIS) 기준 최대 10년 이력을 보여주고, 핵심 점수 추세(PEOS 계산값)는 이 대시보드가 매일 값을 쌓기 시작한 날짜부터만 존재해 매일 조금씩 길어집니다. 각 차트 하단에 어느 쪽인지 표시됩니다.</p>
     <div class="period-toggle">{period_buttons}</div>
   </section>
 

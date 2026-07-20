@@ -6,11 +6,20 @@ __pycache__/
 data/.cache/
 logs/
 
-# Regenerable pipeline intermediates (Level 1/2 storage) — reproducible from
+# Regenerable pipeline intermediates (Level 1 storage) — reproducible from
 # manual_inputs/ + live API calls, not meant to be version-controlled.
 data/raw/*/*.json
-data/normalized/*.csv
 !data/raw/*/.gitkeep
+
+# data/normalized/*.csv (Level 2, tidy date/value series) is INTENTIONALLY
+# version-controlled, not ignored: FRED/ECOS/KOSIS/MOLIT endpoints are known
+# to be unreachable from GitHub Actions runners on any given day (see
+# collectors/kosis.py, collectors/molit.py docstrings), and every CI run
+# checks out a fresh clone with no local cache. Without persisting this
+# tier, every run-level fallback that reads normalized data (CCI scoring,
+# daily dashboard period charts) always finds nothing to fall back to.
+# Committing it turns each successful fetch into durable history instead of
+# a value that's re-derived-or-lost on every run.
 
 # Private data — never pushed to the shared repo, but still readable by the
 # local pipeline/collectors (19.3: 사용자 개인 데이터는 별도 보호).

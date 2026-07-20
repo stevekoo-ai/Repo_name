@@ -56,7 +56,7 @@ jobs:
         run: |
           git config user.name "peos-bot"
           git config user.email "actions@users.noreply.github.com"
-          git add report/ data/snapshots/ data/peos_daily_history.csv docs/peos-daily.html
+          git add report/ data/snapshots/ data/peos_daily_history.csv data/normalized/ docs/peos-daily.html
           if git diff --cached --quiet; then
             echo "No changes to commit"
           else
