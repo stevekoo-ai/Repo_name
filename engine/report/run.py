@@ -10,6 +10,7 @@ Writes report/<key>.json (always), + <key>.html and <key>.md if month_key specif
 from __future__ import annotations
 
 import argparse
+from datetime import date
 from pathlib import Path
 
 from core.config import report_config
@@ -32,12 +33,11 @@ def run(month_key: str | None = None, report_type: str = "monthly") -> dict[str,
     out_dir = REPO_ROOT / report_config().get("output_dir", "report")
     out_dir.mkdir(parents=True, exist_ok=True)
 
-    # JSON always written (for workflow processing)
-    report_key = payload.get('report_month', 'daily')
-    json_path = exporters.export_json(payload, out_dir / f"{report_key}.json")
-
-    # HTML/MD only for monthly (daily uses generic daily.html)
     if report_type == "monthly":
+        # Monthly key stays YYYY-MM (payload["report_month"]) — one file per month.
+        report_key = payload["report_month"]
+        json_path = exporters.export_json(payload, out_dir / f"{report_key}.json")
+
         html_path = out_dir / f"{report_key}.html"
         html_path.write_text(render_html(payload), encoding="utf-8")
 
@@ -49,7 +49,12 @@ def run(month_key: str | None = None, report_type: str = "monthly") -> dict[str,
                   html=str(html_path), markdown=str(md_path), json=str(json_path))
         return {"html": html_path, "markdown": md_path, "json": json_path}
     else:  # daily
-        log_event("pipeline.daily_report_generated", payload=report_key, json=str(json_path))
+        # Daily key is the calendar date (YYYY-MM-DD) so same-month daily
+        # runs don't collide with each other or with the monthly YYYY-MM file.
+        report_key = date.today().isoformat()
+        json_path = exporters.export_json(payload, out_dir / f"{report_key}.json")
+
+        log_event("pipeline.daily_report_generated", date=report_key, json=str(json_path))
         return {"json": json_path}
 
 
