@@ -10,6 +10,7 @@ Catalog of every page in the wiki. See `../CLAUDE.md` for conventions.
 - [7월 실적-주가 괴리 원인 정리 (2026-07-14)](summaries/sk-hynix-earnings-price-divergence-2026-07-14.md) — 강제매도·메타 촉매·거시 요인 정리, ADR IPO 배경 웹검색으로 교차검증
 - [SK하이닉스 장중 기술적 레벨 (2026-07-14 오후)](summaries/sk-hynix-intraday-technical-levels-2026-07-14.md) — 저항 1,936,000원 vs 지지 1,875,000원, RSI 71.43 과열 신호
 - [SK하이닉스 저항 돌파 및 ADR 폭등 (2026-07-15)](summaries/sk-hynix-adr-surge-breakout-2026-07-15.md) — ADR +27.29%, 본주 +10.93%~+12.02%, 바클레이스 목표가 330달러(+117%)
+- [버핏의 AI 시대 투자론 (2026-07-20)](summaries/buffett-ai-interview-2026-07-20.md) — 핵심은 "AI가 아니라 ROIC", AI CapEx 확대 속 자본효율성 유지가 진정한 투자 기준
 
 ### entities
 
@@ -23,3 +24,4 @@ Catalog of every page in the wiki. See `../CLAUDE.md` for conventions.
 - [SK하이닉스 목표주가 근거 체크리스트](concepts/sk-hynix-analyst-thesis-checkpoints.md) — 18개 기관 목표가(국내 최고 한화 430만·해외 Barclays 환산 약 490만 vs BNK 185만·Morningstar $160), 9개 테마별 신호기준(⑨추정하향 3개사 트리거 발동, ③CapEx 둔화 정량화, ⑦CXMT 감시강화), 하루 3회(07/10/19시 KST) 자동 체크
 - [매크로 지표 트렌드 추적](concepts/macro-indicators.md) — 금리 결정·물가·소매판매 등 경제 캘린더를 시계열로 누적 기록, 2026-07-16 한국은행 금리 결정(인상 유력)부터 시작
 - [한국·미국 증시 휴장일 캘린더](concepts/market-holidays.md) — KRX·NYSE/Nasdaq 2026 하반기 휴장일, "시세 미확인 vs 휴장" 구분 기준, 연휴 비대칭 구간 활용법 + 🔴 제헌절(7/17) 누락 사건 정정 기록과 재발 방지 규칙
+- [ROIC를 투자의 핵심 기준으로 보기](concepts/roic-as-investment-criterion.md) — 자본수익률 지표의 정의와 의미, AI 시대 자본효율성 악화 리스크, SK하이닉스 ROIC 모니터링 체크리스트

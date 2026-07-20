@@ -1,8 +1,8 @@
 ---
 title: SK하이닉스 목표주가 근거 체크리스트
 created: 2026-07-15
-updated: 2026-07-17
-tags: [sk-hynix, checkpoints, analyst, daily-tracking]
+updated: 2026-07-20
+tags: [sk-hynix, checkpoints, analyst, daily-tracking, roic-framework]
 ---
 
 애널리스트들의 목표주가 근거를 항목별로 쪼개, 시간이 지나며 유지되는지
@@ -404,6 +404,28 @@ DRAM 뉴스·판정(긍정/중립/훼손)·메모 컬럼으로 구성됨. 원본
 - [sources/websearch-sk-hynix-analyst-targets-2026-07-15.md](../../sources/websearch-sk-hynix-analyst-targets-2026-07-15.md)
 - [sources/sk-hynix-analyst-thesis-daily-check-template-2026-07-15.md](../../sources/sk-hynix-analyst-thesis-daily-check-template-2026-07-15.md)
 - [sources/sk-hynix-analyst-thesis-daily-check-template-2026-07-15.xlsx](../../sources/sk-hynix-analyst-thesis-daily-check-template-2026-07-15.xlsx)
-- [SK하이닉스 저항 돌파 및 ADR 폭등 (2026-07-15)](../summaries/sk-hynix-adr-surge-breakout-2026-07-15.md)
-- [SK하이닉스](../entities/sk-hynix.md)
-- [펀더멘털 불변 vs 심리·수급발 디레이팅](fundamentals-vs-sentiment-derating.md)
+## 투자 프레임: Buffett의 ROIC 기준과의 정렬 (2026-07-20 신규)
+
+Warren Buffett의 최근 AI 인터뷰에서 "AI 시대에도 결국 좋은 기업은 변하지 않는다"는
+메시지가 나왔다. 이는 현재의 9개 체크포인트 분석과 일관성을 갖는다:
+
+- **Buffett의 핵심**: "국채보다 훨씬 높은 수익을 장기간 낼 수 있는 기업" = **ROIC 유지**
+- **우리의 체크포인트와의 교집합**:
+  - ③(AI CapEx): "CapEx는 증가하는데 이익은 따라갈 것인가?" = **자본효율성 문제**
+  - ②(HBM 점유율): SK하이닉스의 HBM 마진은 경쟁사보다 높은가? = **ROIC 우위**
+  - ④(LTA): 가격 상한선 없음 = 수익 상방이 더 크다 = **ROIC 상향 여력**
+  - ⑨(실적): 영업이익 성장률(+650% YoY)이 지속 가능한가? = **ROIC 지속성**
+
+**핵심 질문 재정의**:
+- "SK하이닉스의 주가가 오를까?"가 아니라
+- "SK하이닉스가 AI 시대에도 높은 자본수익률(ROIC)을 유지할 수 있는가?"
+
+자세한 내용은 [ROIC를 투자의 핵심 기준으로 보기](roic-as-investment-criterion.md) 참고.
+
+---
+
+## Sources
+
+- [sources/buffett-ai-interview-analysis-2026-07-20.md](../../sources/buffett-ai-interview-analysis-2026-07-20.md)
+- [summaries/buffett-ai-interview-2026-07-20.md](../summaries/buffett-ai-interview-2026-07-20.md)
+- [concepts/roic-as-investment-criterion.md](roic-as-investment-criterion.md)
