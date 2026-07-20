@@ -81,6 +81,8 @@ def _executive_summary(payload: dict) -> str:
     macro = payload["macro"]
     brief = payload["personal_executive_brief"]
     top_action = payload["actions"][0] if payload["actions"] else None
+    daily_history = payload.get("daily_history_summary", {})
+
     lines = [
         "## 6. Executive Summary",
         f"- 현재 경기 국면: **{macro['regime']}** ({macro['score_band_label']}, 총점 {macro['score']})",
@@ -91,6 +93,24 @@ def _executive_summary(payload: dict) -> str:
         "- 이번 달 핵심 행동: " + (f"[행동] {top_action['title']}" if top_action else "[행동] 핵심 지표 확보 후 재평가 필요"),
         f"- 리포트 충족도: **{payload['report_readiness']}** (Confidence {macro['confidence']}점)",
     ]
+
+    # 일일 이력 요약 추가
+    if daily_history.get("status") == "ok":
+        trend = daily_history.get("trend_summary", {})
+        trend_notes = []
+        if not trend.get("kr_regime_stable"):
+            trend_notes.append("한국 국면 변화")
+        kr_conf_change = trend.get("kr_confidence_change")
+        if kr_conf_change and abs(kr_conf_change) > 5:
+            direction = "상승" if kr_conf_change > 0 else "하락"
+            trend_notes.append(f"신뢰도 {direction} ({kr_conf_change:+.1f}%p)")
+        investment_trend = trend.get("investment_env_trend", 0)
+        if investment_trend and abs(investment_trend) > 2:
+            direction = "개선" if investment_trend > 0 else "악화"
+            trend_notes.append(f"투자환경 {direction}")
+        if trend_notes:
+            lines.append(f"- **월간 일일 추이**: {', '.join(trend_notes)}")
+
     return "\n".join(lines)
 
 
@@ -370,14 +390,103 @@ def _cci_analysis(payload: dict) -> str:
         lines.append(f"- HY OAS: {cci['raw_values']['hy_oas']}%")
         lines.append("")
 
+    # 각 법칙별 상세 해석
+    lines.append("### 각 리스크 신호별 해석")
+    lines.append("")
+
+    # Sahm Rule
+    sahm_score = cci['score_components']['sahm']
+    lines.append(f"**1. Sahm Rule (고용 모멘텀)** — {sahm_score}/20")
+    if sahm_score >= 15:
+        lines.append("- ⚠️ **경고 신호**: 미국 실업률 3개월 이동평균이 최근 12개월 최저치에서 0.5%p 이상 상승했으며, 고용이 급격히 악화 중")
+        lines.append("- **경제 의미**: 금리 인상 효과가 고용 시장에까지 파급. 경기 침체 초기 신호")
+        lines.append("- **사용자 영향**: SK하이닉스 매출 감소 가능성, 보유 ETF 수익률 악화 우려")
+    elif sahm_score >= 8:
+        lines.append("- ⚡ **주의 신호**: 실업률이 소폭 상승 추세. 고용 시장의 약화 신호 but 아직 심각하지 않음")
+        lines.append("- **경제 의미**: 경기 둔화 국면으로 진입하는 중")
+        lines.append("- **사용자 영향**: 대기 자금 확충 검토")
+    else:
+        lines.append("- ✅ **안전 신호**: 실업률이 안정적이거나 하락 중. 고용 시장이 건강함")
+        lines.append("- **경제 의미**: 경기 확장 또는 회복 국면 유지")
+        lines.append("- **사용자 영향**: 공격적 포지션 유지 가능")
+    lines.append("")
+
+    # Yield Curve
+    yc_score = cci['score_components']['yield_curve']
+    lines.append(f"**2. Yield Curve (수익률곡선)** — {yc_score}/15")
+    if yc_score >= 12:
+        lines.append("- 🔴 **극도 경고**: 10Y-2Y 스프레드가 음수(역전)이며, 10Y-3M도 역전. 경기 침체 신호 강함")
+        lines.append("- **경제 의미**: 시장이 향후 경기 침체를 선반영. 장기 금리가 단기보다 낮다는 것은 안전자산 선호 신호")
+        lines.append("- **사용자 영향**: 채권 비중 확대, 공격성 자산 축소 시점. 청약 기회 관찰")
+    elif yc_score >= 6:
+        lines.append("- ⚡ **주의**: 스프레드가 200bp 이하로 축소. 금리 인상 효과가 곡선을 누르는 중")
+        lines.append("- **경제 의미**: 경기 둔화 신호. 통상 6~12개월 후 경기 약세 우려")
+        lines.append("- **사용자 영향**: 리스크 자산 비중 조절 시작")
+    else:
+        lines.append("- ✅ **정상**: 스프레드가 충분히 양수. 곡선이 건강한 상승 구조")
+        lines.append("- **경제 의미**: 경기 확장 신호. 투자심리 양호")
+        lines.append("- **사용자 영향**: 포지션 유지 또는 확대 검토")
+    lines.append("")
+
+    # Harvey Filter
+    hf_score = cci['score_components']['harvey']
+    lines.append(f"**3. Harvey Filter (장기 수익률곡선 역전 신호)** — {hf_score}/15")
+    if hf_score >= 12:
+        lines.append("- 🔴 **경기 침체 신호**: 지난 3개월 이상 장기 곡선이 역전 상태 지속. Sahm Rule보다 선행성 강함")
+        lines.append("- **경제 의미**: 시장 전문가들이 1년 후 경기 침체를 확신하는 신호")
+        lines.append("- **사용자 영향**: 방어 포지션 강화 단계")
+    elif hf_score >= 6:
+        lines.append("- ⚡ **추적 필요**: 최근 역전 신호. 지속 여부 모니터링")
+        lines.append("- **경제 의미**: 곧 경기 둔화 가능성. 하지만 일시적일 수도")
+        lines.append("- **사용자 영향**: 변동성 높은 자산 비중 축소 검토")
+    else:
+        lines.append("- ✅ **안전**: 곡선 역전 신호 없음. 경기 침체 임박 신호 약함")
+        lines.append("- **경제 의미**: 시장의 경기 전망이 중립~긍정적")
+        lines.append("- **사용자 영향**: 현재 포지션 유지")
+    lines.append("")
+
+    # Credit OAS
+    coas_score = cci['score_components']['credit_oas']
+    lines.append(f"**4. HY Credit OAS (신용 스프레드)** — {coas_score}/15")
+    if coas_score >= 12:
+        lines.append("- 🔴 **유동성 위기 신호**: 신용 스프레드 500bp 이상. 시장 불안 극고조")
+        lines.append("- **경제 의미**: 기업 신용 리스크 급증. 기업 부도 우려. 금융 시스템 스트레스")
+        lines.append("- **사용자 영향**: 긴급 현금화 단계. 채권 수익률 급락 우려하며 장기채 매수 기회 동시 주시")
+    elif coas_score >= 6:
+        lines.append("- ⚡ **경고**: 스프레드 300~500bp. 신용 리스크 높아짐")
+        lines.append("- **경제 의미**: 경기 둔화에 따른 기업 부실화 우려")
+        lines.append("- **사용자 영향**: 고수익률 채권 회피. 안전자산 비중 확대")
+    else:
+        lines.append("- ✅ **정상**: 스프레드가 300bp 이하. 신용 시장 양호")
+        lines.append("- **경제 의미**: 기업 신용 환경 건강. 시장 유동성 충분")
+        lines.append("- **사용자 영향**: 신용 자산 비중 유지 가능")
+    lines.append("")
+
+    # Semiconductor Cycle
+    semi_score = cci['score_components']['semiconductor']
+    lines.append(f"**5. 반도체 산업사이클** — {semi_score}/10")
+    if semi_score >= 8:
+        lines.append("- 📈 **긍정 신호**: 출하/재고 비율 정상화, 가격 안정화. 업황 회복 단계")
+        lines.append("- **경제 의미**: AI/DC 인프라 투자 재개. 메모리 공급 부족 심화. 가격 인상 가능성")
+        lines.append("- **사용자 영향 (SK하이닉스 직원)**: 매출 개선 → 보너스 사이클 상향. ETF 수익률 개선")
+    elif semi_score >= 4:
+        lines.append("- ⚡ **회복 중**: 약간의 과잉 공급 남아있으나 개선 추세")
+        lines.append("- **경제 의미**: 시장 정리 진행 중. 향후 2~3개월이 중요")
+        lines.append("- **사용자 영향**: SK하이닉스 지켜보기. 실적 발표 주의")
+    else:
+        lines.append("- 📉 **침체**: 공급 과잉, 가격 하락. 구조조정 우려")
+        lines.append("- **경제 의미**: 산업 사이클 저점. 정부 지원 정책 추적")
+        lines.append("- **사용자 영향**: 현금 확충. 저점 매수 기회 포착 준비")
+    lines.append("")
+
     action = cci["sk_hynix_action"]
-    lines.append(f"**SK Hynix 포지션 관리:**")
+    lines.append(f"### SK Hynix 포지션 관리")
     lines.append(f"- **Action**: {action['action']}")
     lines.append(f"- **Max Weight**: {action['max_weight']}%")
     lines.append(f"- **Context**: {action['description']}")
     lines.append(f"- **Signal**: {action['signal']}")
     lines.append("")
-    lines.append(f"**상태 해석:**")
+    lines.append(f"### 상태 해석")
     lines.append(f"> {cci['interpretation'][state]}")
 
     return "\n".join(lines)
@@ -392,7 +501,24 @@ def _real_estate_trend(payload: dict) -> str:
     lines = ["## 부동산 실거래가 동향 (국토교통부 실거래가 공개시스템)", ""]
 
     if re_data["fetch_status"] == "pending":
-        lines.append(f"- [사실] 데이터 상태: Pending — {re_data.get('fetch_note', 'MOLIT_API_KEY 미설정')}")
+        lines.append(f"- [사실] 데이터 상태: Pending — {re_data.get('fetch_note', 'DATA_GO_KR_KEY 미설정')}")
+        lines.append("")
+        lines.append("**데이터 준비 중:** 다음 달 리포트부터 아래 정보가 자동 생성됩니다.")
+        lines.append("")
+        lines.append("| 지역군 | 기준월 | 평당가(만원) | MoM | 3개월 추세 | 거래량 | 시장 온도 |")
+        lines.append("|---|---|---|---|---|---|---|")
+        lines.append("| 서울 | - | - | - | - | - | - |")
+        lines.append("| 수도권 | - | - | - | - | - | - |")
+        lines.append("| 전국(대표표본) | - | - | - | - | - | - |")
+        lines.append("")
+        lines.append("### 청약 타겟 지역 하이라이트 — 용인 기흥구")
+        lines.append("- [사실] 플랫폼시티 인근 지역의 월간 실거래가 추세")
+        lines.append("- 기준: 평당가(만원), 전월비 변화율, 월간 거래량, 시장 온도(과열/보합/냉각)")
+        lines.append("")
+        lines.append("### 서울 구별 순위")
+        lines.append("- [분석] 25개 자치구를 실거래가 상승률로 순위화")
+        lines.append("- 상승 TOP 3 (Gainers)")
+        lines.append("- 하락 TOP 3 (Decliners)")
         return "\n".join(lines)
     if re_data["fetch_status"] == "source_error" and not any(
         t.get("data_status") == "ok" for t in re_data["tiers"].values()

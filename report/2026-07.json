@@ -952,5 +952,43 @@
       "gainers": [],
       "decliners": []
     }
+  },
+  "daily_history_summary": {
+    "status": "ok",
+    "month": "2026-07",
+    "daily_records": [
+      {
+        "date": "2026-07-15",
+        "kr_regime": "Recovery",
+        "kr_score": 1.0,
+        "kr_confidence": 82.0,
+        "us_regime": "Slowdown",
+        "us_score": 0.0,
+        "us_confidence": 94.0,
+        "investment_env_score": 69.3,
+        "semiconductor_score": 79.6,
+        "bond_score": 41.3
+      },
+      {
+        "date": "2026-07-20",
+        "kr_regime": "Recovery",
+        "kr_score": 1.0,
+        "kr_confidence": 60.0,
+        "us_regime": "Slowdown",
+        "us_score": 0.0,
+        "us_confidence": 39.0,
+        "investment_env_score": 73.1,
+        "semiconductor_score": 79.6,
+        "bond_score": 45.0
+      }
+    ],
+    "trend_summary": {
+      "kr_regime_stable": true,
+      "kr_confidence_change": -22.0,
+      "us_regime_stable": true,
+      "us_confidence_change": -55.0,
+      "investment_env_trend": 3.799999999999997,
+      "semiconductor_trend": 0.0
+    }
   }
 }

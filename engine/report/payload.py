@@ -267,6 +267,9 @@ def build_report_payload(month_key: str | None = None) -> dict:
     # Add real estate transaction price trend (서울/수도권/전국)
     payload["real_estate"] = real_estate_trend.compute_real_estate_trend()
 
+    # Add daily dashboard history integration
+    payload["daily_history_summary"] = _daily_history_summary(month_key)
+
     log_event("report_payload.built", month=month_key, readiness=readiness, action_count=len(actions))
     return payload
 
@@ -348,3 +351,73 @@ def _cci_section() -> dict:
             "RED": "Systemic invalidation. Capital evacuation urgent. Defensive/short positioning required.",
         },
     }
+
+
+def _daily_history_summary(month_key: str) -> dict:
+    """일일 대시보드 이력 데이터를 월간 리포트에 통합 (지난 30일 최신 5개 기록).
+
+    peos_daily_history.csv에서 해당 월의 마지막 기록들을 읽어 일일 변화 추이를 제공한다.
+    """
+    import csv
+    from pathlib import Path
+
+    history_file = Path("data/peos_daily_history.csv")
+    if not history_file.exists():
+        return {"status": "unavailable", "note": "일일 이력 데이터 없음"}
+
+    try:
+        records = []
+        with open(history_file) as f:
+            reader = csv.DictReader(f)
+            for row in reader:
+                run_date = row.get("run_date", "")
+                if run_date.startswith(month_key):
+                    records.append(row)
+
+        if not records:
+            return {"status": "unavailable", "note": f"{month_key} 월간 일일 이력 없음"}
+
+        # 마지막 5개 기록만 사용
+        records = records[-5:]
+
+        # 첫 기록과 마지막 기록의 변화 계산
+        first = records[0]
+        last = records[-1]
+
+        def safe_float(v):
+            if not v or v == '':
+                return None
+            try:
+                return float(v)
+            except (ValueError, TypeError):
+                return None
+
+        return {
+            "status": "ok",
+            "month": month_key,
+            "daily_records": [
+                {
+                    "date": r.get("run_date"),
+                    "kr_regime": r.get("kr_regime"),
+                    "kr_score": safe_float(r.get("kr_raw_score")),
+                    "kr_confidence": safe_float(r.get("kr_confidence")),
+                    "us_regime": r.get("us_regime"),
+                    "us_score": safe_float(r.get("us_raw_score")),
+                    "us_confidence": safe_float(r.get("us_confidence")),
+                    "investment_env_score": safe_float(r.get("investment_environment_score")),
+                    "semiconductor_score": safe_float(r.get("semiconductor_score")),
+                    "bond_score": safe_float(r.get("bond_score")),
+                }
+                for r in records
+            ],
+            "trend_summary": {
+                "kr_regime_stable": first.get("kr_regime") == last.get("kr_regime"),
+                "kr_confidence_change": safe_float(last.get("kr_confidence")) - safe_float(first.get("kr_confidence")) if safe_float(first.get("kr_confidence")) and safe_float(last.get("kr_confidence")) else None,
+                "us_regime_stable": first.get("us_regime") == last.get("us_regime"),
+                "us_confidence_change": safe_float(last.get("us_confidence")) - safe_float(first.get("us_confidence")) if safe_float(first.get("us_confidence")) and safe_float(last.get("us_confidence")) else None,
+                "investment_env_trend": (safe_float(last.get("investment_environment_score")) or 0) - (safe_float(first.get("investment_environment_score")) or 0),
+                "semiconductor_trend": (safe_float(last.get("semiconductor_score")) or 0) - (safe_float(first.get("semiconductor_score")) or 0),
+            }
+        }
+    except Exception as e:
+        return {"status": "error", "note": f"일일 이력 읽기 오류: {str(e)}"}
