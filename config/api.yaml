@@ -84,7 +84,7 @@ sources:
     reliability_grade: 5
     official: true
     requires_key: true
-    env_key: MOLIT_API_KEY
+    env_key: DATA_GO_KR_KEY
     base_url: "https://apis.data.go.kr/1613000/RTMSDataSvcAptTradeDev/getRTMSDataSvcAptTradeDev"
     note: "공공데이터포털(data.go.kr)에서 무료 일반 인증키 발급. 원자료가 개별 거래 단위라 지역군별 월 중위가로 집계해 저장."
 
