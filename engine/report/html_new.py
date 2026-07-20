@@ -128,25 +128,36 @@ def _render_district_movers(movers: dict) -> str:
         <div class="metric"><span class="metric-label">하락 TOP</span><span>{_row(movers['decliners'], '#60A5FA')}</span></div>"""
 
 
+def _render_real_estate_placeholder(status_label: str, note: str) -> str:
+    return f"""
+        <div class="card" style="margin-bottom: 30px;">
+            <h2>🏘️ 부동산 실거래가 동향 (국토교통부 실거래가 공개시스템)</h2>
+            <p style="color: #94A3B8;">{status_label} — {note}</p>
+            <p style="color: #64748B; font-size: 0.9em; margin-top: 8px;">데이터 준비 중: 다음 리포트에서 재시도됩니다. 아래는 채워질 정보의 형식입니다.</p>
+            <table>
+                <tr><th>지역군</th><th>기준월</th><th>평당가(만원)</th><th>MoM</th><th>3개월 추세</th><th>거래량</th><th>시장 온도</th></tr>
+                <tr><td>서울</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td></tr>
+                <tr><td>수도권</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td></tr>
+                <tr><td>전국(대표표본)</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td></tr>
+            </table>
+            <div class="portfolio-section" style="border-left-color: #A855F7; margin-top: 15px;">
+                <strong style="color: #D8B4FE;">📍 청약 타겟 지역 — 용인 기흥구</strong>
+                <div style="color: #94A3B8; font-size: 0.9em; margin-top: 4px;">플랫폼시티 인근 지역의 월간 실거래가 추세 (평당가/MoM/거래량/시장 온도)를 다음 리포트부터 표시합니다.</div>
+            </div>
+        </div>"""
+
+
 def _render_real_estate_section(re_data: dict) -> str:
     if not re_data:
         return ""
 
     if re_data.get("fetch_status") == "pending":
-        return f"""
-        <div class="card" style="margin-bottom: 30px;">
-            <h2>🏘️ 부동산 실거래가 동향</h2>
-            <p style="color: #94A3B8;">Pending — {re_data.get('fetch_note', 'MOLIT_API_KEY 미설정')}</p>
-        </div>"""
+        return _render_real_estate_placeholder("Pending", re_data.get('fetch_note', 'MOLIT_API_KEY 미설정'))
 
     tiers = re_data.get("tiers", {})
     any_ok = any(t.get("data_status") == "ok" for t in tiers.values())
     if not any_ok:
-        return f"""
-        <div class="card" style="margin-bottom: 30px;">
-            <h2>🏘️ 부동산 실거래가 동향</h2>
-            <p style="color: #94A3B8;">Source Error — {re_data.get('fetch_note', '국토교통부 API 응답 없음')}</p>
-        </div>"""
+        return _render_real_estate_placeholder("Source Error", re_data.get('fetch_note', '국토교통부 API 응답 없음'))
 
     coverage = re_data.get("regions_covered")
     total = re_data.get("regions_total")

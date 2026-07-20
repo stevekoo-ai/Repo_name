@@ -500,10 +500,17 @@ def _real_estate_trend(payload: dict) -> str:
 
     lines = ["## 부동산 실거래가 동향 (국토교통부 실거래가 공개시스템)", ""]
 
-    if re_data["fetch_status"] == "pending":
-        lines.append(f"- [사실] 데이터 상태: Pending — {re_data.get('fetch_note', 'DATA_GO_KR_KEY 미설정')}")
+    is_pending = re_data["fetch_status"] == "pending"
+    is_dead_source_error = re_data["fetch_status"] == "source_error" and not any(
+        t.get("data_status") == "ok" for t in re_data.get("tiers", {}).values()
+    )
+    if is_pending or is_dead_source_error:
+        if is_pending:
+            lines.append(f"- [사실] 데이터 상태: Pending — {re_data.get('fetch_note', 'DATA_GO_KR_KEY 미설정')}")
+        else:
+            lines.append(f"- [사실] 데이터 상태: Source Error — {re_data.get('fetch_note', '국토교통부 API 응답 없음')}")
         lines.append("")
-        lines.append("**데이터 준비 중:** 다음 달 리포트부터 아래 정보가 자동 생성됩니다.")
+        lines.append("**데이터 준비 중:** 다음 리포트에서 재시도됩니다. 아래는 채워질 정보의 형식입니다.")
         lines.append("")
         lines.append("| 지역군 | 기준월 | 평당가(만원) | MoM | 3개월 추세 | 거래량 | 시장 온도 |")
         lines.append("|---|---|---|---|---|---|---|")
@@ -519,11 +526,6 @@ def _real_estate_trend(payload: dict) -> str:
         lines.append("- [분석] 25개 자치구를 실거래가 상승률로 순위화")
         lines.append("- 상승 TOP 3 (Gainers)")
         lines.append("- 하락 TOP 3 (Decliners)")
-        return "\n".join(lines)
-    if re_data["fetch_status"] == "source_error" and not any(
-        t.get("data_status") == "ok" for t in re_data["tiers"].values()
-    ):
-        lines.append(f"- [사실] 데이터 상태: Source Error — {re_data.get('fetch_note', '국토교통부 API 응답 없음')}")
         return "\n".join(lines)
 
     coverage = re_data.get("regions_covered")
