@@ -5,11 +5,11 @@
     "regime": "Recession",
     "previous_regime": "Slowdown",
     "transition": "downgrade",
-    "score": 0,
-    "weighted_score": 0.0,
-    "score_band": "early_slowdown",
-    "score_band_label": "초기 둔화",
-    "confidence": 94.0,
+    "score": -1,
+    "weighted_score": -0.8,
+    "score_band": "slowdown",
+    "score_band_label": "둔화",
+    "confidence": 90.9,
     "warnings": [],
     "changes": [
       {
@@ -21,6 +21,7 @@
   },
   "us_macro_dashboard": [
     {
+      "key": "gdp",
       "indicator": "미국 실질 GDP 성장률 (연율화 QoQ)",
       "current": 2.1,
       "previous": 0.5,
@@ -186,9 +187,10 @@
       "history_years": 10
     },
     {
+      "key": "industrial_production",
       "indicator": "미국 산업생산지수",
-      "current": 102.6475,
-      "previous": 102.509,
+      "current": 102.6395,
+      "previous": 102.5606,
       "previous_source": "series_history",
       "trend": "→",
       "score": 0,
@@ -649,34 +651,39 @@
         },
         {
           "date": "2026-01-01",
-          "value": 101.1235
+          "value": 101.0388
         },
         {
           "date": "2026-02-01",
-          "value": 101.9493
+          "value": 101.9263
         },
         {
           "date": "2026-03-01",
-          "value": 101.6273
+          "value": 101.6172
         },
         {
           "date": "2026-04-01",
-          "value": 102.509
+          "value": 102.4196
         },
         {
           "date": "2026-05-01",
-          "value": 102.6475
+          "value": 102.5606
+        },
+        {
+          "date": "2026-06-01",
+          "value": 102.6395
         }
       ],
       "history_years": 10
     },
     {
+      "key": "retail_sales",
       "indicator": "미국 소매판매",
-      "current": 763705.0,
-      "previous": 757036.0,
+      "current": 768553.0,
+      "previous": 766876.0,
       "previous_source": "series_history",
-      "trend": "▲",
-      "score": 1,
+      "trend": "→",
+      "score": 0,
       "status": "ok",
       "source": "FRED",
       "history": [
@@ -1102,11 +1109,11 @@
         },
         {
           "date": "2025-05-01",
-          "value": 714568.0
+          "value": 714513.0
         },
         {
           "date": "2025-06-01",
-          "value": 723033.0
+          "value": 720164.0
         },
         {
           "date": "2025-07-01",
@@ -1146,16 +1153,21 @@
         },
         {
           "date": "2026-04-01",
-          "value": 757036.0
+          "value": 759097.0
         },
         {
           "date": "2026-05-01",
-          "value": 763705.0
+          "value": 766876.0
+        },
+        {
+          "date": "2026-06-01",
+          "value": 768553.0
         }
       ],
       "history_years": 10
     },
     {
+      "key": "cpi",
       "indicator": "미국 CPI",
       "current": 332.568,
       "previous": 333.979,
@@ -1641,9 +1653,10 @@
       "history_years": 10
     },
     {
+      "key": "ppi",
       "indicator": "미국 PPI",
-      "current": 292.504,
-      "previous": 282.7,
+      "current": 286.827,
+      "previous": 290.489,
       "previous_source": "series_history",
       "trend": "▼",
       "score": -1,
@@ -2108,24 +2121,29 @@
         },
         {
           "date": "2026-02-01",
-          "value": 269.553
+          "value": 269.535
         },
         {
           "date": "2026-03-01",
-          "value": 275.979
+          "value": 276.046
         },
         {
           "date": "2026-04-01",
-          "value": 282.7
+          "value": 282.779
         },
         {
           "date": "2026-05-01",
-          "value": 292.504
+          "value": 290.489
+        },
+        {
+          "date": "2026-06-01",
+          "value": 286.827
         }
       ],
       "history_years": 10
     },
     {
+      "key": "unemployment",
       "indicator": "미국 실업률 (3개월 평균 변화, %p)",
       "current": 4.2,
       "previous": 4.3,
@@ -2611,6 +2629,7 @@
       "history_years": 10
     },
     {
+      "key": "trade_balance",
       "indicator": "미국 무역수지 (3개월 평균, 백만달러)",
       "current": -77585.0,
       "previous": -54570.0,
@@ -3096,27 +3115,16 @@
       "history_years": 10
     },
     {
+      "key": "yield_curve",
       "indicator": "미국 10년-2년 국채 금리차 (%p)",
-      "current": 0.4,
-      "previous": 0.36,
+      "current": 0.37,
+      "previous": 0.41,
       "previous_source": "series_history",
       "trend": "→",
       "score": 0,
       "status": "ok",
       "source": "FRED",
       "history": [
-        {
-          "date": "2016-07-15",
-          "value": 0.89
-        },
-        {
-          "date": "2016-07-18",
-          "value": 0.91
-        },
-        {
-          "date": "2016-07-19",
-          "value": 0.86
-        },
         {
           "date": "2016-07-20",
           "value": 0.86
@@ -13096,6 +13104,18 @@
         {
           "date": "2026-07-14",
           "value": 0.4
+        },
+        {
+          "date": "2026-07-15",
+          "value": 0.42
+        },
+        {
+          "date": "2026-07-16",
+          "value": 0.41
+        },
+        {
+          "date": "2026-07-17",
+          "value": 0.37
         }
       ],
       "history_years": 10
@@ -13105,7 +13125,7 @@
     "kr_regime": "Recovery",
     "us_regime": "Recession",
     "kr_score_band": "unbalanced_expansion",
-    "us_score_band": "early_slowdown",
+    "us_score_band": "slowdown",
     "cycle_gap": -5,
     "alignment": "kr_behind",
     "indicator_pairs": [
@@ -13124,17 +13144,17 @@
         "kr_score": -1,
         "us_score": 0,
         "kr_value": 114.912,
-        "us_value": 102.6475,
+        "us_value": 102.6395,
         "relationship": "diverge"
       },
       {
         "key": "retail_sales",
         "label": "소매판매",
-        "kr_score": -1,
-        "us_score": 1,
-        "kr_value": -3.6380597015,
-        "us_value": 763705.0,
-        "relationship": "diverge"
+        "kr_score": 0,
+        "us_score": 0,
+        "kr_value": 0.096711798839455,
+        "us_value": 768553.0,
+        "relationship": "sync"
       },
       {
         "key": "cpi",
@@ -13151,7 +13171,7 @@
         "kr_score": -1,
         "us_score": -1,
         "kr_value": 129.82,
-        "us_value": 292.504,
+        "us_value": 286.827,
         "relationship": "sync"
       },
       {
@@ -13173,21 +13193,21 @@
         "relationship": "diverge"
       }
     ],
-    "narrative": "미국은 현재 Recession 국면, 한국은 Recovery 국면입니다. 한국이 사이클상 미국보다 뒤처져 있어, 미국에서 먼저 나타난 흐름이 시차를 두고 한국에 파급될 가능성을 주시할 필요가 있습니다. 비교 가능한 6개 핵심 지표 중 50%가 미국과 같은 방향으로 움직이고 있습니다. 미국은 경고 신호가 없는데 한국만 경고 신호가 있어, 이번 흐름은 글로벌 요인보다 한국 특유의 요인에서 비롯됐을 가능성이 큽니다. 방향이 엇갈린 지표: GDP 성장, 산업생산, 소매판매 — 이 부분이 한국이 미국과 다르게 가는 지점입니다."
+    "narrative": "미국은 현재 Recession 국면, 한국은 Recovery 국면입니다. 한국이 사이클상 미국보다 뒤처져 있어, 미국에서 먼저 나타난 흐름이 시차를 두고 한국에 파급될 가능성을 주시할 필요가 있습니다. 비교 가능한 6개 핵심 지표 중 67%가 미국과 같은 방향으로 움직이고 있습니다. 미국은 경고 신호가 없는데 한국만 경고 신호가 있어, 이번 흐름은 글로벌 요인보다 한국 특유의 요인에서 비롯됐을 가능성이 큽니다. 방향이 엇갈린 지표: GDP 성장, 산업생산 — 이 부분이 한국이 미국과 다르게 가는 지점입니다."
   },
   "macro": {
     "regime": "Recovery",
     "previous_regime": "Early Expansion",
     "transition": "upgrade",
-    "score": 1,
-    "weighted_score": 1.3,
+    "score": 2,
+    "weighted_score": 2.1,
     "score_band": "unbalanced_expansion",
     "score_band_label": "불균형 확장",
-    "confidence": 82.0,
+    "confidence": 84.5,
     "confidence_components": {
       "data_freshness": 100.0,
       "source_quality": 92.0,
-      "indicator_consistency": 60.0,
+      "indicator_consistency": 70.0,
       "trend_stability": 70.0
     },
     "warnings": [
@@ -13214,6 +13234,7 @@
   },
   "macro_dashboard": [
     {
+      "key": "gdp",
       "indicator": "실질 GDP 성장률",
       "current": 1.831,
       "previous": -0.108,
@@ -13379,6 +13400,7 @@
       "history_years": 10
     },
     {
+      "key": "industrial_production",
       "indicator": "전산업생산지수",
       "current": 114.912,
       "previous": 118.7424,
@@ -13760,12 +13782,13 @@
       "history_years": 10
     },
     {
+      "key": "retail_sales",
       "indicator": "소매판매",
-      "current": -3.6380597015,
-      "previous": 1.804368471,
+      "current": 0.096711798839455,
+      "previous": -3.54477611940299,
       "previous_source": "series_history",
-      "trend": "▼",
-      "score": -1,
+      "trend": "→",
+      "score": 0,
       "status": "ok",
       "source": "OECD (FRED 경유) — KOSIS 대체",
       "history": [
@@ -14235,12 +14258,17 @@
         },
         {
           "date": "2026-04-01",
-          "value": -3.6380597015
+          "value": -3.54477611940299
+        },
+        {
+          "date": "2026-05-01",
+          "value": 0.096711798839455
         }
       ],
       "history_years": 10
     },
     {
+      "key": "exports",
       "indicator": "총수출 증가율",
       "current": 9.1,
       "previous": 8.2,
@@ -14266,6 +14294,7 @@
       "history_years": 10
     },
     {
+      "key": "semiconductor_exports",
       "indicator": "반도체 수출 증가율",
       "current": 24.7,
       "previous": 22.4,
@@ -14291,6 +14320,7 @@
       "history_years": 10
     },
     {
+      "key": "current_account",
       "indicator": "경상수지 (3개월 평균, 억달러)",
       "current": 38607.4,
       "previous": 28292.3,
@@ -14776,6 +14806,7 @@
       "history_years": 10
     },
     {
+      "key": "cpi",
       "indicator": "CPI",
       "current": 118.84768138617,
       "previous": 119.511811590829,
@@ -15141,6 +15172,7 @@
       "history_years": 10
     },
     {
+      "key": "ppi",
       "indicator": "PPI",
       "current": 129.82,
       "previous": 128.75,
@@ -15626,9 +15658,10 @@
       "history_years": 10
     },
     {
+      "key": "unemployment",
       "indicator": "한국 실업률 (3개월 평균 변화, %p)",
       "current": 2.8,
-      "previous": 2.7,
+      "previous": 2.8,
       "previous_source": "series_history",
       "trend": "▲",
       "score": 1,
@@ -16102,11 +16135,16 @@
         {
           "date": "2026-04-01",
           "value": 2.8
+        },
+        {
+          "date": "2026-05-01",
+          "value": 2.8
         }
       ],
       "history_years": 10
     },
     {
+      "key": "us_global",
       "indicator": "미국 고용 + 글로벌 경기 (composite -1~+1)",
       "current": 1.0,
       "previous": null,
@@ -16120,7 +16158,7 @@
     }
   ],
   "personal": {
-    "investment_environment_score": 65.6,
+    "investment_environment_score": 66.9,
     "investment_biases": {
       "stock_bias": "소폭 확대",
       "etf_bias": "소폭 확대",
@@ -16129,64 +16167,64 @@
     },
     "semiconductor_score": 79.6,
     "semiconductor_band": "긍정",
-    "bond_score": 41.3,
-    "fx_score": 32.9,
-    "housing_readiness_score": 60.4,
+    "bond_score": 39.5,
+    "fx_score": 36.6,
+    "housing_readiness_score": null,
     "etf_fit": [
       {
         "ticker": "0183J0.KS",
         "name": "TIGER 미국우주테크",
         "bucket": "space_tech",
-        "fit_score": 56.1,
+        "fit_score": 57.1,
         "data_status": "ok"
       },
       {
         "ticker": "371460.KS",
         "name": "TIGER 차이나전기차SOLACTIVE",
         "bucket": "ev_china",
-        "fit_score": 56.1,
+        "fit_score": 57.1,
         "data_status": "ok"
       },
       {
         "ticker": "411060.KS",
         "name": "ACE KRX금현물",
         "bucket": "gold",
-        "fit_score": 56.1,
+        "fit_score": 57.1,
         "data_status": "ok"
       },
       {
         "ticker": "455850.KS",
         "name": "SOL AI반도체소부장",
         "bucket": "semiconductor",
-        "fit_score": 65.0,
+        "fit_score": 66.0,
         "data_status": "ok"
       },
       {
         "ticker": "469150.KS",
         "name": "ACE AI반도체TOP3+",
         "bucket": "semiconductor",
-        "fit_score": 65.0,
+        "fit_score": 66.0,
         "data_status": "ok"
       },
       {
         "ticker": "475380.KS",
         "name": "RISE 글로벌리얼티인컴",
         "bucket": "reit_income",
-        "fit_score": 56.1,
+        "fit_score": 57.1,
         "data_status": "ok"
       },
       {
         "ticker": "476070.KS",
         "name": "KODEX 글로벌비만치료제TOP2 Plus",
         "bucket": "healthcare_theme",
-        "fit_score": 56.1,
+        "fit_score": 57.1,
         "data_status": "ok"
       }
     ]
   },
   "assets": {
     "stocks": {
-      "score": 68.6,
+      "score": 69.6,
       "stars": "★★★☆☆",
       "data_status": "ok",
       "detail": [
@@ -16200,7 +16238,7 @@
       ]
     },
     "etf": {
-      "score": 58.6,
+      "score": 59.6,
       "stars": "★★★☆☆",
       "data_status": "ok",
       "detail": [
@@ -16208,56 +16246,56 @@
           "ticker": "0183J0.KS",
           "name": "TIGER 미국우주테크",
           "bucket": "space_tech",
-          "fit_score": 56.1,
+          "fit_score": 57.1,
           "data_status": "ok"
         },
         {
           "ticker": "371460.KS",
           "name": "TIGER 차이나전기차SOLACTIVE",
           "bucket": "ev_china",
-          "fit_score": 56.1,
+          "fit_score": 57.1,
           "data_status": "ok"
         },
         {
           "ticker": "411060.KS",
           "name": "ACE KRX금현물",
           "bucket": "gold",
-          "fit_score": 56.1,
+          "fit_score": 57.1,
           "data_status": "ok"
         },
         {
           "ticker": "455850.KS",
           "name": "SOL AI반도체소부장",
           "bucket": "semiconductor",
-          "fit_score": 65.0,
+          "fit_score": 66.0,
           "data_status": "ok"
         },
         {
           "ticker": "469150.KS",
           "name": "ACE AI반도체TOP3+",
           "bucket": "semiconductor",
-          "fit_score": 65.0,
+          "fit_score": 66.0,
           "data_status": "ok"
         },
         {
           "ticker": "475380.KS",
           "name": "RISE 글로벌리얼티인컴",
           "bucket": "reit_income",
-          "fit_score": 56.1,
+          "fit_score": 57.1,
           "data_status": "ok"
         },
         {
           "ticker": "476070.KS",
           "name": "KODEX 글로벌비만치료제TOP2 Plus",
           "bucket": "healthcare_theme",
-          "fit_score": 56.1,
+          "fit_score": 57.1,
           "data_status": "ok"
         }
       ]
     },
     "bond": {
-      "score": 41.3,
-      "stars": "★★☆☆☆",
+      "score": 39.5,
+      "stars": "★☆☆☆☆",
       "data_status": "ok",
       "detail": [
         {
@@ -16279,51 +16317,17 @@
       }
     },
     "subscription_fund": {
-      "score": 60.4,
-      "stars": "★★★☆☆",
-      "data_status": "ok",
-      "detail": [
-        {
-          "name": "세종 5-1생활권 공공분양 (EXAMPLE)",
-          "agency": "LH",
-          "region": "세종 플랫폼시티",
-          "readiness_score": 60.4,
-          "factors": {
-            "eligibility_fit": 100.0,
-            "funding_readiness": 25.5,
-            "region_type_match": 60.0,
-            "timing_readiness": 40.0,
-            "competition_adjustment_inverse": null
-          },
-          "application_start": "2026-08-11",
-          "application_end": "2026-08-12",
-          "data_status": "ok",
-          "platform_city_analysis": {
-            "location": "세종 플랫폼시티",
-            "supply_scale_households": 620,
-            "expected_schedule": {
-              "announce_date": "2026-08-01",
-              "application_start": "2026-08-11",
-              "application_end": "2026-08-12"
-            },
-            "expected_price_krw": 550000000,
-            "funding_gap_krw": 81950000.0,
-            "expected_competition_ratio": null,
-            "user_fit_score": 60.4,
-            "risk_notes": [
-              "예상 경쟁률 미확정 — 청약홈 공고 확정 후 재평가 필요",
-              "자금조달 갭 발생 시 채권/현금 배분 조정 필요 (Action Engine 충돌 조정 대상)"
-            ]
-          }
-        }
-      ]
+      "score": null,
+      "stars": null,
+      "data_status": "pending",
+      "detail": []
     },
     "fx_exposure": {
-      "score": 32.9,
+      "score": 36.6,
       "stars": "★☆☆☆☆",
       "data_status": "ok",
       "detail": {
-        "usdkrw_change_pct_3m": 5.64,
+        "usdkrw_change_pct_3m": 3.52,
         "dollar_index_change_pct_3m": 1.35,
         "kr_us_rate_differential_pct": -1.13,
         "us_fed_funds_change_bp_3m": -1.0
@@ -16331,42 +16335,9 @@
     }
   },
   "housing": {
-    "notices": [
-      {
-        "name": "세종 5-1생활권 공공분양 (EXAMPLE)",
-        "agency": "LH",
-        "region": "세종 플랫폼시티",
-        "readiness_score": 60.4,
-        "factors": {
-          "eligibility_fit": 100.0,
-          "funding_readiness": 25.5,
-          "region_type_match": 60.0,
-          "timing_readiness": 40.0,
-          "competition_adjustment_inverse": null
-        },
-        "application_start": "2026-08-11",
-        "application_end": "2026-08-12",
-        "data_status": "ok",
-        "platform_city_analysis": {
-          "location": "세종 플랫폼시티",
-          "supply_scale_households": 620,
-          "expected_schedule": {
-            "announce_date": "2026-08-01",
-            "application_start": "2026-08-11",
-            "application_end": "2026-08-12"
-          },
-          "expected_price_krw": 550000000,
-          "funding_gap_krw": 81950000.0,
-          "expected_competition_ratio": null,
-          "user_fit_score": 60.4,
-          "risk_notes": [
-            "예상 경쟁률 미확정 — 청약홈 공고 확정 후 재평가 필요",
-            "자금조달 갭 발생 시 채권/현금 배분 조정 필요 (Action Engine 충돌 조정 대상)"
-          ]
-        }
-      }
-    ],
-    "data_status": "ok"
+    "notices": [],
+    "data_status": "pending",
+    "note": "data/manual_inputs/subscription_notices.yaml 에 공고 없음"
   },
   "travel": {
     "trips": [
@@ -16376,11 +16347,11 @@
         "destination_country": "US",
         "departure_date": "2026-09-15",
         "score_kind": "trip_readiness",
-        "score": 51.0,
+        "score": 45.6,
         "factors": {
-          "fx_favorability": 32.9,
+          "fx_favorability": 36.6,
           "cost_risk_inverse": null,
-          "lead_time_readiness": 80.0
+          "lead_time_readiness": 60.0
         },
         "data_status": "ok"
       },
@@ -16390,9 +16361,9 @@
         "destination_country": "JP",
         "departure_date": "2026-10-03",
         "score_kind": "travel_timing",
-        "score": 46.8,
+        "score": 49.1,
         "factors": {
-          "fx_favorability": 32.9,
+          "fx_favorability": 36.6,
           "season_favorability": 70.0,
           "airfare_hotel_trend": null
         },
@@ -16406,7 +16377,7 @@
       "probability": 35,
       "premise": "현재 국면(Recovery)과 반도체 업황(긍정)의 추세가 유지된다.",
       "expected_change": "지표가 현재 범위 내에서 등락하며 국면 전환 신호는 제한적.",
-      "user_impact": "Investment Environment Score 65.6점 수준의 배분 유지가 합리적."
+      "user_impact": "Investment Environment Score 66.9점 수준의 배분 유지가 합리적."
     },
     "bull": {
       "probability": 35,
@@ -16433,12 +16404,12 @@
     {
       "priority": 4,
       "priority_label": "★★★★☆ 검토 필요",
-      "priority_score": 80.5,
-      "title": "세종 5-1생활권 공공분양 (EXAMPLE) 자금 갭 81,950,000원 확보 계획 수립",
-      "reason": "목표 자금 대비 현재 청약저축/현금 잔액이 부족하다.",
-      "invalid_condition": "공고가 취소되거나 자금 목표가 조정되면 보류.",
-      "recheck": "2026-08-11 1개월 전.",
-      "category": "liquidity_survival",
+      "priority_score": 76.4,
+      "title": "SK hynix / Micron 실적발표 확인 (2026-07-24)",
+      "reason": "우선순위 점수 88.0점, ★★★★★ — D-4.",
+      "invalid_condition": "일정이 연기되면 재점검 시점도 함께 조정.",
+      "recheck": "2026-07-24 당일 또는 직후.",
+      "category": "industry_cycle",
       "conflict_note": null
     },
     {
@@ -16455,33 +16426,22 @@
     {
       "priority": 4,
       "priority_label": "★★★★☆ 검토 필요",
-      "priority_score": 72.9,
-      "title": "SK hynix / Micron 실적발표 확인 (2026-07-24)",
-      "reason": "우선순위 점수 86.1점, ★★★★★ — D-9.",
+      "priority_score": 71.8,
+      "title": "한국 수출입 동향 (반도체 포함) 확인 (2026-08-01)",
+      "reason": "우선순위 점수 87.0점, ★★★★★ — D-12.",
       "invalid_condition": "일정이 연기되면 재점검 시점도 함께 조정.",
-      "recheck": "2026-07-24 당일 또는 직후.",
-      "category": "industry_cycle",
-      "conflict_note": null
-    },
-    {
-      "priority": 4,
-      "priority_label": "★★★★☆ 검토 필요",
-      "priority_score": 71.0,
-      "title": "세종 5-1생활권 공공분양 (EXAMPLE) 청약 자격/자금 점검",
-      "reason": "청약 준비도 60.4점 — 신청 전 자격/자금 요건 재확인 필요.",
-      "invalid_condition": "공고가 취소되거나 자격 요건 미충족이 확인되면 보류.",
-      "recheck": "2026-08-11 1주 전.",
-      "category": "liquidity_survival",
+      "recheck": "2026-08-01 당일 또는 직후.",
+      "category": "macro_risk",
       "conflict_note": null
     },
     {
       "priority": 3,
       "priority_label": "★★★☆☆ 관찰 필요",
-      "priority_score": 68.3,
-      "title": "한국 수출입 동향 (반도체 포함) 확인 (2026-08-01)",
-      "reason": "우선순위 점수 85.1점, ★★★★★ — D-17.",
+      "priority_score": 68.1,
+      "title": "FOMC 정례회의 확인 (2026-07-29)",
+      "reason": "우선순위 점수 77.4점, ★★★★☆ — D-9.",
       "invalid_condition": "일정이 연기되면 재점검 시점도 함께 조정.",
-      "recheck": "2026-08-01 당일 또는 직후.",
+      "recheck": "2026-07-29 당일 또는 직후.",
       "category": "macro_risk",
       "conflict_note": null
     },
@@ -16499,20 +16459,9 @@
     {
       "priority": 3,
       "priority_label": "★★★☆☆ 관찰 필요",
-      "priority_score": 64.5,
-      "title": "FOMC 정례회의 확인 (2026-07-29)",
-      "reason": "우선순위 점수 75.5점, ★★★★☆ — D-14.",
-      "invalid_condition": "일정이 연기되면 재점검 시점도 함께 조정.",
-      "recheck": "2026-07-29 당일 또는 직후.",
-      "category": "macro_risk",
-      "conflict_note": null
-    },
-    {
-      "priority": 3,
-      "priority_label": "★★★☆☆ 관찰 필요",
       "priority_score": 58.8,
       "title": "주식/ETF 비중 확대 검토",
-      "reason": "Investment Environment Score 65.6점 — 거시/반도체 환경이 우호적.",
+      "reason": "Investment Environment Score 66.9점 — 거시/반도체 환경이 우호적.",
       "invalid_condition": "Investment Environment Score가 20점 이상 하락하면 보류.",
       "recheck": "다음 정기 리포트.",
       "category": "investment_opportunity",
@@ -16521,20 +16470,20 @@
     {
       "priority": 3,
       "priority_label": "★★★☆☆ 관찰 필요",
-      "priority_score": 55.2,
+      "priority_score": 58.7,
       "title": "미국 CPI 발표 확인 (2026-08-12)",
-      "reason": "우선순위 점수 71.2점, ★★★★☆ — D-28.",
+      "reason": "우선순위 점수 73.1점, ★★★★☆ — D-23.",
       "invalid_condition": "일정이 연기되면 재점검 시점도 함께 조정.",
       "recheck": "2026-08-12 당일 또는 직후.",
       "category": "macro_risk",
       "conflict_note": null
     },
     {
-      "priority": 2,
-      "priority_label": "★★☆☆☆ 참고",
-      "priority_score": 52.9,
+      "priority": 3,
+      "priority_label": "★★★☆☆ 관찰 필요",
+      "priority_score": 56.5,
       "title": "미국 비농업 고용(NFP) 발표 확인 (2026-08-07)",
-      "reason": "우선순위 점수 62.6점, ★★★★☆ — D-23.",
+      "reason": "우선순위 점수 64.5점, ★★★★☆ — D-18.",
       "invalid_condition": "일정이 연기되면 재점검 시점도 함께 조정.",
       "recheck": "2026-08-07 당일 또는 직후.",
       "category": "macro_risk",
@@ -16545,7 +16494,7 @@
       "priority_label": "★★☆☆☆ 참고",
       "priority_score": 52.8,
       "title": "미국 출장 (EXAMPLE) 분할 환전 검토",
-      "reason": "미국 출장 (EXAMPLE): 환전 유리도 51.0점으로 낮지만 일정이 확정되어 있어 환전을 전면 보류하기보다 분할 환전으로 리스크를 분산하는 것이 합리적이다.",
+      "reason": "미국 출장 (EXAMPLE): 환전 유리도 45.6점으로 낮지만 일정이 확정되어 있어 환전을 전면 보류하기보다 분할 환전으로 리스크를 분산하는 것이 합리적이다.",
       "invalid_condition": "출국일 이전 환율이 추가로 5% 이상 불리하게 움직이면 재검토.",
       "recheck": "2026-09-15 2주 전.",
       "category": "liquidity_survival",
@@ -16556,10 +16505,21 @@
       "priority_label": "★★☆☆☆ 참고",
       "priority_score": 52.8,
       "title": "일본 여행 (EXAMPLE) 분할 환전 검토",
-      "reason": "일본 여행 (EXAMPLE): 환전 유리도 46.8점으로 낮지만 일정이 확정되어 있어 환전을 전면 보류하기보다 분할 환전으로 리스크를 분산하는 것이 합리적이다.",
+      "reason": "일본 여행 (EXAMPLE): 환전 유리도 49.1점으로 낮지만 일정이 확정되어 있어 환전을 전면 보류하기보다 분할 환전으로 리스크를 분산하는 것이 합리적이다.",
       "invalid_condition": "출국일 이전 환율이 추가로 5% 이상 불리하게 움직이면 재검토.",
       "recheck": "2026-10-03 2주 전.",
       "category": "travel_discretionary",
+      "conflict_note": null
+    },
+    {
+      "priority": 2,
+      "priority_label": "★★☆☆☆ 참고",
+      "priority_score": 44.8,
+      "title": "채권 신규 매수 보류 및 만기 재투자 방식 재검토",
+      "reason": "Bond Score 39.5점 — 금리/실질금리 매력도가 낮은 국면.",
+      "invalid_condition": "실질금리 매력도 회복 또는 성장 둔화 신호 확산 시 재검토.",
+      "recheck": "다음 금통위/FOMC 이후.",
+      "category": "investment_opportunity",
       "conflict_note": null
     }
   ],
@@ -16575,12 +16535,6 @@
       "topic": "하나증권 락업주와 이사 시점",
       "context": "SK하이닉스 67주는 2027-02-11까지 보유해야 8,791,650원 마크업을 받습니다. 락업 만기(2027-02-11)가 전세 만료(2027-02-22)보다 빠릅니다 (약 11일 차이).",
       "question": "전세 만료 이후 임시 거주(전세/월세) 자금이 필요할 수 있는데, 이 락업주는 자금 계획에서 제외하고 다른 재원으로 임시 거주 비용을 마련하는 쪽으로 생각하고 계신가요?"
-    },
-    {
-      "id": "housing_funding_gap",
-      "topic": "청약 자금 갭과 이사 일정",
-      "context": "세종 5-1생활권 공공분양 (EXAMPLE) 목표 자금 대비 약 81,950,000원이 부족한 상태이고, 전세 만료일은 2027-02-22입니다.",
-      "question": "공공분양 입주 전까지 임시로 다시 전세/월세 계약이 필요한 상황인데, 그 임시 거주 자금과 청약 자금(계약금 등)을 같은 시기에 같이 마련해야 하는 건지, 임시 거주는 월세로 돌려서 목돈 지출을 늦추는 방안도 고려 중이신지 궁금합니다."
     },
     {
       "id": "semiconductor_exposure_breadth",
@@ -16600,8 +16554,8 @@
       "name": "SK hynix / Micron 실적발표",
       "date": "2026-07-24",
       "category": "semiconductor_earnings",
-      "days_until": 9,
-      "priority_score": 86.1,
+      "days_until": 4,
+      "priority_score": 88.0,
       "importance_tier": 5,
       "importance_label": "★★★★★"
     },
@@ -16609,8 +16563,8 @@
       "name": "한국 수출입 동향 (반도체 포함)",
       "date": "2026-08-01",
       "category": "kr_trade",
-      "days_until": 17,
-      "priority_score": 85.1,
+      "days_until": 12,
+      "priority_score": 87.0,
       "importance_tier": 5,
       "importance_label": "★★★★★"
     },
@@ -16618,8 +16572,8 @@
       "name": "FOMC 정례회의",
       "date": "2026-07-29",
       "category": "us_policy",
-      "days_until": 14,
-      "priority_score": 75.5,
+      "days_until": 9,
+      "priority_score": 77.4,
       "importance_tier": 4,
       "importance_label": "★★★★☆"
     },
@@ -16627,8 +16581,8 @@
       "name": "미국 CPI 발표",
       "date": "2026-08-12",
       "category": "us_inflation",
-      "days_until": 28,
-      "priority_score": 71.2,
+      "days_until": 23,
+      "priority_score": 73.1,
       "importance_tier": 4,
       "importance_label": "★★★★☆"
     },
@@ -16636,8 +16590,8 @@
       "name": "미국 비농업 고용(NFP) 발표",
       "date": "2026-08-07",
       "category": "us_employment",
-      "days_until": 23,
-      "priority_score": 62.6,
+      "days_until": 18,
+      "priority_score": 64.5,
       "importance_tier": 4,
       "importance_label": "★★★★☆"
     },
@@ -16645,29 +16599,29 @@
       "name": "한국 CPI 발표",
       "date": "2026-08-05",
       "category": "kr_inflation",
-      "days_until": 21,
-      "priority_score": 59.6,
-      "importance_tier": 3,
-      "importance_label": "★★★☆☆"
+      "days_until": 16,
+      "priority_score": 61.5,
+      "importance_tier": 4,
+      "importance_label": "★★★★☆"
     },
     {
       "name": "한국은행 금융통화위원회",
       "date": "2026-08-14",
       "category": "kr_policy",
-      "days_until": 30,
-      "priority_score": 59.5,
-      "importance_tier": 3,
-      "importance_label": "★★★☆☆"
+      "days_until": 25,
+      "priority_score": 61.4,
+      "importance_tier": 4,
+      "importance_label": "★★★★☆"
     }
   ],
   "personal_executive_brief": {
-    "one_line_diagnosis": "Recovery 국면(총점 1, 신뢰도 82.0점) — 반도체 긍정",
+    "one_line_diagnosis": "Recovery 국면(총점 2, 신뢰도 84.5점) — 반도체 긍정",
     "asset_summary": {
       "stocks": "★★★☆☆",
       "etf": "★★★☆☆",
-      "bond": "★★☆☆☆",
+      "bond": "★☆☆☆☆",
       "cash": "★★★☆☆",
-      "subscription_fund": "★★★☆☆",
+      "subscription_fund": null,
       "fx_exposure": "★☆☆☆☆"
     },
     "top_events": [
@@ -16677,7 +16631,7 @@
       "미국 CPI 발표 (2026-08-12)",
       "미국 비농업 고용(NFP) 발표 (2026-08-07)"
     ],
-    "final_suggestion": "세종 5-1생활권 공공분양 (EXAMPLE) 자금 갭 81,950,000원 확보 계획 수립"
+    "final_suggestion": "SK hynix / Micron 실적발표 확인 (2026-07-24)"
   },
   "appendix": {
     "sources": [

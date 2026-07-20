@@ -123,11 +123,12 @@ def _macro_dashboard(macro: dict, previous_macro: dict | None, indicator_order: 
             previous_source = "series_history"
 
         rows.append({
+            "key": key,
             "indicator": r.get("label", key),
             "current": r.get("value"),
             "previous": previous_value,
             "previous_source": previous_source,
-            "trend": TREND_ARROWS.get(r.get("score"), "N/A") if r.get("status") == "ok" else "N/A",
+            "trend": TREND_ARROWS.get(r.get("score"), "N/A") if r.get("status") in ("ok", "stale") else "N/A",
             "score": r.get("score"),
             "status": r.get("status"),
             "source": r.get("source"),
@@ -203,6 +204,7 @@ def build_report_payload(month_key: str | None = None, report_type: str = "month
 
     payload = {
         "report_month": month_key,
+        "report_type": report_type,
         "report_readiness": readiness,
         "macro_us": {
             "regime": macro_us["regime"],

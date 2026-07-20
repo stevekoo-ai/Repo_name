@@ -1,0 +1,51 @@
+name: Subscription monitor (Seoul/Gyeonggi 국민주택)
+
+on:
+  schedule:
+    - cron: "*/5 * * * *"   # every 5 minutes - API confirmed healthy, daily quota is 40,000 (plenty of headroom)
+  workflow_dispatch:
+    inputs:
+      test_keyword:
+        description: "테스트용: 이 문자열이 단지명/주소에 포함된 기존 공고를 플랫폼시티 매칭인 것처럼 취급해 알림을 발동합니다 (실제 배포에는 비워두세요)"
+        required: false
+        default: ""
+
+permissions:
+  contents: write
+  issues: write
+
+concurrency:
+  group: subscription-monitor
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Fetch listings, check 플랫폼시티 alerts, render page
+        env:
+          DATA_GO_KR_KEY: ${{ secrets.DATA_GO_KR_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GMAIL_ADDRESS: ${{ secrets.GMAIL_ADDRESS }}
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+          ALERT_EMAIL_TO: ${{ secrets.GMAIL_ADDRESS }}
+          EXTRA_TEST_KEYWORD: ${{ github.event.inputs.test_keyword }}
+        run: python3 collectors/subscription_monitor/fetch_and_render.py
+
+      - name: Commit and push if changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add docs/subscription-monitor.html collectors/subscription_monitor/alerted_state.json collectors/subscription_monitor/health_state.json
+          if git diff --cached --quiet; then
+            echo "no changes"
+          else
+            git commit -m "chore: subscription monitor update $(date -u -d '+9 hours' '+%Y-%m-%d %H:%M KST')"
+            git push origin HEAD:main
+          fi

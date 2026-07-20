@@ -2,10 +2,14 @@
 
     python -m engine.report.run [--daily | --monthly] [--month YYYY-MM]
 
-Daily mode: 일일 시장/투자 업데이트 (간소화, 웹페이지 용)
-Monthly mode: 월간 거시경제 심층 분석 (상세, 전략 재점검용)
+Daily mode: 일일 시장/투자 업데이트. Writes report/<YYYY-MM-DD>.json (dated
+snapshot) + report/daily.html (stable URL, includes the period-selectable
+trend section fed by data/peos_daily_history.csv) + appends today's row to
+that history CSV.
 
-Writes report/<key>.json (always), + <key>.html and <key>.md if month_key specified.
+Monthly mode: 월간 거시경제 심층 분석 (상세, 전략 재점검용). Writes
+report/<YYYY-MM>.html/.md/.json — a separate cadence from daily, not folded
+into the daily history series.
 """
 from __future__ import annotations
 
@@ -15,7 +19,7 @@ from pathlib import Path
 
 from core.config import report_config
 from core.logger import log_event
-from . import exporters, payload as payload_mod
+from . import daily_history, exporters, payload as payload_mod
 from .html import render_html
 from .markdown import render_markdown
 
@@ -49,13 +53,20 @@ def run(month_key: str | None = None, report_type: str = "monthly") -> dict[str,
                   html=str(html_path), markdown=str(md_path), json=str(json_path))
         return {"html": html_path, "markdown": md_path, "json": json_path}
     else:  # daily
-        # Daily key is the calendar date (YYYY-MM-DD) so same-month daily
-        # runs don't collide with each other or with the monthly YYYY-MM file.
+        # Dated key so same-month daily runs don't collide with each other or
+        # with the monthly YYYY-MM file; daily.html is the stable URL the
+        # email links to and the user bookmarks.
         report_key = date.today().isoformat()
         json_path = exporters.export_json(payload, out_dir / f"{report_key}.json")
 
-        log_event("pipeline.daily_report_generated", date=report_key, json=str(json_path))
-        return {"json": json_path}
+        history_path = daily_history.append_daily_history(payload, run_date=report_key)
+        history_json = daily_history.load_history_json(history_path)
+        html_path = out_dir / "daily.html"
+        html_path.write_text(render_html(payload, history=history_json), encoding="utf-8")
+
+        log_event("pipeline.daily_report_generated", date=report_key,
+                  html=str(html_path), json=str(json_path), daily_history=str(history_path))
+        return {"html": html_path, "json": json_path, "daily_history": history_path}
 
 
 def main() -> None:

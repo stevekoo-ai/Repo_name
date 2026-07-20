@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>국민주택 일반공급 모니터</title>
+<style>
+  :root{
+    --bg:#f5f6f8; --surface:#ffffff; --surface-2:#eceff3; --ink:#161a20; --muted:#5c6470;
+    --line:#dde1e7; --accent:#0b5fb0; --accent-ink:#0a4a8a; --accent-soft:#e3edf9;
+    --live:#0e9a6c; --live-soft:#e1f5ec;
+    --warn:#b5551a; --warn-soft:#fbe9db; --warn-line:#eec7a0;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#0d1116; --surface:#151a21; --surface-2:#1b212a; --ink:#e7ebf1; --muted:#8b93a1;
+      --line:#2a323d; --accent:#5aa9ef; --accent-ink:#8ec4f5; --accent-soft:#122a41;
+      --live:#3fd39a; --live-soft:#0f2c22;
+      --warn:#ffab6b; --warn-soft:#3a2415; --warn-line:#5a381f;
+    }
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:"Pretendard Variable","Apple SD Gothic Neo","Malgun Gothic",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+    line-height:1.6;}
+  .page{max-width:980px;margin:0 auto;padding:44px 22px 90px;}
+  .topbar{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap;
+    padding-bottom:22px;border-bottom:1px solid var(--line);margin-bottom:28px;}
+  .brand .eyebrow{display:inline-flex;align-items:center;gap:7px;font-size:12px;font-weight:700;
+    letter-spacing:.07em;text-transform:uppercase;color:var(--accent-ink);}
+  .brand .eyebrow .dot{width:7px;height:7px;border-radius:50%;background:var(--live);box-shadow:0 0 0 3px var(--live-soft);}
+  .brand h1{font-size:clamp(22px,3.4vw,28px);font-weight:800;letter-spacing:-0.02em;margin:8px 0 4px;}
+  .brand p{margin:0;color:var(--muted);font-size:14px;max-width:56ch;}
+  .clock{text-align:right;font-size:12.5px;color:var(--muted);font-variant-numeric:tabular-nums;
+    display:flex;flex-direction:column;gap:4px;min-width:190px;}
+  .clock b{color:var(--ink);font-size:13.5px;}
+  .clock .next{color:var(--accent-ink);font-weight:700;}
+  section{margin-top:36px;}
+  h2{font-size:18px;font-weight:800;margin:0 0 4px;display:flex;align-items:center;gap:9px;}
+  .lead{color:var(--muted);font-size:14px;margin:0 0 16px;max-width:70ch;}
+  .bench{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:18px 22px;font-size:14.5px;}
+  .bench b{color:var(--accent-ink);font-variant-numeric:tabular-nums;}
+  .tablewrap{overflow-x:auto;border:1px solid var(--line);border-radius:14px;background:var(--surface);}
+  table{border-collapse:collapse;width:100%;min-width:820px;font-size:13.6px;}
+  th,td{text-align:left;padding:12px 14px;border-bottom:1px solid var(--line);vertical-align:top;}
+  th{background:var(--surface-2);font-size:11.5px;text-transform:uppercase;letter-spacing:.04em;
+    color:var(--muted);font-weight:700;white-space:nowrap;}
+  tr:last-child td{border-bottom:none;}
+  td.num{font-variant-numeric:tabular-nums;white-space:nowrap;}
+  a{color:var(--accent-ink);text-decoration:none;border-bottom:1px solid currentColor;}
+  .tag{display:inline-block;font-size:11px;font-weight:700;padding:2px 9px;border-radius:100px;white-space:nowrap;}
+  .tag.ok{background:var(--live-soft);color:var(--live);}
+  .tag.warn{background:var(--warn-soft);color:var(--warn);}
+  .checklist{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:9px;}
+  .checklist li{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 15px;font-size:13.8px;}
+  footer{margin-top:48px;padding-top:20px;border-top:1px solid var(--line);font-size:12px;color:var(--muted);}
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="topbar">
+    <div class="brand">
+      <span class="eyebrow"><span class="dot"></span>자동 모니터링 · LIVE</span>
+      <h1>서울·경기 국민주택 일반공급 모니터</h1>
+      <p>청약Home 공식 Open API 기반. 접수 마감이 지나지 않은 서울·경기 국민주택(공공분양/뉴홈) 건만 표시합니다.</p>
+    </div>
+    <div class="clock">
+      <div>마지막 갱신<br><b>2026-07-20 19:30 KST</b></div>
+      <div class="next">다음 갱신 예정 07-20 23:30 KST</div>
+    </div>
+  </div>
+
+  <section>
+    <h2>내 청약통장</h2>
+    <div class="bench">
+      저축총액 <b>28,050,000원</b> · 249회 납입 · 가입일 2005-11-03
+    </div>
+  </section>
+
+  <section>
+    <h2>현재 접수중 / 접수예정 공고 (5건)</h2>
+    <p class="lead">국민주택 순차제(저축총액순) 대상만 표시합니다. 신혼희망타운은 &ldquo;국민&rdquo;으로 분류되지만 별도 자체 기준이 있을 수 있어 태그로 구분했습니다.</p>
+    <div class="tablewrap">
+      <table>
+        <thead>
+          <tr><th>단지명</th><th>지역</th><th>주소</th><th>일반공급 접수기간</th><th>당첨자 발표</th><th>총 세대수</th><th>구분</th></tr>
+        </thead>
+        <tbody>
+        <tr>
+          <td><a href="https://www.applyhome.co.kr/ai/aia/selectAPTLttotPblancDetail.do?houseManageNo=2026820004&amp;pblancNo=2026820004" target="_blank" rel="noopener">e편한세상 분당 퍼스트빌리지(성남낙생지구 A-1BL) 신혼희망타운(공공분양)(본청약)</a></td>
+          <td class="num">경기</td>
+          <td>경기도 성남시 성남낙생지구 내 A-1블록</td>
+          <td class="num">2026-07-13 ~ 2026-07-21</td>
+          <td class="num">2026-07-31</td>
+          <td class="num">933</td>
+          <td><span class="tag warn">신혼희망타운(별도기준 가능)</span></td>
+        </tr>
+
+        <tr>
+          <td><a href="https://www.applyhome.co.kr/ai/aia/selectAPTLttotPblancDetail.do?houseManageNo=2026820005&amp;pblancNo=2026820005" target="_blank" rel="noopener">역곡지구 하우스토리(부천역곡지구 A-2BL) 신혼희망타운(공공분양)(본청약)</a></td>
+          <td class="num">경기</td>
+          <td>경기도 부천시 부천역곡 공공주택지구 내 A-2블록</td>
+          <td class="num">2026-07-13 ~ 2026-07-23</td>
+          <td class="num">2026-08-04</td>
+          <td class="num">976</td>
+          <td><span class="tag warn">신혼희망타운(별도기준 가능)</span></td>
+        </tr>
+
+        <tr>
+          <td><a href="https://www.applyhome.co.kr/ai/aia/selectAPTLttotPblancDetail.do?houseManageNo=2026000307&amp;pblancNo=2026000307" target="_blank" rel="noopener">군포대야미지구 A-1블록 6년 분양전환공공임대주택(본청약)</a></td>
+          <td class="num">경기</td>
+          <td>경기도 군포시 대야미동, 속달동, 둔대동 일원 군포대야미 공공주택지구내 A1블록</td>
+          <td class="num">2026-07-13 ~ 2026-07-24</td>
+          <td class="num">2026-08-07</td>
+          <td class="num">377</td>
+          <td><span class="tag ok">일반 순차제</span></td>
+        </tr>
+
+        <tr>
+          <td><a href="https://www.applyhome.co.kr/ai/aia/selectAPTLttotPblancDetail.do?houseManageNo=2026000320&amp;pblancNo=2026000320" target="_blank" rel="noopener">고양창릉 S-4블록 공공분양주택(본청약)</a></td>
+          <td class="num">경기</td>
+          <td>경기도 고양시 덕양구 도내동 외 8개동 일원 고양창릉 공공주택지구 내 S-4블록</td>
+          <td class="num">2026-07-20 ~ 2026-07-29</td>
+          <td class="num">2026-08-19</td>
+          <td class="num">1,024</td>
+          <td><span class="tag ok">일반 순차제</span></td>
+        </tr>
+
+        <tr>
+          <td><a href="https://www.applyhome.co.kr/ai/aia/selectAPTLttotPblancDetail.do?houseManageNo=2026000313&amp;pblancNo=2026000313" target="_blank" rel="noopener">고양창릉지구 S-3블록 이익공유형 분양주택(본청약)</a></td>
+          <td class="num">경기</td>
+          <td>경기도 고양시 덕양구 도내동 외 8개 동 일원 고양창릉 공공주택지구 내 S-3블록</td>
+          <td class="num">2026-07-20 ~ 2026-07-29</td>
+          <td class="num">2026-08-18</td>
+          <td class="num">1,282</td>
+          <td><span class="tag ok">일반 순차제</span></td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <h2>직접 확인 채널</h2>
+    <ul class="checklist">
+      <li><a href="https://www.applyhome.co.kr/ai/aib/selectSubscrptCalenderView.do" target="_blank" rel="noopener">청약홈 청약캘린더</a> — 관심지역 알림(이메일/문자) 신청 가능</li>
+      <li><a href="https://apply.lh.or.kr/" target="_blank" rel="noopener">LH청약플러스</a></li>
+      <li><a href="https://apply.gh.or.kr/" target="_blank" rel="noopener">GH 경기주택도시공사 청약센터</a></li>
+    </ul>
+  </section>
+
+  <footer>
+    데이터 출처: 한국부동산원 청약Home 분양정보 조회 서비스(공공데이터포털 Open API). 5분마다 자동 갱신됩니다.
+    계약·청약 신청 전 반드시 청약홈 원문 공고를 확인하세요.
+  </footer>
+</div>
+</body>
+</html>

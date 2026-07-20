@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import base64
 import html as html_lib
+import json
 from pathlib import Path
 
 from core.config import report_config
@@ -17,9 +18,23 @@ from core.models import DataStatus
 REPO_ROOT = Path(__file__).resolve().parents[2]
 CLOCK_IMAGE_PATH = REPO_ROOT / "docs" / "clock.png"
 
+# Period-trend section (daily report only — see _section_period_trends).
+# Same headline set as the old docs/peos-daily.html dashboard it replaces,
+# kept here instead so the feature lives inside the one report the daily
+# pipeline already emails/links, rather than a second standalone page.
+PERIOD_HEADLINE_METRICS = [
+    ("kr_raw_score", "한국 총점"), ("us_raw_score", "미국 총점"),
+    ("kr_confidence", "한국 Confidence"), ("us_confidence", "미국 Confidence"),
+    ("investment_environment_score", "Investment Environment"),
+    ("semiconductor_score", "반도체"), ("bond_score", "채권"),
+    ("fx_score", "환율"), ("housing_readiness_score", "청약 준비도"),
+]
+PERIODS = [("오늘", 1), ("1주일", 7), ("1개월", 30), ("6개월", 182), ("1년", 365), ("전체", None)]
+
 STATUS_KR = {
     DataStatus.OK.value: "OK", DataStatus.PENDING.value: "Pending",
     DataStatus.NOT_RELEASED.value: "Not Released", DataStatus.SOURCE_ERROR.value: "Source Error",
+    DataStatus.STALE.value: "이전 값 유지",
 }
 
 BAND_TO_BADGE = {
@@ -177,17 +192,23 @@ def _section_investment_clock(payload: dict) -> str:
 def _section_macro_dashboard(payload: dict, dashboard_key: str = "macro_dashboard", title: str = "Macro Dashboard") -> str:
     rows_data = payload[dashboard_key]
     has_fallback_note = any(r.get("previous_source") == "series_history" for r in rows_data)
+    has_stale_note = any(r.get("status") == "stale" for r in rows_data)
     rows = "".join(
         f"""<tr>
-          <td>{_esc(r['indicator'])}</td><td>{_fmt(r['current'])}</td>
+          <td>{_esc(r['indicator'])}</td>
+          <td>{_fmt(r['current'])}{' <sup class="stale-mark" title="오늘 실시간 조회 실패 — 마지막으로 확인된 값 유지 중">‡</sup>' if r.get('status') == 'stale' else ''}</td>
           <td>{_fmt(r['previous'])}{' <sup title="전월 리포트 스냅샷이 아직 없어 원자료 이력의 직전 값을 사용">†</sup>' if r.get('previous_source') == 'series_history' else ''}</td>
           <td>{_esc(r['trend'])}</td><td>{_fmt(r['score'])}</td>
           <td class="spark-cell">{_sparkline_svg(r.get('history') or [], r.get('history_years', 10))}</td>
           <td class="muted">{_esc(r['source'] or STATUS_KR.get(r['status'], r['status']))}</td>
         </tr>""" for r in rows_data
     )
-    footnote = ('<p class="tile-sub">† 전월 PEOS 리포트가 아직 쌓이지 않아, 해당 지표는 원자료(공식 통계) 이력의 '
-                '직전 발표값으로 대체 표시했습니다.</p>') if has_fallback_note else ""
+    footnotes = []
+    if has_stale_note:
+        footnotes.append('‡ 오늘 실시간 조회에 실패한 지표입니다 — 마지막으로 확인된 값을 그대로 유지해 표시했습니다 (추측/대체 데이터 아님).')
+    if has_fallback_note:
+        footnotes.append('† 전월 PEOS 리포트가 아직 쌓이지 않아, 해당 지표는 원자료(공식 통계) 이력의 직전 발표값으로 대체 표시했습니다.')
+    footnote = f'<p class="tile-sub">{" ".join(footnotes)}</p>' if footnotes else ""
     return f"""
     <section class="card">
       <h2>{_esc(title)}</h2>
@@ -262,6 +283,15 @@ def _section_discussion(payload: dict) -> str:
             📋 작성한 답변 전체 복사</button>
           <span class="tile-sub">비워둔 항목은 자동으로 제외됩니다. 복사한 내용은 다음 대화에 붙여넣어 주시면
           반영됩니다. "GitHub Issue로 제출"은 공개 저장소에 남으니, 공개돼도 괜찮은 항목에만 사용해주세요.</span>
+        </div>
+        <div class="copy-output" id="peos-copy-output">
+          <p id="peos-copy-output-msg" class="tile-sub">복사 버튼을 누르면 아래 박스에 결과가 나타납니다. 자동
+          복사가 안 되면, 아래 박스를 <b>먼저 클릭</b>한 다음 Ctrl+A(Mac: Cmd+A)로 전체 선택 →
+          Ctrl+C(Mac: Cmd+C)로 직접 복사해주세요. (자동 선택 기능은 보는 환경에 따라 막힐 수 있어
+          이 방법이 가장 확실합니다.)</p>
+          <textarea id="peos-copy-output-text" readonly rows="6"
+            placeholder="여기에 복사할 내용이 표시됩니다."></textarea>
+          <a id="peos-copy-output-link" href="#" target="_blank" rel="noopener">GitHub 이슈 작성 페이지 열기</a>
         </div>"""
 
     return f"""
@@ -475,6 +505,7 @@ th { color: var(--text-muted); font-weight: 600; font-size: 0.78rem; text-transf
 .spark-labels { display: flex; justify-content: space-between; font-size: 0.68rem; color: var(--text-muted);
   width: 176px; }
 .spark-empty { font-size: 0.78rem; }
+.stale-mark { color: var(--warn); cursor: help; }
 .clock-row { display: flex; gap: 18px; align-items: center; flex-wrap: wrap; }
 .clock-img { width: 180px; height: 180px; border-radius: 10px; flex-shrink: 0;
   background: #ffffff; padding: 6px; border: 1px solid var(--border); }
@@ -496,17 +527,13 @@ th { color: var(--text-muted); font-weight: 600; font-size: 0.78rem; text-transf
 .btn-fb:hover { border-color: var(--accent); }
 .btn-fb:disabled { opacity: 0.7; cursor: default; }
 .btn-fb-primary { background: var(--accent); color: #fff; border-color: var(--accent); }
-.copy-panel { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5);
-  align-items: center; justify-content: center; z-index: 1000; padding: 16px; }
-.copy-panel-box { background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
-  padding: 18px 20px; max-width: 480px; width: 100%; box-shadow: 0 8px 32px rgba(0,0,0,0.3); }
-.copy-panel-box p { margin: 0 0 10px; font-size: 0.9rem; color: var(--text); }
-.copy-panel-box textarea { width: 100%; box-sizing: border-box; padding: 8px 10px; border-radius: 8px;
-  border: 1px solid var(--border); background: var(--surface-2); color: var(--text);
-  font-family: inherit; font-size: 0.82rem; resize: vertical; margin-bottom: 10px; }
-.copy-panel-box a#peos-copy-panel-link { display: none; margin-bottom: 10px; color: var(--accent);
+.copy-output { margin-top: 10px; padding: 12px 14px; background: var(--surface-2);
+  border: 2px dashed var(--accent); border-radius: 10px; }
+.copy-output textarea { width: 100%; box-sizing: border-box; padding: 8px 10px; border-radius: 8px;
+  border: 1px solid var(--border); background: var(--surface); color: var(--text);
+  font-family: inherit; font-size: 0.82rem; resize: vertical; margin-top: 6px; }
+.copy-output a#peos-copy-output-link { display: none; margin-top: 8px; color: var(--accent);
   font-size: 0.88rem; font-weight: 600; }
-.copy-panel-actions { display: flex; justify-content: flex-end; }
 .action-card { border-radius: 10px; border: 1px solid var(--border); padding: 12px 16px; margin: 8px 0 14px; }
 .action-good { border-left: 4px solid var(--good); }
 .action-warn { border-left: 4px solid var(--warn); }
@@ -522,6 +549,16 @@ th { color: var(--text-muted); font-weight: 600; font-size: 0.78rem; text-transf
 .scenario-prob { color: var(--accent); }
 .scenario-card p { margin: 6px 0; }
 footer { color: var(--text-muted); font-size: 0.78rem; text-align: center; padding-top: 16px; }
+.period-toggle { display: flex; gap: 6px; flex-wrap: wrap; margin: 10px 0 16px; }
+.period-toggle button { font-family: inherit; font-size: 0.82rem; font-weight: 600; padding: 6px 14px;
+  border-radius: 999px; border: 1px solid var(--border); background: var(--surface); color: var(--text);
+  cursor: pointer; }
+.period-toggle button.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+.daily-chart-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px;
+  margin-bottom: 4px; }
+.daily-chart-card { background: var(--surface-2); border: 1px solid var(--border); border-radius: 10px;
+  padding: 10px 12px; }
+.daily-chart-label { font-size: 0.82rem; font-weight: 600; color: var(--text-muted); margin-bottom: 4px; }
 """
 
 
@@ -541,23 +578,20 @@ function peosEntryText(entry) {
 
 // Some viewers (e.g. a preview rendered inside a sandboxed iframe) block
 // navigator.clipboard, document.execCommand('copy'), window.alert, and
-// window.open outright — silently, with no error thrown. Never rely on any
-// of those alone: always fall back to a plain on-page panel (no dialog API)
-// with the text pre-selected in a visible textarea, so a manual Ctrl+C/Cmd+C
-// always works regardless of what the surrounding page blocks.
-function peosShowPanel(message, text, linkUrl) {
-  var panel = document.getElementById('peos-copy-panel');
-  var msgEl = document.getElementById('peos-copy-panel-msg');
-  var taEl = document.getElementById('peos-copy-panel-text');
-  var linkEl = document.getElementById('peos-copy-panel-link');
+// window.open outright — silently, with no error thrown, and even
+// programmatic focus()/select() can land the browser's actual selection
+// somewhere else entirely (that's what copied the whole page once already).
+// So: no modal, no scripted select() the user has to trust blindly. One
+// always-visible, always-in-place output box; the user clicks into it
+// themselves and selects with their own Ctrl+A, which is native browser
+// behavior no page script can misdirect.
+function peosShowOutput(message, text, linkUrl) {
+  var box = document.getElementById('peos-copy-output');
+  var msgEl = document.getElementById('peos-copy-output-msg');
+  var taEl = document.getElementById('peos-copy-output-text');
+  var linkEl = document.getElementById('peos-copy-output-link');
   msgEl.textContent = message;
-  if (text) {
-    taEl.style.display = 'block';
-    taEl.value = text;
-  } else {
-    taEl.style.display = 'none';
-    taEl.value = '';
-  }
+  taEl.value = text || '';
   if (linkUrl) {
     linkEl.style.display = 'inline-block';
     linkEl.href = linkUrl;
@@ -565,47 +599,26 @@ function peosShowPanel(message, text, linkUrl) {
     linkEl.style.display = 'none';
     linkEl.removeAttribute('href');
   }
-  panel.style.display = 'flex';
-  if (text) {
-    taEl.focus();
-    taEl.select();
-  }
-}
-
-function peosClosePanel() {
-  document.getElementById('peos-copy-panel').style.display = 'none';
+  if (box.scrollIntoView) box.scrollIntoView({ behavior: 'smooth', block: 'center' });
 }
 
 function peosCopyText(text, btn) {
-  var copied = false;
+  // Best-effort only — never trusted as the source of truth for whether the
+  // copy actually landed on the system clipboard, since these can silently
+  // no-op or misfire depending on the viewer.
   try {
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(text);
-      copied = true;
-    }
-  } catch (e) { /* fall through to the manual panel below */ }
-  if (!copied) {
-    try {
-      var ta = document.createElement('textarea');
-      ta.value = text;
-      ta.style.position = 'fixed';
-      ta.style.opacity = '0';
-      document.body.appendChild(ta);
-      ta.select();
-      copied = document.execCommand('copy');
-      document.body.removeChild(ta);
-    } catch (e) { /* still fine — the panel below is the guaranteed path */ }
-  }
-  peosShowPanel(
-    copied ? '클립보드에 복사를 시도했습니다. 혹시 붙여넣기가 안 되면, 아래 내용을 직접 선택해서 Ctrl+C(Mac: Cmd+C)로 복사해주세요.'
-           : '이 화면에서는 자동 복사가 막혀 있습니다. 아래 내용이 이미 선택되어 있으니 Ctrl+C(Mac: Cmd+C)로 복사해주세요.',
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text);
+  } catch (e) { /* ignore */ }
+  peosShowOutput(
+    '아래 박스에 복사할 내용을 넣어뒀습니다. 자동 복사를 시도했지만 확실하지 않으니, ' +
+    '박스를 직접 클릭한 뒤 Ctrl+A(Mac: Cmd+A) → Ctrl+C(Mac: Cmd+C)로 복사해주세요.',
     text, null
   );
 }
 
 function peosCopyOne(btn) {
   var entry = peosBuildEntry(peosFindCard(btn));
-  if (!entry) { peosShowPanel('먼저 답변을 입력해주세요.', null, null); return; }
+  if (!entry) { peosShowOutput('먼저 답변을 입력해주세요.', '', null); return; }
   peosCopyText(peosEntryText(entry), btn);
 }
 
@@ -618,28 +631,216 @@ function peosCopyAll(btn) {
     var entry = peosBuildEntry(card);
     if (entry) parts.push(peosEntryText(entry));
   });
-  if (!parts.length) { peosShowPanel('입력한 답변이 없습니다.', null, null); return; }
+  if (!parts.length) { peosShowOutput('입력한 답변이 없습니다.', '', null); return; }
   peosCopyText('PEOS ' + month + ' 리포트 피드백\\n\\n' + parts.join('\\n\\n'), btn);
 }
 
 function peosIssueOne(btn) {
   var card = peosFindCard(btn);
   var entry = peosBuildEntry(card);
-  if (!entry) { peosShowPanel('먼저 답변을 입력해주세요.', null, null); return; }
+  if (!entry) { peosShowOutput('먼저 답변을 입력해주세요.', '', null); return; }
   var section = document.getElementById('discussion-section');
   var repo = section.dataset.repo;
   var month = section.dataset.month;
-  if (!repo) { peosShowPanel('연결된 GitHub 저장소 정보가 없습니다.', null, null); return; }
+  if (!repo) { peosShowOutput('연결된 GitHub 저장소 정보가 없습니다.', '', null); return; }
   var title = encodeURIComponent('[피드백] ' + month + ' - ' + entry.topic);
   var body = encodeURIComponent('**질문**\\n' + entry.question + '\\n\\n**답변**\\n' + entry.answer);
   var url = 'https://github.com/' + repo + '/issues/new?title=' + title + '&body=' + body;
   var opened = null;
   try { opened = window.open(url, '_blank', 'noopener'); } catch (e) { /* blocked — fall through */ }
   if (!opened) {
-    peosShowPanel('이 화면에서는 새 창 열기가 막혀 있습니다. 아래 링크를 눌러 GitHub 이슈 작성 페이지로 이동해주세요.', null, url);
+    peosShowOutput('이 화면에서는 새 창 열기가 막혀 있습니다. 아래 링크를 눌러 GitHub 이슈 작성 페이지로 이동해주세요.', '', url);
   }
 }
 """
+
+
+def _period_chart_block(chart_id: str, label: str) -> str:
+    return f"""
+    <div class="daily-chart-card">
+      <div class="daily-chart-label">{_esc(label)}</div>
+      <div class="daily-chart" id="ptchart-{_esc(chart_id)}"></div>
+    </div>"""
+
+
+_PERIOD_JS = """
+var PEOS_HISTORY = __HISTORY_JSON__;
+var PEOS_HEADLINE_METRICS = __HEADLINE_JSON__;
+var PEOS_PERIOD_CHART_IDS = __CHART_IDS_JSON__;
+var peosPeriodWindow = 30;
+
+function peosPeriodRange(dates, windowDays) {
+  if (windowDays === null) return { start: 0, end: dates.length };
+  var start = dates.length - windowDays;
+  if (start < 0) start = 0;
+  return { start: start, end: dates.length };
+}
+
+function peosDrawPeriodChart(chartId) {
+  var el = document.getElementById('ptchart-' + chartId);
+  if (!el) return;
+  var dates = PEOS_HISTORY.dates;
+  var raw = PEOS_HISTORY.series[chartId] || [];
+  var range = peosPeriodRange(dates, peosPeriodWindow);
+  var pairs = [];
+  for (var i = range.start; i < range.end; i++) {
+    if (raw[i] !== null && raw[i] !== undefined) pairs.push([dates[i], raw[i]]);
+  }
+  if (pairs.length < 2) {
+    el.innerHTML = '<span class="muted spark-empty">이 구간에는 데이터가 부족합니다.</span>';
+    return;
+  }
+  var width = 320, height = 64, pad = 6;
+  var values = pairs.map(function (p) { return p[1]; });
+  var lo = Math.min.apply(null, values), hi = Math.max.apply(null, values);
+  var span = (hi - lo) || 1;
+  var n = pairs.length;
+  var pts = pairs.map(function (p, i) {
+    var x = pad + (width - 2 * pad) * i / (n - 1);
+    var y = height - pad - (height - 2 * pad) * (p[1] - lo) / span;
+    return x.toFixed(1) + ',' + y.toFixed(1);
+  }).join(' ');
+  var lastX = pad + (width - 2 * pad);
+  var lastY = height - pad - (height - 2 * pad) * (values[n - 1] - lo) / span;
+  var startLabel = pairs[0][0] + ' \\u00b7 ' + pairs[0][1].toFixed(2);
+  var endLabel = pairs[n - 1][0] + ' \\u00b7 ' + pairs[n - 1][1].toFixed(2);
+  el.innerHTML =
+    '<svg class="spark" viewBox="0 0 ' + width + ' ' + height + '" width="' + width + '" height="' + height + '">' +
+    '<title>' + startLabel + ' \\u2192 ' + endLabel + '</title>' +
+    '<polyline points="' + pts + '" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>' +
+    '<circle cx="' + lastX.toFixed(1) + '" cy="' + lastY.toFixed(1) + '" r="2.5" fill="var(--accent)"/>' +
+    '</svg><div class="spark-labels"><span>' + pairs[0][0] + '</span><span>' + pairs[n - 1][0] + '</span></div>';
+}
+
+function peosFmtTrend(first, last) {
+  if (first === null || first === undefined || last === null || last === undefined) return '데이터 부족';
+  var diff = last - first;
+  if (Math.abs(diff) < 0.5) return '보합 (' + diff.toFixed(1) + ')';
+  return (diff > 0 ? '\\u25b2 상승 ' : '\\u25bc 하락 ') + diff.toFixed(1);
+}
+
+function peosRegimeSummary(regimeArr, start, end) {
+  var counts = {}, changes = 0, prev = null;
+  for (var i = start; i < end; i++) {
+    var v = regimeArr[i];
+    if (v === null || v === undefined || v === '') continue;
+    counts[v] = (counts[v] || 0) + 1;
+    if (prev !== null && v !== prev) changes++;
+    prev = v;
+  }
+  var best = null, bestCount = 0;
+  for (var k in counts) { if (counts[k] > bestCount) { best = k; bestCount = counts[k]; } }
+  return { dominant: best, changes: changes };
+}
+
+function peosUpdatePeriodSummary() {
+  var dates = PEOS_HISTORY.dates;
+  var range = peosPeriodRange(dates, peosPeriodWindow);
+  var body = document.getElementById('period-summary-body');
+  if (body) {
+    var rows = [];
+    PEOS_HEADLINE_METRICS.forEach(function (m) {
+      var key = m[0], label = m[1];
+      var series = PEOS_HISTORY.series[key] || [];
+      var vals = [];
+      for (var i = range.start; i < range.end; i++) {
+        if (series[i] !== null && series[i] !== undefined) vals.push(series[i]);
+      }
+      if (vals.length === 0) {
+        rows.push('<tr><td>' + label + '</td><td colspan="4" class="muted">데이터 없음</td></tr>');
+        return;
+      }
+      var sum = 0;
+      for (var j = 0; j < vals.length; j++) sum += vals[j];
+      var avg = sum / vals.length;
+      var lo = Math.min.apply(null, vals), hi = Math.max.apply(null, vals);
+      var trend = peosFmtTrend(vals[0], vals[vals.length - 1]);
+      rows.push('<tr><td>' + label + '</td><td>' + vals[vals.length - 1].toFixed(1) +
+        '</td><td>' + avg.toFixed(1) + '</td><td>' + lo.toFixed(1) + ' ~ ' + hi.toFixed(1) +
+        '</td><td>' + trend + '</td></tr>');
+    });
+    body.innerHTML = rows.join('');
+  }
+
+  var regimeEl = document.getElementById('period-regime-summary');
+  if (regimeEl) {
+    var kr = peosRegimeSummary(PEOS_HISTORY.regimes.kr_regime || [], range.start, range.end);
+    var us = peosRegimeSummary(PEOS_HISTORY.regimes.us_regime || [], range.start, range.end);
+    regimeEl.innerHTML =
+      '<li><b>한국 지배적 국면</b> ' + (kr.dominant || 'N/A') + ' \\u00b7 기간 내 변경 ' + kr.changes + '회</li>' +
+      '<li><b>미국 지배적 국면</b> ' + (us.dominant || 'N/A') + ' \\u00b7 기간 내 변경 ' + us.changes + '회</li>';
+  }
+}
+
+function peosRedrawPeriodTrends() {
+  for (var i = 0; i < PEOS_PERIOD_CHART_IDS.length; i++) peosDrawPeriodChart(PEOS_PERIOD_CHART_IDS[i]);
+  peosUpdatePeriodSummary();
+}
+
+function peosSetPeriod(days, btn) {
+  peosPeriodWindow = days;
+  var buttons = document.querySelectorAll('.period-toggle button');
+  for (var i = 0; i < buttons.length; i++) buttons[i].classList.remove('active');
+  btn.classList.add('active');
+  peosRedrawPeriodTrends();
+}
+
+document.addEventListener('DOMContentLoaded', peosRedrawPeriodTrends);
+"""
+
+
+def _section_period_trends(payload: dict, history: dict) -> str:
+    """Period-selectable trend charts + a judgment summary that recomputes
+    per window (avg/range/trend per headline metric, dominant regime and
+    change count) — folds the old docs/peos-daily.html dashboard's core
+    feature into the daily report itself instead of a separate page."""
+    if not history or not history.get("dates"):
+        return ""
+
+    kr_defs = [(f"kr_{r['key']}", r["indicator"]) for r in payload.get("macro_dashboard", [])]
+    us_defs = [(f"us_{r['key']}", r["indicator"]) for r in payload.get("us_macro_dashboard", [])]
+
+    headline_charts = "".join(_period_chart_block(k, label) for k, label in PERIOD_HEADLINE_METRICS)
+    kr_charts = "".join(_period_chart_block(k, label) for k, label in kr_defs)
+    us_charts = "".join(_period_chart_block(k, label) for k, label in us_defs)
+
+    period_buttons = "".join(
+        f'<button type="button" class="{"active" if days == 30 else ""}" '
+        f'onclick="peosSetPeriod({days if days is not None else "null"}, this)">{_esc(label)}</button>'
+        for label, days in PERIODS
+    )
+
+    chart_ids = [k for k, _ in PERIOD_HEADLINE_METRICS] + [k for k, _ in kr_defs] + [k for k, _ in us_defs]
+    history_json = json.dumps(history, ensure_ascii=False).replace("</script", "<\\/script")
+    js = (_PERIOD_JS
+          .replace("__HISTORY_JSON__", history_json)
+          .replace("__HEADLINE_JSON__", json.dumps(PERIOD_HEADLINE_METRICS, ensure_ascii=False))
+          .replace("__CHART_IDS_JSON__", json.dumps(chart_ids)))
+
+    return f"""
+    <section class="card" id="period-trends-section">
+      <h2>기간별 추세 &amp; 판단</h2>
+      <p class="tile-sub">기간을 바꾸면 아래 모든 차트와 요약 판단이 그 구간 기준으로 다시 계산됩니다.
+      매일 하루 한 줄씩 쌓이는 데이터라 초반에는 짧게 보이는 게 정상입니다.</p>
+      <div class="period-toggle">{period_buttons}</div>
+
+      <h3>선택 기간 요약 판단</h3>
+      <div class="table-wrap"><table>
+        <thead><tr><th>지표</th><th>최근값</th><th>기간 평균</th><th>기간 범위</th><th>추세</th></tr></thead>
+        <tbody id="period-summary-body"></tbody>
+      </table></div>
+      <ul class="kv-list" id="period-regime-summary"></ul>
+
+      <h3>핵심 점수 추세</h3>
+      <div class="daily-chart-grid">{headline_charts}</div>
+
+      <h3>한국 Core-10 개별 지표 추세</h3>
+      <div class="daily-chart-grid">{kr_charts}</div>
+
+      <h3>미국 Core Macro 개별 지표 추세</h3>
+      <div class="daily-chart-grid">{us_charts}</div>
+    </section>
+    <script>{js}</script>"""
 
 
 def _section_monthly_changes(payload: dict) -> str:
@@ -647,9 +848,14 @@ def _section_monthly_changes(payload: dict) -> str:
     return f'<section class="card"><h2>이번 달 핵심 변화</h2><ul>{items}</ul></section>'
 
 
-def render_html(payload: dict) -> str:
+def render_html(payload: dict, history: dict | None = None) -> str:
+    """Render the report. `history` (from daily_history.load_history_json)
+    is only passed for the daily report — it turns on the period-selectable
+    trend + judgment section; the monthly deep-dive omits it."""
+    is_daily = payload.get("report_type") == "daily"
     body_sections = "".join([
         _section_stat_tiles(payload),
+        _section_period_trends(payload, history) if history else "",
         _section_us_macro_dashboard(payload),
         _section_macro_dashboard(payload),
         _section_regime_comparison(payload),
@@ -666,33 +872,26 @@ def render_html(payload: dict) -> str:
         _section_appendix(payload),
     ])
 
+    title = f"PEOS 일간 리포트 - {_esc(payload['report_month'])}" if is_daily else f"PEOS 월간 리포트 - {_esc(payload['report_month'])}"
+    h1 = f"PEOS 일간 리포트 — {_esc(payload['report_month'])}" if is_daily else f"PEOS 월간 리포트 — {_esc(payload['report_month'])}"
+
     return f"""<!doctype html>
 <html lang="ko">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>PEOS 월간 리포트 - {_esc(payload['report_month'])}</title>
+<title>{title}</title>
 <style>{_CSS}</style>
 </head>
 <body>
 <div class="page">
   <header class="masthead">
-    <h1>PEOS 월간 리포트 — {_esc(payload['report_month'])}</h1>
+    <h1>{h1}</h1>
     <div class="sub">Personal Economic Operating System · 자동 생성 · 투자 자문 아님</div>
   </header>
   {body_sections}
   <footer>PEOS는 공식 데이터와 사용자 자산/목표를 결합해 행동을 제안하는 개인 경제 의사결정 시스템입니다.
   모든 판단은 참고용이며 최종 결정은 사용자에게 있습니다.</footer>
-</div>
-<div id="peos-copy-panel" class="copy-panel">
-  <div class="copy-panel-box">
-    <p id="peos-copy-panel-msg"></p>
-    <textarea id="peos-copy-panel-text" readonly rows="6"></textarea>
-    <a id="peos-copy-panel-link" href="#" target="_blank" rel="noopener">GitHub 이슈 작성 페이지 열기</a>
-    <div class="copy-panel-actions">
-      <button type="button" class="btn-fb" onclick="peosClosePanel()">닫기</button>
-    </div>
-  </div>
 </div>
 <script>{_FEEDBACK_JS}</script>
 </body>

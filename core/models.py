@@ -19,6 +19,11 @@ class DataStatus(str, Enum):
     PENDING = "pending"
     NOT_RELEASED = "not_released"
     SOURCE_ERROR = "source_error"
+    STALE = "stale"  # today's live fetch failed; value carried forward from the
+    # last successful run's snapshot (daily cadence needs this — see
+    # engine/macro/engine.py's carry-forward step) rather than regressing to
+    # Pending every time ECOS/KOSIS has a bad day. Never fabricated — always a
+    # real prior reading, explicitly marked as not fresh.
 
 
 class RevisionStage(str, Enum):

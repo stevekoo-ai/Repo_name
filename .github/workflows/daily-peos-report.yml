@@ -41,29 +41,12 @@ jobs:
           KOSIS_API_KEY: ${{ secrets.KOSIS_API_KEY }}
           FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
           BLS_API_KEY: ${{ secrets.BLS_API_KEY }}
+        # Writes report/<YYYY-MM-DD>.json, report/daily.html (period-toggle
+        # trend section included), and appends today's row to
+        # data/peos_daily_history.csv — see engine/report/run.py.
         run: python -m engine.report.run --daily
 
-      - name: Build webpage (08:00 KST 완료)
-        run: |
-          python -c "
-          from pathlib import Path
-          import json
-          from engine.report.html import render_html
-
-          report_dir = Path('report')
-          json_files = sorted(report_dir.glob('*.json'), reverse=True)
-
-          if json_files:
-            latest_json = json_files[0]
-            with open(latest_json) as f:
-              payload = json.load(f)
-
-            html_path = report_dir / 'daily.html'
-            html_path.write_text(render_html(payload), encoding='utf-8')
-            print(f'Webpage updated: {html_path}')
-          "
-
-      - name: Send email notification
+      - name: Send email notification (08:00 KST 완료)
         if: github.event.inputs.send_email != 'false'
         env:
           GMAIL_ADDRESS: ${{ secrets.GMAIL_ADDRESS }}
@@ -71,32 +54,34 @@ jobs:
         run: |
           python -c "
           import json
+          from datetime import date
           from pathlib import Path
           from src.clock.notify import build_channel
 
           report_dir = Path('report')
-          json_files = sorted(report_dir.glob('*.json'), reverse=True)
+          today_json = report_dir / f'{date.today().isoformat()}.json'
 
-          if json_files:
-            with open(json_files[0]) as f:
+          if today_json.exists():
+            with open(today_json) as f:
               payload = json.load(f)
 
             channel = build_channel()
             channel.send(
               subject='[PEOS Daily] Investment & Macro Update',
-              body_text=f'Report Date: {payload.get(\"report_month\", \"N/A\")}\n\n'
+              body_text=f'Report Date: {date.today().isoformat()}\n\n'
                         f'Key Indicators:\n'
-                        f'Macro Regime: {payload.get(\"macro\", {}).get(\"regime\", \"N/A\")}\n'
-                        f'Semiconductor Cycle: {payload.get(\"semiconductor\", {}).get(\"cycle\", \"N/A\")}\n\n'
+                        f'KR Regime: {payload.get(\"macro\", {}).get(\"regime\", \"N/A\")}\n'
+                        f'US Regime: {payload.get(\"macro_us\", {}).get(\"regime\", \"N/A\")}\n'
+                        f'Semiconductor Score: {payload.get(\"personal\", {}).get(\"semiconductor_score\", \"N/A\")}\n\n'
                         f'Full Report: https://github.com/stevekoo-ai/Repo_name/blob/main/report/daily.html'
             )
           "
 
-      - name: Commit updated report
+      - name: Commit updated report and history
         run: |
           git config user.name "peos-daily-bot"
           git config user.email "actions@users.noreply.github.com"
-          git add report/
+          git add report/ data/peos_daily_history.csv
           if git diff --cached --quiet; then
             echo "No changes to commit"
           else
