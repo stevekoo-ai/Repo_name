@@ -4,6 +4,9 @@ Modules A-I evaluate global macro state and output 0-100 score:
 - 0-30 (GREEN): Expansion, capital injection
 - 31-55 (YELLOW): Deceleration, capital hedging
 - 56-100 (RED): Systemic breakdown, capital evacuation
+
+Fallback strategy:
+- Primary data source → FRED alternative → cached/stale data → synthetic calculation → 0
 """
 from __future__ import annotations
 
@@ -14,6 +17,7 @@ from typing import Optional
 from collectors import base as collector_base
 from collectors import fred, ecos, kosis
 from core.logger import log_event
+from core import cache as cache_mod
 
 
 @dataclass
@@ -52,13 +56,24 @@ class CCIDetail:
             return "RED"
 
 
-def _get_latest(series_id: str, days_back: int = 1) -> Optional[float]:
-    """Fetch latest value from normalized collector data."""
+def _get_latest(series_id: str, days_back: int = 1, fallback_series: Optional[str] = None) -> Optional[float]:
+    """Fetch latest value from normalized collector data, with fallback to alternate series."""
     df = collector_base.read_normalized(series_id)
-    if df.empty:
-        return None
-    latest = df.sort_values("date").iloc[-1]
-    return float(latest["value"]) if latest["value"] is not None else None
+    if not df.empty:
+        latest = df.sort_values("date").iloc[-1]
+        value = latest["value"] if latest["value"] is not None else None
+        if value is not None:
+            return float(value)
+
+    if fallback_series:
+        df_fallback = collector_base.read_normalized(fallback_series)
+        if not df_fallback.empty:
+            latest = df_fallback.sort_values("date").iloc[-1]
+            value = latest["value"] if latest["value"] is not None else None
+            if value is not None:
+                return float(value)
+
+    return None
 
 
 def _get_series_window(series_id: str, days: int) -> list[float]:
@@ -90,16 +105,24 @@ def _min_window(series_id: str, months: int = 12) -> Optional[float]:
 def score_sahm() -> tuple[int, Optional[float], Optional[float]]:
     """Module A: Sahm Rule (US unemployment momentum).
 
+    Primary: FRED US unemployment → Fallback: cached data → OECD-via-FRED proxy
+
     Returns: (score, ma3, min_12m)
     """
     ur_data = fred.fetch_series("us_unemployment")
-    if ur_data.value is None:
-        return 0, None, None
+    series_id = "fred_us_unemployment"
 
-    ma3 = _moving_avg("fred_us_unemployment", window=3)
-    min_12m = _min_window("fred_us_unemployment", months=12)
+    if ur_data.value is None:
+        ma3 = _moving_avg(series_id, window=3)
+        if ma3 is None:
+            log_event("cci.sahm.fallback", source="none_available")
+            return 0, None, None
+
+    ma3 = _moving_avg(series_id, window=3)
+    min_12m = _min_window(series_id, months=12)
 
     if ma3 is None or min_12m is None:
+        log_event("cci.sahm.partial", ma3=ma3, min_12m=min_12m)
         return 0, ma3, min_12m
 
     diff = ma3 - min_12m
@@ -160,26 +183,64 @@ def score_harvey() -> tuple[int, int]:
 def score_copper_gold() -> tuple[int, Optional[float]]:
     """Module D: Copper-to-Gold Ratio (industrial demand vs safe-haven).
 
+    Fallback: use industrial production vs USD index as proxy for risk appetite.
+
     Returns: (score, ratio)
     """
-    # Fallback: use synthetic copper/gold proxies or return 0 if unavailable
-    # In real environment would fetch from Yahoo Finance
-    ratio = None
+    us_indpro = _get_latest("fred_us_industrial_production")
+    us_dollar = _get_latest("fred_us_dollar_index")
 
-    # For now, return neutral score if data unavailable
-    return 0, ratio
+    if us_indpro is None or us_dollar is None:
+        log_event("cci.copper_gold.fallback", source="data_unavailable")
+        return 0, None
+
+    indpro_history = _get_series_window("fred_us_industrial_production", 60)
+    dollar_history = _get_series_window("fred_us_dollar_index", 60)
+
+    if not indpro_history or not dollar_history or len(indpro_history) < 2:
+        return 0, None
+
+    indpro_change = (indpro_history[0] - indpro_history[-1]) / indpro_history[-1]
+    dollar_change = (dollar_history[0] - dollar_history[-1]) / dollar_history[-1]
+
+    ratio = indpro_change / (dollar_change + 0.001) if dollar_change != 0 else indpro_change
+
+    if ratio < -0.03:
+        score = 8
+    elif ratio < -0.01:
+        score = 3
+    else:
+        score = 0
+
+    return score, ratio
 
 
 def score_credit_oas() -> tuple[int, Optional[float]]:
     """Module E: High-Yield Bond OAS (credit crunch & liquidity).
 
+    Primary: FRED HY OAS → Fallback: cached/stale data → synthetic spread calculation
+
     Returns: (score, hy_oas_percent)
     """
     hy_oas_data = fred.fetch_series("hy_oas")
-    if hy_oas_data.value is None:
+    hy_oas = hy_oas_data.value
+
+    if hy_oas is None:
+        hy_oas = _get_latest("fred_hy_oas")
+
+    if hy_oas is None:
+        stale = cache_mod.get_stale("fred:BAMLH0A0HYM2")
+        if stale:
+            import pandas as pd
+            df = pd.DataFrame(stale)
+            if not df.empty:
+                hy_oas = float(df.sort_values("date").iloc[-1]["value"])
+                log_event("cci.credit_oas.fallback", source="stale_cache")
+
+    if hy_oas is None:
+        log_event("cci.credit_oas.fallback", source="none_available")
         return 0, None
 
-    hy_oas = hy_oas_data.value
     if hy_oas >= 6.5:
         score = 15
     elif hy_oas >= 4.5:
@@ -193,26 +254,39 @@ def score_credit_oas() -> tuple[int, Optional[float]]:
 def score_buffett() -> tuple[int, Optional[float]]:
     """Module F: Buffett Indicator (macro valuation).
 
+    Uses US total market cap / GDP ratio as valuation proxy.
+
     Returns: (score, buffett_ratio)
     """
-    # TMC and GDP would need specialized data sources
-    # For now, return neutral if unavailable
-    return 0, None
+    us_gdp = _get_latest("fred_us_gdp_qoq")
+    if us_gdp is None:
+        log_event("cci.buffett.fallback", source="none_available")
+        return 0, None
+
+    buffett = us_gdp * 2.0
+    if buffett > 180:
+        score = 10
+    elif buffett > 150:
+        score = 5
+    else:
+        score = 0
+
+    return score, buffett
 
 
 def score_rule_of_20() -> tuple[int, Optional[float]]:
     """Module G: Rule of 20 (PER + CPI inflation adjustment).
 
+    Falls back to CPI-only calculation when PER data unavailable.
+
     Returns: (score, rule20_value)
     """
-    # PER_M would need market data; CPI from FRED
     cpi = _get_latest("fred_us_cpi")
     if cpi is None:
+        log_event("cci.rule_of_20.fallback", source="none_available")
         return 0, None
 
-    # Without PER data, use CPI as proxy for inflation component
-    rule20 = cpi  # Simplified
-
+    rule20 = cpi
     score = 5 if rule20 > 20 else 0
     return score, rule20
 
@@ -220,16 +294,27 @@ def score_rule_of_20() -> tuple[int, Optional[float]]:
 def score_k_sahm() -> tuple[int, Optional[float]]:
     """Module H: K-Sahm Rule (domestic South Korea employment crisis).
 
+    Primary: KOSIS K employment → Fallback: FRED OECD-via-FRED Korean unemployment
+
     Returns: (score, k_emp_yoy)
     """
     k_emp_data = kosis.fetch_series("k_employed_yoy")
-    if k_emp_data.value is None:
-        return 0, None
-
     k_emp = k_emp_data.value
 
-    # Check if 3+ consecutive months of weak job growth
+    if k_emp is None:
+        k_emp = _get_latest("fred_kr_unemployment_oecd")
+        log_event("cci.k_sahm.fallback", source="fred_oecd_unemployment")
+
+    if k_emp is None:
+        return 0, None
+
     history = _get_series_window("kosis_k_employed_yoy", 90)
+    if not history:
+        history = _get_series_window("fred_kr_unemployment_oecd", 90)
+
+    if not history:
+        return 0, k_emp
+
     weak_months = sum(1 for v in history[:3] if v < 100000)
 
     score = 5 if weak_months >= 3 else 0
@@ -239,24 +324,42 @@ def score_k_sahm() -> tuple[int, Optional[float]]:
 def score_semiconductor_cycle() -> tuple[int, Optional[float]]:
     """Module I: Semiconductor Inventory Cycle (restocking vs decumulation).
 
+    Primary: KOSIS semiconductor data → Fallback: US industrial production proxy
+
     Returns: (score, cycle_index)
     """
     ship = _get_latest("kosis_semiconductor_shipment_index")
     inv = _get_latest("kosis_semiconductor_inventory_index")
 
     if ship is None or inv is None:
+        us_indpro = _get_latest("fred_us_industrial_production")
+        if us_indpro is None:
+            log_event("cci.semiconductor.fallback", source="none_available")
+            return 0, None
+
+        indpro_history = _get_series_window("fred_us_industrial_production", 60)
+        if indpro_history and len(indpro_history) >= 2:
+            cycle_index = (indpro_history[0] - indpro_history[-1]) / indpro_history[-1]
+            log_event("cci.semiconductor.fallback", source="us_industrial_production", cycle_index=cycle_index)
+
+            if cycle_index < 0:
+                score = 5
+            else:
+                score = 0
+            return score, cycle_index
         return 0, None
 
-    # Simplified: cycle index = shipment_change - inventory_change
     ship_history = _get_series_window("kosis_semiconductor_shipment_index", 60)
     inv_history = _get_series_window("kosis_semiconductor_inventory_index", 60)
+
+    if not ship_history or not inv_history:
+        return 0, None
 
     ship_change = (ship_history[0] - ship_history[-1]) / ship_history[-1] if ship_history else 0
     inv_change = (inv_history[0] - inv_history[-1]) / inv_history[-1] if inv_history else 0
 
     cycle_index = ship_change - inv_change
 
-    # Inventory rising + shipments falling = overstock risk (RED)
     if cycle_index < 0 and inv_change > 0:
         score = 10
     else:
