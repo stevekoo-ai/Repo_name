@@ -86,7 +86,7 @@ tests/       pytest 단위/통합 테스트
 2. **08:00 완료**: 웹페이지 생성 + 이메일 발송
    - `python -m engine.report.run --daily`
    - 출력: `report/daily.json` (웹페이지 렌더링용)
-   - 알림: SMTP_HOST/SMTP_USER/SMTP_PASSWORD/NOTIFY_EMAIL_TO 환경변수로 이메일 발송
+   - 알림: GMAIL_ADDRESS/GMAIL_APP_PASSWORD 시크릿(Gmail SMTP, stevekoo.kr@gmail.com)으로 이메일 발송
 
 ### PEOS Monthly Report (거시경제 심층 분석)
 

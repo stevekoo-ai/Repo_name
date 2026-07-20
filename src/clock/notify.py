@@ -58,13 +58,29 @@ class EmailChannel:
 def build_channel() -> NotificationChannel:
     """Pick a channel based on which secrets/env vars are present.
 
-    Precedence: Slack > Email > Noop. Add SLACK_WEBHOOK_URL or the SMTP_*
-    + NOTIFY_EMAIL_TO env vars (as GitHub Actions secrets) to enable a
-    push channel without touching main.py.
+    Precedence: Slack > Gmail > generic SMTP > Noop.
+    - SLACK_WEBHOOK_URL for Slack
+    - GMAIL_ADDRESS + GMAIL_APP_PASSWORD for Gmail (smtp.gmail.com:465,
+      sends to itself unless NOTIFY_EMAIL_TO overrides the recipient)
+    - SMTP_HOST + NOTIFY_EMAIL_TO + SMTP_USER + SMTP_PASSWORD for any other
+      SMTP provider
+    Add the relevant env vars as GitHub Actions secrets to enable a push
+    channel without touching main.py.
     """
     slack_url = os.environ.get("SLACK_WEBHOOK_URL")
     if slack_url:
         return SlackChannel(slack_url)
+
+    gmail_address = os.environ.get("GMAIL_ADDRESS")
+    gmail_app_password = os.environ.get("GMAIL_APP_PASSWORD")
+    if gmail_address and gmail_app_password:
+        return EmailChannel(
+            smtp_host="smtp.gmail.com",
+            smtp_port=465,
+            user=gmail_address,
+            password=gmail_app_password,
+            to_addr=os.environ.get("NOTIFY_EMAIL_TO", gmail_address),
+        )
 
     smtp_host = os.environ.get("SMTP_HOST")
     to_addr = os.environ.get("NOTIFY_EMAIL_TO")
