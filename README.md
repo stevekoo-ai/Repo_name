@@ -79,9 +79,28 @@ tests/       pytest 단위/통합 테스트
 
 ## 자동화
 
-`config/schedule.yaml`에 권장 실행 주기(18.3)가 정의되어 있습니다. 기존 daily-clock GitHub Actions 워크플로우
-(`.github/workflows/daily-clock-report.yml`)는 유지되며, `python -m engine.report.run`을 월간 워크플로우로
-추가하면 매월 자동 리포트 생성이 가능합니다 (아직 워크플로우 파일 자체는 추가하지 않았습니다 — 필요하시면 알려주세요).
+### PEOS Daily Report (매일 06:00~08:00)
+
+`.github/workflows/daily-peos-report.yml` — 매일 23:00 UTC 자동 실행:
+1. **06:00 시작**: 데이터 수집 개시 (ECOS, KOSIS, FRED 등)
+2. **08:00 완료**: 웹페이지 생성 + 이메일 발송
+   - `python -m engine.report.run --daily`
+   - 출력: `report/daily.json` (웹페이지 렌더링용)
+   - 알림: SMTP_HOST/SMTP_USER/SMTP_PASSWORD/NOTIFY_EMAIL_TO 환경변수로 이메일 발송
+
+### PEOS Monthly Report (거시경제 심층 분석)
+
+`.github/workflows/monthly-peos-report.yml` — 매월 5일 08:00 KST 자동 실행:
+- `python -m engine.report.run --monthly` (또는 수동 `--month YYYY-MM`)
+- 출력: `report/<YYYY-MM>.html`, `report/<YYYY-MM>.md`, `report/<YYYY-MM>.json`
+- 용도: 월별 거시경제 지표 발표 이후 전략 재점검, 시나리오 분석
+
+### Investment Clock (기존 유지)
+
+`.github/workflows/daily-clock-report.yml` — 매일 08:00 KST 자동 실행:
+- `python -m src.clock.main`
+- 출력: `docs/clock.png`, `docs/index.html` (인터랙티브 대시보드)
+- 용도: 미국 거시경제 4국면 판정, 자산배분 전술
 
 ## 테스트
 

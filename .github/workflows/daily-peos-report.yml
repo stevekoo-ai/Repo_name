@@ -1,0 +1,108 @@
+name: Daily PEOS Report
+
+on:
+  schedule:
+    # 06:00 KST 시작 (23:00 UTC 전날) — 데이터 수집 개시
+    - cron: "0 23 * * *"
+  workflow_dispatch:
+    inputs:
+      send_email:
+        description: "이메일 발송 여부"
+        required: false
+        default: "true"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: daily-peos-report
+  cancel-in-progress: false
+
+jobs:
+  run-daily-peos:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run PEOS daily pipeline (06:00 KST 수집 개시)
+        env:
+          ECOS_API_KEY: ${{ secrets.ECOS_API_KEY }}
+          KOSIS_API_KEY: ${{ secrets.KOSIS_API_KEY }}
+          FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
+          BLS_API_KEY: ${{ secrets.BLS_API_KEY }}
+        run: python -m engine.report.run --daily
+
+      - name: Build webpage (08:00 KST 완료)
+        run: |
+          python -c "
+          from pathlib import Path
+          import json
+          from engine.report.html import render_html
+
+          report_dir = Path('report')
+          json_files = sorted(report_dir.glob('*.json'), reverse=True)
+
+          if json_files:
+            latest_json = json_files[0]
+            with open(latest_json) as f:
+              payload = json.load(f)
+
+            html_path = report_dir / 'daily.html'
+            html_path.write_text(render_html(payload), encoding='utf-8')
+            print(f'Webpage updated: {html_path}')
+          "
+
+      - name: Send email notification
+        if: github.event.inputs.send_email != 'false'
+        env:
+          SMTP_HOST: ${{ secrets.SMTP_HOST }}
+          SMTP_PORT: ${{ secrets.SMTP_PORT }}
+          SMTP_USER: ${{ secrets.SMTP_USER }}
+          SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
+          NOTIFY_EMAIL_TO: ${{ secrets.NOTIFY_EMAIL_TO }}
+        run: |
+          python -c "
+          import json
+          from pathlib import Path
+          from src.clock.notify import build_channel
+
+          report_dir = Path('report')
+          json_files = sorted(report_dir.glob('*.json'), reverse=True)
+
+          if json_files:
+            with open(json_files[0]) as f:
+              payload = json.load(f)
+
+            channel = build_channel()
+            channel.send(
+              subject='[PEOS Daily] Investment & Macro Update',
+              body_text=f'Report Date: {payload.get(\"report_month\", \"N/A\")}\n\n'
+                        f'Key Indicators:\n'
+                        f'Macro Regime: {payload.get(\"macro\", {}).get(\"regime\", \"N/A\")}\n'
+                        f'Semiconductor Cycle: {payload.get(\"semiconductor\", {}).get(\"cycle\", \"N/A\")}\n\n'
+                        f'Full Report: https://github.com/stevekoo-ai/Repo_name/blob/main/report/daily.html'
+            )
+          "
+
+      - name: Commit updated report
+        run: |
+          git config user.name "peos-daily-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add report/
+          if git diff --cached --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "chore: daily PEOS report $(date -u +'%Y-%m-%d %H:%M:%S')"
+            git push
+          fi

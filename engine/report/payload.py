@@ -171,7 +171,13 @@ def _appendix(macro: dict) -> dict:
     }
 
 
-def build_report_payload(month_key: str | None = None) -> dict:
+def build_report_payload(month_key: str | None = None, report_type: str = "monthly") -> dict:
+    """Build report payload in daily or monthly mode.
+
+    Args:
+        month_key: YYYY-MM, defaults to current month
+        report_type: 'daily' (lightweight) or 'monthly' (full pipeline)
+    """
     month_key = month_key or f"{date.today().year:04d}-{date.today().month:02d}"
 
     macro_result = macro_engine.run_macro_engine(month_key=month_key)

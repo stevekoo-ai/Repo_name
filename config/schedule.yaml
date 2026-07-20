@@ -3,10 +3,12 @@
 # (GitHub Actions cron, APScheduler) is a Phase-8+ deployment step.
 
 jobs:
-  daily_market_update:
-    description: "시장 데이터(주가지수, 환율, 채권금리 등) 갱신"
-    cron: "0 23 * * *"   # 매일 08:00 KST
-    scope: [market]
+  daily_peos_update:
+    description: "일일 PEOS 리포트 — 06:00 시작, 08:00 완료 및 이메일 발송"
+    cron: "0 23 * * *"   # 매일 23:00 UTC = 08:00 KST (실제 완료), 06:00부터 수집 개시
+    scope: [daily_market, daily_investment, daily_semiconductor]
+    output: report/daily.html, report/<YYYY-MM-DD>.json
+    notify: email (SMTP_HOST/SMTP_USER/SMTP_PASSWORD/NOTIFY_EMAIL_TO)
 
   monthly_kr_exports:
     description: "한국 수출/반도체 수출 업데이트"
@@ -31,10 +33,11 @@ jobs:
     trigger: on_release
     scope: [kr_cpi, kr_ppi]
 
-  monthly_report:
-    description: "월간 지표 충족률 검사 -> Macro Engine -> Domain Engines -> Report 생성"
+  monthly_macro_deepdive:
+    description: "월간 거시경제 심층 분석 — 핵심 지표 발표 이후 전략 재점검"
     cron: "0 23 5 * *"   # 매월 5일 08:00 KST 근처 (핵심지표 발표 이후)
-    scope: [full_pipeline]
+    scope: [full_macro_pipeline, scenario_analysis]
+    output: report/<YYYY-MM>.html, report/<YYYY-MM>.md, report/<YYYY-MM>.json
 
 report_generation_triggers:
   - monthly_key_indicators_complete

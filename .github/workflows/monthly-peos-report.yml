@@ -1,8 +1,8 @@
-name: Monthly PEOS Report
+name: Monthly PEOS Report (Macro Deep Dive)
 
 on:
   schedule:
-    # 05일 08:00 KST 근처 실행 (config/schedule.yaml monthly_report과 동일)
+    # 매월 5일 08:00 KST — 핵심 거시 지표 발표 이후 심층 분석 리포트
     - cron: "0 23 5 * *"
   workflow_dispatch:
     inputs:
@@ -19,7 +19,7 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  run-peos:
+  run-monthly-peos:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -35,7 +35,7 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
-      - name: Run PEOS pipeline
+      - name: Run PEOS monthly macro deep-dive (거시경제 심층 분석)
         env:
           ECOS_API_KEY: ${{ secrets.ECOS_API_KEY }}
           KOSIS_API_KEY: ${{ secrets.KOSIS_API_KEY }}
@@ -43,19 +43,19 @@ jobs:
           BLS_API_KEY: ${{ secrets.BLS_API_KEY }}
         run: |
           if [ -n "${{ github.event.inputs.month }}" ]; then
-            python -m engine.report.run --month "${{ github.event.inputs.month }}"
+            python -m engine.report.run --month "${{ github.event.inputs.month }}" --monthly
           else
-            python -m engine.report.run
+            python -m engine.report.run --monthly
           fi
 
-      - name: Commit updated report and snapshot
+      - name: Commit updated monthly report and snapshot
         run: |
-          git config user.name "peos-bot"
+          git config user.name "peos-monthly-bot"
           git config user.email "actions@users.noreply.github.com"
           git add report/ data/snapshots/
           if git diff --cached --quiet; then
             echo "No changes to commit"
           else
-            git commit -m "chore: monthly PEOS report $(date -u +%Y-%m)"
+            git commit -m "chore: monthly PEOS macro report $(date -u +%Y-%m)"
             git push
           fi
