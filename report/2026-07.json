@@ -3126,14 +3126,6 @@
       "source": "FRED",
       "history": [
         {
-          "date": "2016-07-18",
-          "value": 0.91
-        },
-        {
-          "date": "2016-07-19",
-          "value": 0.86
-        },
-        {
           "date": "2016-07-20",
           "value": 0.86
         },
@@ -16166,7 +16158,7 @@
     }
   ],
   "personal": {
-    "investment_environment_score": 67.0,
+    "investment_environment_score": 66.9,
     "investment_biases": {
       "stock_bias": "소폭 확대",
       "etf_bias": "소폭 확대",
@@ -16175,8 +16167,8 @@
     },
     "semiconductor_score": 79.6,
     "semiconductor_band": "긍정",
-    "bond_score": 39.6,
-    "fx_score": 34.4,
+    "bond_score": 39.5,
+    "fx_score": 36.6,
     "housing_readiness_score": null,
     "etf_fit": [
       {
@@ -16232,7 +16224,7 @@
   },
   "assets": {
     "stocks": {
-      "score": 69.7,
+      "score": 69.6,
       "stars": "★★★☆☆",
       "data_status": "ok",
       "detail": [
@@ -16302,7 +16294,7 @@
       ]
     },
     "bond": {
-      "score": 39.6,
+      "score": 39.5,
       "stars": "★☆☆☆☆",
       "data_status": "ok",
       "detail": [
@@ -16331,11 +16323,11 @@
       "detail": []
     },
     "fx_exposure": {
-      "score": 34.4,
+      "score": 36.6,
       "stars": "★☆☆☆☆",
       "data_status": "ok",
       "detail": {
-        "usdkrw_change_pct_3m": 4.74,
+        "usdkrw_change_pct_3m": 3.52,
         "dollar_index_change_pct_3m": 1.35,
         "kr_us_rate_differential_pct": -1.13,
         "us_fed_funds_change_bp_3m": -1.0
@@ -16355,9 +16347,9 @@
         "destination_country": "US",
         "departure_date": "2026-09-15",
         "score_kind": "trip_readiness",
-        "score": 44.2,
+        "score": 45.6,
         "factors": {
-          "fx_favorability": 34.4,
+          "fx_favorability": 36.6,
           "cost_risk_inverse": null,
           "lead_time_readiness": 60.0
         },
@@ -16369,9 +16361,9 @@
         "destination_country": "JP",
         "departure_date": "2026-10-03",
         "score_kind": "travel_timing",
-        "score": 47.8,
+        "score": 49.1,
         "factors": {
-          "fx_favorability": 34.4,
+          "fx_favorability": 36.6,
           "season_favorability": 70.0,
           "airfare_hotel_trend": null
         },
@@ -16385,7 +16377,7 @@
       "probability": 35,
       "premise": "현재 국면(Recovery)과 반도체 업황(긍정)의 추세가 유지된다.",
       "expected_change": "지표가 현재 범위 내에서 등락하며 국면 전환 신호는 제한적.",
-      "user_impact": "Investment Environment Score 67.0점 수준의 배분 유지가 합리적."
+      "user_impact": "Investment Environment Score 66.9점 수준의 배분 유지가 합리적."
     },
     "bull": {
       "probability": 35,
@@ -16412,9 +16404,9 @@
     {
       "priority": 4,
       "priority_label": "★★★★☆ 검토 필요",
-      "priority_score": 75.0,
+      "priority_score": 76.4,
       "title": "SK hynix / Micron 실적발표 확인 (2026-07-24)",
-      "reason": "우선순위 점수 87.2점, ★★★★★ — D-6.",
+      "reason": "우선순위 점수 88.0점, ★★★★★ — D-4.",
       "invalid_condition": "일정이 연기되면 재점검 시점도 함께 조정.",
       "recheck": "2026-07-24 당일 또는 직후.",
       "category": "industry_cycle",
@@ -16434,11 +16426,22 @@
     {
       "priority": 4,
       "priority_label": "★★★★☆ 검토 필요",
-      "priority_score": 70.4,
+      "priority_score": 71.8,
       "title": "한국 수출입 동향 (반도체 포함) 확인 (2026-08-01)",
-      "reason": "우선순위 점수 86.2점, ★★★★★ — D-14.",
+      "reason": "우선순위 점수 87.0점, ★★★★★ — D-12.",
       "invalid_condition": "일정이 연기되면 재점검 시점도 함께 조정.",
       "recheck": "2026-08-01 당일 또는 직후.",
+      "category": "macro_risk",
+      "conflict_note": null
+    },
+    {
+      "priority": 3,
+      "priority_label": "★★★☆☆ 관찰 필요",
+      "priority_score": 68.1,
+      "title": "FOMC 정례회의 확인 (2026-07-29)",
+      "reason": "우선순위 점수 77.4점, ★★★★☆ — D-9.",
+      "invalid_condition": "일정이 연기되면 재점검 시점도 함께 조정.",
+      "recheck": "2026-07-29 당일 또는 직후.",
       "category": "macro_risk",
       "conflict_note": null
     },
@@ -16456,20 +16459,9 @@
     {
       "priority": 3,
       "priority_label": "★★★☆☆ 관찰 필요",
-      "priority_score": 66.6,
-      "title": "FOMC 정례회의 확인 (2026-07-29)",
-      "reason": "우선순위 점수 76.6점, ★★★★☆ — D-11.",
-      "invalid_condition": "일정이 연기되면 재점검 시점도 함께 조정.",
-      "recheck": "2026-07-29 당일 또는 직후.",
-      "category": "macro_risk",
-      "conflict_note": null
-    },
-    {
-      "priority": 3,
-      "priority_label": "★★★☆☆ 관찰 필요",
       "priority_score": 58.8,
       "title": "주식/ETF 비중 확대 검토",
-      "reason": "Investment Environment Score 67.0점 — 거시/반도체 환경이 우호적.",
+      "reason": "Investment Environment Score 66.9점 — 거시/반도체 환경이 우호적.",
       "invalid_condition": "Investment Environment Score가 20점 이상 하락하면 보류.",
       "recheck": "다음 정기 리포트.",
       "category": "investment_opportunity",
@@ -16478,9 +16470,9 @@
     {
       "priority": 3,
       "priority_label": "★★★☆☆ 관찰 필요",
-      "priority_score": 57.3,
+      "priority_score": 58.7,
       "title": "미국 CPI 발표 확인 (2026-08-12)",
-      "reason": "우선순위 점수 72.4점, ★★★★☆ — D-25.",
+      "reason": "우선순위 점수 73.1점, ★★★★☆ — D-23.",
       "invalid_condition": "일정이 연기되면 재점검 시점도 함께 조정.",
       "recheck": "2026-08-12 당일 또는 직후.",
       "category": "macro_risk",
@@ -16489,9 +16481,9 @@
     {
       "priority": 3,
       "priority_label": "★★★☆☆ 관찰 필요",
-      "priority_score": 55.1,
+      "priority_score": 56.5,
       "title": "미국 비농업 고용(NFP) 발표 확인 (2026-08-07)",
-      "reason": "우선순위 점수 63.8점, ★★★★☆ — D-20.",
+      "reason": "우선순위 점수 64.5점, ★★★★☆ — D-18.",
       "invalid_condition": "일정이 연기되면 재점검 시점도 함께 조정.",
       "recheck": "2026-08-07 당일 또는 직후.",
       "category": "macro_risk",
@@ -16502,7 +16494,7 @@
       "priority_label": "★★☆☆☆ 참고",
       "priority_score": 52.8,
       "title": "미국 출장 (EXAMPLE) 분할 환전 검토",
-      "reason": "미국 출장 (EXAMPLE): 환전 유리도 44.2점으로 낮지만 일정이 확정되어 있어 환전을 전면 보류하기보다 분할 환전으로 리스크를 분산하는 것이 합리적이다.",
+      "reason": "미국 출장 (EXAMPLE): 환전 유리도 45.6점으로 낮지만 일정이 확정되어 있어 환전을 전면 보류하기보다 분할 환전으로 리스크를 분산하는 것이 합리적이다.",
       "invalid_condition": "출국일 이전 환율이 추가로 5% 이상 불리하게 움직이면 재검토.",
       "recheck": "2026-09-15 2주 전.",
       "category": "liquidity_survival",
@@ -16513,7 +16505,7 @@
       "priority_label": "★★☆☆☆ 참고",
       "priority_score": 52.8,
       "title": "일본 여행 (EXAMPLE) 분할 환전 검토",
-      "reason": "일본 여행 (EXAMPLE): 환전 유리도 47.8점으로 낮지만 일정이 확정되어 있어 환전을 전면 보류하기보다 분할 환전으로 리스크를 분산하는 것이 합리적이다.",
+      "reason": "일본 여행 (EXAMPLE): 환전 유리도 49.1점으로 낮지만 일정이 확정되어 있어 환전을 전면 보류하기보다 분할 환전으로 리스크를 분산하는 것이 합리적이다.",
       "invalid_condition": "출국일 이전 환율이 추가로 5% 이상 불리하게 움직이면 재검토.",
       "recheck": "2026-10-03 2주 전.",
       "category": "travel_discretionary",
@@ -16524,7 +16516,7 @@
       "priority_label": "★★☆☆☆ 참고",
       "priority_score": 44.8,
       "title": "채권 신규 매수 보류 및 만기 재투자 방식 재검토",
-      "reason": "Bond Score 39.6점 — 금리/실질금리 매력도가 낮은 국면.",
+      "reason": "Bond Score 39.5점 — 금리/실질금리 매력도가 낮은 국면.",
       "invalid_condition": "실질금리 매력도 회복 또는 성장 둔화 신호 확산 시 재검토.",
       "recheck": "다음 금통위/FOMC 이후.",
       "category": "investment_opportunity",
@@ -16562,8 +16554,8 @@
       "name": "SK hynix / Micron 실적발표",
       "date": "2026-07-24",
       "category": "semiconductor_earnings",
-      "days_until": 6,
-      "priority_score": 87.2,
+      "days_until": 4,
+      "priority_score": 88.0,
       "importance_tier": 5,
       "importance_label": "★★★★★"
     },
@@ -16571,8 +16563,8 @@
       "name": "한국 수출입 동향 (반도체 포함)",
       "date": "2026-08-01",
       "category": "kr_trade",
-      "days_until": 14,
-      "priority_score": 86.2,
+      "days_until": 12,
+      "priority_score": 87.0,
       "importance_tier": 5,
       "importance_label": "★★★★★"
     },
@@ -16580,8 +16572,8 @@
       "name": "FOMC 정례회의",
       "date": "2026-07-29",
       "category": "us_policy",
-      "days_until": 11,
-      "priority_score": 76.6,
+      "days_until": 9,
+      "priority_score": 77.4,
       "importance_tier": 4,
       "importance_label": "★★★★☆"
     },
@@ -16589,8 +16581,8 @@
       "name": "미국 CPI 발표",
       "date": "2026-08-12",
       "category": "us_inflation",
-      "days_until": 25,
-      "priority_score": 72.4,
+      "days_until": 23,
+      "priority_score": 73.1,
       "importance_tier": 4,
       "importance_label": "★★★★☆"
     },
@@ -16598,8 +16590,8 @@
       "name": "미국 비농업 고용(NFP) 발표",
       "date": "2026-08-07",
       "category": "us_employment",
-      "days_until": 20,
-      "priority_score": 63.8,
+      "days_until": 18,
+      "priority_score": 64.5,
       "importance_tier": 4,
       "importance_label": "★★★★☆"
     },
@@ -16607,8 +16599,8 @@
       "name": "한국 CPI 발표",
       "date": "2026-08-05",
       "category": "kr_inflation",
-      "days_until": 18,
-      "priority_score": 60.8,
+      "days_until": 16,
+      "priority_score": 61.5,
       "importance_tier": 4,
       "importance_label": "★★★★☆"
     },
@@ -16616,8 +16608,8 @@
       "name": "한국은행 금융통화위원회",
       "date": "2026-08-14",
       "category": "kr_policy",
-      "days_until": 27,
-      "priority_score": 60.6,
+      "days_until": 25,
+      "priority_score": 61.4,
       "importance_tier": 4,
       "importance_label": "★★★★☆"
     }
