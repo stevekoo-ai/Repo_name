@@ -14,7 +14,7 @@ Catalog of every page in the wiki. See `../CLAUDE.md` for conventions.
 
 ### entities
 
-- [SK하이닉스](entities/sk-hynix.md) — 반도체 종목; 7/20 종가 1,764,000원(-4.23%, 최저 종가 경신, 코스피 -4.46% 사이드카), 신규 악재 문샷AI Kimi K3(AI 효율화 우려), ADR 백필 완료($154.03), 실적발표 7/29 공식 확정(D-9), 추정 하향 3개사 트리거 발동 상태
+- [SK하이닉스](entities/sk-hynix.md) — 반도체 종목; 7/20 종가 1,764,000원(-4.23%, 최저 종가 경신, 코스피 -4.46% 사이드카), 신규 악재 문샷AI Kimi K3(AI 효율화 우려), ADR 백필 완료($154.03), 실적발표 7/29 공식 확정(D-8), CXMT 중기 위협 격상(정부 기술자립화 전략 수단, HBM3 진입), 체크포인트 ⑦ "부정"으로 격상
 - [나의 투자 포트폴리오](entities/my-portfolio.md) — 4개 계좌 총 4.5억원(2026-07-13 기준), SK하이닉스가 약 65% 차지하는 집중 포지션; 7/15 급등으로 큰 폭 회복 추정(재스냅샷 필요)
 - [사용자 프로필](entities/user-profile.md) — SK하이닉스 재직/고소득, 장기투자 성향, 용인 수지구 거주 및 플랫폼시티 공공분양 대기; 청약통장 249회 납입(잔액 28,050,000원), 가입일 불일치 확인중
 
@@ -26,3 +26,4 @@ Catalog of every page in the wiki. See `../CLAUDE.md` for conventions.
 - [한국·미국 증시 휴장일 캘린더](concepts/market-holidays.md) — KRX·NYSE/Nasdaq 2026 하반기 휴장일, "시세 미확인 vs 휴장" 구분 기준, 연휴 비대칭 구간 활용법 + 🔴 제헌절(7/17) 누락 사건 정정 기록과 재발 방지 규칙
 - [ROIC를 투자의 핵심 기준으로 보기](concepts/roic-as-investment-criterion.md) — 자본수익률 지표의 정의와 의미, AI 시대 자본효율성 악화 리스크, SK하이닉스 ROIC 모니터링 체크리스트
 - [반도체 시장의 단기 수급 싸이클 vs 장기 펀더멘털](concepts/market-cycles-leverage-risk.md) — 수급 과밀·레버리지 증폭·계절적 요인의 단기 악화 vs 강한 장기 펀더멘털, 투자자별 대응 전략
+- [미중 기술 경쟁과 HBM 시장의 미래](concepts/us-china-tech-competition-hbm.md) — CXMT의 국가 전략 차원 기술 자립화 드라이브, HBM 위협 확산(구세대→신세대), SK하이닉스 중기 우위 위협(2028~2029)
