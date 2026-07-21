@@ -1,0 +1,72 @@
+name: Daily PEOS Report (Legacy — no email)
+
+# This is the original daily-peos-report.yml as it existed on main before
+# this session's rework: no email, dashboard at docs/peos-daily.html. Kept
+# running under its own name, unchanged in behavior, alongside the new
+# daily-peos-report.yml (email + report/daily.html with period-toggle
+# trends) so both can be compared before picking one — see that file's
+# "Daily PEOS Report" workflow for the new version.
+#
+# Note: engine/report/run.py now requires --daily/--monthly (this session
+# added the split); the bare `python -m engine.report.run` this workflow
+# used to call would default to --monthly and stop feeding
+# data/peos_daily_history.csv daily, so this now passes --daily explicitly
+# to keep the original day-over-day behavior intact.
+
+on:
+  schedule:
+    # 21:00 UTC = 06:00 KST (next day)
+    - cron: "0 21 * * *"
+  workflow_dispatch:
+    inputs:
+      month:
+        description: "리포트 대상 월 (YYYY-MM). 비워두면 실행 시점의 이번 달."
+        required: false
+        default: ""
+
+permissions:
+  contents: write
+
+concurrency:
+  group: daily-peos-report-legacy
+  cancel-in-progress: false
+
+jobs:
+  run-peos-legacy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run PEOS pipeline
+        env:
+          ECOS_API_KEY: ${{ secrets.ECOS_API_KEY }}
+          KOSIS_API_KEY: ${{ secrets.KOSIS_API_KEY }}
+          FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
+          BLS_API_KEY: ${{ secrets.BLS_API_KEY }}
+        run: python -m engine.report.run --daily
+
+      - name: Regenerate PEOS Daily Dashboard
+        run: python -m engine.report.daily_dashboard
+
+      - name: Commit updated report, history, and dashboard
+        run: |
+          git config user.name "peos-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add report/ data/snapshots/ data/peos_daily_history.csv docs/peos-daily.html
+          if git diff --cached --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "chore: daily PEOS report (legacy) $(date -u +%Y-%m-%d)"
+            git push
+          fi

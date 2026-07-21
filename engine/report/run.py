@@ -3,9 +3,12 @@
     python -m engine.report.run [--daily | --monthly] [--month YYYY-MM]
 
 Daily mode: 일일 시장/투자 업데이트. Writes report/<YYYY-MM-DD>.json (dated
-snapshot) + report/daily.html (stable URL, includes the period-selectable
-trend section fed by data/peos_daily_history.csv) + appends today's row to
-that history CSV.
+snapshot) + report/daily.html (repo-tracked copy) + docs/peos-report.html
+(same content, under the folder GitHub Pages actually serves — see
+GUIDE.md's "대시보드: https://<id>.github.io/<repo>/" convention already
+used for docs/index.html and docs/peos-daily.html — so the emailed link
+opens a rendered page instead of GitHub's raw-source blob view) +
+appends today's row to data/peos_daily_history.csv.
 
 Monthly mode: 월간 거시경제 심층 분석 (상세, 전략 재점검용). Writes
 report/<YYYY-MM>.html/.md/.json — a separate cadence from daily, not folded
@@ -24,6 +27,7 @@ from .html import render_html
 from .markdown import render_markdown
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
+DOCS_DIR = REPO_ROOT / "docs"
 
 
 def run(month_key: str | None = None, report_type: str = "monthly") -> dict[str, Path]:
@@ -61,12 +65,19 @@ def run(month_key: str | None = None, report_type: str = "monthly") -> dict[str,
 
         history_path = daily_history.append_daily_history(payload, run_date=report_key)
         history_json = daily_history.load_history_json(history_path)
+        rendered = render_html(payload, history=history_json)
+
         html_path = out_dir / "daily.html"
-        html_path.write_text(render_html(payload, history=history_json), encoding="utf-8")
+        html_path.write_text(rendered, encoding="utf-8")
+
+        DOCS_DIR.mkdir(parents=True, exist_ok=True)
+        pages_path = DOCS_DIR / "peos-report.html"
+        pages_path.write_text(rendered, encoding="utf-8")
 
         log_event("pipeline.daily_report_generated", date=report_key,
-                  html=str(html_path), json=str(json_path), daily_history=str(history_path))
-        return {"html": html_path, "json": json_path, "daily_history": history_path}
+                  html=str(html_path), pages=str(pages_path), json=str(json_path),
+                  daily_history=str(history_path))
+        return {"html": html_path, "pages": pages_path, "json": json_path, "daily_history": history_path}
 
 
 def main() -> None:

@@ -41,9 +41,10 @@ jobs:
           KOSIS_API_KEY: ${{ secrets.KOSIS_API_KEY }}
           FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
           BLS_API_KEY: ${{ secrets.BLS_API_KEY }}
-        # Writes report/<YYYY-MM-DD>.json, report/daily.html (period-toggle
-        # trend section included), and appends today's row to
-        # data/peos_daily_history.csv — see engine/report/run.py.
+        # Writes report/<YYYY-MM-DD>.json, report/daily.html, a rendered
+        # copy at docs/peos-report.html (served by GitHub Pages), and
+        # appends today's row to data/peos_daily_history.csv — see
+        # engine/report/run.py.
         run: python -m engine.report.run --daily
 
       - name: Send email notification (08:00 KST 완료)
@@ -73,7 +74,7 @@ jobs:
                         f'KR Regime: {payload.get(\"macro\", {}).get(\"regime\", \"N/A\")}\n'
                         f'US Regime: {payload.get(\"macro_us\", {}).get(\"regime\", \"N/A\")}\n'
                         f'Semiconductor Score: {payload.get(\"personal\", {}).get(\"semiconductor_score\", \"N/A\")}\n\n'
-                        f'Full Report: https://github.com/stevekoo-ai/Repo_name/blob/main/report/daily.html'
+                        f'Full Report: https://stevekoo-ai.github.io/Repo_name/peos-report.html'
             )
           "
 
@@ -81,7 +82,7 @@ jobs:
         run: |
           git config user.name "peos-daily-bot"
           git config user.email "actions@users.noreply.github.com"
-          git add report/ data/peos_daily_history.csv
+          git add report/ data/peos_daily_history.csv docs/peos-report.html
           if git diff --cached --quiet; then
             echo "No changes to commit"
           else

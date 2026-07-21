@@ -79,14 +79,21 @@ tests/       pytest 단위/통합 테스트
 
 ## 자동화
 
-### PEOS Daily Report (매일 06:00~08:00)
+### PEOS Daily Report (매일 06:00~08:00) — 신버전
 
-`.github/workflows/daily-peos-report.yml` — 매일 23:00 UTC 자동 실행:
-1. **06:00 시작**: 데이터 수집 개시 (ECOS, KOSIS, FRED 등)
+`.github/workflows/daily-peos-report.yml` — 매일 23:00 UTC(06:00 KST) 자동 실행:
+1. **06:00 시작**: 데이터 수집 개시 (ECOS, KOSIS, FRED 등), `python -m engine.report.run --daily`
 2. **08:00 완료**: 웹페이지 생성 + 이메일 발송
-   - `python -m engine.report.run --daily`
-   - 출력: `report/daily.json` (웹페이지 렌더링용)
-   - 알림: GMAIL_ADDRESS/GMAIL_APP_PASSWORD 시크릿(Gmail SMTP, stevekoo.kr@gmail.com)으로 이메일 발송
+   - 웹페이지: **https://stevekoo-ai.github.io/Repo_name/peos-report.html** (GitHub Pages, `docs/peos-report.html`) —
+     기간별 추세(오늘/1주일/1개월/6개월/1년/전체) 및 판단 요약이 포함된 인터랙티브 페이지.
+     저장소 안에서 원본을 보려면 `report/daily.html`.
+   - 알림: GMAIL_ADDRESS/GMAIL_APP_PASSWORD 시크릿(Gmail SMTP)으로 매일 이메일 발송, 위 웹페이지 링크 포함
+
+### PEOS Daily Report — 구버전 (병행 운영, 비교용)
+
+`.github/workflows/daily-peos-report-legacy.yml` — 이번 세션 이전부터 운영되던 버전을 그대로 보존.
+이메일 없음, 웹페이지는 `https://stevekoo-ai.github.io/Repo_name/peos-daily.html` (`docs/peos-daily.html`).
+신버전과 나란히 매일 실행되며, 어느 쪽을 계속 쓸지 정해지면 다른 쪽을 제거하면 됩니다.
 
 ### PEOS Monthly Report (거시경제 심층 분석)
 
