@@ -25,3 +25,4 @@ Catalog of every page in the wiki. See `../CLAUDE.md` for conventions.
 - [매크로 지표 트렌드 추적](concepts/macro-indicators.md) — 금리 결정·물가·소매판매 등 경제 캘린더를 시계열로 누적 기록, 2026-07-16 한국은행 금리 결정(인상 유력)부터 시작
 - [한국·미국 증시 휴장일 캘린더](concepts/market-holidays.md) — KRX·NYSE/Nasdaq 2026 하반기 휴장일, "시세 미확인 vs 휴장" 구분 기준, 연휴 비대칭 구간 활용법 + 🔴 제헌절(7/17) 누락 사건 정정 기록과 재발 방지 규칙
 - [ROIC를 투자의 핵심 기준으로 보기](concepts/roic-as-investment-criterion.md) — 자본수익률 지표의 정의와 의미, AI 시대 자본효율성 악화 리스크, SK하이닉스 ROIC 모니터링 체크리스트
+- [반도체 시장의 단기 수급 싸이클 vs 장기 펀더멘털](concepts/market-cycles-leverage-risk.md) — 수급 과밀·레버리지 증폭·계절적 요인의 단기 악화 vs 강한 장기 펀더멘털, 투자자별 대응 전략
