@@ -1,197 +1,289 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SK하이닉스 아침 체크 — 2026-07-21 (화)</title>
-  <style>
-    :root {
-      --bg: #f4f5f1; --surface: #ffffff; --surface-2: #eaebe3;
-      --ink: #1e221d; --ink-soft: #565b4e; --ink-faint: #8b9084;
-      --accent: #2f6b5e; --accent-ink: #143a32; --accent-soft: #dce8e2;
-      --border: #d8d9cf;
-      --pos: #2f6b3f; --pos-bg: #e3ecdd;
-      --neu: #96660f; --neu-bg: #f3e8d2;
-      --neg: #a53f3f; --neg-bg: #f4dede;
-      --unk: #6b7066; --unk-bg: #e7e8e1;
-      --shadow: 0 1px 2px rgba(30,34,29,.06), 0 8px 24px -12px rgba(30,34,29,.18);
-    }
-    @media (prefers-color-scheme: dark) {
-      :root {
-        --bg: #14170f; --surface: #1b201a; --surface-2: #212820;
-        --ink: #e9ece4; --ink-soft: #a9ae9e; --ink-faint: #6e7367;
-        --accent: #74c6ae; --accent-ink: #eaf7f2; --accent-soft: #223730;
-        --border: #303830;
-        --pos: #8fd19f; --pos-bg: #1f3324;
-        --neu: #e3b869; --neu-bg: #3a2f18;
-        --neg: #e79b9b; --neg-bg: #3a2222;
-        --unk: #9aa093; --unk-bg: #262b23;
-        --shadow: 0 1px 2px rgba(0,0,0,.4), 0 8px 24px -12px rgba(0,0,0,.6);
-      }
-    }
-    :root[data-theme="dark"] {
-      --bg: #14170f; --surface: #1b201a; --surface-2: #212820;
-      --ink: #e9ece4; --ink-soft: #a9ae9e; --ink-faint: #6e7367;
-      --accent: #74c6ae; --accent-ink: #eaf7f2; --accent-soft: #223730;
-      --border: #303830;
-      --pos: #8fd19f; --pos-bg: #1f3324;
-      --neu: #e3b869; --neu-bg: #3a2f18;
-      --neg: #e79b9b; --neg-bg: #3a2222;
-      --unk: #9aa093; --unk-bg: #262b23;
-    }
-    :root[data-theme="light"] {
-      --bg: #f4f5f1; --surface: #ffffff; --surface-2: #eaebe3;
-      --ink: #1e221d; --ink-soft: #565b4e; --ink-faint: #8b9084;
-      --accent: #2f6b5e; --accent-ink: #143a32; --accent-soft: #dce8e2;
-      --border: #d8d9cf;
-      --pos: #2f6b3f; --pos-bg: #e3ecdd;
-      --neu: #96660f; --neu-bg: #f3e8d2;
-      --neg: #a53f3f; --neg-bg: #f4dede;
-      --unk: #6b7066; --unk-bg: #e7e8e1;
-    }
-    * { box-sizing: border-box; }
-    body { margin:0; background:var(--bg); color:var(--ink); font-family:-apple-system,"Apple SD Gothic Neo","Pretendard","Noto Sans KR",system-ui,sans-serif; line-height:1.65; }
-    .wrap { max-width:52rem; margin:0 auto; padding:2.5rem 1.5rem 5rem; }
-    header { margin-bottom:2rem; }
-    .eyebrow { display:inline-flex; align-items:center; gap:.4rem; font-family:ui-monospace,"SFMono-Regular",Menlo,Consolas,monospace; font-size:.72rem; letter-spacing:.06em; text-transform:uppercase; color:var(--neg); background:var(--neg-bg); border-radius:999px; padding:.28rem .7rem; margin-bottom:1rem; }
-    h1 { font-size:clamp(1.6rem,4.5vw,2.15rem); font-weight:800; letter-spacing:-.01em; margin:0 0 .5rem; text-wrap:balance; }
-    .lede { color:var(--ink-soft); margin:0; font-size:1rem; }
-    .snapshot { display:grid; grid-template-columns:repeat(auto-fit,minmax(9.5rem,1fr)); gap:.9rem; margin:1.75rem 0; }
-    .stat { background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:1rem 1.1rem; box-shadow:var(--shadow); }
-    .stat .label { font-size:.72rem; color:var(--ink-faint); text-transform:uppercase; letter-spacing:.05em; margin-bottom:.35rem; }
-    .stat .value { font-family:ui-monospace,"SFMono-Regular",Menlo,Consolas,monospace; font-size:1.2rem; font-weight:700; font-variant-numeric:tabular-nums; }
-    .stat .sub { font-size:.8rem; margin-top:.2rem; }
-    .down { color:var(--neg); } .up { color: var(--pos); } .unkc { color:var(--unk); }
-    section { margin-bottom:2.25rem; }
-    h2 { font-size:1.15rem; font-weight:800; margin:0 0 .9rem; }
-    .card { background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:1.25rem 1.4rem; box-shadow:var(--shadow); margin-bottom:.9rem; }
-    .card-head { display:flex; align-items:center; justify-content:space-between; gap:1rem; margin-bottom:.5rem; flex-wrap:wrap; }
-    .card h3 { margin:0; font-size:1rem; font-weight:700; }
-    .card p { margin:.4rem 0 0; color:var(--ink-soft); font-size:.9rem; }
-    .card p strong { color:var(--ink); }
-    .pill { display:inline-flex; align-items:center; gap:.35rem; font-size:.75rem; font-weight:700; padding:.25rem .6rem; border-radius:999px; white-space:nowrap; }
-    .pill.pos { color:var(--pos); background:var(--pos-bg); }
-    .pill.neu { color:var(--neu); background:var(--neu-bg); }
-    .pill.neg { color:var(--neg); background:var(--neg-bg); }
-    .pill.unk { color:var(--unk); background:var(--unk-bg); }
-    .new { border-left:3px solid var(--accent); }
-    .callout { border-left:3px solid var(--neg); background:var(--neg-bg); color:var(--ink); border-radius:0 10px 10px 0; padding:.9rem 1.1rem; font-size:.88rem; }
-    footer { margin-top:3rem; padding-top:1.25rem; border-top:1px solid var(--border); color:var(--ink-faint); font-size:.82rem; }
-    code { font-family:ui-monospace,Menlo,Consolas,monospace; font-size:.85em; background:var(--surface-2); padding:.1em .35em; border-radius:5px; }
-    table { width:100%; border-collapse:collapse; font-size:.9rem; margin:1rem 0; }
-    table th, table td { padding:.6rem .8rem; border-bottom:1px solid var(--border); text-align:left; }
-    table th { font-weight:700; background:var(--surface-2); }
-    table tbody tr:hover { background:var(--surface-2); }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SK하이닉스 아침 체크포인트 리포트 (2026-07-21)</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            min-height: 100vh;
+            color: #333;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+        .header .date {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        .content {
+            padding: 30px;
+        }
+        .section {
+            margin-bottom: 35px;
+        }
+        .section-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #1e3c72;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #667eea;
+            display: flex;
+            align-items: center;
+        }
+        .icon {
+            font-size: 24px;
+            margin-right: 10px;
+        }
+        .metric {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 12px;
+            border-left: 4px solid #667eea;
+        }
+        .metric-label {
+            font-size: 12px;
+            color: #666;
+            text-transform: uppercase;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+        .metric-value {
+            font-size: 22px;
+            font-weight: 700;
+            color: #1e3c72;
+            margin-top: 5px;
+        }
+        .positive { color: #27ae60; }
+        .negative { color: #e74c3c; }
+        .neutral { color: #f39c12; }
+        .checkpoint-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 15px;
+        }
+        .checkpoint {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+        .checkpoint.positive {
+            border-left-color: #27ae60;
+        }
+        .checkpoint.negative {
+            border-left-color: #e74c3c;
+        }
+        .checkpoint.neutral {
+            border-left-color: #f39c12;
+        }
+        .checkpoint-number {
+            font-size: 12px;
+            color: #666;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        .checkpoint-title {
+            font-size: 14px;
+            font-weight: 600;
+            margin-top: 5px;
+            color: #333;
+        }
+        .checkpoint-status {
+            font-size: 13px;
+            margin-top: 8px;
+            line-height: 1.4;
+        }
+        .diagnosis {
+            background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
+            border-left: 4px solid #667eea;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 15px;
+        }
+        .diagnosis-title {
+            font-size: 14px;
+            color: #666;
+            text-transform: uppercase;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        .diagnosis-text {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1e3c72;
+            line-height: 1.6;
+        }
+        .risk-section {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+        }
+        .risk-title {
+            font-size: 12px;
+            color: #856404;
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+        .risk-text {
+            font-size: 14px;
+            color: #856404;
+            margin-top: 8px;
+            line-height: 1.5;
+        }
+        .footer {
+            background: #f8f9fa;
+            padding: 20px;
+            text-align: center;
+            border-top: 1px solid #e9ecef;
+            font-size: 12px;
+            color: #999;
+        }
+        @media (max-width: 640px) {
+            .checkpoint-grid {
+                grid-template-columns: 1fr;
+            }
+            .header h1 {
+                font-size: 22px;
+            }
+        }
+    </style>
 </head>
 <body>
+    <div class="container">
+        <div class="header">
+            <h1>SK하이닉스 아침 체크포인트</h1>
+            <div class="date">2026-07-21 07:00 KST (월)</div>
+        </div>
 
-<div class="wrap">
-  <header>
-    <span class="eyebrow">● 아침 체크 · 2026-07-21 (화)</span>
-    <h1>Kimi K3 충격파 계속 — SOX -20% vs HBM 점유율 50%+</h1>
-    <p class="lede">어제(7/20) 저녁 Kimi K3 악재로 SOX 지수 베어마켓 진입. 본주 -4.23% 최저 종가 경신. 반면 HBM 점유율·Q2 영업이익·ADR 프리미엄 안정화는 강세 신호.</p>
-  </header>
+        <div class="content">
+            <div class="section">
+                <div class="section-title">
+                    <span class="icon">🚀</span> 목표가와 상승 모멘텀
+                </div>
 
-  <div class="snapshot">
-    <div class="stat"><div class="label">본주 종가(7/20)</div><div class="value">1,764,000<span style="font-size:.65rem;">원</span></div><div class="sub down">-4.23% · 최저 종가 경신</div></div>
-    <div class="stat"><div class="label">ADR (7/20)</div><div class="value">$154.03</div><div class="sub up">+1.1% · 백필 완료</div></div>
-    <div class="stat"><div class="label">ADR 프리미엄</div><div class="value">25%</div><div class="sub up">안정화 (정점 52.5%→25%)</div></div>
-  </div>
+                <div class="metric">
+                    <div class="metric-label">현재가</div>
+                    <div class="metric-value">1,764,000원 <span style="font-size:16px; color:#e74c3c;">(-4.23%)</span></div>
+                </div>
 
-  <section>
-    <h2>🆕 어제 저녁 이후 주요 변화</h2>
+                <div class="metric">
+                    <div class="metric-label">강세 클러스터 목표가</div>
+                    <div class="metric-value" style="color:#27ae60;">380~430만원</div>
+                    <div style="font-size:13px; color:#666; margin-top:8px;">상승여력 +115~144%</div>
+                </div>
 
-    <div class="card new">
-      <div class="card-head"><h3>Kimi K3 충격파 심화 (신규 악재)</h3><span class="pill neg">SOX -20% 베어마켓</span></div>
-      <p>중국 문샷AI의 고성능 모델 'Kimi K3' 공개가 7/20 저녁으로 이어지면서 <strong>반도체 설계 자동화 우려 심화</strong> — Cadence·Synopsys 9% 급락, 반도체 시총 $3.3조 증발, <strong>SOX 지수 -20% 베어마켓 진입</strong>. 7/27 전체 모델 weights 공개 예정으로 추가 충격파 가능성. 알파벳 실적(7/22)이 이 우려를 종식시킬 수 있는 최초의 기회.</p>
+                <div class="metric">
+                    <div class="metric-label">해외 최고 (Barclays)</div>
+                    <div class="metric-value" style="color:#27ae60;">약 490만원</div>
+                    <div style="font-size:13px; color:#666; margin-top:8px;">$330 ADR × 환율</div>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-title">
+                    <span class="icon">💡</span> 2분기 실적 전망
+                </div>
+
+                <div class="metric">
+                    <div class="metric-label">매출</div>
+                    <div class="metric-value">83.9조원</div>
+                </div>
+
+                <div class="metric">
+                    <div class="metric-label">영업이익 (컨센서스)</div>
+                    <div class="metric-value" style="color:#27ae60;">64~70조원</div>
+                    <div style="font-size:13px; color:#666; margin-top:8px;">OPM 76.5~82.8% (역대최고)</div>
+                </div>
+
+                <div class="metric">
+                    <div class="metric-label">발표일</div>
+                    <div class="metric-value">7월 29일 09:00</div>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-title">
+                    <span class="icon">📈</span> 체크포인트 판정
+                </div>
+
+                <div style="margin-bottom: 15px;">
+                    <div style="font-size:13px; color:#666; margin-bottom:8px; font-weight:600;">분기점 2개 (의사결정 기준)</div>
+                    <div class="checkpoint-grid">
+                        <div class="checkpoint positive">
+                            <div class="checkpoint-number">③ CapEx</div>
+                            <div class="checkpoint-title">BigTech AI CapEx</div>
+                            <div class="checkpoint-status"><span class="positive">✓ 긍정강화</span><br/>725억$ +77%</div>
+                        </div>
+                        <div class="checkpoint positive">
+                            <div class="checkpoint-number">⑥ 프리미엄</div>
+                            <div class="checkpoint-title">ADR 프리미엄</div>
+                            <div class="checkpoint-status"><span class="positive">✓ 긍정</span><br/>25% 안정화</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="margin-bottom: 15px;">
+                    <div style="font-size:13px; color:#666; margin-bottom:8px; font-weight:600;">컨센서스 7개 (강세론 지지)</div>
+                    <div class="checkpoint-grid" style="grid-template-columns: 1fr 1fr 1fr;">
+                        <div class="checkpoint positive">
+                            <div class="checkpoint-number">①②④⑤⑧⑨</div>
+                            <div class="checkpoint-title">모두 긍정</div>
+                            <div class="checkpoint-status"><span class="positive">✓</span></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <div style="font-size:13px; color:#666; margin-bottom:8px; font-weight:600;">리스크 항목</div>
+                    <div class="checkpoint-grid" style="grid-template-columns: 1fr;">
+                        <div class="checkpoint negative">
+                            <div class="checkpoint-number">⑦ 중국산DRAM</div>
+                            <div class="checkpoint-title">CXMT 위협 (부정)</div>
+                            <div class="checkpoint-status"><span class="negative">✗ 훼손</span><br/>국가지원 + HBM3진입</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="diagnosis">
+                    <div class="diagnosis-title">🧭 한줄 진단</div>
+                    <div class="diagnosis-text">
+                        분기점 2개 살아있고 실적 확정 전 "저평가 기회" 국면.<br/>중기 CXMT 위협 격상 → 포트폴리오 분산 필수.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            2026-07-21 07:00 KST | sk-hynix-analyst-thesis-checkpoints.md
+        </div>
     </div>
-
-    <div class="card new">
-      <div class="card-head"><h3>HBM 점유율 재확인 — 50%+ 지배력 유지 (체크포인트 ②)</h3><span class="pill pos">긍정 강화</span></div>
-      <p>HBM4E 샘플 출하 완료(6월 18일, 삼성보다 늦지만 주문 확보)로 2026년 점유율 <strong>50%+ 유지 전망(골드만삭스·UBS)</strong>. HBM4 시장 70% 점유 기대(UBS). 삼성의 HBM4E 5월 29일 먼저 출하도 확인됐지만 <strong>선두 구도는 유지</strong>. 다만 차세대 경쟁 가속화로 "점유율 감소 가능성"은 인정 — 중기 지배력 확인.</p>
-    </div>
-
-    <div class="card new">
-      <div class="card-head"><h3>CXMT IPO 진행 중 — 장기 위협 신호 (체크포인트 ⑦)</h3><span class="pill neg">리스크 격상</span></div>
-      <p>중국 CXMT가 $8.5~9.8B IPO로 14~15조원 조달 중. <strong>글로벌 점유율 8%(지분 점유율 4위), Q1 수익 719% 급증</strong>, 가격 $138(기존사 $300~400 대비 60~80% 저가). Apple 테스트도 시작됐으며, <strong>영업이익 개선 시 저가 공급 가능성 높음</strong> — SK하이닉스의 장기 가격 압박 요인. 특히 범용 DRAM 시장부터 침투 후 HBM3 진입 계획 중(하반기).</p>
-    </div>
-
-    <div class="card">
-      <div class="card-head"><h3>Q2 영업이익 컨센서스 상향 (체크포인트 ⑨)</h3><span class="pill pos">긍정</span></div>
-      <p>2026 Q2 컨센서스 <strong>58.9조~64조원(Q1 37.6조원 대비 55~70% 증가)</strong>로 강한 개선 신호. "메모리 가격 abnormal"이라는 SK 위원장 경고도 있지만, 이는 Q3 정상화 가능성을 암시하는 것이지 현재의 호실적을 부인하는 것은 아님. 7/29 발표일이 <strong>D-8</strong>로 임박.</p>
-    </div>
-
-  </section>
-
-  <section>
-    <h2>🚀 목표가와 상승 모멘텀</h2>
-    <div class="card">
-      <p>18개 기관 스펙트럼: 한화 430만원(국내 최고)·Barclays 원화환산 약 490만원 vs BNK 185만원·Morningstar $160. 현재가(1,764,000원) 기준:</p>
-      <table>
-        <thead>
-          <tr>
-            <th>목표가</th>
-            <th>상승 여력</th>
-            <th>근거</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>430만원 (한화, 국내 최고)</td>
-            <td><strong>+144%</strong></td>
-            <td>HBM 지배력 + LTA 구조</td>
-          </tr>
-          <tr>
-            <td>약 490만원 (Barclays 원화환산)</td>
-            <td><strong>+177%</strong></td>
-            <td>PER 8배, AI 인프라 장기 수요</td>
-          </tr>
-          <tr>
-            <td>185만원 (BNK, 약세)</td>
-            <td><strong>-4.5% 하회</strong></td>
-            <td>CapEx 둔화 + 가격 정상화</td>
-          </tr>
-        </tbody>
-      </table>
-      <p style="margin-top:1rem; font-size:.85rem;">강세 클러스터(380만~430만원)까지 +115~144%. 현재가는 BNK 약세 목표가 아래. <strong>방향 결정은 7/22 알파벳·7/29 SK하이닉스 실적에 달려 있음</strong>.</p>
-    </div>
-  </section>
-
-  <section>
-    <h2>💡 실적·성장률 전망</h2>
-    <div class="card">
-      <p><strong>발표일 7/29 (D-8, 메타·마이크로소프트와 같은 날)</strong></p>
-      <ul style="margin:.8rem 0;">
-        <li>컨센서스 매출: 83조~84.6조원</li>
-        <li>컨센서스 영업이익: 58.9조~64.8조원 (<strong>YoY +650%</strong>)</li>
-        <li>주목 포인트: Q3 가이던스 (가격 정상화 신호), HBM 수요 전망 (AI CapEx 지속성)</li>
-      </ul>
-      <p style="margin:.8rem 0;">추정 하향 기관 3곳(미래에셋·현대차·한투)의 트리거는 발동 상태지만, 목표가는 유지 중 — 실적 개선 기대는 여전함. 가격 이상 현상("SK 위원장 abnormal 발언")이 Q3 정상화를 암시하는지 여부가 주목.</p>
-    </div>
-  </section>
-
-  <section>
-    <h2>📈 기술적 신호와 리스크</h2>
-    <div class="card">
-      <p><strong>저점 근처</strong>: 종가 1,764,000원, 프리장 저점 1,724,000원 — 7/14 패닉 저점 1,718,000원과 거리 0.3%. 52주 고점(3,002,000원, 6/23) 대비 <strong>-41.2%</strong>. 하루 스윙 폭이 ±7~9% 대로 고변동성 체질 유지 중.</p>
-      <p style="margin-top:1rem;"><strong>리스크</strong>:</p>
-      <ul style="margin:.8rem 0;">
-        <li>Kimi K3 weights 공개(7/27) — 추가 충격파 가능</li>
-        <li>알파벳 실적(7/22) — CapEx 정당성 의문 불식 못 할 경우 악화</li>
-        <li>CXMT 저가 경쟁 + Apple 채택 가능성</li>
-      </ul>
-    </div>
-  </section>
-
-  <div class="callout">
-    <strong>🧭 한줄 진단</strong> — 어제 Kimi K3로 반도체 전체가 -20% 베어마켓에 빠졌지만, SK하이닉스의 HBM 점유율·Q2 영업이익·ADR 프리미엄은 강세 신호. 내일(7/22) 알파벳이 CapEx $180~190B 정당성을 입증하면 반등 재료, 못 하면 추가 약세. 기술적으로 1,724,000원까지 0.3% — 이 레벨 돌파 시 트리거 연쇄 발동 우려. 투자 조언 아님.
-  </div>
-
-  <footer>
-    이 리포트는 아침 07:00(KST) Routine이 자동 생성한다. 원문 근거는 위키 <code>concepts/sk-hynix-analyst-thesis-checkpoints.md</code> 및 웹검색 결과 참고. 투자 조언 아님.
-  </footer>
-</div>
-
 </body>
 </html>
