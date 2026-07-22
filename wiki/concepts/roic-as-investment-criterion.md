@@ -1,7 +1,7 @@
 ---
 title: ROIC를 투자의 핵심 기준으로 보기
 created: 2026-07-20
-updated: 2026-07-20
+updated: 2026-07-22
 tags: [roic, investment-thesis, buffett, fundamentals]
 ---
 
@@ -76,7 +76,14 @@ SK하이닉스 투자 판단 시:
 
 Buffett 관점에서 보면, 실제로 의미 있는 체크포인트는 "가격/수익비"가 아니라 **"ROIC 유지 여부"**.
 
+**실증 데이터(2026-07-22 추가)**: [주가 상승의 정당성 분석](rally-justification-analysis.md)에
+따르면 26Q1 영업이익률 72%, 23Q1→26Q1 매출 10.3배 대비 영업이익은 적자→흑자전환(마진
+레버리지 구조) — "이익률이 매출보다 먼저 움직인다"는 관찰은 곧 ROIC가 실제로 개선되고
+있다는 실증 근거. 같은 분석은 부채비율 20%대·순현금 35조원도 확인해, ROIC 개선이
+레버리지가 아닌 자기자본 효율성에서 나온다는 점도 뒷받침한다.
+
 ## Sources
 
 - sources/buffett-ai-interview-analysis-2026-07-20.md
 - [SK하이닉스 목표주가 근거 체크리스트](sk-hynix-analyst-thesis-checkpoints.md)
+- [SK하이닉스 주가 상승의 정당성 분석](rally-justification-analysis.md)

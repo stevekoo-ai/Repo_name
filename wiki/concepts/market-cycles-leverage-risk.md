@@ -1,7 +1,7 @@
 ---
 title: 반도체 시장의 단기 수급 싸이클 vs 장기 펀더멘털
 created: 2026-07-21
-updated: 2026-07-21
+updated: 2026-07-22
 tags: [market-cycles, leverage, risk, seasonality, semiconductor]
 ---
 
@@ -175,5 +175,7 @@ tags: [market-cycles, leverage, risk, seasonality, semiconductor]
 - sources/semiconductor-crash-analysis-2026-07-21.md
 - [SK하이닉스 목표주가 근거 체크리스트](sk-hynix-analyst-thesis-checkpoints.md)
 - [펀더멘털 불변 vs 심리·수급발 디레이팅](fundamentals-vs-sentiment-derating.md)
+- [SK하이닉스 주가 상승의 정당성 분석](rally-justification-analysis.md) (LTA·공급 자율규율이
+  전통적 사이클 진폭을 낮추는 구조적 근거를 재무 데이터로 뒷받침)
 - [한국·미국 증시 휴장일 캘린더](market-holidays.md)
 - [나의 투자 포트폴리오](../entities/my-portfolio.md)

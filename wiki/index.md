@@ -28,3 +28,4 @@ Catalog of every page in the wiki. See `../CLAUDE.md` for conventions.
 - [반도체 시장의 단기 수급 싸이클 vs 장기 펀더멘털](concepts/market-cycles-leverage-risk.md) — 수급 과밀·레버리지 증폭·계절적 요인의 단기 악화 vs 강한 장기 펀더멘털, 투자자별 대응 전략
 - [미중 기술 경쟁과 HBM 시장의 미래](concepts/us-china-tech-competition-hbm.md) — CXMT의 국가 전략 차원 기술 자립화 드라이브, HBM 위협 확산(구세대→신세대), SK하이닉스 중기 우위 위협(2028~2029)
 - [포트폴리오 리밸런싱과 위험 관리 전략](concepts/portfolio-rebalancing-strategy.md) — 마진콜의 지옥·PDR 과평가·신용 악화 3가지 위험, 홍춘욱 분석, 반도체 차익 실현 + 자산 분산(달러채권·금·REIT) 전략
+- [SK하이닉스 주가 상승의 정당성 분석](concepts/rally-justification-analysis.md) — 23Q1 대비 13.5배 상승이 닷컴버블·일반버블·전통사이클과 각각 다른 이유(PER 6.8배 저평가, 부채비율 20%대·순현금 35조, LTA발 구조변화), 선반영 리스크와 다음 검증대(7/29 실적)
