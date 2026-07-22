@@ -1,7 +1,7 @@
 ---
 title: 미중 기술 경쟁과 HBM 시장의 미래
 created: 2026-07-21
-updated: 2026-07-21
+updated: 2026-07-22
 tags: [us-china-competition, hbm-market, cxmt-threat, tech-autonomy, long-term-risk]
 ---
 
@@ -52,15 +52,15 @@ tags: [us-china-competition, hbm-market, cxmt-threat, tech-autonomy, long-term-r
 
 ## 3. CXMT의 위협 확대 추이
 
-### 현황 스냅샷 (2026-07-21 기준)
+### 현황 스냅샷 (2026-07-22 저녁 갱신)
 
 | 지표 | 수치 | 의의 |
 |-----|------|------|
-| **글로벌 DRAM 점유율** | 8% (4위) | 2026년 10% 목표 설정 |
+| **글로벌 DRAM 점유율** | 7.6% (4위) | 삼성·SK·마이크론에 이은 4위, 2026년 10% 목표 |
 | **가격 전략** | $138/단가 | 기존사 $300~400 대비 60~80% 저가 |
 | **고객 개발** | Apple 테스트 중 | Top-tier ODM 검증 진행 |
 | **성장률** | Q1 수익 719% 급증 | 지수적 성장 궤도 진입 |
-| **IPO 자금** | 약 14~15조원 | 레거시 DRAM 캐파 확대 + R&D |
+| **실제 상장일** | **2026-07-27**(D-5) | 공모가 8.66위안, 공모규모 579억위안(약 12.7~14.5조원). ⚠ 이전 "7/16 상장 완료" 기록은 CSRC 등록승인 단계를 오인한 오류(2026-07-22 저녁 정정) |
 | **HBM 진입 시점** | **하반기 2026년(HBM3)** | 최신 기술이 아닌 구세대 표준 채택 |
 
 ### 전략적 의도: "충분한 성능 + 극저가" 조합
@@ -181,6 +181,7 @@ tags: [us-china-competition, hbm-market, cxmt-threat, tech-autonomy, long-term-r
 ## Sources
 
 - sources/us-china-tech-competition-hbm-2026-07-21.md (영상 분석)
+- [sources/websearch-sk-hynix-evening-check-2026-07-22.md](../../sources/websearch-sk-hynix-evening-check-2026-07-22.md) (CXMT 상장일 7/27 정정)
 - [SK하이닉스 목표주가 근거 체크리스트](sk-hynix-analyst-thesis-checkpoints.md) (체크포인트 ⑦ CXMT 위협)
 - [반도체 시장의 단기 수급 싸이클 vs 장기 펀더멘털](market-cycles-leverage-risk.md) (중기 시장 구조)
 - [나의 투자 포트폴리오](../entities/my-portfolio.md) (포트폴리오 집중 위험)
