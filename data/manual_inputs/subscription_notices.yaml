@@ -28,6 +28,26 @@ notices:
     expected_competition_ratio: null
     source: "청약홈 (수동 입력)"
 
+  - name: "수원 원천동(광교) 공공분양 (PENDING - 청약홈 미등록)"
+    agency: null   # TODO: GH(경기주택도시공사) 또는 LH — 정식 공고 시 확인
+    region: "경기도 수원시 영통구 원천동 80번지 일원"
+    is_platform_city: false
+    housing_type: "국민주택"
+    supply_type: "일반공급"
+    size: null                    # TODO: 정식 공고 전까지 평형 미확정
+    household_count: 600
+    announce_date: null           # TODO: 2026-10 분양 예정 — 통상 입주자모집공고는 접수 시작 1개월 전 공개
+    application_start: null
+    application_end: null
+    expected_price_krw: null
+    expected_competition_ratio: null
+    source: "사용자 제보 (2026-07-23) — 청약홈 API 조회 결과 아직 미등록 확인 (adhoc-subscription-query.yml 실행 기록 참조)"
+    note: >
+      2026-07-23 기준 scripts 및 adhoc 워크플로우로 HOUSE_NM/HSSPLY_ADRES(원천동, 영통구)
+      전체 검색했으나 매칭 없음. Lesson Learned 문서 기준, 접수 시작 약 1개월 전(2026년 9월경)
+      청약홈에 등록될 것으로 예상 — .github/workflows/verify-platform-city.yml 또는
+      adhoc-subscription-query.yml(keyword=원천동)로 9월 이후 재확인 필요.
+
   # 플랫폼시티가 발표될 경우, 아래 예시처럼 민영 주택으로 입력할 것.
   # - name: "용인 플랫폼시티 (EXAMPLE - 민영)"
   #   agency: "플랫폼시티 운영사"
