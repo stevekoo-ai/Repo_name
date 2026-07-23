@@ -12,6 +12,11 @@ on:
         description: 'HOUSE_NM::LIKE search keyword'
         required: true
         default: '광교'
+  push:
+    branches:
+      - claude/yongin-platform-city-subscription-18s8wt
+    paths:
+      - .github/workflows/adhoc-subscription-query.yml
 
 jobs:
   query:
@@ -20,7 +25,7 @@ jobs:
       - name: Query 청약Home by HOUSE_NM keyword
         env:
           SERVICE_KEY: ${{ secrets.DATA_GO_KR_KEY }}
-          KEYWORD: ${{ github.event.inputs.keyword }}
+          KEYWORD: ${{ github.event.inputs.keyword || '광교' }}
         run: |
           code=$(curl -sS -G "https://api.odcloud.kr/api/ApplyhomeInfoDetailSvc/v1/getAPTLttotPblancDetail" \
             -H "Authorization: Infuser ${SERVICE_KEY}" \
