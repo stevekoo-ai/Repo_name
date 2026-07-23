@@ -1,0 +1,32 @@
+# 📚 Lesson Learned Reference: docs/LESSON_LEARNED_API_DEBUGGING.md
+# Ad-hoc lookup tool for one-off questions about a specific 청약Home listing
+# (e.g. "광교 A17 공공분양 여부/평형/접수마감 확인"). Uses the same
+# Infuser auth + --data-urlencode pattern documented in the lesson-learned doc.
+
+name: Ad-hoc subscription query
+
+on:
+  workflow_dispatch:
+    inputs:
+      keyword:
+        description: 'HOUSE_NM::LIKE search keyword'
+        required: true
+        default: '광교'
+
+jobs:
+  query:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Query 청약Home by HOUSE_NM keyword
+        env:
+          SERVICE_KEY: ${{ secrets.DATA_GO_KR_KEY }}
+          KEYWORD: ${{ github.event.inputs.keyword }}
+        run: |
+          code=$(curl -sS -G "https://api.odcloud.kr/api/ApplyhomeInfoDetailSvc/v1/getAPTLttotPblancDetail" \
+            -H "Authorization: Infuser ${SERVICE_KEY}" \
+            --data-urlencode "page=1" \
+            --data-urlencode "perPage=50" \
+            --data-urlencode "cond[HOUSE_NM::LIKE]=${KEYWORD}" \
+            -o resp.json -w "%{http_code}")
+          echo "HTTP status: $code"
+          python3 -c "import json; d=json.load(open('resp.json')); print(json.dumps(d, ensure_ascii=False, indent=2))"
