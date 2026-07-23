@@ -25,7 +25,7 @@ jobs:
       - name: Query 청약Home by HOUSE_NM keyword
         env:
           SERVICE_KEY: ${{ secrets.DATA_GO_KR_KEY }}
-          KEYWORD: ${{ github.event.inputs.keyword || '광교' }}
+          KEYWORD: ${{ github.event.inputs.keyword || 'A17' }}
         run: |
           code=$(curl -sS -G "https://api.odcloud.kr/api/ApplyhomeInfoDetailSvc/v1/getAPTLttotPblancDetail" \
             -H "Authorization: Infuser ${SERVICE_KEY}" \
@@ -35,3 +35,17 @@ jobs:
             -o resp.json -w "%{http_code}")
           echo "HTTP status: $code"
           python3 -c "import json; d=json.load(open('resp.json')); print(json.dumps(d, ensure_ascii=False, indent=2))"
+
+      - name: Query 청약Home by HSSPLY_ADRES keyword (block code often only in address)
+        env:
+          SERVICE_KEY: ${{ secrets.DATA_GO_KR_KEY }}
+          KEYWORD: ${{ github.event.inputs.keyword || 'A17' }}
+        run: |
+          code=$(curl -sS -G "https://api.odcloud.kr/api/ApplyhomeInfoDetailSvc/v1/getAPTLttotPblancDetail" \
+            -H "Authorization: Infuser ${SERVICE_KEY}" \
+            --data-urlencode "page=1" \
+            --data-urlencode "perPage=50" \
+            --data-urlencode "cond[HSSPLY_ADRES::LIKE]=${KEYWORD}" \
+            -o resp_addr.json -w "%{http_code}")
+          echo "HTTP status: $code"
+          python3 -c "import json; d=json.load(open('resp_addr.json')); print(json.dumps(d, ensure_ascii=False, indent=2))"
