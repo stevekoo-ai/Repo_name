@@ -21,7 +21,7 @@ Catalog of every page in the wiki. See `../CLAUDE.md` for conventions.
 ### concepts
 
 - [펀더멘털 불변 vs 심리·수급발 디레이팅](concepts/fundamentals-vs-sentiment-derating.md) — 실적은 멀쩡한데 주가만 심리·수급으로 눌리는 패턴, SK하이닉스가 현재진행형 사례
-- [SK하이닉스 목표주가 근거 체크리스트](concepts/sk-hynix-analyst-thesis-checkpoints.md) — 18개 기관 목표가(국내 최고 한화 430만·해외 Barclays 환산 약 490만 vs BNK 185만·Morningstar $160), 9개 테마별 신호기준(⑨추정하향 3개사 트리거 발동, ③CapEx 둔화 정량화, ⑦CXMT 감시강화), 하루 3회(07/10/19시 KST) 자동 체크
+- [SK하이닉스 목표주가 근거 체크리스트](concepts/sk-hynix-analyst-thesis-checkpoints.md) — 18개 기관 목표가(국내 최고 한화 430만·해외 Barclays 환산 약 490만 vs BNK 185만·Morningstar $160), 9개 테마별 신호기준(③CapEx 혼재/경쟁생존논리 추적중, ⑦CXMT 캐파 400k WSPM 목표), 메모리 공급부족 CY27 피크 전망, 하루 3회(07/10/19시 KST) 자동 체크
 - [매크로 지표 트렌드 추적](concepts/macro-indicators.md) — 금리 결정·물가·소매판매 등 경제 캘린더를 시계열로 누적 기록, 2026-07-16 한국은행 금리 결정(인상 유력)부터 시작
 - [한국·미국 증시 휴장일 캘린더](concepts/market-holidays.md) — KRX·NYSE/Nasdaq 2026 하반기 휴장일, "시세 미확인 vs 휴장" 구분 기준, 연휴 비대칭 구간 활용법 + 🔴 제헌절(7/17) 누락 사건 정정 기록과 재발 방지 규칙
 - [ROIC를 투자의 핵심 기준으로 보기](concepts/roic-as-investment-criterion.md) — 자본수익률 지표의 정의와 의미, AI 시대 자본효율성 악화 리스크, SK하이닉스 ROIC 모니터링 체크리스트

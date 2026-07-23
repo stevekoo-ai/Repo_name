@@ -154,6 +154,17 @@ tags: [market-cycles, leverage, risk, seasonality, semiconductor]
 - 단순한 "AI 열풍"이 아니라 **기업 전략의 핵심 축**
 - 이들이 CapEx를 줄일 이유가 없음 → 메모리 수요 기반 견고함
 
+### 2-2-1. 메모리 공급부족의 "피크 시점" 구체화 (2026-07-23 추가)
+
+메모리 시장 수급 전망 데이터([sources/memory-market-supply-demand-forecast-2026-07-23.md](../../sources/memory-market-supply-demand-forecast-2026-07-23.md))에
+따르면, 하이퍼스케일러 기준 **공급 충분성이 CY26 약 70~80%에서 CY27 최저
+60%까지 악화**될 수 있다는 전망 — 즉 **CY27이 공급부족의 피크 구간**으로
+지목된다. HBM 생산량도 CY26 약 36~38B(1Gb)에서 CY27 약 중간~50B로 확대되지만
+ASP도 $30~40/GB로 동시에 두 배 이상 뛸 것으로 전망돼, 물량 확대가 가격
+하락으로 이어지지 않고 "물량↑·가격↑"이 함께 가는 구도. 단기 변동성과
+무관하게 **장기 펀더멘털 강세 구간이 최소 2027년까지는 꺾이지 않는다**는
+정량적 근거.
+
 ### 2-3. 밸류에이션의 매력
 
 **현재 상황:**
@@ -237,6 +248,7 @@ tags: [market-cycles, leverage, risk, seasonality, semiconductor]
 - [SK하이닉스 주가 상승의 정당성 분석](rally-justification-analysis.md) (LTA·공급 자율규율이
   전통적 사이클 진폭을 낮추는 구조적 근거를 재무 데이터로 뒷받침)
 - [sources/dead-cat-bounce-vs-real-rebound-2026-07-23.md](../../sources/dead-cat-bounce-vs-real-rebound-2026-07-23.md) (찐 반등 판별 4대 신호)
+- [sources/memory-market-supply-demand-forecast-2026-07-23.md](../../sources/memory-market-supply-demand-forecast-2026-07-23.md) (메모리 수급 전망, CY27 공급부족 피크)
 - [포트폴리오 리밸런싱과 위험 관리 전략](portfolio-rebalancing-strategy.md)
 - [한국·미국 증시 휴장일 캘린더](market-holidays.md)
 - [나의 투자 포트폴리오](../entities/my-portfolio.md)
