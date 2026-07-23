@@ -29,4 +29,4 @@ Catalog of every page in the wiki. See `../CLAUDE.md` for conventions.
 - [미중 기술 경쟁과 HBM 시장의 미래](concepts/us-china-tech-competition-hbm.md) — CXMT의 국가 전략 차원 기술 자립화 드라이브, HBM 위협 확산(구세대→신세대), SK하이닉스 중기 우위 위협(2028~2029)
 - [포트폴리오 리밸런싱과 위험 관리 전략](concepts/portfolio-rebalancing-strategy.md) — 마진콜의 지옥·PDR 과평가·신용 악화 3가지 위험, 홍춘욱 분석, 반도체 차익 실현 + 자산 분산(달러채권·금·REIT) 전략
 - [SK하이닉스 주가 상승의 정당성 분석](concepts/rally-justification-analysis.md) — 23Q1 대비 13.5배 상승이 닷컴버블·일반버블·전통사이클과 각각 다른 이유(PER 6.8배 저평가, 부채비율 20%대·순현금 35조, LTA발 구조변화), 선반영 리스크와 다음 검증대(7/29 실적)
-- [CXL & 차세대 메모리 트랙](concepts/cxl-next-gen-memory.md) — HBM 이후 SK하이닉스 다음 성장엔진 후보로서 CXL 표준화·학술논문·경쟁사(삼성 CMM-D·마이크론) 동향을 매일 리포트 Deep Dive 코너로 추적(2026-07-24 신설, 아직 데이터 없음)
+- [CXL & 차세대 메모리 트랙](concepts/cxl-next-gen-memory.md) — HBM 이후 SK하이닉스 다음 성장엔진 후보; CXL 4.0 스펙 발표·MS Azure 상용배포 확인, 삼성 CMM-D 3.0/SK하이닉스 2세대 CMM-DDR5 모두 CXL 3.2 양산 경쟁 중이나 3사 공통으로 자체 컨트롤러 IC 자사화는 중단, 밸류에이션 반영은 아직 이른 단계
