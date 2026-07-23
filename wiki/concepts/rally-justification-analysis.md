@@ -19,6 +19,15 @@ tags: [sk-hynix, valuation, bubble-analysis, per, roic, cycle]
 | 24Q1 → 26Q1 | 4.2배 | 13배 | 10.2배 |
 | 영업이익률 | 23년 적자 | → 26Q1 **72%** | — |
 
+**분기별 실제 추이(SK하이닉스 공식 자료, 사용자 제공 차트 확인·2026-07-23)**:
+24Q1 매출 12.43조/영업익 2.89조 → 24Q2 16.42조/5.47조 → 24Q3 17.57조/7.03조 →
+24Q4 19.77조/8.08조 → 25Q1 17.64조/7.44조 → 25Q2 22.23조/9.21조 →
+25Q3 24.45조/11.38조 → 25Q4 32.83조/19.17조 → **26Q1 52.58조/37.61조**
+(전년동기대비 매출 +198.1%·영업이익 +405.5%). 매 분기 영업이익 증가폭이
+매출 증가폭을 앞지르는 마진 레버리지가 차트로도 명확히 확인됨 — 특히
+25Q4→26Q1 한 분기 만에 영업이익이 거의 2배(19.17조→37.61조) 뛴 것이
+가장 극적인 구간.
+
 핵심은 매출보다 영업이익이, 영업이익보다 이익률이 먼저 움직였다는 것 — 매출
 1.6배 증가 구간에서 이익은 2배씩 뛰는 **마진 레버리지 구조**이고, 주가는
 이 이익 곡선의 기울기를 거의 그대로 추종해왔다. 지금까지의 상승은 대체로
@@ -108,6 +117,7 @@ ASP 인상(+15~20% 프리미엄)**이 확인돼, 이미 진행 중인 분기의 
 
 - [sources/sk-hynix-rally-justification-analysis-2026-07.md](../../sources/sk-hynix-rally-justification-analysis-2026-07.md)
 - [sources/sk-hynix-memory-demand-analysis-2026-07-23.md](../../sources/sk-hynix-memory-demand-analysis-2026-07-23.md)
+- [sources/chart-sk-hynix-quarterly-earnings-2026-04-23.jpeg](../../sources/chart-sk-hynix-quarterly-earnings-2026-04-23.jpeg) (분기별 매출·영업이익 차트, 24Q1~26Q1)
 - [SK하이닉스 목표주가 근거 체크리스트](sk-hynix-analyst-thesis-checkpoints.md)
 - [ROIC를 투자의 핵심 기준으로 보기](roic-as-investment-criterion.md)
 - [반도체 시장의 단기 수급 싸이클 vs 장기 펀더멘털](market-cycles-leverage-risk.md)
