@@ -1,7 +1,7 @@
 ---
 title: SK하이닉스 주가 상승의 정당성 — 버블 vs 실적 선행 분석
 created: 2026-07-22
-updated: 2026-07-22
+updated: 2026-07-23
 tags: [sk-hynix, valuation, bubble-analysis, per, roic, cycle]
 ---
 
@@ -86,6 +86,12 @@ LTA도 계약 갱신 시점의 가격 재협상 리스크에서 자유롭지 않
 검증대** — 7/29 실적 발표([체크포인트 ⑨](sk-hynix-analyst-thesis-checkpoints.md))와
 직결.
 
+**분기 내 선행 신호(2026-07-23 추가)**: C2Q26 분기 중에도 **intra-quarter
+ASP 인상(+15~20% 프리미엄)**이 확인돼, 이미 진행 중인 분기의 실적이
+컨센서스를 상회할 가능성을 시사하는 선행지표가 나왔다 — "26Q2~Q3 실적이
+다음 검증대"라는 위 유보 사항에 대한 긍정적 조기 신호. 상세는
+[sources/sk-hynix-memory-demand-analysis-2026-07-23.md](../../sources/sk-hynix-memory-demand-analysis-2026-07-23.md).
+
 ## 다른 프레임워크와의 관계
 
 - [ROIC를 투자의 핵심 기준으로 보기](roic-as-investment-criterion.md): 이 페이지의
@@ -101,6 +107,7 @@ LTA도 계약 갱신 시점의 가격 재협상 리스크에서 자유롭지 않
 ## Sources
 
 - [sources/sk-hynix-rally-justification-analysis-2026-07.md](../../sources/sk-hynix-rally-justification-analysis-2026-07.md)
+- [sources/sk-hynix-memory-demand-analysis-2026-07-23.md](../../sources/sk-hynix-memory-demand-analysis-2026-07-23.md)
 - [SK하이닉스 목표주가 근거 체크리스트](sk-hynix-analyst-thesis-checkpoints.md)
 - [ROIC를 투자의 핵심 기준으로 보기](roic-as-investment-criterion.md)
 - [반도체 시장의 단기 수급 싸이클 vs 장기 펀더멘털](market-cycles-leverage-risk.md)
