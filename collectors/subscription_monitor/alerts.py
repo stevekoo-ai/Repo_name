@@ -1,6 +1,6 @@
 """
-Detects 용인 플랫폼시티 공공분양 listings among already-fetched rows and fires
-alerts (GitHub Issue + email) exactly once per unique listing.
+Detects 용인 플랫폼시티 및 광교신도시 공공분양 listings among already-fetched rows
+and fires alerts (GitHub Issue + email) exactly once per unique listing.
 
 State (which listings have already been alerted) is persisted to
 alerted_state.json so repeated runs don't re-notify for the same listing.
@@ -14,7 +14,10 @@ from email.mime.text import MIMEText
 
 STATE_PATH = os.path.join(os.path.dirname(__file__), "alerted_state.json")
 HEALTH_STATE_PATH = os.path.join(os.path.dirname(__file__), "health_state.json")
-PLATFORM_CITY_KEYWORDS = ["플랫폼시티"]
+# 광교신도시 공공분양은 "광교"가 정식 명칭/주소에 없는 경우도 있어(예: 원천동 80번지
+# 일원 600세대 공공분양 — 2026-07-23 사용자 제보, 청약홈 미등록 확인됨) "원천동"도 함께
+# 감지한다. See docs/LESSON_LEARNED_API_DEBUGGING.md for the keyword-matching lessons.
+ALERT_KEYWORDS = ["플랫폼시티", "광교", "원천동"]
 DASHBOARD_URL = "https://stevekoo-ai.github.io/Repo_name/subscription-monitor.html"
 
 FAILURE_THRESHOLD = 6  # 6 consecutive 5-minute failures = ~30 minutes of no data
@@ -34,15 +37,17 @@ def save_state(ids: set) -> None:
         json.dump(sorted(ids), f, ensure_ascii=False, indent=2)
 
 
-def find_matches(rows: list, extra_keyword: str | None) -> list:
-    keywords = list(PLATFORM_CITY_KEYWORDS)
+def find_matches(rows: list, extra_keyword: str | None) -> list[tuple[dict, str]]:
+    """Returns (row, matched_keyword) pairs so alerts can say which keyword fired."""
+    keywords = list(ALERT_KEYWORDS)
     if extra_keyword:
         keywords.append(extra_keyword)
     matches = []
     for r in rows:
         haystack = f"{r.get('HOUSE_NM', '')} {r.get('HSSPLY_ADRES', '')}"
-        if any(kw in haystack for kw in keywords):
-            matches.append(r)
+        matched_kw = next((kw for kw in keywords if kw in haystack), None)
+        if matched_kw:
+            matches.append((r, matched_kw))
     return matches
 
 
@@ -75,12 +80,13 @@ def send_email(to_addr: str, gmail_addr: str, gmail_app_password: str, subject: 
         server.sendmail(gmail_addr, [to_addr], msg.as_string())
 
 
-def format_alert(r: dict, is_test: bool) -> tuple:
+def format_alert(r: dict, matched_keyword: str, is_test: bool) -> tuple:
     name = r.get("HOUSE_NM") or "(이름없음)"
     prefix = "[테스트] " if is_test else ""
-    title = f"{prefix}[플랫폼시티 알림] {name}"
+    title = f"{prefix}[청약 알림 · {matched_keyword}] {name}"
     lines = [
-        "테스트 알림입니다 (실제 플랫폼시티 매물이 아닙니다).\n" if is_test else "",
+        "테스트 알림입니다 (실제 매물이 아닙니다).\n" if is_test else "",
+        f"매칭 키워드: {matched_keyword}",
         f"단지명: {name}",
         f"지역: {r.get('SUBSCRPT_AREA_CODE_NM', '-')}",
         f"주소: {r.get('HSSPLY_ADRES', '-')}",
@@ -95,7 +101,7 @@ def format_alert(r: dict, is_test: bool) -> tuple:
 
 
 def run_alerts(rows: list) -> int:
-    """Checks rows for 플랫폼시티 matches and fires alerts for any not seen before.
+    """Checks rows for 플랫폼시티/광교 matches and fires alerts for any not seen before.
     Returns the number of new alerts fired."""
     state = load_state()  # also ensures alerted_state.json exists on disk
 
@@ -105,7 +111,7 @@ def run_alerts(rows: list) -> int:
     if not matches:
         return 0
 
-    new_matches = [m for m in matches if (m.get("HOUSE_MANAGE_NO") or m.get("PBLANC_NO")) not in state]
+    new_matches = [(m, kw) for m, kw in matches if (m.get("HOUSE_MANAGE_NO") or m.get("PBLANC_NO")) not in state]
     if not new_matches:
         return 0
 
@@ -115,8 +121,8 @@ def run_alerts(rows: list) -> int:
     gmail_pw = os.environ.get("GMAIL_APP_PASSWORD")
     to_addr = os.environ.get("ALERT_EMAIL_TO") or gmail_addr or ""
 
-    for m in new_matches:
-        title, body = format_alert(m, is_test)
+    for m, kw in new_matches:
+        title, body = format_alert(m, kw, is_test)
 
         if gh_token and repo_full_name:
             try:
@@ -136,7 +142,7 @@ def run_alerts(rows: list) -> int:
         else:
             print("email secrets not configured, skipping email")
 
-    state |= {(m.get("HOUSE_MANAGE_NO") or m.get("PBLANC_NO")) for m in new_matches}
+    state |= {(m.get("HOUSE_MANAGE_NO") or m.get("PBLANC_NO")) for m, kw in new_matches}
     save_state(state)
     return len(new_matches)
 
@@ -215,7 +221,8 @@ def run_health_monitor(healthy: bool, now_kst, seoul_gyeonggi_count: int) -> Non
             "매일 발송되는 상태 확인 메일입니다. 이 메일이 계속 온다면 시스템이 정상 작동 중이라는 뜻입니다.\n\n"
             f"마지막 갱신: {now_str}\n"
             f"현재 서울·경기 국민주택 매칭: {seoul_gyeonggi_count}건\n"
-            "플랫폼시티 신규 알림: 있었다면 이미 별도 메일/Issue로 받으셨을 것입니다.\n\n"
+            f"감지 키워드: {', '.join(ALERT_KEYWORDS)}\n"
+            "플랫폼시티/광교신도시 신규 알림: 있었다면 이미 별도 메일/Issue로 받으셨을 것입니다.\n\n"
             f"대시보드: {DASHBOARD_URL}"
         )
         _notify(title, body, gh_token, repo_full_name, gmail_addr, gmail_pw, to_addr, also_issue=False)
