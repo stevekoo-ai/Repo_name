@@ -62,7 +62,7 @@ PRESETS = {
     "kr_usdkrw": ("ecos", ("731Y001", "0000001", "D"), "원/달러 환율", "⚠ 문서기억 기반, --raw로 재검증 권장"),
 }
 
-DEFAULT_LOOKBACK_DAYS = 1095  # 최초 백필 시 과거 3년치
+DEFAULT_LOOKBACK_DAYS = 3652  # 최초 백필 시 과거 10년치
 
 
 def _get_env_or_die(name, url):
