@@ -25,7 +25,7 @@ Catalog of every page in the wiki. See `../CLAUDE.md` for conventions.
 - [매크로 지표 트렌드 추적](concepts/macro-indicators.md) — 금리 결정·물가·소매판매 등 경제 캘린더를 시계열로 누적 기록, 2026-07-16 한국은행 금리 결정(인상 유력)부터 시작
 - [한국·미국 증시 휴장일 캘린더](concepts/market-holidays.md) — KRX·NYSE/Nasdaq 2026 하반기 휴장일, "시세 미확인 vs 휴장" 구분 기준, 연휴 비대칭 구간 활용법 + 🔴 제헌절(7/17) 누락 사건 정정 기록과 재발 방지 규칙
 - [ROIC를 투자의 핵심 기준으로 보기](concepts/roic-as-investment-criterion.md) — 자본수익률 지표의 정의와 의미, AI 시대 자본효율성 악화 리스크, SK하이닉스 ROIC 모니터링 체크리스트
-- [반도체 시장의 단기 수급 싸이클 vs 장기 펀더멘털](concepts/market-cycles-leverage-risk.md) — 수급 과밀·레버리지 증폭·계절적 요인의 단기 악화 vs 강한 장기 펀더멘털, "찐 반등 vs 데드캣 바운스" 4대 신호 체크리스트(2026-07-23 기준 4개 모두 미충족/부분충족), 투자자별 대응 전략
+- [반도체 시장의 단기 수급 싸이클 vs 장기 펀더멘털](concepts/market-cycles-leverage-risk.md) — 수급 과밀·레버리지 증폭·계절적 요인의 단기 악화 vs 강한 장기 펀더멘털, "찐 반등 vs 데드캣 바운스" 4대 신호 체크리스트(2026-07-23 기준 4개 모두 미충족/부분충족), 투자자별 대응 전략; 개인·기관·외국인 3년 보유율 추이 분석(2026-07-24 추가) — 2023~24년은 외국인이 주가와 동행하는 major mover였으나 2025~26년 랠리 후반부는 외국인 지분율 하락에도 주가는 최고치 경신(개인 레버리지 매수가 한계매수자로 추정), 지금의 급락은 외국인 아닌 국내·구조적 요인이 major
 - [미중 기술 경쟁과 HBM 시장의 미래](concepts/us-china-tech-competition-hbm.md) — CXMT의 국가 전략 차원 기술 자립화 드라이브, HBM 위협 확산(구세대→신세대), SK하이닉스 중기 우위 위협(2028~2029)
 - [포트폴리오 리밸런싱과 위험 관리 전략](concepts/portfolio-rebalancing-strategy.md) — 마진콜의 지옥·PDR 과평가·신용 악화 3가지 위험, 홍춘욱 분석, 반도체 차익 실현 + 자산 분산(달러채권·금·REIT) 전략
 - [SK하이닉스 주가 상승의 정당성 분석](concepts/rally-justification-analysis.md) — 23Q1 대비 13.5배 상승이 닷컴버블·일반버블·전통사이클과 각각 다른 이유(PER 6.8배 저평가, 부채비율 20%대·순현금 35조, LTA발 구조변화), 선반영 리스크와 다음 검증대(7/29 실적); "이격도(divergence) 게이지" 신규 추가(24Q1→26Q1 -0.105, 실적이 주가보다 누적으로 더 빨리 성장 — 단 분기별 시계열 없이 2점 비교라 근사치)
