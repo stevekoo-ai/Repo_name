@@ -50,9 +50,9 @@ jobs:
         with:
           server_address: smtp.gmail.com
           server_port: 465
-          username: ${{ secrets.MAIL_USERNAME }}
-          password: ${{ secrets.MAIL_PASSWORD }}
+          username: ${{ secrets.GMAIL_ADDRESS }}
+          password: ${{ secrets.GMAIL_APP_PASSWORD }}
           subject: "[SK하이닉스 자동 리포트] ${{ github.event.repository.name }}"
-          to: ${{ secrets.MAIL_TO }}
+          to: ${{ secrets.GMAIL_ADDRESS }}
           from: SK하이닉스 자동 리포트 봇
           body: file:///tmp/report.md
