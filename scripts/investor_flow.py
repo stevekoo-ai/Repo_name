@@ -75,6 +75,16 @@ FIELDS = {
     "retail_net_krw": "prsn_ntby_tr_pbmn",
 }
 
+# KIS "국내주식 현재가 시세" TR: FHKST01010100
+# GET /uapi/domestic-stock/v1/quotations/inquire-price
+# ⚠ 필드명은 문서 기억 기반 — 최초 실호출 시 --raw로 검증할 것
+PRICE_FIELDS = {
+    "price": "stck_prpr",       # 현재가(장중)/종가(장마감후)
+    "change": "prdy_vrss",      # 전일대비
+    "change_pct": "prdy_ctrt",  # 전일대비율(%)
+    "volume": "acml_vol",       # 누적거래량
+}
+
 
 def _get_env_or_die(name):
     v = os.environ.get(name)
@@ -183,6 +193,78 @@ def kis_fetch_investor_trend(ticker, account_type="real", raw=False):
     return parsed
 
 
+def kis_fetch_price(ticker, account_type="real", raw=False):
+    """국내주식 현재가 시세(가격/전일대비/등락률/거래량) 조회."""
+    appkey = _get_env_or_die("KIS_APP_KEY")
+    appsecret = _get_env_or_die("KIS_APP_SECRET")
+    token = kis_get_token(account_type)
+    host = KIS_HOSTS[account_type]
+
+    params = f"FID_COND_MRKT_DIV_CODE=J&FID_INPUT_ISCD={ticker}"
+    req = urllib.request.Request(
+        f"{host}/uapi/domestic-stock/v1/quotations/inquire-price?{params}",
+        headers={
+            "content-type": "application/json; charset=utf-8",
+            "authorization": f"Bearer {token}",
+            "appkey": appkey,
+            "appsecret": appsecret,
+            "tr_id": "FHKST01010100",
+        },
+    )
+    try:
+        with urllib.request.urlopen(req) as resp:
+            data = json.loads(resp.read())
+    except urllib.error.HTTPError as e:
+        sys.exit(f"KIS API 호출 실패: {e.code} {e.read().decode(errors='replace')}")
+
+    if raw:
+        print(json.dumps(data, ensure_ascii=False, indent=2))
+        return None
+
+    row = data.get("output")
+    if not row:
+        sys.exit(
+            "API 응답에서 시세 데이터를 찾지 못했습니다 — --raw로 원본 JSON을 "
+            "확인하고 이 스크립트의 output 추출 키를 응답 구조에 맞게 고치세요."
+        )
+    missing = [v for v in PRICE_FIELDS.values() if v not in row]
+    if missing:
+        sys.exit(
+            f"예상한 필드가 API 응답에 없습니다: {missing}. --raw로 원본을 "
+            "확인해 이 스크립트 상단 PRICE_FIELDS 딕셔너리를 실제 필드명으로 고치세요."
+        )
+    return {
+        "ticker": ticker,
+        "price": int(row[PRICE_FIELDS["price"]]),
+        "change": int(row[PRICE_FIELDS["change"]]),
+        "change_pct": float(row[PRICE_FIELDS["change_pct"]]),
+        "volume": int(row[PRICE_FIELDS["volume"]]),
+    }
+
+
+def read_ticker_rows(ticker):
+    """CSV에서 해당 종목 행만 날짜순으로 정렬해 반환 — 다른 스크립트에서도 재사용."""
+    rows = [r for (d, t), r in _read_csv().items() if t == ticker]
+    rows.sort(key=lambda r: r["date"])
+    return rows
+
+
+def summarize_flows(rows, windows=(1, 5, 20, 60)):
+    """윈도우별 외국인/기관/개인 누적 순매수(원). 데이터 부족한 윈도우는 None."""
+    out = {}
+    for window in windows:
+        chunk = rows[-window:]
+        if len(chunk) < window:
+            out[window] = None
+            continue
+        window_result = {}
+        for label, key in (("foreign", "foreign_net_krw"), ("inst", "inst_net_krw"), ("retail", "retail_net_krw")):
+            vals = [int(r[key]) for r in chunk if r[key] not in ("", None)]
+            window_result[label] = sum(vals) if len(vals) == len(chunk) else None
+        out[window] = window_result
+    return out
+
+
 def _read_csv():
     if not CSV_PATH.exists():
         return {}
@@ -237,9 +319,16 @@ def cmd_append(args):
     print(f"{args.date} {args.ticker} 수동 기록 완료 → {CSV_PATH}")
 
 
+def cmd_quote(args):
+    q = kis_fetch_price(args.ticker, args.account_type, raw=args.raw)
+    if args.raw:
+        return
+    flag = " 🚨 급변동(5%+)" if abs(q["change_pct"]) >= 5 else ""
+    print(f"{q['ticker']}  {q['price']:,}원  {q['change']:+,}({q['change_pct']:+.2f}%){flag}  거래량 {q['volume']:,}주")
+
+
 def cmd_show(args):
-    existing = [r for (d, t), r in _read_csv().items() if t == args.ticker]
-    existing.sort(key=lambda r: r["date"])
+    existing = read_ticker_rows(args.ticker)
     if not existing:
         print(f"{args.ticker} 기록 없음 — fetch나 append로 먼저 데이터를 채우세요.")
         return
@@ -251,17 +340,14 @@ def cmd_show(args):
               f"기관 {r['inst_net_krw']:>15}원  개인 {r['retail_net_krw']:>15}원  [{r['source']}]")
 
     print("\n=== 누적 순매수(원) ===")
-    for window in (1, 5, 20, 60):
-        chunk = existing[-window:]
-        if len(chunk) < window:
-            print(f"{window}일 누적: 미확인 — {window}영업일 중 {len(chunk)}일치만 확보")
+    label_ko = {"foreign": "외국인", "inst": "기관", "retail": "개인"}
+    for window, result in summarize_flows(existing).items():
+        if result is None:
+            print(f"{window}일 누적: 미확인 — {window}영업일치 기록 부족")
             continue
-        for label, key in (("외국인", "foreign_net_krw"), ("기관", "inst_net_krw"), ("개인", "retail_net_krw")):
-            vals = [int(r[key]) for r in chunk if r[key] not in ("", None)]
-            if len(vals) < len(chunk):
-                print(f"{window}일 {label}: 미확인(기록 {len(vals)}/{len(chunk)}일치만 확보)")
-            else:
-                print(f"{window}일 {label}: {sum(vals):+,}원")
+        for key, ko in label_ko.items():
+            v = result[key]
+            print(f"{window}일 {ko}: {'미확인' if v is None else f'{v:+,}원'}")
 
 
 def main():
@@ -292,6 +378,12 @@ def main():
     ps.add_argument("--ticker", default="000660")
     ps.add_argument("--last", type=int, default=10)
     ps.set_defaults(func=cmd_show)
+
+    pq = sub.add_parser("quote", help="증권사 API로 현재가/전일대비/등락률 조회")
+    pq.add_argument("--ticker", default="000660")
+    pq.add_argument("--account-type", default=os.environ.get("KIS_ACCOUNT_TYPE", "real"), choices=["real", "vts"])
+    pq.add_argument("--raw", action="store_true")
+    pq.set_defaults(func=cmd_quote)
 
     args = p.parse_args()
     args.func(args)
