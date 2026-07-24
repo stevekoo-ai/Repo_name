@@ -28,6 +28,7 @@ Catalog of every page in the wiki. See `../CLAUDE.md` for conventions.
 - [반도체 시장의 단기 수급 싸이클 vs 장기 펀더멘털](concepts/market-cycles-leverage-risk.md) — 수급 과밀·레버리지 증폭·계절적 요인의 단기 악화 vs 강한 장기 펀더멘털, "찐 반등 vs 데드캣 바운스" 4대 신호 체크리스트(2026-07-23 기준 4개 모두 미충족/부분충족), 투자자별 대응 전략
 - [미중 기술 경쟁과 HBM 시장의 미래](concepts/us-china-tech-competition-hbm.md) — CXMT의 국가 전략 차원 기술 자립화 드라이브, HBM 위협 확산(구세대→신세대), SK하이닉스 중기 우위 위협(2028~2029)
 - [포트폴리오 리밸런싱과 위험 관리 전략](concepts/portfolio-rebalancing-strategy.md) — 마진콜의 지옥·PDR 과평가·신용 악화 3가지 위험, 홍춘욱 분석, 반도체 차익 실현 + 자산 분산(달러채권·금·REIT) 전략
-- [SK하이닉스 주가 상승의 정당성 분석](concepts/rally-justification-analysis.md) — 23Q1 대비 13.5배 상승이 닷컴버블·일반버블·전통사이클과 각각 다른 이유(PER 6.8배 저평가, 부채비율 20%대·순현금 35조, LTA발 구조변화), 선반영 리스크와 다음 검증대(7/29 실적)
+- [SK하이닉스 주가 상승의 정당성 분석](concepts/rally-justification-analysis.md) — 23Q1 대비 13.5배 상승이 닷컴버블·일반버블·전통사이클과 각각 다른 이유(PER 6.8배 저평가, 부채비율 20%대·순현금 35조, LTA발 구조변화), 선반영 리스크와 다음 검증대(7/29 실적); "이격도(divergence) 게이지" 신규 추가(24Q1→26Q1 -0.105, 실적이 주가보다 누적으로 더 빨리 성장 — 단 분기별 시계열 없이 2점 비교라 근사치)
 - [CXL & 차세대 메모리 트랙](concepts/cxl-next-gen-memory.md) — HBM 이후 SK하이닉스 다음 성장엔진 후보; CXL 4.0 스펙 발표·MS Azure 상용배포 확인, 삼성 CMM-D 3.0/SK하이닉스 2세대 CMM-DDR5 모두 CXL 3.2 양산 경쟁 중이나 3사 공통으로 자체 컨트롤러 IC 자사화는 중단, 밸류에이션 반영은 아직 이른 단계
+- [미국 거시국면(G/I/L)과 역사적 유사 시기 매칭](concepts/macro-regime-history.md) — 1954~2026 CPI·실업률·연방기금금리 원자료 기반 G/I/L 국면점수+유클리드거리 역사적 애널로그 매칭; 첫 실측(시드데이터 2026-05월) G≈0/I+0.0151/L-0.62로 stagflation 경계, 최근접 유사시기 1957-04(아이젠하워 리세션 전조)·1979-04(2차 오일쇼크 전)·2002-12(고용없는회복)
 - [HBM Cycle Score & 선행지표 조기경보(HSEWS)](concepts/hbm-cycle-score.md) — 외국인수급·보유율·ASP·엔비디아주문&CoWoS·공급확대·고객재고 6축 종합점수(0~100)+투자가설 붕괴조건 4개(0~4) 트래킹; 첫 실측(7/24) 73점·경계 — CoWoS완전매진·ASP견조로 강세축은 견고하나 외국인수급(연초누적순매도22조)과 CXMT캐파확장속도(기존전망보다1년빠름)가 새로 흔들리는 두 축
