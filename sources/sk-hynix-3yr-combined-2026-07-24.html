@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<title>SK하이닉스 3년 종합 — 주가·외국인지분율·신용융자잔고</title>
+<title>SK하이닉스 3년 종합 — 주가·지분구조·신용융자잔고</title>
 <style>
 .viz-root {
   color-scheme: light;
@@ -20,6 +20,8 @@
   --s-credit:       #1baf7a;
   --s-credit-wash:  rgba(27,175,122,0.10);
   --s-domestic:     #4a3aa7;
+  --s-minority:     #8e6bbf;
+  --c1:#2a78d6; --c2:#eb6834; --c3:#1baf7a; --c4:#eda100;
   --critical:       #d03b3b;
   --border:         rgba(11,11,11,0.10);
   --brush-fill:     rgba(42,120,214,0.14);
@@ -42,6 +44,8 @@
     --s-credit:       #199e70;
     --s-credit-wash:  rgba(25,158,112,0.16);
     --s-domestic:     #9085e9;
+    --s-minority:     #b09be0;
+    --c1:#3987e5; --c2:#d95926; --c3:#199e70; --c4:#c98500;
     --critical:       #e66767;
     --border:         rgba(255,255,255,0.10);
     --brush-fill:     rgba(57,135,229,0.18);
@@ -89,6 +93,10 @@ svg { display:block; width:100%; height:auto; overflow: visible; }
 .line-credit { fill:none; stroke: var(--s-credit); stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
 .line-domestic { fill:none; stroke: var(--s-domestic); stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
 .dot-domestic { fill: var(--s-domestic); stroke: var(--surface-1); stroke-width:2; }
+.line-minority { fill:none; stroke: var(--s-minority); stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
+.dot-minority { fill: var(--s-minority); stroke: var(--surface-1); stroke-width:2; }
+.flat-line { fill:none; stroke-width:2; stroke-dasharray:6 4; opacity:.85; }
+.flat-label { font-size:10.5px; font-weight:700; }
 .area-price { fill: var(--s-price-wash); }
 .dot-price { fill: var(--s-price); stroke: var(--surface-1); stroke-width:2; }
 .dot-foreign { fill: var(--s-foreign); stroke: var(--surface-1); stroke-width:2; }
@@ -120,12 +128,14 @@ td.num { text-align:right; font-variant-numeric: tabular-nums; color: var(--text
 <body>
 <div class="viz-root">
 <div class="card">
-<h1>SK하이닉스 3년 종합 — 주가 · 외국인 지분율 · 국내(개인+기관) · 신용융자잔고</h1>
+<h1>SK하이닉스 3년 종합 — 주가 · 지분 구조 · 신용융자잔고</h1>
 <p class="sub">2023-01 ~ 2026-07, 월 단위. 아래 미니맵을 드래그하거나 버튼으로 구간을 확대하세요.</p>
 <div class="warn">
 ✅ <b>주가는 사용자가 제공한 2023-01~2026-06 월별 종가 전체 반영</b>(2026-07은 이 위키가 추적한 일별 실측치). 2023Q1 평균 대비 2026Q1 평균이 약 13.2배로, 기존에 별도로 계산해둔 "13.5배" 상승 기록과 거의 일치해 신뢰도 있는 데이터로 판단했습니다. <b>정정: 이번 사이클의 실제 최고 종가는 2026년 6월 2,987,000원</b>— 이전까지 "7/6 고점 2,509,000원"을 사이클 최고가로 기록했으나, 6월 종가가 더 높아 7/6은 이미 고점에서 한 차례 되돌림한 이후였음이 확인됨(아래 위키 반영). 외국인 지분율·신용융자잔고는 여전히 몇 개 스냅샷을 이어붙인 것 — 실측/추정 구분은 툴팁에서 확인 가능.
 <br><br>
 ⚠ <b>개인/기관을 따로 쪼갠 공식 % 시계열은 검색으로 못 구했습니다</b> — 그런 세분화 통계를 정기적으로 공개하는 곳이 마땅치 않네요. 대신 "국내 투자자(개인+기관 합산) = 100% − 외국인%"로 잔여치만 표시합니다(SK스퀘어 등 최대주주 지분 20.5%도 이 안에 포함됨 — 통상 개인/기관 분류에서 특수관계인도 같이 묶여 집계되는 관행을 따름). 참고할 개별 스냅샷: 소액주주 수 78만867명(2024말)→118만6,328명(2025말, +51.9%), 2026-06-19 하루 순매수는 기관 +318.2만주·개인 +269.2만주·외국인 -606.5만주(방향이 갈렸던 하루). 개인/기관을 진짜로 분리하려면 증권사 앱의 "기관" 탭 스크린샷이 필요합니다.
+<br><br>
+📌 <b>"소액주주 지분율" 패널은 "국내(개인+기관 합산)" 패널과 다른 축</b>입니다 — 소액주주는 5%+ 공시대상 대주주(SK스퀘어·국민연금·블랙록·캐피털리서치)를 뺀 규제상 잔여 개념이라 국적과 무관하게 겹칠 수 있어요(둘을 더하면 안 됨). 연말 스냅샷 2개(2024말 62.74%, 2025말 63.34%)뿐이라 점선으로 이었습니다. <b>대주주 패널</b>은 2026년 현재 값만 있어 3년 내내 이 값이었다고 가정한 참고선이며 실제 3년 추이 데이터는 아닙니다(다만 이런 지분은 통상 변동이 크지 않은 편).
 </div>
 
 <div class="zoom-btns">
@@ -147,6 +157,16 @@ td.num { text-align:right; font-variant-numeric: tabular-nums; color: var(--text
 <div class="panel">
 <div class="panel-label"><span class="dot-sw" style="background:var(--s-domestic)"></span>국내 투자자(개인+기관 합산, = 100%−외국인%) (%)</div>
 <svg viewBox="0 0 880 150" class="detail" id="chart-domestic"></svg>
+</div>
+
+<div class="panel">
+<div class="panel-label"><span class="dot-sw" style="background:var(--s-minority)"></span>소액주주 지분율 (규제상 잔여, %) — 연말 스냅샷 2개뿐</div>
+<svg viewBox="0 0 880 130" class="detail" id="chart-minority"></svg>
+</div>
+
+<div class="panel">
+<div class="panel-label"><span class="dot-sw" style="background:var(--c1)"></span>주요 대주주 지분율 (%) — 2026년 현재 스냅샷 기준 참고선, 3년 추이 데이터 아님</div>
+<svg viewBox="0 0 880 130" class="detail" id="chart-majors"></svg>
 </div>
 
 <div class="panel">
@@ -234,6 +254,22 @@ const foreignData = [
 // 표시. 진짜 분리하려면 증권사 앱 "기관" 탭 스크린샷 필요.
 const domesticData = foreignData.map(d => ({mi:d.mi, label:d.label, value: +(100-d.value).toFixed(2), real:d.real}));
 
+// 소액주주(규제상 잔여 — 5%+ 공시대상 대주주 제외 전부) 연말 스냅샷 2개뿐,
+// 월별 시계열 아님. 외국인%과는 다른 분류축(겹칠 수 있음, 합산 금지).
+const minorityData = [
+  {mi: mi(2024,12), label:'2024년말', value: 62.74, real:true},
+  {mi: mi(2025,12), label:'2025년말', value: 63.34, real:true},
+];
+
+// 대주주 4곳 — 3년간 월별 변동 데이터 없음, 2026년 스냅샷만 확보(대체로
+// 안정적인 지분이라 참고선으로만 사용, 실제 3년 추이는 아님)
+const majorHolders = [
+  {name:'SK스퀘어+특수관계인', value:20.5, color:'var(--c1)'},
+  {name:'국민연금공단', value:7.5, color:'var(--c2)'},
+  {name:'블랙록', value:5.12, color:'var(--c3)'},
+  {name:'캐피털 리서치', value:5.07, color:'var(--c4)'},
+];
+
 const creditData = [
   {mi: mi(2025,12), label:'2025-12-15', value: 1.14, real:true},
   {mi: mi(2026,3), label:'2026-03-31', value: 2.17, real:true},
@@ -314,10 +350,45 @@ function drawSeries(svgId, data, opts) {
   svg.innerHTML = html;
 }
 
+function drawFlatLines(svgId, items, opts) {
+  const svg = document.getElementById(svgId);
+  const W = 880, pad = {l:56,r:20,t:14,b:26};
+  const w0 = pad.l, w1 = W-pad.r;
+  const H = opts.h, h0 = pad.t, h1 = H-pad.b;
+  function yPos(v){ return h1 - (v-opts.ymin)/(opts.ymax-opts.ymin)*(h1-h0); }
+  let html = '';
+  opts.yticks.forEach(v => {
+    const y = yPos(v);
+    html += `<line class="gridline" x1="${w0}" y1="${y}" x2="${w1}" y2="${y}" />`;
+    html += `<text class="axislabel" x="${w0-8}" y="${y+4}" text-anchor="end">${v}%</text>`;
+  });
+  html += `<line class="gridline" x1="${w0}" y1="${h1}" x2="${w1}" y2="${h1}" style="stroke:var(--axis)" />`;
+  const sorted = items.slice().sort((a,b)=>b.value-a.value);
+  let lastLabelY = -999;
+  sorted.forEach(it => {
+    const y = yPos(it.value);
+    html += `<line class="flat-line" x1="${w0}" y1="${y}" x2="${w1}" y2="${y}" style="stroke:${it.color}" />`;
+    let labelY = y - 6;
+    if (labelY < lastLabelY + 13) labelY = lastLabelY + 13;
+    lastLabelY = labelY;
+    html += `<text class="flat-label" x="${w0+8}" y="${labelY}" style="fill:${it.color}">${it.name} ${it.value}%</text>`;
+  });
+  const span = view[1]-view[0];
+  const step = span > 24 ? 6 : span > 8 ? 2 : 1;
+  for (let m = Math.ceil(view[0]/step)*step; m <= view[1]; m += step) {
+    const x = xScale(m, view, w0, w1);
+    const yr = 2023 + Math.floor(m/12), mo = (m%12)+1;
+    html += `<text class="axislabel" x="${x}" y="${h1+18}" text-anchor="middle">${yr}.${String(mo).padStart(2,'0')}</text>`;
+  }
+  svg.innerHTML = html;
+}
+
 function renderAll() {
   drawSeries('chart-price', priceData, {h:190, log:true, ymin:80000, ymax:3200000, yticks:[100000,300000,1000000,3000000], yfmt:v=>(v/10000).toFixed(0)+'만', lineClass:'line-price', dotClass:'dot-price', areaClass:'area-price', area:true, gapThreshold: 4, interpThreshold: 1.5});
   drawSeries('chart-foreign', foreignData, {h:150, log:false, ymin:48, ymax:58, yticks:[48,50,52,54,56,58], yfmt:v=>v.toFixed(1)+'%', lineClass:'line-foreign', dotClass:'dot-foreign', area:false, gapThreshold: 100, interpThreshold: 2});
   drawSeries('chart-domestic', domesticData, {h:150, log:false, ymin:42, ymax:52, yticks:[42,44,46,48,50,52], yfmt:v=>v.toFixed(1)+'%', lineClass:'line-domestic', dotClass:'dot-domestic', area:false, gapThreshold: 100, interpThreshold: 2});
+  drawSeries('chart-minority', minorityData, {h:130, log:false, ymin:58, ymax:66, yticks:[58,60,62,64,66], yfmt:v=>v.toFixed(2)+'%', lineClass:'line-minority', dotClass:'dot-minority', area:false, gapThreshold: 100, interpThreshold: 2});
+  drawFlatLines('chart-majors', majorHolders, {h:130, ymin:0, ymax:25, yticks:[0,5,10,15,20,25]});
   drawSeries('chart-credit', creditData, {h:150, log:false, ymin:0, ymax:6, yticks:[0,1.5,3,4.5,6], yfmt:v=>v.toFixed(2)+'조', lineClass:'line-credit', dotClass:'dot-credit', area:false, gapThreshold: 100, interpThreshold: 2});
   drawBrush();
   attachTooltips();
@@ -405,6 +476,8 @@ function buildTable(){
   priceData.forEach(d=>rows.push([d.label,'주가',d.real?'실측':'추정',(d.value/10000).toFixed(0)+'만원']));
   foreignData.forEach(d=>rows.push([d.label,'외국인지분율',d.real?'실측':'추정',d.value.toFixed(2)+'%']));
   domesticData.forEach(d=>rows.push([d.label,'국내(개인+기관 합산)',d.real?'실측(잔여계산)':'추정',d.value.toFixed(2)+'%']));
+  minorityData.forEach(d=>rows.push([d.label,'소액주주(규제상 잔여)',d.real?'실측':'추정',d.value.toFixed(2)+'%']));
+  majorHolders.forEach(d=>rows.push(['2026(현재)','대주주:'+d.name,'실측(스냅샷)',d.value.toFixed(2)+'%']));
   creditData.forEach(d=>rows.push([d.label,'신용융자잔고',d.real?'실측':'추정',d.value.toFixed(2)+'조원']));
   rows.sort((a,b)=> a[0].localeCompare(b[0]));
   let html = '<thead><tr><th>시점</th><th>지표</th><th>구분</th><th>값</th></tr></thead><tbody>';
