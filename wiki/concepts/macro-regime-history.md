@@ -28,18 +28,24 @@ L(유동성) = 연방기금금리_t − CPI YoY_t×100   # 양수 = 긴축적
 방식(최근 24개월은 자기상관 방지를 위해 후보에서 제외, 매칭된 시기끼리는
 최소 12개월 간격 유지).
 
-## 1-1. 온디맨드 거시지표 조회 도구 (2026-07-24 밤 추가)
+## 1-1. 거시지표 자동 수집 도구 (2026-07-24 밤 추가, 같은 날 밤 GitHub Actions로 전환)
 
 [`scripts/macro_data.py`](../../scripts/macro_data.py) — 이 페이지의 G/I/L
 계산과는 별개로, 사용자가 대화 중 "금리 지금 어때?", "GDP 어때?" 하고 물으면
-그 자리에서 실제 수치를 조회해 그래프·논의 재료로 쓰기 위한 범용 조회
-스크립트. 미국은 FRED(연방기금금리·CPI·실업률·GDP, 전부 표준 series_id라
-검증됨), 한국은 ECOS(기준금리·환율, 문서 기억 기반이라 `--raw`로 재검증
-필요)를 지원. `FRED_API_KEY`/`ECOS_API_KEY`는 사용자 GitHub 저장소
-Secrets에 이미 등록돼 있으나, **이 스크립트를 라이브 대화 중 Claude가 직접
-실행하려면 같은 값이 이 Claude 환경의 환경변수로도 설정돼 있어야 한다**(
-GitHub Secrets는 GitHub Actions 러너에만 보이고 이 세션엔 안 보임) — 아직
-미설정 상태.
+바로 답할 수 있게 지표 원자료를 계속 최신으로 쌓아두는 도구. 미국은
+FRED(연방기금금리·CPI·실업률·GDP, 표준 series_id라 검증됨), 한국은
+ECOS(기준금리·환율, 문서 기억 기반 프리셋이라 `--raw`로 재검증 권장)를 지원.
+
+**아키텍처(투자자수급 트래커와 동일 패턴)**: 처음엔 "Claude가 라이브
+대화 중 직접 API를 호출"하는 방식을 생각했지만, 그러려면 이 Claude 환경에도
+API 키를 별도로 넣어야 해서(GitHub Secrets는 Actions 러너에만 보임) 사용자가
+"GitHub에서 다 수집해두자"로 방향을 바꿨다. 지금 구조:
+[`.github/workflows/macro-data-sync.yml`](../../.github/workflows/macro-data-sync.yml)이
+매일 07:10 KST에 `python3 scripts/macro_data.py sync`를 실행해 프리셋 전체를
+조회하고 `sources/macro-series.csv`(series/date/value/provider/fetched_at
+롱포맷)에 upsert·커밋 — **API 키는 GitHub Secrets에만 있으면 되고, Claude는
+이 CSV 파일을 읽기만 하면 된다.** investor_flow.py+sk-hynix-daily-report.yml과
+완전히 같은 "GitHub이 수집, Claude는 판단/조회"역할 분담.
 
 ## 2. 데이터 파이프라인 (아키텍처)
 
