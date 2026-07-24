@@ -3117,8 +3117,8 @@
     {
       "key": "yield_curve",
       "indicator": "미국 10년-2년 국채 금리차 (%p)",
-      "current": 0.36,
-      "previous": 0.37,
+      "current": 0.34,
+      "previous": 0.36,
       "previous_source": "series_history",
       "trend": "→",
       "score": 0,
@@ -13116,27 +13116,31 @@
         {
           "date": "2026-07-22",
           "value": 0.36
+        },
+        {
+          "date": "2026-07-23",
+          "value": 0.34
         }
       ],
       "history_years": 10
     }
   ],
   "kr_us_comparison": {
-    "kr_regime": "Recovery",
+    "kr_regime": "Early Expansion",
     "us_regime": "Recession",
     "kr_score_band": "unbalanced_expansion",
     "us_score_band": "slowdown",
-    "cycle_gap": -5,
+    "cycle_gap": -4,
     "alignment": "kr_behind",
     "indicator_pairs": [
       {
         "key": "gdp",
         "label": "GDP 성장",
-        "kr_score": 1,
+        "kr_score": 0,
         "us_score": 0,
-        "kr_value": 1.831,
+        "kr_value": 0.622,
         "us_value": 2.1,
-        "relationship": "diverge"
+        "relationship": "sync"
       },
       {
         "key": "industrial_production",
@@ -13193,14 +13197,14 @@
         "relationship": "diverge"
       }
     ],
-    "narrative": "미국은 현재 Recession 국면, 한국은 Recovery 국면입니다. 한국이 사이클상 미국보다 뒤처져 있어, 미국에서 먼저 나타난 흐름이 시차를 두고 한국에 파급될 가능성을 주시할 필요가 있습니다. 비교 가능한 6개 핵심 지표 중 67%가 미국과 같은 방향으로 움직이고 있습니다. 미국은 경고 신호가 없는데 한국만 경고 신호가 있어, 이번 흐름은 글로벌 요인보다 한국 특유의 요인에서 비롯됐을 가능성이 큽니다. 방향이 엇갈린 지표: GDP 성장, 산업생산 — 이 부분이 한국이 미국과 다르게 가는 지점입니다."
+    "narrative": "미국은 현재 Recession 국면, 한국은 Early Expansion 국면입니다. 한국이 사이클상 미국보다 뒤처져 있어, 미국에서 먼저 나타난 흐름이 시차를 두고 한국에 파급될 가능성을 주시할 필요가 있습니다. 비교 가능한 6개 핵심 지표 중 83%가 미국과 같은 방향으로 움직이고 있습니다. 미국은 경고 신호가 없는데 한국만 경고 신호가 있어, 이번 흐름은 글로벌 요인보다 한국 특유의 요인에서 비롯됐을 가능성이 큽니다. 방향이 엇갈린 지표: 산업생산 — 이 부분이 한국이 미국과 다르게 가는 지점입니다."
   },
   "macro": {
-    "regime": "Recovery",
+    "regime": "Early Expansion",
     "previous_regime": "Early Expansion",
-    "transition": "upgrade",
-    "score": 2,
-    "weighted_score": 2.1,
+    "transition": null,
+    "score": 1,
+    "weighted_score": 1.1,
     "score_band": "unbalanced_expansion",
     "score_band_label": "불균형 확장",
     "confidence": 84.5,
@@ -13236,11 +13240,11 @@
     {
       "key": "gdp",
       "indicator": "실질 GDP 성장률",
-      "current": 1.831,
-      "previous": -0.108,
+      "current": 0.622,
+      "previous": 1.831,
       "previous_source": "series_history",
-      "trend": "▲",
-      "score": 1,
+      "trend": "→",
+      "score": 0,
       "status": "ok",
       "source": "한국은행 ECOS",
       "history": [
@@ -13395,6 +13399,10 @@
         {
           "date": "2026-01-01",
           "value": 1.831
+        },
+        {
+          "date": "2026-04-01",
+          "value": 0.622
         }
       ],
       "history_years": 10
@@ -16162,7 +16170,7 @@
     }
   ],
   "personal": {
-    "investment_environment_score": 67.1,
+    "investment_environment_score": 65.3,
     "investment_biases": {
       "stock_bias": "소폭 확대",
       "etf_bias": "소폭 확대",
@@ -16171,7 +16179,7 @@
     },
     "semiconductor_score": 79.6,
     "semiconductor_band": "긍정",
-    "bond_score": 39.9,
+    "bond_score": 40.6,
     "fx_score": 33.1,
     "housing_readiness_score": null,
     "etf_fit": [
@@ -16179,56 +16187,56 @@
         "ticker": "0183J0.KS",
         "name": "TIGER 미국우주테크",
         "bucket": "space_tech",
-        "fit_score": 57.3,
+        "fit_score": 55.8,
         "data_status": "ok"
       },
       {
         "ticker": "371460.KS",
         "name": "TIGER 차이나전기차SOLACTIVE",
         "bucket": "ev_china",
-        "fit_score": 57.3,
+        "fit_score": 55.8,
         "data_status": "ok"
       },
       {
         "ticker": "411060.KS",
         "name": "ACE KRX금현물",
         "bucket": "gold",
-        "fit_score": 57.3,
+        "fit_score": 55.8,
         "data_status": "ok"
       },
       {
         "ticker": "455850.KS",
         "name": "SOL AI반도체소부장",
         "bucket": "semiconductor",
-        "fit_score": 66.2,
+        "fit_score": 64.7,
         "data_status": "ok"
       },
       {
         "ticker": "469150.KS",
         "name": "ACE AI반도체TOP3+",
         "bucket": "semiconductor",
-        "fit_score": 66.2,
+        "fit_score": 64.7,
         "data_status": "ok"
       },
       {
         "ticker": "475380.KS",
         "name": "RISE 글로벌리얼티인컴",
         "bucket": "reit_income",
-        "fit_score": 57.3,
+        "fit_score": 55.8,
         "data_status": "ok"
       },
       {
         "ticker": "476070.KS",
         "name": "KODEX 글로벌비만치료제TOP2 Plus",
         "bucket": "healthcare_theme",
-        "fit_score": 57.3,
+        "fit_score": 55.8,
         "data_status": "ok"
       }
     ]
   },
   "assets": {
     "stocks": {
-      "score": 69.8,
+      "score": 68.4,
       "stars": "★★★☆☆",
       "data_status": "ok",
       "detail": [
@@ -16242,7 +16250,7 @@
       ]
     },
     "etf": {
-      "score": 59.8,
+      "score": 58.3,
       "stars": "★★★☆☆",
       "data_status": "ok",
       "detail": [
@@ -16250,56 +16258,56 @@
           "ticker": "0183J0.KS",
           "name": "TIGER 미국우주테크",
           "bucket": "space_tech",
-          "fit_score": 57.3,
+          "fit_score": 55.8,
           "data_status": "ok"
         },
         {
           "ticker": "371460.KS",
           "name": "TIGER 차이나전기차SOLACTIVE",
           "bucket": "ev_china",
-          "fit_score": 57.3,
+          "fit_score": 55.8,
           "data_status": "ok"
         },
         {
           "ticker": "411060.KS",
           "name": "ACE KRX금현물",
           "bucket": "gold",
-          "fit_score": 57.3,
+          "fit_score": 55.8,
           "data_status": "ok"
         },
         {
           "ticker": "455850.KS",
           "name": "SOL AI반도체소부장",
           "bucket": "semiconductor",
-          "fit_score": 66.2,
+          "fit_score": 64.7,
           "data_status": "ok"
         },
         {
           "ticker": "469150.KS",
           "name": "ACE AI반도체TOP3+",
           "bucket": "semiconductor",
-          "fit_score": 66.2,
+          "fit_score": 64.7,
           "data_status": "ok"
         },
         {
           "ticker": "475380.KS",
           "name": "RISE 글로벌리얼티인컴",
           "bucket": "reit_income",
-          "fit_score": 57.3,
+          "fit_score": 55.8,
           "data_status": "ok"
         },
         {
           "ticker": "476070.KS",
           "name": "KODEX 글로벌비만치료제TOP2 Plus",
           "bucket": "healthcare_theme",
-          "fit_score": 57.3,
+          "fit_score": 55.8,
           "data_status": "ok"
         }
       ]
     },
     "bond": {
-      "score": 39.9,
-      "stars": "★☆☆☆☆",
+      "score": 40.6,
+      "stars": "★★☆☆☆",
       "data_status": "ok",
       "detail": [
         {
@@ -16378,14 +16386,14 @@
   },
   "scenarios": {
     "base": {
-      "probability": 35,
-      "premise": "현재 국면(Recovery)과 반도체 업황(긍정)의 추세가 유지된다.",
+      "probability": 40,
+      "premise": "현재 국면(Early Expansion)과 반도체 업황(긍정)의 추세가 유지된다.",
       "expected_change": "지표가 현재 범위 내에서 등락하며 국면 전환 신호는 제한적.",
-      "user_impact": "Investment Environment Score 67.1점 수준의 배분 유지가 합리적."
+      "user_impact": "Investment Environment Score 65.3점 수준의 배분 유지가 합리적."
     },
     "bull": {
-      "probability": 35,
-      "premise": "상향 신호(gdp_strong, semiconductor_strong, us_employment_improving)가 강화된다.",
+      "probability": 30,
+      "premise": "상향 신호(semiconductor_strong, us_employment_improving)가 강화된다.",
       "expected_change": "수출/반도체 개선과 물가 안정이 동반되며 국면이 한 단계 상향될 가능성.",
       "user_impact": "주식/ETF 비중 확대, 반도체/AI 인프라 비중 우선순위 상향을 검토할 수 있다."
     },
@@ -16408,9 +16416,9 @@
     {
       "priority": 4,
       "priority_label": "★★★★☆ 검토 필요",
-      "priority_score": 78.5,
+      "priority_score": 79.2,
       "title": "SK hynix / Micron 실적발표 확인 (2026-07-24)",
-      "reason": "우선순위 점수 89.1점, ★★★★★ — D-1.",
+      "reason": "우선순위 점수 89.5점, ★★★★★ — D-0.",
       "invalid_condition": "일정이 연기되면 재점검 시점도 함께 조정.",
       "recheck": "2026-07-24 당일 또는 직후.",
       "category": "industry_cycle",
@@ -16419,9 +16427,9 @@
     {
       "priority": 4,
       "priority_label": "★★★★☆ 검토 필요",
-      "priority_score": 74.0,
+      "priority_score": 74.7,
       "title": "한국 수출입 동향 (반도체 포함) 확인 (2026-08-01)",
-      "reason": "우선순위 점수 88.1점, ★★★★★ — D-9.",
+      "reason": "우선순위 점수 88.5점, ★★★★★ — D-8.",
       "invalid_condition": "일정이 연기되면 재점검 시점도 함께 조정.",
       "recheck": "2026-08-01 당일 또는 직후.",
       "category": "macro_risk",
@@ -16441,9 +16449,9 @@
     {
       "priority": 4,
       "priority_label": "★★★★☆ 검토 필요",
-      "priority_score": 70.2,
+      "priority_score": 70.9,
       "title": "FOMC 정례회의 확인 (2026-07-29)",
-      "reason": "우선순위 점수 78.5점, ★★★★☆ — D-6.",
+      "reason": "우선순위 점수 78.9점, ★★★★☆ — D-5.",
       "invalid_condition": "일정이 연기되면 재점검 시점도 함께 조정.",
       "recheck": "2026-07-29 당일 또는 직후.",
       "category": "macro_risk",
@@ -16463,9 +16471,9 @@
     {
       "priority": 3,
       "priority_label": "★★★☆☆ 관찰 필요",
-      "priority_score": 60.8,
+      "priority_score": 61.5,
       "title": "미국 CPI 발표 확인 (2026-08-12)",
-      "reason": "우선순위 점수 74.2점, ★★★★☆ — D-20.",
+      "reason": "우선순위 점수 74.6점, ★★★★☆ — D-19.",
       "invalid_condition": "일정이 연기되면 재점검 시점도 함께 조정.",
       "recheck": "2026-08-12 당일 또는 직후.",
       "category": "macro_risk",
@@ -16474,24 +16482,24 @@
     {
       "priority": 3,
       "priority_label": "★★★☆☆ 관찰 필요",
-      "priority_score": 58.8,
-      "title": "주식/ETF 비중 확대 검토",
-      "reason": "Investment Environment Score 67.1점 — 거시/반도체 환경이 우호적.",
-      "invalid_condition": "Investment Environment Score가 20점 이상 하락하면 보류.",
-      "recheck": "다음 정기 리포트.",
-      "category": "investment_opportunity",
-      "conflict_note": "유동성 우선 원칙(15.6) 적용 — 청약/필수자금 확보가 우선이며, 공격적 매수 확대는 해당 자금 목표 달성 후 재검토한다."
-    },
-    {
-      "priority": 3,
-      "priority_label": "★★★☆☆ 관찰 필요",
-      "priority_score": 58.6,
+      "priority_score": 59.3,
       "title": "미국 비농업 고용(NFP) 발표 확인 (2026-08-07)",
-      "reason": "우선순위 점수 65.6점, ★★★★☆ — D-15.",
+      "reason": "우선순위 점수 66.0점, ★★★★☆ — D-14.",
       "invalid_condition": "일정이 연기되면 재점검 시점도 함께 조정.",
       "recheck": "2026-08-07 당일 또는 직후.",
       "category": "macro_risk",
       "conflict_note": null
+    },
+    {
+      "priority": 3,
+      "priority_label": "★★★☆☆ 관찰 필요",
+      "priority_score": 58.8,
+      "title": "주식/ETF 비중 확대 검토",
+      "reason": "Investment Environment Score 65.3점 — 거시/반도체 환경이 우호적.",
+      "invalid_condition": "Investment Environment Score가 20점 이상 하락하면 보류.",
+      "recheck": "다음 정기 리포트.",
+      "category": "investment_opportunity",
+      "conflict_note": "유동성 우선 원칙(15.6) 적용 — 청약/필수자금 확보가 우선이며, 공격적 매수 확대는 해당 자금 목표 달성 후 재검토한다."
     },
     {
       "priority": 2,
@@ -16513,17 +16521,6 @@
       "invalid_condition": "출국일 이전 환율이 추가로 5% 이상 불리하게 움직이면 재검토.",
       "recheck": "2026-10-03 2주 전.",
       "category": "travel_discretionary",
-      "conflict_note": null
-    },
-    {
-      "priority": 2,
-      "priority_label": "★★☆☆☆ 참고",
-      "priority_score": 44.8,
-      "title": "채권 신규 매수 보류 및 만기 재투자 방식 재검토",
-      "reason": "Bond Score 39.9점 — 금리/실질금리 매력도가 낮은 국면.",
-      "invalid_condition": "실질금리 매력도 회복 또는 성장 둔화 신호 확산 시 재검토.",
-      "recheck": "다음 금통위/FOMC 이후.",
-      "category": "investment_opportunity",
       "conflict_note": null
     }
   ],
@@ -16558,8 +16555,8 @@
       "name": "SK hynix / Micron 실적발표",
       "date": "2026-07-24",
       "category": "semiconductor_earnings",
-      "days_until": 1,
-      "priority_score": 89.1,
+      "days_until": 0,
+      "priority_score": 89.5,
       "importance_tier": 5,
       "importance_label": "★★★★★"
     },
@@ -16567,8 +16564,8 @@
       "name": "한국 수출입 동향 (반도체 포함)",
       "date": "2026-08-01",
       "category": "kr_trade",
-      "days_until": 9,
-      "priority_score": 88.1,
+      "days_until": 8,
+      "priority_score": 88.5,
       "importance_tier": 5,
       "importance_label": "★★★★★"
     },
@@ -16576,8 +16573,8 @@
       "name": "FOMC 정례회의",
       "date": "2026-07-29",
       "category": "us_policy",
-      "days_until": 6,
-      "priority_score": 78.5,
+      "days_until": 5,
+      "priority_score": 78.9,
       "importance_tier": 4,
       "importance_label": "★★★★☆"
     },
@@ -16585,8 +16582,8 @@
       "name": "미국 CPI 발표",
       "date": "2026-08-12",
       "category": "us_inflation",
-      "days_until": 20,
-      "priority_score": 74.2,
+      "days_until": 19,
+      "priority_score": 74.6,
       "importance_tier": 4,
       "importance_label": "★★★★☆"
     },
@@ -16594,8 +16591,8 @@
       "name": "미국 비농업 고용(NFP) 발표",
       "date": "2026-08-07",
       "category": "us_employment",
-      "days_until": 15,
-      "priority_score": 65.6,
+      "days_until": 14,
+      "priority_score": 66.0,
       "importance_tier": 4,
       "importance_label": "★★★★☆"
     },
@@ -16603,8 +16600,8 @@
       "name": "한국 CPI 발표",
       "date": "2026-08-05",
       "category": "kr_inflation",
-      "days_until": 13,
-      "priority_score": 62.6,
+      "days_until": 12,
+      "priority_score": 63.0,
       "importance_tier": 4,
       "importance_label": "★★★★☆"
     },
@@ -16612,18 +16609,18 @@
       "name": "한국은행 금융통화위원회",
       "date": "2026-08-14",
       "category": "kr_policy",
-      "days_until": 22,
-      "priority_score": 62.5,
+      "days_until": 21,
+      "priority_score": 62.9,
       "importance_tier": 4,
       "importance_label": "★★★★☆"
     }
   ],
   "personal_executive_brief": {
-    "one_line_diagnosis": "Recovery 국면(총점 2, 신뢰도 84.5점) — 반도체 긍정",
+    "one_line_diagnosis": "Early Expansion 국면(총점 1, 신뢰도 84.5점) — 반도체 긍정",
     "asset_summary": {
       "stocks": "★★★☆☆",
       "etf": "★★★☆☆",
-      "bond": "★☆☆☆☆",
+      "bond": "★★☆☆☆",
       "cash": "★★★☆☆",
       "subscription_fund": null,
       "fx_exposure": "★☆☆☆☆"
