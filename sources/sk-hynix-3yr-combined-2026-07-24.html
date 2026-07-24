@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>SK하이닉스 3년 종합 — 주가·외국인지분율·신용융자잔고</title>
+<style>
+.viz-root {
+  color-scheme: light;
+  --surface-1:      #fcfcfb;
+  --page:           #f9f9f7;
+  --text-primary:   #0b0b0b;
+  --text-secondary: #52514e;
+  --text-muted:     #898781;
+  --grid:           #e1e0d9;
+  --axis:           #c3c2b7;
+  --s-price:        #2a78d6;
+  --s-price-wash:   rgba(42,120,214,0.10);
+  --s-foreign:      #eb6834;
+  --s-foreign-wash: rgba(235,104,52,0.10);
+  --s-credit:       #1baf7a;
+  --s-credit-wash:  rgba(27,175,122,0.10);
+  --critical:       #d03b3b;
+  --border:         rgba(11,11,11,0.10);
+  --brush-fill:     rgba(42,120,214,0.14);
+  --brush-handle:   #2a78d6;
+}
+@media (prefers-color-scheme: dark) {
+  :root:where(:not([data-theme="light"])) .viz-root {
+    color-scheme: dark;
+    --surface-1:      #1a1a19;
+    --page:           #0d0d0d;
+    --text-primary:   #ffffff;
+    --text-secondary: #c3c2b7;
+    --text-muted:     #898781;
+    --grid:           #2c2c2a;
+    --axis:           #383835;
+    --s-price:        #3987e5;
+    --s-price-wash:   rgba(57,135,229,0.14);
+    --s-foreign:      #d95926;
+    --s-foreign-wash: rgba(217,89,38,0.16);
+    --s-credit:       #199e70;
+    --s-credit-wash:  rgba(25,158,112,0.16);
+    --critical:       #e66767;
+    --border:         rgba(255,255,255,0.10);
+    --brush-fill:     rgba(57,135,229,0.18);
+    --brush-handle:   #3987e5;
+  }
+}
+:root[data-theme="dark"] .viz-root {
+  color-scheme: dark;
+  --surface-1:      #1a1a19;
+  --page:           #0d0d0d;
+  --text-primary:   #ffffff;
+  --text-secondary: #c3c2b7;
+  --text-muted:     #898781;
+  --grid:           #2c2c2a;
+  --axis:           #383835;
+  --s-price:        #3987e5;
+  --s-price-wash:   rgba(57,135,229,0.14);
+  --s-foreign:      #d95926;
+  --s-foreign-wash: rgba(217,89,38,0.16);
+  --s-credit:       #199e70;
+  --s-credit-wash:  rgba(25,158,112,0.16);
+  --critical:       #e66767;
+  --border:         rgba(255,255,255,0.10);
+  --brush-fill:     rgba(57,135,229,0.18);
+  --brush-handle:   #3987e5;
+}
+* { box-sizing: border-box; }
+body { margin:0; background: var(--page); font-family: system-ui,-apple-system,"Segoe UI",sans-serif; }
+.viz-root { max-width: 940px; margin: 0 auto; padding: 26px 20px 32px; }
+.card { background: var(--surface-1); border-radius: 12px; padding: 22px 22px 18px; border: 1px solid var(--border); }
+h1 { font-size: 17px; font-weight: 700; color: var(--text-primary); margin: 0 0 4px; }
+.sub { font-size: 12px; color: var(--text-secondary); margin: 0 0 6px; line-height: 1.55; }
+.warn { font-size: 11.5px; color: var(--text-muted); background: var(--grid); border-radius: 7px; padding: 8px 10px; margin: 10px 0 16px; line-height: 1.6; }
+.panel { margin-bottom: 6px; }
+.panel-label { font-size: 11.5px; font-weight: 700; color: var(--text-secondary); display:flex; align-items:center; gap:6px; margin: 14px 0 2px; }
+.dot-sw { width:8px; height:8px; border-radius:50%; display:inline-block; }
+svg { display:block; width:100%; height:auto; overflow: visible; }
+.gridline { stroke: var(--grid); stroke-width:1; }
+.axislabel { fill: var(--text-muted); font-size: 10.5px; }
+.nodata-band { fill: var(--grid); opacity: .5; }
+.nodata-label { fill: var(--text-muted); font-size: 10px; font-style: italic; }
+.line-price { fill:none; stroke: var(--s-price); stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
+.line-foreign { fill:none; stroke: var(--s-foreign); stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
+.line-credit { fill:none; stroke: var(--s-credit); stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
+.area-price { fill: var(--s-price-wash); }
+.dot-price { fill: var(--s-price); stroke: var(--surface-1); stroke-width:2; }
+.dot-foreign { fill: var(--s-foreign); stroke: var(--surface-1); stroke-width:2; }
+.dot-credit { fill: var(--s-credit); stroke: var(--surface-1); stroke-width:2; }
+.dot-hit { fill: transparent; cursor:pointer; }
+.end-label { font-size: 12px; font-weight:700; }
+.legend-row { display:flex; gap:16px; align-items:center; margin: 2px 0 4px; font-size: 11.5px; color: var(--text-secondary); flex-wrap:wrap;}
+.legend-item { display:flex; align-items:center; gap:6px; }
+.swatch { width:14px; height:2px; border-radius:2px; }
+.brush-wrap { margin-top: 16px; }
+.brush-title { font-size: 11px; color: var(--text-muted); margin-bottom: 4px; }
+.brush-svg { width:100%; height:70px; display:block; cursor: crosshair; }
+.brush-overview-line { fill:none; stroke: var(--text-muted); stroke-width:1.5; }
+.brush-sel { fill: var(--brush-fill); }
+.brush-handle { fill: var(--brush-handle); cursor: ew-resize; }
+.brush-edge { stroke: var(--brush-handle); stroke-width:2; }
+.zoom-btns { display:flex; gap:8px; margin: 10px 0 4px; flex-wrap: wrap; }
+.zbtn { font-size: 11.5px; padding: 5px 11px; border-radius: 999px; border: 1px solid var(--border); background: var(--surface-1); color: var(--text-secondary); cursor:pointer; }
+.zbtn:hover { background: var(--grid); }
+.zbtn.active { background: var(--s-price); color:#fff; border-color: var(--s-price); }
+.tooltip { position:absolute; pointer-events:none; background: var(--text-primary); color: var(--surface-1); font-size:11px; padding:6px 9px; border-radius:6px; line-height:1.5; transform: translate(-50%,-115%); white-space:nowrap; opacity:0; transition:opacity .1s; z-index:5; }
+table { width:100%; border-collapse:collapse; margin-top:16px; font-size:11.5px; }
+th, td { text-align:left; padding:6px 5px; border-bottom:1px solid var(--grid); color: var(--text-secondary); }
+th { color: var(--text-muted); font-weight:600; font-size:10px; text-transform:uppercase; letter-spacing:.02em; }
+td.num { text-align:right; font-variant-numeric: tabular-nums; color: var(--text-primary); }
+.footnote { font-size: 11px; color: var(--text-muted); margin-top: 14px; line-height:1.6; }
+</style>
+</head>
+<body>
+<div class="viz-root">
+<div class="card">
+<h1>SK하이닉스 3년 종합 — 주가 · 외국인 지분율 · 신용융자잔고</h1>
+<p class="sub">2023-01 ~ 2026-07, 월 단위. 아래 미니맵을 드래그하거나 버튼으로 구간을 확대하세요.</p>
+<div class="warn">
+⚠ <b>주가는 2025-11 이전 정밀 데이터를 확보하지 못했습니다</b>(KRX/증권사 원자료 직접 스크래핑 차단 — 이 위키의 기존 한계와 동일). 회색 빗금 구간은 "데이터 없음"이며 임의로 선을 잇지 않았습니다. 외국인 지분율은 2023년부터, 신용융자잔고는 2025년 12월부터 실측치가 있습니다. 정확도를 높이려면 증권사 앱의 "년"(연간) 차트 스크린샷을 보내주시면 그걸로 채워 넣을 수 있어요.
+</div>
+
+<div class="zoom-btns">
+  <button class="zbtn active" data-range="0,43">전체 3년</button>
+  <button class="zbtn" data-range="34,43">최근 8개월(25.11~)</button>
+  <button class="zbtn" data-range="40,43">최근 2개월(6~7월 급락)</button>
+</div>
+
+<div class="panel">
+<div class="panel-label"><span class="dot-sw" style="background:var(--s-price)"></span>주가 (원, 로그축)</div>
+<svg viewBox="0 0 880 190" class="detail" id="chart-price"></svg>
+</div>
+
+<div class="panel">
+<div class="panel-label"><span class="dot-sw" style="background:var(--s-foreign)"></span>외국인 지분율 (%)</div>
+<svg viewBox="0 0 880 150" class="detail" id="chart-foreign"></svg>
+</div>
+
+<div class="panel">
+<div class="panel-label"><span class="dot-sw" style="background:var(--s-credit)"></span>SK하이닉스 신용융자잔고 (조원)</div>
+<svg viewBox="0 0 880 150" class="detail" id="chart-credit"></svg>
+</div>
+
+<div class="brush-wrap">
+<div class="brush-title">전체 기간 미리보기 (드래그해서 확대) — 주가 오버레이 기준</div>
+<svg viewBox="0 0 880 70" class="brush-svg" id="brush"></svg>
+</div>
+
+<table id="datatable"></table>
+<p class="footnote">
+Sources: 사용자 제공 화면(외인보유수량, 투자자동향), 언론 보도 종합(이투데이·파이낸셜뉴스·뉴스1·한경·threads 요약 등), 2026-07-24 웹검색. 정밀 일별 시계열이 아닌 스냅샷 재구성 — 방향성 참고용.
+</p>
+</div>
+</div>
+
+<script>
+// month index 0 = 2023-01, 41 = 2026-06, 42 = 2026-07
+function mi(y,m){ return (y-2023)*12 + (m-1); }
+
+const priceData = [
+  {mi: mi(2025,11), label:'2025-11(추정 저항대)', value: 650000, real:true},
+  {mi: mi(2026,7)+5/30, label:'2026-07-06', value: 2509000, real:true},
+  {mi: mi(2026,7)+15/30, label:'2026-07-16', value: 1859500, real:true},
+  {mi: mi(2026,7)+20/30, label:'2026-07-20', value: 1764000, real:true},
+  {mi: mi(2026,7)+22/30, label:'2026-07-22', value: 1830000, real:true},
+  {mi: mi(2026,7)+23/30, label:'2026-07-23', value: 1947000, real:true},
+  {mi: mi(2026,7)+24/30, label:'2026-07-24', value: 1773000, real:true},
+];
+const foreignData = [
+  {mi: mi(2023,5), label:'2023-05-19', value: 50.10, real:true},
+  {mi: mi(2024,1), label:'2024-01', value: 53.17, real:true},
+  {mi: mi(2024,6), label:'2024-06-17', value: 56.25, real:true},
+  {mi: mi(2025,10), label:'2025-10-30', value: 54.63, real:true},
+  {mi: mi(2026,3), label:'2026-03-06', value: 53.0, real:true},
+  {mi: mi(2026,6), label:'2026-06', value: 50.17, real:true},
+  {mi: mi(2026,7)+24/30, label:'2026-07-24', value: 52.60, real:true},
+];
+const creditData = [
+  {mi: mi(2025,12), label:'2025-12-15', value: 1.14, real:true},
+  {mi: mi(2026,3), label:'2026-03-31', value: 2.17, real:true},
+  {mi: mi(2026,4), label:'2026-04-15', value: 2.25, real:true},
+  {mi: mi(2026,6), label:'2026-06-30(역산추정)', value: 4.83, real:false},
+  {mi: mi(2026,7)+8/30, label:'2026-07-08', value: 5.24, real:true},
+];
+
+const FULL = [0, 43];
+let view = FULL.slice();
+
+function xScale(m, range, w0, w1) {
+  return w0 + (m - range[0]) / (range[1]-range[0]) * (w1-w0);
+}
+
+function drawSeries(svgId, data, opts) {
+  const svg = document.getElementById(svgId);
+  const W = 880, pad = {l:56,r:20,t:14,b:26};
+  const w0 = pad.l, w1 = W-pad.r;
+  const H = opts.h, h0 = pad.t, h1 = H-pad.b;
+  const [vlo, vhi] = view;
+  const visible = data.filter(d => d.mi >= vlo-0.5 && d.mi <= vhi+0.5);
+  let html = '';
+  // gridlines + y labels
+  const yVals = opts.log ? opts.yticks : opts.yticks;
+  yVals.forEach(v => {
+    const y = h1 - (opts.log ? (Math.log10(v)-Math.log10(opts.ymin))/(Math.log10(opts.ymax)-Math.log10(opts.ymin)) : (v-opts.ymin)/(opts.ymax-opts.ymin)) * (h1-h0);
+    html += `<line class="gridline" x1="${w0}" y1="${y}" x2="${w1}" y2="${y}" />`;
+    html += `<text class="axislabel" x="${w0-8}" y="${y+4}" text-anchor="end">${opts.yfmt(v)}</text>`;
+  });
+  html += `<line class="gridline" x1="${w0}" y1="${h1}" x2="${w1}" y2="${h1}" style="stroke:var(--axis)" />`;
+
+  function yPos(v) {
+    const t = opts.log ? (Math.log10(v)-Math.log10(opts.ymin))/(Math.log10(opts.ymax)-Math.log10(opts.ymin)) : (v-opts.ymin)/(opts.ymax-opts.ymin);
+    return h1 - t*(h1-h0);
+  }
+
+  // draw connecting segments only between points within ~3 months of each other; else "no data" gap band
+  for (let i=0;i<visible.length-1;i++){
+    const a = visible[i], b = visible[i+1];
+    const xA = xScale(a.mi, view, w0, w1), xB = xScale(b.mi, view, w0, w1);
+    const yA = yPos(a.value), yB = yPos(b.value);
+    if (b.mi - a.mi > opts.gapThreshold) {
+      html += `<rect class="nodata-band" x="${xA}" y="${h0}" width="${xB-xA}" height="${h1-h0}" />`;
+      html += `<text class="nodata-label" x="${(xA+xB)/2}" y="${(h0+h1)/2}" text-anchor="middle">데이터 없음</text>`;
+    } else {
+      const interp = (!a.real||!b.real) || (b.mi - a.mi > (opts.interpThreshold||99));
+      html += `<path class="${opts.lineClass}" d="M${xA},${yA} L${xB},${yB}" ${interp?'stroke-dasharray="5 5" opacity="0.6"':''} />`;
+    }
+  }
+  // area wash for price only
+  if (opts.area && visible.length) {
+    let path = `M${xScale(visible[0].mi,view,w0,w1)},${h1}`;
+    visible.forEach(d => path += ` L${xScale(d.mi,view,w0,w1)},${yPos(d.value)}`);
+    path += ` L${xScale(visible[visible.length-1].mi,view,w0,w1)},${h1} Z`;
+    html = `<path class="${opts.areaClass}" d="${path}" />` + html;
+  }
+  // points
+  visible.forEach(d => {
+    const x = xScale(d.mi, view, w0, w1), y = yPos(d.value);
+    html += `<circle class="${opts.dotClass}" cx="${x}" cy="${y}" r="4.5" ${!d.real?'stroke-dasharray="2 2"':''} />`;
+    html += `<circle class="dot-hit" data-label="${d.label}&#10;${opts.yfmt(d.value)}${d.real?'':' (추정)'}" cx="${x}" cy="${y}" r="12" />`;
+  });
+  // end label
+  if (visible.length) {
+    const last = visible[visible.length-1];
+    const x = xScale(last.mi, view, w0, w1), y = yPos(last.value);
+    html += `<text class="end-label" x="${Math.min(x+8,w1-2)}" y="${y-8}" style="fill:var(--text-primary)">${opts.yfmt(last.value)}</text>`;
+  }
+  // x-axis month ticks (every ~6 months in full view, adapts to zoom)
+  const span = view[1]-view[0];
+  const step = span > 24 ? 6 : span > 8 ? 2 : 1;
+  for (let m = Math.ceil(view[0]/step)*step; m <= view[1]; m += step) {
+    const x = xScale(m, view, w0, w1);
+    const yr = 2023 + Math.floor(m/12), mo = (m%12)+1;
+    html += `<text class="axislabel" x="${x}" y="${h1+18}" text-anchor="middle">${yr}.${String(mo).padStart(2,'0')}</text>`;
+  }
+  svg.innerHTML = html;
+}
+
+function renderAll() {
+  drawSeries('chart-price', priceData, {h:190, log:true, ymin:500000, ymax:3000000, yticks:[500000,1000000,1500000,2000000,2500000,3000000], yfmt:v=>(v/10000).toFixed(0)+'만', lineClass:'line-price', dotClass:'dot-price', areaClass:'area-price', area:true, gapThreshold: 4, interpThreshold: 1.5});
+  drawSeries('chart-foreign', foreignData, {h:150, log:false, ymin:48, ymax:58, yticks:[48,50,52,54,56,58], yfmt:v=>v.toFixed(1)+'%', lineClass:'line-foreign', dotClass:'dot-foreign', area:false, gapThreshold: 100, interpThreshold: 2});
+  drawSeries('chart-credit', creditData, {h:150, log:false, ymin:0, ymax:6, yticks:[0,1.5,3,4.5,6], yfmt:v=>v.toFixed(2)+'조', lineClass:'line-credit', dotClass:'dot-credit', area:false, gapThreshold: 100, interpThreshold: 2});
+  drawBrush();
+  attachTooltips();
+}
+
+function drawBrush(){
+  const svg = document.getElementById('brush');
+  const W=880, H=70, pad={l:56,r:20,t:6,b:6};
+  const w0=pad.l, w1=W-pad.r, h0=pad.t, h1=H-pad.b;
+  const ymin=500000, ymax=3000000;
+  function yPos(v){ const t=(Math.log10(v)-Math.log10(ymin))/(Math.log10(ymax)-Math.log10(ymin)); return h1-t*(h1-h0); }
+  let path='';
+  priceData.forEach((d,i)=>{
+    const x = w0 + (d.mi-FULL[0])/(FULL[1]-FULL[0])*(w1-w0);
+    const y = yPos(d.value);
+    path += (i===0?'M':'L') + x + ',' + y + ' ';
+  });
+  const selX0 = w0 + (view[0]-FULL[0])/(FULL[1]-FULL[0])*(w1-w0);
+  const selX1 = w0 + (view[1]-FULL[0])/(FULL[1]-FULL[0])*(w1-w0);
+  svg.innerHTML = `
+    <line class="gridline" x1="${w0}" y1="${h1}" x2="${w1}" y2="${h1}" style="stroke:var(--axis)" />
+    <path class="brush-overview-line" d="${path}" />
+    <rect class="brush-sel" x="${selX0}" y="${h0}" width="${selX1-selX0}" height="${h1-h0}" />
+    <line class="brush-edge" x1="${selX0}" y1="${h0}" x2="${selX0}" y2="${h1}" />
+    <line class="brush-edge" x1="${selX1}" y1="${h0}" x2="${selX1}" y2="${h1}" />
+    <rect class="brush-handle" x="${selX0-4}" y="${(h0+h1)/2-9}" width="8" height="18" rx="3" />
+    <rect class="brush-handle" x="${selX1-4}" y="${(h0+h1)/2-9}" width="8" height="18" rx="3" />
+  `;
+  // drag logic
+  let dragging = null;
+  const toMonth = px => FULL[0] + (px-w0)/(w1-w0)*(FULL[1]-FULL[0]);
+  svg.onmousedown = (e) => {
+    const rect = svg.getBoundingClientRect();
+    const px = (e.clientX-rect.left)/rect.width*W;
+    const dl = Math.abs(px-selX0), dr = Math.abs(px-selX1);
+    dragging = dl<14 ? 'l' : dr<14 ? 'r' : 'move';
+    svg._dragStartPx = px;
+    svg._dragStartView = view.slice();
+  };
+  window.addEventListener('mousemove', (e) => {
+    if (!dragging) return;
+    const rect = svg.getBoundingClientRect();
+    const px = (e.clientX-rect.left)/rect.width*W;
+    const m = Math.max(FULL[0], Math.min(FULL[1], toMonth(px)));
+    if (dragging==='l') view[0] = Math.min(m, view[1]-1);
+    else if (dragging==='r') view[1] = Math.max(m, view[0]+1);
+    else {
+      const dm = toMonth(px) - toMonth(svg._dragStartPx);
+      let nv0 = svg._dragStartView[0]+dm, nv1 = svg._dragStartView[1]+dm;
+      const span = nv1-nv0;
+      if (nv0 < FULL[0]) { nv0=FULL[0]; nv1=nv0+span; }
+      if (nv1 > FULL[1]) { nv1=FULL[1]; nv0=nv1-span; }
+      view[0]=nv0; view[1]=nv1;
+    }
+    document.querySelectorAll('.zbtn').forEach(b=>b.classList.remove('active'));
+    renderAll();
+  });
+  window.addEventListener('mouseup', () => dragging=null);
+}
+
+function attachTooltips(){
+  const tip = document.createElement('div');
+  tip.className='tooltip'; tip.id='tip';
+  document.querySelector('.card').style.position='relative';
+  const old = document.getElementById('tip-shared');
+  if(!old){ tip.id='tip-shared'; document.querySelector('.card').appendChild(tip); }
+  document.querySelectorAll('[data-label]').forEach(el => {
+    el.onmouseenter = (e) => {
+      const t = document.getElementById('tip-shared');
+      const svgRect = el.closest('svg').getBoundingClientRect();
+      const cardRect = document.querySelector('.card').getBoundingClientRect();
+      const cx = el.cx.baseVal.value / 880 * svgRect.width;
+      const cy = el.cy.baseVal.value / el.closest('svg').viewBox.baseVal.height * svgRect.height;
+      t.style.left = (svgRect.left - cardRect.left + cx) + 'px';
+      t.style.top = (svgRect.top - cardRect.top + cy) + 'px';
+      t.innerHTML = el.getAttribute('data-label').split('\n').join('<br>');
+      t.style.opacity = 1;
+    };
+    el.onmouseleave = () => { const t=document.getElementById('tip-shared'); if(t) t.style.opacity=0; };
+  });
+}
+
+function buildTable(){
+  const rows = [];
+  priceData.forEach(d=>rows.push([d.label,'주가',d.real?'실측':'추정',(d.value/10000).toFixed(0)+'만원']));
+  foreignData.forEach(d=>rows.push([d.label,'외국인지분율',d.real?'실측':'추정',d.value.toFixed(2)+'%']));
+  creditData.forEach(d=>rows.push([d.label,'신용융자잔고',d.real?'실측':'추정',d.value.toFixed(2)+'조원']));
+  rows.sort((a,b)=> a[0].localeCompare(b[0]));
+  let html = '<thead><tr><th>시점</th><th>지표</th><th>구분</th><th>값</th></tr></thead><tbody>';
+  rows.forEach(r => html += `<tr><td>${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td><td class="num">${r[3]}</td></tr>`);
+  html += '</tbody>';
+  document.getElementById('datatable').innerHTML = html;
+}
+
+document.querySelectorAll('.zbtn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const [a,b] = btn.dataset.range.split(',').map(Number);
+    if (a===b) return;
+    view = [a,b];
+    document.querySelectorAll('.zbtn').forEach(x=>x.classList.remove('active'));
+    btn.classList.add('active');
+    renderAll();
+  });
+});
+
+renderAll();
+buildTable();
+</script>
+</body>
+</html>
