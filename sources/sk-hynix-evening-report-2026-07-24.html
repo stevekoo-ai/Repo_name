@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>[SK하이닉스 Daily Monitor] 저녁 - 2026-07-24 19:04</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif; background:linear-gradient(135deg,#667eea 0%,#764ba2 100%); padding:20px; min-height:100vh; color:#333; }
+.container { max-width:1000px; margin:0 auto; background:white; border-radius:12px; box-shadow:0 20px 60px rgba(0,0,0,0.3); overflow:hidden; }
+.header { background:linear-gradient(135deg,#1e3c72 0%,#2a5298 100%); color:white; padding:28px; text-align:center; }
+.header h1 { font-size:22px; margin-bottom:8px; font-weight:700; }
+.header .date { font-size:13px; opacity:0.9; }
+.content { padding:28px; }
+.section { margin-bottom:26px; }
+.section-title { font-size:17px; font-weight:700; color:#1e3c72; margin-bottom:12px; padding-bottom:8px; border-bottom:3px solid #667eea; }
+.metric { background:#f8f9fa; padding:14px; border-radius:8px; margin-bottom:10px; border-left:4px solid #667eea; }
+.metric.positive { border-left-color:#27ae60; } .metric.warn { border-left-color:#f39c12; } .metric.negative { border-left-color:#e74c3c; }
+.metric-label { font-size:11px; color:#666; text-transform:uppercase; font-weight:600; }
+.metric-value { font-size:18px; font-weight:700; color:#1e3c72; margin-top:4px; }
+.positive { color:#27ae60; } .negative { color:#e74c3c; } .warn { color:#f39c12; }
+.new-badge { display:inline-block; background:#e74c3c; color:white; font-size:10px; padding:2px 8px; border-radius:10px; margin-left:6px; }
+.fact { display:inline-block; background:#1e3c72; color:white; font-size:10px; font-weight:700; padding:2px 7px; border-radius:4px; margin-right:6px; }
+.opinion { display:inline-block; background:#8e6bbf; color:white; font-size:10px; font-weight:700; padding:2px 7px; border-radius:4px; margin-right:6px; }
+.diagnosis { background:linear-gradient(135deg,#667eea15 0%,#764ba215 100%); border-left:4px solid #667eea; padding:18px; border-radius:8px; }
+.diagnosis-title { font-size:13px; color:#666; text-transform:uppercase; font-weight:600; margin-bottom:8px; }
+.diagnosis-text { font-size:15px; font-weight:600; color:#1e3c72; line-height:1.6; }
+.footer { background:#f8f9fa; padding:16px; text-align:center; border-top:1px solid #e9ecef; font-size:11px; color:#999; }
+table { width:100%; border-collapse:collapse; font-size:13px; }
+th { padding:9px; text-align:left; font-weight:600; background:#f8f9fa; }
+td { padding:9px; border-bottom:1px solid #e9ecef; vertical-align:top; }
+.deepdive { background:linear-gradient(135deg,#1e3c7208 0%,#8e6bbf10 100%); border:2px dashed #8e6bbf; border-radius:10px; padding:20px; }
+.deepdive .section-title { border-bottom-color:#8e6bbf; }
+.item { font-size:13px; line-height:1.6; margin-bottom:8px; }
+.scorebox { background:linear-gradient(135deg,#1e3c72 0%,#2a5298 100%); color:white; border-radius:10px; padding:20px; text-align:center; margin-bottom:12px; }
+.scorebox .num { font-size:40px; font-weight:800; line-height:1; }
+.scorebox .grade { font-size:13px; font-weight:700; margin-top:5px; opacity:0.95; }
+.breakcond { display:flex; gap:8px; margin-top:10px; flex-wrap:wrap; }
+.breakcond .pill { flex:1; min-width:180px; background:#f8f9fa; border-radius:8px; padding:8px 10px; font-size:11px; border-left:3px solid #27ae60; }
+
+/* macro headline */
+.macro-headline { background:linear-gradient(135deg,#2a3b8f10 0%,#1e3c7210 100%); border:1px solid #d8dcf0; border-radius:10px; padding:20px; }
+.macro-story { font-size:14px; line-height:1.75; color:#2a2f4a; margin-bottom:16px; }
+.macro-story .sign { font-style:italic; color:#8e6bbf; font-size:12px; display:block; margin-top:8px; text-align:right; }
+.gil-row { display:flex; gap:10px; margin-bottom:16px; flex-wrap:wrap; }
+.gil-gauge { flex:1; min-width:140px; background:white; border-radius:8px; padding:12px; text-align:center; border:1px solid #e5e7f5; }
+.gil-gauge .label { font-size:10px; color:#888; font-weight:700; letter-spacing:0.05em; }
+.gil-gauge .val { font-size:22px; font-weight:800; color:#1e3c72; margin:4px 0; }
+.gil-gauge .arrow { font-size:11px; }
+.quadrant-badge { display:inline-block; background:#f39c12; color:white; font-size:12px; font-weight:700; padding:4px 12px; border-radius:20px; }
+.analogue-card { background:white; border:1px solid #e5e7f5; border-radius:8px; padding:14px; margin-bottom:10px; }
+.analogue-card .period { font-size:14px; font-weight:800; color:#1e3c72; }
+.analogue-card .dist { font-size:11px; color:#999; margin-left:6px; }
+.analogue-card .story { font-size:12px; color:#555; line-height:1.6; margin:6px 0 10px; }
+.compare-row { display:flex; gap:8px; margin:8px 0 10px; }
+.compare-box { flex:1; border-radius:6px; padding:8px 10px; font-size:11.5px; line-height:1.5; }
+.compare-box.same { background:#eef1fb; color:#33395c; }
+.compare-box.diff { background:#fff6e9; color:#6b4f1f; }
+.compare-box .tag { font-size:9px; font-weight:800; text-transform:uppercase; letter-spacing:0.04em; display:block; margin-bottom:3px; opacity:0.65; }
+.scenario-grid { display:grid; grid-template-columns:1fr 1fr; gap:6px; }
+.scenario-cell { border-radius:6px; padding:8px 9px; font-size:11px; line-height:1.5; }
+.scenario-cell.risk-up { background:#fdecea; color:#8a2b1f; }
+.scenario-cell.risk-down { background:#eaf7ef; color:#1f6b3a; }
+.scenario-cell.up-up { background:#eef3ff; color:#1f3f8a; }
+.scenario-cell.up-down { background:#f4f1fb; color:#4a3a7a; }
+.scenario-cell b { display:block; font-size:10px; margin-bottom:2px; }
+</style>
+</head>
+<body>
+<div class="container">
+<div class="header">
+<h1>[SK하이닉스 Daily Monitor] 저녁</h1>
+<div class="date">2026-07-24 19:04 KST (금)</div>
+</div>
+<div class="content">
+
+<div class="section">
+<div class="section-title">1. SK하이닉스 주가 현황</div>
+<div class="metric negative">
+<div class="metric-label">종가 확정(7/24)</div>
+<div class="metric-value negative">1,759,000원 (-8.34%)</div>
+<div style="font-size:12px; color:#666; margin-top:6px;">6월 역대 최고 종가(2,987,000원) 대비 드로다운 약 -41.1%. 삼성전자도 동반 7~8%대 급락 — 섹터 전반 수급 충격.</div>
+</div>
+<div class="metric warn">
+<div class="metric-label">🔴 오늘 아침·장초반 대비 새로 추가된 것 <span class="new-badge">NEW</span></div>
+<div style="font-size:13px; margin-top:6px; line-height:1.6;">
+<b>오늘 급락 주체 확정</b> — 체결 기준 매매동향으로 외국인 순매도 <b>1조 7,568억원</b>(전일 코스피 순매수 1위→오늘 순매도 1위 반전, 삼성전자와 순매도 1·2위)과 기관 순매도 <b>8,673억원</b> 확인. 촉발 원인은 어젯밤 미국 빅테크 실적 쇼크(알파벳 -7%대·테슬라 -14%대, AI투자 확대에 따른 FCF 악화 우려)의 밸류체인 전이 + 단일종목 레버리지 ETF 청산. KSD 보유현황(07-24 보유증감 +12,435주, 사실상 보합)과는 방향이 배치되는데, 체결(당일)·결제(통상 T+2) 사이 시차 때문일 가능성 — 검증은 7/28 전후.
+</div>
+</div>
+</div>
+
+<div class="section">
+<div class="section-title">2. 🌐 오늘의 매크로 헤드라인</div>
+<div class="macro-headline">
+<div class="macro-story">
+"오늘 미국 경기 국면은 성장이 딱 멈춰선 자리에서 물가만 살짝 고개를 드는, <b>스태그플레이션 경계선</b> 위에 서 있어요. 가장 닮은 옛날 이야기를 꺼내보면 <b>1957년 봄</b> — 겉으로는 잠잠했지만 몇 달 뒤 침체가 찾아왔던 그 시절과 가장 가까운 거리예요. 오늘은 이 카드를 흔들 만한 새 지표 발표가 없어 아침 판정을 그대로 가져왔습니다 — 확인지표·반박지표 체크리스트도 전부 ⏳(대기) 상태 유지예요."
+<span class="sign">— 오늘의 브리핑, 비서 올림</span>
+</div>
+
+<div class="gil-row">
+<div class="gil-gauge"><div class="label">G · 성장</div><div class="val">≈0.00</div><div class="arrow">⚪ 정체</div></div>
+<div class="gil-gauge"><div class="label">I · 물가</div><div class="val" style="color:#e67e22;">+0.015</div><div class="arrow">🔺 소폭 가속</div></div>
+<div class="gil-gauge"><div class="label">L · 유동성</div><div class="val">-0.62</div><div class="arrow">⚪ 완화적</div></div>
+</div>
+<div style="text-align:center; margin-bottom:16px;"><span class="quadrant-badge">⚠ STAGFLATION (경계선)</span> <span style="font-size:11px; color:#999; margin-left:8px;">시드데이터 2026-05월 기준 · CPI YoY 4.25%</span></div>
+
+<div style="font-size:13px; font-weight:700; color:#1e3c72; margin-bottom:8px;">가장 닮은 과거 시기 TOP 3 (아침 카드 재사용)</div>
+
+<div class="analogue-card">
+<span class="period">① 1957년 4월</span><span class="dist">거리 0.085 · 최근접</span>
+<div class="story">한국전쟁 이후 물가가 진정된 듯 보였던 봄. 이 몇 달 뒤인 1957년 8월, 아이젠하워 리세션이 터졌다 — "겉으로는 안정, 속으로는 균열"이 별명.</div>
+<div class="compare-row">
+<div class="compare-box same"><span class="tag">공통점</span>물가는 진정된 듯, 고용 개선은 멈춘 애매한 정체기 — 방향성이 안 보이는 지표들</div>
+<div class="compare-box diff"><span class="tag">차이점</span>그때는 없던 AI 데이터센터·HBM 사이클이 지금은 별도 성장엔진으로 돌아가는 중</div>
+</div>
+<div class="scenario-grid">
+<div class="scenario-cell risk-up"><b>🔴 위험↑</b>신용스프레드 확대 + 산업생산 동시 둔화 → 침체 전이 확률↑</div>
+<div class="scenario-cell risk-down"><b>🟢 위험↓</b>고용지표 서프라이즈 상회로 G 플러스 반등 → 이 애널로그와 거리 멀어짐</div>
+<div class="scenario-cell up-up"><b>🚀 상승기대↑</b>거시 흔들려도 하이퍼스케일러 CapEx 유지 → SK하이닉스만 디커플링 강세</div>
+<div class="scenario-cell up-down"><b>📉 상승기대↓</b>침체신호가 실제 데이터센터 투자둔화로 전이 → HBM 수요 자체 훼손(최악)</div>
+</div>
+</div>
+
+<div class="analogue-card">
+<span class="period">② 1979년 4월</span><span class="dist">거리 0.229</span>
+<div class="story">2차 오일쇼크 직전, 볼커 의장 취임(1979-08) 이전. 이후 물가가 폭주하며 본격 스태그플레이션으로 번졌던 서곡.</div>
+<div class="compare-row">
+<div class="compare-box same"><span class="tag">공통점</span>물가 재가속 초기, Fed 스탠스가 아직 명확히 매파로 굳어지지 않은 애매한 시점</div>
+<div class="compare-box diff"><span class="tag">차이점</span>그때는 오일쇼크(공급충격), 지금은(오른다면) AI 전력·설비 수요발(수요충격) — 원인이 다름</div>
+</div>
+<div class="scenario-grid">
+<div class="scenario-cell risk-up"><b>🔴 위험↑</b>에너지 가격 급등 or Fed 긴축 재개 → 1979-80형 스태그플레이션 재현, 멀티플 전반 압박</div>
+<div class="scenario-cell risk-down"><b>🟢 위험↓</b>물가가속이 일회성(관세 등)으로 확인, Fed 동결 유지 → 긴축 우려 완화</div>
+<div class="scenario-cell up-up"><b>🚀 상승기대↑</b>물가상승이 AI 설비·전력수요 확대로 확인("성장통") → 메모리 수요 강세 방증</div>
+<div class="scenario-cell up-down"><b>📉 상승기대↓</b>금리 실제 재인상 → 저PER 근거는 유지되나 시장 전체 리레이팅 둔화</div>
+</div>
+</div>
+
+<div class="analogue-card">
+<span class="period">③ 2002년 12월</span><span class="dist">거리 0.339</span>
+<div class="story">닷컴버블 붕괴 후 "고용 없는 회복" 국면. Fed는 이후 2003년 6월 1.0%까지 추가 인하했다.</div>
+<div class="compare-row">
+<div class="compare-box same"><span class="tag">공통점</span>저성장·고용 정체가 이어지는 국면이라는 큰 틀</div>
+<div class="compare-box diff"><span class="tag">차이점</span>2002년은 닷컴버블 후유증(설비과잉)이 원인, 지금은 정반대로 AI투자가 고용·설비를 견인 중 — 가장 근본적 차이</div>
+</div>
+<div class="scenario-grid">
+<div class="scenario-cell risk-up"><b>🔴 위험↑</b>AI CapEx 자체가 꺾여 고용 견인력 상실 → 진짜 "고용없는회복"으로 수렴, 메모리 수요도 함께 훼손</div>
+<div class="scenario-cell risk-down"><b>🟢 위험↓</b>AI투자가 계속 고용 예외적으로 지지 → 이 애널로그와 유사성 자체가 옅어짐</div>
+<div class="scenario-cell up-up"><b>🚀 상승기대↑</b>위 "위험↓"과 사실상 동일 — AI CapEx 견조 유지 자체가 상승기대 근거</div>
+<div class="scenario-cell up-down"><b>📉 상승기대↓</b>위 "위험↑"과 동일 트리거 — 이 애널로그는 위험·상승기대 축이 같은 방향으로 움직이는 예외 케이스</div>
+</div>
+</div>
+
+<div style="font-size:11px; color:#999; margin-top:10px; text-align:center;">수렴도(convergence) 스코어: 기준선 0% 유지 — 오늘 확인/반박된 개별 지표 없음</div>
+</div>
+</div>
+
+<div class="section">
+<div class="section-title">3. 🚨 HBM Cycle Score (하루 최종 확정치)</div>
+<div class="scorebox">
+<div class="num">70<span style="font-size:20px;">/100</span></div>
+<div class="grade">⚠ 경계(60~80)</div>
+</div>
+<table>
+<tr><th>축</th><th>배점</th><th>비고</th></tr>
+<tr><td>외국인수급</td><td>5/15</td><td>등록보유율 안정적이나 오늘 체결기준 대량매도(1.76조) 미반영 상태</td></tr>
+<tr><td>보유율</td><td>8/15</td><td>변화 없음</td></tr>
+<tr><td>ASP</td><td>20/25</td><td>3주연속하락 미해당, 2027 상승 전망 유지</td></tr>
+<tr><td>엔비디아&CoWoS</td><td>22/25</td><td>CoWoS 완전가동 유지, 단 GB300 일부 CSP 주문 일시중단 뉴스로 소폭 하향</td></tr>
+<tr><td>공급확대</td><td>5/10</td><td>변화 없음(CXMT 캐파확장 경계 유지)</td></tr>
+<tr><td>고객재고</td><td>10/10</td><td>알파벳·오픈AI·메타 CapEx 확대 재확인으로 소폭 상향</td></tr>
+</table>
+<div class="breakcond">
+<div class="pill">①ASP5%+하락 <b class="positive">미충족</b></div>
+<div class="pill">②엔비디아주문-10% <b class="positive">미충족</b></div>
+<div class="pill">③CoWoS95%이하 <b class="positive">미충족</b></div>
+<div class="pill">④외국인20일순매도 <b class="warn">미충족(관찰)</b></div>
+</div>
+<div style="font-size:12px; color:#666; margin-top:8px;">붕괴조건 0/4 — 투자 가설 [유지]</div>
+</div>
+
+<div class="section">
+<div class="section-title">4. ⚡ 선행지표: 엔비디아 주문 & CoWoS</div>
+<div class="item"><span class="fact">FACT</span>TSMC CoWoS 자체는 여전히 완전가동(약 100%), 2026년말 12~13만WPM까지 증설 중.</div>
+<div class="item"><span class="fact">FACT</span>다만 MS 등 일부 CSP가 GB300 신규주문을 일시 중단하고 더 안정적인 HGX 8-카드 시리즈로 대체 발주 중이라는 뉴스 확인(날짜 미확정 — 재검증 필요). CoWoS-S 주문 축소·CoWoS-L 대기주문 확대.</div>
+<div class="item"><span class="opinion">OPINION</span>판정을 "완전한 Bullish"에서 <b class="warn">"대체로 Bullish, GB300 개별모델 단위 주문 변동성 존재"</b>로 한 단계 낮춤. CoWoS 활용률 자체는 여전히 95% 훨씬 위.</div>
+</div>
+
+<div class="section">
+<div class="section-title">5. 🌐 하이퍼스케일러 고객 동향</div>
+<div class="item">🇺🇸 <span class="fact">FACT</span>알파벳 CapEx $205B로 추가 상향 재확인, 오픈AI 조지아주 3.2GW 데이터센터 프로젝트 발표, 메타 데이터센터 건설용 120억달러 회사채 발행 추진 — CapEx 확대 기조 계속 확인. 재고 센티먼트 9~10점(부정 키워드 없음).</div>
+<div class="item">🇨🇳 <span class="fact">FACT</span>CXMT-텐센트 D램 장기공급계약(약 4.5조원, 기존 확인 사실과 동일), CXMT 상하이 상장 절차 진행(7/27 D-3) — 오늘 신규 확인 사항 없음.</div>
+</div>
+
+<div class="section">
+<div class="section-title">6. FACT vs OPINION 매트릭스</div>
+<table>
+<tr><th>항목</th><th>판정</th><th>비고</th></tr>
+<tr><td>①DRAM/NAND</td><td class="positive">긍정강화</td><td>HBM이 DRAM웨이퍼 23%까지 확대</td></tr>
+<tr><td>②HBM4</td><td class="positive">긍정</td><td>SK 60%+ 점유율 유지, 삼성 추격은 감시 지속</td></tr>
+<tr><td>③CapEx(분기점)</td><td class="positive">긍정 재확인</td><td>알파벳 $205B, 오픈AI·메타 신규 투자 확대 확인</td></tr>
+<tr><td>④LTA</td><td class="positive">긍정</td><td>가격상한선 없음</td></tr>
+<tr><td>⑤주주환원</td><td class="positive">긍정</td><td>100조원 계획</td></tr>
+<tr><td>⑥ADR(분기점)</td><td class="positive">긍정강화</td><td>7/29 양방향전환 개시 예정</td></tr>
+<tr><td>⑦중국산DRAM</td><td class="negative">부정, 주의</td><td>CXMT 상장 D-3(7/27), 텐센트 계약 기존 확인</td></tr>
+<tr><td>⑧마이크론할인</td><td class="positive">긍정</td><td>PER 6.8~6.9배</td></tr>
+<tr><td>⑨실적/마진</td><td class="positive">긍정</td><td>발표 7/29(D-5)</td></tr>
+</table>
+</div>
+
+<div class="section">
+<div class="section-title">7. 🎯 찐반등 4대 신호 체크 (오늘 전부 불충족)</div>
+<table>
+<tr><th>신호</th><th>상태</th></tr>
+<tr><td>①빚의 청산</td><td class="warn">부분확인·미확정</td></tr>
+<tr><td>②개미의 항복</td><td class="negative">불충족(혼재)</td></tr>
+<tr><td>③외국인 귀환</td><td class="negative">불충족 재확인·강화 — 오늘 체결기준 순매도 1.76조원(코스피 순매도 1위)</td></tr>
+<tr><td>④미국빅테크 동반상승</td><td class="negative">불충족 재확인·강화 — 알파벳 -7%대·테슬라 -14%대 동반 급락(정반대 방향)</td></tr>
+</table>
+<div style="font-size:12px; color:#666; margin-top:8px;">오늘 급락은 사실상 ④번 신호가 정반대로 실현된 결과 — 4대 신호 중 하나도 충족 안 됨, "찐 반등" 근거는 더 약해진 하루.</div>
+</div>
+
+<div class="section deepdive">
+<div class="section-title">8. [Deep Dive] CXL & 차세대 메모리 트랙</div>
+<div class="item" style="color:#666;">신규 소식 없음 — CXL 4.0 스펙, MS Azure 상용배포, 삼성 CMM-D 3.0·SK하이닉스 2세대 CMM-DDR5(추론효율 35.7%개선), 3사 공통 컨트롤러 자사화 중단 기존 확인 유지.</div>
+</div>
+
+<div class="section">
+<div class="diagnosis">
+<div class="diagnosis-title">🧭 한줄 진단 & 관전 포인트</div>
+<div class="diagnosis-text">
+오늘 급락은 펀더멘털 훼손이 아니라 미국 빅테크(알파벳·테슬라) 실적쇼크發 수급 충격이다 — 외국인·기관이 동시에 팔았고, 찐반등 4대 신호는 오늘 전부 불충족으로 오히려 후퇴했다. 반면 HBM Cycle Score는 70점(경계)으로 하루 만에 3점만 하락했을 뿐, 붕괴조건은 여전히 0/4 — CoWoS 완전가동·CapEx 확대 재확인 등 핵심 수요 축은 안 흔들렸다. 다음 검증 포인트는 ①7/28 전후 KSD 보유율에 오늘의 대량매도가 실제로 반영되는지 ②7/27 CXMT 상장 ③7/29 SK하이닉스 자체 실적.
+</div>
+</div>
+</div>
+
+</div>
+<div class="footer">2026-07-24 19:04 KST | 다음 체크: 내일 07:00 아침</div>
+</div>
+</body>
+</html>
