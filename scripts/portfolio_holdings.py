@@ -14,6 +14,13 @@ sources/portfolio-holdings.csv에 기록하는 스크립트. GitHub Actions가 �
   KIS_ACCOUNT_IRP   — IRP(개인퇴직연금) 계좌
   4개 전부 등록할 필요는 없다 — 등록된 것만 조회한다.
 
+⚠ 앱키(KIS_APP_KEY/KIS_APP_SECRET)는 KIS Developers 신청 시점에 특정
+계좌번호 하나에 묶인다(신청현황 화면에 계좌별로 별도 행이 뜨는 게 그
+증거) — 다른 계좌의 앱키로 조회하면 output1 자체가 없는 형태로 실패한다
+(2026-07-25 실측 확인). 계좌별로 별도 앱키가 필요하면
+KIS_APP_KEY_{슬롯}/KIS_APP_SECRET_{슬롯}(예: KIS_APP_KEY_ISP)을 추가
+등록하면 되고, 없으면 공용 KIS_APP_KEY/KIS_APP_SECRET로 자동 폴백한다.
+
 ⚠ 계좌 종류별로 실제 KIS 잔고조회 TR이 다르다:
   - GEN/ISP(일반·ISA 등 위탁계좌): TR TTTC8434R (문서 기억 기반, --raw로 검증 권장)
   - IRP(퇴직연금): TR TTTC2202R — KIS 공식 GitHub 예제(koreainvestment/open-trading-api)로
@@ -83,6 +90,17 @@ def _get_env_or_die(name):
     return v
 
 
+def _get_account_keys(suffix):
+    """계좌별 앱키/시크릿 조회. KIS는 앱키가 발급 시점에 특정 계좌번호에
+    묶여있어(KIS Developers 신청현황에서 계좌별로 별도 등록), 다른 계좌의
+    앱키로 조회하면 output1이 아예 없는 형태로 실패한다(2026-07-25 실측
+    확인). KIS_APP_KEY_{suffix}/KIS_APP_SECRET_{suffix}가 있으면 그걸
+    우선 쓰고, 없으면 공용 KIS_APP_KEY/KIS_APP_SECRET로 폴백한다."""
+    appkey = os.environ.get(f"KIS_APP_KEY_{suffix}") or _get_env_or_die("KIS_APP_KEY")
+    appsecret = os.environ.get(f"KIS_APP_SECRET_{suffix}") or _get_env_or_die("KIS_APP_SECRET")
+    return appkey, appsecret
+
+
 def _load_accounts():
     accounts = []
     for suffix, (label, is_pension) in ACCOUNT_SLOTS.items():
@@ -119,20 +137,23 @@ def _load_accounts():
     return accounts
 
 
-def kis_get_token(account_type="real"):
+def kis_get_token(appkey, appsecret, account_type="real"):
+    """OAuth2 접근토큰 발급. 앱키별로 토큰이 다르므로(계좌마다 다른 앱키를
+    쓸 수 있음, _get_account_keys 참고) 캐시도 (account_type, appkey) 조합으로
+    구분해서 저장한다."""
     from pathlib import Path as _P
     import json as _json
     from datetime import datetime as _dt, timedelta as _td
 
     token_cache = _P(__file__).resolve().parent / ".kis_token_cache.json"
+    cache_key = f"{account_type}:{appkey}"
+    cached_all = {}
     if token_cache.exists():
-        cached = _json.loads(token_cache.read_text())
-        if cached.get("account_type") == account_type and \
-                _dt.fromisoformat(cached["expires_at"]) > _dt.now():
-            return cached["access_token"]
+        cached_all = _json.loads(token_cache.read_text())
+        entry = cached_all.get(cache_key)
+        if entry and _dt.fromisoformat(entry["expires_at"]) > _dt.now():
+            return entry["access_token"]
 
-    appkey = _get_env_or_die("KIS_APP_KEY")
-    appsecret = _get_env_or_die("KIS_APP_SECRET")
     host = KIS_HOSTS[account_type]
     body = json.dumps({"grant_type": "client_credentials", "appkey": appkey, "appsecret": appsecret}).encode()
     req = urllib.request.Request(f"{host}/oauth2/tokenP", data=body, method="POST",
@@ -141,15 +162,13 @@ def kis_get_token(account_type="real"):
         data = json.loads(resp.read())
     token = data["access_token"]
     expires_at = _dt.now() + _td(seconds=int(data.get("expires_in", 86400)) - 300)
-    token_cache.write_text(_json.dumps({"account_type": account_type, "access_token": token,
-                                         "expires_at": expires_at.isoformat()}))
+    cached_all[cache_key] = {"access_token": token, "expires_at": expires_at.isoformat()}
+    token_cache.write_text(_json.dumps(cached_all))
     return token
 
 
-def fetch_general_balance(cano, prdt_cd, account_type="real", raw=False):
-    appkey = _get_env_or_die("KIS_APP_KEY")
-    appsecret = _get_env_or_die("KIS_APP_SECRET")
-    token = kis_get_token(account_type)
+def fetch_general_balance(cano, prdt_cd, appkey, appsecret, account_type="real", raw=False):
+    token = kis_get_token(appkey, appsecret, account_type)
     host = KIS_HOSTS[account_type]
     tr_id = GENERAL_BALANCE_TR[account_type]
 
@@ -216,11 +235,9 @@ def _parse_holdings(data):
     return holdings
 
 
-def fetch_pension_balance(cano, prdt_cd, account_type="real", raw=False):
+def fetch_pension_balance(cano, prdt_cd, appkey, appsecret, account_type="real", raw=False):
     """퇴직연금 체결기준잔고(IRP 등) 조회. DC(55번 계좌)는 KIS API 자체가 미지원(공식 문서 명시)."""
-    appkey = _get_env_or_die("KIS_APP_KEY")
-    appsecret = _get_env_or_die("KIS_APP_SECRET")
-    token = kis_get_token(account_type)
+    token = kis_get_token(appkey, appsecret, account_type)
     host = KIS_HOSTS[account_type]
 
     params = f"CANO={cano}&ACNT_PRDT_CD={prdt_cd}&USER_DVSN_CD=00&CTX_AREA_FK100=&CTX_AREA_NK100="
@@ -300,10 +317,11 @@ def cmd_sync(args):
                   file=sys.stderr)
             continue
         try:
+            appkey, appsecret = _get_account_keys(acc["slot"])
             if acc["pension"]:  # IRP
-                holdings = fetch_pension_balance(acc["cano"], acc["prdt_cd"], args.account_type, raw=args.raw)
+                holdings = fetch_pension_balance(acc["cano"], acc["prdt_cd"], appkey, appsecret, args.account_type, raw=args.raw)
             else:  # GEN, ISP
-                holdings = fetch_general_balance(acc["cano"], acc["prdt_cd"], args.account_type, raw=args.raw)
+                holdings = fetch_general_balance(acc["cano"], acc["prdt_cd"], appkey, appsecret, args.account_type, raw=args.raw)
         except SystemExit as e:
             print(f"[{acc['label']}] 조회 실패: {e}", file=sys.stderr)
             continue
