@@ -1,7 +1,7 @@
 ---
 title: 매크로 지표 트렌드 추적
 created: 2026-07-16
-updated: 2026-07-16
+updated: 2026-07-25
 tags: [macro, rates, concept, daily-tracking]
 ---
 
@@ -9,6 +9,16 @@ tags: [macro, rates, concept, daily-tracking]
 발표치뿐 아니라 시간에 따른 추세 변화와 [SK하이닉스](../entities/sk-hynix.md)
 등 자산 가격과의 관계를 나중에 되짚어볼 수 있게 하는 페이지. investing.com
 캘린더 캡처를 `/ingest`할 때마다 아래 표에 행을 추가한다.
+
+**⚠ 2026-07-24부터 사실상 비활성 — [미국 거시국면(G/I/L)과 역사적 유사
+시기 매칭](macro-regime-history.md)이 이 역할을 대부분 흡수했다.** 그
+페이지는 FRED/ECOS API 기반 자동 파이프라인([scripts/macro_data.py](../../scripts/macro_data.py),
+매일 07:10 KST GitHub Actions)으로 미국·한국 금리·CPI·GDP·환율을 계속
+갱신하는 반면, 이 페이지는 investing.com 봇 차단 이슈로 사용자의 수동
+캡처에 의존해 2026-07-16 이후 갱신이 끊겼다. 개별 경제 캘린더 이벤트
+(예: 특정 지표 발표 시각·컨센서스)를 기록할 필요가 다시 생기면 이
+페이지를 재사용하되, 시계열·국면 판단은 macro-regime-history.md를
+우선 참고할 것.
 
 ## 자동화 한계 (2026-07-16 확인)
 
@@ -43,3 +53,4 @@ investing.com, tradingeconomics.com 모두 자동 스크래핑 시도 시 **403
 - [sources/websearch-bok-rate-decision-2026-07-16.md](../../sources/websearch-bok-rate-decision-2026-07-16.md)
 - [SK하이닉스](../entities/sk-hynix.md)
 - [SK하이닉스 목표주가 근거 체크리스트](sk-hynix-analyst-thesis-checkpoints.md)
+- [미국 거시국면(G/I/L)과 역사적 유사 시기 매칭](macro-regime-history.md) (2026-07-24부터 이 역할을 대부분 대체)

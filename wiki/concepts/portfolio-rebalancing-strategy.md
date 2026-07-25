@@ -1,7 +1,7 @@
 ---
 title: 포트폴리오 리밸런싱과 위험 관리 전략
 created: 2026-07-21
-updated: 2026-07-21
+updated: 2026-07-25
 tags: [portfolio, rebalancing, risk-management, asset-allocation, leverage-risk]
 ---
 
@@ -140,11 +140,11 @@ tags: [portfolio, rebalancing, risk-management, asset-allocation, leverage-risk]
 
 | 기간 | 행동 | 목표 |
 |------|------|------|
-| 7/21(월) 현재 | 리밸런싱 계획 수립 | 심리적 준비 |
+| 7/21(화) 현재 | 리밸런싱 계획 수립 | 심리적 준비 |
 | 7/21~22 | 반도체 30% 매도 시작 | 현금 확보 시작 |
 | 7/22(화) | 알파벳 실적 반응 관찰 | 추세 판단 |
 | 7/22~29 | 시장 반응에 따라 단계적 조정 | 유연한 대응 |
-| 7/29(화) | SK하이닉스 실적 발표 | 최종 판단 기회 |
+| 7/29(수) | SK하이닉스 실적 발표 | 최종 판단 기회 |
 | 8월 이후 | 자산 배분 목표 도달 | 안정성 강화 |
 
 ---
