@@ -16,9 +16,11 @@ sources/portfolio-holdings.csv에 기록하는 스크립트. GitHub Actions가 �
 
 ⚠ 계좌 종류별로 실제 KIS 잔고조회 TR이 다르다:
   - GEN/ISP(일반·ISA 등 위탁계좌): TR TTTC8434R (문서 기억 기반, --raw로 검증 권장)
-  - DC/IRP(퇴직연금계좌): **아직 미구현** — 정확한 TR을 확신할 수 없어
-    임의 코드를 넣는 대신 명시적으로 "미구현"을 반환한다. 실제 계정으로
-    확인 후 PENSION_BALANCE_TR을 채워 넣을 것.
+  - IRP(퇴직연금): TR TTTC2202R — KIS 공식 GitHub 예제(koreainvestment/open-trading-api)로
+    검증. 응답 필드명은 위탁계좌와 동일.
+  - DC(퇴직연금): **KIS API 자체가 미지원** — 공식 문서에 "55번 계좌(DC가입자계좌)의
+    경우 해당 API 이용이 불가합니다"라고 명시돼 있어, 코드를 못 찾은 게 아니라
+    API가 애초에 DC 계좌를 지원하지 않는 것으로 보인다. 명시적으로 건너뛴다.
 
 사용법:
   python3 scripts/portfolio_holdings.py sync                  # 등록된 계좌 전체 조회+CSV 기록
@@ -57,9 +59,13 @@ HOLDING_FIELDS = {
     "profit_loss_pct": "evlu_pfls_rt",
 }
 
-# 퇴직연금(IRP/DC) 잔고조회 TR — 미확인. 일반계좌와 다른 TR을 쓰는 것으로
-# 알려져 있으나 정확한 코드를 문서 기억만으로 확신할 수 없어 비워둔다.
-PENSION_BALANCE_TR = None
+# KIS "퇴직연금 체결기준잔고" TR: TTTC2202R — 공식 예제로 검증됨
+# (koreainvestment/open-trading-api, examples_llm/domestic_stock/pension_inquire_present_balance)
+# GET /uapi/domestic-stock/v1/trading/pension/inquire-present-balance
+# 응답 필드명은 HOLDING_FIELDS와 동일(pdno/prdt_name/hldg_qty/... 공유).
+# ⚠ 공식 문서 명시: "55번 계좌(DC가입자계좌)의 경우 해당 API 이용이 불가합니다"
+# — DC는 코드 문제가 아니라 KIS API 자체가 지원하지 않는 것으로 보임.
+PENSION_BALANCE_TR = "TTTC2202R"
 
 # 계좌 슬롯: 환경변수 접미사 -> (표시 라벨, 퇴직연금 여부)
 ACCOUNT_SLOTS = {
@@ -158,6 +164,10 @@ def fetch_general_balance(cano, prdt_cd, account_type="real", raw=False):
         print(json.dumps(data, ensure_ascii=False, indent=2))
         return []
 
+    return _parse_holdings(data)
+
+
+def _parse_holdings(data):
     rows = data.get("output1")
     if rows is None:
         sys.exit(
@@ -190,6 +200,37 @@ def fetch_general_balance(cano, prdt_cd, account_type="real", raw=False):
             "profit_loss_pct": r[HOLDING_FIELDS["profit_loss_pct"]],
         })
     return holdings
+
+
+def fetch_pension_balance(cano, prdt_cd, account_type="real", raw=False):
+    """퇴직연금 체결기준잔고(IRP 등) 조회. DC(55번 계좌)는 KIS API 자체가 미지원(공식 문서 명시)."""
+    appkey = _get_env_or_die("KIS_APP_KEY")
+    appsecret = _get_env_or_die("KIS_APP_SECRET")
+    token = kis_get_token(account_type)
+    host = KIS_HOSTS[account_type]
+
+    params = f"CANO={cano}&ACNT_PRDT_CD={prdt_cd}&USER_DVSN_CD=00&CTX_AREA_FK100=&CTX_AREA_NK100="
+    req = urllib.request.Request(
+        f"{host}/uapi/domestic-stock/v1/trading/pension/inquire-present-balance?{params}",
+        headers={
+            "content-type": "application/json; charset=utf-8",
+            "authorization": f"Bearer {token}",
+            "appkey": appkey,
+            "appsecret": appsecret,
+            "tr_id": PENSION_BALANCE_TR,
+        },
+    )
+    try:
+        with urllib.request.urlopen(req) as resp:
+            data = json.loads(resp.read())
+    except urllib.error.HTTPError as e:
+        sys.exit(f"KIS 퇴직연금 잔고조회 API 실패: {e.code} {e.read().decode(errors='replace')}")
+
+    if raw:
+        print(json.dumps(data, ensure_ascii=False, indent=2))
+        return []
+
+    return _parse_holdings(data)
 
 
 def _read_csv():
@@ -240,12 +281,15 @@ def cmd_sync(args):
 
     total = 0
     for acc in accounts:
-        if acc["pension"]:
-            print(f"[{acc['label']}] 퇴직연금 계좌 — PENSION_BALANCE_TR 미구현, 건너뜀 "
-                  f"(정확한 TR 확인 후 코드 보강 필요)", file=sys.stderr)
+        if acc["slot"] == "DC":
+            print(f"[{acc['label']}] DC(퇴직연금 55번 계좌)는 KIS API 자체가 미지원(공식 문서 명시) — 건너뜀",
+                  file=sys.stderr)
             continue
         try:
-            holdings = fetch_general_balance(acc["cano"], acc["prdt_cd"], args.account_type, raw=args.raw)
+            if acc["pension"]:  # IRP
+                holdings = fetch_pension_balance(acc["cano"], acc["prdt_cd"], args.account_type, raw=args.raw)
+            else:  # GEN, ISP
+                holdings = fetch_general_balance(acc["cano"], acc["prdt_cd"], args.account_type, raw=args.raw)
         except SystemExit as e:
             print(f"[{acc['label']}] 조회 실패: {e}", file=sys.stderr)
             continue
