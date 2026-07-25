@@ -52,11 +52,20 @@ jobs:
       - name: Regenerate PEOS Daily Dashboard
         run: python -m engine.report.daily_dashboard
 
+      - name: Publish latest monthly report to Pages
+        # report/ now holds both the <month>.html "latest" file and dated <YYYY-MM-DD>.html
+        # archive copies (same content, different name) — pick the month file specifically
+        # so docs/report.html always points at "today's report", not whichever file the
+        # filesystem happens to list first.
+        run: |
+          LATEST_MONTH_FILE=$(ls report/*.html | grep -vE '/[0-9]{4}-[0-9]{2}-[0-9]{2}\.html$' | sort | tail -1)
+          cp "$LATEST_MONTH_FILE" docs/report.html
+
       - name: Commit updated report, history, and dashboard
         run: |
           git config user.name "peos-bot"
           git config user.email "actions@users.noreply.github.com"
-          git add report/ data/snapshots/ data/peos_daily_history.csv data/normalized/ docs/peos-daily.html
+          git add report/ data/snapshots/ data/peos_daily_history.csv data/normalized/ docs/peos-daily.html docs/report.html
           if git diff --cached --quiet; then
             echo "No changes to commit"
           else
