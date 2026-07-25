@@ -1,0 +1,98 @@
+<title>SK하이닉스 장초반 체크 — 2026-07-17</title>
+<style>
+  :root {
+    --bg: #f4f5f1; --surface: #ffffff; --surface-2: #eaebe3;
+    --ink: #1e221d; --ink-soft: #565b4e; --ink-faint: #8b9084;
+    --accent: #2f6b5e; --accent-ink: #143a32; --accent-soft: #dce8e2;
+    --border: #d8d9cf;
+    --pos: #2f6b3f; --pos-bg: #e3ecdd;
+    --neu: #96660f; --neu-bg: #f3e8d2;
+    --neg: #a53f3f; --neg-bg: #f4dede;
+    --unk: #6b7066; --unk-bg: #e7e8e1;
+    --shadow: 0 1px 2px rgba(30,34,29,.06), 0 8px 24px -12px rgba(30,34,29,.18);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #14170f; --surface: #1b201a; --surface-2: #212820;
+      --ink: #e9ece4; --ink-soft: #a9ae9e; --ink-faint: #6e7367;
+      --accent: #74c6ae; --accent-ink: #eaf7f2; --accent-soft: #223730;
+      --border: #303830;
+      --pos: #8fd19f; --pos-bg: #1f3324;
+      --neu: #e3b869; --neu-bg: #3a2f18;
+      --neg: #e79b9b; --neg-bg: #3a2222;
+      --unk: #9aa093; --unk-bg: #262b23;
+      --shadow: 0 1px 2px rgba(0,0,0,.4), 0 8px 24px -12px rgba(0,0,0,.6);
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #14170f; --surface: #1b201a; --surface-2: #212820;
+    --ink: #e9ece4; --ink-soft: #a9ae9e; --ink-faint: #6e7367;
+    --accent: #74c6ae; --accent-ink: #eaf7f2; --accent-soft: #223730;
+    --border: #303830;
+    --pos: #8fd19f; --pos-bg: #1f3324;
+    --neu: #e3b869; --neu-bg: #3a2f18;
+    --neg: #e79b9b; --neg-bg: #3a2222;
+    --unk: #9aa093; --unk-bg: #262b23;
+  }
+  :root[data-theme="light"] {
+    --bg: #f4f5f1; --surface: #ffffff; --surface-2: #eaebe3;
+    --ink: #1e221d; --ink-soft: #565b4e; --ink-faint: #8b9084;
+    --accent: #2f6b5e; --accent-ink: #143a32; --accent-soft: #dce8e2;
+    --border: #d8d9cf;
+    --pos: #2f6b3f; --pos-bg: #e3ecdd;
+    --neu: #96660f; --neu-bg: #f3e8d2;
+    --neg: #a53f3f; --neg-bg: #f4dede;
+    --unk: #6b7066; --unk-bg: #e7e8e1;
+  }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--ink); font-family:-apple-system,"Apple SD Gothic Neo","Pretendard","Noto Sans KR",system-ui,sans-serif; line-height:1.65; }
+  .wrap { max-width:52rem; margin:0 auto; padding:2.5rem 1.5rem 5rem; }
+  header { margin-bottom:2rem; }
+  .eyebrow { display:inline-flex; align-items:center; gap:.4rem; font-family:ui-monospace,"SFMono-Regular",Menlo,Consolas,monospace; font-size:.72rem; letter-spacing:.06em; text-transform:uppercase; color:var(--unk); background:var(--unk-bg); border-radius:999px; padding:.28rem .7rem; margin-bottom:1rem; }
+  h1 { font-size:clamp(1.5rem,4.5vw,2rem); font-weight:800; letter-spacing:-.01em; margin:0 0 .5rem; text-wrap:balance; }
+  .lede { color:var(--ink-soft); margin:0; font-size:1rem; }
+  .snapshot { display:grid; grid-template-columns:repeat(auto-fit,minmax(9.5rem,1fr)); gap:.9rem; margin:1.75rem 0; }
+  .stat { background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:1rem 1.1rem; box-shadow:var(--shadow); }
+  .stat .label { font-size:.72rem; color:var(--ink-faint); text-transform:uppercase; letter-spacing:.05em; margin-bottom:.35rem; }
+  .stat .value { font-family:ui-monospace,"SFMono-Regular",Menlo,Consolas,monospace; font-size:1.2rem; font-weight:700; font-variant-numeric:tabular-nums; }
+  .stat .sub { font-size:.8rem; margin-top:.2rem; }
+  .down { color:var(--neg); } .up { color:var(--pos); } .unkc { color:var(--unk); }
+  .card { background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:1.25rem 1.4rem; box-shadow:var(--shadow); margin-bottom:.9rem; }
+  .card p { margin:.4rem 0 0; color:var(--ink-soft); font-size:.9rem; }
+  footer { margin-top:3rem; padding-top:1.25rem; border-top:1px solid var(--border); color:var(--ink-faint); font-size:.82rem; }
+  code { font-family:ui-monospace,Menlo,Consolas,monospace; font-size:.85em; background:var(--surface-2); padding:.1em .35em; border-radius:5px; }
+</style>
+
+<div class="wrap">
+  <header>
+    <span class="eyebrow">● 장초반 체크 · 2026-07-17 10:00</span>
+    <h1>본주 개별 시세 미확인 — 코스피는 약세 지속</h1>
+    <p class="lede">오늘은 종목 단위 실시간 데이터를 검색으로 확보하지 못했다. 확인된 사실만 보고한다.</p>
+  </header>
+
+  <div class="snapshot">
+    <div class="stat"><div class="label">본주 (오늘 09~10시)</div><div class="value unkc">미확인</div><div class="sub">검색상 실시간 시세 미포착</div></div>
+    <div class="stat"><div class="label">코스피 (장중)</div><div class="value">6,820선</div><div class="sub down">시가 6,960.50 대비 약 -2%</div></div>
+    <div class="stat"><div class="label">ADR 간밤(7/16 美) 세션</div><div class="value unkc">미확인</div><div class="sub">뉴스 인덱싱 지연 추정</div></div>
+  </div>
+
+  <div class="card">
+    <p><strong>확인된 것:</strong> 코스피가 오늘 시가 6,960.50에서 6,820선까지
+    밀리며 약세 지속(어제 -5%대 급락에 이어 반등 실패 흐름). 지수가 -2%
+    안팎이라는 점을 감안하면 SK하이닉스도 강한 반등은 아닐 가능성이 높지만,
+    <strong>종목 등락률 자체는 확인하지 못했으므로 숫자를 추정해 쓰지 않는다.</strong></p>
+    <p><strong>미확인인 것:</strong> ① 본주 오늘 등락률(검색이 예측 사이트·과거
+    기사만 반환) ② 간밤 ADR(7/16 미국 세션) 마감치 — 아침 7시 체크에 이어
+    여전히 미포착. 둘 다 저녁 체크(19:00)에서 확정 예정.</p>
+    <p><strong>어제 저녁 체크 이후 새 뉴스:</strong> 새로운 애널리스트
+    목표가·급등락 원인 기사 없음. 아침 체크(07:00)에서 확인한 3건(실적발표일
+    7/29 확정, LTA 가격상한 없음, CXMT-텐센트 계약)이 오늘의 최신 상태
+    그대로다.</p>
+  </div>
+
+  <footer>
+    이 리포트는 장초반 10:00(KST) Routine이 자동 생성한다. 원문 근거는 위키
+    <code>concepts/sk-hynix-analyst-thesis-checkpoints.md</code> 참고. 투자
+    조언 아님.
+  </footer>
+</div>

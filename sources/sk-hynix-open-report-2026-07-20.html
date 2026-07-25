@@ -1,0 +1,123 @@
+<title>SK하이닉스 장초반 체크 — 2026-07-20 (월)</title>
+<style>
+  :root {
+    --bg: #f4f5f1; --surface: #ffffff; --surface-2: #eaebe3;
+    --ink: #1e221d; --ink-soft: #565b4e; --ink-faint: #8b9084;
+    --accent: #2f6b5e; --accent-ink: #143a32; --accent-soft: #dce8e2;
+    --border: #d8d9cf;
+    --pos: #2f6b3f; --pos-bg: #e3ecdd;
+    --neu: #96660f; --neu-bg: #f3e8d2;
+    --neg: #a53f3f; --neg-bg: #f4dede;
+    --unk: #6b7066; --unk-bg: #e7e8e1;
+    --shadow: 0 1px 2px rgba(30,34,29,.06), 0 8px 24px -12px rgba(30,34,29,.18);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #14170f; --surface: #1b201a; --surface-2: #212820;
+      --ink: #e9ece4; --ink-soft: #a9ae9e; --ink-faint: #6e7367;
+      --accent: #74c6ae; --accent-ink: #eaf7f2; --accent-soft: #223730;
+      --border: #303830;
+      --pos: #8fd19f; --pos-bg: #1f3324;
+      --neu: #e3b869; --neu-bg: #3a2f18;
+      --neg: #e79b9b; --neg-bg: #3a2222;
+      --unk: #9aa093; --unk-bg: #262b23;
+      --shadow: 0 1px 2px rgba(0,0,0,.4), 0 8px 24px -12px rgba(0,0,0,.6);
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #14170f; --surface: #1b201a; --surface-2: #212820;
+    --ink: #e9ece4; --ink-soft: #a9ae9e; --ink-faint: #6e7367;
+    --accent: #74c6ae; --accent-ink: #eaf7f2; --accent-soft: #223730;
+    --border: #303830;
+    --pos: #8fd19f; --pos-bg: #1f3324;
+    --neu: #e3b869; --neu-bg: #3a2f18;
+    --neg: #e79b9b; --neg-bg: #3a2222;
+    --unk: #9aa093; --unk-bg: #262b23;
+  }
+  :root[data-theme="light"] {
+    --bg: #f4f5f1; --surface: #ffffff; --surface-2: #eaebe3;
+    --ink: #1e221d; --ink-soft: #565b4e; --ink-faint: #8b9084;
+    --accent: #2f6b5e; --accent-ink: #143a32; --accent-soft: #dce8e2;
+    --border: #d8d9cf;
+    --pos: #2f6b3f; --pos-bg: #e3ecdd;
+    --neu: #96660f; --neu-bg: #f3e8d2;
+    --neg: #a53f3f; --neg-bg: #f4dede;
+    --unk: #6b7066; --unk-bg: #e7e8e1;
+  }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--ink); font-family:-apple-system,"Apple SD Gothic Neo","Pretendard","Noto Sans KR",system-ui,sans-serif; line-height:1.65; }
+  .wrap { max-width:52rem; margin:0 auto; padding:2.5rem 1.5rem 5rem; }
+  header { margin-bottom:2rem; }
+  .eyebrow { display:inline-flex; align-items:center; gap:.4rem; font-family:ui-monospace,"SFMono-Regular",Menlo,Consolas,monospace; font-size:.72rem; letter-spacing:.06em; text-transform:uppercase; color:var(--accent-ink); background:var(--accent-soft); border-radius:999px; padding:.28rem .7rem; margin-bottom:1rem; }
+  h1 { font-size:clamp(1.5rem,4.5vw,2rem); font-weight:800; letter-spacing:-.01em; margin:0 0 .5rem; text-wrap:balance; }
+  .lede { color:var(--ink-soft); margin:0; font-size:1rem; }
+  .snapshot { display:grid; grid-template-columns:repeat(auto-fit,minmax(9.5rem,1fr)); gap:.9rem; margin:1.75rem 0; }
+  .stat { background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:1rem 1.1rem; box-shadow:var(--shadow); }
+  .stat .label { font-size:.72rem; color:var(--ink-faint); text-transform:uppercase; letter-spacing:.05em; margin-bottom:.35rem; }
+  .stat .value { font-family:ui-monospace,"SFMono-Regular",Menlo,Consolas,monospace; font-size:1.2rem; font-weight:700; font-variant-numeric:tabular-nums; }
+  .stat .sub { font-size:.8rem; margin-top:.2rem; }
+  .down { color:var(--neg); } .up { color: var(--pos); } .unkc { color:var(--unk); }
+  .card { background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:1.25rem 1.4rem; box-shadow:var(--shadow); margin-bottom:.9rem; }
+  .card-head { display:flex; align-items:center; justify-content:space-between; gap:1rem; margin-bottom:.5rem; flex-wrap:wrap; }
+  .card h3 { margin:0; font-size:1rem; font-weight:700; }
+  .card p { margin:.4rem 0 0; color:var(--ink-soft); font-size:.9rem; }
+  .card p strong { color:var(--ink); }
+  .pill { display:inline-flex; align-items:center; gap:.35rem; font-size:.75rem; font-weight:700; padding:.25rem .6rem; border-radius:999px; white-space:nowrap; }
+  .pill.pos { color:var(--pos); background:var(--pos-bg); }
+  .pill.neu { color:var(--neu); background:var(--neu-bg); }
+  .pill.neg { color:var(--neg); background:var(--neg-bg); }
+  .new { border-left:3px solid var(--accent); }
+  .redline { border-left:3px solid var(--neg); }
+  footer { margin-top:3rem; padding-top:1.25rem; border-top:1px solid var(--border); color:var(--ink-faint); font-size:.82rem; }
+  code { font-family:ui-monospace,Menlo,Consolas,monospace; font-size:.85em; background:var(--surface-2); padding:.1em .35em; border-radius:5px; }
+</style>
+
+<div class="wrap">
+  <header>
+    <span class="eyebrow">● 장초반 체크 · 2026-07-20 (월) · 사용자 캡처 반영</span>
+    <h1>프리장 -7.5% → 개장 V반등 +1.2% — 1시간 롤러코스터</h1>
+    <p class="lede">연휴(제헌절+주말) 직후 첫 거래일. 미국 목·금 세션이 프리장 갭으로 반영됐다가 개장 후 급반전했다.</p>
+  </header>
+
+  <div class="snapshot">
+    <div class="stat"><div class="label">프리장 저점 (08:15)</div><div class="value">1,724,000</div><div class="sub down">-7.51% (NXT)</div></div>
+    <div class="stat"><div class="label">09:15 현재</div><div class="value">1,864,000</div><div class="sub up">+1.19% · 저점 대비 +9.3%</div></div>
+    <div class="stat"><div class="label">1분 RSI 스윙</div><div class="value">29.6→82.3</div><div class="sub">과매도→과열, 1시간 새</div></div>
+  </div>
+
+  <div class="card new">
+    <div class="card-head"><h3>무슨 일이 있었나</h3><span class="pill neu">변동성 이벤트</span></div>
+    <p>연휴 동안 쌓인 미국 두 세션(목 -13.7% 확정, 금 미확인)이 프리장(NXT)
+    갭다운으로 한꺼번에 반영돼 <strong>08:15 저점 1,724,000원(-7.51%)</strong>
+    — 7/14 패닉 저점(1,718,000원) 코앞까지 갔다가, 정규장 개장 직후 대량
+    거래와 함께 <strong>V자 반등해 09:14 고점 1,884,000원, 09:15
+    +1.19%</strong>로 돌아섰다. 배경(보도): 극심한 과매도(ADR RSI 31) +
+    <strong>SKHY 옵션 첫 만기(7/17, IV 171.83%) 소멸로 감마 헤징 수급 노이즈
+    해소</strong> + AI 메모리 수요 확신 유지. 캘린더 페이지가 예고했던
+    "연휴 직후 첫 거래일 갭 이벤트"가 정확히 실현된 사례.</p>
+  </div>
+
+  <div class="card redline">
+    <div class="card-head"><h3>🔴 정정 — 7/16 종가는 1,842,000원</h3><span class="pill neg">실측 우선</span></div>
+    <p>차트 캡처 2장의 등락 기준가가 모두 <strong>1,842,000원</strong>으로
+    일치 — 기존 위키 기록(뉴스 인용 1,859,500원/-10.69%)과 17,500원
+    불일치해 <strong>실측값 1,842,000원(-11.53%)으로 정정</strong>했다.
+    CNBC의 "-11.5%"가 정확했던 것으로 판명. 이에 따라 ADR 프리미엄도
+    <strong>약 22.8%</strong>로 미세 조정(여전히 "10~25% 안정" 구간).</p>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><h3>그 외</h3><span class="pill neu">유지</span></div>
+    <p>새 애널리스트 변경 없음. 7/17(금) 미국 ADR 세션 종가는 여전히 미확인
+    — 오늘 저녁 체크에서 재시도. 오늘 종가·장중 후반 흐름도 저녁 체크에서
+    확정한다. 다음 이벤트: 7/22(수) 알파벳 실적 → 7/29(수) SK하이닉스 실적
+    (공식 확정, D-9).</p>
+  </div>
+
+  <footer>
+    이 리포트는 장초반 10:00(KST) Routine이 자동 생성하며, 오늘은 사용자
+    제공 차트 캡처 2장을 함께 반영했다. 원문 근거는 위키
+    <code>sources/chart-sk-hynix-open-2026-07-20-notes.md</code> 참고. 투자
+    조언 아님.
+  </footer>
+</div>

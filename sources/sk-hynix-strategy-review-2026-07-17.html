@@ -1,0 +1,315 @@
+<title>SK하이닉스 종합 전략 검토 보고서 — 2026-07-17</title>
+<style>
+  :root {
+    --bg: #f4f5f1; --surface: #ffffff; --surface-2: #eaebe3;
+    --ink: #1e221d; --ink-soft: #565b4e; --ink-faint: #8b9084;
+    --accent: #2f6b5e; --accent-ink: #143a32; --accent-soft: #dce8e2;
+    --border: #d8d9cf;
+    --pos: #2f6b3f; --pos-bg: #e3ecdd;
+    --neu: #96660f; --neu-bg: #f3e8d2;
+    --neg: #a53f3f; --neg-bg: #f4dede;
+    --unk: #6b7066; --unk-bg: #e7e8e1;
+    --shadow: 0 1px 2px rgba(30,34,29,.06), 0 8px 24px -12px rgba(30,34,29,.18);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #14170f; --surface: #1b201a; --surface-2: #212820;
+      --ink: #e9ece4; --ink-soft: #a9ae9e; --ink-faint: #6e7367;
+      --accent: #74c6ae; --accent-ink: #eaf7f2; --accent-soft: #223730;
+      --border: #303830;
+      --pos: #8fd19f; --pos-bg: #1f3324;
+      --neu: #e3b869; --neu-bg: #3a2f18;
+      --neg: #e79b9b; --neg-bg: #3a2222;
+      --unk: #9aa093; --unk-bg: #262b23;
+      --shadow: 0 1px 2px rgba(0,0,0,.4), 0 8px 24px -12px rgba(0,0,0,.6);
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #14170f; --surface: #1b201a; --surface-2: #212820;
+    --ink: #e9ece4; --ink-soft: #a9ae9e; --ink-faint: #6e7367;
+    --accent: #74c6ae; --accent-ink: #eaf7f2; --accent-soft: #223730;
+    --border: #303830;
+    --pos: #8fd19f; --pos-bg: #1f3324;
+    --neu: #e3b869; --neu-bg: #3a2f18;
+    --neg: #e79b9b; --neg-bg: #3a2222;
+    --unk: #9aa093; --unk-bg: #262b23;
+  }
+  :root[data-theme="light"] {
+    --bg: #f4f5f1; --surface: #ffffff; --surface-2: #eaebe3;
+    --ink: #1e221d; --ink-soft: #565b4e; --ink-faint: #8b9084;
+    --accent: #2f6b5e; --accent-ink: #143a32; --accent-soft: #dce8e2;
+    --border: #d8d9cf;
+    --pos: #2f6b3f; --pos-bg: #e3ecdd;
+    --neu: #96660f; --neu-bg: #f3e8d2;
+    --neg: #a53f3f; --neg-bg: #f4dede;
+    --unk: #6b7066; --unk-bg: #e7e8e1;
+  }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--ink); font-family:-apple-system,"Apple SD Gothic Neo","Pretendard","Noto Sans KR",system-ui,sans-serif; line-height:1.7; }
+  .wrap { max-width:54rem; margin:0 auto; padding:2.5rem 1.5rem 5rem; }
+  header { margin-bottom:2.25rem; }
+  .eyebrow { display:inline-flex; align-items:center; gap:.4rem; font-family:ui-monospace,"SFMono-Regular",Menlo,Consolas,monospace; font-size:.72rem; letter-spacing:.06em; text-transform:uppercase; color:var(--accent-ink); background:var(--accent-soft); border-radius:999px; padding:.28rem .7rem; margin-bottom:1rem; }
+  h1 { font-size:clamp(1.6rem,4.5vw,2.15rem); font-weight:800; letter-spacing:-.01em; margin:0 0 .5rem; text-wrap:balance; }
+  .lede { color:var(--ink-soft); margin:0; font-size:1rem; }
+  section { margin-bottom:2.75rem; }
+  h2 { font-size:1.25rem; font-weight:800; margin:0 0 .9rem; padding-top:.5rem; border-top:2px solid var(--border); }
+  h3 { font-size:1.02rem; font-weight:700; margin:1.4rem 0 .6rem; }
+  p { margin:.5rem 0; }
+  .card { background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:1.25rem 1.4rem; box-shadow:var(--shadow); margin-bottom:.9rem; }
+  .card p { color:var(--ink-soft); font-size:.92rem; }
+  .card p strong { color:var(--ink); }
+  .pill { display:inline-flex; align-items:center; gap:.35rem; font-size:.75rem; font-weight:700; padding:.25rem .6rem; border-radius:999px; white-space:nowrap; }
+  .pill.pos { color:var(--pos); background:var(--pos-bg); }
+  .pill.neu { color:var(--neu); background:var(--neu-bg); }
+  .pill.neg { color:var(--neg); background:var(--neg-bg); }
+  .pill.unk { color:var(--unk); background:var(--unk-bg); }
+  .table-wrap { overflow-x:auto; border:1px solid var(--border); border-radius:12px; background:var(--surface); box-shadow:var(--shadow); margin:.75rem 0 1rem; }
+  table { width:100%; border-collapse:collapse; font-size:.85rem; }
+  th, td { text-align:left; padding:.55rem .75rem; border-bottom:1px solid var(--border); vertical-align:top; }
+  th { font-size:.66rem; text-transform:uppercase; letter-spacing:.05em; color:var(--ink-faint); background:var(--surface-2); }
+  tr:last-child td { border-bottom:none; }
+  td.num { font-variant-numeric:tabular-nums; white-space:nowrap; }
+  .callout { border-left:3px solid var(--accent); background:var(--accent-soft); border-radius:0 10px 10px 0; padding:.9rem 1.1rem; font-size:.9rem; margin:.9rem 0; }
+  .callout.warn { border-left-color:var(--neg); background:var(--neg-bg); }
+  .callout.note { border-left-color:var(--neu); background:var(--neu-bg); }
+  ul { margin:.4rem 0 .8rem; padding-left:1.3rem; } li { margin:.3rem 0; }
+  code { font-family:ui-monospace,"SFMono-Regular",Menlo,Consolas,monospace; font-size:.85em; background:var(--surface-2); padding:.1em .35em; border-radius:5px; }
+  a { color:var(--accent-ink); } @media (prefers-color-scheme:dark){ a{ color:var(--accent);} }
+  footer { margin-top:3rem; padding-top:1.25rem; border-top:1px solid var(--border); color:var(--ink-faint); font-size:.82rem; }
+  .toc { background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:1.1rem 1.4rem; box-shadow:var(--shadow); font-size:.9rem; margin-bottom:2rem; }
+  .toc ol { margin:.3rem 0 0; padding-left:1.3rem; }
+</style>
+
+<div class="wrap">
+  <header>
+    <span class="eyebrow">종합 전략 검토 · 2026-07-17</span>
+    <h1>SK하이닉스 집중 포트폴리오 — 6개 영역 종합 검토 보고서</h1>
+    <p class="lede">위키에 축적된 검증 데이터 + 오늘 수행한 웹 리서치를 통합. 본주·ADR 각각의 전망과, 요청된 6개 검토 영역을 순서대로 다룬다. <strong>이 문서는 정보 정리와 분석 프레임워크이며 투자 조언이 아니다 — 모든 판단과 책임은 본인에게 있다.</strong></p>
+  </header>
+
+  <div class="toc">
+    <strong>목차</strong>
+    <ol>
+      <li>핵심 요약 + 본주 vs ADR 전망</li>
+      <li>거시경제 시나리오 3가지와 자산배분 프레임</li>
+      <li>종목·매매 전략 (밸류에이션/기술/수급/분할 프레임)</li>
+      <li>반도체 산업·기술 사이클</li>
+      <li>부동산 전환·청약 전략</li>
+      <li>행동 편향 점검 (본인 사례 포함)</li>
+      <li>리스크 관리 체계 (Trigger 기반)</li>
+    </ol>
+  </div>
+
+  <section>
+    <h2>0. 핵심 요약</h2>
+    <div class="callout">
+      <strong>이 보고서의 가장 중요한 한 문장:</strong> 지금의 문제는 "SK하이닉스가 오를까 내릴까"가 아니라, <strong>2027-02 전세 만료라는 확정된 지출 일정과, 고용+자산이 한 회사에 이중으로 묶인 구조에서, 하루 ±10~16%씩 움직이는 자산이 전체의 65%를 차지하고 있다는 구조 자체</strong>다. 종목 전망이 맞아도 구조가 틀리면 계획이 무너질 수 있고, 종목 전망이 틀려도 구조가 맞으면 계획은 지켜진다.
+    </div>
+
+    <h3>본주(000660) 전망 — 단기 역풍, 중기 실적 의존</h3>
+    <div class="card">
+      <p><strong>단기(~3개월):</strong> 역풍 우세. ① 한국은행이 3년 6개월 만의 <strong>인상 사이클</strong>에 진입(2.75%, 2027년 초 3.25% 전망 서베이) — 국내 성장주 밸류에이션에 구조적 부담. ② 7월 초 외국인 5일간 -3.2조 순매도 등 수급 불안정. ③ 레버리지 단일종목 ETF 4종이 변동성을 양방향 증폭. ④ 단, 전일 종가(1,859,500원)가 이미 <strong>BNK 약세 목표가(185만원)에 도달</strong>해 있어 비관이 상당 부분 가격에 반영됐다는 해석도 가능. 방향을 가를 이벤트는 <strong>7/22 알파벳 → 7/29 SK하이닉스·메타·MS 실적</strong>.</p>
+      <p><strong>중기(6~24개월):</strong> 강세 근거(LTA 가격상한 없음, HBM 공급부족 2027년까지 컨센서스, 국내 7개사 380만~420만원)가 아직 다수이나, 약세 신호(모건스탠리 피크아웃론, 미래에셋 추정치 -12% 하향, 중국산 DRAM의 대형 CSP 실공급 개시)가 <strong>이번 주 들어 늘어나는 추세</strong>. 위키 체크리스트의 진짜 분기점 2개(빅테크 CapEx·ADR 프리미엄) 중 CapEx가 7월 말 실적에서 확인되는 것이 최대 변수.</p>
+    </div>
+
+    <h3>ADR(SKHY) 전망 — 프리미엄 수렴이 핵심 변수</h3>
+    <div class="card">
+      <p><strong>ADR은 본주와 다른 자산처럼 움직일 수 있다.</strong> 현재 ADR 프리미엄 약 30.7%(7/16 계산, 정점 51.5%에서 축소 중)는 "높음·중립" 구간. 프리미엄이 계속 정상화(10~25% 구간으로 수렴)된다면, <strong>본주가 보합이어도 ADR은 상대적으로 더 하락</strong>할 수 있다 — 산술적으로 30.7%→20% 수렴만으로 ADR에 약 -8% 상대 압력. 반대로 UBS는 "ADR 매수·본주 매도" 페어트레이드를 권고했는데 이는 프리미엄 유지·확대에 베팅하는 셈 — 기관 사이에서도 프리미엄의 방향 자체가 논쟁 대상이다.</p>
+      <p>구조적으로는 ① 상장 4일 만에 +27%/-9%를 오간 극단적 변동성(신규 상장 효과), ② 원웨이 fungibility(Morningstar가 지적한 프리미엄 지속·변동성 확대 요인), ③ $265억 조달이라는 역대 최대 규모가 만든 높은 글로벌 주목도, ④ 지수 편입 여부(미확인 — 확인되면 수급 상방 요인)가 병존. <strong>요약: ADR = 본주 방향성 × 프리미엄 변동 × 환율, 세 겹의 변수를 가진 자산</strong>이며, 원화 기준 투자자에게 본주보다 리스크가 한 겹 더 많다.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2>1. 거시경제 시나리오와 자산배분 프레임</h2>
+
+    <h3>향후 24~36개월 거시 환경 — 확인된 사실</h3>
+    <ul>
+      <li><strong>미국:</strong> 2026-05 CPI +4.2%(3년 1개월 만의 최고), 6월 점도표에서 <strong>인상 9명 vs 동결 8명 vs 인하 1명</strong> — 기존 "2026년 인하 재개" 기대가 인플레 재가속으로 무너진 상태. 성장률 전망 2.2%로 하향.</li>
+      <li><strong>한국:</strong> 7/16 기준금리 2.75% 인상 확정, 8·10월 추가 인상 가능성, 서베이 기준 2027년 초 3.25% 도달 전망. 물가는 2027년 2.3%로 완화 전망.</li>
+      <li><strong>함의:</strong> 한·미 모두 "긴축 재개" 국면 — 성장주 멀티플에는 역풍, 예금·채권의 상대 매력은 상승, 부동산 대출 비용은 상승(주담대 8% 우려 보도).</li>
+    </ul>
+
+    <h3>시나리오 3가지 (24~36개월)</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>구분</th><th>낙관 (주관 확률 ~30%)</th><th>중립 (~45%)</th><th>비관 (~25%)</th></tr></thead>
+        <tbody>
+          <tr><td>거시 경로</td><td>인플레 재둔화 → 2027년 인하 재개, 연착륙</td><td>고금리 장기화(higher-for-longer), 성장 둔화되나 침체 회피</td><td>인플레 고착 or 긴축발 침체, AI 투자 ROI 실망</td></tr>
+          <tr><td>반도체 업황</td><td>HBM 부족 2028년까지 연장, CapEx 상향</td><td>2027년까지 호황 유지, 2027~28 공급 증가로 둔화 시작</td><td>2026 하반기~2027 초 피크아웃 (모건스탠리·BNK 시나리오)</td></tr>
+          <tr><td>SK하이닉스 참고 목표가</td><td class="num">380만~490만원 클러스터</td><td class="num">중앙값 ~400만원, 단 도달 시점 지연</td><td class="num">185만원(BNK)~그 이하, Morningstar $160</td></tr>
+          <tr><td>주식(성장주) 기대</td><td>높음 / 변동성 높음</td><td>중간 / 변동성 높음</td><td>마이너스 / 변동성 극대</td></tr>
+          <tr><td>현금·단기채 기대</td><td>낮음(기회비용)</td><td>중간(3%대 무위험 수익)</td><td><strong>높음(구매력 방어 + 저가 매수 실탄)</strong></td></tr>
+          <tr><td>수도권 부동산</td><td>공급절벽 + 인하 전환 → 강세 재개</td><td>공급절벽 vs 고금리 상쇄 → 핵심지만 선별 상승</td><td>고금리에 눌려 정체, 단 공급부족으로 폭락 가능성도 제한</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p style="font-size:.85rem; color:var(--ink-soft);">※ 확률은 계산이 아니라 위 확인된 사실들에 기반한 주관적 가중치다. 핵심은 확률 자체보다 <strong>"비관 시나리오(25%)가 현실화됐을 때 2027년 주거 계획이 살아남는 배분인가"</strong>라는 질문이다.</p>
+
+    <h3>자산배분 프레임 (예시 프레임워크 — 조언 아님)</h3>
+    <div class="card">
+      <p>일반적으로 통용되는 원칙 두 가지를 현 상황에 대입하면: ① <strong>1~2년 내 사용이 확정된 자금은 변동성 자산에 두지 않는다</strong> — 2027-02 전세 만료 + 청약 계약금·중도금은 "확정 지출"에 가깝다. ② <strong>단일 종목 비중의 일반적 권고 상한(전체 금융자산의 10~20%)</strong> 대비 현재 65%는 3~6배 수준. 여기에 재직 회사와 동일하다는 이중 집중까지 겹친다.</p>
+      <p>예시 프레임: 필요 주거 자금(계약금+중도금 예상액)을 먼저 역산해 "터치 불가 버킷"(현금·단기예금·MMF)으로 분리하고, 나머지 위험자산 안에서 SK하이닉스 비중 목표(예: 30~40%)와 도달 일정(예: 실적 이벤트 전후 분할)을 사전에 정하는 방식 — 아래 6장 Trigger 표와 연동. <strong>구체 수치는 본인의 주거 예산이 정해져야 계산 가능하다.</strong></p>
+    </div>
+  </section>
+
+  <section>
+    <h2>2. 종목·매매 전략</h2>
+
+    <h3>선반영 수준 — 밸류에이션 진단</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>지표</th><th>현재</th><th>역사적 맥락</th><th>해석</th></tr></thead>
+        <tbody>
+          <tr><td>선행 PER</td><td class="num">약 6.9~7.4배</td><td>마이크론 9.4~10배 대비 20~35% 할인</td><td><span class="pill pos">상대적으로 부담 없음</span></td></tr>
+          <tr><td>PBR</td><td class="num">4배 초과</td><td><strong>과거 메모리 피크 구간과 유사</strong> (역사적 평균의 2~3배)</td><td><span class="pill neg">과열 신호</span></td></tr>
+          <tr><td>Trailing PER</td><td class="num">10.7배(2024 기준)</td><td>이익 급증으로 낮아 보이는 착시 가능</td><td><span class="pill neu">중립</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="callout note">
+      <strong>지표가 서로 모순되는 이유가 이 사이클의 본질이다.</strong> PER이 싼 것은 "지금 이익이 사상 최대"이기 때문이고, PBR이 비싼 것은 "시장이 이 이익의 지속을 이미 믿고 있기" 때문. "이제 PBR 말고 PER로 봐야 한다(뉴 패러다임)"는 주장이 확산되는 것 자체가, 역사적으로는 사이클 후반부에 자주 나타났던 현상이라는 점도 기록해둔다 — 2004 PC·2010s 모바일·2017 서버 슈퍼사이클 모두 공급과잉으로 끝났다.
+    </div>
+
+    <h3>기술적 구간 (우리가 직접 관측·기록한 값만)</h3>
+    <ul>
+      <li>52주 고점 <strong>3,002,000원</strong>(2026-06-23 실측) — 현재가 대비 +61% 위</li>
+      <li>7/14 관측 저항 1,936,000원 / 지지 1,875,000원 — 현재가(1,859,500원)는 <strong>이 지지선 아래로 내려온 상태</strong></li>
+      <li>7/14 저점 1,718,000원(패닉 저점) — 다음 관측 하방 참조점</li>
+      <li>최근 5거래일 일중 변동: -16.15% / +11.9% / +10.9~12% / -10.69% — <strong>하루 ±10% 이상이 일상화</strong></li>
+    </ul>
+
+    <h3>수급</h3>
+    <p>7월 초 외국인 5일간 -3.2조 순매도 vs 기관 +1.4조 순매수로 엇갈림 → 7/9~10 외국인이 14거래일 만에 순매수 전환(+1,727억)했으나 7/16 급락일 재이탈 추정. <strong>"국내 매수 자금의 미국 이탈"(ADR 상장 부작용)</strong> 우려도 보도됨 — 본주 수급에는 구조적 마이너스 요인일 수 있다.</p>
+
+    <h3>분할 축소 프레임 (예시 — 조언 아님)</h3>
+    <div class="card">
+      <p>"팔지 말지"를 한 번에 정하지 않고, <strong>사전에 정한 조건에 수량을 연동</strong>하는 방식이 행동편향(5장)을 구조적으로 차단한다. 예시 프레임:</p>
+      <ul>
+        <li><strong>시간 기반:</strong> 2027-02 주거 자금 필요 시점까지 분기마다 일정 비율(예: 보유분의 10~15%)씩 기계적으로 — 타이밍 판단을 제거하는 가장 단순한 방법</li>
+        <li><strong>이벤트 기반:</strong> 7/29 실적 + 빅테크 CapEx 확인 후 첫 결정, 이후 분기 실적마다 재평가</li>
+        <li><strong>가격 기반:</strong> 위 기술적 참조점(1,718,000 / 1,875,000 / 1,936,000 / 3,002,000)을 상·하방 트리거로 사용</li>
+        <li><strong>세제 고려:</strong> ISA 계좌분(19주)과 일반 계좌분(117주)의 매도 세금 구조가 다르다 — 매도 순서 설계에 반영할 것(상세 시뮬레이션은 별도 확인 필요)</li>
+      </ul>
+      <p><strong>대체 투자처(동일 산업 내 분산):</strong> 이미 ISA에 보유 중인 반도체 ETF(ACE미국반도체TOP3+, SOL AI반도체소부장)가 그 역할 — 단일 종목 → ETF 전환은 "업황 노출은 유지하되 개별기업 리스크만 낮추는" 중간 단계 선택지. 다만 <strong>재직 회사 업황과의 상관관계는 그대로 남는다</strong>는 한계도 명시해둔다.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2>3. 반도체 산업·기술 사이클</h2>
+
+    <h3>3년 전망 (제품별 분리)</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>제품</th><th>2026 하반기</th><th>2027</th><th>2028</th></tr></thead>
+        <tbody>
+          <tr><td><strong>HBM</strong></td><td>공급부족 지속 (3사 완판 확인)</td><td>부족 지속이 컨센서스 (기술장벽으로 증설 느림)</td><td><span class="pill unk">엇갈림</span> 신규 팹 가동 vs AI 수요 흡수</td></tr>
+          <tr><td><strong>범용 DRAM</strong></td><td>3Q 가격 정점 시나리오 (2Q 대비 +13~18%)</td><td>4Q26~1Q27 하락 전환 가능성 (트렌드포스 계열) + <strong>중국 CXMT 잠식 개시</strong></td><td>공급 정상화 국면 예상</td></tr>
+          <tr><td><strong>NAND</strong></td><td>상대적 약체 (미래에셋 ASP 하향의 한 축)</td><td>수요 회복 불확실</td><td>—</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>사이클 위치 판단</h3>
+    <p>신한("아직 중반") vs 모건스탠리("개선 지표 정점 근접") vs SEMI("27~28 슬로다운 가능성 낮음") — <strong>기관 간 진단이 갈리기 시작한 것 자체가 사이클 중~후반의 전형적 특징</strong>이다. 초입에는 이런 논쟁이 없다. 위키 체크리스트의 9개 항목 중 이번 주에만 ②HBM4(중립 하향)·③CapEx(논쟁 격화)·⑦중국산DRAM(주의 상향)·⑨실적추정(-12% 하향 첫 사례) 4개가 움직였다.</p>
+
+    <h3>경쟁 구도 — 추격은 수치로 확인됨</h3>
+    <ul>
+      <li>HBM4 점유율: SK하이닉스 58%(1Q26) → 2026년 전망 50~55%로 <strong>하락 전망</strong>, 삼성 21%→28~29% 상승, 마이크론 17~18%</li>
+      <li>삼성이 업계 최초 HBM4 양산(2월)·130일 만에 매출 $10억 — "SK 독주"에서 "3파전"으로 서사 전환 중</li>
+      <li>단, SK하이닉스의 루빈향 70% 점유(UBS 추정)와 가격상한 없는 LTA 구조는 여전히 차별적 우위</li>
+    </ul>
+
+    <h3>Peak/Downturn 신호 정의 (위키 체크리스트와 연동)</h3>
+    <div class="card">
+      <p>다음 신호가 <strong>2개 이상 동시에</strong> 확인되면 사이클 후반 진입으로 간주하는 프레임: ① 빅테크 CapEx 가이던스 하향(7월 말 실적에서 1차 확인) ② 범용 DRAM 현물가 하락 전환(4Q26~1Q27 감시) ③ HBM 공급계약의 가격 조건 악화(LTA 상한 부활 등) ④ 경쟁사 점유율 잠식 가속(삼성 30%+ 도달) ⑤ 증권사 실적 추정 하향의 연쇄화(현재 미래에셋 1곳 → 3곳 이상으로 확산 시). 이건 매일 3회 자동 체크가 이미 추적 중인 항목들이다.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2>4. 부동산 전환·청약 전략</h2>
+
+    <h3>2026~2028 수도권 시장</h3>
+    <ul>
+      <li><strong>공급:</strong> 수도권 입주물량 2026년 10.0만호(-35%), 2027년 11.6만호 — 공급 절벽. 서울은 2027년 1.7만호대(연평균의 40%)</li>
+      <li><strong>가격:</strong> 2026년 수도권 +4.5% 전망, 전세는 그 이상 — "초양극화"(핵심지·신축만 선별 상승)</li>
+      <li><strong>금리 반전 주의:</strong> 기존 전망들의 "금리 하향 안정" 전제는 <strong>7/16 한은 인상으로 이미 깨졌다</strong>. 인상 사이클(→3.25%)이 이어지면 매수 대기자의 대출 여력이 줄어 가격 상승을 누르는 힘과, 공급절벽이 받치는 힘이 충돌하는 국면 — "폭등도 폭락도 어려운 선별 장세"가 중립 시나리오</li>
+    </ul>
+
+    <h3>청약 경쟁력 — 납입총액 기준 정량 비교</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>항목</th><th>수치</th><th>비고</th></tr></thead>
+        <tbody>
+          <tr><td>보유 납입인정액</td><td class="num"><strong>28,050,000원</strong> (249회)</td><td>2026-07 기준, 월 25만원 납입 중</td></tr>
+          <tr><td>참고 커트라인: 고양창릉 S5 84형</td><td class="num">당해 2,990만 / 경기 2,845만</td><td>3기 신도시 최고 수준 사례</td></tr>
+          <tr><td>인기지역 일반 커트라인</td><td class="num">2,500만원+</td><td>2025~26 공개 데이터 기준</td></tr>
+          <tr><td>2027-02 시점 예상 납입액</td><td class="num">약 29,800,000원 (256회)</td><td>월 25만 지속 가정</td></tr>
+          <tr><td>2028-01 시점 예상 납입액</td><td class="num">약 32,550,000원 (267회)</td><td>플랫폼시티 본청약 대기 구간</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="callout">
+      <strong>진단:</strong> 현재 2,805만원은 "인기지역 일반 커트라인(2,500만+)은 통과, 최상위 사례(당해 2,990만)에는 소폭 미달"인 경계 구간. 다만 <strong>플랫폼시티는 용인 = 당해지역 자격</strong>이고, 2027년이면 3,000만원대에 진입하므로 시간은 유리한 방향으로 작동한다. 20년 납입 통장은 그 자체로 상위권 자산 — <strong>납입총액 전략은 유효하며, 청약을 포기하고 매매로 가야 할 정량적 이유는 현재 없다.</strong>
+    </div>
+
+    <h3>매매 vs 청약, 그리고 현금화 시점</h3>
+    <div class="card">
+      <p><strong>플랫폼시티 공공분양의 구체 일정은 아직 미공고</strong>(사업 전체 2030 완공 목표)라는 게 최대 불확실성 — 2027-02 전세 만료와 본청약 시점이 어긋날 가능성이 높다. 따라서 현실적 경로는 ① 전세 1회 연장(2027~2029)으로 청약 시점까지 버티기, ② 그 사이 분양가 상승·커트라인 상승을 감수, ③ 병행으로 수지구 통학권 내 매매 후보를 모니터링하는 3-트랙. <strong>어느 경로든 계약금·중도금이 필요한 시점은 "예고 없이" 온다 — 그래서 1장의 "터치 불가 버킷" 선분리가 필요하다.</strong> 주식 현금화 시점을 부동산 일정에 종속시키는 것(필요할 때 강제 매도)이 최악의 패턴이고, 그 반대(미리 확보해두고 기다림)가 계획이 살아남는 구조다.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2>5. 행동 편향 점검 — 본인 사례 포함</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>편향</th><th>일반 정의</th><th>이 포트폴리오에서의 실제 관찰</th></tr></thead>
+        <tbody>
+          <tr><td><strong>하우스머니 효과</strong></td><td>수익금을 "공짜 돈"으로 여겨 더 큰 위험 감수</td><td>+759% 수익 상태에서 "몇 주 더 살까"라는 질문이 자연스러워진 것 자체 (7/16 TSMC 베팅 문의)</td></tr>
+          <tr><td><strong>확증편향</strong></td><td>믿음에 부합하는 정보만 수집</td><td><strong>우리 자동 체크 시스템도 이 오류를 범했다</strong> — "HBM4 인증"만 검색해 축소 뉴스를 하루 놓침(7/16, 이후 수정). 사람이 아니라 시스템도 걸리는 편향</td></tr>
+          <tr><td><strong>앵커링</strong></td><td>특정 숫자에 판단이 고정</td><td>52주 고점 3,002,000원 대비 "-38%나 빠졌으니 싸다"는 직관 — 고점이 적정가였다는 보장은 없음</td></tr>
+          <tr><td><strong>처분효과 역형태</strong></td><td>수익 종목을 "아까워서" 못 파는 것</td><td>"매도 타이밍 결정 어려움"이라고 스스로 기술한 상태 — 전형적 증상</td></tr>
+          <tr><td><strong>친숙성/내부자 착시</strong></td><td>잘 아는 회사 = 안전하다는 착각</td><td>재직자로서의 정보 우위감. 단, 엔론·리먼 직원들도 자사주에 집중했다 — <strong>아는 것과 주가를 맞추는 것은 다른 문제</strong></td></tr>
+          <tr><td><strong>최근성 편향</strong></td><td>최근 경험을 과대 확장</td><td>"급락 후엔 반등했다"(7/14 경험)를 다음 급락에도 적용하려는 패턴 (7/16 문의) — 그날은 반등하지 않았다</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="card">
+      <p><strong>구조적 해법은 "의지"가 아니라 "사전 규칙"이다:</strong> ① 매도 조건을 시장이 열리기 전(감정이 없을 때) 문서로 정한다 ② 조건-수량을 기계적으로 연동한다(2장 프레임) ③ 규칙 변경은 "다음 분기부터 적용"으로 지연시킨다(당일 충동 차단) ④ 판단 기록을 남겨 사후 검증한다 — 이 위키의 체크 이력이 정확히 그 장치이며, 7/16 "TSMC 반등 베팅" 문의가 실제로 틀렸다는 기록도 이미 남아 있다.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2>6. 리스크 관리 체계</h2>
+
+    <h3>집중도의 실측 위험 (VaR 근사)</h3>
+    <div class="card">
+      <p>정식 VaR 계산에는 시계열 전체가 필요하지만, 관측된 사실만으로도 근사 가능: SK하이닉스 65% 비중 × 최근 실측 일중 변동(-16.15%~+12%) = <strong>포트폴리오 전체가 하루에 ±6.5~10.5%(약 ±3,000만~4,800만원) 움직이는 구조</strong>. 실제로 7/13 하루에 그 규모의 평가액 증발을 경험했다. 비관 시나리오(주가가 현 수준에서 추가로 -30%, 과거 사이클 하강기엔 -50~70%도 발생)에서는 평가액 기준 -8,900만~-2.2억원 노출. 여기에 <strong>같은 시나리오에서 PS(성과급)도 함께 줄어드는 소득 동조화</strong>가 겹친다 — 이것이 단순 집중투자보다 위험한 이유.</p>
+    </div>
+
+    <h3>Trigger 기반 대응 매뉴얼 (위키 자동 체크와 연동)</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Trigger (감시 중인 신호)</th><th>확인 채널</th><th>사전 정의 대응 (예시)</th></tr></thead>
+        <tbody>
+          <tr><td>빅테크 CapEx 가이던스 하향 (분기점 ③)</td><td>7/22·29·30 실적 — 자동 체크 중</td><td>강세 시나리오 하향 재평가, 비중 목표 재계산</td></tr>
+          <tr><td>실적 추정 하향 3개사 이상 확산 (⑨)</td><td>저녁 체크 (현재 1개사: 미래에셋)</td><td>사이클 후반 신호로 간주, 분할 축소 가속</td></tr>
+          <tr><td>ADR 프리미엄 35%+ 재진입 or 10% 미만 급락 (⑥)</td><td>아침·장초반 체크</td><td>ADR-본주 상대 포지션 재점검</td></tr>
+          <tr><td>중국산 DRAM 추가 대형 계약 (⑦)</td><td>일일 체크 (현재: 텐센트 1건)</td><td>범용 D램 노출 축소 검토</td></tr>
+          <tr><td>본주 1,718,000원(7/14 패닉 저점) 하회</td><td>가격 — 장초반 체크</td><td>"기술적 반등 기대" 논리 폐기, 구조 재평가</td></tr>
+          <tr><td>주거 자금 필요 시점 12개월 전 도달 (2026-02 경과—이미 해당)</td><td>캘린더</td><td><strong>필요 금액의 버킷 분리 완료 여부 점검 — 현재 미완료 상태</strong></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="callout warn">
+      <strong>가장 정직한 지적:</strong> 위 표의 마지막 행이 이미 발동된 상태다. 2027-02 전세 만료까지 7개월 — 어떤 시나리오를 믿든, "주거에 필요한 최소 금액이 얼마이고 그 돈이 지금 어디에 있는가"에 대한 답이 이 위키 어디에도 아직 없다. 종목 전망보다 이 답을 먼저 채우는 것이 이 보고서의 결론이다.
+    </div>
+  </section>
+
+  <footer>
+    작성: 2026-07-17, 위키 검증 데이터(체크리스트·포트폴리오·프로필) + 당일 웹 리서치 통합.
+    원문 근거: <code>sources/websearch-strategy-review-research-2026-07-17.md</code>,
+    <code>wiki/concepts/sk-hynix-analyst-thesis-checkpoints.md</code>,
+    <code>wiki/entities/my-portfolio.md</code>, <code>wiki/entities/user-profile.md</code>.
+    미확인 항목은 본문에 명시. <strong>이 문서는 투자·부동산·세무 조언이 아니며, 모든 결정과 책임은 본인에게 있다.</strong>
+  </footer>
+</div>

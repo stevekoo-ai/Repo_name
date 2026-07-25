@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SK하이닉스 아침 체크포인트 리포트 (2026-07-21)</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            min-height: 100vh;
+            color: #333;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+        .header .date {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        .content {
+            padding: 30px;
+        }
+        .section {
+            margin-bottom: 35px;
+        }
+        .section-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #1e3c72;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #667eea;
+            display: flex;
+            align-items: center;
+        }
+        .icon {
+            font-size: 24px;
+            margin-right: 10px;
+        }
+        .metric {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 12px;
+            border-left: 4px solid #667eea;
+        }
+        .metric-label {
+            font-size: 12px;
+            color: #666;
+            text-transform: uppercase;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+        .metric-value {
+            font-size: 22px;
+            font-weight: 700;
+            color: #1e3c72;
+            margin-top: 5px;
+        }
+        .positive { color: #27ae60; }
+        .negative { color: #e74c3c; }
+        .neutral { color: #f39c12; }
+        .checkpoint-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 15px;
+        }
+        .checkpoint {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+        .checkpoint.positive {
+            border-left-color: #27ae60;
+        }
+        .checkpoint.negative {
+            border-left-color: #e74c3c;
+        }
+        .checkpoint.neutral {
+            border-left-color: #f39c12;
+        }
+        .checkpoint-number {
+            font-size: 12px;
+            color: #666;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        .checkpoint-title {
+            font-size: 14px;
+            font-weight: 600;
+            margin-top: 5px;
+            color: #333;
+        }
+        .checkpoint-status {
+            font-size: 13px;
+            margin-top: 8px;
+            line-height: 1.4;
+        }
+        .diagnosis {
+            background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
+            border-left: 4px solid #667eea;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 15px;
+        }
+        .diagnosis-title {
+            font-size: 14px;
+            color: #666;
+            text-transform: uppercase;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        .diagnosis-text {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1e3c72;
+            line-height: 1.6;
+        }
+        .risk-section {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+        }
+        .risk-title {
+            font-size: 12px;
+            color: #856404;
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+        .risk-text {
+            font-size: 14px;
+            color: #856404;
+            margin-top: 8px;
+            line-height: 1.5;
+        }
+        .footer {
+            background: #f8f9fa;
+            padding: 20px;
+            text-align: center;
+            border-top: 1px solid #e9ecef;
+            font-size: 12px;
+            color: #999;
+        }
+        @media (max-width: 640px) {
+            .checkpoint-grid {
+                grid-template-columns: 1fr;
+            }
+            .header h1 {
+                font-size: 22px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>SK하이닉스 아침 체크포인트</h1>
+            <div class="date">2026-07-21 07:00 KST (월)</div>
+        </div>
+
+        <div class="content">
+            <div class="section">
+                <div class="section-title">
+                    <span class="icon">🚀</span> 목표가와 상승 모멘텀
+                </div>
+
+                <div class="metric">
+                    <div class="metric-label">현재가</div>
+                    <div class="metric-value">1,764,000원 <span style="font-size:16px; color:#e74c3c;">(-4.23%)</span></div>
+                </div>
+
+                <div class="metric">
+                    <div class="metric-label">강세 클러스터 목표가</div>
+                    <div class="metric-value" style="color:#27ae60;">380~430만원</div>
+                    <div style="font-size:13px; color:#666; margin-top:8px;">상승여력 +115~144%</div>
+                </div>
+
+                <div class="metric">
+                    <div class="metric-label">해외 최고 (Barclays)</div>
+                    <div class="metric-value" style="color:#27ae60;">약 490만원</div>
+                    <div style="font-size:13px; color:#666; margin-top:8px;">$330 ADR × 환율</div>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-title">
+                    <span class="icon">💡</span> 2분기 실적 전망
+                </div>
+
+                <div class="metric">
+                    <div class="metric-label">매출</div>
+                    <div class="metric-value">83.9조원</div>
+                </div>
+
+                <div class="metric">
+                    <div class="metric-label">영업이익 (컨센서스)</div>
+                    <div class="metric-value" style="color:#27ae60;">64~70조원</div>
+                    <div style="font-size:13px; color:#666; margin-top:8px;">OPM 76.5~82.8% (역대최고)</div>
+                </div>
+
+                <div class="metric">
+                    <div class="metric-label">발표일</div>
+                    <div class="metric-value">7월 29일 09:00</div>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-title">
+                    <span class="icon">📈</span> 체크포인트 판정
+                </div>
+
+                <div style="margin-bottom: 15px;">
+                    <div style="font-size:13px; color:#666; margin-bottom:8px; font-weight:600;">분기점 2개 (의사결정 기준)</div>
+                    <div class="checkpoint-grid">
+                        <div class="checkpoint positive">
+                            <div class="checkpoint-number">③ CapEx</div>
+                            <div class="checkpoint-title">BigTech AI CapEx</div>
+                            <div class="checkpoint-status"><span class="positive">✓ 긍정강화</span><br/>725억$ +77%</div>
+                        </div>
+                        <div class="checkpoint positive">
+                            <div class="checkpoint-number">⑥ 프리미엄</div>
+                            <div class="checkpoint-title">ADR 프리미엄</div>
+                            <div class="checkpoint-status"><span class="positive">✓ 긍정</span><br/>25% 안정화</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="margin-bottom: 15px;">
+                    <div style="font-size:13px; color:#666; margin-bottom:8px; font-weight:600;">컨센서스 7개 (강세론 지지)</div>
+                    <div class="checkpoint-grid" style="grid-template-columns: 1fr 1fr 1fr;">
+                        <div class="checkpoint positive">
+                            <div class="checkpoint-number">①②④⑤⑧⑨</div>
+                            <div class="checkpoint-title">모두 긍정</div>
+                            <div class="checkpoint-status"><span class="positive">✓</span></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <div style="font-size:13px; color:#666; margin-bottom:8px; font-weight:600;">리스크 항목</div>
+                    <div class="checkpoint-grid" style="grid-template-columns: 1fr;">
+                        <div class="checkpoint negative">
+                            <div class="checkpoint-number">⑦ 중국산DRAM</div>
+                            <div class="checkpoint-title">CXMT 위협 (부정)</div>
+                            <div class="checkpoint-status"><span class="negative">✗ 훼손</span><br/>국가지원 + HBM3진입</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="diagnosis">
+                    <div class="diagnosis-title">🧭 한줄 진단</div>
+                    <div class="diagnosis-text">
+                        분기점 2개 살아있고 실적 확정 전 "저평가 기회" 국면.<br/>중기 CXMT 위협 격상 → 포트폴리오 분산 필수.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            2026-07-21 07:00 KST | sk-hynix-analyst-thesis-checkpoints.md
+        </div>
+    </div>
+</body>
+</html>

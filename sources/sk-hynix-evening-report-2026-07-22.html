@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SK하이닉스 저녁 리포트 (2026-07-22)</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif; background:linear-gradient(135deg,#667eea 0%,#764ba2 100%); padding:20px; min-height:100vh; color:#333; }
+.container { max-width:900px; margin:0 auto; background:white; border-radius:12px; box-shadow:0 20px 60px rgba(0,0,0,0.3); overflow:hidden; }
+.header { background:linear-gradient(135deg,#1e3c72 0%,#2a5298 100%); color:white; padding:28px; text-align:center; }
+.header h1 { font-size:25px; margin-bottom:8px; font-weight:700; }
+.header .date { font-size:13px; opacity:0.9; }
+.content { padding:28px; }
+.section { margin-bottom:26px; }
+.section-title { font-size:17px; font-weight:700; color:#1e3c72; margin-bottom:12px; padding-bottom:8px; border-bottom:3px solid #667eea; }
+.metric { background:#f8f9fa; padding:14px; border-radius:8px; margin-bottom:10px; border-left:4px solid #667eea; }
+.metric.positive { border-left-color:#27ae60; }
+.metric.negative { border-left-color:#e74c3c; }
+.metric.corrected { border-left-color:#e67e22; }
+.metric-label { font-size:11px; color:#666; text-transform:uppercase; font-weight:600; }
+.metric-value { font-size:18px; font-weight:700; color:#1e3c72; margin-top:4px; }
+.positive { color:#27ae60; } .negative { color:#e74c3c; }
+.new-badge { display:inline-block; background:#e74c3c; color:white; font-size:10px; padding:2px 8px; border-radius:10px; margin-left:6px; }
+.fix-badge { display:inline-block; background:#e67e22; color:white; font-size:10px; padding:2px 8px; border-radius:10px; margin-left:6px; }
+.diagnosis { background:linear-gradient(135deg,#667eea15 0%,#764ba215 100%); border-left:4px solid #667eea; padding:18px; border-radius:8px; }
+.diagnosis-title { font-size:13px; color:#666; text-transform:uppercase; font-weight:600; margin-bottom:8px; }
+.diagnosis-text { font-size:15px; font-weight:600; color:#1e3c72; line-height:1.6; }
+.footer { background:#f8f9fa; padding:16px; text-align:center; border-top:1px solid #e9ecef; font-size:11px; color:#999; }
+table { width:100%; border-collapse:collapse; font-size:13px; }
+th { padding:9px; text-align:left; font-weight:600; background:#f8f9fa; }
+td { padding:9px; border-bottom:1px solid #e9ecef; }
+</style>
+</head>
+<body>
+<div class="container">
+<div class="header">
+<h1>SK하이닉스 저녁 체크</h1>
+<div class="date">2026-07-22 19:00 KST (수)</div>
+</div>
+<div class="content">
+
+<div class="section">
+<div class="section-title">오늘 아침 리포트 대비 새로 추가된 것</div>
+<div class="metric negative">
+<div class="metric-label">종가 확정 <span class="new-badge">NEW</span></div>
+<div class="metric-value negative">1,830,000원 (-0.33%)</div>
+<div style="font-size:12px; color:#666; margin-top:6px;">장중 200만원 터치(고가 2,006,000원) 후 차익실현 매물로 상승분 반납. "200만원 안착" 1차 시도 실패(완전 무효화는 아님)</div>
+</div>
+<div class="metric corrected">
+<div class="metric-label">🔴 정정 — CXMT 상장 상태 <span class="fix-badge">FIX</span></div>
+<div class="metric-value" style="font-size:16px;">아직 미상장, 실제 상장일 7/27(D-5)</div>
+<div style="font-size:12px; color:#666; margin-top:6px;">오늘 아침 체크의 "7/16 상장 완료"는 오류 — CSRC 등록승인 단계를 오인. 공모가 8.66위안, 공모규모 579억위안(약 12.7~14.5조원) 확정</div>
+</div>
+<div class="metric positive">
+<div class="metric-label">신규 — KB증권 리포트 <span class="new-badge">NEW</span></div>
+<div class="metric-value positive">목표가 420만원 유지</div>
+<div style="font-size:12px; color:#666; margin-top:6px;">"AI 효율의 역설, 투자는 더 커진다" — Kimi K3발 약세론에 대한 최초의 명시적 반박. 2026년 DRAM+199%/NAND+255%(YoY) 신규 전망</div>
+</div>
+</div>
+
+<div class="section">
+<div class="section-title">🚀 목표가와 상승 모멘텀</div>
+<div class="metric">
+<div class="metric-label">오늘 종가 / 장중 고가</div>
+<div class="metric-value">1,830,000원 / 2,006,000원</div>
+</div>
+<div class="metric positive">
+<div class="metric-label">강세 클러스터 목표가</div>
+<div class="metric-value positive">380~430만원 (KB 420만원 유지)</div>
+</div>
+</div>
+
+<div class="section">
+<div class="section-title">💡 실적 전망</div>
+<div class="metric">
+<div class="metric-label">2Q26 컨센서스 · 발표일</div>
+<div class="metric-value">매출 84.57조 · 영업익 64.80조 · 7/29(D-7)</div>
+</div>
+</div>
+
+<div class="section">
+<div class="section-title">📈 기술적 신호 · 리스크</div>
+<table>
+<tr><th>항목</th><th>판정</th><th>비고</th></tr>
+<tr><td>①DRAM/NAND</td><td class="positive">긍정강화</td><td>KB: 2026년 DRAM+199%/NAND+255%(YoY)</td></tr>
+<tr><td>③CapEx(분기점)</td><td>D-day 임박</td><td>알파벳 실적 7/23 새벽 05:30 KST</td></tr>
+<tr><td>⑥ADR프리미엄(분기점)</td><td class="positive">긍정</td><td>25% 안정 유지</td></tr>
+<tr><td>⑦중국산DRAM</td><td class="negative">부정(정정)</td><td>CXMT 실제 상장 7/27(D-5), 판정 유지</td></tr>
+</table>
+</div>
+
+<div class="section">
+<div class="diagnosis">
+<div class="diagnosis-title">🧭 한줄 진단</div>
+<div class="diagnosis-text">
+200만원 첫 도전은 실패했지만 소폭 하락에 그쳐 추세 훼손은 아님. KB의 "AI 효율 역설" 반박 논리가 Kimi K3 약세론에 균열을 냄. 내일 새벽 알파벳 실적이 이번 주 최대 분기점, CXMT는 7/27 실제 상장일까지 관찰 지속 필요.
+</div>
+</div>
+</div>
+
+</div>
+<div class="footer">2026-07-22 19:00 KST | 다음 체크: 내일 07:00 아침</div>
+</div>
+</body>
+</html>

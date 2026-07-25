@@ -1,0 +1,169 @@
+<title>SK하이닉스 저녁 체크 — 2026-07-20 (월)</title>
+<style>
+  :root {
+    --bg: #f4f5f1; --surface: #ffffff; --surface-2: #eaebe3;
+    --ink: #1e221d; --ink-soft: #565b4e; --ink-faint: #8b9084;
+    --accent: #2f6b5e; --accent-ink: #143a32; --accent-soft: #dce8e2;
+    --border: #d8d9cf;
+    --pos: #2f6b3f; --pos-bg: #e3ecdd;
+    --neu: #96660f; --neu-bg: #f3e8d2;
+    --neg: #a53f3f; --neg-bg: #f4dede;
+    --unk: #6b7066; --unk-bg: #e7e8e1;
+    --shadow: 0 1px 2px rgba(30,34,29,.06), 0 8px 24px -12px rgba(30,34,29,.18);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #14170f; --surface: #1b201a; --surface-2: #212820;
+      --ink: #e9ece4; --ink-soft: #a9ae9e; --ink-faint: #6e7367;
+      --accent: #74c6ae; --accent-ink: #eaf7f2; --accent-soft: #223730;
+      --border: #303830;
+      --pos: #8fd19f; --pos-bg: #1f3324;
+      --neu: #e3b869; --neu-bg: #3a2f18;
+      --neg: #e79b9b; --neg-bg: #3a2222;
+      --unk: #9aa093; --unk-bg: #262b23;
+      --shadow: 0 1px 2px rgba(0,0,0,.4), 0 8px 24px -12px rgba(0,0,0,.6);
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #14170f; --surface: #1b201a; --surface-2: #212820;
+    --ink: #e9ece4; --ink-soft: #a9ae9e; --ink-faint: #6e7367;
+    --accent: #74c6ae; --accent-ink: #eaf7f2; --accent-soft: #223730;
+    --border: #303830;
+    --pos: #8fd19f; --pos-bg: #1f3324;
+    --neu: #e3b869; --neu-bg: #3a2f18;
+    --neg: #e79b9b; --neg-bg: #3a2222;
+    --unk: #9aa093; --unk-bg: #262b23;
+  }
+  :root[data-theme="light"] {
+    --bg: #f4f5f1; --surface: #ffffff; --surface-2: #eaebe3;
+    --ink: #1e221d; --ink-soft: #565b4e; --ink-faint: #8b9084;
+    --accent: #2f6b5e; --accent-ink: #143a32; --accent-soft: #dce8e2;
+    --border: #d8d9cf;
+    --pos: #2f6b3f; --pos-bg: #e3ecdd;
+    --neu: #96660f; --neu-bg: #f3e8d2;
+    --neg: #a53f3f; --neg-bg: #f4dede;
+    --unk: #6b7066; --unk-bg: #e7e8e1;
+  }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--ink); font-family:-apple-system,"Apple SD Gothic Neo","Pretendard","Noto Sans KR",system-ui,sans-serif; line-height:1.65; }
+  .wrap { max-width:52rem; margin:0 auto; padding:2.5rem 1.5rem 5rem; }
+  header { margin-bottom:2rem; }
+  .eyebrow { display:inline-flex; align-items:center; gap:.4rem; font-family:ui-monospace,"SFMono-Regular",Menlo,Consolas,monospace; font-size:.72rem; letter-spacing:.06em; text-transform:uppercase; color:var(--neg); background:var(--neg-bg); border-radius:999px; padding:.28rem .7rem; margin-bottom:1rem; }
+  h1 { font-size:clamp(1.6rem,4.5vw,2.15rem); font-weight:800; letter-spacing:-.01em; margin:0 0 .5rem; text-wrap:balance; }
+  .lede { color:var(--ink-soft); margin:0; font-size:1rem; }
+  .snapshot { display:grid; grid-template-columns:repeat(auto-fit,minmax(9.5rem,1fr)); gap:.9rem; margin:1.75rem 0; }
+  .stat { background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:1rem 1.1rem; box-shadow:var(--shadow); }
+  .stat .label { font-size:.72rem; color:var(--ink-faint); text-transform:uppercase; letter-spacing:.05em; margin-bottom:.35rem; }
+  .stat .value { font-family:ui-monospace,"SFMono-Regular",Menlo,Consolas,monospace; font-size:1.2rem; font-weight:700; font-variant-numeric:tabular-nums; }
+  .stat .sub { font-size:.8rem; margin-top:.2rem; }
+  .down { color:var(--neg); } .up { color: var(--pos); } .unkc { color:var(--unk); }
+  section { margin-bottom:2.25rem; }
+  h2 { font-size:1.15rem; font-weight:800; margin:0 0 .9rem; }
+  .card { background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:1.25rem 1.4rem; box-shadow:var(--shadow); margin-bottom:.9rem; }
+  .card-head { display:flex; align-items:center; justify-content:space-between; gap:1rem; margin-bottom:.5rem; flex-wrap:wrap; }
+  .card h3 { margin:0; font-size:1rem; font-weight:700; }
+  .card p { margin:.4rem 0 0; color:var(--ink-soft); font-size:.9rem; }
+  .card p strong { color:var(--ink); }
+  .pill { display:inline-flex; align-items:center; gap:.35rem; font-size:.75rem; font-weight:700; padding:.25rem .6rem; border-radius:999px; white-space:nowrap; }
+  .pill.pos { color:var(--pos); background:var(--pos-bg); }
+  .pill.neu { color:var(--neu); background:var(--neu-bg); }
+  .pill.neg { color:var(--neg); background:var(--neg-bg); }
+  .pill.unk { color:var(--unk); background:var(--unk-bg); }
+  .new { border-left:3px solid var(--accent); }
+  .callout { border-left:3px solid var(--neg); background:var(--neg-bg); color:var(--ink); border-radius:0 10px 10px 0; padding:.9rem 1.1rem; font-size:.88rem; }
+  footer { margin-top:3rem; padding-top:1.25rem; border-top:1px solid var(--border); color:var(--ink-faint); font-size:.82rem; }
+  code { font-family:ui-monospace,Menlo,Consolas,monospace; font-size:.85em; background:var(--surface-2); padding:.1em .35em; border-radius:5px; }
+</style>
+
+<div class="wrap">
+  <header>
+    <span class="eyebrow">● 저녁 체크 · 2026-07-20 (월)</span>
+    <h1>최저 종가 경신 -4.23% — 새 악재는 "Kimi K3"</h1>
+    <p class="lede">프리장 -7.5% → +1.2% → 종가 -4.23%의 롤러코스터. 코스피는 -4.46%로 매도 사이드카가 발동됐다.</p>
+  </header>
+
+  <div class="snapshot">
+    <div class="stat"><div class="label">본주 종가</div><div class="value">1,764,000<span style="font-size:.65rem;">원</span></div><div class="sub down">-4.23% · 최저 종가 경신</div></div>
+    <div class="stat"><div class="label">코스피</div><div class="value">6,516.27</div><div class="sub down">-4.46% · 매도 사이드카</div></div>
+    <div class="stat"><div class="label">ADR 7/17(금) 백필</div><div class="value">$154.03</div><div class="sub up">+1.1% · 시세 공백 전부 종결</div></div>
+  </div>
+
+  <section>
+    <h2>🆕 오늘 아침 대비 새로 추가된 것</h2>
+
+    <div class="card new">
+      <div class="card-head"><h3>신규 악재 — 문샷AI 'Kimi K3' (체크포인트 ③)</h3><span class="pill neg">AI 효율화 우려</span></div>
+      <p>중국 문샷AI가 고성능 모델 Kimi K3를 공개하며 <strong>"저비용
+      AI → 인프라 투자 효율화" 우려</strong>가 재점화 — 딥시크식 서사의
+      재판으로, 오늘 코스피 -4.46% 급락의 원인 중 하나로 지목됐다. 빅테크
+      실적(7/22~)을 앞두고 CapEx 분기점 ③에 직접 걸리는 악재. 연휴 악재
+      일괄 반영·유동성 위축과 겹쳤다.</p>
+    </div>
+
+    <div class="card new">
+      <div class="card-head"><h3>ADR 백필 완료 + 프리미엄 판정 보류 (⑥)</h3><span class="pill neu">재확대 추정 ≈29.6%</span></div>
+      <p>금요일(7/17) 미국 세션 <strong>$154.03(+1.1%)</strong> 확정으로
+      지난주부터의 시세 공백이 전부 닫혔다. 단 오늘 본주만 -4.23% 더
+      빠지면서 프리미엄은 안정 구간(22.8%)에서 <strong>약 29.6%로 재확대
+      추정</strong>(시점 불일치 페어) — 오늘 밤 미국 세션 후 동일자 페어로
+      재판정한다. 구조 참고: <strong>ADR→본주 전환 물량이 전체의 2.5%뿐</strong>
+      — 차익 통로가 좁아 프리미엄이 지속될 것이라는 분석(서울경제).</p>
+    </div>
+
+    <div class="card">
+      <div class="card-head"><h3>수급 — 정오와 마감이 달랐다</h3><span class="pill unk">상충 기록</span></div>
+      <p>정오 실측(사용자 캡처): 외국인 코스피 +3,721억 순매수, SK하이닉스
+      순매수 4위. 마감 보도: "외국인·기관 동반 매도세 집중". <strong>장
+      후반 외국인 수급이 뒤집힌 것으로 추정</strong> — 두 기록 모두 보존,
+      시점 차이로 해석. 오늘 지지 매수가 있었으나 끝까지 버티지 못한 그림.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2>🚀 목표가와 상승 모멘텀</h2>
+    <div class="card">
+      <p>18개 기관 스펙트럼 변동 없음: 한화 430만(국내 최고)·Barclays 환산
+      약 490만 ~ BNK 185만·Morningstar $160. 오늘 종가(1,764,000원) 기준
+      강세 클러스터(380만~430만)까지 <strong>+115~144%</strong>. 현재가는
+      **BNK 약세 목표가(185만원)마저 -4.5% 하회** — 최약세 전망 아래에서
+      거래 중.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2>💡 실적·성장률 전망</h2>
+    <div class="card">
+      <p>발표일 7/29 공식 확정(6-K), <strong>D-9</strong>. 컨센서스 매출 약
+      83조~84.6조원, 영업이익 약 62.3조~64.8조원(YoY 약 +650%). 추정 하향
+      기관 3곳 유지(4번째 없음). 1차 판정은 모레 <strong>7/22 알파벳
+      실적(D-2)</strong> — Kimi K3 우려가 실제 CapEx 가이던스로 반박될지
+      확인될지가 관전 포인트.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2>📈 기술적 신호와 리스크</h2>
+    <div class="card">
+      <p>오늘 확정 참조점: 종가 1,764,000원(최저 종가), 프리장 저점
+      1,724,000원 — <strong>7/14 패닉 저점 1,718,000원과의 거리가 0.3%</strong>까지
+      좁혀졌다. 이 레벨이 깨지면 트리거 표의 "기술적 반등 논리 폐기" 조건
+      발동. 52주 고점(3,002,000원, 6/23) 대비 -41.2%. 하루 스윙 ±9%대가
+      지속되는 고변동성 체질 유지.</p>
+    </div>
+  </section>
+
+  <div class="callout">
+    <strong>🧭 한줄 진단</strong> — 오늘의 핵심은 낙폭 자체보다 "무엇이
+    남았는가"다: 가격은 최약세 목표가 아래, 7/14 패닉 저점까지 0.3%,
+    그리고 이틀 뒤 알파벳 실적. Kimi K3 우려가 실적으로 반박되면 반등
+    재료, 확인되면 트리거 연쇄 발동 구간 — 방향이 아니라 이벤트가 답할
+    차례다. 투자 조언 아님.
+  </div>
+
+  <footer>
+    이 리포트는 저녁 19:00(KST) Routine이 자동 생성한다. 원문 근거는 위키
+    <code>concepts/sk-hynix-analyst-thesis-checkpoints.md</code> 및
+    <code>sources/websearch-sk-hynix-evening-check-2026-07-20.md</code> 참고.
+    투자 조언 아님.
+  </footer>
+</div>

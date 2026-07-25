@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>[SK하이닉스 Daily Monitor] 미리보기 v2 - HSEWS (2026-07-24)</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif; background:linear-gradient(135deg,#667eea 0%,#764ba2 100%); padding:20px; min-height:100vh; color:#333; }
+.container { max-width:980px; margin:0 auto; background:white; border-radius:12px; box-shadow:0 20px 60px rgba(0,0,0,0.3); overflow:hidden; }
+.header { background:linear-gradient(135deg,#1e3c72 0%,#2a5298 100%); color:white; padding:28px; text-align:center; }
+.header h1 { font-size:22px; margin-bottom:8px; font-weight:700; }
+.header .date { font-size:13px; opacity:0.9; }
+.preview-banner { background:#fff3cd; color:#856404; text-align:center; font-size:12px; font-weight:600; padding:8px; }
+.content { padding:28px; }
+.section { margin-bottom:26px; }
+.section-title { font-size:17px; font-weight:700; color:#1e3c72; margin-bottom:12px; padding-bottom:8px; border-bottom:3px solid #667eea; }
+.metric { background:#f8f9fa; padding:14px; border-radius:8px; margin-bottom:10px; border-left:4px solid #667eea; }
+.metric.positive { border-left-color:#27ae60; }
+.metric.warn { border-left-color:#f39c12; }
+.metric.negative { border-left-color:#e74c3c; }
+.metric-label { font-size:11px; color:#666; text-transform:uppercase; font-weight:600; }
+.metric-value { font-size:18px; font-weight:700; color:#1e3c72; margin-top:4px; }
+.positive { color:#27ae60; } .negative { color:#e74c3c; } .warn { color:#f39c12; }
+.fact { display:inline-block; background:#1e3c72; color:white; font-size:10px; font-weight:700; padding:2px 7px; border-radius:4px; margin-right:6px; }
+.opinion { display:inline-block; background:#8e6bbf; color:white; font-size:10px; font-weight:700; padding:2px 7px; border-radius:4px; margin-right:6px; }
+.diagnosis { background:linear-gradient(135deg,#667eea15 0%,#764ba215 100%); border-left:4px solid #667eea; padding:18px; border-radius:8px; }
+.diagnosis-title { font-size:13px; color:#666; text-transform:uppercase; font-weight:600; margin-bottom:8px; }
+.diagnosis-text { font-size:15px; font-weight:600; color:#1e3c72; line-height:1.6; }
+.footer { background:#f8f9fa; padding:16px; text-align:center; border-top:1px solid #e9ecef; font-size:11px; color:#999; }
+table { width:100%; border-collapse:collapse; font-size:13px; }
+th { padding:9px; text-align:left; font-weight:600; background:#f8f9fa; }
+td { padding:9px; border-bottom:1px solid #e9ecef; vertical-align:top; }
+.deepdive { background:linear-gradient(135deg,#1e3c7208 0%,#8e6bbf10 100%); border:2px dashed #8e6bbf; border-radius:10px; padding:20px; }
+.deepdive .section-title { border-bottom-color:#8e6bbf; }
+.subhead { font-size:13px; font-weight:700; color:#8e6bbf; margin:14px 0 6px; }
+.subhead:first-child { margin-top:0; }
+.item { font-size:13px; line-height:1.6; margin-bottom:8px; }
+.scorebox { background:linear-gradient(135deg,#1e3c72 0%,#2a5298 100%); color:white; border-radius:10px; padding:24px; text-align:center; margin-bottom:16px; }
+.scorebox .num { font-size:48px; font-weight:800; line-height:1; }
+.scorebox .grade { font-size:15px; font-weight:700; margin-top:6px; opacity:0.95; }
+.breakcond { display:flex; gap:10px; margin-top:14px; flex-wrap:wrap; }
+.breakcond .pill { flex:1; min-width:200px; background:#f8f9fa; border-radius:8px; padding:10px 12px; font-size:12px; border-left:3px solid #27ae60; }
+.breakcond .pill.hit { border-left-color:#e74c3c; background:#fdecea; }
+</style>
+</head>
+<body>
+<div class="container">
+<div class="preview-banner">⚠ 새로 구축한 HSEWS(HBM Cycle Score+엔비디아/CoWoS 독립섹션+외국인수급 정량화) 포맷 미리보기입니다. 정식 자동 발행이 아닌 데모.</div>
+<div class="header">
+<h1>[SK하이닉스 Daily Monitor] 미리보기</h1>
+<div class="date">2026-07-24 09:00 KST (금)</div>
+</div>
+<div class="content">
+
+<div class="section">
+<div class="section-title">1. SK하이닉스 주가 현황</div>
+<div class="metric positive">
+<div class="metric-label">최신 확정 종가(7/23)</div>
+<div class="metric-value positive">1,947,000원 (+6.39%)</div>
+<div style="font-size:12px; color:#666; margin-top:6px;">오늘(7/24) 장중 시세는 검색 미확인 — 전일 종가 유지. 200만원 재도전 임박.</div>
+</div>
+</div>
+
+<div class="section">
+<div class="section-title">2. 🚨 HBM Cycle Score</div>
+<div class="scorebox">
+<div class="num">73<span style="font-size:22px;">/100</span></div>
+<div class="grade">⚠ 경계(60~80) — 강세 유지되나 두 축이 새로 흔들림</div>
+</div>
+<table>
+<tr><th>축</th><th>배점</th><th>이번 체크</th><th>근거</th></tr>
+<tr><td>외국인 수급</td><td>15</td><td class="warn">8</td><td>연초 이후 SK하이닉스 누적 순매도 22조원(코스피 전체 순매도 70조원의 상당 비중) — 7월 초 +1,727억 순매수로 14거래일만에 전환됐으나 아직 추세 확정 아님. 종목별 1/5/20/60일 정밀 수치는 미확인</td></tr>
+<tr><td>외국인 보유율</td><td>15</td><td class="warn">8</td><td>오늘 검색으로 정확한 %p 델타 확보 실패 — 최근 스냅샷(7/22 52.39%) 유지, 미확인 처리</td></tr>
+<tr><td>HBM ASP</td><td>25</td><td class="positive">20</td><td>2Q26 HBM3e ASP 거의 flat(YoY), 하락 아님. HBM이 DRAM 웨이퍼 생산의 23%까지 확대(작년 19%). 2027년 ASP는 공급제약으로 오히려 큰 폭 상승 전망 — 3주 연속 하락 규칙 미해당</td></tr>
+<tr><td>엔비디아 주문 &amp; CoWoS</td><td>25</td><td class="positive">24</td><td>TSMC CoWoS 완전매진(리드타임 52~78주), 수요 3배 증가(2024 37만장→2025 67만장→2026 약100만장), 엔비디아가 2026~27 CoWoS 신규 예약의 절반 이상·CoWoS-L의 70%+ 확보 — 매우 강한 긍정</td></tr>
+<tr><td>공급 확대 위험</td><td>10</td><td class="warn">5</td><td>⚠ CXMT가 기존 전망(2027년말 40만WSPM)보다 빠르게 확장 중 — 2026년말 기준 이미 35만WSPM으로 마이크론(37.5만WSPM)에 근접한다는 새 분석 발견. 체크포인트⑦ 갱신 필요</td></tr>
+<tr><td>고객사 재고 센티먼트</td><td>10</td><td class="positive">8</td><td>MS·메타·아마존·구글 모두 2026 CapEx를 오히려 상향(합산 $725B, +77%YoY) — "inventory digestion/pause" 등 부정 키워드는 검색되지 않음</td></tr>
+</table>
+<div class="breakcond">
+<div class="pill">① HBM ASP 5%+ 하락<br><b class="positive">미충족</b></div>
+<div class="pill">② 엔비디아 주문 -10%<br><b class="positive">미충족(오히려 확대)</b></div>
+<div class="pill">③ CoWoS 활용률 95%이하<br><b class="positive">미충족(완전매진)</b></div>
+<div class="pill">④ 외국인 20일 순매도 전환<br><b class="warn">미확인(최근 순매수 전환 정황)</b></div>
+</div>
+<div style="font-size:12px; color:#666; margin-top:10px;">가설 붕괴조건 충족: <b>0/4</b> (④는 정밀 수치 미확보로 판정 보류) — HBM 투자 가설 [유지]</div>
+</div>
+
+<div class="section">
+<div class="section-title">3. ⚡ 선행지표: 엔비디아 주문 &amp; TSMC CoWoS 활용률</div>
+<div class="metric positive">
+<div class="item"><span class="fact">FACT</span>TSMC CoWoS(2.5D 패키징) 2.5년간 수요 3배 증가 — 2024년 약 37만장 → 2025년 약 67만장 → 2026년 약 100만장 전망. CoWoS-S·CoWoS-L 모두 완전매진, 리드타임 52~78주. TSMC는 월 생산능력을 7.5~8만장에서 2026년말 12~13만WPM까지 증설 중이나 그래도 예약 초과 상태 유지</div>
+<div class="item"><span class="fact">FACT</span>엔비디아가 2026~2027년 TSMC CoWoS 신규 증설분의 절반 이상(약 80~85만장)을 확보, 전체 CoWoS의 약 60%(약 60만장), CoWoS-L만 놓고 보면 70%+ 를 사실상 독점 — GB300 NVL72(CoWoS-L 기반)가 2026년 양산 출하의 중심</div>
+<div class="item"><span class="opinion">OPINION</span>주문 축소·지연 관련 부정 뉴스는 이번 체크에서 검색되지 않음 — 직전(7/16) "HBM4 출하 20~30% 축소" 보도는 SK하이닉스향 배분 조정이었고 엔비디아 자체 주문총량 축소는 아니었다는 기존 해석과 정합적. Bullish 판정</div>
+<div class="metric-label" style="margin-top:10px;">종합 판정</div>
+<div class="metric-value positive">Bullish</div>
+</div>
+</div>
+
+<div class="section">
+<div class="section-title">4. 🌐 하이퍼스케일러 고객 동향</div>
+<div class="metric">
+<div class="metric-label">🇺🇸 미국(Google·MS·Amazon·Meta)</div>
+<div class="item"><span class="fact">FACT</span>2026년 합산 CapEx $725B(전년 $410B 대비 +77%YoY) — Amazon $200B·Google $185B·Meta $125~145B(기존 가이던스 상향)·MS 분기 $30.88B(+84%YoY). MS Azure AI 매출 연환산 $37B(+123%YoY), 구글클라우드 백로그 $460B+</div>
+<div class="item"><span class="opinion">OPINION</span>"경쟁생존논리 vs ROIC규율" — 지금까지 CapEx 상향에도 주가가 하락하는 패턴이 반복됐는데, 이번 체크에선 명확한 반대신호(주가급락) 뉴스는 확인 안 됨. 7/29(메타·MS·SK하이닉스)·7/30(아마존) 실적이 여전히 최종 검증대</div>
+<div class="item"><span class="fact">FACT</span>재고 센티먼트: "inventory/digestion/optimization/pause" 등 부정 키워드 검색 결과 없음 — 4개사 모두 8~9점(정상 운영) 잠정 평가</div>
+</div>
+<div class="metric">
+<div class="metric-label">🇨🇳 중국(ByteDance·Alibaba·Tencent·Baidu)</div>
+<div class="item"><span class="opinion">OPINION</span>이번 체크에서 신규 수치 확보 실패 — 미확인, 기존 상태 유지</div>
+</div>
+</div>
+
+<div class="section">
+<div class="section-title">5. FACT vs OPINION 매트릭스</div>
+<table>
+<tr><th>항목</th><th>판정</th><th>비고</th></tr>
+<tr><td>①DRAM/NAND</td><td class="positive">긍정강화</td><td>HBM이 DRAM웨이퍼 23%까지 확대(작년19%), 3주연속하락 규칙 미해당</td></tr>
+<tr><td>②HBM4</td><td class="positive">긍정</td><td>SK 60%+ 점유율 전망 유지</td></tr>
+<tr><td>③CapEx(분기점)</td><td class="warn">혼재</td><td>합산 $725B로 재상향, 7/29~30 재검증 예정</td></tr>
+<tr><td>④LTA</td><td class="positive">긍정</td><td>가격상한선 없음</td></tr>
+<tr><td>⑤주주환원</td><td class="positive">긍정</td><td>100조원 계획</td></tr>
+<tr><td>⑥ADR(분기점)</td><td class="positive">긍정강화</td><td>7/29 양방향전환 개시 확정</td></tr>
+<tr><td>⑦중국산DRAM</td><td class="negative">부정, 주의 격상</td><td>⚠ CXMT 캐파 확장 속도가 기존 전망보다 빠름(2026말 35만WSPM, 마이크론 근접) — 재확인 필요</td></tr>
+<tr><td>⑧마이크론할인</td><td class="positive">긍정</td><td>PER 6.8~6.9배</td></tr>
+<tr><td>⑨실적/마진</td><td class="positive">긍정</td><td>발표 7/29(D-5)</td></tr>
+</table>
+</div>
+
+<div class="section">
+<div class="section-title">6. 🎯 찐반등 4대 신호 체크</div>
+<table>
+<tr><th>신호</th><th>상태</th></tr>
+<tr><td>①빚의 청산</td><td class="warn">부분확인·미확정</td></tr>
+<tr><td>②개미의 항복</td><td class="negative">불충족</td></tr>
+<tr><td>③외국인 귀환</td><td class="warn">부분충족 — SK하이닉스 종목 7월초 +1,727억 순매수 전환(14거래일만), "보름 이상 지속" 기준엔 아직 미달</td></tr>
+<tr><td>④미국빅테크 동반상승</td><td class="negative">불충족</td></tr>
+</table>
+</div>
+
+<div class="section deepdive">
+<div class="section-title">7. [Deep Dive] CXL &amp; 차세대 메모리 트랙</div>
+<div style="font-size:12px; color:#666; margin-bottom:10px;">직전 체크(오늘 아침) 대비 신규 소식 없음 — 기존 확인 사항 유지: CXL 4.0 스펙 발표, MS Azure 상용배포, 삼성/SK하이닉스 CXL3.2 경쟁 중이나 3사 공통 컨트롤러 자사화 중단. 상세는 <a href="../concepts/cxl-next-gen-memory.md">cxl-next-gen-memory.md</a> 참고.</div>
+</div>
+
+<div class="section">
+<div class="diagnosis">
+<div class="diagnosis-title">🧭 한줄 진단 &amp; 관전 포인트</div>
+<div class="diagnosis-text">
+HBM Cycle Score 73점(경계 구간) — 엔비디아 주문·CoWoS·ASP는 여전히 매우 강한 반면, 외국인 수급(연초 대량 순매도 이력이 아직 완전히 해소 안 됨)과 CXMT 공급확장 속도(기존 전망보다 빠름)라는 두 축이 새로 흔들리기 시작했다. 가설 붕괴조건은 아직 0/4로 유지되지만, ⑦CXMT 캐파 재평가와 20일 누적 외국인 수급 정밀 확인이 다음 체크의 최우선 과제.
+</div>
+</div>
+</div>
+
+</div>
+<div class="footer">2026-07-24 09:00 KST | 미리보기 — 정식 리포트는 10:00 장초반부터 이 포맷 적용</div>
+</div>
+</body>
+</html>

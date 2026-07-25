@@ -1,12 +1,24 @@
 ---
 title: 나의 투자 포트폴리오
 created: 2026-07-13
-updated: 2026-07-15
+updated: 2026-07-22
 tags: [portfolio, accounts]
 ---
 
 DC(퇴직연금), IRP, ISA, 일반 4개 계좌로 구성된 개인 투자 포트폴리오. 스냅샷을
 `/ingest` 할 때마다 이 페이지를 최신 상태로 갱신한다.
+
+**🔧 자동 수집 파이프라인 (2026-07-25 신설)**: 4개 계좌 전부 한국투자증권(KIS)
+소속 확인 — [`scripts/portfolio_holdings.py`](../../scripts/portfolio_holdings.py)가
+KIS API로 계좌별 보유종목·평가금액·손익을 매일 19:10 KST에 자동 조회해
+`sources/portfolio-holdings.csv`에 기록한다([`.github/workflows/portfolio-holdings-sync.yml`](../../.github/workflows/portfolio-holdings-sync.yml)).
+계좌번호는 GitHub Secrets(`KIS_ACCOUNT_GEN`/`KIS_ACCOUNT_ISP`/`KIS_ACCOUNT_DC`/`KIS_ACCOUNT_IRP`)에만 저장 — 일반/ISA는 KIS
+"주식잔고조회" TR(TTTC8434R)로 조회되지만, **IRP/DC(퇴직연금) 계좌는
+정확한 잔고조회 TR을 아직 확신할 수 없어 미구현** — 임의 코드를 넣지
+않고 명시적으로 건너뛴다. 아침·저녁 Routine이 이 CSV를 읽어 "계좌별
+보유종목의 거시환경 대비 유불리 판단 + 전망 + 체크포인트" 표를 리포트에
+포함한다(사용자 요청) — 이 판단 자체는 GitHub Actions가 아니라 Routine
+세션(Claude)이 매번 직접 수행, CSV가 없으면 섹션 자체를 생략한다.
 
 ## 최신 스냅샷 (2026-07-13)
 
@@ -38,6 +50,12 @@ DC(퇴직연금), IRP, ISA, 일반 4개 계좌로 구성된 개인 투자 포트
 크게 흔들렸다는 사실 자체가, 집중도가 높은 포트폴리오는 등락 폭도 그만큼
 크다는 걸 보여주는 사례다.
 
+**업데이트(2026-07-22)**: 7/13 급락(-16.15%) 이후 등락을 거쳐 7/20
+최저 종가(1,764,000원)까지 재차 눌렸다가, 7/21(+4.08%)·7/22 장중(+8~9%,
+200만원 돌파 시도)로 연속 급반등 — 136주(ISA 19 + 일반 117) 기준 평가금액이
+**약 2.7~2.8억원 수준**으로 확인돼 기존 296,760,000원 추정치와 대체로
+부합한다. 상세는 [SK하이닉스](sk-hynix.md)의 "7/22 급등 배경" 섹션 참고.
+
 [사용자](user-profile.md)는 SK하이닉스 재직자이자 고소득의 상당 부분이
 PS(성과급)에서 나오는 구조라, 위 SK하이닉스 집중 리스크는 투자자산에 그치지
 않고 소득 측면과도 겹친다 — 회사 실적이 흔들리면 자산과 소득이 동시에 영향을
@@ -49,3 +67,4 @@ PS(성과급)에서 나오는 구조라, 위 SK하이닉스 집중 리스크는 
 - [SK하이닉스 저항 돌파 및 ADR 폭등 (2026-07-15)](../summaries/sk-hynix-adr-surge-breakout-2026-07-15.md)
 - [사용자 프로필](user-profile.md)
 - [sources/portfolio-holdings-2026-07-13.md](../../sources/portfolio-holdings-2026-07-13.md)
+- [sources/sk-hynix-surge-analysis-2026-07-22.md](../../sources/sk-hynix-surge-analysis-2026-07-22.md)

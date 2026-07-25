@@ -1,0 +1,110 @@
+<title>SK하이닉스 아침 체크 — 2026-07-18 (토)</title>
+<style>
+  :root {
+    --bg: #f4f5f1; --surface: #ffffff; --surface-2: #eaebe3;
+    --ink: #1e221d; --ink-soft: #565b4e; --ink-faint: #8b9084;
+    --accent: #2f6b5e; --accent-ink: #143a32; --accent-soft: #dce8e2;
+    --border: #d8d9cf;
+    --pos: #2f6b3f; --pos-bg: #e3ecdd;
+    --neu: #96660f; --neu-bg: #f3e8d2;
+    --neg: #a53f3f; --neg-bg: #f4dede;
+    --unk: #6b7066; --unk-bg: #e7e8e1;
+    --shadow: 0 1px 2px rgba(30,34,29,.06), 0 8px 24px -12px rgba(30,34,29,.18);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #14170f; --surface: #1b201a; --surface-2: #212820;
+      --ink: #e9ece4; --ink-soft: #a9ae9e; --ink-faint: #6e7367;
+      --accent: #74c6ae; --accent-ink: #eaf7f2; --accent-soft: #223730;
+      --border: #303830;
+      --pos: #8fd19f; --pos-bg: #1f3324;
+      --neu: #e3b869; --neu-bg: #3a2f18;
+      --neg: #e79b9b; --neg-bg: #3a2222;
+      --unk: #9aa093; --unk-bg: #262b23;
+      --shadow: 0 1px 2px rgba(0,0,0,.4), 0 8px 24px -12px rgba(0,0,0,.6);
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #14170f; --surface: #1b201a; --surface-2: #212820;
+    --ink: #e9ece4; --ink-soft: #a9ae9e; --ink-faint: #6e7367;
+    --accent: #74c6ae; --accent-ink: #eaf7f2; --accent-soft: #223730;
+    --border: #303830;
+    --pos: #8fd19f; --pos-bg: #1f3324;
+    --neu: #e3b869; --neu-bg: #3a2f18;
+    --neg: #e79b9b; --neg-bg: #3a2222;
+    --unk: #9aa093; --unk-bg: #262b23;
+  }
+  :root[data-theme="light"] {
+    --bg: #f4f5f1; --surface: #ffffff; --surface-2: #eaebe3;
+    --ink: #1e221d; --ink-soft: #565b4e; --ink-faint: #8b9084;
+    --accent: #2f6b5e; --accent-ink: #143a32; --accent-soft: #dce8e2;
+    --border: #d8d9cf;
+    --pos: #2f6b3f; --pos-bg: #e3ecdd;
+    --neu: #96660f; --neu-bg: #f3e8d2;
+    --neg: #a53f3f; --neg-bg: #f4dede;
+    --unk: #6b7066; --unk-bg: #e7e8e1;
+  }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--ink); font-family:-apple-system,"Apple SD Gothic Neo","Pretendard","Noto Sans KR",system-ui,sans-serif; line-height:1.65; }
+  .wrap { max-width:52rem; margin:0 auto; padding:2.5rem 1.5rem 5rem; }
+  header { margin-bottom:2rem; }
+  .eyebrow { display:inline-flex; align-items:center; gap:.4rem; font-family:ui-monospace,"SFMono-Regular",Menlo,Consolas,monospace; font-size:.72rem; letter-spacing:.06em; text-transform:uppercase; color:var(--unk); background:var(--unk-bg); border-radius:999px; padding:.28rem .7rem; margin-bottom:1rem; }
+  h1 { font-size:clamp(1.5rem,4.5vw,2rem); font-weight:800; letter-spacing:-.01em; margin:0 0 .5rem; text-wrap:balance; }
+  .lede { color:var(--ink-soft); margin:0; font-size:1rem; }
+  .snapshot { display:grid; grid-template-columns:repeat(auto-fit,minmax(9.5rem,1fr)); gap:.9rem; margin:1.75rem 0; }
+  .stat { background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:1rem 1.1rem; box-shadow:var(--shadow); }
+  .stat .label { font-size:.72rem; color:var(--ink-faint); text-transform:uppercase; letter-spacing:.05em; margin-bottom:.35rem; }
+  .stat .value { font-family:ui-monospace,"SFMono-Regular",Menlo,Consolas,monospace; font-size:1.2rem; font-weight:700; font-variant-numeric:tabular-nums; }
+  .stat .sub { font-size:.8rem; margin-top:.2rem; }
+  .down { color:var(--neg); } .up { color:var(--pos); } .unkc { color:var(--unk); }
+  .card { background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:1.25rem 1.4rem; box-shadow:var(--shadow); margin-bottom:.9rem; }
+  .card p { margin:.4rem 0 0; color:var(--ink-soft); font-size:.9rem; }
+  .card p strong { color:var(--ink); }
+  h2 { font-size:1.1rem; font-weight:800; margin:1.5rem 0 .8rem; }
+  .callout { border-left:3px solid var(--neu); background:var(--neu-bg); color:var(--ink); border-radius:0 10px 10px 0; padding:.9rem 1.1rem; font-size:.88rem; margin-top:1.2rem; }
+  footer { margin-top:3rem; padding-top:1.25rem; border-top:1px solid var(--border); color:var(--ink-faint); font-size:.82rem; }
+  code { font-family:ui-monospace,Menlo,Consolas,monospace; font-size:.85em; background:var(--surface-2); padding:.1em .35em; border-radius:5px; }
+</style>
+
+<div class="wrap">
+  <header>
+    <span class="eyebrow">● 아침 체크 · 2026-07-18 (토) · 주말 휴장</span>
+    <h1>주말 휴장 — 지난주 미확정 시세 백필 시도, 아직 실패</h1>
+    <p class="lede">오늘·내일은 한국·미국 모두 휴장. 새 애널리스트·체크포인트 뉴스 없음.</p>
+  </header>
+
+  <div class="snapshot">
+    <div class="stat"><div class="label">오늘 KRX</div><div class="value">휴장</div><div class="sub">토요일 (정상)</div></div>
+    <div class="stat"><div class="label">7/17(금) 본주 종가</div><div class="value unkc">미확인</div><div class="sub">3일째 인덱싱 지연</div></div>
+    <div class="stat"><div class="label">ADR 7/16·17 세션</div><div class="value unkc">미확인</div><div class="sub">검색은 7/15까지만 반환</div></div>
+  </div>
+
+  <h2>오늘 체크 결과</h2>
+  <div class="card">
+    <p><strong>주말 휴장(정상):</strong> 오늘(토)·내일(일)은 양국 모두 거래
+    없음. 다음 실거래는 월요일(7/20) 한국 개장 — 그날 장초반 체크(10:00)에서
+    지난주 미확정치까지 한 번에 백필을 시도한다.</p>
+    <p><strong>백필 실패 상세:</strong> 7/17(금) 본주 종가와 7/16·17 미국
+    세션 ADR 종가를 다각도로 재검색했으나 모두 실패 — 뉴스 검색이 7/15
+    세션($176.46)까지만 반환하는 상태가 3일째다. 검색 중 과거 기사 2건(6월
+    코스피 8,864 기사, 7/14 코스피 6,856.83 기사)이 "17일"로 오매칭되는
+    것을 확인하고 기각했다 — <strong>확정 안 된 숫자는 쓰지 않는다는 원칙
+    유지</strong>.</p>
+    <p><strong>참고 변형 수치:</strong> CNBC는 7/16 서울 종가 낙폭을
+    "-11.5%"로 표기(우리 확정치는 복수 국내 소스 기준 -10.69%/1,859,500원)
+    — 기존 확정치를 유지하되 변형 수치 존재를 기록해둔다.</p>
+    <p><strong>새 뉴스:</strong> 어제 저녁 체크(교보 400만원 신규, CXMT 격상,
+    CapEx 둔화 정량화) 이후 신규 애널리스트·체크포인트 뉴스 없음.</p>
+  </div>
+
+  <div class="callout">
+    <strong>다가오는 일정:</strong> 7/22(수) 알파벳 실적 → 7/29(수) SK하이닉스
+    실적(사실상 확정)·메타·마이크로소프트 → 7/30(목) 아마존. 다음 주가
+    체크포인트 ③(빅테크 CapEx)과 ⑨(실적)의 실제 판정 주간이다.
+  </div>
+
+  <footer>
+    이 리포트는 아침 07:00(KST) Routine이 자동 생성한다. 휴장일 판정 기준은
+    위키 <code>concepts/market-holidays.md</code> 참고. 투자 조언 아님.
+  </footer>
+</div>
