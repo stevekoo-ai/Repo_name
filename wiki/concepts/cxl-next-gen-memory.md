@@ -1,7 +1,7 @@
 ---
 title: CXL & 차세대 메모리 트랙 (Next-HBM Engine)
 created: 2026-07-24
-updated: 2026-07-24
+updated: 2026-07-25
 tags: [cxl, memory, standardization, sk-hynix, next-gen, daily-tracking]
 ---
 
@@ -67,6 +67,13 @@ HBM 이후의 "다음 성장 엔진"으로 주목하는 트랙이라 별도 페�
   멀티턴 LLM 서빙 프레임워크 — SSD급 비용으로 DRAM급 KV-cache 효율 지향.
 
 ### ⓒ 경쟁사 뉴스룸 및 수급 동향
+- **(2026-07-25 저녁 체크 추가) [FACT] 삼성전자 1TB CXL 메모리 풀 성능
+  테스트 결과 공개**(2026년 7월 실시): 8-GPU 환경에서 기존 D램 대비
+  약 92% 추론 성능을 유지하면서도 훨씬 큰 캐시(KV-cache)를 지원한다고
+  발표 — CXL의 "대역폭은 D램보다 낮지만 용량 확장으로 실사용 성능
+  손실은 제한적"이라는 가치제안을 정량 수치로 처음 제시한 사례.
+  [OPINION] 자체 발표치라 제3자 검증 전이고, 아직 상용 제품 벤치마크는
+  아니라는 점은 유의.
 - **[FACT] 삼성전자 CMM-D 3.0**(CXL 3.2 기반): 2026년 말 양산 목표(TrendForce,
   2026-07-21). CXL 3.2의 CHMU(Hot Page Monitoring Unit)로 데이터 접근빈도
   실시간 모니터링·배치 최적화 기능 추가. 앞서 CXL 3.1 기반 버전은 인텔·AMD
