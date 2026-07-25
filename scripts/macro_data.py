@@ -127,27 +127,49 @@ def fred_fetch(series_id, start=None, end=None, raw=False):
     return [(o["date"], o["value"]) for o in obs if o["value"] != "."]
 
 
-def ecos_fetch(stat_code, item_code, cycle, start, end, raw=False):
-    key = _get_env_or_die("ECOS_API_KEY", "https://ecos.bok.or.kr/api/")
-    url = f"{ECOS_BASE}/{key}/json/kr/1/1000/{stat_code}/{cycle}/{start}/{end}/{item_code}"
+def _ecos_fetch_page(key, stat_code, item_code, cycle, start, end, row_from, row_to):
+    url = f"{ECOS_BASE}/{key}/json/kr/{row_from}/{row_to}/{stat_code}/{cycle}/{start}/{end}/{item_code}"
     try:
         with urllib.request.urlopen(url) as resp:
-            data = json.loads(resp.read())
+            return json.loads(resp.read())
     except urllib.error.HTTPError as e:
         sys.exit(f"ECOS API 호출 실패: {e.code} {e.read().decode(errors='replace')}")
 
+
+def ecos_fetch(stat_code, item_code, cycle, start, end, raw=False):
+    """ECOS는 요청당 최대 1000행 — 일별(D) 시리즈는 10년치가 1000행을
+    훌쩍 넘기므로(전체 응답의 list_total_count 확인 후) 페이지네이션한다.
+    페이지네이션 안 하면 "가장 오래된 1000행"만 오고 최근 데이터가 통째로
+    누락되는 버그가 있었음(2026-07-25 실계정 테스트로 발견 — kr_usdkrw가
+    2016~2020년치만 채워지고 2020~2026년은 비어있었음)."""
+    key = _get_env_or_die("ECOS_API_KEY", "https://ecos.bok.or.kr/api/")
+
+    first = _ecos_fetch_page(key, stat_code, item_code, cycle, start, end, 1, 1000)
     if raw:
-        print(json.dumps(data, ensure_ascii=False, indent=2))
+        print(json.dumps(first, ensure_ascii=False, indent=2))
         return []
 
-    if "RESULT" in data:
-        sys.exit(f"ECOS API 오류 응답: {data['RESULT']}")
-    rows = data.get("StatisticSearch", {}).get("row")
+    if "RESULT" in first:
+        sys.exit(f"ECOS API 오류 응답: {first['RESULT']}")
+    search = first.get("StatisticSearch", {})
+    rows = search.get("row")
     if not rows:
         sys.exit(
             f"응답에서 데이터를 찾지 못했습니다 — --raw로 원본을 확인하세요. "
-            f"통계표코드/항목코드가 틀렸을 수 있습니다: {json.dumps(data, ensure_ascii=False)[:300]}"
+            f"통계표코드/항목코드가 틀렸을 수 있습니다: {json.dumps(first, ensure_ascii=False)[:300]}"
         )
+
+    total = int(search.get("list_total_count", len(rows)))
+    row_from = 1001
+    while row_from <= total:
+        row_to = min(row_from + 999, total)
+        page = _ecos_fetch_page(key, stat_code, item_code, cycle, start, end, row_from, row_to)
+        page_rows = page.get("StatisticSearch", {}).get("row")
+        if not page_rows:
+            break
+        rows.extend(page_rows)
+        row_from += 1000
+
     return [(r["TIME"], r["DATA_VALUE"]) for r in rows]
 
 
