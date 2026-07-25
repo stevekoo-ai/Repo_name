@@ -1,0 +1,54 @@
+name: Daily Investment Clock Report
+
+on:
+  schedule:
+    # 23:00 UTC = 08:00 KST (next day)
+    - cron: "0 23 * * *"
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: daily-clock-report
+  cancel-in-progress: false
+
+jobs:
+  run-clock:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run investment clock pipeline
+        env:
+          FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          SMTP_HOST: ${{ secrets.SMTP_HOST }}
+          SMTP_PORT: ${{ secrets.SMTP_PORT }}
+          SMTP_USER: ${{ secrets.SMTP_USER }}
+          SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
+          NOTIFY_EMAIL_TO: ${{ secrets.NOTIFY_EMAIL_TO }}
+        run: python -m src.clock.main
+
+      - name: Commit updated data and dashboard
+        run: |
+          git config user.name "investment-clock-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add data/history.csv docs/
+          if git diff --cached --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "chore: daily investment clock update $(date -u +%Y-%m-%d)"
+            git push
+          fi

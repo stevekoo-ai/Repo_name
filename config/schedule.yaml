@@ -1,0 +1,45 @@
+# PEOS automation schedule (Master Instruction 18.3, 18.4).
+# Describes intended cadence; wiring this to an actual scheduler
+# (GitHub Actions cron, APScheduler) is a Phase-8+ deployment step.
+
+jobs:
+  daily_market_update:
+    description: "시장 데이터(주가지수, 환율, 채권금리 등) 갱신"
+    cron: "0 23 * * *"   # 매일 08:00 KST
+    scope: [market]
+
+  monthly_kr_exports:
+    description: "한국 수출/반도체 수출 업데이트"
+    cron: "0 23 1 * *"   # 매월 1일 08:00 KST 근처(발표 즉시 수동 트리거 권장)
+    scope: [exports, semiconductor_exports]
+
+  us_employment_trigger:
+    description: "미국 고용지표(NFP) 발표 시 실행 (매월 첫째 금요일 밤 실행 권장)"
+    cron: null
+    trigger: on_release
+    scope: [us_employment]
+
+  us_cpi_trigger:
+    description: "미국 CPI 발표 시 실행"
+    cron: null
+    trigger: on_release
+    scope: [us_cpi]
+
+  kr_cpi_ppi_trigger:
+    description: "한국 CPI/PPI 발표 시 실행"
+    cron: null
+    trigger: on_release
+    scope: [kr_cpi, kr_ppi]
+
+  monthly_report:
+    description: "월간 지표 충족률 검사 -> Macro Engine -> Domain Engines -> Report 생성"
+    cron: "0 23 5 * *"   # 매월 5일 08:00 KST 근처 (핵심지표 발표 이후)
+    scope: [full_pipeline]
+
+report_generation_triggers:
+  - monthly_key_indicators_complete
+  - gdp_release
+  - imf_outlook_release
+  - bok_outlook_revision
+  - fomc_key_variable_change
+  - user_manual_request

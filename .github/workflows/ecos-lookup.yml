@@ -1,0 +1,31 @@
+name: ECOS Table Lookup
+
+on:
+  workflow_dispatch:
+    inputs:
+      keyword:
+        description: "검색어. 표 검색: '경제성장률' / 항목 검색: '--items 902Y015 한국'"
+        required: true
+        default: "경제성장률"
+
+jobs:
+  lookup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install requests
+
+      - name: Look up ECOS statistic tables
+        env:
+          ECOS_API_KEY: ${{ secrets.ECOS_API_KEY }}
+        # Intentionally unquoted so a "--items <code> <keyword>" input word-splits into
+        # separate argv entries; this is a manually-dispatched diagnostic tool only.
+        run: python -m scripts.ecos_lookup ${{ github.event.inputs.keyword }}

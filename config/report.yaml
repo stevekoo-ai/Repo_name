@@ -1,0 +1,53 @@
+# PEOS report template configuration (Master Instruction 16, 25).
+# Section order and output formats are externalized so the report builder
+# never hardcodes structure. Markdown and HTML are both fully implemented
+# (engine/report/markdown.py, engine/report/html.py); pdf/excel are
+# prepared extension points (engine/report/exporters.py) per 18.1's
+# "PDF/Excel export 준비".
+
+output_formats: [markdown, html, json]
+
+sections:
+  - us_macro_dashboard
+  - us_regime_judgement
+  - macro_dashboard
+  - regime_judgement
+  - kr_us_comparison
+  - executive_summary
+  - monthly_key_changes
+  - indicator_deep_dive
+  - personal_analysis
+  - asset_impact
+  - scenario_analysis
+  - discussion_points
+  - action_plan
+  - economic_calendar
+  - personal_executive_brief
+  - appendix
+
+action_grade_labels:
+  5: "★★★★★ 반드시 확인 / 반드시 실행"
+  4: "★★★★☆ 검토 필요"
+  3: "★★★☆☆ 관찰 필요"
+  2: "★★☆☆☆ 참고"
+  1: "보류"
+
+calendar_importance_labels:
+  5: "★★★★★ 반드시 확인"
+  4: "★★★★☆ 검토"
+  3: "★★★☆☆ 관찰"
+
+scenario_labels: [base, bull, bear]
+
+output_dir: "report"
+
+# Macro Dashboard trend sparklines (13.x follow-up: raw indicators must show
+# a long enough history to make "직전 대비" meaningful even before multiple
+# monthly PEOS snapshots exist).
+trend_history_years: 10
+
+# Used to build "GitHub Issue로 제출" links in the HTML report's Discussion
+# Points section (engine/report/html.py). Public repo — only non-sensitive
+# feedback should go through this path; the "복사하기" buttons are the
+# private alternative (paste into chat instead).
+github_repo: "stevekoo-ai/Repo_name"

@@ -1,0 +1,16 @@
+# EXAMPLE manual input for 산업통상자원부 수출입 동향 (Master Instruction 8.1, 7.3).
+# MOTIE does not publish a stable public API for these figures; update this
+# file monthly from the official 산업통상자원부 보도자료 / K-stat 수치.
+# Replace the EXAMPLE rows below with real released values — the pipeline
+# treats every row here as an official, judgment-grade observation (grade 5).
+
+updated_at: "2026-07-14"
+series:
+  total_exports_yoy:               # 총수출 증가율 (%, YoY)
+    - { date: "2026-04-01", value: 6.8 }   # EXAMPLE
+    - { date: "2026-05-01", value: 8.2 }   # EXAMPLE
+    - { date: "2026-06-01", value: 9.1 }   # EXAMPLE
+  semiconductor_exports_yoy:       # 반도체 수출 증가율 (%, YoY)
+    - { date: "2026-04-01", value: 18.9 }  # EXAMPLE
+    - { date: "2026-05-01", value: 22.4 }  # EXAMPLE
+    - { date: "2026-06-01", value: 24.7 }  # EXAMPLE
