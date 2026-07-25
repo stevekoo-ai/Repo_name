@@ -17,6 +17,9 @@ from engine.action import engine as action_engine
 from engine.macro import engine as macro_engine
 from engine.macro import snapshot as macro_snapshot
 from engine.personal import mapping
+from engine.rate_analysis import scoring as rate_scoring
+from engine.crisis_analysis import scoring as cci_scoring
+from engine.real_estate import market_trend as real_estate_trend
 from . import discussion as discussion_mod
 from . import scenario as scenario_mod
 
@@ -253,5 +256,168 @@ def build_report_payload(month_key: str | None = None) -> dict:
         "appendix": _appendix(macro),
     }
 
+    # Add interest rate analysis
+    rate_analysis = _rate_analysis_section()
+    payload["rate_analysis"] = rate_analysis
+
+    # Add comprehensive crisis index
+    cci_analysis = _cci_section()
+    payload["cci_analysis"] = cci_analysis
+
+    # Add real estate transaction price trend (서울/수도권/전국)
+    payload["real_estate"] = real_estate_trend.compute_real_estate_trend()
+
+    # Add daily dashboard history integration
+    payload["daily_history_summary"] = _daily_history_summary(month_key)
+
     log_event("report_payload.built", month=month_key, readiness=readiness, action_count=len(actions))
     return payload
+
+
+def _rate_analysis_section() -> dict:
+    """Generate interest rate analysis section (US/KR yield comparison and portfolio impact)."""
+    rate_score_detail = rate_scoring.calculate_rate_score()
+    portfolio_rec = rate_scoring.portfolio_recommendation(rate_score_detail.total_score)
+    sk_hynix_rec = rate_scoring.sk_hynix_outlook(rate_score_detail.total_score, rate_score_detail.spread)
+
+    return {
+        "total_score": rate_score_detail.total_score,
+        "score_components": {
+            "absolute_rates": rate_score_detail.absolute_rate_score,
+            "trend_analysis": rate_score_detail.trend_score,
+            "spread": rate_score_detail.spread_score,
+            "market_signals": rate_score_detail.market_signal_score,
+        },
+        "current_rates": {
+            "us_10y": round(rate_score_detail.us_10y, 2) if rate_score_detail.us_10y else None,
+            "kr_10y": round(rate_score_detail.kr_10y, 2) if rate_score_detail.kr_10y else None,
+            "spread_bp": round(rate_score_detail.spread, 0) if rate_score_detail.spread else None,
+        },
+        "trends": {
+            "us_10y_1m_change_bp": round(rate_score_detail.trend_1m, 1) if rate_score_detail.trend_1m else None,
+            "us_10y_3m_trend": "up" if rate_score_detail.trend_3m and rate_score_detail.trend_3m > 0 else "down",
+        },
+        "market_signal": {
+            "us_10y_2y_spread": round(rate_score_detail.us_10y_2y_spread, 2) if rate_score_detail.us_10y_2y_spread else None,
+            "yield_curve_status": "normal" if rate_score_detail.us_10y_2y_spread and rate_score_detail.us_10y_2y_spread > 0 else "inverted",
+        },
+        "portfolio_recommendation": {
+            "stocks": portfolio_rec["stocks"],
+            "bonds": portfolio_rec["bonds"],
+            "cash": portfolio_rec["cash"],
+            "condition": portfolio_rec["condition"],
+            "rebalance_trigger": portfolio_rec["rebalance_trigger"],
+        },
+        "sk_hynix_outlook": {
+            "3m_upside_probability": sk_hynix_rec["3m_probability"],
+            "6m_upside_probability": sk_hynix_rec["6m_probability"],
+            "12m_upside_probability": sk_hynix_rec["12m_probability"],
+            "rationale": sk_hynix_rec["rationale"],
+        },
+    }
+
+
+def _cci_section() -> dict:
+    """Generate Comprehensive Crisis Index analysis section."""
+    cci_detail = cci_scoring.calculate_cci()
+    sk_hynix_action = cci_scoring.get_sk_hynix_action(cci_detail)
+
+    return {
+        "total_score": cci_detail.total_score,
+        "state": cci_detail.state,
+        "score_components": {
+            "sahm": cci_detail.sahm_score,
+            "yield_curve": cci_detail.yield_curve_score,
+            "harvey": cci_detail.harvey_score,
+            "copper_gold": cci_detail.copper_gold_score,
+            "credit_oas": cci_detail.credit_score,
+            "buffett": cci_detail.buffett_score,
+            "rule_of_20": cci_detail.rule20_score,
+            "k_sahm": cci_detail.k_sahm_score,
+            "semiconductor": cci_detail.semiconductor_score,
+        },
+        "raw_values": {
+            "ur_ma3": round(cci_detail.ur_ma3, 2) if cci_detail.ur_ma3 else None,
+            "ur_min_12m": round(cci_detail.ur_min_12m, 2) if cci_detail.ur_min_12m else None,
+            "spread_10y2y": round(cci_detail.spread_10y2y, 3) if cci_detail.spread_10y2y else None,
+            "spread_10y3m": round(cci_detail.spread_10y3m, 3) if cci_detail.spread_10y3m else None,
+            "hy_oas": round(cci_detail.hy_oas, 2) if cci_detail.hy_oas else None,
+            "k_emp_yoy": round(cci_detail.k_emp_yoy, 0) if cci_detail.k_emp_yoy else None,
+        },
+        "sk_hynix_action": sk_hynix_action,
+        "interpretation": {
+            "GREEN": "Systemic expansion. Capital injection favored. Aggressive growth positioning optimal.",
+            "YELLOW": "Momentum deceleration. Capital hedging recommended. Tactical positioning advised.",
+            "RED": "Systemic invalidation. Capital evacuation urgent. Defensive/short positioning required.",
+        },
+    }
+
+
+def _daily_history_summary(month_key: str) -> dict:
+    """일일 대시보드 이력 데이터를 월간 리포트에 통합 (지난 30일 최신 5개 기록).
+
+    peos_daily_history.csv에서 해당 월의 마지막 기록들을 읽어 일일 변화 추이를 제공한다.
+    """
+    import csv
+    from pathlib import Path
+
+    history_file = Path("data/peos_daily_history.csv")
+    if not history_file.exists():
+        return {"status": "unavailable", "note": "일일 이력 데이터 없음"}
+
+    try:
+        records = []
+        with open(history_file) as f:
+            reader = csv.DictReader(f)
+            for row in reader:
+                run_date = row.get("run_date", "")
+                if run_date.startswith(month_key):
+                    records.append(row)
+
+        if not records:
+            return {"status": "unavailable", "note": f"{month_key} 월간 일일 이력 없음"}
+
+        # 마지막 5개 기록만 사용
+        records = records[-5:]
+
+        # 첫 기록과 마지막 기록의 변화 계산
+        first = records[0]
+        last = records[-1]
+
+        def safe_float(v):
+            if not v or v == '':
+                return None
+            try:
+                return float(v)
+            except (ValueError, TypeError):
+                return None
+
+        return {
+            "status": "ok",
+            "month": month_key,
+            "daily_records": [
+                {
+                    "date": r.get("run_date"),
+                    "kr_regime": r.get("kr_regime"),
+                    "kr_score": safe_float(r.get("kr_raw_score")),
+                    "kr_confidence": safe_float(r.get("kr_confidence")),
+                    "us_regime": r.get("us_regime"),
+                    "us_score": safe_float(r.get("us_raw_score")),
+                    "us_confidence": safe_float(r.get("us_confidence")),
+                    "investment_env_score": safe_float(r.get("investment_environment_score")),
+                    "semiconductor_score": safe_float(r.get("semiconductor_score")),
+                    "bond_score": safe_float(r.get("bond_score")),
+                }
+                for r in records
+            ],
+            "trend_summary": {
+                "kr_regime_stable": first.get("kr_regime") == last.get("kr_regime"),
+                "kr_confidence_change": safe_float(last.get("kr_confidence")) - safe_float(first.get("kr_confidence")) if safe_float(first.get("kr_confidence")) and safe_float(last.get("kr_confidence")) else None,
+                "us_regime_stable": first.get("us_regime") == last.get("us_regime"),
+                "us_confidence_change": safe_float(last.get("us_confidence")) - safe_float(first.get("us_confidence")) if safe_float(first.get("us_confidence")) and safe_float(last.get("us_confidence")) else None,
+                "investment_env_trend": (safe_float(last.get("investment_environment_score")) or 0) - (safe_float(first.get("investment_environment_score")) or 0),
+                "semiconductor_trend": (safe_float(last.get("semiconductor_score")) or 0) - (safe_float(first.get("semiconductor_score")) or 0),
+            }
+        }
+    except Exception as e:
+        return {"status": "error", "note": f"일일 이력 읽기 오류: {str(e)}"}

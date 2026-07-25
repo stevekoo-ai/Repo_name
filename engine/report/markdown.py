@@ -81,6 +81,8 @@ def _executive_summary(payload: dict) -> str:
     macro = payload["macro"]
     brief = payload["personal_executive_brief"]
     top_action = payload["actions"][0] if payload["actions"] else None
+    daily_history = payload.get("daily_history_summary", {})
+
     lines = [
         "## 6. Executive Summary",
         f"- 현재 경기 국면: **{macro['regime']}** ({macro['score_band_label']}, 총점 {macro['score']})",
@@ -91,6 +93,24 @@ def _executive_summary(payload: dict) -> str:
         "- 이번 달 핵심 행동: " + (f"[행동] {top_action['title']}" if top_action else "[행동] 핵심 지표 확보 후 재평가 필요"),
         f"- 리포트 충족도: **{payload['report_readiness']}** (Confidence {macro['confidence']}점)",
     ]
+
+    # 일일 이력 요약 추가
+    if daily_history.get("status") == "ok":
+        trend = daily_history.get("trend_summary", {})
+        trend_notes = []
+        if not trend.get("kr_regime_stable"):
+            trend_notes.append("한국 국면 변화")
+        kr_conf_change = trend.get("kr_confidence_change")
+        if kr_conf_change and abs(kr_conf_change) > 5:
+            direction = "상승" if kr_conf_change > 0 else "하락"
+            trend_notes.append(f"신뢰도 {direction} ({kr_conf_change:+.1f}%p)")
+        investment_trend = trend.get("investment_env_trend", 0)
+        if investment_trend and abs(investment_trend) > 2:
+            direction = "개선" if investment_trend > 0 else "악화"
+            trend_notes.append(f"투자환경 {direction}")
+        if trend_notes:
+            lines.append(f"- **월간 일일 추이**: {', '.join(trend_notes)}")
+
     return "\n".join(lines)
 
 
@@ -258,6 +278,74 @@ def _personal_brief(payload: dict) -> str:
     return "\n".join(lines)
 
 
+def _rate_analysis(payload: dict) -> str:
+    """Render interest rate analysis section (US/KR yield comparison and portfolio strategy)."""
+    if "rate_analysis" not in payload or not payload["rate_analysis"]:
+        return ""
+
+    ra = payload["rate_analysis"]
+    score = ra.get("total_score", 0)
+
+    # Determine score interpretation
+    if score >= 85:
+        interpretation = "극도 완화 (Extreme easing) — 공격적 성장 전략"
+    elif score >= 70:
+        interpretation = "완화 사이클 (Easing) — 성장 지향"
+    elif score >= 55:
+        interpretation = "중립~약한 완화 (Neutral-Accommodative) — 균형 배분"
+    elif score >= 40:
+        interpretation = "긴축 사이클 (Tightening) — 방어적 전략"
+    else:
+        interpretation = "극도 긴축 (Extreme tightening) — 극도 방어적"
+
+    rates = ra.get("current_rates", {})
+    trends = ra.get("trends", {})
+    portfolio = ra.get("portfolio_recommendation", {})
+    hynix = ra.get("sk_hynix_outlook", {})
+
+    lines = [
+        "## 금리 분석 (Interest Rate Environment)",
+        "",
+        f"**금리 점수: {score}/100 ({interpretation})**",
+        "",
+        "### 점수 구성",
+        f"| 항목 | 점수 | 만점 |",
+        "|------|------|------|",
+        f"| 절대 금리 수준 | {ra['score_components'].get('absolute_rates', 0)} | 30 |",
+        f"| 추이 분석 | {ra['score_components'].get('trend_analysis', 0)} | 30 |",
+        f"| Yield Spread | {ra['score_components'].get('spread', 0)} | 25 |",
+        f"| 시장 신호 | {ra['score_components'].get('market_signals', 0)} | 15 |",
+        "",
+        "### 현재 금리 상황",
+        f"- **미국 10Y Treasury**: {_fmt(rates.get('us_10y'), '%')}",
+        f"- **한국 10Y 국고채**: {_fmt(rates.get('kr_10y'), '%')}",
+        f"- **Spread (US-KR)**: {_fmt(rates.get('spread_bp'), 'bp')}",
+        f"  - 기준: 200~250bp | 현재: {('**정상 범위**' if rates.get('spread_bp') is not None and 150 <= rates['spread_bp'] <= 300 else '**주의 필요**')}",
+        "",
+        "### 추이 신호",
+        f"- **미국 10Y 1개월 변화**: {_fmt(trends.get('us_10y_1m_change_bp'), 'bp')}",
+        f"- **3개월 추세**: {'상승 (긴축)' if trends.get('us_10y_3m_trend') == 'up' else '하강 (완화)'}",
+        "",
+        "### 시장 신호",
+        f"- **역수익 곡선 (10Y-2Y)**: {_fmt(ra.get('market_signal', {}).get('us_10y_2y_spread'), '%')}",
+        f"- **상태**: {'**정상** (경기순환 양호)' if ra.get('market_signal', {}).get('yield_curve_status') == 'normal' else '⚠️ **역수익** (경기약세 경고)'}",
+        "",
+        "### 포트폴리오 전략",
+        f"**권장 자산 배분**: 주식 {portfolio.get('stocks', 50)}% + 채권 {portfolio.get('bonds', 30)}% + 현금 {portfolio.get('cash', 20)}%",
+        f"**기본 원칙**: {portfolio.get('condition', 'N/A')}",
+        f"**리밸런싱 트리거**: 점수 {portfolio.get('rebalance_trigger', 0)}점 이상/이하 변화",
+        "",
+        "### SK Hynix 관점",
+        f"- **3개월 상승 가능성**: {hynix.get('3m_upside_probability', 50)}%",
+        f"- **6개월 상승 가능성**: {hynix.get('6m_upside_probability', 50)}%",
+        f"- **12개월 상승 가능성**: {hynix.get('12m_upside_probability', 50)}%",
+        f"- **근거**: {hynix.get('rationale', 'N/A')}",
+        "",
+    ]
+
+    return "\n".join(lines)
+
+
 def _appendix(payload: dict) -> str:
     a = payload["appendix"]
     lines = ["## 16. Appendix", "- 데이터 출처: " + (", ".join(a["sources"]) if a["sources"] else "N/A"),
@@ -267,12 +355,237 @@ def _appendix(payload: dict) -> str:
     return "\n".join(lines)
 
 
+def _cci_analysis(payload: dict) -> str:
+    """Comprehensive Crisis Index analysis with SK Hynix trading signals."""
+    if "cci_analysis" not in payload:
+        return ""
+
+    cci = payload["cci_analysis"]
+    state_emoji = {"GREEN": "🟢", "YELLOW": "🟡", "RED": "🔴"}
+    state = cci["state"]
+    score = cci["total_score"]
+
+    lines = [
+        f"## 위기지수 분석 (Comprehensive Crisis Index)",
+        f"**상태: {state_emoji.get(state, '?')} {state}** | **점수: {score}/100**",
+        "",
+        "| 지표 | 점수 | 해석 |",
+        "|------|------|------|",
+        f"| Sahm Rule (고용 모멘텀) | {cci['score_components']['sahm']}/20 | US 실업률 3개월 MA 추이 |",
+        f"| Yield Curve (수익률곡선) | {cci['score_components']['yield_curve']}/15 | 10Y-2Y, 10Y-3M 스프레드 |",
+        f"| Harvey Filter (3개월 검증) | {cci['score_components']['harvey']}/15 | 장기 수익률곡선 역전 신호 |",
+        f"| Copper-Gold Ratio | {cci['score_components']['copper_gold']}/10 | 산업 수요 vs 안전자산 선호 |",
+        f"| HY Credit OAS | {cci['score_components']['credit_oas']}/15 | 신용 긴축 및 유동성 지수 |",
+        f"| Buffett Indicator | {cci['score_components']['buffett']}/5 | 거시 가치평가 지표 |",
+        f"| Rule of 20 | {cci['score_components']['rule_of_20']}/5 | PER + 인플레이션 조정 |",
+        f"| K-Sahm Rule (한국 고용) | {cci['score_components']['k_sahm']}/5 | 국내 일자리 악화 신호 |",
+        f"| 반도체 산업사이클 | {cci['score_components']['semiconductor']}/10 | 출하-재고 사이클 추이 |",
+        "",
+    ]
+
+    if cci["raw_values"]["ur_ma3"] is not None:
+        lines.append(f"**주요 지표 현황:**")
+        lines.append(f"- 미국 실업률 3M MA: {cci['raw_values']['ur_ma3']}%")
+        lines.append(f"- 10Y-2Y 스프레드: {cci['raw_values']['spread_10y2y']}%p")
+        lines.append(f"- HY OAS: {cci['raw_values']['hy_oas']}%")
+        lines.append("")
+
+    # 각 법칙별 상세 해석
+    lines.append("### 각 리스크 신호별 해석")
+    lines.append("")
+
+    # Sahm Rule
+    sahm_score = cci['score_components']['sahm']
+    lines.append(f"**1. Sahm Rule (고용 모멘텀)** — {sahm_score}/20")
+    if sahm_score >= 15:
+        lines.append("- ⚠️ **경고 신호**: 미국 실업률 3개월 이동평균이 최근 12개월 최저치에서 0.5%p 이상 상승했으며, 고용이 급격히 악화 중")
+        lines.append("- **경제 의미**: 금리 인상 효과가 고용 시장에까지 파급. 경기 침체 초기 신호")
+        lines.append("- **사용자 영향**: SK하이닉스 매출 감소 가능성, 보유 ETF 수익률 악화 우려")
+    elif sahm_score >= 8:
+        lines.append("- ⚡ **주의 신호**: 실업률이 소폭 상승 추세. 고용 시장의 약화 신호 but 아직 심각하지 않음")
+        lines.append("- **경제 의미**: 경기 둔화 국면으로 진입하는 중")
+        lines.append("- **사용자 영향**: 대기 자금 확충 검토")
+    else:
+        lines.append("- ✅ **안전 신호**: 실업률이 안정적이거나 하락 중. 고용 시장이 건강함")
+        lines.append("- **경제 의미**: 경기 확장 또는 회복 국면 유지")
+        lines.append("- **사용자 영향**: 공격적 포지션 유지 가능")
+    lines.append("")
+
+    # Yield Curve
+    yc_score = cci['score_components']['yield_curve']
+    lines.append(f"**2. Yield Curve (수익률곡선)** — {yc_score}/15")
+    if yc_score >= 12:
+        lines.append("- 🔴 **극도 경고**: 10Y-2Y 스프레드가 음수(역전)이며, 10Y-3M도 역전. 경기 침체 신호 강함")
+        lines.append("- **경제 의미**: 시장이 향후 경기 침체를 선반영. 장기 금리가 단기보다 낮다는 것은 안전자산 선호 신호")
+        lines.append("- **사용자 영향**: 채권 비중 확대, 공격성 자산 축소 시점. 청약 기회 관찰")
+    elif yc_score >= 6:
+        lines.append("- ⚡ **주의**: 스프레드가 200bp 이하로 축소. 금리 인상 효과가 곡선을 누르는 중")
+        lines.append("- **경제 의미**: 경기 둔화 신호. 통상 6~12개월 후 경기 약세 우려")
+        lines.append("- **사용자 영향**: 리스크 자산 비중 조절 시작")
+    else:
+        lines.append("- ✅ **정상**: 스프레드가 충분히 양수. 곡선이 건강한 상승 구조")
+        lines.append("- **경제 의미**: 경기 확장 신호. 투자심리 양호")
+        lines.append("- **사용자 영향**: 포지션 유지 또는 확대 검토")
+    lines.append("")
+
+    # Harvey Filter
+    hf_score = cci['score_components']['harvey']
+    lines.append(f"**3. Harvey Filter (장기 수익률곡선 역전 신호)** — {hf_score}/15")
+    if hf_score >= 12:
+        lines.append("- 🔴 **경기 침체 신호**: 지난 3개월 이상 장기 곡선이 역전 상태 지속. Sahm Rule보다 선행성 강함")
+        lines.append("- **경제 의미**: 시장 전문가들이 1년 후 경기 침체를 확신하는 신호")
+        lines.append("- **사용자 영향**: 방어 포지션 강화 단계")
+    elif hf_score >= 6:
+        lines.append("- ⚡ **추적 필요**: 최근 역전 신호. 지속 여부 모니터링")
+        lines.append("- **경제 의미**: 곧 경기 둔화 가능성. 하지만 일시적일 수도")
+        lines.append("- **사용자 영향**: 변동성 높은 자산 비중 축소 검토")
+    else:
+        lines.append("- ✅ **안전**: 곡선 역전 신호 없음. 경기 침체 임박 신호 약함")
+        lines.append("- **경제 의미**: 시장의 경기 전망이 중립~긍정적")
+        lines.append("- **사용자 영향**: 현재 포지션 유지")
+    lines.append("")
+
+    # Credit OAS
+    coas_score = cci['score_components']['credit_oas']
+    lines.append(f"**4. HY Credit OAS (신용 스프레드)** — {coas_score}/15")
+    if coas_score >= 12:
+        lines.append("- 🔴 **유동성 위기 신호**: 신용 스프레드 500bp 이상. 시장 불안 극고조")
+        lines.append("- **경제 의미**: 기업 신용 리스크 급증. 기업 부도 우려. 금융 시스템 스트레스")
+        lines.append("- **사용자 영향**: 긴급 현금화 단계. 채권 수익률 급락 우려하며 장기채 매수 기회 동시 주시")
+    elif coas_score >= 6:
+        lines.append("- ⚡ **경고**: 스프레드 300~500bp. 신용 리스크 높아짐")
+        lines.append("- **경제 의미**: 경기 둔화에 따른 기업 부실화 우려")
+        lines.append("- **사용자 영향**: 고수익률 채권 회피. 안전자산 비중 확대")
+    else:
+        lines.append("- ✅ **정상**: 스프레드가 300bp 이하. 신용 시장 양호")
+        lines.append("- **경제 의미**: 기업 신용 환경 건강. 시장 유동성 충분")
+        lines.append("- **사용자 영향**: 신용 자산 비중 유지 가능")
+    lines.append("")
+
+    # Semiconductor Cycle
+    semi_score = cci['score_components']['semiconductor']
+    lines.append(f"**5. 반도체 산업사이클** — {semi_score}/10")
+    if semi_score >= 8:
+        lines.append("- 📈 **긍정 신호**: 출하/재고 비율 정상화, 가격 안정화. 업황 회복 단계")
+        lines.append("- **경제 의미**: AI/DC 인프라 투자 재개. 메모리 공급 부족 심화. 가격 인상 가능성")
+        lines.append("- **사용자 영향 (SK하이닉스 직원)**: 매출 개선 → 보너스 사이클 상향. ETF 수익률 개선")
+    elif semi_score >= 4:
+        lines.append("- ⚡ **회복 중**: 약간의 과잉 공급 남아있으나 개선 추세")
+        lines.append("- **경제 의미**: 시장 정리 진행 중. 향후 2~3개월이 중요")
+        lines.append("- **사용자 영향**: SK하이닉스 지켜보기. 실적 발표 주의")
+    else:
+        lines.append("- 📉 **침체**: 공급 과잉, 가격 하락. 구조조정 우려")
+        lines.append("- **경제 의미**: 산업 사이클 저점. 정부 지원 정책 추적")
+        lines.append("- **사용자 영향**: 현금 확충. 저점 매수 기회 포착 준비")
+    lines.append("")
+
+    action = cci["sk_hynix_action"]
+    lines.append(f"### SK Hynix 포지션 관리")
+    lines.append(f"- **Action**: {action['action']}")
+    lines.append(f"- **Max Weight**: {action['max_weight']}%")
+    lines.append(f"- **Context**: {action['description']}")
+    lines.append(f"- **Signal**: {action['signal']}")
+    lines.append("")
+    lines.append(f"### 상태 해석")
+    lines.append(f"> {cci['interpretation'][state]}")
+
+    return "\n".join(lines)
+
+
+def _real_estate_trend(payload: dict) -> str:
+    """국토교통부 실거래가 기반 서울/수도권/전국 가격 추세 + 청약 타겟 지역 하이라이트."""
+    re_data = payload.get("real_estate")
+    if not re_data:
+        return ""
+
+    lines = ["## 부동산 실거래가 동향 (국토교통부 실거래가 공개시스템)", ""]
+
+    is_pending = re_data["fetch_status"] == "pending"
+    is_dead_source_error = re_data["fetch_status"] == "source_error" and not any(
+        t.get("data_status") == "ok" for t in re_data.get("tiers", {}).values()
+    )
+    if is_pending or is_dead_source_error:
+        if is_pending:
+            lines.append(f"- [사실] 데이터 상태: Pending — {re_data.get('fetch_note', 'DATA_GO_KR_KEY 미설정')}")
+        else:
+            lines.append(f"- [사실] 데이터 상태: Source Error — {re_data.get('fetch_note', '국토교통부 API 응답 없음')}")
+        lines.append("")
+        lines.append("**데이터 준비 중:** 다음 리포트에서 재시도됩니다. 아래는 채워질 정보의 형식입니다.")
+        lines.append("")
+        lines.append("| 지역군 | 기준월 | 평당가(만원) | MoM | 3개월 추세 | 거래량 | 시장 온도 |")
+        lines.append("|---|---|---|---|---|---|---|")
+        lines.append("| 서울 | - | - | - | - | - | - |")
+        lines.append("| 수도권 | - | - | - | - | - | - |")
+        lines.append("| 전국(대표표본) | - | - | - | - | - | - |")
+        lines.append("")
+        lines.append("### 청약 타겟 지역 하이라이트 — 용인 기흥구")
+        lines.append("- [사실] 플랫폼시티 인근 지역의 월간 실거래가 추세")
+        lines.append("- 기준: 평당가(만원), 전월비 변화율, 월간 거래량, 시장 온도(과열/보합/냉각)")
+        lines.append("")
+        lines.append("### 서울 구별 순위")
+        lines.append("- [분석] 25개 자치구를 실거래가 상승률로 순위화")
+        lines.append("- 상승 TOP 3 (Gainers)")
+        lines.append("- 하락 TOP 3 (Decliners)")
+        return "\n".join(lines)
+
+    coverage = re_data.get("regions_covered")
+    total = re_data.get("regions_total")
+    if coverage is not None and total:
+        lines.append(f"- [사실] 조회 지역 커버리지: {coverage}/{total}개 지역")
+        lines.append("")
+
+    lines += ["| 지역군 | 기준월 | 평당가(만원) | MoM | 3개월 추세 | 거래량 | 시장 온도 |",
+              "|---|---|---|---|---|---|---|"]
+    for tier in ("seoul", "capital_area", "nationwide"):
+        t = re_data["tiers"][tier]
+        if t.get("data_status") != "ok":
+            lines.append(f"| {_tier_label(tier)} | - | Pending | - | - | - | - |")
+            continue
+        lines.append(
+            f"| {t['label']} | {t['reference_month']} | {_fmt(t['price_per_pyeong_manwon'])} | "
+            f"{_fmt(t['mom_change_pct'], '%')} | {_fmt(t['trend_3m_pct'], '%')} | "
+            f"{_fmt(t['transaction_count'])}건 | {t['market_heat']} |"
+        )
+    lines.append("")
+    lines.append("- [해석] '전국'은 250여개 시군구 전수조사가 아니라 8개 특·광역시 + 주요 도청소재지 대표 도시 표본 기준 추정치.")
+    lines.append("")
+
+    hl = re_data["highlight"]
+    lines.append(f"### 청약 타겟 지역 하이라이트 — {hl['region_name']}")
+    if hl.get("note"):
+        lines.append(f"- [사실] {hl['note']}")
+    if hl.get("data_status") == "ok":
+        lines.append(
+            f"- [사실] {hl['reference_month']} 기준 평당가 {_fmt(hl['price_per_pyeong_manwon'])}만원 "
+            f"(MoM {_fmt(hl.get('mom_change_pct'), '%')}), 거래 {_fmt(hl.get('transaction_count'))}건, "
+            f"시장 온도 {hl.get('market_heat', 'N/A')}"
+        )
+    else:
+        lines.append("- [사실] 데이터 상태: Pending — 최근 조회 기간 내 확인된 실거래 없음")
+    lines.append("")
+
+    movers = re_data.get("seoul_district_movers", {})
+    if movers.get("data_status") == "ok":
+        lines.append("### 서울 자치구 MoM 상승/하락 TOP")
+        gainers = ", ".join(f"{g['name']} ({_fmt(g['mom_change_pct'], '%')})" for g in movers["gainers"])
+        decliners = ", ".join(f"{d['name']} ({_fmt(d['mom_change_pct'], '%')})" for d in movers["decliners"])
+        lines.append(f"- 상승 TOP: {gainers or '데이터 부족'}")
+        lines.append(f"- 하락 TOP: {decliners or '데이터 부족'}")
+
+    return "\n".join(lines)
+
+
+def _tier_label(tier: str) -> str:
+    return {"seoul": "서울", "capital_area": "수도권", "nationwide": "전국(대표표본)"}.get(tier, tier)
+
+
 def render_markdown(payload: dict) -> str:
     header = f"# 월간 PEOS 리포트 - {payload['report_month']}\n"
     sections = [
         _us_macro_dashboard(payload), _us_regime_judgement(payload),
         _macro_dashboard(payload), _regime_judgement(payload), _kr_us_comparison(payload),
         _executive_summary(payload), _monthly_key_changes(payload),
+        _rate_analysis(payload), _cci_analysis(payload), _real_estate_trend(payload),
         _indicator_deep_dive(payload), _personal_analysis(payload),
         _asset_impact(payload), _scenario_analysis(payload), _discussion_points(payload),
         _action_plan(payload), _calendar(payload), _personal_brief(payload), _appendix(payload),
