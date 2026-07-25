@@ -58,6 +58,11 @@ PRESETS = {
     "us_unemployment": ("fred", "UNRATE", "미국 실업률", "검증됨"),
     "us_gdp_real": ("fred", "GDPC1", "미국 실질GDP(분기, 연율)", "검증됨"),
     "us_gdp_nominal": ("fred", "GDP", "미국 명목GDP(분기, 연율)", "검증됨"),
+    # 유가는 CPI 에너지 항목의 선행변수라 거시국면 판단에 직접 쓰인다.
+    # 2026-07-26까지 유가를 웹검색으로만 인용하다 "스팟 급등"과 "월평균"을
+    # 혼동하는 오류가 났다 — CPI는 월평균 기준이므로 일별 원자료가 필요하다.
+    "us_brent": ("fred", "DCOILBRENTEU", "브렌트유 현물(일별, $/배럴)", "검증됨(FRED 표준 series_id)"),
+    "us_wti": ("fred", "DCOILWTICO", "WTI 현물(일별, $/배럴)", "검증됨(FRED 표준 series_id)"),
     "kr_base_rate": ("ecos", ("722Y001", "0101000", "M"), "한국은행 기준금리", "⚠ 문서기억 기반, --raw로 재검증 권장"),
     "kr_usdkrw": ("ecos", ("731Y001", "0000001", "D"), "원/달러 환율", "⚠ 문서기억 기반, --raw로 재검증 권장"),
 }
