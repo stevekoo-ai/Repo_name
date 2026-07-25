@@ -245,16 +245,47 @@ td { padding:9px; border-bottom:1px solid #e9ecef; vertical-align:top; }
 </div>
 
 <div class="section">
-<div class="section-title">10. 📂 보유 포트폴리오 유불리 체크 — 일반(GEN) 계좌</div>
-<div style="font-size:12px; color:#666; margin-bottom:10px;">오늘 처음 KIS API 실계정 수집이 성공했습니다(ISA/IRP는 API 오류로 아직 실패 중, DC는 API 자체 미지원 — 이 표는 일반 계좌만 반영된 부분 데이터입니다).</div>
+<div class="section-title">10. 📂 보유 포트폴리오 유불리 체크 — GEN+ISA+IRP 3개 계좌 완전 자동화</div>
+<div style="font-size:12px; color:#666; margin-bottom:10px;"><b class="new-badge" style="position:static; margin-left:0;">UPDATE</b> 오늘 저녁 계좌별 전용 KIS 앱키(ISA·IRP 각각 별도 발급)를 등록하면서 3개 계좌 전부 자동 수집 성공 — "output1 없음" 오류의 원인은 앱키가 계좌번호 단위로 발급되기 때문이었음. DC는 KIS API 자체가 공식 미지원이라 여전히 제외. 3개 계좌 합산 평가금액 약 3.20억원, SK하이닉스(GEN+ISA 138주)가 약 75.8% 차지.</div>
+
+<div style="font-size:13px; font-weight:700; color:#1e3c72; margin:14px 0 6px;">일반(GEN) — 약 2.11억원</div>
 <table>
-<tr><th>종목</th><th>수량</th><th>평가금액</th><th>계좌 내 비중</th><th>유불리</th><th>전망 · 체크포인트</th></tr>
-<tr class="portfolio-row"><td>SK하이닉스</td><td>119주</td><td>209,321,000원</td><td>99.3%</td><td class="unfav">🔴 불리</td><td>오늘 붕괴조건④ 격상으로 단기 경계 강화(장기 펀더멘털 유지). 7/28 보유율 갱신·7/29 실적 주시</td></tr>
-<tr class="portfolio-row"><td>제주반도체</td><td>20주</td><td>1,406,000원</td><td>0.7%</td><td class="unfav">🔴 불리</td><td>SK하이닉스와 동일 반도체 섹터 민감도, 소형주라 변동성 더 큼(현재 손실 중)</td></tr>
-<tr class="portfolio-row"><td>롯데렌탈</td><td>4주</td><td>160,000원</td><td>0.1%</td><td class="neu">⚪ 판단보류</td><td>금리 민감 업종 추정이나 위키 내 분석 이력 없어 근거 부족 — 종목 자체 조사 필요</td></tr>
-<tr class="portfolio-row"><td>우리금융지주</td><td>4주</td><td>123,400원</td><td>0.1%</td><td class="fav">🟢 유리</td><td>은행/금융지주는 stagflation 경계 국면에서 상대적 방어적(배당·이자마진)</td></tr>
+<tr><th>종목</th><th>수량</th><th>평가금액</th><th>계좌 내 비중</th><th>유불리</th></tr>
+<tr class="portfolio-row"><td>SK하이닉스</td><td>119주</td><td>209,321,000원</td><td>99.2%</td><td class="unfav">🔴 불리</td></tr>
+<tr class="portfolio-row"><td>제주반도체</td><td>20주</td><td>1,406,000원</td><td>0.7%</td><td class="unfav">🔴 불리</td></tr>
+<tr class="portfolio-row"><td>롯데렌탈</td><td>4주</td><td>160,000원</td><td>0.1%</td><td class="neu">⚪ 판단보류</td></tr>
+<tr class="portfolio-row"><td>우리금융지주</td><td>4주</td><td>123,400원</td><td>0.1%</td><td class="fav">🟢 유리</td></tr>
 </table>
-<div style="font-size:12px; color:#666; margin-top:8px;">일반 계좌 SK하이닉스+제주반도체 집중도 약 99.7% — 상세는 <a href="../../wiki/entities/my-portfolio.md">entities/my-portfolio.md</a> 참고.</div>
+
+<div style="font-size:13px; font-weight:700; color:#1e3c72; margin:16px 0 6px;">ISA(ISP) — 약 9,304.7만원</div>
+<table>
+<tr><th>종목</th><th>수량</th><th>평가금액</th><th>계좌 내 비중</th><th>유불리</th></tr>
+<tr class="portfolio-row"><td>SK하이닉스</td><td>19주</td><td>33,421,000원</td><td>35.9%</td><td class="unfav">🔴 불리</td></tr>
+<tr class="portfolio-row"><td>삼성전자</td><td>108주</td><td>26,946,000원</td><td>29.0%</td><td class="unfav">🔴 불리</td></tr>
+<tr class="portfolio-row"><td>ACE AI반도체TOP3+</td><td>297주</td><td>16,327,575원</td><td>17.6%</td><td class="unfav">🔴 불리</td></tr>
+<tr class="portfolio-row"><td>KODEX 글로벌비만치료제TOP2 Plus</td><td>440주</td><td>5,104,000원</td><td>5.5%</td><td class="fav">🟢 유리</td></tr>
+<tr class="portfolio-row"><td>ACE KRX금현물</td><td>113주</td><td>2,974,725원</td><td>3.2%</td><td class="fav">🟢 유리</td></tr>
+<tr class="portfolio-row"><td>TIGER 차이나전기차SOLACTIVE</td><td>202주</td><td>2,182,610원</td><td>2.3%</td><td class="unfav">🔴 불리</td></tr>
+<tr class="portfolio-row"><td>SOL AI반도체소부장</td><td>100주</td><td>2,144,000원</td><td>2.3%</td><td class="unfav">🔴 불리</td></tr>
+<tr class="portfolio-row"><td>TIGER 미국우주테크</td><td>225주</td><td>1,651,500원</td><td>1.8%</td><td class="unfav">🔴 불리</td></tr>
+<tr class="portfolio-row"><td>이노진</td><td>615주</td><td>814,260원</td><td>0.9%</td><td class="neu">⚪ 판단보류</td></tr>
+<tr class="portfolio-row"><td>RISE 글로벌리얼티인컴</td><td>70주</td><td>775,250원</td><td>0.8%</td><td class="neu">⚪ 판단보류</td></tr>
+<tr class="portfolio-row"><td>나노팀</td><td>166주</td><td>706,330원</td><td>0.8%</td><td class="neu">⚪ 판단보류</td></tr>
+</table>
+
+<div style="font-size:13px; font-weight:700; color:#1e3c72; margin:16px 0 6px;">IRP — 약 1,602.0만원</div>
+<table>
+<tr><th>종목</th><th>수량</th><th>평가금액</th><th>계좌 내 비중</th><th>유불리</th></tr>
+<tr class="portfolio-row"><td>KODEX 인도Nifty50</td><td>544주</td><td>6,615,040원</td><td>41.3%</td><td class="neu">⚪ 판단보류</td></tr>
+<tr class="portfolio-row"><td>KODEX 미국AI전력핵심인프라</td><td>134주</td><td>3,040,460원</td><td>19.0%</td><td class="fav">🟢 유리</td></tr>
+<tr class="portfolio-row"><td>SOL 미국넥스트테크TOP10액티브</td><td>265주</td><td>2,911,025원</td><td>18.2%</td><td class="unfav">🔴 불리</td></tr>
+<tr class="portfolio-row"><td>TIME 글로벌탑픽액티브</td><td>100주</td><td>1,225,500원</td><td>7.6%</td><td class="neu">⚪ 판단보류</td></tr>
+<tr class="portfolio-row"><td>KIWOOM 삼성전자&SK하이닉스채권혼합50</td><td>100주</td><td>1,161,500원</td><td>7.3%</td><td class="neu">⚪ 판단보류</td></tr>
+<tr class="portfolio-row"><td>TIGER 차이나전기차SOLACTIVE</td><td>50주</td><td>540,250원</td><td>3.4%</td><td class="unfav">🔴 불리</td></tr>
+<tr class="portfolio-row"><td>ACE KRX금현물</td><td>20주</td><td>526,500원</td><td>3.3%</td><td class="fav">🟢 유리</td></tr>
+</table>
+
+<div style="font-size:12px; color:#666; margin-top:10px;">계좌별 반도체 집중도: GEN(SK하이닉스+제주반도체 99.7%) &gt; ISA(SK하이닉스+삼성전자+AI반도체 테마 3종 약 84%) &gt; IRP(직접보유 없음, 혼합형 펀드로 간접노출만) — 상세는 <a href="../../wiki/entities/my-portfolio.md">entities/my-portfolio.md</a> 참고.</div>
 </div>
 
 </div>
