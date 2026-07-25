@@ -91,9 +91,17 @@ def _load_accounts():
             continue
         parts = [p.strip() for p in raw.split(",")]
         if len(parts) != 2:
+            # 실제 값은 GitHub이 로그에서 자동으로 가리므로(***), 값 대신
+            # "구조"만 진단 정보로 남긴다 — 콤마 개수·조각별 길이·개행 포함
+            # 여부는 계좌번호 자체를 노출하지 않고도 원인 판별에 충분하다.
+            part_lengths = [len(p) for p in parts]
+            has_newline = "\n" in raw or "\r" in raw
             sys.exit(
-                f"KIS_ACCOUNT_{suffix} 형식이 잘못됐습니다: '{raw}' — "
-                f"\"CANO,ACNT_PRDT_CD\" 형식이어야 합니다(예: \"50123456,01\")."
+                f"KIS_ACCOUNT_{suffix} 형식이 잘못됐습니다 — "
+                f"\"CANO,ACNT_PRDT_CD\" 형식이어야 합니다(예: \"50123456,01\"). "
+                f"[진단: 콤마로 나눈 조각 수={len(parts)}(2여야 함), "
+                f"각 조각 길이={part_lengths}, 전체 길이={len(raw)}, "
+                f"개행문자 포함={has_newline}]"
             )
         cano, prdt_cd = parts
         accounts.append({"slot": suffix, "cano": cano, "prdt_cd": prdt_cd, "label": label, "pension": is_pension})
