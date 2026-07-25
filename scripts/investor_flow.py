@@ -190,6 +190,13 @@ def kis_fetch_investor_trend(ticker, account_type="real", raw=False):
             "확인해 이 스크립트 상단 FIELDS 딕셔너리를 실제 필드명으로 고치세요."
         )
 
+    # ⚠ *_tr_pbmn 필드는 실측 결과 "백만원" 단위로 확인됨(2026-07-25 실계정
+    # 테스트: 7/24 외국인 1일 순매도 필드값 -1,753,255 → ×1,000,000 = 약
+    # -1.753조원, 같은 날 웹검색으로 확보한 "1조7,568억원 순매도" 추정치와
+    # 0.2% 오차로 정합 — "원" 단위였다면 100만 배 차이가 났을 것이므로
+    # 백만원 단위가 맞다고 판단). 위키 관례(원 단위 표기)에 맞춰 정규화.
+    KRW_UNIT_MULTIPLIER = 1_000_000
+
     parsed = []
     for r in rows:
         d = r[FIELDS["date"]]
@@ -199,9 +206,9 @@ def kis_fetch_investor_trend(ticker, account_type="real", raw=False):
             "foreign_net_qty": r[FIELDS["foreign_net_qty"]],
             "inst_net_qty": r[FIELDS["inst_net_qty"]],
             "retail_net_qty": r[FIELDS["retail_net_qty"]],
-            "foreign_net_krw": r[FIELDS["foreign_net_krw"]],
-            "inst_net_krw": r[FIELDS["inst_net_krw"]],
-            "retail_net_krw": r[FIELDS["retail_net_krw"]],
+            "foreign_net_krw": int(r[FIELDS["foreign_net_krw"]]) * KRW_UNIT_MULTIPLIER,
+            "inst_net_krw": int(r[FIELDS["inst_net_krw"]]) * KRW_UNIT_MULTIPLIER,
+            "retail_net_krw": int(r[FIELDS["retail_net_krw"]]) * KRW_UNIT_MULTIPLIER,
             "source": "kis_api",
             "note": "",
         })
