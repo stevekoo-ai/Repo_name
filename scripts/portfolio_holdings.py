@@ -89,6 +89,12 @@ def _load_accounts():
         raw = os.environ.get(f"KIS_ACCOUNT_{suffix}")
         if not raw:
             continue
+        if suffix == "DC":
+            # DC는 KIS API 자체가 미지원이라 cmd_sync에서 무조건 건너뛴다 —
+            # 형식이 맞든 틀리든 실제로 쓰이지 않으므로, 값 검증으로 다른
+            # 계좌의 동기화까지 막지 않는다.
+            accounts.append({"slot": suffix, "cano": None, "prdt_cd": None, "label": label, "pension": is_pension})
+            continue
         parts = [p.strip() for p in raw.split(",")]
         if len(parts) != 2:
             # 실제 값은 GitHub이 로그에서 자동으로 가리므로(***), 값 대신
