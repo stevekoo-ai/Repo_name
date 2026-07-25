@@ -12,7 +12,7 @@ DC(퇴직연금), IRP, ISA, 일반 4개 계좌로 구성된 개인 투자 포트
 소속 확인 — [`scripts/portfolio_holdings.py`](../../scripts/portfolio_holdings.py)가
 KIS API로 계좌별 보유종목·평가금액·손익을 매일 19:10 KST에 자동 조회해
 `sources/portfolio-holdings.csv`에 기록한다([`.github/workflows/portfolio-holdings-sync.yml`](../../.github/workflows/portfolio-holdings-sync.yml)).
-계좌번호는 GitHub Secrets(`KIS_ACCOUNT_1~4`)에만 저장 — 일반/ISA는 KIS
+계좌번호는 GitHub Secrets(`KIS_ACCOUNT_GEN`/`KIS_ACCOUNT_ISP`/`KIS_ACCOUNT_DC`/`KIS_ACCOUNT_IRP`)에만 저장 — 일반/ISA는 KIS
 "주식잔고조회" TR(TTTC8434R)로 조회되지만, **IRP/DC(퇴직연금) 계좌는
 정확한 잔고조회 TR을 아직 확신할 수 없어 미구현** — 임의 코드를 넣지
 않고 명시적으로 건너뛴다. 아침·저녁 Routine이 이 CSV를 읽어 "계좌별

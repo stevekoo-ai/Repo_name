@@ -22,10 +22,10 @@ jobs:
         env:
           KIS_APP_KEY: ${{ secrets.KIS_APP_KEY }}
           KIS_APP_SECRET: ${{ secrets.KIS_APP_SECRET }}
-          KIS_ACCOUNT_1: ${{ secrets.KIS_ACCOUNT_1 }}
-          KIS_ACCOUNT_2: ${{ secrets.KIS_ACCOUNT_2 }}
-          KIS_ACCOUNT_3: ${{ secrets.KIS_ACCOUNT_3 }}
-          KIS_ACCOUNT_4: ${{ secrets.KIS_ACCOUNT_4 }}
+          KIS_ACCOUNT_GEN: ${{ secrets.KIS_ACCOUNT_GEN }}
+          KIS_ACCOUNT_ISP: ${{ secrets.KIS_ACCOUNT_ISP }}
+          KIS_ACCOUNT_DC: ${{ secrets.KIS_ACCOUNT_DC }}
+          KIS_ACCOUNT_IRP: ${{ secrets.KIS_ACCOUNT_IRP }}
         run: python3 scripts/portfolio_holdings.py sync
 
       - name: 변경사항 커밋 & 푸시

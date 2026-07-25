@@ -6,20 +6,23 @@ sources/portfolio-holdings.csv에 기록하는 스크립트. GitHub Actions가 �
 거시환경 대비 유불리 판단" 같은 분석에 쓴다 — 판단 자체는 이 스크립트가
 하지 않는다(규칙 기반 수집만).
 
-계좌 등록(GitHub Secrets, 채팅에 붙여넣지 말 것):
-  KIS_ACCOUNT_1, KIS_ACCOUNT_2, ... 형식으로 계좌 수만큼 등록.
-  값 형식: "CANO,ACNT_PRDT_CD,라벨"  예) "50123456,01,일반"
-  라벨에 "IRP"/"DC"/"연금"이 들어가면 퇴직연금 계좌로 인식한다.
+계좌 등록(GitHub Secrets, 채팅에 붙여넣지 말 것) — 계좌마다 고정된 이름의
+환경변수 하나씩, 값은 "CANO,ACNT_PRDT_CD"(예: "50123456,01"):
+  KIS_ACCOUNT_GEN   — 일반(위탁) 계좌
+  KIS_ACCOUNT_ISP   — ISA 계좌
+  KIS_ACCOUNT_DC    — DC(퇴직연금) 계좌
+  KIS_ACCOUNT_IRP   — IRP(개인퇴직연금) 계좌
+  4개 전부 등록할 필요는 없다 — 등록된 것만 조회한다.
 
 ⚠ 계좌 종류별로 실제 KIS 잔고조회 TR이 다르다:
-  - 일반/ISA 등 위탁계좌: TR TTTC8434R (문서 기억 기반, --raw로 검증 권장)
-  - IRP/DC 등 퇴직연금계좌: **아직 미구현** — 정확한 TR을 확신할 수 없어
+  - GEN/ISP(일반·ISA 등 위탁계좌): TR TTTC8434R (문서 기억 기반, --raw로 검증 권장)
+  - DC/IRP(퇴직연금계좌): **아직 미구현** — 정확한 TR을 확신할 수 없어
     임의 코드를 넣는 대신 명시적으로 "미구현"을 반환한다. 실제 계정으로
     확인 후 PENSION_BALANCE_TR을 채워 넣을 것.
 
 사용법:
-  python3 scripts/portfolio_holdings.py sync              # 등록된 계좌 전체 조회+CSV 기록
-  python3 scripts/portfolio_holdings.py sync --raw --account 1   # 계좌1 원본 JSON만 확인
+  python3 scripts/portfolio_holdings.py sync                  # 등록된 계좌 전체 조회+CSV 기록
+  python3 scripts/portfolio_holdings.py sync --raw --account GEN   # GEN 계좌 원본 JSON만 확인
 """
 import os
 import sys
@@ -58,6 +61,14 @@ HOLDING_FIELDS = {
 # 알려져 있으나 정확한 코드를 문서 기억만으로 확신할 수 없어 비워둔다.
 PENSION_BALANCE_TR = None
 
+# 계좌 슬롯: 환경변수 접미사 -> (표시 라벨, 퇴직연금 여부)
+ACCOUNT_SLOTS = {
+    "GEN": ("일반", False),
+    "ISP": ("ISA", False),
+    "DC": ("DC", True),
+    "IRP": ("IRP", True),
+}
+
 
 def _get_env_or_die(name):
     v = os.environ.get(name)
@@ -68,25 +79,22 @@ def _get_env_or_die(name):
 
 def _load_accounts():
     accounts = []
-    i = 1
-    while True:
-        raw = os.environ.get(f"KIS_ACCOUNT_{i}")
+    for suffix, (label, is_pension) in ACCOUNT_SLOTS.items():
+        raw = os.environ.get(f"KIS_ACCOUNT_{suffix}")
         if not raw:
-            break
+            continue
         parts = [p.strip() for p in raw.split(",")]
-        if len(parts) != 3:
+        if len(parts) != 2:
             sys.exit(
-                f"KIS_ACCOUNT_{i} 형식이 잘못됐습니다: '{raw}' — "
-                f"\"CANO,ACNT_PRDT_CD,라벨\" 형식이어야 합니다(예: \"50123456,01,일반\")."
+                f"KIS_ACCOUNT_{suffix} 형식이 잘못됐습니다: '{raw}' — "
+                f"\"CANO,ACNT_PRDT_CD\" 형식이어야 합니다(예: \"50123456,01\")."
             )
-        cano, prdt_cd, label = parts
-        is_pension = any(k in label.upper() for k in ("IRP", "DC", "연금"))
-        accounts.append({"cano": cano, "prdt_cd": prdt_cd, "label": label, "pension": is_pension})
-        i += 1
+        cano, prdt_cd = parts
+        accounts.append({"slot": suffix, "cano": cano, "prdt_cd": prdt_cd, "label": label, "pension": is_pension})
     if not accounts:
         sys.exit(
-            "등록된 계좌가 없습니다. KIS_ACCOUNT_1(,_2,_3...) 환경변수를 "
-            "\"CANO,ACNT_PRDT_CD,라벨\" 형식으로 설정하세요."
+            "등록된 계좌가 없습니다. KIS_ACCOUNT_GEN/ISP/DC/IRP 중 필요한 것을 "
+            "\"CANO,ACNT_PRDT_CD\" 형식으로 GitHub Secrets에 설정하세요."
         )
     return accounts
 
@@ -226,7 +234,9 @@ def upsert_holdings(account_label, holdings, source="kis_api"):
 def cmd_sync(args):
     accounts = _load_accounts()
     if args.account:
-        accounts = [accounts[args.account - 1]]
+        accounts = [a for a in accounts if a["slot"] == args.account.upper()]
+        if not accounts:
+            sys.exit(f"'{args.account}' 슬롯은 등록되지 않았습니다(GEN/ISP/DC/IRP 중 하나).")
 
     total = 0
     for acc in accounts:
@@ -254,7 +264,7 @@ def main():
     sub = p.add_subparsers(dest="cmd", required=True)
 
     ps = sub.add_parser("sync", help="등록된 계좌 전체(또는 --account로 선택 1개) 조회+CSV 기록")
-    ps.add_argument("--account", type=int, help="1부터 시작하는 계좌 번호, 생략시 전체")
+    ps.add_argument("--account", help="GEN/ISP/DC/IRP 중 하나, 생략시 등록된 계좌 전체")
     ps.add_argument("--account-type", default=os.environ.get("KIS_ACCOUNT_TYPE", "real"), choices=["real", "vts"])
     ps.add_argument("--raw", action="store_true", help="파싱하지 않고 원본 JSON만 출력(필드명 검증용)")
     ps.set_defaults(func=cmd_sync)
