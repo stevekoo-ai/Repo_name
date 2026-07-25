@@ -47,7 +47,7 @@ import argparse
 import urllib.request
 import urllib.error
 from pathlib import Path
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 CSV_PATH = Path(__file__).resolve().parent.parent / "sources" / "sk-hynix-investor-flow.csv"
 TOKEN_CACHE = Path(__file__).resolve().parent / ".kis_token_cache.json"
@@ -84,6 +84,21 @@ PRICE_FIELDS = {
     "change_pct": "prdy_ctrt",  # 전일대비율(%)
     "volume": "acml_vol",       # 누적거래량
 }
+
+# KIS "해외주식 현재가상세" TR: HHDFS76200200 (ADR·해외상장 종목용)
+# GET /uapi/overseas-price/v1/quotations/price-detail
+# ⚠⚠ 국내주식 API보다 신뢰도 낮음(TR/파라미터 모두 문서 기억 기반, 재검증
+# 안 됨) — 반드시 --raw로 먼저 실제 응답을 확인하고 필드명을 맞출 것.
+# EXCD는 거래소 코드(NASDAQ="NAS"), SYMB는 종목코드(SKHY 등).
+OVERSEAS_PRICE_FIELDS = {
+    "price": "last",       # 현재가
+    "change": "diff",      # 전일대비
+    "change_pct": "rate",  # 전일대비율(%)
+    "prev_close": "base",  # 전일종가
+}
+
+ADR_CSV_PATH = Path(__file__).resolve().parent.parent / "sources" / "sk-hynix-adr-quote.csv"
+ADR_CSV_FIELDS = ["date", "symbol", "price", "change", "change_pct", "prev_close", "source", "fetched_at"]
 
 
 def _get_env_or_die(name):
@@ -242,6 +257,97 @@ def kis_fetch_price(ticker, account_type="real", raw=False):
     }
 
 
+def kis_fetch_overseas_price(symbol, excd="NAS", account_type="real", raw=False):
+    """해외상장 종목(ADR 등) 현재가 조회. 국내주식 API보다 검증도가 낮음."""
+    appkey = _get_env_or_die("KIS_APP_KEY")
+    appsecret = _get_env_or_die("KIS_APP_SECRET")
+    token = kis_get_token(account_type)
+    host = KIS_HOSTS[account_type]
+
+    params = f"AUTH=&EXCD={excd}&SYMB={symbol}"
+    req = urllib.request.Request(
+        f"{host}/uapi/overseas-price/v1/quotations/price-detail?{params}",
+        headers={
+            "content-type": "application/json; charset=utf-8",
+            "authorization": f"Bearer {token}",
+            "appkey": appkey,
+            "appsecret": appsecret,
+            "tr_id": "HHDFS76200200",
+        },
+    )
+    try:
+        with urllib.request.urlopen(req) as resp:
+            data = json.loads(resp.read())
+    except urllib.error.HTTPError as e:
+        sys.exit(f"KIS 해외주식 API 호출 실패: {e.code} {e.read().decode(errors='replace')}")
+
+    if raw:
+        print(json.dumps(data, ensure_ascii=False, indent=2))
+        return None
+
+    row = data.get("output")
+    if not row:
+        sys.exit(
+            "API 응답에서 해외주식 시세를 찾지 못했습니다 — --raw로 원본 JSON을 "
+            "확인하고 output 추출 키를 응답 구조에 맞게 고치세요."
+        )
+    missing = [v for v in OVERSEAS_PRICE_FIELDS.values() if v not in row]
+    if missing:
+        sys.exit(
+            f"예상한 필드가 API 응답에 없습니다: {missing}. --raw로 원본을 확인해 "
+            "이 스크립트 상단 OVERSEAS_PRICE_FIELDS 딕셔너리를 실제 필드명으로 고치세요."
+        )
+    return {
+        "symbol": symbol,
+        "price": float(row[OVERSEAS_PRICE_FIELDS["price"]]),
+        "change": float(row[OVERSEAS_PRICE_FIELDS["change"]]),
+        "change_pct": float(row[OVERSEAS_PRICE_FIELDS["change_pct"]]),
+        "prev_close": float(row[OVERSEAS_PRICE_FIELDS["prev_close"]]),
+    }
+
+
+def _read_adr_csv():
+    if not ADR_CSV_PATH.exists():
+        return {}
+    rows = {}
+    with ADR_CSV_PATH.open(newline="", encoding="utf-8") as f:
+        for row in csv.DictReader(f):
+            rows[(row["date"], row["symbol"])] = row
+    return rows
+
+
+def _write_adr_csv(rows_by_key):
+    ADR_CSV_PATH.parent.mkdir(parents=True, exist_ok=True)
+    ordered = sorted(rows_by_key.values(), key=lambda r: (r["date"], r["symbol"]))
+    with ADR_CSV_PATH.open("w", newline="", encoding="utf-8") as f:
+        w = csv.DictWriter(f, fieldnames=ADR_CSV_FIELDS)
+        w.writeheader()
+        for r in ordered:
+            w.writerow(r)
+
+
+def upsert_adr_row(quote, source="kis_api"):
+    existing = _read_adr_csv()
+    today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    key = (today, quote["symbol"])
+    existing[key] = {
+        "date": today, "symbol": quote["symbol"],
+        "price": quote["price"], "change": quote["change"],
+        "change_pct": quote["change_pct"], "prev_close": quote["prev_close"],
+        "source": source, "fetched_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+    }
+    _write_adr_csv(existing)
+
+
+def read_latest_adr(symbol):
+    """가장 최근 fetched_at 기준 ADR 기록 1건 반환(없으면 None) — 다른 스크립트 재사용용."""
+    rows = [r for (d, s), r in _read_adr_csv().items() if s == symbol]
+    if not rows:
+        return None
+    rows.sort(key=lambda r: r["fetched_at"])
+    return rows[-1]
+
+
 def read_ticker_rows(ticker):
     """CSV에서 해당 종목 행만 날짜순으로 정렬해 반환 — 다른 스크립트에서도 재사용."""
     rows = [r for (d, t), r in _read_csv().items() if t == ticker]
@@ -327,6 +433,15 @@ def cmd_quote(args):
     print(f"{q['ticker']}  {q['price']:,}원  {q['change']:+,}({q['change_pct']:+.2f}%){flag}  거래량 {q['volume']:,}주")
 
 
+def cmd_adr_quote(args):
+    q = kis_fetch_overseas_price(args.symbol, args.excd, args.account_type, raw=args.raw)
+    if args.raw:
+        return
+    upsert_adr_row(q)
+    flag = " 🚨 급변동(5%+)" if abs(q["change_pct"]) >= 5 else ""
+    print(f"{q['symbol']}  ${q['price']:,.2f}  {q['change']:+,.2f}({q['change_pct']:+.2f}%){flag}  전일종가 ${q['prev_close']:,.2f}  → {ADR_CSV_PATH}에 기록")
+
+
 def cmd_show(args):
     existing = read_ticker_rows(args.ticker)
     if not existing:
@@ -384,6 +499,13 @@ def main():
     pq.add_argument("--account-type", default=os.environ.get("KIS_ACCOUNT_TYPE", "real"), choices=["real", "vts"])
     pq.add_argument("--raw", action="store_true")
     pq.set_defaults(func=cmd_quote)
+
+    pa2 = sub.add_parser("adr-quote", help="ADR(해외상장) 현재가 조회, sources/sk-hynix-adr-quote.csv에 기록")
+    pa2.add_argument("--symbol", default="SKHY")
+    pa2.add_argument("--excd", default="NAS", help="거래소 코드(NASDAQ=NAS)")
+    pa2.add_argument("--account-type", default=os.environ.get("KIS_ACCOUNT_TYPE", "real"), choices=["real", "vts"])
+    pa2.add_argument("--raw", action="store_true")
+    pa2.set_defaults(func=cmd_adr_quote)
 
     args = p.parse_args()
     args.func(args)

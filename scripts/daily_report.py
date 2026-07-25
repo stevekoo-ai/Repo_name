@@ -16,7 +16,7 @@ import argparse
 from datetime import datetime, timezone, timedelta
 from pathlib import Path
 
-from investor_flow import kis_fetch_price, read_ticker_rows, summarize_flows
+from investor_flow import kis_fetch_price, read_ticker_rows, summarize_flows, read_latest_adr
 
 KST = timezone(timedelta(hours=9))
 REPORT_DIR = Path(__file__).resolve().parent.parent / "sources"
@@ -38,6 +38,16 @@ def build_report(ticker: str) -> str:
         lines.append(f"- 거래량: {q['volume']:,}주")
     except SystemExit as e:
         lines.append(f"- 시세 조회 실패: {e}")
+
+    # --- ADR ---
+    lines.append("\n## ADR(SKHY, 나스닥)")
+    adr = read_latest_adr("SKHY")
+    if adr is None:
+        lines.append("- 기록 없음 — investor_flow.py adr-quote를 먼저 실행하세요(미국 장중에만 유의미).")
+    else:
+        pct = float(adr["change_pct"])
+        flag = " 🚨 급변동(±5% 이상)" if abs(pct) >= 5 else ""
+        lines.append(f"- {adr['date']} 기준: **${float(adr['price']):,.2f}** ({float(adr['change']):+,.2f}, {pct:+.2f}%){flag}, 전일종가 ${float(adr['prev_close']):,.2f}")
 
     # --- 수급 ---
     lines.append("\n## 투자자별 순매수")
