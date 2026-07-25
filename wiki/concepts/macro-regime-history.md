@@ -1,7 +1,7 @@
 ---
 title: 미국 거시국면(G/I/L)과 역사적 유사 시기 매칭
 created: 2026-07-24
-updated: 2026-07-24
+updated: 2026-07-25
 tags: [macro, regime, gil, historical-analogue, sk-hynix, daily-tracking]
 ---
 
@@ -216,3 +216,4 @@ convergence_pct = (score − min) / (max − min) × 100
 - [scripts/regime_engine.py](../../scripts/regime_engine.py) (G/I/L 계산 및 매칭 엔진)
 - [HBM Cycle Score & 선행지표 조기경보(HSEWS)](hbm-cycle-score.md)
 - [SK하이닉스 주가 상승의 정당성 분석](rally-justification-analysis.md)
+- [매크로 지표 트렌드 추적](macro-indicators.md) (2026-07-16까지의 수동 경제캘린더 기록 — 이 페이지가 그 역할을 대부분 흡수)
