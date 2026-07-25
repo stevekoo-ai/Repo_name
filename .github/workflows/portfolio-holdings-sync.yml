@@ -24,6 +24,8 @@ jobs:
           KIS_APP_SECRET: ${{ secrets.KIS_APP_SECRET }}
           KIS_APP_KEY_ISP: ${{ secrets.KIS_APP_KEY_ISP }}
           KIS_APP_SECRET_ISP: ${{ secrets.KIS_APP_SECRET_ISP }}
+          KIS_APP_KEY_IRP: ${{ secrets.KIS_APP_KEY_IRP }}
+          KIS_APP_SECRET_IRP: ${{ secrets.KIS_APP_SECRET_IRP }}
           KIS_ACCOUNT_GEN: ${{ secrets.KIS_ACCOUNT_GEN }}
           KIS_ACCOUNT_ISP: ${{ secrets.KIS_ACCOUNT_ISP }}
           KIS_ACCOUNT_DC: ${{ secrets.KIS_ACCOUNT_DC }}
