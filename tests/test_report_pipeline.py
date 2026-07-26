@@ -63,7 +63,7 @@ def test_full_pipeline_produces_a_readable_report():
     assert scenario_total == 100
 
     markdown = render_markdown(payload)
-    assert markdown.startswith("# 월간 PEOS 리포트 - 1999-01")
+    assert markdown.startswith("# PEOS 일일 리포트 - 1999-01")
     for heading in ("Executive Summary", "Macro Dashboard", "Action Plan", "Personal Executive Brief"):
         assert heading in markdown
 

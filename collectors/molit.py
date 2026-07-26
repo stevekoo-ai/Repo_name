@@ -178,10 +178,15 @@ def fetch_and_store() -> dict[str, Any]:
     probe_region = all_regions[0]
     probe_rows = base.retry(
         lambda: _fetch_region_month(probe_region["code"], target_months[-1], api_key),
-        label=f"molit:probe:{probe_region['code']}", attempts=1, backoff_seconds=0,
+        label=f"molit:probe:{probe_region['code']}", attempts=2, backoff_seconds=1.5,
     )
     if probe_rows is None:
-        note = "MOLIT unreachable (probe call failed) — skipped remaining regions to avoid a long CI stall"
+        # A single try=1 probe never survived a transient blip (GitHub Actions runner IPs have
+        # been observed to intermittently, not permanently, fail to reach apis.data.go.kr — same
+        # pattern as KOSIS/ECOS). One extra attempt costs a few seconds and materially improves
+        # the odds of a real network hiccup not tripping the breaker; a true block still fails
+        # fast within ~10s either way, which is what the circuit breaker exists to bound.
+        note = "MOLIT unreachable (probe call failed after retry) — skipped remaining regions to avoid a long CI stall"
         log_event("collector.molit_circuit_breaker_tripped", level="warning", note=note)
         return {"status": "source_error", "note": note, "regions_total": len(all_regions), "regions_covered": 0}
 
