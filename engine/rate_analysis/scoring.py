@@ -257,6 +257,14 @@ def calculate_rate_score() -> RateScoreDetail:
     Fetches latest rates from FRED/ECOS collectors, computes trends,
     and returns detailed scoring breakdown.
     """
+    # us_10y_treasury is covered by fred.fetch_all() (called from engine/macro/indicators.py
+    # earlier in the pipeline), but kr_10y_yield has no other caller anywhere — every other
+    # ECOS series used by this module (kr_3y_yield) is fetched explicitly by indicators.py,
+    # kr_10y_yield never was, which is why the spread score always read as "unavailable"
+    # regardless of network conditions. Fetch it directly here so this module doesn't rely on
+    # an unrelated pipeline stage's side effect to populate the one series it actually needs.
+    ecos.fetch_series("kr_10y_yield")
+
     # Fetch latest rates
     us_10y = _get_latest_rate("us_10y_treasury")
     kr_10y = _get_latest_rate("kr_10y_yield")
