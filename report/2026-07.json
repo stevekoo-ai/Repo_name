@@ -16640,17 +16640,17 @@
     "previous_month_regime": "Early Expansion"
   },
   "rate_analysis": {
-    "total_score": 50,
+    "total_score": 65.0,
     "score_components": {
-      "absolute_rates": 30,
-      "trend_analysis": 5,
-      "spread": 0,
+      "absolute_rates": 20,
+      "trend_analysis": 15,
+      "spread": 15.0,
       "market_signals": 15
     },
     "current_rates": {
       "us_10y": 4.71,
-      "kr_10y": null,
-      "spread_bp": null
+      "kr_10y": 1.57,
+      "spread_bp": 314.0
     },
     "trends": {
       "us_10y_1m_change_bp": 21.0,
@@ -16661,17 +16661,17 @@
       "yield_curve_status": "normal"
     },
     "portfolio_recommendation": {
-      "stocks": 40,
-      "bonds": 35,
-      "cash": 25,
-      "condition": "Tightening cycle — defensive",
-      "rebalance_trigger": 30
+      "stocks": 50,
+      "bonds": 30,
+      "cash": 20,
+      "condition": "Neutral to moderately accommodative — balanced",
+      "rebalance_trigger": 40
     },
     "sk_hynix_outlook": {
-      "3m_upside_probability": 50,
-      "6m_upside_probability": 50,
-      "12m_upside_probability": 55,
-      "rationale": "Tightening rates pressure valuation multiples. Spread data unavailable."
+      "3m_upside_probability": 65,
+      "6m_upside_probability": 58,
+      "12m_upside_probability": 60,
+      "rationale": "Neutral rate environment maintains AI momentum. Wide US-KR spread (strong dollar) supports export competitiveness."
     }
   },
   "cci_analysis": {
@@ -16711,7 +16711,7 @@
   },
   "real_estate": {
     "fetch_status": "source_error",
-    "fetch_note": "MOLIT unreachable (probe call failed) — skipped remaining regions to avoid a long CI stall",
+    "fetch_note": "MOLIT unreachable (probe call failed after retry) — skipped remaining regions to avoid a long CI stall",
     "regions_covered": 0,
     "regions_total": 55,
     "tiers": {
@@ -16746,18 +16746,6 @@
     "status": "ok",
     "month": "2026-07",
     "daily_records": [
-      {
-        "date": "2026-07-21",
-        "kr_regime": "Recovery",
-        "kr_score": 2.0,
-        "kr_confidence": 84.5,
-        "us_regime": "Recession",
-        "us_score": -1.0,
-        "us_confidence": 90.9,
-        "investment_env_score": 66.7,
-        "semiconductor_score": 79.6,
-        "bond_score": 38.8
-      },
       {
         "date": "2026-07-22",
         "kr_regime": "Recovery",
@@ -16805,6 +16793,18 @@
         "investment_env_score": 65.3,
         "semiconductor_score": 79.6,
         "bond_score": 40.6
+      },
+      {
+        "date": "2026-07-26",
+        "kr_regime": "Early Expansion",
+        "kr_score": 1.0,
+        "kr_confidence": 84.5,
+        "us_regime": "Recession",
+        "us_score": -1.0,
+        "us_confidence": 90.9,
+        "investment_env_score": 65.5,
+        "semiconductor_score": 79.6,
+        "bond_score": 41.0
       }
     ],
     "trend_summary": {
