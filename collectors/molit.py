@@ -29,6 +29,7 @@ failure 200+ more times.
 """
 from __future__ import annotations
 
+import time
 from datetime import datetime
 from statistics import median
 from typing import Any
@@ -130,7 +131,18 @@ def _fetch_region_month(lawd_cd: str, deal_ymd: str, api_key: str) -> list[dict[
     }
     resp = requests.get(base_url, params=params, timeout=_TIMEOUT_SECONDS)
     resp.raise_for_status()
-    payload = resp.json()
+    try:
+        payload = resp.json()
+    except ValueError:
+        # data.go.kr's standard OpenAPI error envelope (SERVICE_ACCESS_DENIED_ERROR,
+        # INVALID_REQUEST_PARAMETER_ERROR, ...) comes back as XML even when type=json is
+        # requested, because the gateway rejects the request before it ever reaches the
+        # service that would honor `type`. This is the exact response shape you get when the
+        # 인증키 is valid but not approved for *this specific* API product (활용신청 is
+        # per-service, not per-key) — e.g. approved for a 한국부동산원 product but not for
+        # 국토교통부_아파트매매 실거래 상세자료. Surface the raw body so that's diagnosable
+        # instead of showing up as an opaque JSON-parse failure.
+        raise RuntimeError(f"MOLIT returned non-JSON response (likely a service/auth error): {resp.text[:300]}")
     header = payload.get("response", {}).get("header", {})
     if header.get("resultCode") not in (None, "00", "000"):
         raise RuntimeError(f"MOLIT error response: {header.get('resultMsg')}")
@@ -139,6 +151,24 @@ def _fetch_region_month(lawd_cd: str, deal_ymd: str, api_key: str) -> list[dict[
         return []
     rows = items.get("item", []) if isinstance(items, dict) else items
     return rows if isinstance(rows, list) else [rows]
+
+
+def _probe_with_detail(lawd_cd: str, deal_ymd: str, api_key: str,
+                        attempts: int = 2, backoff_seconds: float = 1.5) -> tuple[list[dict] | None, str | None]:
+    """Like base.retry(_fetch_region_month), but also returns the last exception's message —
+    base.retry() only logs it and returns None, which is enough for every other collector but
+    not here (see the caller's comment on why the exact error text matters for MOLIT)."""
+    last_error: str | None = None
+    for attempt in range(1, attempts + 1):
+        try:
+            return _fetch_region_month(lawd_cd, deal_ymd, api_key), None
+        except Exception as exc:  # collectors must never crash the pipeline
+            last_error = str(exc)
+            log_event("collector.fetch_failed", level="warning",
+                      label=f"molit:probe:{lawd_cd}", attempt=attempt, error=last_error)
+            if attempt < attempts:
+                time.sleep(backoff_seconds * attempt)
+    return None, last_error
 
 
 def _price_per_pyeong(row: dict[str, Any]) -> float | None:
@@ -176,17 +206,22 @@ def fetch_and_store() -> dict[str, Any]:
     target_months = _trailing_deal_months(months_needed)
 
     probe_region = all_regions[0]
-    probe_rows = base.retry(
-        lambda: _fetch_region_month(probe_region["code"], target_months[-1], api_key),
-        label=f"molit:probe:{probe_region['code']}", attempts=2, backoff_seconds=1.5,
-    )
+    probe_rows, probe_error = _probe_with_detail(probe_region["code"], target_months[-1], api_key)
     if probe_rows is None:
         # A single try=1 probe never survived a transient blip (GitHub Actions runner IPs have
         # been observed to intermittently, not permanently, fail to reach apis.data.go.kr — same
         # pattern as KOSIS/ECOS). One extra attempt costs a few seconds and materially improves
         # the odds of a real network hiccup not tripping the breaker; a true block still fails
         # fast within ~10s either way, which is what the circuit breaker exists to bound.
-        note = "MOLIT unreachable (probe call failed after retry) — skipped remaining regions to avoid a long CI stall"
+        #
+        # The captured exception is surfaced in `note` (not just the log) because this failure
+        # has at least two very different root causes that need different fixes: a genuine
+        # network/timeout issue vs. data.go.kr returning an auth/service error (e.g. this key is
+        # approved for a different data.go.kr product — 한국부동산원 vs 국토교통부_아파트매매
+        # 실거래 상세자료 require *separate* 활용신청 approval even under the same 인증키). Those
+        # look identical as a bare "probe call failed" but very different once the actual
+        # response/exception text is visible.
+        note = f"MOLIT unreachable (probe call failed after retry): {probe_error} — skipped remaining regions to avoid a long CI stall"
         log_event("collector.molit_circuit_breaker_tripped", level="warning", note=note)
         return {"status": "source_error", "note": note, "regions_total": len(all_regions), "regions_covered": 0}
 
