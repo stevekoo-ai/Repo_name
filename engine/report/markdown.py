@@ -580,7 +580,7 @@ def _tier_label(tier: str) -> str:
 
 
 def render_markdown(payload: dict) -> str:
-    header = f"# 월간 PEOS 리포트 - {payload['report_month']}\n"
+    header = f"# PEOS 일일 리포트 - {payload['report_month']}\n"
     sections = [
         _us_macro_dashboard(payload), _us_regime_judgement(payload),
         _macro_dashboard(payload), _regime_judgement(payload), _kr_us_comparison(payload),

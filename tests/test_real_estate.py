@@ -3,6 +3,8 @@ no network calls (those paths are exercised end-to-end only in CI with a real
 MOLIT_API_KEY)."""
 from __future__ import annotations
 
+import pytest
+
 from collectors import molit
 from engine.real_estate import market_trend
 
@@ -56,3 +58,57 @@ def test_market_heat_bands():
     assert market_trend._market_heat(1.5, 5.0) == "과열"
     assert market_trend._market_heat(-1.5, None) == "냉각"
     assert market_trend._market_heat(0.2, -2.0) == "보합"
+
+
+class _FakeResponse:
+    """Minimal requests.Response stand-in for exercising _fetch_region_month's error paths
+    without a real network call."""
+
+    def __init__(self, text: str, json_ok: bool = True, status_ok: bool = True):
+        self.text = text
+        self._json_ok = json_ok
+        self._status_ok = status_ok
+
+    def raise_for_status(self):
+        if not self._status_ok:
+            raise __import__("requests").exceptions.HTTPError("500 Server Error")
+
+    def json(self):
+        if not self._json_ok:
+            raise ValueError("Expecting value: line 1 column 1 (char 0)")
+        import json
+        return json.loads(self.text)
+
+
+def test_fetch_region_month_surfaces_data_go_kr_error_response(monkeypatch):
+    """data.go.kr's own error envelope (resultCode != 00) must not be swallowed as an empty
+    result — a wrong/unapproved service key looks exactly like "no data" otherwise."""
+    body = '{"response": {"header": {"resultCode": "30", "resultMsg": "SERVICE_ACCESS_DENIED_ERROR"}}}'
+    monkeypatch.setattr(molit.requests, "get", lambda *a, **k: _FakeResponse(body))
+
+    with pytest.raises(RuntimeError, match="SERVICE_ACCESS_DENIED_ERROR"):
+        molit._fetch_region_month("11110", "202601", "fake-key")
+
+
+def test_fetch_region_month_surfaces_non_json_body_as_likely_auth_error(monkeypatch):
+    """data.go.kr returns an XML error envelope (not JSON) when the gateway rejects a request
+    before it reaches the service that would honor type=json — the classic signature of a key
+    that's valid but not 활용신청-approved for *this* specific API product. This must produce a
+    message pointing at that, not an opaque JSON-decode failure."""
+    xml_body = "<OpenAPI_ServiceResponse><cmmMsgHeader><errMsg>SERVICE ACCESS DENIED</errMsg></cmmMsgHeader></OpenAPI_ServiceResponse>"
+    monkeypatch.setattr(molit.requests, "get", lambda *a, **k: _FakeResponse(xml_body, json_ok=False))
+
+    with pytest.raises(RuntimeError, match="non-JSON response"):
+        molit._fetch_region_month("11110", "202601", "fake-key")
+
+
+def test_probe_with_detail_returns_error_message_instead_of_swallowing_it(monkeypatch):
+    def _always_fails(*a, **k):
+        raise RuntimeError("SERVICE_ACCESS_DENIED_ERROR")
+
+    monkeypatch.setattr(molit, "_fetch_region_month", _always_fails)
+
+    rows, error = molit._probe_with_detail("11110", "202601", "fake-key", attempts=1, backoff_seconds=0)
+
+    assert rows is None
+    assert error == "SERVICE_ACCESS_DENIED_ERROR"

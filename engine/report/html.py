@@ -660,13 +660,13 @@ def render_html(payload: dict) -> str:
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>PEOS 월간 리포트 - {_esc(payload['report_month'])}</title>
+<title>PEOS 일일 리포트 - {_esc(payload['report_month'])}</title>
 <style>{_CSS}</style>
 </head>
 <body>
 <div class="page">
   <header class="masthead">
-    <h1>PEOS 월간 리포트 — {_esc(payload['report_month'])}</h1>
+    <h1>PEOS 일일 리포트 — {_esc(payload['report_month'])}</h1>
     <div class="sub">Personal Economic Operating System · 자동 생성 · 투자 자문 아님</div>
   </header>
   {body_sections}

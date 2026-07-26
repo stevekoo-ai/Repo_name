@@ -212,7 +212,7 @@ def render_html(payload: dict) -> str:
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PEOS 월간 리포트 - {month}</title>
+    <title>PEOS 일일 리포트 - {month}</title>
     <style>
         * {{ margin: 0; padding: 0; box-sizing: border-box; }}
         body {{
@@ -354,9 +354,9 @@ def render_html(payload: dict) -> str:
 <body>
     <div class="container">
         <div class="header">
-            <h1>📊 PEOS 월간 리포트</h1>
-            <p>{month}</p>
-            <div class="date">{datetime.now().strftime('%Y년 %m월 %d일')}</div>
+            <h1>📊 PEOS 일일 리포트</h1>
+            <p>매일 자동 생성 · 기준월 {month}</p>
+            <div class="date">{datetime.now().strftime('%Y년 %m월 %d일')} 생성</div>
         </div>
 
         <div class="grid-2">
