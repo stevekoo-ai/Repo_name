@@ -300,9 +300,15 @@ def kis_fetch_overseas_price(symbol, excd="NAS", account_type="real", raw=False)
         )
     missing = [v for v in OVERSEAS_PRICE_FIELDS.values() if v not in row]
     if missing:
+        # 2026-07-28 발견: 이 진단 메시지가 필드명만 나열하고 실제 응답을
+        # 보여주지 않아서, sk-hynix-adr-quote.csv가 생성 이래 단 한 번도
+        # 채워지지 않은 채로 (adr-quote ... || true)에 조용히 묻혀 있었다.
+        # 실제 응답 키를 로그에 함께 남겨 재발 시 --raw 왕복 없이 바로
+        # 고칠 수 있게 한다.
         sys.exit(
-            f"예상한 필드가 API 응답에 없습니다: {missing}. --raw로 원본을 확인해 "
-            "이 스크립트 상단 OVERSEAS_PRICE_FIELDS 딕셔너리를 실제 필드명으로 고치세요."
+            f"예상한 필드가 API 응답에 없습니다: {missing}. 실제 응답 키: "
+            f"{sorted(row.keys())}\n실제 응답 전체: {json.dumps(row, ensure_ascii=False)}\n"
+            "이 스크립트 상단 OVERSEAS_PRICE_FIELDS 딕셔너리를 위 실제 필드명으로 고치세요."
         )
     return {
         "symbol": symbol,
