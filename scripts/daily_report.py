@@ -16,7 +16,7 @@ import argparse
 from datetime import datetime, timezone, timedelta
 from pathlib import Path
 
-from investor_flow import kis_fetch_price, read_ticker_rows, summarize_flows, read_latest_adr
+from investor_flow import kis_fetch_price, read_ticker_rows, summarize_flows, read_latest_adr, read_latest_price_snapshot
 
 KST = timezone(timedelta(hours=9))
 REPORT_DIR = Path(__file__).resolve().parent.parent / "sources"
@@ -38,6 +38,21 @@ def build_report(ticker: str) -> str:
         lines.append(f"- 거래량: {q['volume']:,}주")
     except SystemExit as e:
         lines.append(f"- 시세 조회 실패: {e}")
+
+    # --- 외국인 보유율 & 250일 최고가 대비 드로다운 ---
+    # 2026-07-28 추가: 그동안 "KSD 보유율 미확인"·"정확한 종가 미확인"으로
+    # 반복 표기되던 항목을 investor_flow.py snapshot 커맨드가 채워둔
+    # sk-hynix-price-snapshot.csv에서 읽어온다(웹검색 불필요).
+    lines.append("\n## 외국인 보유율 & 250일 최고가 대비")
+    snap = read_latest_price_snapshot(ticker)
+    if snap is None:
+        lines.append("- 기록 없음 — investor_flow.py snapshot을 먼저 실행하세요.")
+    else:
+        lines.append(f"- {snap['date']} 기준 외국인 보유율: **{float(snap['foreign_hold_pct']):.2f}%** (보유 {int(snap['foreign_hold_qty']):,}주)")
+        lines.append(
+            f"- 250일 최고가: {int(snap['day250_high']):,}원({snap['day250_high_date']}) "
+            f"대비 **{float(snap['day250_high_vrss_pct']):+.2f}%**"
+        )
 
     # --- ADR ---
     lines.append("\n## ADR(SKHY, 나스닥)")
