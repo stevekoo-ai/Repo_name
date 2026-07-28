@@ -1,7 +1,7 @@
 ---
 title: 펀더멘털 불변 vs 심리·수급발 디레이팅
 created: 2026-07-13
-updated: 2026-07-22
+updated: 2026-07-28
 tags: [concept, market-psychology, valuation, risk]
 ---
 
@@ -70,6 +70,25 @@ tags: [concept, market-psychology, valuation, risk]
 [SK하이닉스](../entities/sk-hynix.md)의 "7/22 급등 배경" 섹션과
 [sources/sk-hynix-surge-analysis-2026-07-22.md](../../sources/sk-hynix-surge-analysis-2026-07-22.md) 참고.
 
+### "AI 거품론"도 심리·수급발 디레이팅의 사례 (2026-07-28 추가, 김광석 특강)
+
+[김광석 경제전문가 특강](../sources/kim-kwangsuk-market-volatility-lecture-2026-07.md)은
+2026년 7월의 AI 거품론을 "실질적인 붕괴보다는 투자자들의 공포 심리가
+과도하게 반영된 현상"으로 해석한다 — 이 페이지의 핵심 개념(펀더멘털
+불변 + 심리·수급발 디레이팅)과 정확히 같은 프레임이다. 같은 강연에서
+**국민연금 리밸런싱**과 **레버리지 ETF 손실 증폭**을 하락의 구조적
+원인으로, **중동 지정학 리스크·주요국 금리 인상**을 심리 위축 요인으로
+지목했는데 — 후자는 [거시국면(G/I/L) 추적](macro-regime-history.md)의
+1979-04형 애널로그(오일쇼크·긴축)가 이미 다루는 내용과 방향이 일치한다.
+전자(국민연금 리밸런싱)는 이 위키에 없던 새 관찰이라
+[market-cycles-leverage-risk.md "1-1-1"](market-cycles-leverage-risk.md#1-1-1-국민연금nps-전략적-리밸런싱-매도-2026-07-28-추가-김광석-특강)에
+별도로 기록했다.
+
+**주의**: 이 특강 요약은 SK하이닉스나 CXMT 같은 개별 종목·사건을
+다루지 않는 일반 시장 논평이다 — 7/28 CXMT 상장 쇼크([entities/sk-hynix.md](../entities/sk-hynix.md)
+참고)처럼 이 위키가 실측으로 추적 중인 개별 사건과는 별개의, 더 넓은
+프레임으로 취급할 것.
+
 ### 일반적으로 알려진 사례 (⚠ 위키 소스로 검증되지 않음, 일반 시장 상식·참고용)
 
 아래는 어떤 소스에서 `/ingest` 된 것이 아니라 일반 지식으로 정리한 것이며,
@@ -95,3 +114,5 @@ tags: [concept, market-psychology, valuation, risk]
 - [SK하이닉스](../entities/sk-hynix.md)
 - [sources/sk-hynix-surge-analysis-2026-07-22.md](../../sources/sk-hynix-surge-analysis-2026-07-22.md)
 - 일반 사례 목록: 별도 소스 없음 — 일반 지식, 재검증 필요
+- [sources/kim-kwangsuk-market-volatility-lecture-2026-07.md](../../sources/kim-kwangsuk-market-volatility-lecture-2026-07.md) (AI 거품론 = 공포심리 프레임)
+- [미국 거시국면(G/I/L)과 역사적 유사 시기 매칭](macro-regime-history.md)

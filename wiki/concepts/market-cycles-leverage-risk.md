@@ -1,7 +1,7 @@
 ---
 title: 반도체 시장의 단기 수급 싸이클 vs 장기 펀더멘털
 created: 2026-07-21
-updated: 2026-07-26
+updated: 2026-07-28
 tags: [market-cycles, leverage, risk, seasonality, semiconductor]
 ---
 
@@ -24,6 +24,25 @@ tags: [market-cycles, leverage, risk, seasonality, semiconductor]
 **시사점:**
 - "모두가 사는" 구간에서 "모두가 파는" 구간으로 극단적 전환
 - 개인 투자자·소액 자금이 가장 타격을 받는 구간
+
+### 1-1-1. 국민연금(NPS) 전략적 리밸런싱 매도 (2026-07-28 추가, 김광석 특강)
+
+[김광석 경제전문가 특강](../sources/kim-kwangsuk-market-volatility-lecture-2026-07.md)이
+지목한 하락 원인 중 하나 — 국민연금이 **기금 운용 전략상 국내 주식
+비중을 조절**하는 과정에서 나온 대규모 매도세가 하방 압력을 높였다는
+분석. 레버리지 ETF발 매물(1-2)이나 개별 투자자 수급(1-4-1)과는 성격이
+다른 **제도적·구조적 매도**라는 게 핵심 — 개별 종목 뉴스나 심리와
+무관하게, 기금의 자산배분 규칙에 따라 정기적으로 나올 수 있는 물량이다.
+
+**SK하이닉스 관점에서 확인할 것**: `market-cycles-leverage-risk.md`
+1-4-2(투자자별 보유율 3년 추이)에서 국민연금은 SK하이닉스 지분
+7.35~7.9% 수준의 대주주([1-4-2 표](#1-4-2-투자자별개인기관외국인-보유율-3년-추이--가격-상관관계-2026-07-24-추가)
+참고) — 리밸런싱이 실제로 진행 중이라면 이 지분율 변화로 관측 가능할
+것이다. **다만 이번 특강 요약에는 SK하이닉스 특정 수치나 시점이
+없어**, 이 위키의 실측 데이터(KSD 보유율, 외국인/기관 수급)로 국민연금
+매도가 실제로 SK하이닉스 하락에 기여했는지는 아직 검증되지 않았다 —
+[HBM Cycle Score](hbm-cycle-score.md)의 "기관" 축이나 향후 KSD 보유율
+갱신에서 국민연금 지분 변동이 확인되면 이 섹션에 반영할 것.
 
 ### 1-2. 레버리지 물량의 양방향 증폭 — 마진콜의 악순환
 
@@ -622,3 +641,4 @@ ASP도 $30~40/GB로 동시에 두 배 이상 뛸 것으로 전망돼, 물량 확
 - [포트폴리오 리밸런싱과 위험 관리 전략](portfolio-rebalancing-strategy.md)
 - [한국·미국 증시 휴장일 캘린더](market-holidays.md)
 - [나의 투자 포트폴리오](../entities/my-portfolio.md)
+- [sources/kim-kwangsuk-market-volatility-lecture-2026-07.md](../../sources/kim-kwangsuk-market-volatility-lecture-2026-07.md) (국민연금 리밸런싱 매도, 1-1-1)
