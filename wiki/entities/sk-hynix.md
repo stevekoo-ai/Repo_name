@@ -29,6 +29,15 @@ tags: [sk-hynix, semiconductor, stock, adr]
 | 삼성전기 | -15.92% |
 | 코스피 | 장중 -8~10% |
 
+**[OPINION] 왜 SK하이닉스 개별 이슈가 코스피 전체 서킷브레이커로 번졌나**:
+[김광석 특강](../../sources/kim-kwangsuk-market-volatility-lecture-2026-07.md)이
+지목한 **"시장 쏠림"**으로 설명된다 — 코스피가 삼성전자·SK하이닉스
+두 종목에 시가총액 **50% 이상**을 의존하고 있어, 반도체 실적 기대감이
+꺾이면 SK하이닉스가 아니라 지수 자체가 함께 무너진다. 오늘처럼 지수가
+같이 빠지면 [레버리지 ETF·마진콜 압력](../concepts/market-cycles-leverage-risk.md#1-2-레버리지-물량의-양방향-증폭--마진콜의-악순환)이
+다시 SK하이닉스로 돌아오는 자기강화 루프가 성립한다 — 오늘의 -14.65%가
+개별 종목 리스크치고 유독 컸던 구조적 이유.
+
 **주가 수준**: 7/27 종가는 KIS API 실측 단가 기준 **1,816,000원**(7/24 1,759,000에서
 **+3.2% 반등**했었다). 여기서 -14.65%면 **약 1,550,000원 내외**. 6월 ATH
 2,987,000원 대비 드로다운은 **약 -48%**로 확대 — **-50%선에 근접**했다.
@@ -606,3 +615,4 @@ HBM3 시장 진입 계획까지 보도. 7/16 급락 원인에 "CXMT 14조 실탄
 - [sources/chart-sk-hynix-quarterly-earnings-2026-04-23.jpeg](../../sources/chart-sk-hynix-quarterly-earnings-2026-04-23.jpeg) (분기별 실적 차트)
 - [sources/websearch-sk-hynix-morning-check-2026-07-24.md](../../sources/websearch-sk-hynix-morning-check-2026-07-24.md)
 - [sources/chart-sk-hynix-premarket-2026-07-23-0800.png](../../sources/chart-sk-hynix-premarket-2026-07-23-0800.png) (사용자 제공 08:00 프리마켓 갭업 차트)
+- [sources/kim-kwangsuk-market-volatility-lecture-2026-07.md](../../sources/kim-kwangsuk-market-volatility-lecture-2026-07.md) (코스피 시장 쏠림 50%+, 레버리지 ETF 복리효과)
