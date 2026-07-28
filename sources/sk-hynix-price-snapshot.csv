@@ -1,0 +1,2 @@
+date,ticker,price,change,change_pct,volume,foreign_hold_pct,foreign_hold_qty,day250_high,day250_high_date,day250_high_vrss_pct,source,fetched_at
+2026-07-28,000660,1550000,-266000,-14.65,8120587,52.11,371422583,2987000,2026-06-25,-48.11,kis_api,2026-07-28T12:34:40+00:00

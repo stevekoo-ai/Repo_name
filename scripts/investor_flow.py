@@ -77,7 +77,13 @@ FIELDS = {
 
 # KIS "국내주식 현재가 시세" TR: FHKST01010100
 # GET /uapi/domestic-stock/v1/quotations/inquire-price
-# ⚠ 필드명은 문서 기억 기반 — 최초 실호출 시 --raw로 검증할 것
+# ✅ 2026-07-28 실계정 --raw 응답으로 검증 완료(더 이상 문서기억 기반 아님).
+# 이때 부수 발견 — 응답에 hts_frgn_ehrt(외국인 보유율/소진율)·frgn_hldn_qty
+# (외국인 보유수량)·d250_hgpr(250일 최고가)·d250_hgpr_vrss_prpr_rate(그
+# 대비 등락률, 즉 드로다운)가 이미 들어있었다. 그동안 위키에서 매번
+# "KSD 보유율 미확인"·"정확한 종가 미확인"·드로다운 수기 계산으로 처리해온
+# 세 가지가 전부 이 한 번의 API 호출로 해결된다 — snapshot 커맨드로 별도
+# 영속화한다(아래 PRICE_SNAPSHOT_FIELDS).
 PRICE_FIELDS = {
     "price": "stck_prpr",       # 현재가(장중)/종가(장마감후)
     "change": "prdy_vrss",      # 전일대비
@@ -85,20 +91,42 @@ PRICE_FIELDS = {
     "volume": "acml_vol",       # 누적거래량
 }
 
+# 위 TR의 부가 필드 — 외국인 보유율/최고가 대비 드로다운. snapshot 커맨드
+# 전용(quote 커맨드의 즉석 조회에는 안 씀, 하위호환 유지).
+PRICE_SNAPSHOT_EXTRA_FIELDS = {
+    "foreign_hold_pct": "hts_frgn_ehrt",             # 외국인 보유율(%)
+    "foreign_hold_qty": "frgn_hldn_qty",             # 외국인 보유수량
+    "day250_high": "d250_hgpr",                      # 250거래일 최고가
+    "day250_high_date": "d250_hgpr_date",            # 그 날짜(YYYYMMDD)
+    "day250_high_vrss_pct": "d250_hgpr_vrss_prpr_rate",  # 최고가 대비 등락률(=드로다운, 부호 반전 아님에 유의)
+}
+
 # KIS "해외주식 현재가상세" TR: HHDFS76200200 (ADR·해외상장 종목용)
 # GET /uapi/overseas-price/v1/quotations/price-detail
-# ⚠⚠ 국내주식 API보다 신뢰도 낮음(TR/파라미터 모두 문서 기억 기반, 재검증
-# 안 됨) — 반드시 --raw로 먼저 실제 응답을 확인하고 필드명을 맞출 것.
-# EXCD는 거래소 코드(NASDAQ="NAS"), SYMB는 종목코드(SKHY 등).
+# ✅ 2026-07-28 실계정 --raw 응답으로 검증 완료. 애초 예상했던 diff/rate
+# 필드는 존재하지 않았다 — 실제 응답엔 last(현재가)·base(전일종가)만 있고
+# 전일대비/등락률은 별도 필드로 안 내려온다(t_xdif/t_xrat은 원화 환산
+# 기준으로 보이는 값이라 신뢰하지 않고, last-base로 직접 계산한다).
 OVERSEAS_PRICE_FIELDS = {
     "price": "last",       # 현재가
-    "change": "diff",      # 전일대비
-    "change_pct": "rate",  # 전일대비율(%)
     "prev_close": "base",  # 전일종가
 }
 
 ADR_CSV_PATH = Path(__file__).resolve().parent.parent / "sources" / "sk-hynix-adr-quote.csv"
 ADR_CSV_FIELDS = ["date", "symbol", "price", "change", "change_pct", "prev_close", "source", "fetched_at"]
+
+# 2026-07-28 신설 — 본주 종가·외국인 보유율·250일 최고가 대비 등락률을
+# 매일 영속화. 그동안 위키 리포트에서 "정확한 종가 미확인"·"KSD 보유율
+# 미확인"으로 반복 표기되던 두 항목과, 드로다운 수기 계산을 이 파일
+# 하나로 대체한다. investor-flow.csv(수급)와는 별도 파일 — 수급은 30일
+# 이력 TR이라 갱신 주기가 다르고, 이건 당일 스냅샷이라 성격이 다르다.
+PRICE_SNAPSHOT_CSV_PATH = Path(__file__).resolve().parent.parent / "sources" / "sk-hynix-price-snapshot.csv"
+PRICE_SNAPSHOT_CSV_FIELDS = [
+    "date", "ticker", "price", "change", "change_pct", "volume",
+    "foreign_hold_pct", "foreign_hold_qty",
+    "day250_high", "day250_high_date", "day250_high_vrss_pct",
+    "source", "fetched_at",
+]
 
 
 def _get_env_or_die(name):
@@ -215,8 +243,10 @@ def kis_fetch_investor_trend(ticker, account_type="real", raw=False):
     return parsed
 
 
-def kis_fetch_price(ticker, account_type="real", raw=False):
-    """국내주식 현재가 시세(가격/전일대비/등락률/거래량) 조회."""
+def kis_fetch_price(ticker, account_type="real", raw=False, with_snapshot_extra=False):
+    """국내주식 현재가 시세(가격/전일대비/등락률/거래량) 조회.
+    with_snapshot_extra=True면 외국인 보유율·250일 최고가 대비 등락률도
+    함께 반환(snapshot 커맨드 전용, 기존 quote 커맨드는 하위호환 위해 기본값 False)."""
     appkey = _get_env_or_die("KIS_APP_KEY")
     appsecret = _get_env_or_die("KIS_APP_SECRET")
     token = kis_get_token(account_type)
@@ -255,13 +285,27 @@ def kis_fetch_price(ticker, account_type="real", raw=False):
             f"예상한 필드가 API 응답에 없습니다: {missing}. --raw로 원본을 "
             "확인해 이 스크립트 상단 PRICE_FIELDS 딕셔너리를 실제 필드명으로 고치세요."
         )
-    return {
+    result = {
         "ticker": ticker,
         "price": int(row[PRICE_FIELDS["price"]]),
         "change": int(row[PRICE_FIELDS["change"]]),
         "change_pct": float(row[PRICE_FIELDS["change_pct"]]),
         "volume": int(row[PRICE_FIELDS["volume"]]),
     }
+    if with_snapshot_extra:
+        missing_extra = [v for v in PRICE_SNAPSHOT_EXTRA_FIELDS.values() if v not in row]
+        if missing_extra:
+            sys.exit(
+                f"snapshot 부가 필드가 API 응답에 없습니다: {missing_extra}. 실제 응답 키: "
+                f"{sorted(row.keys())}\nPRICE_SNAPSHOT_EXTRA_FIELDS를 고치세요."
+            )
+        result["foreign_hold_pct"] = float(row[PRICE_SNAPSHOT_EXTRA_FIELDS["foreign_hold_pct"]])
+        result["foreign_hold_qty"] = int(row[PRICE_SNAPSHOT_EXTRA_FIELDS["foreign_hold_qty"]])
+        result["day250_high"] = int(row[PRICE_SNAPSHOT_EXTRA_FIELDS["day250_high"]])
+        d = row[PRICE_SNAPSHOT_EXTRA_FIELDS["day250_high_date"]]
+        result["day250_high_date"] = f"{d[0:4]}-{d[4:6]}-{d[6:8]}"
+        result["day250_high_vrss_pct"] = float(row[PRICE_SNAPSHOT_EXTRA_FIELDS["day250_high_vrss_pct"]])
+    return result
 
 
 def kis_fetch_overseas_price(symbol, excd="NAS", account_type="real", raw=False):
@@ -300,16 +344,27 @@ def kis_fetch_overseas_price(symbol, excd="NAS", account_type="real", raw=False)
         )
     missing = [v for v in OVERSEAS_PRICE_FIELDS.values() if v not in row]
     if missing:
+        # 2026-07-28 발견: 이 진단 메시지가 필드명만 나열하고 실제 응답을
+        # 보여주지 않아서, sk-hynix-adr-quote.csv가 생성 이래 단 한 번도
+        # 채워지지 않은 채로 (adr-quote ... || true)에 조용히 묻혀 있었다.
+        # 실제 응답 키를 로그에 함께 남겨 재발 시 --raw 왕복 없이 바로
+        # 고칠 수 있게 한다.
         sys.exit(
-            f"예상한 필드가 API 응답에 없습니다: {missing}. --raw로 원본을 확인해 "
-            "이 스크립트 상단 OVERSEAS_PRICE_FIELDS 딕셔너리를 실제 필드명으로 고치세요."
+            f"예상한 필드가 API 응답에 없습니다: {missing}. 실제 응답 키: "
+            f"{sorted(row.keys())}\n실제 응답 전체: {json.dumps(row, ensure_ascii=False)}\n"
+            "이 스크립트 상단 OVERSEAS_PRICE_FIELDS 딕셔너리를 위 실제 필드명으로 고치세요."
         )
+    price = float(row[OVERSEAS_PRICE_FIELDS["price"]])
+    prev_close = float(row[OVERSEAS_PRICE_FIELDS["prev_close"]])
+    # 응답에 전일대비/등락률 필드가 직접 없어 여기서 계산한다(위 주석 참고).
+    change = price - prev_close
+    change_pct = (change / prev_close * 100) if prev_close else 0.0
     return {
         "symbol": symbol,
-        "price": float(row[OVERSEAS_PRICE_FIELDS["price"]]),
-        "change": float(row[OVERSEAS_PRICE_FIELDS["change"]]),
-        "change_pct": float(row[OVERSEAS_PRICE_FIELDS["change_pct"]]),
-        "prev_close": float(row[OVERSEAS_PRICE_FIELDS["prev_close"]]),
+        "price": price,
+        "change": change,
+        "change_pct": change_pct,
+        "prev_close": prev_close,
     }
 
 
@@ -349,6 +404,50 @@ def upsert_adr_row(quote, source="kis_api"):
 def read_latest_adr(symbol):
     """가장 최근 fetched_at 기준 ADR 기록 1건 반환(없으면 None) — 다른 스크립트 재사용용."""
     rows = [r for (d, s), r in _read_adr_csv().items() if s == symbol]
+    if not rows:
+        return None
+    rows.sort(key=lambda r: r["fetched_at"])
+    return rows[-1]
+
+
+def _read_price_snapshot_csv():
+    if not PRICE_SNAPSHOT_CSV_PATH.exists():
+        return {}
+    rows = {}
+    with PRICE_SNAPSHOT_CSV_PATH.open(newline="", encoding="utf-8") as f:
+        for row in csv.DictReader(f):
+            rows[(row["date"], row["ticker"])] = row
+    return rows
+
+
+def _write_price_snapshot_csv(rows_by_key):
+    PRICE_SNAPSHOT_CSV_PATH.parent.mkdir(parents=True, exist_ok=True)
+    ordered = sorted(rows_by_key.values(), key=lambda r: (r["date"], r["ticker"]))
+    with PRICE_SNAPSHOT_CSV_PATH.open("w", newline="", encoding="utf-8") as f:
+        w = csv.DictWriter(f, fieldnames=PRICE_SNAPSHOT_CSV_FIELDS)
+        w.writeheader()
+        for r in ordered:
+            w.writerow(r)
+
+
+def upsert_price_snapshot_row(q, source="kis_api"):
+    existing = _read_price_snapshot_csv()
+    today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    key = (today, q["ticker"])
+    existing[key] = {
+        "date": today, "ticker": q["ticker"],
+        "price": q["price"], "change": q["change"], "change_pct": q["change_pct"], "volume": q["volume"],
+        "foreign_hold_pct": q["foreign_hold_pct"], "foreign_hold_qty": q["foreign_hold_qty"],
+        "day250_high": q["day250_high"], "day250_high_date": q["day250_high_date"],
+        "day250_high_vrss_pct": q["day250_high_vrss_pct"],
+        "source": source, "fetched_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+    }
+    _write_price_snapshot_csv(existing)
+
+
+def read_latest_price_snapshot(ticker):
+    """가장 최근 fetched_at 기준 스냅샷 1건 반환(없으면 None) — 다른 스크립트 재사용용."""
+    rows = [r for (d, t), r in _read_price_snapshot_csv().items() if t == ticker]
     if not rows:
         return None
     rows.sort(key=lambda r: r["fetched_at"])
@@ -440,6 +539,19 @@ def cmd_quote(args):
     print(f"{q['ticker']}  {q['price']:,}원  {q['change']:+,}({q['change_pct']:+.2f}%){flag}  거래량 {q['volume']:,}주")
 
 
+def cmd_snapshot(args):
+    q = kis_fetch_price(args.ticker, args.account_type, raw=args.raw, with_snapshot_extra=True)
+    if args.raw:
+        return
+    upsert_price_snapshot_row(q)
+    print(
+        f"{q['ticker']}  {q['price']:,}원({q['change_pct']:+.2f}%)  "
+        f"외국인보유율 {q['foreign_hold_pct']:.2f}%  "
+        f"250일최고 {q['day250_high']:,}원({q['day250_high_date']}, 대비 {q['day250_high_vrss_pct']:+.2f}%)  "
+        f"→ {PRICE_SNAPSHOT_CSV_PATH}에 기록"
+    )
+
+
 def cmd_adr_quote(args):
     q = kis_fetch_overseas_price(args.symbol, args.excd, args.account_type, raw=args.raw)
     if args.raw:
@@ -506,6 +618,12 @@ def main():
     pq.add_argument("--account-type", default=os.environ.get("KIS_ACCOUNT_TYPE", "real"), choices=["real", "vts"])
     pq.add_argument("--raw", action="store_true")
     pq.set_defaults(func=cmd_quote)
+
+    psn = sub.add_parser("snapshot", help="현재가+외국인보유율+250일최고가 조회, sources/sk-hynix-price-snapshot.csv에 기록")
+    psn.add_argument("--ticker", default="000660")
+    psn.add_argument("--account-type", default=os.environ.get("KIS_ACCOUNT_TYPE", "real"), choices=["real", "vts"])
+    psn.add_argument("--raw", action="store_true")
+    psn.set_defaults(func=cmd_snapshot)
 
     pa2 = sub.add_parser("adr-quote", help="ADR(해외상장) 현재가 조회, sources/sk-hynix-adr-quote.csv에 기록")
     pa2.add_argument("--symbol", default="SKHY")
