@@ -1,7 +1,7 @@
 ---
 title: 미중 기술 경쟁과 HBM 시장의 미래
 created: 2026-07-21
-updated: 2026-07-22
+updated: 2026-07-29
 tags: [us-china-competition, hbm-market, cxmt-threat, tech-autonomy, long-term-risk]
 ---
 
@@ -89,6 +89,16 @@ tags: [us-china-competition, hbm-market, cxmt-threat, tech-autonomy, long-term-r
 - **가격 경쟁 본격화:** "충분한 성능"으로 만족하는 고객이 저가 옵션 채택
 - **점유율 잠식:** 50% → 40% 대로 점진적 하락 가능성
 - **사업 구조 변화:** 고마진 HBM → 저마진 혼재 포트폴리오로 전환 압박
+
+**(2026-07-29 추가) 대안 프레임 — TAM(시장 규모) 관점**: 위 분석은
+전부 "점유율이 얼마나 잠식되는가"를 축으로 한다. [주식시장의
+본질](stock-market-essence.md)이 제기하는 반론은, AI 인프라 수요로
+HBM 시장 규모(TAM) 자체가 훨씬 크게 성장한다면 점유율이 50%→40%로
+줄어도 절대 매출·이익은 오히려 커질 수 있다는 것 — "점유율 방어"보다
+"TAM이 얼마나 커지는가"가 더 중요한 질문일 수 있다는 관점. 다만 이건
+검증된 사실이 아니라 AI 수요가 실제로 그만큼 커진다는 전제에 의존하는
+낙관적 해석(OPINION)이라, 이 페이지의 점유율 잠식 시나리오와 병기해
+두고 다음 체크에서 계속 비교 추적한다.
 
 ### 장기 (2030+): 생태계 판도 재편
 - 정치적 선호도 변화 (중국 정부 지원)
@@ -182,6 +192,7 @@ tags: [us-china-competition, hbm-market, cxmt-threat, tech-autonomy, long-term-r
 
 - sources/us-china-tech-competition-hbm-2026-07-21.md (영상 분석)
 - [sources/websearch-sk-hynix-evening-check-2026-07-22.md](../../sources/websearch-sk-hynix-evening-check-2026-07-22.md) (CXMT 상장일 7/27 정정)
+- [주식시장의 본질](stock-market-essence.md) (TAM 대안 프레임)
 - [SK하이닉스 목표주가 근거 체크리스트](sk-hynix-analyst-thesis-checkpoints.md) (체크포인트 ⑦ CXMT 위협)
 - [반도체 시장의 단기 수급 싸이클 vs 장기 펀더멘털](market-cycles-leverage-risk.md) (중기 시장 구조)
 - [나의 투자 포트폴리오](../entities/my-portfolio.md) (포트폴리오 집중 위험)

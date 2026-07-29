@@ -645,6 +645,7 @@ Warren Buffett의 최근 AI 인터뷰에서 "AI 시대에도 결국 좋은 기�
 
 ## Sources
 
+- [주식시장의 본질](stock-market-essence.md) (③CapEx·⑦중국산DRAM 판정의 이론적 배경 — CapEx선행지표·TAM 프레임)
 - [sources/warrenai-report-2026-07-16.md](../../sources/warrenai-report-2026-07-16.md) (참고 형식 + 오류 2건 검증 메모)
 - [sources/websearch-sk-hynix-crash-2026-07-16.md](../../sources/websearch-sk-hynix-crash-2026-07-16.md)
 - [sources/websearch-sk-hynix-tsmc-current-2026-07-16.md](../../sources/websearch-sk-hynix-tsmc-current-2026-07-16.md)

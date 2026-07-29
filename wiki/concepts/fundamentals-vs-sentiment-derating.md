@@ -1,7 +1,7 @@
 ---
 title: 펀더멘털 불변 vs 심리·수급발 디레이팅
 created: 2026-07-13
-updated: 2026-07-28
+updated: 2026-07-29
 tags: [concept, market-psychology, valuation, risk]
 ---
 
@@ -9,7 +9,10 @@ tags: [concept, market-psychology, valuation, risk]
 급락하는 패턴. 금융에서 흔히 **멀티플 디레이팅(multiple de-rating)** 이라
 부른다. 위험한 이유는 실적 문제와 달리 "언제 개선되는지"를 실적 지표로
 가늠하기 어렵고, 레버리지·포지셔닝발 매물처럼 자기강화적으로 더 빠질 수
-있다는 점이다.
+있다는 점이다. 이 페이지가 사례를 실측으로 추적한다면, 왜 이런 괴리가
+구조적으로 발생하는지의 이론적 배경은 [주식시장의 본질](stock-market-essence.md)
+참고(2026-07-29 신설, 기업은 현재를 증명·시장은 미래를 가격에 반영한다는
+프레임).
 
 ### 지금 진행 중인 사례: SK하이닉스 (위키 근거 있음)
 
@@ -106,6 +109,7 @@ tags: [concept, market-psychology, valuation, risk]
 
 ## Sources
 
+- [주식시장의 본질](stock-market-essence.md)
 - [SK하이닉스 반등 전망 분석 (2026-07-13)](../summaries/sk-hynix-rebound-analysis-2026-07-13.md)
 - [SK하이닉스 본주·ADR 차트 비교 (2026-07-13)](../summaries/sk-hynix-adr-krw-chart-comparison-2026-07-13.md)
 - [7월 실적-주가 괴리 원인 정리 (2026-07-14)](../summaries/sk-hynix-earnings-price-divergence-2026-07-14.md)
