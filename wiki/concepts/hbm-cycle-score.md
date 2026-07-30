@@ -16,7 +16,9 @@ tags: [hbm, cycle-score, nvidia, cowos, early-warning, sk-hynix, daily-tracking]
 [찐반등 4대 신호](market-cycles-leverage-risk.md)는 그대로 유지하고, 이
 페이지는 **그 위에 얹는 요약 레이어**다 — 매 체크 리포트 최상단에 "숫자
 두 개"(HBM Cycle Score, 붕괴조건 충족 개수)만 봐도 판단 가능하게 하는 것이
-목표.
+목표. 이 점수가 "가설이 깨지는 조건"을 추적한다면, 반대 방향(패닉이
+풀리는 조건)은 [패닉 회복 신호 추적 프레임](panic-recovery-signals.md)이
+담당 — 2026-07-30 신설, 매일 함께 확인할 것.
 
 ## 1. HBM Cycle Score (0~100)
 
@@ -164,6 +166,7 @@ main에 반영했고, 실제 계정으로 2회 검증(디버그 raw 조회 1회 
 
 ## Sources
 
+- [패닉 회복 신호 추적 프레임](panic-recovery-signals.md)
 - 사용자가 제시한 HBM Supercycle Early Warning System(HSEWS) 설계
   (2026-07-24 채팅)
 - [SK하이닉스 목표주가 근거 체크리스트](sk-hynix-analyst-thesis-checkpoints.md)

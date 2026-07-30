@@ -104,6 +104,7 @@ G/I/L](macro-regime-history.md)). 이 세 축이 결국 "미래 현금흐름"에
 
 ## Sources
 
+- [패닉 회복 신호 추적 프레임](panic-recovery-signals.md) (엔비디아 사례의 "제번스의 역설" 반박이 실제 회복 트리거로 검증된 사례들 참고)
 - [sources/dialogue-stock-market-essence-2026-07-29.md](../../sources/dialogue-stock-market-essence-2026-07-29.md) (사용자 제공 대화 정리본)
 - [펀더멘털 불변 vs 심리·수급발 디레이팅](fundamentals-vs-sentiment-derating.md)
 - [SK하이닉스 목표주가 근거 체크리스트](sk-hynix-analyst-thesis-checkpoints.md)
