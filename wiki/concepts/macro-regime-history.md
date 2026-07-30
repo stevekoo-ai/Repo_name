@@ -12,6 +12,38 @@ tags: [macro, regime, gil, historical-analogue, sk-hynix, daily-tracking]
 것 — [HBM Cycle Score](hbm-cycle-score.md)가 "SK하이닉스 미시 축"이라면
 이 페이지는 그 위에 얹히는 "거시 배경 축"이다.
 
+## 0. 이 저장소의 다른 "경제계절" 시스템과의 관계 (2026-07-30 밤 발견)
+
+이 저장소 `main` 브랜치에는 이 페이지와 **완전히 별개로 구축된** 두 개의
+자동화 시스템이 이미 있다 — 다른 Claude Code 세션이 만든 것으로 보이며,
+지금까지 이 위키·SK하이닉스 데일리 리포트에는 한 번도 언급되지 않았다:
+
+1. **Investment Clock**(`src/clock/`, 매일 08:00 KST GitHub Actions) —
+   미국 거시 4국면(Recovery/Overheat/Stagflation/Reflation) 모델. 결과는
+   `docs/index.html`(GitHub Pages 대시보드) + `data/history.csv`에 매일
+   커밋됨.
+2. **PEOS**(Personal Economic Operating System, `engine/`, 매일 06:00
+   KST) — 미국·한국 거시 Regime(Recovery/Early Expansion/Expansion/Late
+   Expansion/Slowdown/Recession) + 반도체·투자·채권·환율·부동산·청약까지
+   개인화한 풀리포트. 결과는 `report/<날짜>.md`+`docs/peos-daily.html`.
+
+**둘 다 GitHub Actions에서는 매일 정상 실행되지만, 알림 채널
+(Slack/이메일) 시크릿이 비어있어 아무에게도 전달되지 않고 있었다** —
+2026-07-30 사용자 문의로 발견, 앞으로 SK하이닉스 데일리 리포트에 통합해
+전달하기로 결정.
+
+**⚠️ 오늘(2026-07-30) 세 시스템의 판정이 서로 다르다 — 억지로 통일하지
+않고 병기한다**:
+- 이 페이지(G/I/L, CPI 기반): **stagflation**(1957-01형 최근접)
+- Investment Clock(CPI YoY 기반): **Overheat(과열)**, 유리자산 원자재
+- PEOS(미국): **Slowdown**, PEOS(한국): **Early Expansion**
+
+세 시스템이 쓰는 입력 지표·계산식·기준연도가 다르므로 같은 "경제계절"이라는
+말을 써도 직접 비교는 위험하다 — **이 페이지는 계속 G/I/L·역사적
+애널로그 매칭이라는 고유 역할을 유지**하고, Investment Clock·PEOS 판정은
+"다른 방법론의 참고 의견"으로 매일 리포트에 나란히 병기한다(하나로
+합치거나 어느 한쪽을 정답으로 취급하지 않음).
+
 ## 1. G/I/L 국면 점수
 
 ```
