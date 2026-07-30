@@ -72,6 +72,34 @@ tags: [concept, recovery-signals, sk-hynix, nvidia, daily-tracking]
 | 낙폭 정체(더 이상 신저가를 안 만드는가) | **가격 CSV 자동 계산** |
 | 비정상 옵션 거래량(다음 촉매 선점 매수 정황) | 웹검색 — 한국 개별주 옵션 데이터는 자동화·웹검색 모두 접근성 낮음, **참고용 미확인 처리가 기본값** |
 
+## 2-1. 국제 매체·기관 교차검증 (2026-07-30 밤, 사용자 요청 — 한국 외 미국·중국·일본·대만 확대)
+
+한국 매체·기관에만 의존하면 확증편향 위험이 있어, 신뢰할 만한 해외
+매체·기관의 독립적 시각을 교차검증용으로 추가한다. **자국 소스(특히
+중국 매체)는 자국 기업에 유리하게 서술할 유인이 있으므로, 단독 인용
+대신 다른 지역 소스와 겹치는 부분만 채택한다.**
+
+**🇺🇸 미국**
+- [FACT] Bloomberg(2026-07-27) "SK Hynix and Memory Chip Makers Hope AI Breaks the Boom and Bust Cycle" — 이번 사이클이 과거 반도체 붐-버스트와 다른지 심층 분석, 우리 프레임("수요 붕괴가 아니라 리레이팅")과 같은 방향의 독립적 분석.
+- [FACT] Bloomberg(2026-07-27) "SK Hynix's $570 Billion Selloff Shows Cracks in Memory-Chip Boom" — 기사 자체가 **"반등은 AI 지출(CapEx) 확인에 달려있다"**고 명시 — 정확히 이 프레임의 Tier1 논리와 같은 결론에 미국 최상위 경제매체가 독자적으로 도달.
+- [OPINION, Tier2 보강] Benzinga(2026-07-2x) — 저명 테크 투자자 **Dan Niles**가 "이번 SK하이닉스 급락은 강제청산(forced liquidation)에 의한 단기 바닥"이라고 명시적으로 코멘트 — 셀사이드 애널리스트는 아니지만 독립적 신뢰도 있는 시장 참여자의 방어적 코멘트로 Tier2에 포함.
+- [OPINION] Motley Fool(2026-07-29) "Is SK Hynix Stock a Buy After Its Latest Earnings Report?" — 리테일 대상 매체, 신중한 긍정 논조(구체 수치 인용은 확인 안 됨).
+- [FACT, 컨텍스트용] CNBC(2026-07-29) "Chip stocks shed more than $1 trillion" — 하락 규모의 심각성을 보여주는 크로스체크 자료(반박 신호는 아님).
+
+**🇹🇼 대만 (DigiTimes — 반도체 전문 산업매체, 신뢰도 높음)**
+- [FACT] DigiTimes(2026-04-21) "CXMT HBM3 timeline slips, mass production unlikely in 2026" — 대만 반도체 전문매체가 **CXMT의 HBM 양산 지연을 독립적으로 확인** — 우리 위키의 "CXMT 실제 HBM 수율 10~20%" 판단과 같은 방향(중국 소스가 아닌 제3자 확인이라는 점에서 신뢰도 보강).
+- [FACT] DigiTimes(2026-04-09) "CXMT targets 12-layer HBM production by 2027" — **2027년 목표**라는 점에 유의(현재 능력이 아니라 미래 계획) — "당장의 위협"과 "장기 추격 시도"를 구분해서 볼 것.
+
+**🇨🇳 중국 (esmchina.com·163.com 등 현지 산업매체 — 자국 소스 편향 감안, 교차검증 용도로만 사용)**
+- [FACT, 교차검증됨] 중국 소스 스스로도 CXMT의 **1a공정 DDR5·LPDDR5X(범용 D램, HBM 아님) 수율은 80%+**라고 밝히면서 **HBM 자체 수율은 언급하지 않음** — "범용 D램과 HBM은 진입장벽이 다르다"는 우리 프레임을 중국 소스가 스스로 방증(HBM 수율 얘기를 피해간 것 자체가 신호).
+- [FACT] 같은 소스: **삼성전자의 HBM4 완제품 수율도 60% 미만**(1c DRAM 공정 수율 자체는 2026-02 80% 돌파) — HBM4 수율 장벽은 CXMT만의 문제가 아니라 **삼성조차 아직 씨름 중**인 업계 공통 난제 — "한국이 압도적으로 쉽게 앞서있다"는 낙관도, "중국이 곧 따라잡는다"는 공포도 둘 다 과장일 수 있음을 시사.
+- ⚠️ [미검증, 중국 2차 매체 단일소스 — 채택 보류] "SK하이닉스가 HBM4 생산비중을 늦추고 범용 D램으로 전환 중"이라는 주장 발견(esmchina.com) — SK하이닉스 1차 공시·컨콜로 확인되지 않은 단일 중국 매체 소스라 **[FACT]로 승격하지 않고 미확인 상태로만 기록**, 다음 체크에서 1차 소스 검증 시도.
+
+**🇯🇵 일본**
+- [미확인] 이번 조사에서 니케이(日本経済新聞) 등 일본 매체의 SK하이닉스·HBM 사이클 직접 기사는 확보하지 못함. 대신 서방 매체를 통해 **Micron의 히로시마 HBM 신규 공장**(가동 목표 2028년) 관련 보도만 확인 — 일본은 현재 이 프레임에서 "생산기지" 역할로만 언급되고, 자국 매체의 독자적 사이클 전망은 다음 체크에서 재시도.
+
+**종합**: 국제 소스를 넓혀도 기존 판단(Tier1 4건 확인, CXMT의 HBM 특화 약점, 반등 조건은 CapEx 확인)이 뒤집히지 않고 오히려 **다지역·다매체 교차검증으로 신뢰도가 강화**됐다. 다만 SK하이닉스의 "HBM4→범용 D램 전환" 미확인 주장은 다음 체크에서 반드시 검증할 것.
+
 ## 3. 일일 판정 방식
 
 Tier 1 항목 중 **✅(확인)이 하나라도 나오면 "반박 신호 포착"**으로 리포트
@@ -89,6 +117,7 @@ Score·붕괴조건 4개와는 별개 트랙**이지만, Tier 1의 첫 번째·�
 | 2026-07-30 낮(사용자 제공 분석+검증) | **✅ 3건째 확인, 이번이 가장 강력** — **삼성전자 2Q 실적**: DS(반도체) 영업이익 89.2조원(전사의 99.7%) vs MX 영업손실 7,000억원(첫 적자)·DX 영업손실 8,000억원(첫 적자), 원인은 메모리 가격 급등에 따른 원가상승으로 공식 언급 — "AI메모리 수요 피크아웃" 공포를 **삼성 내부 손익으로 직접 반박**(외부 3자 추정이 아니라 실제 회사 재무제표). **SK하이닉스 컨콜**: 10여개 고객 5년 LTA+예치금 이행장치 공식 확인 — "고객 확약이 후퇴하고 있다"는 공포와 정반대 방향 | 변화 없음 | **바닥 다지기 → 반박 신호 누적 단계** — Tier1 확인 건수가 2건→3건으로 늘었고, 이번 삼성 MX 적자는 지금까지 나온 신호 중 **가장 직접적이고 강력**(엔비디아·MS 등 3자 데이터가 아니라 경쟁사 내부 손익 데이터). 다만 여전히 SK하이닉스 주가 자체의 반등은 미확인 — 오후~저녁 가격 반응 여부가 다음 체크의 핵심 관찰 포인트 | [sources/samsung-mx-loss-skhynix-lta-2026-07-30.md](../../sources/samsung-mx-loss-skhynix-lta-2026-07-30.md) |
 | 2026-07-30 13:25(사용자 실시간 차트) | 변화 없음(위 3건 유지) | 변화 없음 | **"소화 지연" 확인 — 신호 나온 지 4시간+ 지났는데 가격은 오히려 더 하락** — 1,331,000원(-5.00%, 전일종가 1,401,000원 대비), RSI(14) **21.04로 극도의 과매도**(CCI -105.70도 동반). 삼성 MX 적자·SK하이닉스 LTA라는 Tier1급 반박 신호가 오전에 나왔음에도 오후 들어 낙폭이 오히려 확대 — 어제 정리한 딥시크 사례(반박신호 후 24시간 내 반등)의 시간창 안에는 아직 있으나, "신호는 있는데 가격이 안 따라온다"는 긴장이 뚜렷해지는 중. RSI·CCI 극단치는 보조지표(반등의 필요조건이지 충분조건은 아님)로만 참고 — 저녁 체크에서 종가 기준 최종 판정 | 사용자 실시간 차트 캡처 |
 | **2026-07-30 19:xx(저녁, 하루 최종 확정치)** | **✅ 4건째 확인 — 이번이 가장 강력한 단일 반박** — **CXMT(창신메모리)의 실제 HBM 수율이 10~20%에 불과하다는 사실 확인**(양산 가능 수준인 60~70%대와 큰 격차) — "중국이 곧 HBM 자립해 SK하이닉스 우위를 잠식한다"는, 이번 폭락을 촉발한 핵심 공포 중 하나를 **경쟁사 실측 데이터로 직접 반박**. 기존 3건(하이퍼스케일러 CapEx 유지, 엔비디아·TSMC 공급망, 삼성 MX/DX 첫 적자+SK하이닉스 LTA)도 유지 | **8개 기관 목표가 하향(전부 "매수" 유지) + 한국투자증권은 오히려 380만→470만원으로 상향** — 방어적 코멘트를 넘어 정반대 방향의 상향 사례가 처음 등장, Tier2 신호 밀도가 오늘 가장 높음 | **바닥 다지기 진행중 (아직 "회복초입"은 아님)** — Tier1 확인 4건(오늘만 2건 추가)·Tier2 최다 밀도·외국인 수급 순매수 전환(+5,861억)·낙폭 둔화(-14.65%→-9.61%→-5.64%→**-5.64%, 종가 1,322,000원**)까지 반박 신호가 사실상 총출동했음에도 **가격은 여전히 종가 기준 하락 마감** — 엄격한 정의(가격이 실제로 방향을 튼다)로는 아직 "회복초입"을 선언할 수 없다. 다만 신호 강도·밀도·외국인 방향전환이 동시에 겹친 것은 이번 폭락 국면 중 오늘이 가장 강한 전환 후보 지점 — 내일 가격이 신호를 따라오는지가 "바닥 다지기→회복초입" 승격의 핵심 관찰 포인트 | CXMT 수율(웹검색), 목표가(체크포인트 페이지 연동), 수급(`sources/sk-hynix-investor-flow.csv`) |
+| **2026-07-30 밤(국제 소스 확대, 사용자 요청)** | 변화 없음(4건 유지), **단 신뢰도 보강** — Bloomberg가 "반등은 CapEx 확인에 달려있다"고 독자적으로 같은 결론 도달, 대만 DigiTimes가 CXMT HBM 양산 지연을 제3자로 재확인, 중국 소스 스스로도 CXMT의 HBM(비범용) 수율은 언급 회피 + 삼성조차 HBM4 수율 60% 미만이라 "업계 공통 난제"임이 드러남 | Dan Niles(미국, Benzinga) "강제청산에 의한 단기 바닥" 코멘트 추가 확인 — Tier2에 해외 독립 인사 코멘트 첫 편입 | **판정 변경 없음(바닥 다지기 진행중 유지)** — 다만 한국 매체·기관에만 의존했을 때보다 다지역 교차검증으로 확신도가 올라감. ⚠️ 신규 미확인 항목 발견: "SK하이닉스 HBM4→범용D램 전환" 주장(중국 매체 단독) — 1차 소스 미확인이라 채택 보류, 다음 체크 검증 대상으로 등록 | Bloomberg·CNBC·Benzinga·Motley Fool(미국), DigiTimes(대만), esmchina.com·163.com(중국) — 상세 인용은 본문 "2-1" 참고 |
 
 ## Sources
 
@@ -97,3 +126,12 @@ Score·붕괴조건 4개와는 별개 트랙**이지만, Tier 1의 첫 번째·�
 - [SK하이닉스 목표주가 근거 체크리스트](sk-hynix-analyst-thesis-checkpoints.md)
 - [HBM Cycle Score & 선행지표 조기경보(HSEWS)](hbm-cycle-score.md)
 - [반도체 시장의 단기 수급 싸이클 vs 장기 펀더멘털](market-cycles-leverage-risk.md)
+- [SK Hynix and Memory Chip Makers Hope AI Breaks the Boom and Bust Cycle - Bloomberg](https://www.bloomberg.com/news/newsletters/2026-07-27/sk-hynix-and-memory-chip-makers-hope-ai-breaks-the-boom-and-bust-cycle)
+- [SK Hynix's $570 Billion Selloff Shows Cracks in Memory-Chip Boom - Bloomberg](https://www.bloomberg.com/news/articles/2026-07-27/sk-hynix-s-rebound-from-470-billion-rout-hinges-on-ai-spending)
+- [Chip stocks shed more than $1 trillion - CNBC](https://www.cnbc.com/2026/07/29/chip-selloff-sk-hynix-samsung-softbank.html)
+- [SK Hynix Slump Marks 'Short-Term Bottom' in AI Stocks, Says Dan Niles - Benzinga](https://www.benzinga.com/markets/equities/26/07/60787722/sk-hynix-slump-marks-short-term-bottom-in-ai-stocks-fueled-by-forced-liquidations-says-dan-niles)
+- [Is SK Hynix Stock a Buy After Its Latest Earnings Report? - The Motley Fool](https://www.fool.com/investing/2026/07/29/is-sk-hynix-stock-a-buy-after-its-latest-earnings-report/)
+- [China's DRAM milestone arrives with CXMT IPO; HBM now separates contenders from leaders - DigiTimes](https://www.digitimes.com/news/a20260717VL203/cxmt-ipo-dram-hbm-manufacturing-ymtc.html)
+- [CXMT HBM3 timeline slips, mass production unlikely in 2026 - DigiTimes](https://www.digitimes.com/news/a20260421PD230/cxmt-hbm3-dram-production-2026.html)
+- [CXMT targets 12-layer HBM production by 2027 - DigiTimes](https://www.digitimes.com/news/a20260409PD229/cxmt-hbm-production-2027-market.html)
+- [SK海力士放缓HBM4、加码常规DRAM，存储产能分配正在发生变化 - 国际电子商情(esmchina.com, 미검증·단일소스)](https://www.esmchina.com/news/14294.html)
