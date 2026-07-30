@@ -1,5 +1,5 @@
 {
-  "consecutive_failures": 2,
+  "consecutive_failures": 3,
   "outage_alerted": false,
   "last_heartbeat_date": "2026-07-29"
 }
