@@ -1,11 +1,11 @@
-"""Notification channel abstraction.
+"""Notification channel abstraction, shared by every scheduled pipeline in this repo.
 
-The daily pipeline always writes the dashboard to docs/ (committed to the
-repo and served via GitHub Pages) — that channel has no dependency on
-secrets and always runs. Push-style notifications (email/Slack) are opt-in:
-implement `NoopChannel` by default, and flip to `EmailChannel` /
-`SlackChannel` by setting the relevant env vars as GitHub Actions secrets.
-No code elsewhere needs to change to switch channels — only
+Each pipeline always writes its dashboard/report to docs/ or report/
+(committed to the repo and served via GitHub Pages) — that channel has no
+dependency on secrets and always runs. Push-style notifications (email/Slack)
+are opt-in: `NoopChannel` is the default (dashboard-only delivery), and it
+flips to `EmailChannel` / `SlackChannel` by setting the relevant env vars as
+GitHub Actions secrets. No caller needs to change to switch channels — only
 `build_channel()`'s env var check.
 """
 from __future__ import annotations

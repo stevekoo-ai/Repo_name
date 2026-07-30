@@ -12,7 +12,9 @@ from pathlib import Path
 
 import pandas as pd
 
-from . import data_sources, notify, report, storage
+from core import notify
+
+from . import data_sources, report, storage
 from .model import build_full_history, read_clock
 from .render import draw_clock, draw_trend_charts
 
