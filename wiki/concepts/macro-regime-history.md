@@ -344,4 +344,5 @@ convergence_pct = (score − min) / (max − min) × 100
 - [scripts/regime_engine.py](../../scripts/regime_engine.py) (G/I/L 계산 및 매칭 엔진)
 - [HBM Cycle Score & 선행지표 조기경보(HSEWS)](hbm-cycle-score.md)
 - [SK하이닉스 주가 상승의 정당성 분석](rally-justification-analysis.md)
+- [트럼프 2026 중간선거 트래커](trump-midterm-tracker.md) (중동·유가 트랙 교차연동)
 - [매크로 지표 트렌드 추적](macro-indicators.md) (2026-07-16까지의 수동 경제캘린더 기록 — 이 페이지가 그 역할을 대부분 흡수)
