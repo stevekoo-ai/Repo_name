@@ -69,12 +69,18 @@ tags: [concept, recovery-signals, sk-hynix, nvidia, daily-tracking]
 먼저 정의하고, 그 공포를 반박할 만한 구체적 데이터를 체크리스트로
 추적한다. 공포 자체가 바뀌면 체크리스트도 바뀐다.
 
-### 현재(2026-07-30 기준) 지배적 공포 2개
+### 현재(2026-07-31 기준) 지배적 공포 2개 — 반박 신호는 누적되나 아직 완전 해소는 아님
 
 1. **"AI 메모리 수요가 피크아웃했다"** — SK하이닉스 실적이 컨센서스에
-   못 미치며 촉발, 7/29~30 미국 반도체 섹터 전체 동반매도로 확산
+   못 미치며 촉발, 7/29~30 미국 반도체 섹터 전체 동반매도로 확산.
+   **7/31 아침 갱신**: 아마존까지 CapEx "significantly higher" 상향
+   확정되며 4대 하이퍼스케일러 전부 CapEx 유지·상향으로 마무리 — 이
+   공포의 핵심 반박 데이터는 사실상 다 나왔다고 볼 수 있음.
 2. **"중국이 D램·장비까지 자립해 3강 체제가 끝난다"** — CXMT IPO +
-   DUV 노광장비 국산화 + 목표가 33% 하향(미래에셋)으로 격상
+   DUV 노광장비 국산화 + 목표가 33% 하향(미래에셋)으로 격상.
+   **7/31 아침 갱신**: HBM 수율(~25%)·양산목표(2027년) 등 반박 근거가
+   더 정밀해짐 — 단 범용 D램 위협 축은 여전히 유효해 공포 자체가
+   완전히 해소된 건 아님.
 
 ### Tier 1 — 직접 반박 신호 (최우선 매일 체크)
 
@@ -132,6 +138,7 @@ Tier2보다는 강하지만, 외부 데이터가 아니라 내부자 판단이�
 - [OPINION, Tier2 보강] Benzinga(2026-07-2x) — 저명 테크 투자자 **Dan Niles**가 "이번 SK하이닉스 급락은 강제청산(forced liquidation)에 의한 단기 바닥"이라고 명시적으로 코멘트 — 셀사이드 애널리스트는 아니지만 독립적 신뢰도 있는 시장 참여자의 방어적 코멘트로 Tier2에 포함.
 - [OPINION] Motley Fool(2026-07-29) "Is SK Hynix Stock a Buy After Its Latest Earnings Report?" — 리테일 대상 매체, 신중한 긍정 논조(구체 수치 인용은 확인 안 됨).
 - [FACT, 컨텍스트용] CNBC(2026-07-29) "Chip stocks shed more than $1 trillion" — 하락 규모의 심각성을 보여주는 크로스체크 자료(반박 신호는 아님).
+- [FACT, 2026-07-31 추가] SemiAnalysis "China's CXMT Is Set to Challenge DRAM Incumbents" — 미국 반도체 전문 리서치 매체가 **CXMT 월 웨이퍼 투입량의 2% 미만만 HBM에 배정**, HBM3 8-hi 추정 수율 **약 25%**라고 구체 수치로 확인 — 어제까지의 "10~20%" 추정보다 더 정밀한 독립 확인.
 
 **🇹🇼 대만 (DigiTimes — 반도체 전문 산업매체, 신뢰도 높음)**
 - [FACT] DigiTimes(2026-04-21) "CXMT HBM3 timeline slips, mass production unlikely in 2026" — 대만 반도체 전문매체가 **CXMT의 HBM 양산 지연을 독립적으로 확인** — 우리 위키의 "CXMT 실제 HBM 수율 10~20%" 판단과 같은 방향(중국 소스가 아닌 제3자 확인이라는 점에서 신뢰도 보강).
@@ -166,6 +173,7 @@ Score·붕괴조건 4개와는 별개 트랙**이지만, Tier 1의 첫 번째·�
 | **2026-07-30 19:xx(저녁, 하루 최종 확정치)** | **✅ 4건째 확인 — 이번이 가장 강력한 단일 반박** — **CXMT(창신메모리)의 실제 HBM 수율이 10~20%에 불과하다는 사실 확인**(양산 가능 수준인 60~70%대와 큰 격차) — "중국이 곧 HBM 자립해 SK하이닉스 우위를 잠식한다"는, 이번 폭락을 촉발한 핵심 공포 중 하나를 **경쟁사 실측 데이터로 직접 반박**. 기존 3건(하이퍼스케일러 CapEx 유지, 엔비디아·TSMC 공급망, 삼성 MX/DX 첫 적자+SK하이닉스 LTA)도 유지 | **8개 기관 목표가 하향(전부 "매수" 유지) + 한국투자증권은 오히려 380만→470만원으로 상향** — 방어적 코멘트를 넘어 정반대 방향의 상향 사례가 처음 등장, Tier2 신호 밀도가 오늘 가장 높음 | **바닥 다지기 진행중 (아직 "회복초입"은 아님)** — Tier1 확인 4건(오늘만 2건 추가)·Tier2 최다 밀도·외국인 수급 순매수 전환(+5,861억)·낙폭 둔화(-14.65%→-9.61%→-5.64%→**-5.64%, 종가 1,322,000원**)까지 반박 신호가 사실상 총출동했음에도 **가격은 여전히 종가 기준 하락 마감** — 엄격한 정의(가격이 실제로 방향을 튼다)로는 아직 "회복초입"을 선언할 수 없다. 다만 신호 강도·밀도·외국인 방향전환이 동시에 겹친 것은 이번 폭락 국면 중 오늘이 가장 강한 전환 후보 지점 — 내일 가격이 신호를 따라오는지가 "바닥 다지기→회복초입" 승격의 핵심 관찰 포인트 | CXMT 수율(웹검색), 목표가(체크포인트 페이지 연동), 수급(`sources/sk-hynix-investor-flow.csv`) |
 | **2026-07-30 밤(국제 소스 확대, 사용자 요청)** | 변화 없음(4건 유지), **단 신뢰도 보강** — Bloomberg가 "반등은 CapEx 확인에 달려있다"고 독자적으로 같은 결론 도달, 대만 DigiTimes가 CXMT HBM 양산 지연을 제3자로 재확인, 중국 소스 스스로도 CXMT의 HBM(비범용) 수율은 언급 회피 + 삼성조차 HBM4 수율 60% 미만이라 "업계 공통 난제"임이 드러남 | Dan Niles(미국, Benzinga) "강제청산에 의한 단기 바닥" 코멘트 추가 확인 — Tier2에 해외 독립 인사 코멘트 첫 편입 | **판정 변경 없음(바닥 다지기 진행중 유지)** — 다만 한국 매체·기관에만 의존했을 때보다 다지역 교차검증으로 확신도가 올라감. ⚠️ 신규 미확인 항목 발견: "SK하이닉스 HBM4→범용D램 전환" 주장(중국 매체 단독) — 1차 소스 미확인이라 채택 보류, 다음 체크 검증 대상으로 등록 | Bloomberg·CNBC·Benzinga·Motley Fool(미국), DigiTimes(대만), esmchina.com·163.com(중국) — 상세 인용은 본문 "2-1" 참고 |
 | **2026-07-30 밤(사용자 제보, 속보)** | 변화 없음(4건 유지) | 변화 없음 | **신규 Tier1.5 신호 등장 — 최태원 SK그룹 회장이 SK하이닉스 보통주 3,620주(약 47.9억원)를 개인 명의로 첫 장내매수**("책임경영 차원", 복수 매체 교차확인). 엔비디아 6사례엔 없던 "지배주주 내부자 매수" 유형이라 위 Tier1.5로 별도 신설해 기록 — 방향은 긍정이나 금액(47.9억원)이 시총(약 96조원) 대비 미미해 **종합판정("바닥 다지기 진행중")을 바꿀 만한 규모는 아님**, 상징적 신호로만 반영 | [sources/choi-taewon-sk-hynix-insider-buy-2026-07-30.md](../../sources/choi-taewon-sk-hynix-insider-buy-2026-07-30.md) |
+| **2026-07-31 07:xx(아침, 풀버전)** | **✅ Tier1 4건 유지 + 강도 보강** — ①하이퍼스케일러 CapEx: 아마존까지 확정되며 4개사 전부 완결(AWS+37%·CapEx "significantly higher") ②엔비디아·TSMC 공급망: CoWoS 캐파 60% 확보 재확인 ③삼성 MX/DX 적자+SK LTA: 변동없음 ④CXMT HBM 반박: 월투입 2%미만·수율 25%·2027년 양산목표로 더 정밀해짐(SemiAnalysis·TechTimes 등 해외 산업매체 교차확인) | 목표가 8개 하향+한투 상향 유지(변동없음) | **판정 유지 — 바닥 다지기 진행중**. 시장 개장 전이라 가격 반응은 아직 관찰 불가(장초반 체크로 이월). Tier1 신호 자체는 이번 폭락 국면 중 오늘 아침이 누적 강도상 최고 수준 — 오늘 실제 개장 후 가격이 이 신호들을 따라오는지가 "바닥다지기→회복초입" 승격의 핵심 관찰 포인트 | 웹검색(아마존 실적·CXMT 정밀데이터) |
 
 ## Sources
 
@@ -178,6 +186,9 @@ Score·붕괴조건 4개와는 별개 트랙**이지만, Tier 1의 첫 번째·�
 - [SK Hynix's $570 Billion Selloff Shows Cracks in Memory-Chip Boom - Bloomberg](https://www.bloomberg.com/news/articles/2026-07-27/sk-hynix-s-rebound-from-470-billion-rout-hinges-on-ai-spending)
 - [Chip stocks shed more than $1 trillion - CNBC](https://www.cnbc.com/2026/07/29/chip-selloff-sk-hynix-samsung-softbank.html)
 - [SK Hynix Slump Marks 'Short-Term Bottom' in AI Stocks, Says Dan Niles - Benzinga](https://www.benzinga.com/markets/equities/26/07/60787722/sk-hynix-slump-marks-short-term-bottom-in-ai-stocks-fueled-by-forced-liquidations-says-dan-niles)
+- [China's CXMT Is Set to Challenge DRAM Incumbents - SemiAnalysis](https://newsletter.semianalysis.com/p/chinas-cxmt-is-set-to-challenge-dram)
+- [CXMT Debuts at $489B: DoD Ban and Three-Year HBM Deficit Trail the Pop - TechTimes](https://www.techtimes.com/articles/321667/20260727/cxmt-debuts-489b-dod-ban-three-year-hbm-deficit-trail-pop.htm)
+- [Amazon Q2 Earnings Meet: Revenue, AWS Beat; 2026 Capex Guide Jumps - ValueSense](https://valuesense.io/news/amazon-q2-earnings-meet-revenue-aws-beat-2026-capex-guide-jumps)
 - [Is SK Hynix Stock a Buy After Its Latest Earnings Report? - The Motley Fool](https://www.fool.com/investing/2026/07/29/is-sk-hynix-stock-a-buy-after-its-latest-earnings-report/)
 - [China's DRAM milestone arrives with CXMT IPO; HBM now separates contenders from leaders - DigiTimes](https://www.digitimes.com/news/a20260717VL203/cxmt-ipo-dram-hbm-manufacturing-ymtc.html)
 - [CXMT HBM3 timeline slips, mass production unlikely in 2026 - DigiTimes](https://www.digitimes.com/news/a20260421PD230/cxmt-hbm3-dram-production-2026.html)
