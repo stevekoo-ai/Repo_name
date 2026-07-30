@@ -24,6 +24,7 @@ import argparse
 from datetime import date
 from pathlib import Path
 
+from core import notify
 from core.config import report_config
 from core.logger import log_event
 from . import daily_history, exporters, payload as payload_mod
@@ -31,6 +32,29 @@ from .html_new import render_html
 from .markdown import render_markdown
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
+
+
+def _notify_summary(payload: dict) -> None:
+    """Push a short summary via the configured notification channel (see core/notify.py).
+
+    Defaults to a no-op — the dashboard/report files are the always-on delivery
+    mechanism, this is only active once SMTP_*/NOTIFY_EMAIL_TO (or
+    SLACK_WEBHOOK_URL) are set as GitHub Actions secrets.
+    """
+    macro, macro_us, personal = payload["macro"], payload["macro_us"], payload["personal"]
+    subject = (
+        f"[PEOS 리포트] {payload['report_month']} — "
+        f"한국 {macro['regime']} / 미국 {macro_us['regime']} ({payload['report_readiness']})"
+    )
+    body = (
+        f"한국 Regime: {macro['regime']} (점수 {macro['score']}, 신뢰도 {macro['confidence']:.1f})\n"
+        f"미국 Regime: {macro_us['regime']} (점수 {macro_us['score']}, 신뢰도 {macro_us['confidence']:.1f})\n"
+        f"투자환경 점수: {personal['investment_environment_score']}\n"
+        f"반도체 점수: {personal['semiconductor_score']} ({personal['semiconductor_band']})\n"
+        f"액션 아이템: {len(payload['actions'])}건\n\n"
+        f"전체 리포트: report/{payload['report_month']}.md (GitHub Pages: docs/report.html)"
+    )
+    notify.build_channel().send(subject, body)
 
 
 def run(month_key: str | None = None, archive: bool = True, archive_date: str | None = None) -> dict[str, Path]:
@@ -68,6 +92,9 @@ def run(month_key: str | None = None, archive: bool = True, archive_date: str | 
               readiness=payload["report_readiness"], html=str(html_path),
               markdown=str(md_path), json=str(json_path),
               archived_as=archive_date if archive else None)
+
+    _notify_summary(payload)
+
     return result
 
 
