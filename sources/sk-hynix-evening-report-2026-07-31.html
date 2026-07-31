@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>[SK하이닉스 Daily Monitor] 저녁 - 2026-07-31 19:20</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif; background:linear-gradient(135deg,#667eea 0%,#764ba2 100%); padding:20px; min-height:100vh; color:#333; }
+.container { max-width:1000px; margin:0 auto; background:white; border-radius:12px; box-shadow:0 20px 60px rgba(0,0,0,0.3); overflow:hidden; }
+.header { background:linear-gradient(135deg,#1e3c72 0%,#2a5298 100%); color:white; padding:28px; text-align:center; }
+.header h1 { font-size:22px; margin-bottom:8px; font-weight:700; }
+.header .date { font-size:13px; opacity:0.9; }
+.content { padding:28px; }
+.section { margin-bottom:26px; }
+.section-title { font-size:17px; font-weight:700; color:#1e3c72; margin-bottom:12px; padding-bottom:8px; border-bottom:3px solid #667eea; }
+.subsection-title { font-size:14px; font-weight:700; color:#1e3c72; margin:16px 0 8px; }
+.metric { background:#f8f9fa; padding:14px; border-radius:8px; margin-bottom:10px; border-left:4px solid #667eea; }
+.metric.positive { border-left-color:#27ae60; } .metric.warn { border-left-color:#f39c12; } .metric.negative { border-left-color:#e74c3c; }
+.metric-label { font-size:11px; color:#666; text-transform:uppercase; font-weight:600; }
+.metric-value { font-size:18px; font-weight:700; color:#1e3c72; margin-top:4px; }
+.positive { color:#27ae60; } .negative { color:#e74c3c; } .warn { color:#f39c12; }
+.fact { display:inline-block; background:#1e3c72; color:white; font-size:10px; font-weight:700; padding:2px 7px; border-radius:4px; margin-right:6px; }
+.opinion { display:inline-block; background:#8e6bbf; color:white; font-size:10px; font-weight:700; padding:2px 7px; border-radius:4px; margin-right:6px; }
+.unver { display:inline-block; background:#c0561a; color:white; font-size:10px; font-weight:700; padding:2px 7px; border-radius:4px; margin-right:6px; }
+.fixpend { display:inline-block; background:#555; color:white; font-size:10px; font-weight:700; padding:2px 7px; border-radius:4px; margin-right:6px; }
+.diagnosis { background:linear-gradient(135deg,#667eea15 0%,#764ba215 100%); border-left:4px solid #667eea; padding:18px; border-radius:8px; }
+.diagnosis-title { font-size:13px; color:#666; text-transform:uppercase; font-weight:600; margin-bottom:8px; }
+.diagnosis-text { font-size:15px; font-weight:600; color:#1e3c72; line-height:1.7; }
+.footer { background:#f8f9fa; padding:16px; text-align:center; border-top:1px solid #e9ecef; font-size:11px; color:#999; }
+table { width:100%; border-collapse:collapse; font-size:13px; }
+th { padding:9px; text-align:left; font-weight:600; background:#f8f9fa; }
+td { padding:9px; border-bottom:1px solid #e9ecef; vertical-align:top; }
+.deepdive { background:linear-gradient(135deg,#1e3c7208 0%,#8e6bbf10 100%); border:2px dashed #8e6bbf; border-radius:10px; padding:20px; }
+.deepdive .section-title { border-bottom-color:#8e6bbf; }
+.item { font-size:13px; line-height:1.6; margin-bottom:8px; }
+.scorebox { background:linear-gradient(135deg,#2e7d4f 0%,#1e5c38 100%); color:white; border-radius:10px; padding:20px; text-align:center; margin-bottom:12px; }
+.scorebox .num { font-size:40px; font-weight:800; line-height:1; }
+.scorebox .grade { font-size:13px; font-weight:700; margin-top:5px; opacity:0.95; }
+.breakcond { display:flex; gap:8px; margin-top:10px; flex-wrap:wrap; }
+.breakcond .pill { flex:1; min-width:180px; background:#f8f9fa; border-radius:8px; padding:8px 10px; font-size:11px; border-left:3px solid #27ae60; }
+.breakcond .pill.hit { border-left-color:#e74c3c; background:#fdecea; }
+.table-wrap { overflow-x:auto; }
+.macro-headline { background:linear-gradient(135deg,#2a3b8f10 0%,#1e3c7210 100%); border:1px solid #d8dcf0; border-radius:10px; padding:20px; }
+.macro-story { font-size:14px; line-height:1.75; color:#2a2f4a; margin-bottom:16px; }
+.macro-story .sign { font-style:italic; color:#8e6bbf; font-size:12px; display:block; margin-top:8px; text-align:right; }
+.gil-row { display:flex; gap:10px; margin-bottom:16px; flex-wrap:wrap; }
+.gil-gauge { flex:1; min-width:140px; background:white; border-radius:8px; padding:12px; text-align:center; border:1px solid #e5e7f5; }
+.gil-gauge .label { font-size:10px; color:#888; font-weight:700; letter-spacing:0.05em; }
+.gil-gauge .val { font-size:22px; font-weight:800; color:#1e3c72; margin:4px 0; }
+.gil-gauge .arrow { font-size:11px; }
+.quadrant-badge { display:inline-block; background:#f39c12; color:white; font-size:12px; font-weight:700; padding:4px 12px; border-radius:20px; }
+.analogue-card { background:white; border:1px solid #e5e7f5; border-radius:8px; padding:14px; margin-bottom:10px; }
+.analogue-card .period { font-size:14px; font-weight:800; color:#1e3c72; }
+.analogue-card .dist { font-size:11px; color:#999; margin-left:6px; }
+.scenario-grid { display:flex; flex-direction:column; gap:8px; margin-top:10px; }
+.scenario-cell { border-radius:6px; padding:10px 12px; font-size:12px; line-height:1.6; }
+.scenario-cell.risk-up { background:#fdecea; color:#8a2b1f; }
+.scenario-cell.risk-down { background:#eaf7ef; color:#1f6b3a; }
+.scenario-cell.up-up { background:#eef3ff; color:#1f3f8a; }
+.scenario-cell.up-down { background:#f4f1fb; color:#4a3a7a; }
+.scenario-cell b { display:block; font-size:10.5px; margin-bottom:3px; }
+.conv { text-align:center; margin-top:12px; padding:10px; background:#fdecea; border-radius:8px; font-size:12px; color:#8a2b1f; font-weight:600; line-height:1.6; }
+.alert-banner { background:linear-gradient(135deg,#2e7d4f 0%,#1e5c38 100%); color:white; border-radius:10px; padding:16px 20px; margin-bottom:20px; font-size:14px; font-weight:700; text-align:center; line-height:1.6; }
+.recovery-banner { background:linear-gradient(135deg,#8e6bbf 0%,#5f4487 100%); color:white; border-radius:10px; padding:16px 20px; margin-bottom:20px; font-size:14px; font-weight:700; text-align:center; line-height:1.6; }
+.portfolio-row td.fav { color:#27ae60; font-weight:700; }
+.portfolio-row td.unfav { color:#e74c3c; font-weight:700; }
+.portfolio-row td.neu { color:#888; font-weight:700; }
+.recovery-box { background:#fff8ee; border:1px solid #f0dfc0; border-radius:10px; padding:16px; }
+.tier1 { border-left:4px solid #27ae60; background:#eaf7ef; padding:10px 12px; border-radius:6px; margin-bottom:6px; font-size:12.5px; line-height:1.6; }
+.tier2 { border-left:4px solid #f39c12; background:#fff6e5; padding:10px 12px; border-radius:6px; margin-bottom:6px; font-size:12.5px; line-height:1.6; }
+.verdict-banner { background:linear-gradient(135deg,#8e6bbf 0%,#5f4487 100%); color:white; border-radius:10px; padding:14px 18px; text-align:center; font-size:14px; font-weight:700; margin-top:12px; line-height:1.6; }
+.season-card { background:#f4f1fb; border:1px solid #e0d8f5; border-radius:10px; padding:14px 16px; margin-bottom:10px; }
+.season-card .name { font-size:13px; font-weight:800; color:#4a3a7a; }
+.us-detail { background:#eef3ff; border-left:4px solid #1f3f8a; padding:14px 16px; border-radius:8px; margin-bottom:10px; font-size:13px; line-height:1.75; color:#1f2a52; }
+.us-detail .moves { margin-top:8px; font-size:12px; color:#3a4680; }
+.kr-outlook { background:#fff4f0; border-left:4px solid #c0561a; padding:14px 16px; border-radius:8px; font-size:13px; line-height:1.75; color:#5a3420; }
+.tp-card { background:#fff; border:1px solid #e9ecef; border-left:4px solid #27ae60; border-radius:8px; padding:12px 14px; margin-bottom:10px; }
+.tp-card.down { border-left-color:#e74c3c; }
+.tp-card.unver { border-left-color:#c0561a; }
+.tp-head { display:flex; justify-content:space-between; align-items:baseline; flex-wrap:wrap; gap:6px; }
+.tp-firm { font-size:13.5px; font-weight:800; color:#1e3c72; }
+.tp-price { font-size:15px; font-weight:800; color:#1e3c72; }
+.tp-delta { font-size:11px; font-weight:700; margin-left:6px; }
+.tp-basis { font-size:12px; color:#555; margin-top:6px; line-height:1.65; }
+.tp-opinion { font-size:12px; color:#5f4487; margin-top:6px; line-height:1.65; background:#f4f1fb; padding:8px 10px; border-radius:6px; }
+.trump-timeline-cat { margin-bottom:16px; }
+.trump-timeline-cat .cat-head { font-size:13.5px; font-weight:800; color:#c0392b; margin-bottom:6px; }
+.trump-timeline-cat table { font-size:11.5px; }
+.trump-timeline-cat td.tdate { white-space:nowrap; color:#888; font-size:11px; }
+.trump-timeline-cat td.tstat { white-space:nowrap; font-weight:700; }
+.peos-section-head { font-size:12.5px; font-weight:700; color:#4a3a7a; margin:12px 0 6px; }
+.peos-dash-table { font-size:11.5px; }
+.peos-dash-table td, .peos-dash-table th { padding:5px 7px; }
+.peos-regime-box { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:10px; }
+.peos-regime-box .box { flex:1; min-width:150px; background:white; border:1px solid #e0d8f5; border-radius:8px; padding:10px 12px; text-align:center; }
+.peos-regime-box .box .r { font-size:16px; font-weight:800; color:#4a3a7a; margin:2px 0; }
+.peos-regime-box .box .c { font-size:11px; color:#888; }
+</style>
+</head>
+<body>
+<div class="container">
+<div class="header">
+<h1>[SK하이닉스 Daily Monitor] 저녁</h1>
+<div class="date">2026-07-31 19:20 KST (금, 하루 최종 확정치)</div>
+</div>
+<div class="content">
+
+<div class="alert-banner">🚀🚀 SK하이닉스 종가 확정 1,718,000원(+29.95%, 상한가) — 17년 만의 첫 상한가<br><span style="font-weight:500;font-size:12.5px;opacity:0.95;">삼성전자 +25.6~27%·삼성전기 동반 상한가("코스피 톱5 중 3개 상한가") · 외국인 체결기준 +3조 5,883억원 순매수(KIS API 수집 이래 단일 최대) · HBM Cycle Score 63→69/100</span></div>
+
+<div class="recovery-banner">🟣 패닉 회복 신호 종합판정: "바닥 다지기 진행중" → <b>"회복 초입"으로 공식 승격</b><br><span style="font-weight:500;font-size:12px;">근거: Tier1 6건 유지+가격이 상한가로 강하게 동반 반응. 단 지속성은 미확정 — 국내 언론 "기술적 되돌림·과열 경계" 신중론도 함께 기록</span></div>
+
+<div class="section">
+<div class="section-title">1. SK하이닉스 주가 현황 — 오늘 아침 리포트 대비 새로 추가된 것</div>
+<div class="metric positive">
+<div class="metric-label">종가 확정 (CSV, KIS API)</div>
+<div class="metric-value positive">1,718,000원 (+396,000원, +29.95%)</div>
+<div style="font-size:12px; color:#666; margin-top:6px;">전일(1,322,000원, -5.64%) 대비 <b>상한가(17년 만의 첫 상한가)</b>. 250일 최고가(2,987,000원, 6/25) 대비 드로다운 -42.48%로 대폭 축소(어제 -55.74%). 거래량 10,347,350주.</div>
+</div>
+<div class="metric positive">
+<div class="metric-label">🔧 데이터 파이프라인 — PR #35 병합 확인(오늘 아침 보고했던 두 버그 모두 해결)</div>
+<div style="font-size:13px; margin-top:6px; line-height:1.7;">
+<span class="fact">FACT</span>`git merge origin/main` 결과 <b>PR #35(KIS 토큰 재발급 충돌·ADR 0.0% 버그 수정)가 오늘 06:22 KST 병합 완료</b>됐음을 확인. ADR CSV는 7/31행부터 <b>$158.20(+6.17%, 전일종가 $149.00)</b>로 정상화, `portfolio-holdings.csv`도 7/27 3일 정체를 해소하고 오늘(09:23 KST) 갱신분을 확보했다.<br>
+<span class="opinion">OPINION</span>이 브랜치가 main보다 51커밋 뒤처져 있던 것도 오늘 이 merge로 처음 확인·해소했다 — 앞으로는 매 체크마다 `git merge origin/main`을 거치지 않으면 CSV가 스탈될 수 있다는 걸 재확인.
+</div>
+</div>
+<div class="metric positive">
+<div class="metric-label">수급 확정 — KIS API 수집 이래 단일 최대</div>
+<div style="font-size:13px; margin-top:6px; line-height:1.7;">
+<span class="fact">FACT</span>외국인 체결기준 <b>+3조 5,883억원 순매수(2,170,716주)</b>, 기관 +5,447억원. 개인은 -4조 1,036억원 순매도(체결기준 -2,452,928주) — 급락장 투매가 아니라 <b>상한가 랠리 중 차익실현</b> 성격(국내 언론도 "차익실현"으로 표현). 20일 누적 외국인 순매도는 -10.54조→<b>-5.30조</b>로 하루 만에 절반 가까이 축소.
+</div>
+</div>
+</div>
+
+<div class="section">
+<div class="section-title">2. 🌐 오늘의 매크로 헤드라인</div>
+<div class="macro-headline">
+<div class="macro-story">
+"아침 카드를 재사용하되, 오늘 하루 확인된 것으로 체크리스트를 갱신합니다. 거시 국면(G/I/L) 자체는 스택플레이션으로 변동 없습니다만, 오늘의 진짜 이야기는 거시가 아니라 <b>미국 반도체 섹터 전체의 재평가</b>였습니다 — 마이크로소프트·아마존의 잇따른 CapEx 확인이 SOX를 +8.19% 밀어올렸고, 그 온기가 한국 반도체주 상한가로 이어졌습니다. 여기에 삼성전자의 '2028년까지 공급부족 지속' 가이던스까지 겹치며, 이번 폭락 국면을 촉발했던 두 공포('AI 메모리 수요 피크아웃', '중국의 HBM 자립')에 대한 반박 데이터와 가격이 오늘 처음으로 함께 움직였습니다."
+<span class="sign">— 오늘의 브리핑, 비서 올림</span>
+</div>
+
+<div class="subsection-title">2-1. 🇺🇸 미국 시장 진행상황 (하루 최종 확정)</div>
+<div class="us-detail">
+<span class="fact">FACT</span><b>필라델피아 반도체지수(SOX) +8.19%</b> — 마이크론+18.36%·샌디스크+25.99%·AMD+13.00%·인텔+11.30% 등 미국 반도체주 전반이 두 자릿수로 급등, 특정 종목이 아닌 섹터 전체 재평가로 확인됐다.
+<div class="moves"><b>마이크로소프트 FY26 Q4</b>: 매출 $90B(+18%)·EPS $4.81(+32%), Azure+43%YoY(2022년초 이후 최고성장, 연 $100B 최초돌파), AI capex 분기 $41B·2026 가이던스 ~$190B 재확인 — 아마존에 이은 두 번째 CapEx 확인.</div>
+<br><span class="opinion">OPINION</span>구글·메타·MS·아마존 4대 하이퍼스케일러 중 이번 주에만 2곳(MS·아마존)이 연달아 실적으로 CapEx 의지를 재확인 — "AI 인프라 투자 둔화" 공포에 대한 반박이 사실상 완결됐다고 볼 수 있다.
+</div>
+
+<div class="subsection-title">2-2. 🇰🇷 오늘 한국장 전망 (종가 확정)</div>
+<div class="kr-outlook">
+<span class="fact">FACT</span>코스피 09:15 기준 +13%(6,320.82)까지 급등, <b>매수 사이드카 발동</b>. SK하이닉스는 15:12 +29.95%를 거쳐 <b>종가 1,718,000원(+29.95%, 상한가) 확정</b> — 17년 만의 첫 상한가. 삼성전자 +25.6~27%·삼성전기 동반 상한가, "코스피 톱5 중 3개 상한가" 진기록.
+<br><br><span class="opinion">OPINION</span>업계 코멘트는 신중한 편이다 — "실적 개선보다 낙폭과대 되돌림·기술적 반등 성격이 강하다", "정상 범위를 넘는 변동성 자체를 주시해야 한다"는 지적이 나온다. 개인 투자자도 오늘 대규모 차익실현(-4.10조원)에 나섰다 — 상한가는 확정 사실이지만, 이게 하루짜리 반등인지 추세 전환의 시작인지는 <b>내일 이후 며칠이 결정</b>한다.
+</div>
+
+<div class="gil-row">
+<div class="gil-gauge"><div class="label">G · 성장</div><div class="val">-0.1</div><div class="arrow">변동없음</div></div>
+<div class="gil-gauge"><div class="label">I · 물가</div><div class="val">+0.0083</div><div class="arrow">변동없음</div></div>
+<div class="gil-gauge"><div class="label">L · 유동성</div><div class="val">+0.13</div><div class="arrow">변동없음</div></div>
+</div>
+<div style="text-align:center; margin-bottom:16px;"><span class="quadrant-badge">⚠ STAGFLATION (유지)</span> <span style="font-size:11px; color:#999; margin-left:8px;">target 2026-06 · 1957-01형 최근접 · 재계산 없음(비용절감)</span></div>
+
+<div class="analogue-card">
+<span class="period">① 1957년 1월</span><span class="dist">거리 0.145 · 최근접</span>
+<div class="scenario-grid">
+<div class="scenario-cell risk-up"><b>🔴 위험↑</b>신용스프레드 확대+산업생산·소비심리 둔화 <span style="opacity:0.7;">(⏳ 미확인)</span></div>
+<div class="scenario-cell risk-down"><b>🟢 위험↓</b>브렌트유 급속 레벨다운, 6월 PCE 디스인플레 지속 <b>진행중</b></div>
+<div class="scenario-cell up-up"><b>🚀 상승기대↑</b>아마존·MS 연속 CapEx 확정 <b>가격에 반영(상한가)</b></div>
+<div class="scenario-cell up-down"><b>📉 상승기대↓</b>SOX 약세장 진입 서사는 오늘 급등으로 사실상 반박 <b>완화</b></div>
+</div>
+</div>
+
+<div class="conv">📉 수렴도(convergence): <b>-25% 유지</b><br><span style="font-weight:500;font-size:11.5px;">아침 카드 재사용, 8월 CPI 확인 전까지 보수적 유지</span></div>
+</div>
+</div>
+
+<div class="section">
+<div class="section-title">3. 🚨 HBM Cycle Score (하루 최종 확정치)</div>
+<div class="scorebox">
+<div class="num">69<span style="font-size:20px;">/100</span></div>
+<div class="grade">경계(60~80) 🔺+6</div>
+</div>
+<div class="table-wrap">
+<table>
+<tr><th>축</th><th>배점</th><th>비고</th></tr>
+<tr><td>외국인수급</td><td>8/15 <span class="positive">(4→8)</span></td><td>🟢🟢 오늘 하루 +3조 5,883억원 순매수(KIS API 이래 최대), 20일 누적 -10.54조→-5.30조</td></tr>
+<tr><td>보유율</td><td>6/15 <span class="positive">(5→6)</span></td><td>50.77%→50.86%, 소폭 순증</td></tr>
+<tr><td>ASP</td><td>20/25</td><td>변동없음</td></tr>
+<tr><td>엔비디아&amp;CoWoS</td><td>20/25</td><td>변동없음, 오늘 신규 뉴스 없음</td></tr>
+<tr><td>공급확대</td><td>5/10 <span class="positive">(4→5)</span></td><td>삼성전자 "2028년까지 공급부족 지속" 가이던스로 근접 과잉 리스크 추가 완화</td></tr>
+<tr><td>고객재고</td><td>10/10</td><td>MS도 CapEx 재확인, 아마존에 이은 2번째</td></tr>
+</table>
+</div>
+<div class="breakcond">
+<div class="pill">①ASP5%+하락 <b class="positive">미충족</b></div>
+<div class="pill">②엔비디아주문-10% <b class="positive">미충족</b></div>
+<div class="pill">③CoWoS95%이하 <b class="positive">미충족</b></div>
+<div class="pill hit">④외국인20일순매도 <b class="negative">🔴 충족(단, 급속 완화중)</b></div>
+</div>
+<div style="font-size:12px; color:#666; margin-top:8px;"><b>붕괴조건 🔴 1/4 유지</b> — 20일 누적이 아직 마이너스라 공식 충족이나, 오늘 하루 만에 절반 가까이 축소된 속도는 이례적. 이 추세가 이어지면 며칠 내 해소 가능.</div>
+</div>
+
+<div class="section">
+<div class="section-title">4. 🔄 패닉 회복 신호 체크 (하루 최종 확정치)</div>
+<div class="recovery-box">
+<div class="tier1"><span class="fact">Tier1</span><b>6건 전부 유지</b>, 신규 반박 추가 없음(오늘 오후 이후 새 소식 없음) — ①하이퍼스케일러 CapEx(아마존+MS) ②엔비디아·CoWoS ③삼성 MX/DX 적자+LTA ④CXMT HBM 반박 ⑤삼성 2028년 공급부족 가이던스</div>
+<div class="tier2"><span class="opinion">Tier2</span>목표가 스펙트럼 변동없음(어제 확정치 유지 — 상한가 직후라 애널리스트 코멘트는 아직 미발표 가능성, 내일 이후 확인)</div>
+<div class="item" style="font-size:12px; color:#666;">보조지표: 종가 기준 상한가+거래량 10,347,350주로 신호와 가격이 명확히 동반. "소화 지연" 아님 — 오늘은 신호가 나오자마자 가격이 바로 따라온 하루.</div>
+<div class="verdict-banner">🟣 종합판정: "바닥 다지기 진행중" → <b>"회복 초입"으로 공식 승격</b><br><span style="font-weight:500;font-size:12px;">§3 정의("Tier1 확인+가격 동반 반응")를 가장 강하게 충족한 사례(상한가). 단 개인 대규모 차익실현(-4.10조)과 언론의 "기술적 되돌림" 신중론도 함께 기록 — 내일 이후 지속 여부가 "회복 진행중"으로의 추가 승격 여부를 결정</span></div>
+</div>
+</div>
+
+<div class="section">
+<div class="section-title">5. ⚡ 선행지표: 엔비디아 주문 &amp; CoWoS</div>
+<div class="item"><span class="opinion">OPINION</span>오늘 신규 확인된 뉴스 없음 — 기존 Bullish 판정 유지(CoWoS 완전예약, 엔비디아 60% 확보).</div>
+</div>
+
+<div class="section">
+<div class="section-title">6. 🌐 하이퍼스케일러 고객 동향</div>
+<div class="item">🇺🇸 <span class="fact">FACT</span><b>마이크로소프트 FY26 Q4</b> 매출 $90B(+18%)·EPS $4.81(+32%)·Azure+43%(연 $100B 최초돌파)·AI capex 분기 $41B, 2026 가이던스 ~$190B 재확인 — 재고 센티먼트 9/10.</div>
+<div class="item">🇨🇳 <span class="fact">FACT</span>오늘 신규 확인 없음 — 기존 판정 유지.</div>
+</div>
+
+<div class="section">
+<div class="section-title">7. FACT vs OPINION 매트릭스 (9개 체크포인트, 하루 최종 확정치)</div>
+<div class="table-wrap">
+<table>
+<tr><th>#</th><th>항목</th><th>확인된 사실 [FACT]</th><th>SK하이닉스 영향 [OPINION]</th></tr>
+<tr><td>①</td><td>DRAM/NAND</td><td>삼성전자 "2028년까지 공급부족 지속" 컨콜 가이던스 신규 반영</td><td class="positive">긍정 강화</td></tr>
+<tr><td>②</td><td>HBM4</td><td>변화 없음</td><td class="positive">긍정 유지</td></tr>
+<tr><td>③</td><td>CapEx</td><td>MS 추가확인(Azure+43%) — 4개사 전부 재확인 완료</td><td class="positive">완전 해소</td></tr>
+<tr><td>④</td><td>LTA</td><td>변화 없음</td><td class="positive">긍정</td></tr>
+<tr><td>⑤</td><td>주주환원</td><td>변화 없음(최태원 회장 매수는 어제 반영)</td><td class="warn">중립</td></tr>
+<tr><td>⑥</td><td>ADR</td><td>🟢 버그 해소 — $158.20(+6.17%)로 정상화(PR #35 병합)</td><td class="positive">정상화</td></tr>
+<tr><td>⑦</td><td>중국산DRAM</td><td>변화 없음</td><td class="positive">반박신호 유지</td></tr>
+<tr><td>⑧</td><td>마이크론대비</td><td>변화 없음</td><td class="positive">긍정</td></tr>
+<tr><td>⑨</td><td>실적/주가</td><td>🚀 종가 1,718,000원(+29.95%, 상한가·17년만)</td><td class="positive">역대급 긍정</td></tr>
+</table>
+</div>
+</div>
+
+<div class="section" id="target-price">
+<div class="section-title">8. 🎯 목표가 스펙트럼 상세 (변동없음, 어제 확정치 유지)</div>
+<div style="font-size:12px; color:#666; margin-bottom:10px;">오늘은 상한가 당일이라 신규 애널리스트 목표가 변경이 확인되지 않았다 — 통상 애널리스트 코멘트는 급등 다음 거래일 이후 나오는 경우가 많다, 내일부터 재확인.</div>
+<div class="tp-summary" style="text-align:center; margin-top:10px; padding:10px; background:#f8f9fa; border-radius:8px; font-size:12.5px; font-weight:600; color:#1e3c72;">📊 스펙트럼 유지: 최저 148만원(BNK) ~ 최고 470만원(한투) — 오늘 종가(171.8만원)는 이 스펙트럼의 하단~중하단 구간에 위치, 상한가에도 불구하고 목표가 밴드 안에서는 여전히 여력 구간.</div>
+</div>
+
+<div class="section">
+<div class="section-title">9. 🎯 찐반등 4대 신호 체크 (하루 최종 확정치)</div>
+<table>
+<tr><th>신호</th><th>상태</th></tr>
+<tr><td>①빚의 청산</td><td class="warn">부분확인·미확정(변화없음)</td></tr>
+<tr><td>②개미의 항복</td><td class="warn">미충족(성격 다름) — 오늘 개인 -4조 1,036억 순매도는 "항복"이 아니라 상한가 랠리 중 차익실현</td></tr>
+<tr><td>③외국인 귀환</td><td class="warn">🚀 역대급 단일신호(+3조 5,883억), 20일 지속 기준은 미충족</td></tr>
+<tr><td>④미국빅테크·반도체 동반상승</td><td class="positive">✅ 명확히 충족 — SOX+8.19%, 개별종목 전방위 두자릿수 급등</td></tr>
+</table>
+<div style="font-size:12px; color:#666; margin-top:8px;">4개 중 명확 충족은 여전히 <b>1개(④)</b>지만, ③이 오늘 이 프레임 추적 이래 최대 강도의 단일 신호를 냈다. 내일 이후 외국인 수급 방향이 유지되는지가 다음 단계의 핵심 관찰점.</div>
+</div>
+
+<div class="section deepdive">
+<div class="section-title">10. [Deep Dive] CXL &amp; 차세대 메모리 트랙</div>
+<div class="item" style="color:#666;">오늘도 신규 소식 없음(8일째) — 기존 확인분과 동일.</div>
+</div>
+
+<div class="section">
+<div class="diagnosis">
+<div class="diagnosis-title">🧭 한줄 진단 &amp; 관전 포인트</div>
+<div class="diagnosis-text">
+이번 폭락 국면을 촉발했던 두 공포 — "AI 메모리 수요 피크아웃"과 "중국의 HBM 자립" — 를 반박하는 데이터는 이번 주 내내 쌓여왔지만, 가격은 계속 그걸 외면해왔다. 오늘 처음으로 가격이 그 신호들을 <b>상한가(17년 만)</b>로 따라왔다. 외국인은 KIS API 수집 이래 최대 규모로 순매수했고, HBM Cycle Score도 69점까지 올라왔다. 그러나 개인은 대규모 차익실현에 나섰고, 국내 언론도 "기술적 되돌림 성격"이라는 신중론을 함께 전한다. <b>오늘 하루로 "찐 반등"을 선언하기엔 이르다</b> — 내일 이후 외국인 수급이 계속 이어지는지, 개인 매도가 진정되는지가 "회복 초입"에서 "회복 진행중"으로 넘어가는 핵심 관문이다.
+</div>
+</div>
+</div>
+
+<div class="section">
+<div class="section-title">11. 📂 보유 포트폴리오 유불리 체크 — GEN+ISA+IRP 3계좌</div>
+<div style="font-size:12px; color:#666; margin-bottom:10px;">🟢 <b>portfolio-holdings.csv 3일 정체 해소</b> — PR #35 병합으로 오늘(7/31 09:23 KST) 갱신분 확보. 3계좌 합산 평가금액 <b>317,178,055원</b>. 다만 SK하이닉스만 비교하면 7/27(폭락 전) 대비 아직 <b>-5.4%</b> — 오늘 상한가로도 3거래일 폭락(-27.2%)을 완전히 회복하진 못함(복리효과).</div>
+<div class="table-wrap">
+<table>
+<tr><th>계좌</th><th>종목</th><th>평가금액</th><th>유불리</th><th>비고</th></tr>
+<tr class="portfolio-row"><td>GEN</td><td><b>SK하이닉스</b> 120주</td><td>206,160,000원</td><td class="fav">🟢 유리</td><td>상한가+역대급 외국인 순매수, HBM Cycle Score 69</td></tr>
+<tr class="portfolio-row"><td>GEN</td><td>제주반도체 20주</td><td>1,302,000원</td><td class="fav">🟢 유리</td><td>반도체 섹터 동반 반등</td></tr>
+<tr class="portfolio-row"><td>GEN</td><td>롯데렌탈·우리금융지주</td><td>291,800원</td><td class="neu">⚪/🟢</td><td>비중 미미 / 금융주 견조</td></tr>
+<tr class="portfolio-row"><td>ISA</td><td><b>SK하이닉스</b> 19주 + 삼성전자 108주</td><td>60,992,000원</td><td class="fav">🟢 유리</td><td>삼성전자도 +25.6~27% 동반 상한가급</td></tr>
+<tr class="portfolio-row"><td>ISA</td><td>ACE AI반도체TOP3+ 297주</td><td>16,606,755원</td><td class="fav">🟢 유리</td><td>수익률 최고(+214%) — 차익실현 검토 여지 유효</td></tr>
+<tr class="portfolio-row"><td>ISA</td><td>기타(비만치료제·금현물·우주테크 등)</td><td>16,075,560원</td><td class="neu">⚪ 혼재</td><td>반도체 사이클과 무관, 오늘은 상대적으로 소외</td></tr>
+<tr class="portfolio-row"><td>IRP</td><td>KODEX 인도Nifty50·AI전력인프라 등</td><td>15,749,940원</td><td class="fav">🟢 대체로 유리</td><td>미국 빅테크 랠리·AI CapEx 재확인 수혜</td></tr>
+</table>
+</div>
+<div style="font-size:12px; color:#666; margin-top:10px;">SK하이닉스 139주가 여전히 3계좌 합산의 압도적 비중(약 75%). 상세는 <a href="../../wiki/entities/my-portfolio.md">entities/my-portfolio.md</a>.</div>
+</div>
+
+<div class="section deepdive" style="border-color:#c0392b;">
+<div class="section-title" style="border-bottom-color:#c0392b;">12. 🇺🇸 [특별 코너] 트럼프 2026 중간선거 트래커 — 카테고리별 타임라인</div>
+<div style="font-size:12px; color:#666; margin-bottom:10px;">오늘 큰 정치 이슈 없음 — 어제 확정치 유지, 신규 조사 생략.</div>
+
+<div class="trump-timeline-cat">
+<div class="cat-head">🏛️ 정치</div>
+<table><tr><th>날짜</th><th>상태</th><th>비고</th></tr>
+<tr><td class="tdate">07-31 아침</td><td class="tstat negative">🔴↘(변화없음)</td><td>범위 재확인(32~39%, 순지지율 -17.4~-22)</td></tr>
+<tr><td class="tdate">07-31 저녁</td><td class="tstat negative">🔴↘(변화없음)</td><td>신규 조사 없음, 유지</td></tr>
+</table>
+</div>
+<div class="trump-timeline-cat">
+<div class="cat-head">💰 경제</div>
+<table><tr><th>날짜</th><th>상태</th><th>비고</th></tr>
+<tr><td class="tdate">07-31 아침</td><td class="tstat negative">🔴↘(변화없음)</td><td>관세 재추진 국면 유지</td></tr>
+<tr><td class="tdate">07-31 저녁</td><td class="tstat negative">🔴↘(변화없음)</td><td>유지</td></tr>
+</table>
+</div>
+<div class="trump-timeline-cat">
+<div class="cat-head">⚔️ 전쟁/외교</div>
+<table><tr><th>날짜</th><th>상태</th><th>비고</th></tr>
+<tr><td class="tdate">07-31 아침</td><td class="tstat warn">🔴→(혼재)</td><td>중동↘·우크라이나↗ 혼재 유지</td></tr>
+<tr><td class="tdate">07-31 저녁</td><td class="tstat warn">🔴→(변화없음)</td><td>유지</td></tr>
+</table>
+</div>
+<div class="trump-timeline-cat">
+<div class="cat-head">🛂 이민</div>
+<table><tr><th>날짜</th><th>상태</th><th>비고</th></tr>
+<tr><td class="tdate">07-31 아침</td><td class="tstat negative">🔴↘(변화없음)</td><td>구체 수치 유지</td></tr>
+<tr><td class="tdate">07-31 저녁</td><td class="tstat negative">🔴↘(변화없음)</td><td>유지</td></tr>
+</table>
+</div>
+<div class="trump-timeline-cat">
+<div class="cat-head">🥊 경쟁구도</div>
+<table><tr><th>날짜</th><th>상태</th><th>비고</th></tr>
+<tr><td class="tdate">07-31 아침</td><td class="tstat negative">🔴⏳(변화없음)</td><td>최초 실측치 유지</td></tr>
+<tr><td class="tdate">07-31 저녁</td><td class="tstat negative">🔴⏳(변화없음)</td><td>유지</td></tr>
+</table>
+</div>
+<div class="item" style="color:#666; margin-top:6px;">오늘 이슈: 없음(변화 없음).</div>
+</div>
+
+<div class="section">
+<div class="section-title">13. 🌡️ 경제계절 참고 (PEOS / Investment Clock, 하루 최종 확정치)</div>
+<div style="font-size:12px; color:#8a6d1f; margin-bottom:10px;">오늘자(2026-07-31) PEOS 리포트 최초 확보 — 어제자 이월이 아니라 실제 오늘 데이터.</div>
+
+<div class="peos-regime-box">
+<div class="box"><div class="c">🇺🇸 미국 국면</div><div class="r">Slowdown</div><div class="c">총점 -1 · 신뢰도 90.9점</div></div>
+<div class="box"><div class="c">🇰🇷 한국 국면</div><div class="r">Early Expansion</div><div class="c">총점 +1 · 신뢰도 84.5점</div></div>
+<div class="box"><div class="c">🕐 Investment Clock</div><div class="r">Overheat(과열)</div><div class="c">유리자산: 원자재</div></div>
+</div>
+
+<div class="peos-section-head">미국 Macro Dashboard (주요 지표, 오늘자)</div>
+<div class="table-wrap">
+<table class="peos-dash-table">
+<tr><th>지표</th><th>현재</th><th>이전</th><th>추세</th></tr>
+<tr><td>실질GDP성장률(연율화)</td><td>1.50</td><td>2.10</td><td>→</td></tr>
+<tr><td>CPI</td><td>332.57</td><td>333.98</td><td class="negative">▼</td></tr>
+<tr><td>PPI</td><td>286.83</td><td>290.49</td><td class="negative">▼</td></tr>
+<tr><td>실업률(3개월평균 변화,%p)</td><td>4.20</td><td>4.30</td><td class="positive">▲</td></tr>
+<tr><td>10Y-2Y 금리차(%p)</td><td>0.45</td><td>0.45</td><td>→</td></tr>
+</table>
+</div>
+
+<div class="peos-section-head">한국 Macro Dashboard (주요 지표)</div>
+<div class="table-wrap">
+<table class="peos-dash-table">
+<tr><th>지표</th><th>현재</th><th>이전</th><th>추세</th></tr>
+<tr><td>반도체 수출 증가율</td><td>24.70</td><td>22.40</td><td class="positive">▲</td></tr>
+<tr><td>총수출 증가율</td><td>9.10</td><td>8.20</td><td>→</td></tr>
+<tr><td>전산업생산지수</td><td>114.91</td><td>118.74</td><td class="negative">▼</td></tr>
+<tr><td>경상수지(3개월평균,억달러)</td><td>38,607.4</td><td>28,292.3</td><td class="positive">▲</td></tr>
+<tr><td>CPI</td><td>118.85</td><td>119.51</td><td class="negative">▼</td></tr>
+</table>
+</div>
+
+<div class="peos-section-head">Executive Summary</div>
+<div class="item"><span class="fact">FACT</span>미국 Slowdown / 한국 Early Expansion — 비교 가능 6개 핵심 지표 중 83%가 미국과 같은 방향. 뚜렷한 경고 신호 없음.</div>
+<div class="item"><span class="opinion">OPINION</span>"Early Expansion 국면(총점 1, 신뢰도 84.5점) — 반도체 긍정". 이번 달 핵심 행동: 한국 수출입 동향(반도체 포함) 확인(2026-08-01, D-1).</div>
+
+<div class="item" style="font-size:12px; color:#666; margin-top:8px;">⚠️ 이 페이지 자체의 G/I/L 판정(Stagflation)과는 다른 방법론·다른 결과 — 통일하지 않고 병기.</div>
+</div>
+
+</div>
+<div class="footer">2026-07-31 19:20 KST | 데이터 출처: KIS API(시세·수급·ADR·보유율, main 병합 후 확정) · FRED/ECOS API(거시) · 웹검색(MS실적·상한가 보도·삼성 2028년 가이던스) · report/2026-07-31.md(PEOS) | 다음 체크: 내일 07:00 아침</div>
+</div>
+</body>
+</html>
