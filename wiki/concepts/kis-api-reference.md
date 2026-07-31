@@ -26,12 +26,12 @@ Secrets에서만 읽고, 발급받은 토큰은 `scripts/.kis_token_cache.json`�
 | `investor_flow.py fetch` | `FHKST01010900` | 종목별 일별 투자자매매동향 — 외국인/기관/개인 순매수 수량·금액(최근 30영업일) | `sources/sk-hynix-investor-flow.csv` | ✅ 2026-07-28 검증(금액은 백만원 단위로 확인) |
 | `investor_flow.py quote` | `FHKST01010100` | 국내주식 현재가·전일대비·등락률·거래량(즉석 조회용, 미저장) | — | ✅ 검증 |
 | `investor_flow.py snapshot` | `FHKST01010100` | 위와 같은 TR — 부가 필드로 **외국인 보유율·보유수량·250일 최고가·그 대비 등락률(드로다운)**까지 저장 | `sources/sk-hynix-price-snapshot.csv` | ✅ 검증 |
-| `investor_flow.py adr-quote`(기본, 일별) | `HHDFS76240000` | 해외상장(ADR) 종목의 **일별 확정 시세** — 호출 시각과 무관하게 마지막 마감 거래일의 정확한 종가·등락률 | `sources/sk-hynix-adr-quote.csv` | ⚠ 미검증(필드명 문서 기반) |
+| `investor_flow.py adr-quote`(기본, 일별) | `HHDFS76240000` | 해외상장(ADR) 종목의 **일별 확정 시세** — 호출 시각과 무관하게 마지막 마감 거래일의 정확한 종가·등락률 | `sources/sk-hynix-adr-quote.csv` | 🔧 필드명은 검증됨, 단 **버그 발견+수정 중**([PR #40](https://github.com/stevekoo-ai/Repo_name/pull/40), 병합 대기): API의 `rate` 필드가 `diff`와 부호가 어긋나는 응답 확인(2026-07-31 SKHY, diff=+3.10인데 rate=-2.08%) → `change_pct`를 `diff`·전일종가로 직접 재계산하도록 수정 |
 | `investor_flow.py adr-quote --intraday` | `HHDFS76200200` | 해외상장 종목 실시간 현재가 — 나스닥 정규장(22:30~05:00 KST) 밖에서는 "현재가=전일종가"만 반환하는 한계 있음 | 〃 | ✅ 검증(단, 이 한계도 함께 확인됨) |
-| `investor_flow.py credit-balance` | `FHPST04760000` | **국내주식 신용잔고 일별추이** — 융자(신규/상환/잔고 주수·금액·비율)와 대주(공매도용 대여) 잔고를 종목별로. **찐반등 신호①(빚의 청산)의 데이터소스** | `sources/sk-hynix-credit-balance.csv` | ⚠ 미검증(2026-07-31 PR #39, 금액 단위 특히 확인 필요) |
-| `investor_flow.py index-quote` | `FHPUP02100000` | **국내업종 현재지수** — 코스피(0001)/코스닥(1001)/코스피200(2001) 현재가·전일대비·등락률 + **상승/하락/보합/상한가/하한가 종목수** | `sources/kr-index-quote.csv` | ⚠ 미검증(PR #39) |
-| `investor_flow.py short-sale` | `FHPST04830000` | 국내주식 **공매도 일별추이** — 당일/누적 공매도 체결수량·비중·거래대금 | `sources/sk-hynix-short-sale.csv` | ⚠ 미검증(PR #39) |
-| `investor_flow.py etf-nav` | `FHPST02400000` | **ETF/ETN 현재가+NAV+추적오차율+괴리율** | `sources/portfolio-etf-nav.csv` | ⚠ 미검증(PR #39) |
+| `investor_flow.py credit-balance` | `FHPST04760000` | **국내주식 신용잔고 일별추이** — 융자(신규/상환/잔고 주수·금액·비율)와 대주(공매도용 대여) 잔고를 종목별로. **찐반등 신호①(빚의 청산)의 데이터소스** | `sources/sk-hynix-credit-balance.csv` | ✅ 검증 완료(2026-08-01, 필드명 정상·`loan_balance_qty` 값 교차검증 완료 — [market-cycles-leverage-risk.md](market-cycles-leverage-risk.md) 참고. `loan_balance_amt` 금액 단위는 여전히 미확정, 절대 금액 표기 금지) |
+| `investor_flow.py index-quote` | `FHPUP02100000` | **국내업종 현재지수** — 코스피(0001)/코스닥(1001)/코스피200(2001) 현재가·전일대비·등락률 + **상승/하락/보합/상한가/하한가 종목수** | `sources/kr-index-quote.csv` | ✅ 검증 완료(2026-08-01, PR #39 첫 실행에서 정상 수집 확인) |
+| `investor_flow.py short-sale` | `FHPST04830000` | 국내주식 **공매도 일별추이** — 당일/누적 공매도 체결수량·비중·거래대금 | `sources/sk-hynix-short-sale.csv` | ✅ 검증 완료(2026-08-01, PR #39 첫 실행에서 정상 수집 확인) |
+| `investor_flow.py etf-nav` | `FHPST02400000` | **ETF/ETN 현재가+NAV+추적오차율+괴리율** | `sources/portfolio-etf-nav.csv` | ✅ 검증 완료(2026-08-01, PR #39 첫 실행에서 정상 수집 확인) |
 | `portfolio_holdings.py sync`(일반/ISA 계좌) | `TTTC8434R`(실전)/`VTTC8434R`(모의) | 계좌별 보유종목·수량·평균단가·평가금액·손익률 | `sources/portfolio-holdings.csv` | ✅ 검증 |
 | `portfolio_holdings.py sync`(연금 계좌, IRP/DC) | `TTTC2202R` | 위와 동일(퇴직연금 계좌 전용 TR) | 〃 | ✅ 검증 |
 
