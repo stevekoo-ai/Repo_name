@@ -38,8 +38,14 @@ def _notify_summary(payload: dict) -> None:
     """Push a short summary via the configured notification channel (see core/notify.py).
 
     Defaults to a no-op — the dashboard/report files are the always-on delivery
-    mechanism, this is only active once SMTP_*/NOTIFY_EMAIL_TO (or
-    SLACK_WEBHOOK_URL) are set as GitHub Actions secrets.
+    mechanism, this is only active once GMAIL_ADDRESS+GMAIL_APP_PASSWORD, SMTP_*,
+    or SLACK_WEBHOOK_URL are set as GitHub Actions secrets.
+
+    Delivery is best-effort: report/<month>.{html,md,json} are already written to
+    disk by the time this runs, and the caller (daily-peos-report.yml) still needs
+    to commit+push them. A bad SMTP login or a transient network block must not
+    take down report generation, so any failure here is logged and swallowed
+    rather than propagated.
     """
     macro, macro_us, personal = payload["macro"], payload["macro_us"], payload["personal"]
     subject = (
@@ -54,7 +60,10 @@ def _notify_summary(payload: dict) -> None:
         f"액션 아이템: {len(payload['actions'])}건\n\n"
         f"전체 리포트: report/{payload['report_month']}.md (GitHub Pages: docs/report.html)"
     )
-    notify.build_channel().send(subject, body)
+    try:
+        notify.build_channel().send(subject, body)
+    except Exception as exc:
+        log_event("notify.send_failed", level="warning", error=str(exc))
 
 
 def run(month_key: str | None = None, archive: bool = True, archive_date: str | None = None) -> dict[str, Path]:
