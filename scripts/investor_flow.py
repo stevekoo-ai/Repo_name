@@ -38,6 +38,19 @@ FIELDS 딕셔너리만 고치면 된다. 지어낸 숫자를 반환하지 않기
 
   # 원본 API 응답 구조 확인용(최초 1회 필드명 검증 목적)
   python3 scripts/investor_flow.py fetch --ticker 000660 --days 5 --raw
+
+  # 4) 신용융자잔고(융자/대주) — 찐반등 신호①(빚의 청산)의 데이터소스
+  python3 scripts/investor_flow.py credit-balance --ticker 000660
+
+  # 5) 코스피/코스닥 지수 현재가 + 상승/하락/상한/하한 종목수
+  python3 scripts/investor_flow.py index-quote --index-code 0001  # 코스피
+  python3 scripts/investor_flow.py index-quote --index-code 1001  # 코스닥
+
+  # 6) 공매도 일별추이
+  python3 scripts/investor_flow.py short-sale --ticker 000660
+
+  # 7) ETF/ETN 현재가+NAV+괴리율(포트폴리오 보유 ETF 점검용)
+  python3 scripts/investor_flow.py etf-nav --ticker 469150
 """
 import os
 import sys
@@ -114,6 +127,96 @@ OVERSEAS_PRICE_FIELDS = {
 
 ADR_CSV_PATH = Path(__file__).resolve().parent.parent / "sources" / "sk-hynix-adr-quote.csv"
 ADR_CSV_FIELDS = ["date", "symbol", "price", "change", "change_pct", "prev_close", "source", "fetched_at"]
+
+# 2026-07-31 신설 — stevekoo-ai/open-trading-api(KIS 공식 예제 저장소) 조사로
+# 발견한 4개 신규 TR. 그동안 위키에서 "미확인"으로 남아있던 신용융자잔고
+# (찐반등 신호①)와, 코스피/코스닥 지수·상한가 종목수(매번 웹검색하던 것)를
+# API로 대체한다. 아래 4개 TR 전부 이 샌드박스에서 실호출 검증을 못 했다
+# (아웃바운드 네트워크 차단) — open-trading-api의 chk_*.py 예제 파일에 있는
+# COLUMN_MAPPING을 근거로 필드명을 채웠으나, 최초 실행 시 반드시 --raw로
+# 원본 응답을 확인할 것(이 저장소의 기존 원칙과 동일).
+
+# KIS "국내주식 신용잔고 일별추이" TR: FHPST04760000
+# GET /uapi/domestic-stock/v1/quotations/daily-credit-balance
+# 출처: open-trading-api examples_llm/domestic_stock/daily_credit_balance/
+CREDIT_BALANCE_CSV_PATH = Path(__file__).resolve().parent.parent / "sources" / "sk-hynix-credit-balance.csv"
+CREDIT_BALANCE_CSV_FIELDS = [
+    "date", "ticker",
+    "loan_new_qty", "loan_redeem_qty", "loan_balance_qty", "loan_balance_amt", "loan_balance_rate",
+    "short_new_qty", "short_redeem_qty", "short_balance_qty", "short_balance_amt", "short_balance_rate",
+    "source", "fetched_at",
+]
+CREDIT_BALANCE_FIELDS = {
+    "date": "stlm_date",                          # 결제 일자
+    "loan_new_qty": "whol_loan_new_stcn",          # 전체 융자 신규 주수
+    "loan_redeem_qty": "whol_loan_rdmp_stcn",      # 전체 융자 상환 주수(매도상환+현금상환 합계)
+    "loan_balance_qty": "whol_loan_rmnd_stcn",     # 전체 융자 잔고 주수
+    "loan_balance_amt": "whol_loan_rmnd_amt",      # 전체 융자 잔고 금액 — 단위 미검증, --raw로 확인 후 사용
+    "loan_balance_rate": "whol_loan_rmnd_rate",    # 전체 융자 잔고 비율(%)
+    "short_new_qty": "whol_stln_new_stcn",         # 전체 대주 신규 주수
+    "short_redeem_qty": "whol_stln_rdmp_stcn",     # 전체 대주 상환 주수
+    "short_balance_qty": "whol_stln_rmnd_stcn",    # 전체 대주 잔고 주수
+    "short_balance_amt": "whol_stln_rmnd_amt",     # 전체 대주 잔고 금액
+    "short_balance_rate": "whol_stln_rmnd_rate",   # 전체 대주 잔고 비율(%)
+}
+
+# KIS "국내업종 현재지수" TR: FHPUP02100000
+# GET /uapi/domestic-stock/v1/quotations/inquire-index-price
+# 출처: open-trading-api examples_llm/domestic_stock/inquire_index_price/
+# 종목코드 대신 업종코드 사용: 코스피=0001, 코스닥=1001, 코스피200=2001
+INDEX_CSV_PATH = Path(__file__).resolve().parent.parent / "sources" / "kr-index-quote.csv"
+INDEX_CSV_FIELDS = [
+    "date", "index_code", "index_name", "price", "change", "change_pct",
+    "advancers", "decliners", "unchanged", "limit_up", "limit_down",
+    "source", "fetched_at",
+]
+INDEX_NAMES = {"0001": "KOSPI", "1001": "KOSDAQ", "2001": "KOSPI200"}
+INDEX_FIELDS = {
+    "price": "bstp_nmix_prpr",          # 업종 지수 현재가
+    "change": "bstp_nmix_prdy_vrss",    # 전일 대비
+    "change_pct": "bstp_nmix_prdy_ctrt",  # 전일 대비율(%)
+    "advancers": "ascn_issu_cnt",       # 상승 종목 수
+    "decliners": "down_issu_cnt",       # 하락 종목 수
+    "unchanged": "stnr_issu_cnt",       # 보합 종목 수
+    "limit_up": "uplm_issu_cnt",        # 상한 종목 수 — "코스피 톱5 중 3개 상한가" 같은 서술을 API로 확인 가능
+    "limit_down": "lslm_issu_cnt",      # 하한 종목 수
+}
+
+# KIS "국내주식 공매도 일별추이" TR: FHPST04830000
+# GET /uapi/domestic-stock/v1/quotations/daily-short-sale
+# 출처: open-trading-api examples_llm/domestic_stock/daily_short_sale/
+SHORT_SALE_CSV_PATH = Path(__file__).resolve().parent.parent / "sources" / "sk-hynix-short-sale.csv"
+SHORT_SALE_CSV_FIELDS = [
+    "date", "ticker", "short_qty", "short_vol_pct", "cum_short_qty", "cum_short_vol_pct",
+    "short_amt", "source", "fetched_at",
+]
+SHORT_SALE_FIELDS = {
+    "date": "stck_bsop_date",                   # 주식 영업 일자
+    "short_qty": "ssts_cntg_qty",                # 공매도 체결 수량
+    "short_vol_pct": "ssts_vol_rlim",            # 공매도 거래량 비중(%)
+    "cum_short_qty": "acml_ssts_cntg_qty",       # 누적 공매도 체결 수량
+    "cum_short_vol_pct": "acml_ssts_cntg_qty_rlim",  # 누적 공매도 체결 수량 비중(%)
+    "short_amt": "ssts_tr_pbmn",                 # 공매도 거래 대금
+}
+
+# KIS "ETF/ETN 현재가" TR: FHPST02400000
+# GET /uapi/etfetn/v1/quotations/inquire-price
+# 출처: open-trading-api examples_llm/etfetn/inquire_price/
+# 포트폴리오 보유 ETF(ACE AI반도체TOP3+, SOL AI반도체소부장, KODEX 인도Nifty50 등)의
+# NAV·괴리율을 매일 수집해 portfolio-holdings.csv의 현재가와 대조하는 용도.
+ETF_NAV_CSV_PATH = Path(__file__).resolve().parent.parent / "sources" / "portfolio-etf-nav.csv"
+ETF_NAV_CSV_FIELDS = [
+    "date", "ticker", "price", "nav", "nav_change", "nav_change_pct",
+    "tracking_error_pct", "divergence_pct", "source", "fetched_at",
+]
+ETF_NAV_FIELDS = {
+    "price": "stck_prpr",           # 주식 현재가
+    "nav": "nav",                   # NAV
+    "nav_change": "nav_prdy_vrss",  # NAV 전일 대비
+    "nav_change_pct": "nav_prdy_ctrt",  # NAV 전일 대비율(%)
+    "tracking_error_pct": "trc_errt",  # 추적 오차율(%)
+    "divergence_pct": "dprt",       # 괴리율(%) — 시장가가 NAV 대비 얼마나 괴리됐는지
+}
 
 # 2026-07-28 신설 — 본주 종가·외국인 보유율·250일 최고가 대비 등락률을
 # 매일 영속화. 그동안 위키 리포트에서 "정확한 종가 미확인"·"KSD 보유율
@@ -454,6 +557,266 @@ def kis_fetch_overseas_daily_price(symbol, excd="NAS", account_type="real", raw=
     }
 
 
+def kis_fetch_credit_balance(ticker, account_type="real", raw=False):
+    """국내주식 신용잔고 일별추이(융자·대주) 조회 — 찐반등 신호①(빚의 청산)의
+    데이터 소스. 결제일자(FID_INPUT_DATE_1)를 오늘 날짜로 주면 최근 30건까지
+    반환된다."""
+    appkey = _get_env_or_die("KIS_APP_KEY")
+    appsecret = _get_env_or_die("KIS_APP_SECRET")
+    token = kis_get_token(account_type)
+    host = KIS_HOSTS[account_type]
+
+    today = datetime.now(timezone.utc).strftime("%Y%m%d")
+    params = (
+        f"FID_COND_MRKT_DIV_CODE=J&FID_COND_SCR_DIV_CODE=20476"
+        f"&FID_INPUT_ISCD={ticker}&FID_INPUT_DATE_1={today}"
+    )
+    req = urllib.request.Request(
+        f"{host}/uapi/domestic-stock/v1/quotations/daily-credit-balance?{params}",
+        headers={
+            "content-type": "application/json; charset=utf-8",
+            "authorization": f"Bearer {token}",
+            "appkey": appkey,
+            "appsecret": appsecret,
+            "tr_id": "FHPST04760000",
+        },
+    )
+    try:
+        with urllib.request.urlopen(req) as resp:
+            data = json.loads(resp.read())
+    except urllib.error.HTTPError as e:
+        sys.exit(f"KIS 신용잔고 API 호출 실패: {e.code} {e.read().decode(errors='replace')}")
+
+    if raw:
+        print(json.dumps(data, ensure_ascii=False, indent=2))
+        return []
+
+    rows = data.get("output") or []
+    if not rows:
+        sys.exit(
+            "API 응답에서 신용잔고 데이터를 찾지 못했습니다 — --raw로 원본 JSON을 "
+            "확인하고 output 추출 키를 응답 구조에 맞게 고치세요."
+        )
+    missing = [v for v in CREDIT_BALANCE_FIELDS.values() if v not in rows[0]]
+    if missing:
+        sys.exit(
+            f"예상한 필드가 API 응답에 없습니다: {missing}. 실제 응답 키: "
+            f"{sorted(rows[0].keys())}\nCREDIT_BALANCE_FIELDS를 위 실제 필드명으로 고치세요."
+        )
+
+    parsed = []
+    for r in rows:
+        d = r[CREDIT_BALANCE_FIELDS["date"]]
+        parsed.append({
+            "date": f"{d[0:4]}-{d[4:6]}-{d[6:8]}",
+            "ticker": ticker,
+            "loan_new_qty": r[CREDIT_BALANCE_FIELDS["loan_new_qty"]],
+            "loan_redeem_qty": r[CREDIT_BALANCE_FIELDS["loan_redeem_qty"]],
+            "loan_balance_qty": r[CREDIT_BALANCE_FIELDS["loan_balance_qty"]],
+            "loan_balance_amt": r[CREDIT_BALANCE_FIELDS["loan_balance_amt"]],
+            "loan_balance_rate": r[CREDIT_BALANCE_FIELDS["loan_balance_rate"]],
+            "short_new_qty": r[CREDIT_BALANCE_FIELDS["short_new_qty"]],
+            "short_redeem_qty": r[CREDIT_BALANCE_FIELDS["short_redeem_qty"]],
+            "short_balance_qty": r[CREDIT_BALANCE_FIELDS["short_balance_qty"]],
+            "short_balance_amt": r[CREDIT_BALANCE_FIELDS["short_balance_amt"]],
+            "short_balance_rate": r[CREDIT_BALANCE_FIELDS["short_balance_rate"]],
+            "source": "kis_api",
+            "fetched_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+        })
+    return parsed
+
+
+def kis_fetch_index_price(index_code, account_type="real", raw=False):
+    """국내업종 현재지수 조회 — 코스피(0001)/코스닥(1001)/코스피200(2001).
+    상승/하락/보합/상한/하한 종목수까지 함께 내려와, "코스피 톱5 중 3개
+    상한가" 같은 서술을 웹검색 없이 확인할 수 있다."""
+    appkey = _get_env_or_die("KIS_APP_KEY")
+    appsecret = _get_env_or_die("KIS_APP_SECRET")
+    token = kis_get_token(account_type)
+    host = KIS_HOSTS[account_type]
+
+    params = f"FID_COND_MRKT_DIV_CODE=U&FID_INPUT_ISCD={index_code}"
+    req = urllib.request.Request(
+        f"{host}/uapi/domestic-stock/v1/quotations/inquire-index-price?{params}",
+        headers={
+            "content-type": "application/json; charset=utf-8",
+            "authorization": f"Bearer {token}",
+            "appkey": appkey,
+            "appsecret": appsecret,
+            "tr_id": "FHPUP02100000",
+        },
+    )
+    try:
+        with urllib.request.urlopen(req) as resp:
+            data = json.loads(resp.read())
+    except urllib.error.HTTPError as e:
+        sys.exit(f"KIS 지수 API 호출 실패: {e.code} {e.read().decode(errors='replace')}")
+
+    if raw:
+        print(json.dumps(data, ensure_ascii=False, indent=2))
+        return None
+
+    row = data.get("output")
+    if isinstance(row, list):
+        row = row[0] if row else None
+    if not row:
+        sys.exit(
+            "API 응답에서 지수 데이터를 찾지 못했습니다 — --raw로 원본 JSON을 "
+            "확인하고 output 추출 키를 응답 구조에 맞게 고치세요."
+        )
+    missing = [v for v in INDEX_FIELDS.values() if v not in row]
+    if missing:
+        sys.exit(
+            f"예상한 필드가 API 응답에 없습니다: {missing}. 실제 응답 키: "
+            f"{sorted(row.keys())}\nINDEX_FIELDS를 위 실제 필드명으로 고치세요."
+        )
+    return {
+        "index_code": index_code,
+        "index_name": INDEX_NAMES.get(index_code, index_code),
+        "price": float(row[INDEX_FIELDS["price"]]),
+        "change": float(row[INDEX_FIELDS["change"]]),
+        "change_pct": float(row[INDEX_FIELDS["change_pct"]]),
+        "advancers": int(row[INDEX_FIELDS["advancers"]]),
+        "decliners": int(row[INDEX_FIELDS["decliners"]]),
+        "unchanged": int(row[INDEX_FIELDS["unchanged"]]),
+        "limit_up": int(row[INDEX_FIELDS["limit_up"]]),
+        "limit_down": int(row[INDEX_FIELDS["limit_down"]]),
+    }
+
+
+def kis_fetch_short_sale(ticker, account_type="real", raw=False):
+    """국내주식 공매도 일별추이 조회."""
+    appkey = _get_env_or_die("KIS_APP_KEY")
+    appsecret = _get_env_or_die("KIS_APP_SECRET")
+    token = kis_get_token(account_type)
+    host = KIS_HOSTS[account_type]
+
+    params = f"FID_COND_MRKT_DIV_CODE=J&FID_INPUT_ISCD={ticker}&FID_INPUT_DATE_1=&FID_INPUT_DATE_2="
+    req = urllib.request.Request(
+        f"{host}/uapi/domestic-stock/v1/quotations/daily-short-sale?{params}",
+        headers={
+            "content-type": "application/json; charset=utf-8",
+            "authorization": f"Bearer {token}",
+            "appkey": appkey,
+            "appsecret": appsecret,
+            "tr_id": "FHPST04830000",
+        },
+    )
+    try:
+        with urllib.request.urlopen(req) as resp:
+            data = json.loads(resp.read())
+    except urllib.error.HTTPError as e:
+        sys.exit(f"KIS 공매도 API 호출 실패: {e.code} {e.read().decode(errors='replace')}")
+
+    if raw:
+        print(json.dumps(data, ensure_ascii=False, indent=2))
+        return []
+
+    # output2가 일별 리스트(open-trading-api 예제 기준) — output1은 최신 단건 요약으로 추정.
+    rows = data.get("output2") or data.get("output1") or []
+    if not rows:
+        sys.exit(
+            "API 응답에서 공매도 데이터를 찾지 못했습니다 — --raw로 원본 JSON을 "
+            "확인하고 output1/output2 추출 키를 응답 구조에 맞게 고치세요."
+        )
+    missing = [v for v in SHORT_SALE_FIELDS.values() if v not in rows[0]]
+    if missing:
+        sys.exit(
+            f"예상한 필드가 API 응답에 없습니다: {missing}. 실제 응답 키: "
+            f"{sorted(rows[0].keys())}\nSHORT_SALE_FIELDS를 위 실제 필드명으로 고치세요."
+        )
+
+    parsed = []
+    for r in rows:
+        d = r[SHORT_SALE_FIELDS["date"]]
+        parsed.append({
+            "date": f"{d[0:4]}-{d[4:6]}-{d[6:8]}",
+            "ticker": ticker,
+            "short_qty": r[SHORT_SALE_FIELDS["short_qty"]],
+            "short_vol_pct": r[SHORT_SALE_FIELDS["short_vol_pct"]],
+            "cum_short_qty": r[SHORT_SALE_FIELDS["cum_short_qty"]],
+            "cum_short_vol_pct": r[SHORT_SALE_FIELDS["cum_short_vol_pct"]],
+            "short_amt": r[SHORT_SALE_FIELDS["short_amt"]],
+            "source": "kis_api",
+            "fetched_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+        })
+    return parsed
+
+
+def kis_fetch_etf_nav(ticker, account_type="real", raw=False):
+    """ETF/ETN 현재가+NAV+괴리율 조회 — 포트폴리오 보유 ETF 점검용."""
+    appkey = _get_env_or_die("KIS_APP_KEY")
+    appsecret = _get_env_or_die("KIS_APP_SECRET")
+    token = kis_get_token(account_type)
+    host = KIS_HOSTS[account_type]
+
+    params = f"FID_COND_MRKT_DIV_CODE=J&FID_INPUT_ISCD={ticker}"
+    req = urllib.request.Request(
+        f"{host}/uapi/etfetn/v1/quotations/inquire-price?{params}",
+        headers={
+            "content-type": "application/json; charset=utf-8",
+            "authorization": f"Bearer {token}",
+            "appkey": appkey,
+            "appsecret": appsecret,
+            "tr_id": "FHPST02400000",
+        },
+    )
+    try:
+        with urllib.request.urlopen(req) as resp:
+            data = json.loads(resp.read())
+    except urllib.error.HTTPError as e:
+        sys.exit(f"KIS ETF API 호출 실패: {e.code} {e.read().decode(errors='replace')}")
+
+    if raw:
+        print(json.dumps(data, ensure_ascii=False, indent=2))
+        return None
+
+    row = data.get("output")
+    if not row:
+        sys.exit(
+            "API 응답에서 ETF 데이터를 찾지 못했습니다 — --raw로 원본 JSON을 "
+            "확인하고 output 추출 키를 응답 구조에 맞게 고치세요."
+        )
+    missing = [v for v in ETF_NAV_FIELDS.values() if v not in row]
+    if missing:
+        sys.exit(
+            f"예상한 필드가 API 응답에 없습니다: {missing}. 실제 응답 키: "
+            f"{sorted(row.keys())}\nETF_NAV_FIELDS를 위 실제 필드명으로 고치세요."
+        )
+    return {
+        "ticker": ticker,
+        "price": float(row[ETF_NAV_FIELDS["price"]]),
+        "nav": float(row[ETF_NAV_FIELDS["nav"]]),
+        "nav_change": float(row[ETF_NAV_FIELDS["nav_change"]]),
+        "nav_change_pct": float(row[ETF_NAV_FIELDS["nav_change_pct"]]),
+        "tracking_error_pct": float(row[ETF_NAV_FIELDS["tracking_error_pct"]]),
+        "divergence_pct": float(row[ETF_NAV_FIELDS["divergence_pct"]]),
+    }
+
+
+def _generic_upsert(csv_path, fields, key_fields, rows_by_new, extra=None):
+    """credit-balance/short-sale/index-quote/etf-nav 공용 append-only CSV 갱신
+    헬퍼 — 기존 _read_csv/_write_csv와 같은 패턴이나 파일·키가 매번 달라 범용화."""
+    existing = {}
+    if csv_path.exists():
+        with csv_path.open(newline="", encoding="utf-8") as f:
+            for row in csv.DictReader(f):
+                existing[tuple(row[k] for k in key_fields)] = row
+    for r in rows_by_new:
+        row = {k: r.get(k, "") for k in fields}
+        if extra:
+            row.update(extra)
+        existing[tuple(row[k] for k in key_fields)] = row
+    csv_path.parent.mkdir(parents=True, exist_ok=True)
+    ordered = sorted(existing.values(), key=lambda r: tuple(r[k] for k in key_fields))
+    with csv_path.open("w", newline="", encoding="utf-8") as f:
+        w = csv.DictWriter(f, fieldnames=fields)
+        w.writeheader()
+        for r in ordered:
+            w.writerow(r)
+    return len(rows_by_new)
+
+
 def _read_adr_csv():
     if not ADR_CSV_PATH.exists():
         return {}
@@ -661,6 +1024,63 @@ def cmd_adr_quote(args):
     print(f"{q['symbol']}  ${q['price']:,.2f}  {q['change']:+,.2f}({q['change_pct']:+.2f}%){flag}  전일종가 ${q['prev_close']:,.2f}{date_note}  → {ADR_CSV_PATH}에 기록")
 
 
+def cmd_credit_balance(args):
+    rows = kis_fetch_credit_balance(args.ticker, args.account_type, raw=args.raw)
+    if args.raw:
+        return
+    n = _generic_upsert(CREDIT_BALANCE_CSV_PATH, CREDIT_BALANCE_CSV_FIELDS, ("date", "ticker"), rows,
+                         extra={"source": "kis_api", "fetched_at": datetime.now(timezone.utc).isoformat(timespec="seconds")})
+    latest = rows[-1] if rows else None
+    if latest:
+        print(f"{args.ticker} 신용잔고: 융자잔고 {int(latest['loan_balance_qty']):,}주(비율 {latest['loan_balance_rate']}%), "
+              f"대주잔고 {int(latest['short_balance_qty']):,}주(비율 {latest['short_balance_rate']}%) → {CREDIT_BALANCE_CSV_PATH}에 {n}건 기록")
+
+
+def cmd_index_quote(args):
+    q = kis_fetch_index_price(args.index_code, args.account_type, raw=args.raw)
+    if args.raw:
+        return
+    today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    row = {
+        "date": today, "index_code": q["index_code"], "index_name": q["index_name"],
+        "price": q["price"], "change": q["change"], "change_pct": q["change_pct"],
+        "advancers": q["advancers"], "decliners": q["decliners"], "unchanged": q["unchanged"],
+        "limit_up": q["limit_up"], "limit_down": q["limit_down"],
+    }
+    _generic_upsert(INDEX_CSV_PATH, INDEX_CSV_FIELDS, ("date", "index_code"), [row],
+                     extra={"source": "kis_api", "fetched_at": datetime.now(timezone.utc).isoformat(timespec="seconds")})
+    print(f"{q['index_name']}  {q['price']:,.2f}  {q['change']:+,.2f}({q['change_pct']:+.2f}%)  "
+          f"상승{q['advancers']}/하락{q['decliners']}/보합{q['unchanged']}  상한{q['limit_up']}/하한{q['limit_down']}  → {INDEX_CSV_PATH}에 기록")
+
+
+def cmd_short_sale(args):
+    rows = kis_fetch_short_sale(args.ticker, args.account_type, raw=args.raw)
+    if args.raw:
+        return
+    n = _generic_upsert(SHORT_SALE_CSV_PATH, SHORT_SALE_CSV_FIELDS, ("date", "ticker"), rows,
+                         extra={"source": "kis_api", "fetched_at": datetime.now(timezone.utc).isoformat(timespec="seconds")})
+    latest = rows[-1] if rows else None
+    if latest:
+        print(f"{args.ticker} 공매도: 당일 {int(latest['short_qty']):,}주(비중 {latest['short_vol_pct']}%), "
+              f"누적 {int(latest['cum_short_qty']):,}주 → {SHORT_SALE_CSV_PATH}에 {n}건 기록")
+
+
+def cmd_etf_nav(args):
+    q = kis_fetch_etf_nav(args.ticker, args.account_type, raw=args.raw)
+    if args.raw:
+        return
+    today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    row = {
+        "date": today, "ticker": q["ticker"], "price": q["price"], "nav": q["nav"],
+        "nav_change": q["nav_change"], "nav_change_pct": q["nav_change_pct"],
+        "tracking_error_pct": q["tracking_error_pct"], "divergence_pct": q["divergence_pct"],
+    }
+    _generic_upsert(ETF_NAV_CSV_PATH, ETF_NAV_CSV_FIELDS, ("date", "ticker"), [row],
+                     extra={"source": "kis_api", "fetched_at": datetime.now(timezone.utc).isoformat(timespec="seconds")})
+    print(f"{q['ticker']}  현재가 {q['price']:,.0f}  NAV {q['nav']:,.2f}({q['nav_change_pct']:+.2f}%)  "
+          f"추적오차 {q['tracking_error_pct']:.2f}%  괴리율 {q['divergence_pct']:+.2f}%  → {ETF_NAV_CSV_PATH}에 기록")
+
+
 def cmd_show(args):
     existing = read_ticker_rows(args.ticker)
     if not existing:
@@ -732,6 +1152,30 @@ def main():
     pa2.add_argument("--raw", action="store_true")
     pa2.add_argument("--intraday", action="store_true", help="일별 확정시세 대신 실시간 현재가 조회(미국 장중 22:30~05:00 KST에서만 의미 있음)")
     pa2.set_defaults(func=cmd_adr_quote)
+
+    pcb = sub.add_parser("credit-balance", help="신용융자잔고(융자/대주) 조회, sources/sk-hynix-credit-balance.csv에 기록 — 찐반등 신호① 데이터소스")
+    pcb.add_argument("--ticker", default="000660")
+    pcb.add_argument("--account-type", default=os.environ.get("KIS_ACCOUNT_TYPE", "real"), choices=["real", "vts"])
+    pcb.add_argument("--raw", action="store_true")
+    pcb.set_defaults(func=cmd_credit_balance)
+
+    pix = sub.add_parser("index-quote", help="코스피/코스닥 지수 현재가+등락종목수 조회, sources/kr-index-quote.csv에 기록")
+    pix.add_argument("--index-code", default="0001", help="코스피=0001, 코스닥=1001, 코스피200=2001")
+    pix.add_argument("--account-type", default=os.environ.get("KIS_ACCOUNT_TYPE", "real"), choices=["real", "vts"])
+    pix.add_argument("--raw", action="store_true")
+    pix.set_defaults(func=cmd_index_quote)
+
+    pss = sub.add_parser("short-sale", help="공매도 일별추이 조회, sources/sk-hynix-short-sale.csv에 기록")
+    pss.add_argument("--ticker", default="000660")
+    pss.add_argument("--account-type", default=os.environ.get("KIS_ACCOUNT_TYPE", "real"), choices=["real", "vts"])
+    pss.add_argument("--raw", action="store_true")
+    pss.set_defaults(func=cmd_short_sale)
+
+    pen = sub.add_parser("etf-nav", help="ETF/ETN 현재가+NAV+괴리율 조회, sources/portfolio-etf-nav.csv에 기록")
+    pen.add_argument("--ticker", required=True, help="ETF 종목코드(예: 469150=ACE AI반도체TOP3+)")
+    pen.add_argument("--account-type", default=os.environ.get("KIS_ACCOUNT_TYPE", "real"), choices=["real", "vts"])
+    pen.add_argument("--raw", action="store_true")
+    pen.set_defaults(func=cmd_etf_nav)
 
     args = p.parse_args()
     args.func(args)
