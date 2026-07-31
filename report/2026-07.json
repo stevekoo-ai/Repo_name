@@ -16729,18 +16729,6 @@
     "month": "2026-07",
     "daily_records": [
       {
-        "date": "2026-07-26",
-        "kr_regime": "Early Expansion",
-        "kr_score": 1.0,
-        "kr_confidence": 84.5,
-        "us_regime": "Recession",
-        "us_score": -1.0,
-        "us_confidence": 90.9,
-        "investment_env_score": 65.5,
-        "semiconductor_score": 79.6,
-        "bond_score": 41.0
-      },
-      {
         "date": "2026-07-27",
         "kr_regime": "Early Expansion",
         "kr_score": 1.0,
@@ -16787,6 +16775,18 @@
         "investment_env_score": 69.9,
         "semiconductor_score": 79.6,
         "bond_score": 42.7
+      },
+      {
+        "date": "2026-07-31",
+        "kr_regime": "Early Expansion",
+        "kr_score": 1.0,
+        "kr_confidence": 84.5,
+        "us_regime": "Slowdown",
+        "us_score": -1.0,
+        "us_confidence": 90.9,
+        "investment_env_score": 69.9,
+        "semiconductor_score": 79.6,
+        "bond_score": 42.7
       }
     ],
     "trend_summary": {
@@ -16794,7 +16794,7 @@
       "kr_confidence_change": 0.0,
       "us_regime_stable": false,
       "us_confidence_change": 0.0,
-      "investment_env_trend": 4.400000000000006,
+      "investment_env_trend": 4.1000000000000085,
       "semiconductor_trend": 0.0
     }
   }
