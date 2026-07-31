@@ -58,6 +58,18 @@ jobs:
           echo "::group::해외주식 현재가(price-detail, ADR) 원본"
           python3 scripts/investor_flow.py adr-quote --symbol SKHY --excd NAS --raw || true
           echo "::endgroup::"
+          echo "::group::신용잔고(daily-credit-balance) 원본"
+          python3 scripts/investor_flow.py credit-balance --ticker 000660 --raw || true
+          echo "::endgroup::"
+          echo "::group::코스피 지수(inquire-index-price) 원본"
+          python3 scripts/investor_flow.py index-quote --index-code 0001 --raw || true
+          echo "::endgroup::"
+          echo "::group::공매도(daily-short-sale) 원본"
+          python3 scripts/investor_flow.py short-sale --ticker 000660 --raw || true
+          echo "::endgroup::"
+          echo "::group::ETF NAV(inquire-price) 원본"
+          python3 scripts/investor_flow.py etf-nav --ticker 469150 --raw || true
+          echo "::endgroup::"
 
       - name: 종목별 투자자매매동향 fetch
         if: ${{ github.event.inputs.debug_raw != 'true' }}
@@ -81,6 +93,42 @@ jobs:
           KIS_APP_SECRET: ${{ secrets.KIS_APP_SECRET }}
         run: python3 scripts/investor_flow.py snapshot --ticker 000660
 
+      # 2026-07-31 추가 — stevekoo-ai/open-trading-api(KIS 공식 예제) 조사로
+      # 발견한 4개 TR. 신용잔고는 찐반등 신호①(빚의 청산)의 데이터소스,
+      # 지수는 "코스피 몇% 급등" 같은 서술을 웹검색 없이 확인하기 위함.
+      # 전부 실패해도 리포트 자체를 막지 않도록 || true.
+      - name: 신용융자잔고(찐반등 신호①) fetch
+        if: ${{ github.event.inputs.debug_raw != 'true' }}
+        env:
+          KIS_APP_KEY: ${{ secrets.KIS_APP_KEY }}
+          KIS_APP_SECRET: ${{ secrets.KIS_APP_SECRET }}
+        run: python3 scripts/investor_flow.py credit-balance --ticker 000660 || true
+
+      - name: 코스피·코스닥 지수 fetch
+        if: ${{ github.event.inputs.debug_raw != 'true' }}
+        env:
+          KIS_APP_KEY: ${{ secrets.KIS_APP_KEY }}
+          KIS_APP_SECRET: ${{ secrets.KIS_APP_SECRET }}
+        run: |
+          python3 scripts/investor_flow.py index-quote --index-code 0001 || true
+          python3 scripts/investor_flow.py index-quote --index-code 1001 || true
+
+      - name: 공매도 일별추이 fetch
+        if: ${{ github.event.inputs.debug_raw != 'true' }}
+        env:
+          KIS_APP_KEY: ${{ secrets.KIS_APP_KEY }}
+          KIS_APP_SECRET: ${{ secrets.KIS_APP_SECRET }}
+        run: python3 scripts/investor_flow.py short-sale --ticker 000660 || true
+
+      - name: 보유 ETF(AI반도체 테마) NAV·괴리율 fetch
+        if: ${{ github.event.inputs.debug_raw != 'true' }}
+        env:
+          KIS_APP_KEY: ${{ secrets.KIS_APP_KEY }}
+          KIS_APP_SECRET: ${{ secrets.KIS_APP_SECRET }}
+        run: |
+          python3 scripts/investor_flow.py etf-nav --ticker 469150 || true
+          python3 scripts/investor_flow.py etf-nav --ticker 455850 || true
+
       - name: 1차 리포트 생성
         id: report
         if: ${{ github.event.inputs.debug_raw != 'true' }}
@@ -100,6 +148,10 @@ jobs:
           git add sources/sk-hynix-investor-flow.csv sources/sk-hynix-auto-report-*.md
           [ -f sources/sk-hynix-adr-quote.csv ] && git add sources/sk-hynix-adr-quote.csv
           [ -f sources/sk-hynix-price-snapshot.csv ] && git add sources/sk-hynix-price-snapshot.csv
+          [ -f sources/sk-hynix-credit-balance.csv ] && git add sources/sk-hynix-credit-balance.csv
+          [ -f sources/kr-index-quote.csv ] && git add sources/kr-index-quote.csv
+          [ -f sources/sk-hynix-short-sale.csv ] && git add sources/sk-hynix-short-sale.csv
+          [ -f sources/portfolio-etf-nav.csv ] && git add sources/portfolio-etf-nav.csv
           git diff --cached --quiet || git commit -m "자동 리포트: $(date -u +%Y-%m-%dT%H:%M:%SZ)"
           for i in 1 2 3 4 5; do
             git push && break
