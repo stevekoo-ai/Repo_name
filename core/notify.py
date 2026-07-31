@@ -1,11 +1,11 @@
-"""Notification channel abstraction.
+"""Notification channel abstraction, shared by every scheduled pipeline in this repo.
 
-The daily pipeline always writes the dashboard to docs/ (committed to the
-repo and served via GitHub Pages) — that channel has no dependency on
-secrets and always runs. Push-style notifications (email/Slack) are opt-in:
-implement `NoopChannel` by default, and flip to `EmailChannel` /
-`SlackChannel` by setting the relevant env vars as GitHub Actions secrets.
-No code elsewhere needs to change to switch channels — only
+Each pipeline always writes its dashboard/report to docs/ or report/
+(committed to the repo and served via GitHub Pages) — that channel has no
+dependency on secrets and always runs. Push-style notifications (email/Slack)
+are opt-in: `NoopChannel` is the default (dashboard-only delivery), and it
+flips to `EmailChannel` / `SlackChannel` by setting the relevant env vars as
+GitHub Actions secrets. No caller needs to change to switch channels — only
 `build_channel()`'s env var check.
 """
 from __future__ import annotations
@@ -58,9 +58,20 @@ class EmailChannel:
 def build_channel() -> NotificationChannel:
     """Pick a channel based on which secrets/env vars are present.
 
-    Precedence: Slack > Email > Noop. Add SLACK_WEBHOOK_URL or the SMTP_*
-    + NOTIFY_EMAIL_TO env vars (as GitHub Actions secrets) to enable a
-    push channel without touching main.py.
+    Precedence: Slack > generic SMTP > Gmail > Noop.
+
+    - SLACK_WEBHOOK_URL alone enables Slack.
+    - SMTP_HOST + SMTP_USER + SMTP_PASSWORD + NOTIFY_EMAIL_TO enables a
+      generic SMTP server.
+    - GMAIL_ADDRESS + GMAIL_APP_PASSWORD enables Gmail specifically (smtp.gmail.com,
+      SSL/465) — this repo's other pipelines (sk-hynix-daily-report.yml,
+      subscription-monitor.yml) already register these two secrets against a
+      real Gmail account, so this reuses that instead of asking for a second,
+      redundant set of SMTP_* secrets. Recipient defaults to GMAIL_ADDRESS
+      itself (send-to-self) unless NOTIFY_EMAIL_TO overrides it.
+
+    Add the relevant env vars as GitHub Actions secrets to enable a push
+    channel without touching any caller.
     """
     slack_url = os.environ.get("SLACK_WEBHOOK_URL")
     if slack_url:
@@ -75,6 +86,17 @@ def build_channel() -> NotificationChannel:
             user=os.environ["SMTP_USER"],
             password=os.environ["SMTP_PASSWORD"],
             to_addr=to_addr,
+        )
+
+    gmail_addr = os.environ.get("GMAIL_ADDRESS")
+    gmail_password = os.environ.get("GMAIL_APP_PASSWORD")
+    if gmail_addr and gmail_password:
+        return EmailChannel(
+            smtp_host="smtp.gmail.com",
+            smtp_port=465,
+            user=gmail_addr,
+            password=gmail_password,
+            to_addr=to_addr or gmail_addr,
         )
 
     return NoopChannel()

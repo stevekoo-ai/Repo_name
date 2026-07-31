@@ -142,17 +142,33 @@ def _get_env_or_die(name):
 
 
 def kis_get_token(account_type="real"):
-    """KIS OAuth2 접근토큰 발급. 24시간 유효 — 로컬에 캐시해 재발급 최소화."""
-    if TOKEN_CACHE.exists():
-        cached = json.loads(TOKEN_CACHE.read_text())
-        if cached.get("account_type") == account_type and \
-                datetime.fromisoformat(cached["expires_at"]) > datetime.now():
-            return cached["access_token"]
+    """KIS OAuth2 접근토큰 발급. 24시간 유효 — 로컬에 캐시해 재발급 최소화.
 
+    ⚠ 2026-07-31 수정: 캐시 형식을 scripts/portfolio_holdings.py와 동일한
+    "{account_type}:{appkey}" 키 방식으로 통일했다. 예전엔 이 스크립트만
+    단일 엔트리 형식을 써서, 같은 파일을 쓰더라도 portfolio_holdings.py가
+    이 스크립트가 막 발급한 토큰을 읽지 못했다(형식 불일치) — 그 결과 두
+    스크립트가 GitHub Actions에서 비슷한 시각에 각자 새 토큰을 발급받으려다
+    KIS의 "동일 appkey 단시간 재발급 제한"에 걸려 하나가 403으로 실패하는
+    사고가 반복됐다(2026-07-28~30, portfolio-holdings-sync.yml 3일 연속 실패
+    — sk-hynix-daily-report.yml 저녁 실행과 45~90초 간격으로 겹침). 형식을
+    통일하고 워크플로에 actions/cache로 이 파일을 공유하게 하면, 먼저 도는
+    쪽이 발급한 토큰을 나중 쪽이 재사용해 충돌을 피한다."""
     appkey = _get_env_or_die("KIS_APP_KEY")
     appsecret = _get_env_or_die("KIS_APP_SECRET")
-    host = KIS_HOSTS[account_type]
+    cache_key = f"{account_type}:{appkey}"
 
+    cached_all = {}
+    if TOKEN_CACHE.exists():
+        try:
+            cached_all = json.loads(TOKEN_CACHE.read_text())
+        except json.JSONDecodeError:
+            cached_all = {}
+        entry = cached_all.get(cache_key)
+        if entry and datetime.fromisoformat(entry["expires_at"]) > datetime.now():
+            return entry["access_token"]
+
+    host = KIS_HOSTS[account_type]
     body = json.dumps({
         "grant_type": "client_credentials",
         "appkey": appkey,
@@ -167,11 +183,8 @@ def kis_get_token(account_type="real"):
 
     token = data["access_token"]
     expires_at = datetime.now() + timedelta(seconds=int(data.get("expires_in", 86400)) - 300)
-    TOKEN_CACHE.write_text(json.dumps({
-        "account_type": account_type,
-        "access_token": token,
-        "expires_at": expires_at.isoformat(),
-    }))
+    cached_all[cache_key] = {"access_token": token, "expires_at": expires_at.isoformat()}
+    TOKEN_CACHE.write_text(json.dumps(cached_all))
     return token
 
 
@@ -368,6 +381,79 @@ def kis_fetch_overseas_price(symbol, excd="NAS", account_type="real", raw=False)
     }
 
 
+def kis_fetch_overseas_daily_price(symbol, excd="NAS", account_type="real", raw=False):
+    """해외상장 종목(ADR 등)의 **일별 확정 시세**를 조회한다 — 이 저장소의
+    자동체크 3회(07:00/10:00/19:00 KST)가 전부 나스닥 정규장(22:30~05:00
+    KST) 밖에 있어, 기존 kis_fetch_overseas_price()(실시간 현재가 조회,
+    HHDFS76200200)가 장 마감 후 스냅샷을 되돌려주면서 "현재가=전일종가"가
+    되어 change_pct가 계속 0.0%으로 찍히던 문제(2026-07-30~31 사용자 지적)
+    를 해결하기 위한 함수. 이 TR은 확정된 거래일 종가 시계열을 주므로 호출
+    시각과 무관하게 마지막으로 마감된 세션의 정확한 종가·전일대비를 얻을
+    수 있다. **이게 ADR 확인의 주(main) 경로**여야 하고, 실시간 현재가는
+    미국 장중(22:30~05:00 KST)에만 보조적으로 의미가 있다.
+    ⚠ TR HHDFS76240000("해외주식 기간별시세"), 파라미터·필드명은 KIS
+    공식문서 기반 최선 추정이며 이 샌드박스는 아웃바운드 네트워크가
+    막혀있어 실호출로 검증하지 못했다 — 이 저장소의 다른 TR과 동일한
+    원칙대로, 최초 실행 시 --raw로 원본 응답을 반드시 확인하고 output2
+    배열의 정렬 순서(최신이 [0]인지 [-1]인지)와 필드명(xymd/clos/diff/rate)이
+    다르면 아래 코드를 그에 맞게 고칠 것."""
+    appkey = _get_env_or_die("KIS_APP_KEY")
+    appsecret = _get_env_or_die("KIS_APP_SECRET")
+    token = kis_get_token(account_type)
+    host = KIS_HOSTS[account_type]
+
+    # GUBN=0(일별), BYMD=공백(최근 기준), MODP=0(수정주가 미반영)
+    params = f"AUTH=&EXCD={excd}&SYMB={symbol}&GUBN=0&BYMD=&MODP=0"
+    req = urllib.request.Request(
+        f"{host}/uapi/overseas-price/v1/quotations/dailyprice?{params}",
+        headers={
+            "content-type": "application/json; charset=utf-8",
+            "authorization": f"Bearer {token}",
+            "appkey": appkey,
+            "appsecret": appsecret,
+            "tr_id": "HHDFS76240000",
+        },
+    )
+    try:
+        with urllib.request.urlopen(req) as resp:
+            data = json.loads(resp.read())
+    except urllib.error.HTTPError as e:
+        sys.exit(f"KIS 해외주식 일별시세 API 호출 실패: {e.code} {e.read().decode(errors='replace')}")
+
+    if raw:
+        print(json.dumps(data, ensure_ascii=False, indent=2))
+        return None
+
+    rows = data.get("output2")
+    if not rows:
+        sys.exit(
+            "API 응답에서 일별시세 리스트(output2)를 찾지 못했습니다 — --raw로 "
+            "원본 JSON을 확인하고 이 함수의 추출 키를 응답 구조에 맞게 고치세요."
+        )
+    latest = rows[0]  # 최신순(내림차순) 정렬 가정 — 응답이 과거순이면 rows[-1]로 수정
+    required = ["xymd", "clos", "diff", "rate"]
+    missing = [k for k in required if k not in latest]
+    if missing:
+        sys.exit(
+            f"예상한 필드가 API 응답에 없습니다: {missing}. 실제 응답 키: "
+            f"{sorted(latest.keys())}\n실제 응답 전체(최신행): {json.dumps(latest, ensure_ascii=False)}\n"
+            "이 함수의 required 필드명을 위 실제 필드명으로 고치세요."
+        )
+    price = float(latest["clos"])
+    change = float(latest["diff"])
+    change_pct = float(latest["rate"])
+    trade_date_raw = str(latest["xymd"])  # YYYYMMDD
+    trade_date = f"{trade_date_raw[:4]}-{trade_date_raw[4:6]}-{trade_date_raw[6:]}"
+    return {
+        "symbol": symbol,
+        "date": trade_date,
+        "price": price,
+        "change": change,
+        "change_pct": change_pct,
+        "prev_close": price - change,
+    }
+
+
 def _read_adr_csv():
     if not ADR_CSV_PATH.exists():
         return {}
@@ -390,10 +476,15 @@ def _write_adr_csv(rows_by_key):
 
 def upsert_adr_row(quote, source="kis_api"):
     existing = _read_adr_csv()
-    today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
-    key = (today, quote["symbol"])
+    # 일별시세(daily) 응답은 실제 거래일(quote["date"])을 주므로 그걸 키로
+    # 쓴다 — 예전엔 항상 "오늘(UTC)" 날짜로 덮어써서, 예를 들어 KST 아침에
+    # 조회한 게 실제로는 그제 미국장 마감분이어도 "오늘" 행으로 잘못
+    # 기록됐다. 실시간 현재가(intraday) 경로처럼 거래일 정보가 없는
+    # 경우에만 UTC 오늘 날짜로 폴백한다.
+    row_date = quote.get("date") or datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    key = (row_date, quote["symbol"])
     existing[key] = {
-        "date": today, "symbol": quote["symbol"],
+        "date": row_date, "symbol": quote["symbol"],
         "price": quote["price"], "change": quote["change"],
         "change_pct": quote["change_pct"], "prev_close": quote["prev_close"],
         "source": source, "fetched_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
@@ -553,12 +644,21 @@ def cmd_snapshot(args):
 
 
 def cmd_adr_quote(args):
-    q = kis_fetch_overseas_price(args.symbol, args.excd, args.account_type, raw=args.raw)
+    # 2026-07-31부터 기본 경로를 일별 확정시세(daily)로 전환 — 이 저장소의
+    # 자동체크 3회가 전부 나스닥 정규장 밖 시각이라, 실시간 현재가(intraday)
+    # 경로는 "현재가=전일종가"인 마감 스냅샷만 돌려줘 change_pct가 계속
+    # 0.0%으로 찍히는 문제가 있었다. --intraday를 명시하면 예전 실시간
+    # 경로(미국 장중 디버깅용)를 그대로 쓸 수 있다.
+    if args.intraday:
+        q = kis_fetch_overseas_price(args.symbol, args.excd, args.account_type, raw=args.raw)
+    else:
+        q = kis_fetch_overseas_daily_price(args.symbol, args.excd, args.account_type, raw=args.raw)
     if args.raw:
         return
     upsert_adr_row(q)
     flag = " 🚨 급변동(5%+)" if abs(q["change_pct"]) >= 5 else ""
-    print(f"{q['symbol']}  ${q['price']:,.2f}  {q['change']:+,.2f}({q['change_pct']:+.2f}%){flag}  전일종가 ${q['prev_close']:,.2f}  → {ADR_CSV_PATH}에 기록")
+    date_note = f" [{q['date']} 거래일]" if q.get("date") else ""
+    print(f"{q['symbol']}  ${q['price']:,.2f}  {q['change']:+,.2f}({q['change_pct']:+.2f}%){flag}  전일종가 ${q['prev_close']:,.2f}{date_note}  → {ADR_CSV_PATH}에 기록")
 
 
 def cmd_show(args):
@@ -625,11 +725,12 @@ def main():
     psn.add_argument("--raw", action="store_true")
     psn.set_defaults(func=cmd_snapshot)
 
-    pa2 = sub.add_parser("adr-quote", help="ADR(해외상장) 현재가 조회, sources/sk-hynix-adr-quote.csv에 기록")
+    pa2 = sub.add_parser("adr-quote", help="ADR(해외상장) 시세 조회(기본: 일별 확정시세), sources/sk-hynix-adr-quote.csv에 기록")
     pa2.add_argument("--symbol", default="SKHY")
     pa2.add_argument("--excd", default="NAS", help="거래소 코드(NASDAQ=NAS)")
     pa2.add_argument("--account-type", default=os.environ.get("KIS_ACCOUNT_TYPE", "real"), choices=["real", "vts"])
     pa2.add_argument("--raw", action="store_true")
+    pa2.add_argument("--intraday", action="store_true", help="일별 확정시세 대신 실시간 현재가 조회(미국 장중 22:30~05:00 KST에서만 의미 있음)")
     pa2.set_defaults(func=cmd_adr_quote)
 
     args = p.parse_args()

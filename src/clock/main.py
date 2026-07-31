@@ -12,7 +12,9 @@ from pathlib import Path
 
 import pandas as pd
 
-from . import data_sources, notify, report, storage
+from core import notify
+
+from . import data_sources, report, storage
 from .model import build_full_history, read_clock
 from .render import draw_clock, draw_trend_charts
 
@@ -33,17 +35,21 @@ def run(history_path: Path = DEFAULT_HISTORY_PATH, docs_dir: Path = DEFAULT_DOCS
     draw_trend_charts(history, docs_dir)
     report.render_report(reading, history, run_date, docs_dir / "index.html")
 
-    channel = notify.build_channel()
-    channel.send(
-        subject=f"[Investment Clock] {reading.phase['name']} phase — favor {reading.phase['asset']}",
-        body_text=(
-            f"Data as of {max(reading.growth.as_of, reading.inflation.as_of).date()}\n"
-            f"Growth: {reading.growth.label} ({reading.growth.change:+.2f})\n"
-            f"Inflation (CPI YoY): {reading.inflation.label} ({reading.inflation.change:+.2f}pp), "
-            f"level {reading.inflation.value:.2f}%\n"
-            f"Phase: {reading.phase['name']} ({reading.phase['name_kr']}) -> {reading.phase['asset']}"
-        ),
-    )
+    try:
+        notify.build_channel().send(
+            subject=f"[Investment Clock] {reading.phase['name']} phase — favor {reading.phase['asset']}",
+            body_text=(
+                f"Data as of {max(reading.growth.as_of, reading.inflation.as_of).date()}\n"
+                f"Growth: {reading.growth.label} ({reading.growth.change:+.2f})\n"
+                f"Inflation (CPI YoY): {reading.inflation.label} ({reading.inflation.change:+.2f}pp), "
+                f"level {reading.inflation.value:.2f}%\n"
+                f"Phase: {reading.phase['name']} ({reading.phase['name_kr']}) -> {reading.phase['asset']}"
+            ),
+        )
+    except Exception as exc:
+        # The dashboard (docs/index.html, committed above) is the reliable delivery
+        # path; a bad SMTP login or transient network block must not fail the whole run.
+        print(f"[warn] notification send failed: {exc}")
 
     print(f"Phase: {reading.phase['name']} -> {reading.phase['asset']}")
     print(f"History rows: {len(history)} (from {history['data_asof'].min()} to {history['data_asof'].max()})")
