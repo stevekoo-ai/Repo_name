@@ -121,8 +121,11 @@ PS(성과급)에서 나오는 구조라, 위 SK하이닉스 집중 리스크는 
 않고 소득 측면과도 겹친다 — 회사 실적이 흔들리면 자산과 소득이 동시에 영향을
 받는 구조.
 
+시크릿 이름·워크플로우 전체 목록은 [자동화 인프라](automation-infrastructure.md) 참고.
+
 ## Sources
 
+- [자동화 인프라 — GitHub Actions 워크플로우 & 시크릿 인벤토리](automation-infrastructure.md)
 - [계좌 현황 스냅샷 (2026-07-13)](../summaries/portfolio-holdings-2026-07-13.md)
 - [SK하이닉스 저항 돌파 및 ADR 폭등 (2026-07-15)](../summaries/sk-hynix-adr-surge-breakout-2026-07-15.md)
 - [사용자 프로필](user-profile.md)
