@@ -86,9 +86,13 @@ tests/       pytest 단위/통합 테스트
 매일 06:00 KST에 `python -m engine.report.run`을 실행해 `report/<월>.md`와 `docs/report.html`(GitHub Pages)을
 갱신·커밋합니다. `daily-clock-report.yml`(Investment Clock)은 별도로 유지됩니다.
 
-기본은 대시보드/리포트 파일만 갱신되고 별도 알림은 없습니다(pull 방식). 저장소 Settings → Secrets에
-`SLACK_WEBHOOK_URL` 또는 `SMTP_HOST`/`SMTP_PORT`/`SMTP_USER`/`SMTP_PASSWORD`/`NOTIFY_EMAIL_TO`를 등록하면
-코드 수정 없이 매일 리포트 요약이 Slack/이메일로 자동 발송됩니다(`core/notify.py`, Investment Clock과 공용).
+기본은 대시보드/리포트 파일만 갱신되고 별도 알림은 없습니다(pull 방식). `core/notify.py`(Investment
+Clock과 공용)가 매일 리포트 요약을 Slack/이메일로 자동 발송하며, 우선순위는 `SLACK_WEBHOOK_URL` >
+범용 SMTP(`SMTP_HOST`/`SMTP_PORT`/`SMTP_USER`/`SMTP_PASSWORD`/`NOTIFY_EMAIL_TO`) > **Gmail**
+(`GMAIL_ADDRESS`+`GMAIL_APP_PASSWORD` — 이 저장소의 다른 워크플로우가 이미 쓰는 Gmail 계정을 재사용,
+새 시크릿 등록 불필요) > 무발송입니다. 이 저장소에 등록된 전체 시크릿 인벤토리와 각 GitHub Actions
+워크플로우의 용도는 [wiki/entities/automation-infrastructure.md](wiki/entities/automation-infrastructure.md)에
+정리돼 있습니다.
 
 ## 테스트
 
