@@ -534,7 +534,7 @@ def kis_fetch_overseas_daily_price(symbol, excd="NAS", account_type="real", raw=
             "원본 JSON을 확인하고 이 함수의 추출 키를 응답 구조에 맞게 고치세요."
         )
     latest = rows[0]  # 최신순(내림차순) 정렬 가정 — 응답이 과거순이면 rows[-1]로 수정
-    required = ["xymd", "clos", "diff", "rate"]
+    required = ["xymd", "clos", "diff"]
     missing = [k for k in required if k not in latest]
     if missing:
         sys.exit(
@@ -544,7 +544,13 @@ def kis_fetch_overseas_daily_price(symbol, excd="NAS", account_type="real", raw=
         )
     price = float(latest["clos"])
     change = float(latest["diff"])
-    change_pct = float(latest["rate"])
+    # 2026-08-01 수정: API의 "rate" 필드를 직접 신뢰하지 않는다 — 실계정
+    # 검증(2026-07-31) 결과 diff(+3.10, 상승)와 rate(-2.08%, 하락)의 부호가
+    # 서로 어긋나는 응답이 실제로 수신됨(SKHY 7/31행). diff·전일종가로
+    # 직접 재계산하면 항상 부호가 일치하므로, kis_fetch_overseas_price()
+    # (실시간 경로)와 동일하게 이쪽도 API 필드를 신뢰하지 않고 직접 계산한다.
+    prev_close = price - change
+    change_pct = (change / prev_close * 100) if prev_close else 0.0
     trade_date_raw = str(latest["xymd"])  # YYYYMMDD
     trade_date = f"{trade_date_raw[:4]}-{trade_date_raw[4:6]}-{trade_date_raw[6:]}"
     return {
