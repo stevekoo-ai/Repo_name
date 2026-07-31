@@ -90,13 +90,25 @@ YYYY-MM-DD HH:MM UTC — LINT → 2 issues found (see report)
 6. Update `wiki/index.md` and append one line to `wiki/log.md`.
 7. Report which pages were created vs. updated.
 
-### Query (`/query <question>`)
+### Query (`/query <question>`, and ordinary conversation)
+
+Applies to explicit `/query` calls and to any conversational question or
+discussion in the session — not just slash-command invocations. Every such
+exchange must leave a trace in the wiki; nothing gets discussed and then
+lost. No need to ask permission first — record, then move on.
 
 1. Read `wiki/index.md` and grep `wiki/` for pages relevant to the question.
 2. Answer the question, citing which wiki page(s) support each claim.
-3. If the answer surfaces something worth keeping that isn't already in the
-   wiki, propose filing it back in — don't write it in without saying so.
-4. Append one line to `wiki/log.md`.
+3. **Always record the exchange — recording is mandatory, never optional.**
+   Judge how much it matters and size the write-up accordingly:
+   - Important/new/insight-bearing: write a proper entry into the relevant
+     existing page (new page only if nothing fits) — include the reasoning
+     or insight behind it, not just the bare fact, cross-linked as usual.
+   - Minor, a repeat, or adds nothing new: a brief note is enough (a short
+     line on the relevant page, or just the `log.md` entry if there's truly
+     nothing page-worthy) — don't skip it, just don't over-write it.
+   - Write first; don't wait for the user to confirm before recording.
+4. Append one line to `wiki/log.md` describing what happened either way.
 
 ### Lint (`/lint`)
 
