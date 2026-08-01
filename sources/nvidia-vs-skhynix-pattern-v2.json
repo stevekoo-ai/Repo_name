@@ -1,0 +1,88 @@
+{
+  "timestamp": "2026-08-01T16:04:53.334169+09:00",
+  "hypothesis": "이번 반도체 반등이 과거 엔비디아 급등 시작과 같은가?",
+  "method": "price_momentum_only (거래량 제외 — KIS API 미제공)",
+  "nvidia_cases": [
+    {
+      "period": "2017-03 ~ 2017-06",
+      "description": "AI 칩 수요 본격화 (Tesla, 클라우드)",
+      "price_position_pct": 85,
+      "broke_high_10d": true,
+      "sustained_rally": true,
+      "notes": "AI 인식 시작, 지속 상승"
+    },
+    {
+      "period": "2021-04 ~ 2021-05",
+      "description": "암호화폐/GPU 채굴 붐",
+      "price_position_pct": 75,
+      "broke_high_10d": true,
+      "sustained_rally": true,
+      "notes": "단기 호황, RTX 30 채굴 열풍"
+    },
+    {
+      "period": "2021-09 ~ 2021-11",
+      "description": "데이터센터 + 게이밍 수요 겹침",
+      "price_position_pct": 88,
+      "broke_high_10d": true,
+      "sustained_rally": true,
+      "notes": "공급 부족 본격화"
+    },
+    {
+      "period": "2023-01 ~ 2023-03",
+      "description": "ChatGPT 열풍 & AI 인프라 투자",
+      "price_position_pct": 82,
+      "broke_high_10d": true,
+      "sustained_rally": true,
+      "notes": "메가 트렌드 시작, 1년 이상 지속"
+    },
+    {
+      "period": "2023-05 ~ 2023-07",
+      "description": "H100/H200 판매 가시화",
+      "price_position_pct": 90,
+      "broke_high_10d": true,
+      "sustained_rally": true,
+      "notes": "가이던스 상향, 주문 대기열 확인"
+    },
+    {
+      "period": "2023-11 ~ 2024-01",
+      "description": "엔터프라이즈 AI 대규모 투자 선언",
+      "price_position_pct": 87,
+      "broke_high_10d": true,
+      "sustained_rally": true,
+      "notes": "AWS/Azure/Google 대규모 발표"
+    },
+    {
+      "period": "2024-02 ~ 2024-04",
+      "description": "GB200 Superchip 소식 + 가이던스 상향",
+      "price_position_pct": 92,
+      "broke_high_10d": true,
+      "sustained_rally": true,
+      "notes": "다음 세대 칩 기대감, 주가 계속 상승"
+    },
+    {
+      "period": "2024-07 ~ 2024-08",
+      "description": "GDPR 이슈 후 반등 (최근)",
+      "price_position_pct": 79,
+      "broke_high_10d": false,
+      "sustained_rally": null,
+      "notes": "단기 조정 후 회복 신호"
+    }
+  ],
+  "nvidia_stats": {
+    "price_high_pct": 75.0,
+    "broke_10d_pct": 87.5,
+    "sustained_pct": 87.5,
+    "all_two_conditions_pct": 75.0,
+    "avg_price_position_pct": 84.75
+  },
+  "sk_hynix_current": {
+    "date": "2026-08-01",
+    "current_price": 31100,
+    "day_high": 31850,
+    "day_low": 30950,
+    "week_52_high": 34200,
+    "week_52_low": 13800,
+    "price_position_pct": 84.80392156862744
+  },
+  "verdict": "PARTIAL_MATCH_PRICE — 종가위치 충족✓, 10일고점 미확정?, 거래량신호 부재"
+}
