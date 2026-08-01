@@ -11,12 +11,14 @@ timestamped file, so initial/revised/final releases are all preserved
 from __future__ import annotations
 
 import json
+import re
 import time
 from datetime import date, datetime, timezone
 from pathlib import Path
 from typing import Any, Callable, TypeVar
 
 import pandas as pd
+import requests
 
 from core.logger import log_event
 
@@ -25,6 +27,31 @@ RAW_DIR = REPO_ROOT / "data" / "raw"
 NORMALIZED_DIR = REPO_ROOT / "data" / "normalized"
 
 T = TypeVar("T")
+
+_SECRET_QUERY_PARAM = re.compile(r"(?i)([?&](?:service[_-]?key|api[_-]?key|key|token|secret)=)[^&\s]+")
+
+
+def redact_url(url: str) -> str:
+    """Mask API-key/token-shaped query params in a URL.
+
+    requests.exceptions.HTTPError embeds the full request URL — including query
+    string — in its message (`"... for url: {resp.url}"`). Every collector that
+    authenticates via a `?serviceKey=`/`?apiKey=`-style query param (MOLIT, FRED,
+    KOSIS) would otherwise leak the raw key into anything that logs or surfaces
+    str(exc) — which for MOLIT specifically means the committed, public
+    report/<month>.md `fetch_note` text, not just an ephemeral log line. See
+    raise_for_status() below, the actual call site for this.
+    """
+    return _SECRET_QUERY_PARAM.sub(r"\1***", url)
+
+
+def raise_for_status(resp: requests.Response) -> None:
+    """Like resp.raise_for_status(), but with API keys/tokens stripped from the
+    exception message via redact_url() — safe to log or embed in report text."""
+    try:
+        resp.raise_for_status()
+    except requests.exceptions.HTTPError as exc:
+        raise requests.exceptions.HTTPError(redact_url(str(exc)), response=resp) from None
 
 
 def retry(fn: Callable[[], T], attempts: int = 3, backoff_seconds: float = 1.5, label: str = "") -> T | None:

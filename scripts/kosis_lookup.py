@@ -25,6 +25,8 @@ from datetime import datetime
 
 import requests
 
+from collectors.base import raise_for_status
+
 KOSIS_BASE_URL = "https://kosis.kr/openapi"
 
 # A few plausible (orgId, tblId) candidates per indicator, gathered from
@@ -47,7 +49,7 @@ def _try_candidate(api_key: str, org_id: str, tbl_id: str, start: str, end: str,
     }
     try:
         resp = requests.get(url, params=params, timeout=15)
-        resp.raise_for_status()
+        raise_for_status(resp)
         payload = resp.json()
     except Exception as exc:  # network/JSON errors reported as-is, not raised
         return {"ok": False, "error": str(exc)}

@@ -64,14 +64,15 @@ class _FakeResponse:
     """Minimal requests.Response stand-in for exercising _fetch_region_month's error paths
     without a real network call."""
 
-    def __init__(self, text: str, json_ok: bool = True, status_ok: bool = True):
+    def __init__(self, text: str, json_ok: bool = True, status_ok: bool = True, status_error: str | None = None):
         self.text = text
         self._json_ok = json_ok
         self._status_ok = status_ok
+        self._status_error = status_error or "500 Server Error"
 
     def raise_for_status(self):
         if not self._status_ok:
-            raise __import__("requests").exceptions.HTTPError("500 Server Error")
+            raise __import__("requests").exceptions.HTTPError(self._status_error)
 
     def json(self):
         if not self._json_ok:
@@ -100,6 +101,29 @@ def test_fetch_region_month_surfaces_non_json_body_as_likely_auth_error(monkeypa
 
     with pytest.raises(RuntimeError, match="non-JSON response"):
         molit._fetch_region_month("11110", "202601", "fake-key")
+
+
+def test_fetch_region_month_never_leaks_the_real_key_on_http_error(monkeypatch):
+    """Regression test for a real incident: a 401 from data.go.kr surfaced the raw
+    DATA_GO_KR_KEY value (from requests' HTTPError embedding the full request URL) into
+    fetch_and_store()'s note — which then got committed verbatim into the public
+    report/<month>.md. _fetch_region_month must never let the real key value survive in
+    any exception it raises, regardless of which HTTP status caused the failure."""
+    real_key = "751fd46ea503be38c38d3b466987abf162c356f40a2e060ef7fb7953fb5ca078"
+    status_error = (
+        "401 Client Error: Unauthorized for url: "
+        f"https://apis.data.go.kr/1613000/RTMSDataSvcAptTradeDev/getRTMSDataSvcAptTradeDev"
+        f"?serviceKey={real_key}&LAWD_CD=11110&DEAL_YMD=202607&pageNo=1&numOfRows=1000&type=json"
+    )
+    monkeypatch.setattr(
+        molit.requests, "get",
+        lambda *a, **k: _FakeResponse("", status_ok=False, status_error=status_error),
+    )
+
+    with pytest.raises(Exception) as excinfo:
+        molit._fetch_region_month("11110", "202607", real_key)
+
+    assert real_key not in str(excinfo.value)
 
 
 def test_probe_with_detail_returns_error_message_instead_of_swallowing_it(monkeypatch):
