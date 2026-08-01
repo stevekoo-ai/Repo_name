@@ -88,6 +88,33 @@ sources:
     base_url: "https://apis.data.go.kr/1613000/RTMSDataSvcAptTradeDev/getRTMSDataSvcAptTradeDev"
     note: "공공데이터포털(data.go.kr)에서 무료 일반 인증키 발급. 원자료가 개별 거래 단위라 지역군별 월 중위가로 집계해 저장."
 
+  molit_rent:
+    label: "국토교통부 실거래가 공개시스템 (아파트 전월세 실거래가 자료)"
+    reliability_grade: 5
+    official: true
+    requires_key: true
+    env_key: DATA_GO_KR_KEY
+    base_url: "https://apis.data.go.kr/1613000/RTMSDataSvcAptRent/getRTMSDataSvcAptRent"
+    note: "data.go.kr 활용신청은 상품(API) 단위 — molit과 키는 같아도 별도 승인 필요 (data ID 15126474). base_url은 data.go.kr Swagger 문서로 아직 미확인 — 실제 서비스ID가 다르면(예: ...Dev 접미사) SERVICE_ACCESS_DENIED_ERROR가 아닌 404로 나타날 수 있으니 그 경우 이 URL부터 확인."
+
+  molit_villa:
+    label: "국토교통부 실거래가 공개시스템 (연립다세대 매매 실거래가 자료)"
+    reliability_grade: 5
+    official: true
+    requires_key: true
+    env_key: DATA_GO_KR_KEY
+    base_url: "https://apis.data.go.kr/1613000/RTMSDataSvcRHTrade/getRTMSDataSvcRHTrade"
+    note: "data.go.kr 활용신청은 상품(API) 단위 — molit과 키는 같아도 별도 승인 필요. base_url은 data.go.kr Swagger 문서로 아직 미확인, molit_rent와 동일하게 확인 필요."
+
+  molit_officetel:
+    label: "국토교통부 실거래가 공개시스템 (오피스텔 매매 실거래가 자료)"
+    reliability_grade: 5
+    official: true
+    requires_key: true
+    env_key: DATA_GO_KR_KEY
+    base_url: "https://apis.data.go.kr/1613000/RTMSDataSvcOffiTrade/getRTMSDataSvcOffiTrade"
+    note: "data.go.kr 활용신청은 상품(API) 단위 — molit과 키는 같아도 별도 승인 필요. base_url은 data.go.kr Swagger 문서로 아직 미확인, molit_rent와 동일하게 확인 필요."
+
 # Master Instruction 18.2 cache windows, in seconds.
 cache_ttl_seconds:
   realtime_fx: 1800
