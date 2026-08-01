@@ -51,11 +51,11 @@ def _render_sk_hynix_action(action: dict) -> str:
     <div class="action-box {state_class}">
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 15px;">
             <div>
-                <strong style="color: #CBD5E1;">Action</strong>
+                <strong style="color: #CBD5E1;">조치</strong>
                 <div style="font-size: 1.2em; color: #F1F5F9; margin-top: 5px;">{action_type}</div>
             </div>
             <div>
-                <strong style="color: #CBD5E1;">Max Weight</strong>
+                <strong style="color: #CBD5E1;">최대 비중</strong>
                 <div style="font-size: 1.2em; color: #F1F5F9; margin-top: 5px;">{max_weight}%</div>
             </div>
         </div>
@@ -450,9 +450,9 @@ def render_html(payload: dict) -> str:
             </div>
         </div>
 
-        <!-- SK Hynix 액션 플랜 -->
+        <!-- SK하이닉스 액션 플랜 -->
         <div class="card" style="margin-bottom: 30px;">
-            <h2>🎯 SK Hynix 포지션 관리</h2>
+            <h2>🎯 SK하이닉스 포지션 관리</h2>
             {_render_sk_hynix_action(cci.get('sk_hynix_action', {}))}
         </div>
 
@@ -461,7 +461,7 @@ def render_html(payload: dict) -> str:
 
         <!-- 포트폴리오 추천 -->
         <div class="card" style="margin-bottom: 30px;">
-            <h2>📈 포트폴리오 추천 (Rate 기반)</h2>
+            <h2>📈 포트폴리오 추천 (금리 기반)</h2>
             <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin: 20px 0;">
                 <div style="background: rgba(59, 130, 246, 0.1); padding: 20px; border-radius: 8px; text-align: center; border-left: 4px solid #3B82F6;">
                     <div style="font-size: 2em; font-weight: bold; color: #93C5FD;">{rate.get('portfolio_recommendation', {}).get('stocks', '--')}%</div>
@@ -483,9 +483,9 @@ def render_html(payload: dict) -> str:
             </div>
         </div>
 
-        <!-- SK Hynix 아웃룩 -->
+        <!-- SK하이닉스 아웃룩 -->
         <div class="card" style="margin-bottom: 30px;">
-            <h2>🔮 SK Hynix 전망 (3M/6M/12M)</h2>
+            <h2>🔮 SK하이닉스 전망 (3개월/6개월/12개월)</h2>
             <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin: 20px 0;">
                 <div style="background: rgba(34, 197, 94, 0.1); padding: 20px; border-radius: 8px; text-align: center;">
                     <div style="font-size: 1.8em; font-weight: bold; color: #86EFAC;">{rate.get('sk_hynix_outlook', {}).get('3m_upside_probability', '--')}%</div>

@@ -329,31 +329,31 @@ def portfolio_recommendation(score: int) -> dict:
     if score >= 85:
         return {
             "stocks": 70, "bonds": 20, "cash": 10,
-            "condition": "Extreme easing — aggressive growth",
+            "condition": "극단적 완화 — 공격적 성장 전략",
             "rebalance_trigger": 65,
         }
     elif score >= 70:
         return {
             "stocks": 60, "bonds": 25, "cash": 15,
-            "condition": "Easing cycle — growth focused",
+            "condition": "완화 국면 — 성장주 중심",
             "rebalance_trigger": 50,
         }
     elif score >= 55:
         return {
             "stocks": 50, "bonds": 30, "cash": 20,
-            "condition": "Neutral to moderately accommodative — balanced",
+            "condition": "중립~다소 완화적 — 균형 배분",
             "rebalance_trigger": 40,
         }
     elif score >= 40:
         return {
             "stocks": 40, "bonds": 35, "cash": 25,
-            "condition": "Tightening cycle — defensive",
+            "condition": "긴축 국면 — 방어적 배분",
             "rebalance_trigger": 30,
         }
     else:
         return {
             "stocks": 30, "bonds": 40, "cash": 30,
-            "condition": "Extreme tightening — highly defensive",
+            "condition": "극단적 긴축 — 고도 방어적",
             "rebalance_trigger": 55,
         }
 
@@ -406,22 +406,22 @@ def sk_hynix_outlook(score: int, spread_bp: Optional[float]) -> dict:
 def _generate_hynix_rationale(score: int, spread_bp: Optional[float]) -> str:
     """Generate text explanation of SK Hynix outlook."""
     if score >= 75:
-        rate_factor = "Rate easing supports AI semiconductor demand"
+        rate_factor = "금리 완화가 AI 반도체 수요를 뒷받침"
     elif score >= 60:
-        rate_factor = "Neutral rate environment maintains AI momentum"
+        rate_factor = "중립적 금리 환경이 AI 모멘텀을 유지"
     elif score >= 45:
-        rate_factor = "Tightening rates pressure valuation multiples"
+        rate_factor = "긴축 금리가 밸류에이션 배수를 압박"
     else:
-        rate_factor = "Extreme tightening threatens semiconductor cycle"
+        rate_factor = "극단적 긴축이 반도체 사이클을 위협"
 
     if spread_bp is not None:
         if spread_bp > 250:
-            spread_factor = "Wide US-KR spread (strong dollar) supports export competitiveness"
+            spread_factor = "미-한 금리차 확대(달러 강세)가 수출 경쟁력을 뒷받침"
         elif spread_bp > 150:
-            spread_factor = "Moderate spread maintains export margin"
+            spread_factor = "적당한 금리차가 수출 마진을 유지"
         else:
-            spread_factor = "Narrow spread (weak dollar) pressures export margins"
+            spread_factor = "금리차 축소(달러 약세)가 수출 마진을 압박"
     else:
-        spread_factor = "Spread data unavailable"
+        spread_factor = "금리차 데이터 없음"
 
     return f"{rate_factor}. {spread_factor}."
