@@ -13,6 +13,7 @@ from __future__ import annotations
 import os
 import smtplib
 from email.mime.text import MIMEText
+from email.utils import formatdate, make_msgid
 from typing import Protocol
 
 import requests
@@ -50,6 +51,13 @@ class EmailChannel:
         msg["Subject"] = subject
         msg["From"] = self.user
         msg["To"] = self.to_addr
+        # MIMEText doesn't set these on its own. A missing Date/Message-ID is a
+        # strong spam/forgery signal to receiving servers — Gmail in particular
+        # has been observed to accept (250 OK) a header-bare self-to-self message
+        # over SMTP and then silently drop it rather than deliver or spam-file it,
+        # which looks identical to success from the sending side.
+        msg["Date"] = formatdate(localtime=False)
+        msg["Message-ID"] = make_msgid(domain=self.user.rpartition("@")[2] or None)
         with smtplib.SMTP_SSL(self.smtp_host, self.smtp_port) as server:
             server.login(self.user, self.password)
             server.sendmail(self.user, [self.to_addr], msg.as_string())
