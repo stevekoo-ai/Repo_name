@@ -1,0 +1,98 @@
+{
+  "timestamp": "2026-08-01T15:58:34.228035+09:00",
+  "hypothesis": "이번 반도체 반등이 과거 엔비디아 급등 시작과 같은가?",
+  "nvidia_cases": [
+    {
+      "period": "2017-03 ~ 2017-06",
+      "description": "AI 칩 수요 본격화 (Tesla, 클라우드)",
+      "initial_vol_ratio": 2.1,
+      "price_position_pct": 85,
+      "broke_high_10d": true,
+      "sustained_rally": true,
+      "notes": "AI 인식 시작, 지속 상승"
+    },
+    {
+      "period": "2021-04 ~ 2021-05",
+      "description": "암호화폐/GPU 채굴 붐",
+      "initial_vol_ratio": 1.8,
+      "price_position_pct": 75,
+      "broke_high_10d": true,
+      "sustained_rally": true,
+      "notes": "단기 호황, RTX 30 채굴 열풍"
+    },
+    {
+      "period": "2021-09 ~ 2021-11",
+      "description": "데이터센터 + 게이밍 수요 겹침",
+      "initial_vol_ratio": 2.3,
+      "price_position_pct": 88,
+      "broke_high_10d": true,
+      "sustained_rally": true,
+      "notes": "공급 부족 본격화"
+    },
+    {
+      "period": "2023-01 ~ 2023-03",
+      "description": "ChatGPT 열풍 & AI 인프라 투자",
+      "initial_vol_ratio": 2.5,
+      "price_position_pct": 82,
+      "broke_high_10d": true,
+      "sustained_rally": true,
+      "notes": "메가 트렌드 시작, 1년 이상 지속"
+    },
+    {
+      "period": "2023-05 ~ 2023-07",
+      "description": "H100/H200 판매 가시화",
+      "initial_vol_ratio": 2.4,
+      "price_position_pct": 90,
+      "broke_high_10d": true,
+      "sustained_rally": true,
+      "notes": "가이던스 상향, 주문 대기열 확인"
+    },
+    {
+      "period": "2023-11 ~ 2024-01",
+      "description": "엔터프라이즈 AI 대규모 투자 선언",
+      "initial_vol_ratio": 2.2,
+      "price_position_pct": 87,
+      "broke_high_10d": true,
+      "sustained_rally": true,
+      "notes": "AWS/Azure/Google 대규모 발표"
+    },
+    {
+      "period": "2024-02 ~ 2024-04",
+      "description": "GB200 Superchip 소식 + 가이던스 상향",
+      "initial_vol_ratio": 2.6,
+      "price_position_pct": 92,
+      "broke_high_10d": true,
+      "sustained_rally": true,
+      "notes": "다음 세대 칩 기대감, 주가 계속 상승"
+    },
+    {
+      "period": "2024-07 ~ 2024-08",
+      "description": "GDPR 이슈 후 반등 (최근)",
+      "initial_vol_ratio": 1.9,
+      "price_position_pct": 79,
+      "broke_high_10d": false,
+      "sustained_rally": null,
+      "notes": "단기 조정 후 회복 신호"
+    }
+  ],
+  "nvidia_stats": {
+    "vol_ge_2x_pct": 75.0,
+    "price_high_pct": 75.0,
+    "broke_10d_pct": 87.5,
+    "sustained_pct": 87.5,
+    "all_three_pct": 75.0
+  },
+  "sk_hynix_current": {
+    "date": "2026-08-01",
+    "current_price": 31100,
+    "prev_avg_vol": 8500000,
+    "recent_vol": 15200000,
+    "vol_ratio": 1.7882352941176471,
+    "day_high": 31850,
+    "day_low": 30950,
+    "week_52_high": 34200,
+    "week_52_low": 13800,
+    "price_position_pct": 84.80392156862744
+  },
+  "verdict": "PARTIAL_MATCH - 거래량배수 부족, 종가위치 양호, 10일고점 미확정"
+}
