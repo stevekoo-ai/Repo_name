@@ -245,6 +245,7 @@ tags: [nvidia, pattern-analysis, sk-hynix, bullish-signal, hypothesis-validation
   - NVIDIA 8개 사례, SK하이닉스 현황(가격 데이터 CONFIRMED), 통계 및 판정 포함
 - `/sources/sk-hynix-price-snapshot.csv` — SK하이닉스 실제 가격 실측(KIS API), 이 페이지의 SK하이닉스 현재가·250일 최고가 출처
 - [sources/sk-hynix-tradingview-chart-2026-08-01.md](../../sources/sk-hynix-tradingview-chart-2026-08-01.md) — 사용자 제공 TradingView 차트 텍스트 기록 (52주고점 정확한 날짜·52주전 시점 가격 확인)
+- [sources/Hynix 52 weeks stock.png](<../../sources/Hynix 52 weeks stock.png>) — 위 기록의 원본 스크린샷 (사용자가 GitHub main 브랜치 업로드로 추가 제공, 2026-08-02)
 - 엔비디아 공개 투자자 발표자료 및 미디어 보도 통계
 - 사용자 제공 차트 데이터 (3건 실측, 웹서치 기반)
 - [KIS Open API 데이터 카탈로그](kis-api-reference.md) — `HHDFS76240000` TR 스펙
