@@ -16729,7 +16729,29 @@
     }
   },
   "daily_history_summary": {
-    "status": "unavailable",
-    "note": "2026-08 월간 일일 이력 없음"
+    "status": "ok",
+    "month": "2026-08",
+    "daily_records": [
+      {
+        "date": "2026-08-01",
+        "kr_regime": "Early Expansion",
+        "kr_score": 1.0,
+        "kr_confidence": 90.5,
+        "us_regime": "Slowdown",
+        "us_score": -1.0,
+        "us_confidence": 96.9,
+        "investment_env_score": 69.9,
+        "semiconductor_score": 79.6,
+        "bond_score": 42.7
+      }
+    ],
+    "trend_summary": {
+      "kr_regime_stable": true,
+      "kr_confidence_change": 0.0,
+      "us_regime_stable": true,
+      "us_confidence_change": 0.0,
+      "investment_env_trend": 0.0,
+      "semiconductor_trend": 0.0
+    }
   }
 }
