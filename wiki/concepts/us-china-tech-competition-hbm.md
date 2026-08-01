@@ -1,7 +1,7 @@
 ---
 title: 미중 기술 경쟁과 HBM 시장의 미래
 created: 2026-07-21
-updated: 2026-07-29
+updated: 2026-08-01
 tags: [us-china-competition, hbm-market, cxmt-threat, tech-autonomy, long-term-risk]
 ---
 
@@ -62,6 +62,36 @@ tags: [us-china-competition, hbm-market, cxmt-threat, tech-autonomy, long-term-r
 | **성장률** | Q1 수익 719% 급증 | 지수적 성장 궤도 진입 |
 | **실제 상장일** | **2026-07-27**(D-5) | 공모가 8.66위안, 공모규모 579억위안(약 12.7~14.5조원). ⚠ 이전 "7/16 상장 완료" 기록은 CSRC 등록승인 단계를 오인한 오류(2026-07-22 저녁 정정) |
 | **HBM 진입 시점** | **하반기 2026년(HBM3)** | 최신 기술이 아닌 구세대 표준 채택 |
+
+### 국제 매체 교차검증 (2026-08-01, 주말 리서치 체크 — 미국·대만 소스로 재확인)
+
+기존 수치들이 서로 다른 지역 매체로 **독립 재확인**됐다 — 단일 소스 리스크가
+낮아졌다는 뜻:
+- **[FACT, 대만 Taipei Times 7/28 + 미국 EE Times/Tom's Hardware]** CXMT 상장일
+  실제 첫날 주가 +466% 급등, 조달액 약 $8.6B(RMB 57.92B) — 이 위키의 기존
+  기록("약 12.7~14.5조원")과 자릿수·방향 일치. 상장 첫날 만에 **중국 A주
+  전체 시총 1위**(약 3.3조위안=$487.74B), 중국 반도체 사상 최대 IPO라는
+  점도 재확인.
+- **[FACT, DigiTimes 7/31 — 대만 소스]** 글로벌 DRAM 점유율 **7.67%**로
+  거의 동일한 수치 재확인(이 위키의 7.6%와 정합). 2028년 기술 로드맵 관련
+  Research Insight 발행 — "여전히 격차 존재"라는 논조는 대만 소스가
+  중국 경쟁력을 과장하지 않는 방향으로 일관됨(대만은 경쟁 당사국이라
+  오히려 위협을 축소 안 할 유인이 있는데도 이런 논조라는 점에서 신뢰도
+  가점).
+- **[미검증, 미국 Morgan Stanley 추정 — EE Times 경유]** CXMT의 HBM 생산능력이
+  **2026년말 약 10,000 wpm → 2028년말 40,000 wpm**로 확대될 것이라는
+  전망. 이 위키가 기존에 추적해온 "CXMT 월 웨이퍼 투입량의 2% 미만만 HBM,
+  수율 약 25%, HBM3E 양산목표 2027년"(entities/sk-hynix.md, 7/31 아침 체크,
+  SemiAnalysis 기반)과 **큰 방향은 같으나(당장은 소규모, 점진 확대) 숫자
+  자체는 다른 기관 추정이라 직접 비교는 어려움** — 두 추정치 모두
+  "2026년 현재는 걸음마 수준, 2027~2028년에 본격화"라는 정성적 결론에는
+  수렴.
+- 🇺🇸🇯🇵 **미확인**: Bloomberg·Reuters·CNBC·닛케이에서 지난 2~3일(7/31~8/1)
+  내 SK하이닉스/CXMT를 직접 다루는 **신규 반박 또는 신규 약세** 논조 기사는
+  이번 검색에서 확인되지 않음(주말이라 뉴스 발행량 자체가 적은 영향으로
+  추정) — 검색된 자료는 대부분 7/29~30 실적 발표 직후 기사의 재유통.
+- 🇨🇳 **중국 도메스틱 소스**(esmchina.com, 163.com 등) 직접 검색 결과 없음 —
+  **미확인**으로 남긴다(위 DigiTimes·EE Times 등 타 지역 소스로만 교차검증됨).
 
 ### 전략적 의도: "충분한 성능 + 극저가" 조합
 
@@ -196,3 +226,7 @@ HBM 시장 규모(TAM) 자체가 훨씬 크게 성장한다면 점유율이 50%�
 - [SK하이닉스 목표주가 근거 체크리스트](sk-hynix-analyst-thesis-checkpoints.md) (체크포인트 ⑦ CXMT 위협)
 - [반도체 시장의 단기 수급 싸이클 vs 장기 펀더멘털](market-cycles-leverage-risk.md) (중기 시장 구조)
 - [나의 투자 포트폴리오](../entities/my-portfolio.md) (포트폴리오 집중 위험)
+- [CXMT shares soar in blockbuster listing - Taipei Times](https://www.taipeitimes.com/News/biz/archives/2026/07/28/2003861477)
+- [Research Insight: CXMT reaches 7.67% DRAM share with US$4.4B IPO, 2028 tech roadmap - DigiTimes](https://www.digitimes.com/news/a20260731PD207/cxmt-dram-ipo-technology-2028.html)
+- [China's CXMT Is Set to Challenge DRAM Incumbents - SemiAnalysis](https://newsletter.semianalysis.com/p/chinas-cxmt-is-set-to-challenge-dram)
+- [CXMT IPO: Where China's Largest DRAM Maker Stands? - EE Times](https://www.eetimes.com/cxmt-ipo-where-chinas-largest-dram-maker-stands/)

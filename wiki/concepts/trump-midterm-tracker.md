@@ -1,7 +1,7 @@
 ---
 title: 트럼프 2026 중간선거 트래커
 created: 2026-07-30
-updated: 2026-07-30
+updated: 2026-08-01
 tags: [politics, us-midterm, trump, daily-tracking, macro]
 ---
 
@@ -107,6 +107,7 @@ HBM Cycle Score와는 **독립적인 트랙**으로 관리한다.
 | 2026-07-30 | 🔴↘ | 지지율 32%(Quinnipiac, 최저치 경신), 제네릭밸럿 민주 D+7~11 |
 | 2026-07-30 밤 | 🔴↘ | 범위 32~39%로 정교화(CNN34%·Emerson39%등 조사기관별 편차 확인) |
 | 2026-07-31 | 🔴↘(변화없음) | 범위 재확인(32~39%, 순지지율 -17.4~-22), 5개 조사기관 교차확인 |
+| 2026-08-01/02(주말) | 🔴↘(변화없음) | 재검색해도 새 여론조사 없음(주말) — AP-NORC 33%·순지지율 -20.6 등 기존 범위 안 |
 
 ### 💰 경제 — 타임라인
 | 날짜 | 상태 | 비고 |
@@ -114,6 +115,7 @@ HBM Cycle Score와는 **독립적인 트랙**으로 관리한다.
 | 2026-07-30 | 🔴⏳ | 셧다운發 10월 통계 영구결측 우려(백악관 공식 경고) |
 | 2026-07-30 밤 | 🔴↘ | 대법원 IEEPA 관세 위헌판결(6-3, 2026-02) 후 대체관세 재추진, 환급 $1,000~1,300억 |
 | 2026-07-31 | 🔴↘(변화없음) | 관세 재추진 국면 유지 |
+| 2026-08-01 | 🔴↘ | **신규 관세 14개국 발효**(한국·일본 포함) — 말레이시아25%·인도네시아32%·캄보디아36%·라오스40% 등, 한국向 관세가 이 트래커에 처음 구체적으로 잡힘(대미 반도체 수출 영향은 다음 체크에서 확인) |
 
 ### ⚔️ 전쟁/외교 — 타임라인
 | 날짜 | 상태 | 비고 |
@@ -121,6 +123,7 @@ HBM Cycle Score와는 **독립적인 트랙**으로 관리한다.
 | 2026-07-30 | 🔴↘ | 이란 휴전 종료·재격화, 후티 홍해 항행금지 선언(7/20) |
 | 2026-07-30 밤 | 🔴→(혼재로 세분화) | 중동은 악화 유지, **우크라이나는 오히려 개선**(젤렌스키·위트코프·커슈너 협의, 크렘린 "협상 개방적") |
 | 2026-07-31 | 🔴→(변화없음) | 중동↘·우크라이나↗ 혼재 유지 |
+| 2026-08-01/02 | 🔴🔴↘↘ | **급격 악화** — 트럼프 "이란 매우 세게 타격" 예고(7/31), 국무부 중동 전역 여행경보("지금 떠나라"), 쿠웨이트 이란발 드론공격 보고(8/1 새벽). 이스라엘 최고경계이나 참전여부는 혼재보도. 단 가자 평화안(하마스 무장해제·이스라엘 철수)은 별도로 진전 — 중동 내에서도 이란축↘·가자축↗로 갈림 |
 
 ### 🛂 이민 — 타임라인
 | 날짜 | 상태 | 비고 |
@@ -128,6 +131,7 @@ HBM Cycle Score와는 **독립적인 트랙**으로 관리한다.
 | 2026-07-30 | 🔴↘ | ICE 총격 사망사건 이후 이민정책 강한반대 49%로 급등 |
 | 2026-07-30 밤 | 🔴↘ | 구체 수치 확보 — 강제추방 60만+·자진출국 190만+ 누적 250만+ 출국, ICE 인력 1만→2.2만 증원 |
 | 2026-07-31 | 🔴↘(변화없음) | 구체 수치 유지 |
+| 2026-08-01/02 | 🔴↘(변화없음) | 재검색해도 신규 수치·사건 미확인 — 기존 구체 수치(강제추방 60만+ 등) 유지 |
 
 ### 🥊 경쟁구도 — 타임라인
 | 날짜 | 상태 | 비고 |
@@ -135,6 +139,7 @@ HBM Cycle Score와는 **독립적인 트랙**으로 관리한다.
 | 2026-07-30 | ⏳ | 초기 미평가(데이터 확보 전) |
 | 2026-07-30 밤 | 🔴⏳(최초 실측) | NYT/Siena — 상원 경합주 4곳 민주 우위(WI+8·NC+6·PA+4·OH+4), 하원 토스업 17석 |
 | 2026-07-31 | 🔴⏳(변화없음) | 최초 실측치 유지 |
+| 2026-08-01/02 | 🔴⏳ | **[미검증, 예정 일정]** 미시간·버지니아 8/4 예비선거 예정 — 매사추세츠 마키(현역) vs 몰튼(도전) 경선, 미네소타 클로버샤 등 경합 확인. 아직 결과는 아니고 일정 확인 수준 |
 
 ## 체크 이력
 
@@ -144,6 +149,7 @@ HBM Cycle Score와는 **독립적인 트랙**으로 관리한다.
 | 2026-07-30 19:xx(저녁, 본격 갱신) | 🔴↘(변화없음) | 🔴⏳(변화없음) | 🔴↘(변화없음) | 🔴↘(변화없음) | ⏳(변화없음) | **오늘 저녁 체크에서는 신규 정치 뉴스가 검색되지 않음 — 오전 확인분과 변화 없음**으로 판정. SK하이닉스 이슈(CXMT·삼성 실적)에 리서치가 집중된 하루라 트래커 자체의 진전은 제한적이었음을 투명하게 기록 — 다음 체크(7/31)에서 재조사 |
 | **2026-07-30 밤(심층 갱신, 사용자 요청)** | 🔴↘(범위 32~39%로 정교화) | 🔴↘(관세 축 구체화) | 🔴→(중동↘·우크라이나↗ 혼재로 세분화) | 🔴↘(구체 수치 확보) | **🔴⏳(최초 실측)** | 경쟁구도가 처음으로 정량 판세 확보(민주당 상원 4석 우위 지역 확인, 하원 토스업 17석) — 대법원 관세 위헌 판결 후 트럼프의 대체관세 재추진, 우크라이나 평화협상은 오히려 진전 조짐이라 5개 카테고리 전체가 단순 악화 일변도는 아님을 이번 심층조사로 확인 |
 | 2026-07-31 07:xx(아침, 간략 재사용) | 🔴↘(변화없음) | 🔴↘(변화없음) | 🔴→(변화없음) | 🔴↘(변화없음) | 🔴⏳(변화없음) | 어젯밤 확정치 그대로 재사용 — 간밤 큰 뉴스 확인 안 됨. 지지율 재검색 결과 CNN 34%·AP-NORC 33%·Quinnipiac 32%·Verasight 39%·Reuters/Ipsos 37% 등 **기존 범위(32~39%)와 정합**, 순지지율 -17.4~-22로 재확인(큰 변화 아니라 5개 카테고리 판정에는 영향 없음) |
+| **2026-08-01/02 주말 체크(일요일, 사용자 요청 — 월요일 개장 대비)** | 🔴↘(변화없음) | 🔴↘(관세 신규 확인) | 🔴🔴↘↘(급격 악화 — 최대 이슈) | 🔴↘(변화없음) | 🔴⏳(구체 사례 신규 확인) | **[FACT] 이란 신규 공습이 이번 주말 임박** — 트럼프가 7/31 "매우 세게 타격하겠다(hitting them very hard)"고 예고, 국무부가 중동 전역 미국인에 "지금 떠나라" 여행경보 발령, 쿠웨이트에서 8/1 새벽 이란발 드론 공격 보고(CNN). 이스라엘은 "최고 경계"이나 자체 참전 결정은 미확인이라며 부인 보도도 혼재. 다만 같은 기간 **가자 평화안(하마스 무장해제·이스라엘 철수) 진전은 별도로 보도**돼 중동 내에서도 이란 축과 가자 축이 반대로 움직임. **[FACT] 신규 관세 발효(8/1)**: 한국·일본 포함 14개국에 새 관세율 발효(말레이시아 25%·인도네시아 32%·캄보디아 36%·라오스 40% 등) — 한국 관련 관세가 이 트래커에 처음 구체적으로 잡힘, SK하이닉스 대미 수출과의 접점은 다음 체크에서 확인 필요. **[미검증] 경쟁구도**: 미시간·버지니아 8/4 예비선거 예정(매사추세츠 마키 vs 몰튼, 미네소타 클로버샤 등 경합 확인) — 아직 결과 아닌 예정 일정. 지지율(정치)·이민 항목은 기존 범위·수치에서 변화 없음 |
 
 ## Sources
 
@@ -167,3 +173,10 @@ HBM Cycle Score와는 **독립적인 트랙**으로 관리한다.
 - [With just a few primary elections to go, the competitive Senate map keeps shifting - NPR](https://www.npr.org/2026/07/27/nx-s1-5907379/2026-midterm-election-senate-races)
 - [GOP holds edge in Senate swing-state races: New York Times polls - The Hill](https://thehill.com/homenews/campaign/5949463-texas-maine-iowa-ohio-alaska-senate-races/)
 - [macro-regime-history.md](macro-regime-history.md) (유가·거시국면 교차연동)
+- [Live updates: US-Iran war news; State Department warns citizens across the Middle East - CNN](https://www.cnn.com/2026/08/01/world/live-news/iran-war-trump)
+- [Trump touts progress on Gaza peace effort as war with Iran drags on - CNN (7/31)](https://www.cnn.com/2026/07/31/world/live-news/iran-war-trump)
+- [Israel assesses Iran will fire missiles even without joining new US offensive - Times of Israel](https://www.timesofisrael.com/liveblog-august-01-2026/)
+- [Fact Sheet: Trump Imposes Additional Tariffs on Canada - White House (7월)](https://www.whitehouse.gov/fact-sheets/2026/07/fact-sheet-president-donald-j-trump-imposes-additional-tariffs-on-canada/)
+- [Trump 2.0 tariff tracker - Trade Compliance Resource Hub](https://www.tradecomplianceresourcehub.com/2026/07/27/trump-2-0-tariff-tracker/)
+- [Michigan's August 2026 primary election guide - wzzm13](https://www.wzzm13.com/article/news/politics/elections/michigan-august-2026-primary-election-guide/69-d2214353-b92b-4f78-b1aa-d6a4007fc11f)
+- [Virginia voter guide: Parties nominate candidates for Congress - WTOP](https://wtop.com/virginia-election/2026/07/virginia-voter-guide-parties-nominate-candidates-for-congress-local-offices-ahead-of-2026-midterms/)
