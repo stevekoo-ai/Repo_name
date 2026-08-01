@@ -1,7 +1,7 @@
 ---
 title: KIS Open API 데이터 카탈로그
 created: 2026-07-31
-updated: 2026-07-31
+updated: 2026-08-01
 tags: [kis-api, data-reference, infrastructure, github-actions]
 ---
 
@@ -26,7 +26,7 @@ Secrets에서만 읽고, 발급받은 토큰은 `scripts/.kis_token_cache.json`�
 | `investor_flow.py fetch` | `FHKST01010900` | 종목별 일별 투자자매매동향 — 외국인/기관/개인 순매수 수량·금액(최근 30영업일) | `sources/sk-hynix-investor-flow.csv` | ✅ 2026-07-28 검증(금액은 백만원 단위로 확인) |
 | `investor_flow.py quote` | `FHKST01010100` | 국내주식 현재가·전일대비·등락률·거래량(즉석 조회용, 미저장) | — | ✅ 검증 |
 | `investor_flow.py snapshot` | `FHKST01010100` | 위와 같은 TR — 부가 필드로 **외국인 보유율·보유수량·250일 최고가·그 대비 등락률(드로다운)**까지 저장 | `sources/sk-hynix-price-snapshot.csv` | ✅ 검증 |
-| `investor_flow.py adr-quote`(기본, 일별) | `HHDFS76240000` | 해외상장(ADR) 종목의 **일별 확정 시세** — 호출 시각과 무관하게 마지막 마감 거래일의 정확한 종가·등락률 | `sources/sk-hynix-adr-quote.csv` | 🔧 필드명은 검증됨, 단 **버그 발견+수정 중**([PR #40](https://github.com/stevekoo-ai/Repo_name/pull/40), 병합 대기): API의 `rate` 필드가 `diff`와 부호가 어긋나는 응답 확인(2026-07-31 SKHY, diff=+3.10인데 rate=-2.08%) → `change_pct`를 `diff`·전일종가로 직접 재계산하도록 수정 |
+| `investor_flow.py adr-quote`(기본, 일별) | `HHDFS76240000` | 해외상장(ADR) 종목의 **일별 확정 시세** — 호출 시각과 무관하게 마지막 마감 거래일의 정확한 종가·등락률. **2026-08-01부터 3방법 크로스체크**(rate 필드/diff 재계산/전거래일 이력 대조)가 전부 일치해야 `change_pct`를 확정, 어긋나면 값을 비우고 `crosscheck=MISMATCH`로 CSV에 남김 — 상세는 아래 "ADR 크로스체크" 참고 | `sources/sk-hynix-adr-quote.csv` | 🔧 필드명은 검증됨, **부호버그+크로스체크 추가** 전부 [PR #40](https://github.com/stevekoo-ai/Repo_name/pull/40)에 반영(병합 대기): API의 `rate` 필드가 `diff`와 부호가 어긋나는 응답 확인(2026-07-31 SKHY, diff=+3.10인데 rate=-2.08%) |
 | `investor_flow.py adr-quote --intraday` | `HHDFS76200200` | 해외상장 종목 실시간 현재가 — 나스닥 정규장(22:30~05:00 KST) 밖에서는 "현재가=전일종가"만 반환하는 한계 있음 | 〃 | ✅ 검증(단, 이 한계도 함께 확인됨) |
 | `investor_flow.py credit-balance` | `FHPST04760000` | **국내주식 신용잔고 일별추이** — 융자(신규/상환/잔고 주수·금액·비율)와 대주(공매도용 대여) 잔고를 종목별로. **찐반등 신호①(빚의 청산)의 데이터소스** | `sources/sk-hynix-credit-balance.csv` | ✅ 검증 완료(2026-08-01, 필드명 정상·`loan_balance_qty` 값 교차검증 완료 — [market-cycles-leverage-risk.md](market-cycles-leverage-risk.md) 참고. `loan_balance_amt` 금액 단위는 여전히 미확정, 절대 금액 표기 금지) |
 | `investor_flow.py index-quote` | `FHPUP02100000` | **국내업종 현재지수** — 코스피(0001)/코스닥(1001)/코스피200(2001) 현재가·전일대비·등락률 + **상승/하락/보합/상한가/하한가 종목수** | `sources/kr-index-quote.csv` | ✅ 검증 완료(2026-08-01, PR #39 첫 실행에서 정상 수집 확인) |
@@ -40,6 +40,31 @@ Secrets에서만 읽고, 발급받은 토큰은 `scripts/.kis_token_cache.json`�
 `*_FIELDS` 딕셔너리와 다르면 거기만 고치면 된다(값을 지어내지 않기
 위해, 예상 필드가 없으면 스크립트가 조용히 넘어가지 않고 에러로
 멈추도록 이미 구현돼 있음).
+
+### ADR 크로스체크 (2026-08-01 신설 — 사용자 요청)
+
+사용자가 "ADR이 왜 매번 틀리냐"고 질문한 뒤([체크포인트⑥ 포스트모템](sk-hynix-analyst-thesis-checkpoints.md)
+참고), "3가지 방법이 모두 같으면 확정, 안 맞으면 나한테 보고하고 결정은
+내가 한다"고 명시적으로 요청 — `kis_fetch_overseas_daily_price()`가
+이제 서로 독립적인 3가지 방법으로 등락률을 계산해 대조한다:
+
+- **A) rate** — API가 자체 계산해 주는 등락률 필드(그대로 신뢰하면 위험 — 이게 바로 원래 버그였음)
+- **B) calc** — 같은 응답 행의 `diff`(변동폭)·종가로 직접 재계산
+- **C) hist** — 같은 API 응답의 전 거래일 확정 종가(`output2[1]`)를 독립적인 전일종가로 삼아 재계산 — `diff`에 전혀 의존하지 않는 유일한 방법이라, A·B가 같은 원인으로 동시에 틀렸을 경우도 걸러낼 수 있음
+
+**판정**: 확보 가능한 방법들(2~3개)이 오차범위(0.1%p) 안에서 일치하면
+그 값을 확정치로 채택하고 `sources/sk-hynix-adr-quote.csv`의 `crosscheck`
+컬럼에 `OK`(3/3 일치)나 `OK_PARTIAL(2/3)`을 기록. **불일치하면 숫자를
+지어내지 않고 `change_pct`를 비워둔 채 `crosscheck=MISMATCH`로 표시**,
+`crosscheck_detail` 컬럼에 세 값을 전부 남기고(`rate:-2.08|calc:+2.17|hist:+2.17`
+형식) stderr에도 경고를 출력한다. `daily_report.py`의 자동 1차 리포트도
+MISMATCH를 크래시 없이 "등락률 미확정, 사용자 확인 필요"로 표시하도록
+갱신됨. **이 컬럼을 읽는 사람(또는 Claude 세션)의 역할**: MISMATCH 행을
+발견하면 세 값을 그대로 사용자에게 보고하고, 어느 쪽을 최종값으로 쓸지는
+사용자가 결정하도록 한다 — 자동으로 어느 한쪽을 골라 확정하지 않는다.
+아직 실계정 API 호출로 검증은 못 했음(샌드박스 아웃바운드 차단) — 다음
+GitHub Actions 실행에서 `--raw`로 `rate` 필드 존재 여부·`output2[1]`이
+실제로 전 거래일인지 재확인 필요.
 
 ## 2. 조사 완료, 아직 미구현 — 필요해지면 바로 참고
 
