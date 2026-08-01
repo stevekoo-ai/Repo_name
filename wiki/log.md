@@ -164,3 +164,4 @@ Append-only. Newest entry at the bottom. See `../CLAUDE.md` for format.
 2026-08-01 07:xx KST — QUERY 자동루틴(아침) 실행 중 발견 → market-cycles-leverage-risk.md에 KOSPI+17.91%/KOSDAQ+11.63% 정밀확정치 및 신용융자잔고 미청산 발견(신호① 미충족 확정) 반영, kis-api-reference.md PR#39 4종 TR 검증완료 표기 + adr-quote 부호버그(PR #40) 반영
 2026-08-01 07:xx KST — REPORT 아침 체크(휴장·토요일) 실행 → HBM 69/100·찐반등1/4·회복초입 7/31 확정치 이월 + 신규발견 2건(KOSPI+17.91%·KOSDAQ+11.63% 정밀종가, 신용융자잔고 미청산→신호① 미충족 확정) 반영, ADR 부호버그 PR #40 별도 기록 → sk-hynix-morning-report-2026-08-01.html 발행
 2026-08-01 07:xx KST — CHECK 9개 체크포인트 정식 점검(자동루틴, 토·휴장) → sk-hynix-analyst-thesis-checkpoints.md·hbm-cycle-score.md·macro-regime-history.md 체크이력에 오늘 행 추가(전부 7/31 저녁 확정치 이월), PR #35 병합 재확인·PR #40 오픈상태 확인(GitHub MCP), ADR $158.20 오기록 정정(→$145.90 CSV 확정), 이메일 트리거 재생성(잘못된 Gmail커넥터 방식→notifications:email 방식으로 수정)
+2026-08-01 10:xx KST — REPORT 장초반 체크(휴장·토요일, 초간단) → 아침 확정치 재사용, 특이사항 없음 → sk-hynix-open-report-2026-08-01.html 발행
