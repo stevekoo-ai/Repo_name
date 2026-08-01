@@ -59,6 +59,15 @@ def build_report(ticker: str) -> str:
     adr = read_latest_adr("SKHY")
     if adr is None:
         lines.append("- 기록 없음 — investor_flow.py adr-quote를 먼저 실행하세요(미국 장중에만 유의미).")
+    elif adr.get("crosscheck") == "MISMATCH" or not adr.get("change_pct"):
+        # 2026-08-01 — change_pct 크로스체크(3가지 방법) 불일치 시 investor_flow.py가
+        # 숫자를 지어내지 않고 이 필드를 비워둔다. 여기서도 float()로 억지로
+        # 채우지 않고 그대로 미확정 표시 — 사람이 보고 결정할 몫이다.
+        lines.append(
+            f"- {adr.get('date', '?')} 기준: **${float(adr['price']):,.2f}**, 전일종가 ${float(adr['prev_close']):,.2f} — "
+            f"⚠️ change_pct 크로스체크 불일치(MISMATCH), 등락률 미확정: {adr.get('crosscheck_detail', '')} "
+            "(사용자 확인 필요, sk-hynix-adr-quote.csv 참고)"
+        )
     else:
         pct = float(adr["change_pct"])
         flag = " 🚨 급변동(±5% 이상)" if abs(pct) >= 5 else ""

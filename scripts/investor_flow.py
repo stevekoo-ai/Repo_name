@@ -126,7 +126,20 @@ OVERSEAS_PRICE_FIELDS = {
 }
 
 ADR_CSV_PATH = Path(__file__).resolve().parent.parent / "sources" / "sk-hynix-adr-quote.csv"
-ADR_CSV_FIELDS = ["date", "symbol", "price", "change", "change_pct", "prev_close", "source", "fetched_at"]
+ADR_CSV_FIELDS = [
+    "date", "symbol", "price", "change", "change_pct", "prev_close",
+    "crosscheck", "crosscheck_detail", "source", "fetched_at",
+]
+
+# 2026-08-01 신설 — change_pct 부호버그(diff는 +인데 API의 rate 필드는 -로
+# 나온 사례, 7/31 SKHY 발견) 재발 방지용 크로스체크. 서로 독립적인 3가지
+# 방법으로 등락률을 각각 계산해 서로 맞는지 대조하고, 어긋나면 숫자를
+# 지어내지 않고 change_pct를 비워둔 채 "MISMATCH"로 표시한다 — 사용자
+# 요청("3가지 방법이 모두 같으면 확정, 안 맞으면 나한테 보고하고 내가
+# 결정")에 따른 설계. 자동화 파이프라인(GitHub Actions)은 판단을 못 하니
+# 여기서는 "숨기지 않고 눈에 띄게 기록"까지만 하고, 실제 결정은 이 CSV를
+# 읽는 사람(또는 Claude 세션)이 사용자에게 보고 후 받는다.
+ADR_CROSSCHECK_TOLERANCE_PCT = 0.1  # 이 안이면 "사실상 같음"으로 간주(반올림 오차)
 
 # 2026-07-31 신설 — stevekoo-ai/open-trading-api(KIS 공식 예제 저장소) 조사로
 # 발견한 4개 신규 TR. 그동안 위키에서 "미확인"으로 남아있던 신용융자잔고
@@ -544,22 +557,76 @@ def kis_fetch_overseas_daily_price(symbol, excd="NAS", account_type="real", raw=
         )
     price = float(latest["clos"])
     change = float(latest["diff"])
-    # 2026-08-01 수정: API의 "rate" 필드를 직접 신뢰하지 않는다 — 실계정
-    # 검증(2026-07-31) 결과 diff(+3.10, 상승)와 rate(-2.08%, 하락)의 부호가
-    # 서로 어긋나는 응답이 실제로 수신됨(SKHY 7/31행). diff·전일종가로
-    # 직접 재계산하면 항상 부호가 일치하므로, kis_fetch_overseas_price()
-    # (실시간 경로)와 동일하게 이쪽도 API 필드를 신뢰하지 않고 직접 계산한다.
-    prev_close = price - change
-    change_pct = (change / prev_close * 100) if prev_close else 0.0
+    prev_close_same_row = price - change
     trade_date_raw = str(latest["xymd"])  # YYYYMMDD
     trade_date = f"{trade_date_raw[:4]}-{trade_date_raw[4:6]}-{trade_date_raw[6:]}"
+
+    # 2026-08-01 — 3방법 크로스체크 신설. 실계정 검증(2026-07-31)에서
+    # diff(+3.10, 상승)와 API의 rate 필드(-2.08%, 하락)가 서로 어긋나는
+    # 응답이 실제로 수신됐다 — 어느 한쪽을 그냥 믿는 대신, 서로 독립적인
+    # 3가지 방법으로 등락률을 각각 구해서 대조한다(사용자 요청: "3가지
+    # 방법이 모두 같으면 확정, 안 맞으면 나한테 보고하고 내가 결정").
+    #
+    #   A) rate  — API가 자체 계산해 주는 등락률 필드를 그대로 신뢰
+    #   B) calc  — 같은 행의 diff·종가로 직접 재계산(prev_close = clos-diff)
+    #   C) hist  — 이 응답의 바로 다음 행(output2[1], 즉 전 거래일의
+    #              확정 종가)을 독립적인 전일종가로 삼아 재계산 — diff에
+    #              전혀 의존하지 않는 유일한 방법이라 A·B가 같은 원인으로
+    #              동시에 틀렸을 경우에도 걸러낼 수 있다.
+    rate_pct = None
+    if "rate" in latest and latest["rate"] not in (None, ""):
+        try:
+            rate_pct = float(latest["rate"])
+        except (TypeError, ValueError):
+            rate_pct = None
+    calc_pct = (change / prev_close_same_row * 100) if prev_close_same_row else None
+    hist_pct = None
+    if len(rows) > 1:
+        try:
+            hist_prev_close = float(rows[1]["clos"])
+            if hist_prev_close:
+                hist_pct = (price - hist_prev_close) / hist_prev_close * 100
+        except (KeyError, TypeError, ValueError):
+            hist_pct = None
+
+    methods = {"rate": rate_pct, "calc": calc_pct, "hist": hist_pct}
+    available = {k: v for k, v in methods.items() if v is not None}
+    detail = "|".join(f"{k}:{v:+.2f}" for k, v in methods.items() if v is not None)
+
+    if len(available) >= 2:
+        spread = max(available.values()) - min(available.values())
+        if spread <= ADR_CROSSCHECK_TOLERANCE_PCT:
+            crosscheck = "OK" if len(available) == 3 else "OK_PARTIAL(2/3)"
+            # 합치하면 diff 기반(calc)을 확정치로 채택 — 세 방법 모두 오차
+            # 범위 안이므로 어느 걸 골라도 사실상 같지만, diff는 이 응답
+            # 자체가 준 값이라 반올림이 가장 덜 누적된 값으로 우선한다.
+            change_pct = calc_pct if calc_pct is not None else next(iter(available.values()))
+        else:
+            crosscheck = "MISMATCH"
+            change_pct = None
+            print(
+                f"⚠️ ADR change_pct 크로스체크 불일치 감지 ({symbol}, {trade_date}): "
+                f"{detail} — 자동으로 숫자를 확정하지 않고 change_pct를 비워둡니다. "
+                f"{ADR_CSV_PATH.name}의 crosscheck=MISMATCH 행을 확인해 사용자에게 "
+                "보고하고 어느 값을 쓸지 결정을 받으세요.",
+                file=sys.stderr,
+            )
+    elif len(available) == 1:
+        crosscheck = "PARTIAL_SINGLE(1/3)"
+        change_pct = next(iter(available.values()))
+    else:
+        crosscheck = "NO_METHOD"
+        change_pct = None
+
     return {
         "symbol": symbol,
         "date": trade_date,
         "price": price,
         "change": change,
         "change_pct": change_pct,
-        "prev_close": price - change,
+        "prev_close": prev_close_same_row,
+        "crosscheck": crosscheck,
+        "crosscheck_detail": detail,
     }
 
 
@@ -836,8 +903,11 @@ def _read_adr_csv():
 def _write_adr_csv(rows_by_key):
     ADR_CSV_PATH.parent.mkdir(parents=True, exist_ok=True)
     ordered = sorted(rows_by_key.values(), key=lambda r: (r["date"], r["symbol"]))
+    # restval="" — 2026-08-01에 crosscheck/crosscheck_detail 컬럼을 새로
+    # 추가하기 전에 기록된 옛 행에는 이 키들이 아예 없다. 그대로 두면
+    # DictWriter가 ValueError를 내므로 빈 문자열로 채워 하위호환한다.
     with ADR_CSV_PATH.open("w", newline="", encoding="utf-8") as f:
-        w = csv.DictWriter(f, fieldnames=ADR_CSV_FIELDS)
+        w = csv.DictWriter(f, fieldnames=ADR_CSV_FIELDS, restval="")
         w.writeheader()
         for r in ordered:
             w.writerow(r)
@@ -852,10 +922,16 @@ def upsert_adr_row(quote, source="kis_api"):
     # 경우에만 UTC 오늘 날짜로 폴백한다.
     row_date = quote.get("date") or datetime.now(timezone.utc).strftime("%Y-%m-%d")
     key = (row_date, quote["symbol"])
+    # crosscheck/crosscheck_detail — kis_fetch_overseas_daily_price()(일별
+    # 확정시세 경로)만 채운다. 실시간현재가(intraday) 경로는 방법이 하나뿐
+    # (price-prev_close 직접계산)이라 대조할 다른 방법이 없으므로 "N/A"로
+    # 명시해 크로스체크를 아예 안 거쳤다는 걸 숨기지 않는다.
     existing[key] = {
         "date": row_date, "symbol": quote["symbol"],
         "price": quote["price"], "change": quote["change"],
         "change_pct": quote["change_pct"], "prev_close": quote["prev_close"],
+        "crosscheck": quote.get("crosscheck", "N/A_INTRADAY"),
+        "crosscheck_detail": quote.get("crosscheck_detail", ""),
         "source": source, "fetched_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
     }
     _write_adr_csv(existing)
@@ -1025,9 +1101,19 @@ def cmd_adr_quote(args):
     if args.raw:
         return
     upsert_adr_row(q)
-    flag = " 🚨 급변동(5%+)" if abs(q["change_pct"]) >= 5 else ""
     date_note = f" [{q['date']} 거래일]" if q.get("date") else ""
-    print(f"{q['symbol']}  ${q['price']:,.2f}  {q['change']:+,.2f}({q['change_pct']:+.2f}%){flag}  전일종가 ${q['prev_close']:,.2f}{date_note}  → {ADR_CSV_PATH}에 기록")
+    if q["change_pct"] is None:
+        # 크로스체크 불일치 — 숫자를 지어내지 않고 있는 그대로 눈에 띄게
+        # 보고한다. GitHub Actions 로그에도 남아 다음 사람이 놓치지 않는다.
+        print(
+            f"⚠️ {q['symbol']}  ${q['price']:,.2f}  전일종가 ${q['prev_close']:,.2f}{date_note}  "
+            f"— change_pct 크로스체크 불일치(MISMATCH), 값 미확정: {q.get('crosscheck_detail', '')}  "
+            f"→ {ADR_CSV_PATH}에 crosscheck=MISMATCH로 기록. 사용자에게 보고하고 결정 받을 것."
+        )
+        return
+    flag = " 🚨 급변동(5%+)" if abs(q["change_pct"]) >= 5 else ""
+    cc_note = f" [크로스체크 {q['crosscheck']}]" if q.get("crosscheck") else ""
+    print(f"{q['symbol']}  ${q['price']:,.2f}  {q['change']:+,.2f}({q['change_pct']:+.2f}%){flag}  전일종가 ${q['prev_close']:,.2f}{date_note}{cc_note}  → {ADR_CSV_PATH}에 기록")
 
 
 def cmd_credit_balance(args):
