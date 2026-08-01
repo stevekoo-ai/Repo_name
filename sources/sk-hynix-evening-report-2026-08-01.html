@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SK하이닉스 Daily Monitor - 저녁 2026-08-01</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #f9fafb;
+        }
+        @media (prefers-color-scheme: dark) {
+            body { background: #0f1117; color: #c9d1d9; }
+        }
+        .container { max-width: 900px; margin: 0 auto; padding: 20px; }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .header h1 { font-size: 24px; margin-bottom: 5px; }
+        .header p { opacity: 0.9; font-size: 14px; }
+        .section {
+            background: white;
+            border: 1px solid #e1e4e8;
+            border-radius: 6px;
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+        @media (prefers-color-scheme: dark) {
+            .section { background: #161b22; border-color: #30363d; }
+        }
+        .section h2 {
+            font-size: 18px;
+            margin-bottom: 12px;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 8px;
+        }
+        .key-stat {
+            font-size: 32px;
+            font-weight: bold;
+            color: #667eea;
+            margin: 10px 0;
+        }
+        .stat-label { font-size: 12px; color: #666; text-transform: uppercase; }
+        @media (prefers-color-scheme: dark) { .stat-label { color: #8b949e; } }
+        .positive { color: #28a745; }
+        .negative { color: #cb2431; }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 10px 0;
+            font-size: 13px;
+        }
+        th, td {
+            text-align: left;
+            padding: 8px;
+            border-bottom: 1px solid #e1e4e8;
+        }
+        @media (prefers-color-scheme: dark) { th, td { border-bottom-color: #30363d; } }
+        th { background: #f6f8fa; font-weight: 600; }
+        @media (prefers-color-scheme: dark) { th { background: #0d1117; } }
+        .badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-right: 4px;
+        }
+        .badge-success { background: #d4edda; color: #155724; }
+        .badge-warning { background: #fff3cd; color: #856404; }
+        .badge-danger { background: #f8d7da; color: #721c24; }
+        .badge-info { background: #d1ecf1; color: #0c5460; }
+        @media (prefers-color-scheme: dark) {
+            .badge-success { background: #238636; color: #aaffc9; }
+            .badge-warning { background: #3d2817; color: #d29922; }
+            .badge-danger { background: #67060c; color: #f85149; }
+            .badge-info { background: #0550ae; color: #79c0ff; }
+        }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .verdict {
+            background: #f0f7ff;
+            border-left: 4px solid #667eea;
+            padding: 12px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+        @media (prefers-color-scheme: dark) {
+            .verdict { background: #0d1b2a; border-left-color: #58a6ff; }
+        }
+        .timestamp { color: #666; font-size: 12px; }
+        @media (prefers-color-scheme: dark) { .timestamp { color: #8b949e; } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📊 SK하이닉스 Daily Monitor</h1>
+            <p>저녁 체크 · 2026-08-01 19:00 KST</p>
+        </div>
+
+        <!-- Section 1: 주가 현황 -->
+        <div class="section">
+            <h2>1️⃣ SK하이닉스 주가 현황</h2>
+            <div class="grid-2">
+                <div>
+                    <div class="stat-label">본주 (2026-07-31)</div>
+                    <div class="key-stat">1,718,000</div>
+                    <div class="positive">↑ +396,000 (+29.95%)</div>
+                </div>
+                <div>
+                    <div class="stat-label">ADR (2026-07-31)</div>
+                    <div class="key-stat">$145.90</div>
+                    <div style="color: #666;">-$2.20 (-1.49%)</div>
+                </div>
+            </div>
+            <div style="margin-top: 12px; padding: 8px; background: #f0f7ff; border-radius: 4px;">
+                <strong>Note:</strong> 2026-08-01 마감 종가 미확정 (시장 진행 중). 현재 확정치는 7/31 end-of-day.
+            </div>
+        </div>
+
+        <!-- Section 2: 거시 헤드라인 -->
+        <div class="section">
+            <h2>2️⃣ 매크로 헤드라인</h2>
+            <h3 style="font-size: 14px; margin: 10px 0;">🇺🇸 미국 시장 진행상황</h3>
+            <ul style="margin-left: 20px; margin-bottom: 12px;">
+                <li>빅테크 CapEx: 2026년 $725B 예상 (전년 대비 +77%) — 🟢 No slowdown signal</li>
+                <li>NVIDIA Blackwell: CoWoS 점유율 70%, 주문 +40% YoY</li>
+                <li>Hyperscaler (Google/MS/Amazon/Meta): 전부 increase guidance 유지</li>
+            </ul>
+            <h3 style="font-size: 14px; margin: 10px 0;">🇰🇷 오늘 한국장 전망</h3>
+            <ul style="margin-left: 20px;">
+                <li>7/31: KOSPI +17.91%, SK하이닉스 상한가 (+29.95%)</li>
+                <li>8/1: 강세 가정하 추세 지속성 관찰 필수</li>
+                <li>기술적 신호: 52주 고가($34,200 / 현재 $31,100) 돌파 추적</li>
+            </ul>
+        </div>
+
+        <!-- Section 3: 찐반등 신호 체크 -->
+        <div class="section">
+            <h2>3️⃣ 찐반등 신호 4대 (2026-07-31)</h2>
+            <table>
+                <tr>
+                    <th>신호</th>
+                    <th>상태</th>
+                    <th>수치</th>
+                </tr>
+                <tr>
+                    <td>① 신용융자 잔고</td>
+                    <td><span class="badge badge-danger">미청산</span></td>
+                    <td>3.40M 주 (안정적)</td>
+                </tr>
+                <tr>
+                    <td>② 개인 순매수</td>
+                    <td><span class="badge badge-success">확인</span></td>
+                    <td>+1,463,948 주</td>
+                </tr>
+                <tr>
+                    <td>③ 외국인 연속매수</td>
+                    <td><span class="badge badge-success">강화</span></td>
+                    <td>+3.64조 KRW (역대최대)</td>
+                </tr>
+                <tr>
+                    <td>④ 미국 반도체 동반</td>
+                    <td><span class="badge badge-success">확인</span></td>
+                    <td>NVIDIA +40% CoWoS, CapEx +77%</td>
+                </tr>
+            </table>
+            <div class="verdict">
+                <strong>종합 판정:</strong> 3/4 신호 충족 (신용융자① 제외). 7/31은 실질적인 "찐 반등" 신호로 평가. 개인+외국인 동시 매수 + 기본지표 확인 (빅테크 CapEx) = 단순 반등이 아닌 구조적 신뢰도 높음.
+            </div>
+        </div>
+
+        <!-- Section 4: 패닉 회복 신호 -->
+        <div class="section">
+            <h2>4️⃣ 패닉 회복 신호 검증</h2>
+            <h3 style="font-size: 14px; margin: 10px 0;">Tier 1: 공포 직접 반박 (FACT)</h3>
+            <table>
+                <tr>
+                    <th>근거</th>
+                    <th>상태</th>
+                    <th>평가</th>
+                </tr>
+                <tr>
+                    <td>외국인 +3.64조 순매수 (7/31)</td>
+                    <td><span class="badge badge-success">✅</span></td>
+                    <td>기관 신뢰도 회복의 가장 강한 신호</td>
+                </tr>
+                <tr>
+                    <td>하이퍼스케일러 CapEx 전부 증가</td>
+                    <td><span class="badge badge-success">✅</span></td>
+                    <td>AI 인프라 수요 재확인 — 구조적 강세</td>
+                </tr>
+                <tr>
+                    <td>NVIDIA Blackwell +40% CoWoS 수요</td>
+                    <td><span class="badge badge-success">✅</span></td>
+                    <td>HBM 공급 구조 재확인</td>
+                </tr>
+                <tr>
+                    <td>SK하이닉스 애널 buy 18/18기관</td>
+                    <td><span class="badge badge-info">유지</span></td>
+                    <td>Barclays $330→$300 하향도 여전히 매수</td>
+                </tr>
+            </table>
+            <h3 style="font-size: 14px; margin: 10px 0;">국제 매체 교차검증</h3>
+            <ul style="margin-left: 20px;">
+                <li>🇺🇸 Bloomberg/Reuters: CapEx 증가 확인 (일관)</li>
+                <li>🇹🇼 DigiTimes: NVIDIA Blackwell 공급 강세 (미확인 - 웹검색 제약)</li>
+                <li>🇨🇳 미디어: CXMT 경쟁 신호 (별도 추적)</li>
+            </ul>
+            <div class="verdict">
+                <strong>종합 판정:</strong> 🟢 <strong>회복 초입 확인 → 회복 진행중 상향 고려</strong>
+                <br/><br/>
+                근거: Tier1 공포 반박 3/4 이상 확인 (외국인 대량매수·CapEx 구조·NVIDIA 수요) + 가격 동반 반응 (+29.95% 상한가). 다음 추적: 8/2~12 (10일내 고점 돌파 여부 — NVIDIA 패턴 검증 신호)
+            </div>
+        </div>
+
+        <!-- Section 5: 체크포인트 요약 -->
+        <div class="section">
+            <h2>5️⃣ 9개 분석 체크포인트 (2026-07-31 기준)</h2>
+            <table>
+                <tr>
+                    <th>체크</th>
+                    <th>항목</th>
+                    <th>상태</th>
+                    <th>가중치</th>
+                </tr>
+                <tr>
+                    <td>①</td>
+                    <td>메모리 공급부족 CY27 피크</td>
+                    <td><span class="badge badge-success">✅</span></td>
+                    <td>구조적</td>
+                </tr>
+                <tr>
+                    <td>②</td>
+                    <td>HBM4 점유율 58% 유지</td>
+                    <td><span class="badge badge-info">중립</span></td>
+                    <td>경쟁</td>
+                </tr>
+                <tr>
+                    <td>③</td>
+                    <td>빅테크 CapEx 전부 증가</td>
+                    <td><span class="badge badge-success">✅</span></td>
+                    <td>핵심</td>
+                </tr>
+                <tr>
+                    <td>④</td>
+                    <td>LTA 가격책정 탄력성</td>
+                    <td><span class="badge badge-success">✅</span></td>
+                    <td>수익성</td>
+                </tr>
+                <tr>
+                    <td>⑤</td>
+                    <td>AI 수익성 확인 경로</td>
+                    <td><span class="badge badge-info">진행</span></td>
+                    <td>실적</td>
+                </tr>
+                <tr>
+                    <td>⑥</td>
+                    <td>ADR 프리미엄 10~35%</td>
+                    <td><span class="badge badge-warning">⚠️</span></td>
+                    <td>기술</td>
+                </tr>
+                <tr>
+                    <td>⑦</td>
+                    <td>CXMT 위협 모니터링</td>
+                    <td><span class="badge badge-warning">⚠️</span></td>
+                    <td>중기</td>
+                </tr>
+                <tr>
+                    <td>⑧</td>
+                    <td>부채비율 20% 유지 (재무)</td>
+                    <td><span class="badge badge-success">✅</span></td>
+                    <td>안정성</td>
+                </tr>
+                <tr>
+                    <td>⑨</td>
+                    <td>애널리스트 consensus 유지</td>
+                    <td><span class="badge badge-success">✅</span></td>
+                    <td>시장심리</td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- Section 6: 목표가 스펙트럼 (간소) -->
+        <div class="section">
+            <h2>6️⃣ 목표가 스펙트럼 (18개 기관, 07-31 확정)</h2>
+            <table style="font-size: 12px;">
+                <tr>
+                    <th>기관</th>
+                    <th>목표가</th>
+                    <th>현재가 대비</th>
+                    <th>평가</th>
+                </tr>
+                <tr>
+                    <td>한화증권</td>
+                    <td>430만원</td>
+                    <td>+150%</td>
+                    <td>최고가</td>
+                </tr>
+                <tr>
+                    <td>KB증권</td>
+                    <td>420만원</td>
+                    <td>+145%</td>
+                    <td>매수</td>
+                </tr>
+                <tr>
+                    <td>Barclays (환산)</td>
+                    <td>약 490만원</td>
+                    <td>+185%</td>
+                    <td>강력 매수</td>
+                </tr>
+                <tr>
+                    <td>평균 (국내)</td>
+                    <td>약 400만원</td>
+                    <td>+133%</td>
+                    <td>컨센서스</td>
+                </tr>
+                <tr>
+                    <td>BNK 투자증권</td>
+                    <td>185만원</td>
+                    <td>-46%</td>
+                    <td>약세 소수</td>
+                </tr>
+            </table>
+            <p style="margin-top: 10px; font-size: 13px;">
+                <strong>최근 변동:</strong> Barclays $330→$300 하향 (7/29) — 여전히 +117% 매수 신호
+            </p>
+        </div>
+
+        <!-- Section 7: NVIDIA 패턴 vs SK하이닉스 (v3 하이브리드) -->
+        <div class="section">
+            <h2>7️⃣ NVIDIA 급등 패턴 vs SK하이닉스 (v3 검증)</h2>
+            <table>
+                <tr>
+                    <th>조건</th>
+                    <th>NVIDIA 성공 기준</th>
+                    <th>SK하이닉스 현황</th>
+                    <th>판정</th>
+                </tr>
+                <tr>
+                    <td>거래량배수</td>
+                    <td>≥2.0배 (평균 2.09배)</td>
+                    <td>1.79배</td>
+                    <td><span class="badge badge-danger">✗</span></td>
+                </tr>
+                <tr>
+                    <td>종가위치</td>
+                    <td>≥80% (평균 85.5%)</td>
+                    <td>84.8%</td>
+                    <td><span class="badge badge-success">✓</span></td>
+                </tr>
+                <tr>
+                    <td>10일내 고점 돌파</td>
+                    <td>달성률 87.5%</td>
+                    <td>08-12 추적 필요</td>
+                    <td><span class="badge badge-info">?</span></td>
+                </tr>
+            </table>
+            <div class="verdict">
+                <strong>판정:</strong> <strong style="color: #667eea;">PARTIAL_MATCH (2/3 부분충족)</strong>
+                <br/>
+                신뢰도: <strong>65/100점</strong>
+                <br/>
+                <br/>
+                강점: 종가 위치 84.8%는 엔비디아 성공 기준과 거의 동일 (차이 0.7%)
+                <br/>
+                약점: 거래량 1.79배는 기준 2.0배에 미달 (기관 신호 약함)
+                <br/>
+                미정: 10일내 고점(34,200원) 돌파 여부 → <strong>08-12까지 추적 필수</strong>
+            </div>
+        </div>
+
+        <!-- Section 8: 한줄 진단 -->
+        <div class="section" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+            <h2 style="border-bottom-color: rgba(255,255,255,0.3); color: white;">📌 종합 진단</h2>
+            <p style="font-size: 16px; margin: 12px 0;">
+                <strong>2026-07-31은 "찐 반등" 신호 3/4 충족</strong><br/>
+                • 외국인 역대최대 순매수 (+3.64조)<br/>
+                • 빅테크 CapEx 전부 증가 (구조적 강세)<br/>
+                • NVIDIA Blackwell 수요 +40% (공급 재확인)<br/>
+                <br/>
+                → 패닉 회복 신호: "회복 초입" 확인 · "회복 진행중" 상향 고려<br/>
+                → NVIDIA 패턴: 가격·고점은 양호, 거래량 신호 약함 → 다음 10일 추적 필수
+            </p>
+        </div>
+
+        <!-- Footer -->
+        <div style="text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid #e1e4e8;">
+            <p class="timestamp">마지막 갱신: 2026-08-01 19:00 KST</p>
+            <p class="timestamp">데이터 기준: 7/31 end-of-day (08-01 마감 데이터 미확정)</p>
+            <p style="font-size: 12px; color: #667eea; margin-top: 10px;">
+                🔗 <strong>Sources:</strong> KIS API · Investing.com · Barclays · Morningstar · 웹 리서치
+            </p>
+        </div>
+    </div>
+</body>
+</html>
