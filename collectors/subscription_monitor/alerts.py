@@ -11,6 +11,7 @@ import os
 import smtplib
 import urllib.request
 from email.mime.text import MIMEText
+from email.utils import formatdate, make_msgid
 
 STATE_PATH = os.path.join(os.path.dirname(__file__), "alerted_state.json")
 HEALTH_STATE_PATH = os.path.join(os.path.dirname(__file__), "health_state.json")
@@ -74,6 +75,11 @@ def send_email(to_addr: str, gmail_addr: str, gmail_app_password: str, subject: 
     msg["Subject"] = subject
     msg["From"] = gmail_addr
     msg["To"] = to_addr
+    # A missing Date/Message-ID is a spam/forgery signal — Gmail has been observed to
+    # accept (250 OK) a header-bare self-to-self message and then silently drop it
+    # rather than deliver or spam-file it (see core/notify.py for the same fix + why).
+    msg["Date"] = formatdate(localtime=False)
+    msg["Message-ID"] = make_msgid(domain=gmail_addr.rpartition("@")[2] or None)
     with smtplib.SMTP("smtp.gmail.com", 587, timeout=20) as server:
         server.starttls()
         server.login(gmail_addr, gmail_app_password)
