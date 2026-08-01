@@ -100,15 +100,25 @@ NVIDIA_BULLISH_CASES = [
     }
 ]
 
-# SK하이닉스 현재 상황 (2026-08-01 기준)
+# SK하이닉스 현재 상황 (2026-07-31 KIS API 확정 종가 기준)
+#
+# ⚠️ 2026-08-01 발견·수정: 이전 버전은 current_price=31100/week_52_high=34200 등
+# 실제 가격과 스케일이 56배 다른 플레이스홀더 숫자를 쓰고 있었다(진짜 종가는
+# 1,718,000원대). sources/sk-hynix-price-snapshot.csv(KIS API 실측)로 교체.
+# 52주 최저가는 KIS API가 250일 최고가만 제공하고 최저가 필드가 없어 확보
+# 실패 — 웹서치로 나온 "245,000원"은 2026-07-16에 이미 "우리 관측과 명백히
+# 불일치"로 재사용 금지 처리된 값(23Q1 시점 가격이 재활용된 것으로 추정,
+# sk-hynix-analyst-thesis-checkpoints.md 참고)이라 채택하지 않음.
+# → price_position_pct는 52주 최저가 확보 전까지 계산 보류(None), 대신
+# 250일 최고가 대비 등락률(KIS 실측, 신뢰 가능)을 대체 지표로 병기.
 SK_HYNIX_CURRENT = {
-    "date": "2026-08-01",
-    "current_price": 31100,
-    "day_high": 31850,
-    "day_low": 30950,
-    "week_52_high": 34200,
-    "week_52_low": 13800,
-    "price_position_pct": ((31100 - 13800) / (34200 - 13800)) * 100,  # 84.8%
+    "date": "2026-07-31",
+    "current_price": 1718000,
+    "day250_high": 2987000,
+    "day250_high_date": "2026-06-25",
+    "vs_day250_high_pct": -42.48,  # KIS API 실측(d250_hgpr_vrss_prpr_rate)
+    "week_52_low": None,  # 미검증 — KIS API 미제공, 웹서치 값은 신뢰 불가(재사용 금지 처리 이력)
+    "price_position_pct": None,  # 52주 최저가 확보 전까지 계산 불가
     "vol_ratio": 1.79,  # KIS API 실측 (거래량 필드 부재로 수동 추정)
     "vol_source": "kis_api_inferred"
 }
@@ -174,11 +184,12 @@ def analyze_pattern():
     print(f"- 추정(공개자료): {sum(stats['estimated'])}/{total}")
 
     # SK하이닉스 현황
-    print("\n[3] SK하이닉스 현재 상황 (2026-08-01):")
+    print(f"\n[3] SK하이닉스 현재 상황 ({SK_HYNIX_CURRENT['date']} KIS API 확정 종가):")
     print("-" * 80)
     print(f"현재가:          {SK_HYNIX_CURRENT['current_price']:,}원")
     print(f"거래량배수:      {SK_HYNIX_CURRENT['vol_ratio']:.2f}배 (KIS API 추정)")
-    print(f"종가위치:        {SK_HYNIX_CURRENT['price_position_pct']:.1f}% (52주 기준)")
+    print(f"250일 최고가:    {SK_HYNIX_CURRENT['day250_high']:,}원 ({SK_HYNIX_CURRENT['day250_high_date']}), 대비 {SK_HYNIX_CURRENT['vs_day250_high_pct']:+.2f}%")
+    print(f"종가위치(52주):  미검증 — 52주 최저가 미확보 (아래 [주의] 참고)")
     print(f"10일내고점:      ??(진행 중)")
 
     print("\n[4] 비교 분석 (3가지 조건):")
@@ -190,7 +201,9 @@ def analyze_pattern():
     else:
         checks.append(f"✗ 거래량배수 미충족 ({SK_HYNIX_CURRENT['vol_ratio']:.2f}배 < 2.0배)")
 
-    if SK_HYNIX_CURRENT['price_position_pct'] >= 80:
+    if SK_HYNIX_CURRENT['price_position_pct'] is None:
+        checks.append(f"? 종가 고가근처 판정 불가 (52주 최저가 미검증 — 250일 최고가 대비는 {SK_HYNIX_CURRENT['vs_day250_high_pct']:+.2f}%)")
+    elif SK_HYNIX_CURRENT['price_position_pct'] >= 80:
         checks.append(f"✓ 종가 고가근처 충족 ({SK_HYNIX_CURRENT['price_position_pct']:.1f}%)")
     else:
         checks.append(f"✗ 종가 고가근처 미충족 ({SK_HYNIX_CURRENT['price_position_pct']:.1f}%)")
@@ -199,6 +212,12 @@ def analyze_pattern():
 
     for check in checks:
         print(f"  {check}")
+
+    print("\n  [주의] 2026-08-01 발견: 이전 버전(v3 최초)은 종가위치를 84.8%로")
+    print("  보고했으나, 이는 실제와 스케일이 56배 다른 플레이스홀더 숫자로")
+    print("  계산된 오류였다. 52주 최저가를 KIS API가 제공하지 않고 웹서치로")
+    print("  나온 값(245,000원)은 과거 재사용 금지 처리된 이력이 있어 채택하지")
+    print("  않음 — 신뢰 가능한 52주 최저가를 확보할 때까지 이 조건은 판정 보류.")
 
     print("\n[5] 가설 검증 결과:")
     print("-" * 80)
@@ -214,32 +233,34 @@ SK하이닉스 현 상황:
     → 기관/외국인 수급 신호 약함 (소매주도 우려)
     → 대비: 엔비디아 성공 사례 평균 2.09배와 차이
 
-  ✓ 종가 위치 양호 (84.8%)
-    → 고점 근처에서 출발 (엔비디아 평균 85.5%와 거의 동일)
-    → 추진력 있는 상승 신호
+  ? 종가 위치 판정 보류 (52주 최저가 미검증)
+    → 참고: 250일 최고가(2,987,000원, 06-25) 대비 -42.48% (아직 고점과 거리 있음)
+    → 52주 최저가를 신뢰 가능한 소스로 확보하면 재계산 필요
 
   ? 10일 고점 돌파 미확정
     → 향후 추적 필수 (기한: 08-12경)
 
 신뢰도 평가:
-  - 가격 모멘텀: ★★★★☆ (80점, 종가위치 양호)
+  - 가격 모멘텀: ☆☆☆☆☆ (판정 보류 — 52주 최저가 미검증으로 기존 84.8%는 오류였음)
   - 거래량 신호: ★★☆☆☆ (40점, 배수 부족)
-  - 종합: ★★★☆☆ (65점, 부분 충족)
+  - 종합: ★★☆☆☆ (35점, 데이터 불확실성 반영해 하향 — 재검증 전까지 잠정치)
 
 결론:
-  현재는 "거래량 신호 약하나 가격 모멘텀은 양호" 상태.
+  이전 버전(v3 최초)은 종가위치를 84.8%로 보고하며 "가격 모멘텀 양호"로
+  판정했으나, 이는 실제 주가(1,718,000원대)와 56배 다른 플레이스홀더
+  숫자(31,100원대)로 계산된 오류였다(2026-08-01 발견·수정). 신뢰 가능한
+  52주 최저가를 아직 확보하지 못해 이 조건은 "미검증"으로 하향한다.
 
-  엔비디아 성공 사례들은 거래량+가격+고점 3가지를 모두 충족했을 때
-  1년 이상 지속 상승으로 이어졌다. SK하이닉스는 현재:
-
+  현재 확실히 말할 수 있는 것:
   - 거래량: 미충족 (1.79배, 기준 2.0배)
-  - 가격: 충족 (84.8%, 기준 80%+)
+  - 가격(52주 위치): 미검증 — 250일 최고가 대비는 -42.48%로 아직 고점과 거리 있음
   - 고점: 미확정 (08-12 추적 필요)
 
-  **위험:** 소매주도 반등일 가능성 (지속성 낮음)
-  **기회:** 거래량 증가 시 본격 상승 신호
+  **위험:** 데이터 오류로 과신했던 "가격 모멘텀 양호" 판정이 무효화됨 —
+  실제 신뢰도는 이전 65점보다 낮을 가능성. 52주 최저가 검증 전까지 보수적 접근 필요.
+  **다음 조치:** 신뢰 가능한 52주 최저가 확보(KRX/증권사 API 등) → 재계산 필수.
 
-  08-12까지 고점 돌파 + 거래량 변화 추적 필수.
+  08-12까지 고점 돌파 + 거래량 변화 + 52주 최저가 검증 필수.
   09-01부터 3개월 지속성 검증 시작.
 """)
 
@@ -268,9 +289,15 @@ SK하이닉스 현 상황:
             'all_three_conditions_pct': 100 * all_three / total,
         },
         'sk_hynix_current': SK_HYNIX_CURRENT,
-        'verdict': 'PARTIAL_MATCH_V3 — 가격모멘텀 충족✓, 거래량부족✗, 고점미확정?',
-        'trust_score': 65,
-        'next_checkpoints': ['08-12 고점돌파 판정', '거래량 추적', '09-01 3개월 지속성 검증']
+        'verdict': 'PARTIAL_MATCH_V3_CORRECTED — 가격모멘텀 미검증?(52주최저가 미확보), 거래량부족✗, 고점미확정?',
+        'trust_score': 35,
+        'known_issues': [
+            '2026-08-01 발견: SK_HYNIX_CURRENT가 실제 가격(1,718,000원대)과 56배 다른 '
+            '플레이스홀더 숫자(31,100원대)를 쓰고 있어 종가위치 84.8%가 오류였음 — 수정 완료',
+            '52주 최저가는 KIS API 미제공, 웹서치 결과(245,000원)는 2026-07-16에 이미 '
+            '재사용 금지 처리된 값(23Q1 시점 가격으로 추정)이라 채택하지 않음 — 여전히 미검증'
+        ],
+        'next_checkpoints': ['52주 최저가 신뢰 소스 확보(최우선)', '08-12 고점돌파 판정', '거래량 추적', '09-01 3개월 지속성 검증']
     }
 
     output_file = REPORT_DIR / "nvidia-vs-skhynix-pattern-v3-hybrid.json"
