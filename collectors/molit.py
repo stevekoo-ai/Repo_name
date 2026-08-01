@@ -130,7 +130,7 @@ def _fetch_region_month(lawd_cd: str, deal_ymd: str, api_key: str) -> list[dict[
         "pageNo": 1, "numOfRows": _PAGE_SIZE, "type": "json",
     }
     resp = requests.get(base_url, params=params, timeout=_TIMEOUT_SECONDS)
-    resp.raise_for_status()
+    base.raise_for_status(resp)
     try:
         payload = resp.json()
     except ValueError:
@@ -142,7 +142,12 @@ def _fetch_region_month(lawd_cd: str, deal_ymd: str, api_key: str) -> list[dict[
         # per-service, not per-key) — e.g. approved for a 한국부동산원 product but not for
         # 국토교통부_아파트매매 실거래 상세자료. Surface the raw body so that's diagnosable
         # instead of showing up as an opaque JSON-parse failure.
-        raise RuntimeError(f"MOLIT returned non-JSON response (likely a service/auth error): {resp.text[:300]}")
+        # data.go.kr error bodies occasionally echo request parameters back (including the
+        # key) — redact defensively even though this is response text, not the request URL.
+        raise RuntimeError(
+            f"MOLIT returned non-JSON response (likely a service/auth error): "
+            f"{base.redact_url(resp.text[:300])}"
+        )
     header = payload.get("response", {}).get("header", {})
     if header.get("resultCode") not in (None, "00", "000"):
         raise RuntimeError(f"MOLIT error response: {header.get('resultMsg')}")
