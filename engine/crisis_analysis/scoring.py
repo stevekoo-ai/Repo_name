@@ -421,24 +421,24 @@ def get_sk_hynix_action(cci: CCIDetail) -> dict:
     if cci.state == "GREEN":
         return {
             "state": "GREEN",
-            "action": "AGGRESSIVE_LONG",
+            "action": "적극 매수 (Long)",
             "max_weight": 25,
-            "description": "Macro liquidity stable. Job markets expanding. Semi restocking active.",
-            "signal": "Deploy DCA on supply chain drawdowns. Hold through CCI 30.",
+            "description": "거시 유동성 안정. 고용시장 확장세. 반도체 재고 확충 진행 중.",
+            "signal": "공급망발 조정 구간에서 분할매수(DCA) 실행. CCI 30 돌파 전까지 보유.",
         }
     elif cci.state == "YELLOW":
         return {
             "state": "YELLOW",
-            "action": "DEFENSIVE_SCALING",
+            "action": "방어적 비중 축소",
             "max_weight": 10,
-            "description": "Yield inversions observed. Valuations extended. Momentum decelerating.",
-            "signal": "Take profits systematically. Reallocate to bonds/USD cash.",
+            "description": "장단기 금리 역전 관찰됨. 밸류에이션 확장. 모멘텀 둔화 중.",
+            "signal": "체계적으로 이익 실현. 채권/달러 현금성 자산으로 재배분.",
         }
     else:  # RED
         return {
             "state": "RED",
-            "action": "ABSOLUTE_EXIT_AND_HEDGE",
+            "action": "전량 청산 및 헤지",
             "max_weight": 0,
-            "description": "Sahm Rules active. Credit crunch verified. Semiconductor inventory stacking.",
-            "signal": "Execute sell orders on all long cyclical tech. Initiate shorts via inverse ETFs.",
+            "description": "Sahm Rule 발동. 신용경색 확인. 반도체 재고 누적 심화.",
+            "signal": "경기순환 성장주 롱 포지션 전량 매도. 인버스 ETF로 숏 포지션 개시.",
         }
