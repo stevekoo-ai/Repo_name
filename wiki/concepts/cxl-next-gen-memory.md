@@ -1,7 +1,7 @@
 ---
 title: CXL & 차세대 메모리 트랙 (Next-HBM Engine)
 created: 2026-07-24
-updated: 2026-07-30
+updated: 2026-08-03
 tags: [cxl, memory, standardization, sk-hynix, next-gen, daily-tracking]
 ---
 
@@ -159,3 +159,8 @@ Dive] CXL & 차세대 메모리 트랙" 고정 코너로 반영(사용자 요청
 6일째 조용. 재검색 결과 삼성 CMM-D 3.0 연내 양산·SK하이닉스 256GB
 CMM-DDR5·Liqid 협력 등은 전부 기존 확인분(7/19~21)과 동일, 새로 나온
 것 없음.
+
+**2026-08-03(아침 체크, 월)**: ⓐⓑⓒⓓ 전 항목 **오늘도 신규 소식 없음**
+— 재확인만(삼성 CMM-D 3.0 연내 양산 목표, SK하이닉스 IMTE 아키텍처
+추론효율 35.7% 개선, CXL 탑재 서버 90%+ 보급). 휴장 이틀 지나 첫
+평일 체크지만 CXL 트랙 자체는 저빈도 이벤트라 특이사항 없음.
