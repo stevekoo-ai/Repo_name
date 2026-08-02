@@ -45,6 +45,22 @@ CapEx·엔비디아&CoWoS·CXL·CXMT 국제매체 교차검증·트럼프 트래
 것 — 신규 반박은 아니지만 다지역 교차검증으로 신뢰도가 강화됨
 ([us-china-tech-competition-hbm.md](../concepts/us-china-tech-competition-hbm.md) 참고).
 
+## 현재 상태 (2026-08-02 19:xx, 저녁 자동체크 — 휴장 2일차, 하루 최종 확정치)
+
+가격 **1,718,000원(+29.95%, 상한가) 그대로 이월**, 신규 거래일 없음.
+저녁 웹서치로 3가지 추가 확인: **① HBM4 신호 혼재** — 삼성·SK 둘 다
+하이브리드본딩을 HBM4E로 연기(업계 공통 로드맵 조정, 경쟁열위 아님),
+SK는 "HBM4 수율 HBM3E 근접"(7/29)·"엔비디아向 12층 양산 6월 말 조기
+개시"(7/13) 확인 — 기존 "엔비디아向 HBM4 20~30% 축소설"(4월~)에 대한
+반박 신호. **② MS CFO가 2026 CapEx $190B 중 $25B를 "메모리 등 부품가
+상승" 요인으로 명시적 귀속** — 메타(7/26)에 이은 두 번째 고객사발
+가격결정력 방증. **③ SA 헤지펀드 규모 재검증 완결** — cornerstone
+investor 실보도 수치($7B 의향/$5B 실배정, [상세](../concepts/situational-awareness-fund-liquidation.md))로
+"시총 대비 1% 미만" 결론을 추정에서 실증으로 격상. HBM Cycle Score
+70/100·찐반등 1/4·패닉회복 "회복초입" 전부 유지, 신규 수치 변경 없음
+(상세는 각 concepts 페이지 08-02 저녁 항목 참고). 월요일(8/3) 개장이
+휴장 이틀간 쌓인 정성적 보강 재료의 첫 실측 시점.
+
 **[HBM Cycle Score](../concepts/hbm-cycle-score.md) 69→70/100**(공급확대
 축 소폭 상향, CXMT 약세 재확인). **[찐반등 4대 신호](../concepts/market-cycles-leverage-risk.md)**
 1/4 그대로(④만 충족, 신규 거래일 없어 변동 없음). **[패닉회복신호](../concepts/panic-recovery-signals.md)**

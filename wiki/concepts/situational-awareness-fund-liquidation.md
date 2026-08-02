@@ -103,6 +103,25 @@ $2.4~4.8B(약 3.5~7조원) 규모를 하루이틀 안에 강제매도했다는 �
 전체 랠리의 규모를 "기계적으로" 설명한다는 해석(interpretation)은
 분리해야 한다. 전자는 확인됨, 후자는 **과대해석이었고 지금 철회한다.**
 
+**🆕 2026-08-02 저녁 후속 보강 — 추정치를 실제 보도 수치로 대체**: 저녁
+체크 웹서치에서 위 "15~30% 가정" 추정을 대체할 더 구체적인 근거를
+발견했다. SA는 SK하이닉스의 $28B 나스닥 ADR 상장(2026-07) 당시
+**"cornerstone investor"(초석투자자)로 최대 $7B까지 참여 의사를
+표명**했고, Baillie Gifford·Coatue Management와 함께 3사 합산
+**약 $5B를 최종 배정**받았다(북빌딩 단계에서 희망액보다 축소, 3사간
+개별 배분 비율은 미공개 — [Hedgeweek](https://www.hedgeweek.com/situational-awareness-backs-sk-hynixs-28bn-us-listing/) ·
+[Seoul Economic Daily](https://en.sedaily.com/finance/2026/07/08/sk-hynix-lands-record-cornerstone-backing-for-adr-draws-ai)).
+SA 혼자 이 중 최대치(최대 $7B, 3사 평균이면 약 $1.7B)를 가져갔다고
+가정해도 SK하이닉스 시총($865.5B) 대비 **0.19~0.81%** — 위 표의
+0.28~0.56% 추정과 **같은 자릿수(1% 미만)로 재확인**된다. 즉 정확한
+개별 배분액은 미공개이지만, 독립적으로 보도된 cornerstone 투자
+규모($5~7B)로 재검산해도 "코스피·삼성전자 전체 랠리를 기계적으로
+설명하기엔 규모가 작다"는 위 결론은 **바뀌지 않고 오히려 보강**된다.
+다만 SA가 SK하이닉스 ADR 상장의 **최대 단일 cornerstone 투자자**였다는
+사실 자체는, SK하이닉스 개별 종목(특히 ADR)에 대한 SA의 관여도가
+이전에 생각했던 것보다 더 구체적이고 컸음을 보여준다 — "핵심
+집중종목"이라는 기존 서술을 뒷받침하는 근거가 하나 늘었다는 뜻이다.
+
 ## 이 위키의 기존 프레임에 주는 함의
 
 ### 1. 급락(7/28~30)의 원인 재해석
@@ -193,6 +212,9 @@ $2.4~4.8B(약 3.5~7조원) 규모를 하루이틀 안에 강제매도했다는 �
 - [CNN Business — The market's big AI doubts are exposing the riskiest players](https://www.cnn.com/2026/07/31/business/situational-awareness-citadel-ai-trade)
 - [Yahoo Finance — AI wizkid Leopold Aschenbrenner forced to sell entire portfolio after rout](https://finance.yahoo.com/technology/ai/articles/ai-wizkid-leopold-aschenbrenner-seeks-113210756.html)
 - [Forbes — AI Stocks Face A New Risk As Hedge Fund Leverage Unwinds](https://www.forbes.com/sites/jimosman/2026/07/30/ai-stocks-face-a-new-risk-as-hedge-fund-leverage-unwinds/)
+- [Hedgeweek — Situational Awareness backs SK Hynix's $28bn US listing](https://www.hedgeweek.com/situational-awareness-backs-sk-hynixs-28bn-us-listing/)
+- [Seoul Economic Daily — SK hynix Lands Record Cornerstone Backing for ADR, Draws 'AI Midas'](https://en.sedaily.com/finance/2026/07/08/sk-hynix-lands-record-cornerstone-backing-for-adr-draws-ai)
+- [Yahoo Finance — NVDA, NBIS, SKHY, SNDK Stock Losses Reportedly Force Ex-OpenAI Researcher's $20B Fund To Seek Capital](https://finance.yahoo.com/markets/stocks/articles/nvda-nbis-skhy-sndk-stock-104808718.html)
 - [market-cycles-leverage-risk.md](market-cycles-leverage-risk.md) (찐반등 신호③ 재해석 대상)
 - [panic-recovery-signals.md](panic-recovery-signals.md) ("회복 초입" 판정 신중론 병기)
 - [hbm-cycle-score.md](hbm-cycle-score.md) (외국인수급 축 해석 주의)
