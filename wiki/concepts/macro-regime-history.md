@@ -1,7 +1,7 @@
 ---
 title: 미국 거시국면(G/I/L)과 역사적 유사 시기 매칭
 created: 2026-07-24
-updated: 2026-07-30
+updated: 2026-08-02
 tags: [macro, regime, gil, historical-analogue, sk-hynix, daily-tracking]
 ---
 
@@ -225,6 +225,21 @@ G가 거의 정확히 0이라 recovery/stagflation 경계에 걸쳐 있음 — "
 - 📉 **상승기대↓**: 7월 FOMC 실제 인상 → 저PER(6.8배) 근거는 유지돼도
   시장 전체 멀티플 리레이팅이 지연
 
+**⚠️ [OPINION, 김광석 교수 "8월 시장 대전망" 특강, 2026-08-02 INGEST]
+위 🔴위험↑ 트리거("유가 급등")에 구체적 타이밍·메커니즘 추가**: 현재
+유가 변동은 공급 쇼크보다 **원유 재고 소진 속도**에 기인하며, 재고가
+바닥나는 시점(**2026년 8~9월** 전망)까지 이란-이스라엘-미국 무력충돌이
+지속되는지가 "제4차 오일쇼크" 여부를 가르는 핵심 변수라는 시각 —
+[trump-midterm-tracker.md](trump-midterm-tracker.md)가 8/2 저녁 확인한
+"이란-쿠웨이트 충돌이 2월말부터 이어진 지속 무력분쟁"이라는 사실과
+겹쳐보면, 이 8~9월 재고소진 타이밍이 이 애널로그의 위험↑ 트리거가
+실제로 발동하는지를 가늠할 다음 관찰 시점이 된다. 같은 교수는 반대로
+**"공포의 정점이 오히려 주가 바닥"**이라는 원칙도 함께 제시했다 —
+전쟁 공포가 최고조에 달한 시점이 데이터로 확인되면(예: 유가 급등+
+안전자산 선호 동시 피크) 오히려 반등 신호로 해석할 여지가 있다는
+뜻이라 위험↑ 트리거와 반증 신호를 함께 관찰할 것. 상세는
+[stock-market-essence.md §9](stock-market-essence.md).
+
 ### ③ 2005-11형 — "긴축 후반, 자산가격은 아직 버티는 중" (신규)
 
 **공통점**: 긴축 사이클 후반부에 실질금리가 플러스인데도(L +0.545)
@@ -394,3 +409,5 @@ convergence_pct = (score − min) / (max − min) × 100
 - [SK하이닉스 주가 상승의 정당성 분석](rally-justification-analysis.md)
 - [트럼프 2026 중간선거 트래커](trump-midterm-tracker.md) (중동·유가 트랙 교차연동)
 - [매크로 지표 트렌드 추적](macro-indicators.md) (2026-07-16까지의 수동 경제캘린더 기록 — 이 페이지가 그 역할을 대부분 흡수)
+- [sources/kim-kwangsuk-august-2026-market-outlook-lecture.md](../../sources/kim-kwangsuk-august-2026-market-outlook-lecture.md) (2026-08-02 인제스트, 유가 재고소진 타이밍·"공포정점=저점" 프레임)
+- [주식시장의 본질](stock-market-essence.md) (§9, "공포의 정점이 저점" 프레임)
