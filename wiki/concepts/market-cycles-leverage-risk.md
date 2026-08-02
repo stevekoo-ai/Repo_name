@@ -156,6 +156,41 @@ tags: [market-cycles, leverage, risk, seasonality, semiconductor]
 나침반이다 — [체크포인트 매핑](sk-hynix-analyst-thesis-checkpoints.md)과
 비슷하게, 실제 값을 계산하는 공식이 아니라 서사의 힘을 보여주는 지표로 사용.
 
+### 🆕 2026-08-02 밤(사용자 제보) — "글로벌 디레버리징+숏커버링" 프레임 INGEST, 월요일 관찰 포인트
+
+[사용자 제보, 영상 요약] 7월 급락의 원인을 **"세계적인 레버리지 투자
+붕괴(글로벌 디레버리징)"**로, 하락폭 증폭 요인을 **패시브 ETF의
+기계적 매도**로 짚는 새 소스 — 이 페이지가 지금까지 추적해온 개별
+메커니즘들(1-1 수급과밀, 1-2 레버리지 양방향 증폭,
+[situational-awareness-fund-liquidation.md](situational-awareness-fund-liquidation.md)의
+SA 헤지펀드 강제청산)을 **"글로벌 디레버리징"이라는 하나의 상위
+프레임으로 묶는 관점**이다 — 서로 다른 소스가 독립적으로 "레버리지
+청산"을 공통 원인으로 지목한다는 점에서 정성적 수렴도가 높다. **한국
+시장 변동성이 글로벌 대비 유독 컸다**는 관찰도 언급 — 원인은 미확인
+(단일 종목 레버리지 ETF 비중, 개인 신용거래 비중 등 이 위키의 기존
+1-1/1-2 프레임과 연결 지어 검증 필요).
+
+**⚠️ 가장 중요한 실전 함의 — 월요일(8/3) 관찰 포인트**: 이 소스는
+7/31 반등을 **"숏 커버링(공매도 청산 매수)에 의한 반등"**으로
+명시적으로 규정하고, "월요일 장의 흐름을 확인해 추가 상승 탄력이
+없으면 현금을 확보하라"는 리스크관리 지침을 제시한다 — 이는 위
+"반등이 나타나는 메커니즘 자체" 섹션의 "공매도 청산 매수"가 **찐
+반등이 아니라 일회성 소진 효과일 수 있다는 경고**와 정확히 같은
+문제의식이며, 오늘 밤 이미 다룬 [SA 헤지펀드 overhang 해소](situational-awareness-fund-liquidation.md)
+정정과도 같은 방향(7/31 급등의 상당 부분이 일회성 요인일 수 있다는
+신중론)이다. **월요일 개장 후 반드시 확인할 것**: 숏커버링·overhang
+해소 효과가 빠진 뒤에도 (a) 찐반등 4대 신호 중 추가 충족 여부 (b)
+외국인 순매수 독립 지속 여부 (c) 상한가 되돌림 여부 — 이 셋이
+전부 확인되지 않으면 "회복 초입→회복 진행중" 승격은 보류.
+
+**참고 — 반도체 섹터·유동성 지표 전략**: 같은 소스는 "과도하게
+하락한 반도체 섹터가 실적 기반으로 주도주 역할을 지속할 가능성",
+"달러 인덱스·미국 국채 10년물 등 글로벌 유동성 지표 지속 모니터링"을
+제안 — 전자는 이 위키의 펀더멘털 낙관 프레임과 일치, 후자는
+[macro-regime-history.md](macro-regime-history.md)의 L(유동성) 축이
+이미 추적 중인 지표와 동일선상(신규 지표 아님, 방법론 재확인).
+상세: [sources/july-selloff-deleveraging-analysis-2026-08.md](../../sources/july-selloff-deleveraging-analysis-2026-08.md)
+
 ### ✅ 2026-07-24 저녁 최종 확정 기준 (하루 최종 확정치, 아래 표가 현재 유효한 판정)
 
 | 신호 | 판정 | 근거 |
@@ -952,3 +987,5 @@ ASP도 $30~40/GB로 동시에 두 배 이상 뛸 것으로 전망돼, 물량 확
 - [나의 투자 포트폴리오](../entities/my-portfolio.md)
 - [sources/kim-kwangsuk-market-volatility-lecture-2026-07.md](../../sources/kim-kwangsuk-market-volatility-lecture-2026-07.md) (국민연금 리밸런싱 매도, 1-1-1)
 - [sources/kim-kwangsuk-live-pce-2026-07-30.md](../../sources/kim-kwangsuk-live-pce-2026-07-30.md) (인버스 ETF·8월 유동성장세 전망, 1-2)
+- [sources/july-selloff-deleveraging-analysis-2026-08.md](../../sources/july-selloff-deleveraging-analysis-2026-08.md) (2026-08-02 인제스트, 글로벌 디레버리징·숏커버링 반등 경고)
+- [Situational Awareness LP 강제청산](situational-awareness-fund-liquidation.md)
