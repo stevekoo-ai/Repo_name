@@ -2,6 +2,10 @@
 
 Catalog of every page in the wiki. See `../CLAUDE.md` for conventions.
 
+### ops (운영 — sync 전 가장 먼저 읽을 것)
+
+- [메세지박스](messagebox.md) — 🔴 다중 클라이언트(mobile+desktop) 동기화 전 우선 확인 게시판. 활성 HALT/CAUTION/INFO 메시지, 모바일 대행 작업 지시(action_for_mobile). [CLAUDE.md 동기화 규칙](../CLAUDE.md)에 따라 세션 시작·sync 전 가장 먼저 읽는다.
+
 ### summaries
 
 - [SK하이닉스 반등 전망 분석 (2026-07-13)](summaries/sk-hynix-rebound-analysis-2026-07-13.md) — 7/13 급락 후 단기 반등 신호와 핵심 변수 정리
