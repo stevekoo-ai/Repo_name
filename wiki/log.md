@@ -191,3 +191,23 @@ Append-only. Newest entry at the bottom. See `../CLAUDE.md` for format.
 2026-08-03 15:xx KST — QUERY "오늘 반도체 주가가 영 힘을 못쓰네.. 상한가 이후의 어떤 눈치보는 상황인가.. ? 오늘 미국장의 방향이 영향을 크게 주려나?" → 웹서치로 종가 무렵 재확인 결과 아침 -2.44%(SK하이닉스)에서 **종가 무렵 SK하이닉스·삼성전자 모두 -8%대로 낙폭 확대**, 코스피도 -5%대 재하락 마감(헤럴드경제 "또 도망가는 외인") — "눈치보기(관망)"가 아니라 장중 내내 매도 압력이 강해진 것으로 정정. 개인 1조원+ 순매수 방어에도 외국인·기관 매도 지속. 오늘 낙폭이 이미 알려진 미국 훈풍(7/31 SOX+8.19%)조차 압도했다는 점에서 "한국 자체 수급이 미국 방향보다 강하게 작용한 하루"로 답변, 오늘 밤 신규 미국세션의 영향은 있겠지만 "미국 좋으면 무조건 따라간다"는 도식은 오늘로 반박됨을 설명. updated entities/sk-hynix.md, concepts/market-cycles-leverage-risk.md
 2026-08-03 15:xx KST — QUERY "처음 방향을 잡고 상한가를 갔던 맥락이 오늘 이 주춤함으로 방향성이 흐릿해지는 것 같은데, 단기 횡보구간이 기존에도 있었던 패턴이었잖아?" → 두 층위 선례 확인: ①미시적(같은 7월 사이클 내) 7/16 패닉저점→7/20 롤러코스터(프리장-7.5%→V반등+1.2%→재차-3.69%)→7/22 저녁 1,829,000원대 진짜 횡보(변동폭1%이내)→7/23 재반등 1,947,000원 — 지금과 같은 "급변→재탐색→숨고르기" 리듬이 이미 한 차례 압축 재현됐었음 ②거시적(월별 데이터, sources/sk-hynix-monthly-close-2023-2026.md) 2025-10(+38.5%)→11월 -6.7%눌림→12월+22.8%재가속, 2026-05 +13.3%(앞뒤달 대비 둔화)→6월+39.3%폭발 — 이번 랠리 자체가 "숨고르기 후 재가속"을 반복해온 패턴. 단서: 오늘 -8%대는 예전 진짜 횡보(변동폭1%)보다 강도가 크고, SA overhang·신용잔고·외국인수급 등 구체적 추적 변수가 얽혀 있어 완전 동일시는 이름을 명시. updated entities/sk-hynix.md
 2026-08-03 종가 후 KST — QUERY 사용자가 외부 AI 도구의 "Still Hungry"(재료소진 vs 배부름 아님) 다중 페르소나 해석을 공유·논의 요청 → 웹서치로 종가(1,582,000원, -7.97%, 장중 1,563,000~1,645,000) 교차검증, 제보된 "7/29 저점 124.6만"은 우리 KIS API 확정 종가(7/30 최저 1,322,000)와 불일치 확인(장중 틱일 가능성, 검증불가로 명시). "포지션조정 vs 서사붕괴" 판정은 panic-recovery-signals.md §1 프레임과 일치한다고 검증. 반면 nvidia-pattern-hypothesis.md 기준 7/31 랠리 자체가 거래량1.79배·종가위치53%로 "엔비디아식 폭발모멘텀" 등급이 아니었다는 긴장점 추가, 신용융자잔고 7/31 -7.84% 감소가 "레버리지자금 익절설"의 구체 근거로 확인, 오늘 외국인 순매도 전환(찐반등③후퇴)을 경고 근거로 병기. 55/45 확률은 정밀수치 아닌 느낌표현으로 평가. updated entities/sk-hynix.md
+
+
+ 2026-08-03 — SYNC(desktop 세션 기준선 확립) → remote 서사 브랜치 기준 로컬 reset --hard 완료 후 신규
+  작업 통합 push. 사전 진단: 로컬은 커밋 0개·리모트 미연결이나 파일 가득, GitHub와 조용히 분기 상태 —
+  PEOS 전체 구조(444파일)는 remote에 있었고 로컬엔 scripts/ 일부만. 동기화 중 모바일이 동시 3커밋 push로
+  non-fast-forward → pull --rebase로 통합, log.md append 충돌 → 양쪽 보존 시간순 병합 해결(force push
+  안 쓰고 rebase 해결한 첫 사례). 동시 메세지박스 프로토콜 신설(messagebox.md + CLAUDE.md 운영섹션). →
+  updated wiki/index.md, CLAUDE.md, created wiki/messagebox.md, 2 concept pages. 이후부턴 다중
+  클라이언트 충돌 방지 + 메세지박스 규칙 적용
+ 
+ 2026-08-03 — INVEST(desktop) → 재부팅 후 사내 LLM 게이트웨이 접속 장애 가능성 조사 + GitHub API 접속
+  검증 + 다중 클라이언트 충돌 방지 전략 설계. 산출물: concepts/claude-code-internal-routing.md(라우팅
+  실체=.claude/settings.json env, 재부팅 후 장애 시나리오 4가지, GitHub PAT는 자격 증명 관리자 보관·사내
+  MITM으로 SSL 검증 비활성화 필요), concepts/multi-client-conflict-prevention.md(5대 메커니즘+역할
+  분담), .claude/settings.json 백업
+
+  2026-08-03 — DECIDE(모바일이 messagebox 안 보인다는 보고 → 진단: 모바일이 default branch main을 보고
+  있어 서사 브랜치 작업이 안 보인 것) → 3옵션 검토 후 default는 main 유지, 모바일이 매 세션 서사
+  브랜치로 checkout하는 방식 채택. CLAUDE.md 브랜치 전략에 checkout 규칙 명시. → 모바일은 이후 매 세션
+  시작 시 git checkout claude/ai-agent-impl-002tip 필수
