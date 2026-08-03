@@ -151,9 +151,15 @@ lost. No need to ask permission first — record, then move on.
 ### 브랜치 전략 (Branch Strategy)
 
 - **`main`**: GitHub Actions 자동 수집 + 리포트 생성. 사람/에이전트
-  직접 커밋 금지.
+  직접 커밋 금지. **default branch로 유지** (워크플로우가 main에서
+  돌고 main에 push하도록 짜여 있으므로 변경 금지).
 - **`claude/ai-agent-impl-002tip`**: 위키/엔티티/컨셉 정리 및 서사.
   mobile·desktop 모두 여기서 작업.
+- **세션 시작 시 반드시 서사 브랜치로 checkout**:
+  `git fetch origin && git checkout claude/ai-agent-impl-002tip`.
+  default가 main이라 clone/pull 시 main을 받으므로, 모바일은 매
+  세션 시작 시 명시적으로 서사 브랜치로 전환해야 이번 작업
+  (messagebox·운영 섹션·concept)을 볼 수 있다. [messagebox](wiki/messagebox.md) 참조.
 - 두 브랜치가 갈라져 있을 경우, 데이터 참조 시 반드시 브랜치 확인.
 - wiki/log.md의 마지막 항목을 기준으로 브랜치 동기화 필요.
 
