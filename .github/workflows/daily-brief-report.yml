@@ -13,6 +13,7 @@
 
         - name: Find latest daily brief
           id: find
+          shell: bash
           run: |
             FILE=$(ls -t report/daily-brief-*.html 2>/dev/null | head -1)
             echo "file=$FILE" >> "$GITHUB_OUTPUT"
@@ -30,5 +31,4 @@
             subject: "[Daily Brief] ${{ github.event.head_commit.message }}"
             to: ${{ secrets.GMAIL_ADDRESS }}
             from: Daily Brief Bot
-            html: true
-            html_body: ${{ steps.find.outputs.file }}
+            html_body: file://${{ steps.find.outputs.file }}
