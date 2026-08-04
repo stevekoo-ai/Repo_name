@@ -31,4 +31,4 @@
             to: ${{ secrets.GMAIL_ADDRESS }}
             from: Daily Brief Bot
             html: true
-            body_html_file: ${{ steps.find.outputs.file }}
+            html_body: ${{ steps.find.outputs.file }}
