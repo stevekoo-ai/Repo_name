@@ -36,6 +36,27 @@ tags: [messagebox, sync, multi-client, ops, priority]
 
 <!-- 새 메시지는 아래 양식을 복사해 위에 추가. 가장 최근가 맨 위. -->
 
+### 🟡 log.md 로그 로테이션 도입 — mobile 2026-08-04T12:xxZ
+
+- **who**: mobile
+- **when_utc**: 2026-08-04T12:00:00Z (대략)
+- **expires_utc**: 2026-09-01T00:00:00Z (다음 로테이션 전까지 유효)
+- **what**: 사용자가 "위키가 너무 크지 않냐"고 물어서 실측한 결과
+  `wiki/log.md`가 193KB(전체 위키의 20%)까지 커진 걸 확인 → 웹 리서치로
+  검증된 방법(hot/warm/cold tiered memory, 표준 log rotation)을 골라
+  적용. **7월 항목(158줄, 151KB)을 `wiki/log-archive/2026-07.md`로
+  이관하고, `wiki/log.md`는 당월(8월) 항목만 남김(193KB→43KB)**. 내용은
+  그대로 잘라서 옮긴 것뿐(수정 없음), diff로 동일함 확인 완료.
+  `CLAUDE.md`의 "log.md conventions" 섹션에 "Log rotation" 하위 규칙으로
+  공식 반영 — 매월 첫 세션이 지난달 몫을 archive로 옮기는 방식으로
+  계속 운영. **desktop이 `log.md`에서 옛날(7월) 항목을 찾으려 하면
+  더 이상 거기 없고 `wiki/log-archive/2026-07.md`에 있음** — 다음 세션
+  시작 시 이 점 참고 바람. append-only 자동병합 속성 자체는 안 바뀜(이번
+  로테이션은 월 1회 일괄 cut이라 진행 중인 동시편집과 충돌 안 함).
+- **read_first**: `wiki/log.md` 상단 로테이션 안내, `CLAUDE.md` "Log
+  rotation" 섹션, [wiki/log-archive/2026-07.md](log-archive/2026-07.md)
+- **status**: active
+
 ### 🟦 daily-brief-report.yml 메일 본문 버그 수정 — mobile 2026-08-04T10:24Z
 
 - **who**: mobile
