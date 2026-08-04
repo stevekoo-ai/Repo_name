@@ -177,6 +177,37 @@ lost. No need to ask permission first — record, then move on.
 - pre-commit hook 실패 시 새 커밋 생성 (amend 금지).
 - 커밋 메시지 끝에 `Co-Authored-By: Claude <noreply@anthropic.com>`.
 
+### 코드 작성 품질 (Code Quality Protocol)
+
+- **코드 작성 전 반드시 cross-check 수행**: 외부 라이브러리 API, 파라미터명, 설정파일 키 이름 등은 **실제 documentation/소스 코드를 먼저 읽고** 작성 — 기억이나 추측으로 코드 생성 금지.
+- **Double/triple check 원칙**:
+  1. 첫 번째: `Glob`/`Grep`으로 관련 파일 구조 확인
+  2. 두 번째: `Read`로 API/파라미터명/유사 패턴 확인
+  3. 세 번째: `WebFetch`로 외부 문서 (예: GitHub Actions action param, npm package API 등) 검증
+  4. 검증 완료 전까지 코드 작성 시작 금지
+- **Cross-check subfunction 패턴**: 검증이 필요한 작업은 반드시 별도 단계로 분리. 예:
+  ```
+  Step A: WebFetch("https://github.com/owner/action/docs", "What are all valid 'with' parameters?")
+  Step B: Grep("**/*.yml", parameter_name)로 프로젝트 내 사용 패턴 확인
+  Step C: 검증 완료 후 코드 작성
+  ```
+  검증 단계 없이 바로 코드 생성하는 것은 절대 금지.
+- **에러 발생 시**: "틀릴 수 있다"는 가정으로 접근. "이렇게 하면 된다"가 아닌 "문서에 이렇게 나온다"로 결론 서술.
+
+### 중간 단계 작업 — 진단형 테스트 스크립트 (Intermediate Task Protocol)
+
+상호 사용자가 "어떻게 하면 될까?", "어떤 문제가 있는지 확인해줘", "이걸 해보려고 하는데" 같은 **중간 단계의 질문**을 했을 때, 부분적인 스크립트나 단계별 테스트 → 실패 → 수정 → 재시도 사이클은 절대 금지.
+
+- **모든 케이스를 cover하는 정교한 diagnostic 스크립트**를 한 번에 작성해서 제공해야 함. 실패하면 그 원인을 설명하고 **수정된 전체 스크립트**를 재제공.
+- 스크립트는 다음을 포함해야 함:
+  1. **환경 진단** — OS, Python 버전, PATH, 접근 가능한 툴 목록
+  2. **파일/리소스 존재 확인** — 모든 대상 파일, 키, API endpoint 검증
+  3. **네트워크/연결성 테스트** — SSL 모드별 폴백, timeout 설정
+  4. **에러별 분기 처리** — 401/403/409/422/429 등 HTTP status code별 자동 대응
+  5. **대체 경로 폴백** — 주요 경로 실패 시 자동 fallback (예: credential manager → clipboard → pat.txt → 수동 입력)
+  6. **최종 요약 리포트** — 성공/실패, 원인이면 원인명, 다음 액션 제안
+- **최종 결론이 나야 종료**: 성공했거나 원인이 명확히 특정되어야 종료. "어쩌면 될지도 모른다"로 끝내면 안 됨.
+
 ### 시간대 (Timezone)
 
 - 모든 시간 기준: KST(UTC+9). 금융 데이터 기준일은 거래일 기준.
