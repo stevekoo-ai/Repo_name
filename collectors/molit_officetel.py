@@ -47,10 +47,13 @@ def _fetch_region_month(lawd_cd: str, deal_ymd: str, api_key: str) -> list[dict[
             f"MOLIT officetel (오피스텔) returned non-JSON response (likely a service/auth error): "
             f"{base.redact_url(resp.text[:300])}"
         )
-    header = payload.get("response", {}).get("header", {})
+    # See collectors/molit.py's _fetch_region_month comment — this API's JSON is flat
+    # ({"header":..., "body":...}), not wrapped in a "response" key. Support both shapes.
+    envelope = payload.get("response", payload)
+    header = envelope.get("header", {})
     if header.get("resultCode") not in (None, "00", "000"):
         raise RuntimeError(f"MOLIT officetel (오피스텔) error response: {header.get('resultMsg')}")
-    items = payload.get("response", {}).get("body", {}).get("items")
+    items = envelope.get("body", {}).get("items")
     if not items:
         return []
     rows = items.get("item", []) if isinstance(items, dict) else items
