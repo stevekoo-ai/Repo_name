@@ -1,3 +1,5 @@
+  name: Daily Brief Email Sender
+
   on:
     push:
       paths:
@@ -8,9 +10,16 @@
       runs-on: ubuntu-latest
       steps:
         - uses: actions/checkout@v4
+
         - uses: actions/setup-python@v5
           with:
             python-version: "3.12"
+
+        - name: Get date from latest daily brief
+          id: getdate
+          run: |
+            date=$(ls -t report/daily-brief-*.html | head -1 | sed 's/.*daily-brief-//;s/\.html//')
+            echo "date=$date" >> "$GITHUB_OUTPUT"
 
         - name: Send daily brief email
           env:
@@ -22,7 +31,7 @@
             server_port: 465
             username: ${{ secrets.GMAIL_ADDRESS }}
             password: ${{ secrets.GMAIL_APP_PASSWORD }}
-            subject: "[Daily Brief SKhynix Local LLM] ${{ github.event.head_commit.message }}"
+            subject: "[Daily Brief] ${{ github.event.head_commit.message }}"
             to: ${{ secrets.GMAIL_ADDRESS }}
             from: Daily Brief Bot
-            body_file: report/daily-brief-${{ github.event.head_commit.timestamp | split('T')[0] }}.html
+            body_file: report/daily-brief-${{ steps.getdate.outputs.date }}.html
