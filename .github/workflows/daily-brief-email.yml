@@ -1,4 +1,4 @@
-  name: Daily Brief Email Sender
+  name: Daily Brief Report Sender
 
   on:
     push:
