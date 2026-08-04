@@ -1,7 +1,7 @@
 ---
 title: KIS Open API 데이터 카탈로그
 created: 2026-07-31
-updated: 2026-08-01
+updated: 2026-08-04
 tags: [kis-api, data-reference, infrastructure, github-actions]
 ---
 
@@ -65,6 +65,46 @@ MISMATCH를 크래시 없이 "등락률 미확정, 사용자 확인 필요"로 �
 아직 실계정 API 호출로 검증은 못 했음(샌드박스 아웃바운드 차단) — 다음
 GitHub Actions 실행에서 `--raw`로 `rate` 필드 존재 여부·`output2[1]`이
 실제로 전 거래일인지 재확인 필요.
+
+### 5년 백필 & 외국인보유율의 KIS 구조적 한계 (2026-08-04 신설 — 사용자 요청)
+
+사용자가 "5년치를 KIS API 하나로만 뽑으려니 걸리는 게 있다"며 짚어준
+문제를 검증한 결과. 새 스크립트 `scripts/hynix_5y_history.py`(가격/보유율/
+merge 3개 서브커맨드)로 정리.
+
+**① 주가는 KIS로 5년치 가능**: `inquire-daily-itemchartprice`(TR
+`FHKST03010100`)가 `FID_INPUT_DATE_1/2`로 날짜 range를 받는다 — 1회
+호출 최대 ~100건이라 90~100일 창으로 나눠 페이지네이션하면 된다.
+✅ `stevekoo-ai/open-trading-api` 공식 예제로 파라미터·필드명 교차검증
+완료(`stck_bsop_date`/`stck_oprc`/`stck_hgpr`/`stck_lwpr`/`stck_clpr`/
+`acml_vol`/`acml_tr_pbmn`).
+
+**② 외국인 보유율은 KIS 전체를 뒤져도 5년치가 안 된다 — 구조적 한계
+확정**. 이번에 3개 경로를 전부 확인했고 셋 다 "최근 30영업일" 벽에
+막힌다:
+- `inquire-investor`(`FHKST01010900`, `investor_flow.py fetch`가 이미
+  씀) — docstring 자체가 "최근 30영업일" 명시, 날짜 range 파라미터 없음
+- `inquire-price`(`FHKST01010100`, `investor_flow.py snapshot`이 이미
+  씀) — `hts_frgn_ehrt`(외국인 보유율)를 부수 필드로 주지만 "오늘 시점"
+  스냅샷 1건뿐
+- **🆕 `inquire-daily-price`(`FHKST01010400`)** — 이번에 새로 발견. 일별
+  `hts_frgn_ehrt`를 배열로 주긴 하지만 공식 예제 docstring에 "최근
+  30거래일(주,월)로 제한되어 있습니다"라고 명시돼 있어 역시 30일 벽.
+  (참고로 이 TR과 `inquire-daily-itemchartprice`의 `FID_ORG_ADJ_PRC`
+  0/1 의미가 문서상 서로 반대로 보임 — 전자는 "0:수정주가미반영
+  1:수정주가반영", 후자는 "0:수정주가 1:원주가". 실사용 전 `--raw`로
+  실제 종가 흐름과 대조 확인 권장.)
+
+→ **결론: 외국인 보유율 5년 이력은 KIS 밖에서 구해야 한다.** KRX
+정보데이터시스템 Open API(`openapi.krx.co.kr` — 웹 대시보드
+`data.krx.co.kr`과 다른 도메인, 흔히 혼동됨)가 유력 후보이나, 이
+세션은 두 도메인 모두 아웃바운드 네트워크가 막혀 있어(화이트리스트
+프록시) 실호출로 검증 못 함 — `hynix_5y_history.py`의
+`foreign-ownership` 서브커맨드는 **엔드포인트·파라미터명·응답
+필드명 전부 미검증 추정치**로 작성돼 있다. 서비스 신청 후 실제
+명세서로 대조·수정 필요. 대안으로 커뮤니티 라이브러리
+`sharebook-kr/pykrx`(비공식 스크래핑 경로, 정식 Open API 아님)도
+검토 가능.
 
 ## 2. 조사 완료, 아직 미구현 — 필요해지면 바로 참고
 
