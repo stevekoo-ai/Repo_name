@@ -31,4 +31,4 @@
             subject: "[Daily Brief] ${{ github.event.head_commit.message }}"
             to: ${{ secrets.GMAIL_ADDRESS }}
             from: Daily Brief Bot
-            html_body: file://${{ steps.find.outputs.file }}
+            html_body: ${{ steps.find.outputs.file }}
