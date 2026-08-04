@@ -16620,7 +16620,7 @@
   },
   "real_estate": {
     "fetch_status": "source_error",
-    "fetch_note": null,
+    "fetch_note": "MOLIT unreachable (probe call failed after retry): HTTPSConnectionPool(host='apis.data.go.kr', port=443): Max retries exceeded with url: /1613000/RTMSDataSvcAptTradeDev/getRTMSDataSvcAptTradeDev?serviceKey=751fd46ea503be38c38d3b466987abf162c356f40a2e060ef7fb7953fb5ca078&LAWD_CD=11110&DEAL_YMD=202607&pageNo=1&numOfRows=1000&type=json (Caused by ConnectTimeoutError(<HTTPSConnection(host='apis.data.go.kr', port=443) at 0x7f0e68528ec0>, 'Connection to apis.data.go.kr timed out. (connect timeout=8)')) — skipped remaining regions to avoid a long CI stall",
     "regions_covered": 0,
     "regions_total": 55,
     "tiers": {
@@ -16653,7 +16653,7 @@
   },
   "real_estate_rent": {
     "fetch_status": "source_error",
-    "fetch_note": null,
+    "fetch_note": "MOLIT rent (전월세) unreachable (probe call failed after retry): HTTPSConnectionPool(host='apis.data.go.kr', port=443): Max retries exceeded with url: /1613000/RTMSDataSvcAptRent/getRTMSDataSvcAptRent?serviceKey=751fd46ea503be38c38d3b466987abf162c356f40a2e060ef7fb7953fb5ca078&LAWD_CD=11110&DEAL_YMD=202607&pageNo=1&numOfRows=1000&type=json (Caused by ConnectTimeoutError(<HTTPSConnection(host='apis.data.go.kr', port=443) at 0x7f0e68529df0>, 'Connection to apis.data.go.kr timed out. (connect timeout=8)')) — skipped remaining regions to avoid a long CI stall",
     "regions_covered": 0,
     "regions_total": 55,
     "jeonse_tiers": {
@@ -16703,7 +16703,7 @@
   },
   "real_estate_villa": {
     "fetch_status": "source_error",
-    "fetch_note": null,
+    "fetch_note": "MOLIT villa (연립다세대) unreachable (probe call failed after retry): HTTPSConnectionPool(host='apis.data.go.kr', port=443): Max retries exceeded with url: /1613000/RTMSDataSvcRHTrade/getRTMSDataSvcRHTrade?serviceKey=751fd46ea503be38c38d3b466987abf162c356f40a2e060ef7fb7953fb5ca078&LAWD_CD=11110&DEAL_YMD=202607&pageNo=1&numOfRows=1000&type=json (Caused by ConnectTimeoutError(<HTTPSConnection(host='apis.data.go.kr', port=443) at 0x7f0e6852ac00>, 'Connection to apis.data.go.kr timed out. (connect timeout=8)')) — skipped remaining regions to avoid a long CI stall",
     "regions_covered": 0,
     "regions_total": 55,
     "tiers": {
@@ -16736,7 +16736,7 @@
   },
   "real_estate_officetel": {
     "fetch_status": "source_error",
-    "fetch_note": null,
+    "fetch_note": "MOLIT officetel (오피스텔) unreachable (probe call failed after retry): HTTPSConnectionPool(host='apis.data.go.kr', port=443): Max retries exceeded with url: /1613000/RTMSDataSvcOffiTrade/getRTMSDataSvcOffiTrade?serviceKey=751fd46ea503be38c38d3b466987abf162c356f40a2e060ef7fb7953fb5ca078&LAWD_CD=11110&DEAL_YMD=202607&pageNo=1&numOfRows=1000&type=json (Caused by ConnectTimeoutError(<HTTPSConnection(host='apis.data.go.kr', port=443) at 0x7f0e68679250>, 'Connection to apis.data.go.kr timed out. (connect timeout=8)')) — skipped remaining regions to avoid a long CI stall",
     "regions_covered": 0,
     "regions_total": 55,
     "tiers": {
