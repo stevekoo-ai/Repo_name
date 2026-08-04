@@ -81,7 +81,7 @@ def _fetch_api(series_id: str, api_key: str, timeout: int = 20) -> pd.DataFrame 
         params={"series_id": series_id, "api_key": api_key, "file_type": "json"},
         timeout=timeout,
     )
-    resp.raise_for_status()
+    base.raise_for_status(resp)
     obs = resp.json().get("observations", [])
     if not obs:
         return None

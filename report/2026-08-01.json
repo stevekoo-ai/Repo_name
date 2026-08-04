@@ -16697,7 +16697,7 @@
   },
   "real_estate": {
     "fetch_status": "source_error",
-    "fetch_note": "MOLIT unreachable (probe call failed after retry): 401 Client Error: Unauthorized for url: https://apis.data.go.kr/1613000/RTMSDataSvcAptTradeDev/getRTMSDataSvcAptTradeDev?serviceKey=751fd46ea503be38c38d3b466987abf162c356f40a2e060ef7fb7953fb5ca078&LAWD_CD=11110&DEAL_YMD=202607&pageNo=1&numOfRows=1000&type=json — skipped remaining regions to avoid a long CI stall",
+    "fetch_note": "MOLIT unreachable (probe call failed after retry): 401 Client Error: Unauthorized for url: https://apis.data.go.kr/1613000/RTMSDataSvcAptTradeDev/getRTMSDataSvcAptTradeDev?serviceKey=***REDACTED***&LAWD_CD=11110&DEAL_YMD=202607&pageNo=1&numOfRows=1000&type=json — skipped remaining regions to avoid a long CI stall",
     "regions_covered": 0,
     "regions_total": 55,
     "tiers": {
@@ -16729,7 +16729,29 @@
     }
   },
   "daily_history_summary": {
-    "status": "unavailable",
-    "note": "2026-08 월간 일일 이력 없음"
+    "status": "ok",
+    "month": "2026-08",
+    "daily_records": [
+      {
+        "date": "2026-08-01",
+        "kr_regime": "Early Expansion",
+        "kr_score": 1.0,
+        "kr_confidence": 90.5,
+        "us_regime": "Slowdown",
+        "us_score": -1.0,
+        "us_confidence": 96.9,
+        "investment_env_score": 69.9,
+        "semiconductor_score": 79.6,
+        "bond_score": 42.7
+      }
+    ],
+    "trend_summary": {
+      "kr_regime_stable": true,
+      "kr_confidence_change": 0.0,
+      "us_regime_stable": true,
+      "us_confidence_change": 0.0,
+      "investment_env_trend": 0.0,
+      "semiconductor_trend": 0.0
+    }
   }
 }

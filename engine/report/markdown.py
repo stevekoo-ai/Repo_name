@@ -335,7 +335,7 @@ def _rate_analysis(payload: dict) -> str:
         f"**기본 원칙**: {portfolio.get('condition', 'N/A')}",
         f"**리밸런싱 트리거**: 점수 {portfolio.get('rebalance_trigger', 0)}점 이상/이하 변화",
         "",
-        "### SK Hynix 관점",
+        "### SK하이닉스 관점",
         f"- **3개월 상승 가능성**: {hynix.get('3m_upside_probability', 50)}%",
         f"- **6개월 상승 가능성**: {hynix.get('6m_upside_probability', 50)}%",
         f"- **12개월 상승 가능성**: {hynix.get('12m_upside_probability', 50)}%",
@@ -480,11 +480,11 @@ def _cci_analysis(payload: dict) -> str:
     lines.append("")
 
     action = cci["sk_hynix_action"]
-    lines.append(f"### SK Hynix 포지션 관리")
-    lines.append(f"- **Action**: {action['action']}")
-    lines.append(f"- **Max Weight**: {action['max_weight']}%")
-    lines.append(f"- **Context**: {action['description']}")
-    lines.append(f"- **Signal**: {action['signal']}")
+    lines.append(f"### SK하이닉스 포지션 관리")
+    lines.append(f"- **조치**: {action['action']}")
+    lines.append(f"- **최대 비중**: {action['max_weight']}%")
+    lines.append(f"- **배경**: {action['description']}")
+    lines.append(f"- **신호**: {action['signal']}")
     lines.append("")
     lines.append(f"### 상태 해석")
     lines.append(f"> {cci['interpretation'][state]}")

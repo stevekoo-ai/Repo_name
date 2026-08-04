@@ -80,7 +80,7 @@ def _fetch_table(spec: dict, api_key: str, start: str, end: str, timeout: int = 
         "tblId": spec["tbl_id"],
     }
     resp = requests.get(url, params=params, timeout=timeout)
-    resp.raise_for_status()
+    base.raise_for_status(resp)
     payload = resp.json()
     if isinstance(payload, dict) and payload.get("err"):
         raise RuntimeError(payload.get("errMsg", "KOSIS error response"))

@@ -16711,7 +16711,7 @@
   },
   "real_estate": {
     "fetch_status": "source_error",
-    "fetch_note": "MOLIT unreachable (probe call failed after retry): 401 Client Error: Unauthorized for url: https://apis.data.go.kr/1613000/RTMSDataSvcAptTradeDev/getRTMSDataSvcAptTradeDev?serviceKey=751fd46ea503be38c38d3b466987abf162c356f40a2e060ef7fb7953fb5ca078&LAWD_CD=11110&DEAL_YMD=202606&pageNo=1&numOfRows=1000&type=json — skipped remaining regions to avoid a long CI stall",
+    "fetch_note": "MOLIT unreachable (probe call failed after retry): 401 Client Error: Unauthorized for url: https://apis.data.go.kr/1613000/RTMSDataSvcAptTradeDev/getRTMSDataSvcAptTradeDev?serviceKey=***REDACTED***&LAWD_CD=11110&DEAL_YMD=202606&pageNo=1&numOfRows=1000&type=json — skipped remaining regions to avoid a long CI stall",
     "regions_covered": 0,
     "regions_total": 55,
     "tiers": {

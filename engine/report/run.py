@@ -21,6 +21,7 @@ cron) execution.
 from __future__ import annotations
 
 import argparse
+import os
 from datetime import date
 from pathlib import Path
 
@@ -48,17 +49,32 @@ def _notify_summary(payload: dict) -> None:
     rather than propagated.
     """
     macro, macro_us, personal = payload["macro"], payload["macro_us"], payload["personal"]
+    month = payload["report_month"]
     subject = (
-        f"[PEOS 리포트] {payload['report_month']} — "
+        f"[PEOS 리포트] {month} — "
         f"한국 {macro['regime']} / 미국 {macro_us['regime']} ({payload['report_readiness']})"
     )
+
+    # GITHUB_REPOSITORY (e.g. "stevekoo-ai/Repo_name") is set automatically by GitHub
+    # Actions but not present in a local run — fall back to the bare relative path
+    # rather than emitting a link that would point nowhere.
+    repo = os.environ.get("GITHUB_REPOSITORY")
+    if repo:
+        owner, _, name = repo.partition("/")
+        report_lines = (
+            f"전체 리포트 보기: https://github.com/{repo}/blob/main/report/{month}.md\n"
+            f"대시보드: https://{owner}.github.io/{name}/report.html"
+        )
+    else:
+        report_lines = f"전체 리포트: report/{month}.md (GitHub Pages: docs/report.html)"
+
     body = (
         f"한국 Regime: {macro['regime']} (점수 {macro['score']}, 신뢰도 {macro['confidence']:.1f})\n"
         f"미국 Regime: {macro_us['regime']} (점수 {macro_us['score']}, 신뢰도 {macro_us['confidence']:.1f})\n"
         f"투자환경 점수: {personal['investment_environment_score']}\n"
         f"반도체 점수: {personal['semiconductor_score']} ({personal['semiconductor_band']})\n"
         f"액션 아이템: {len(payload['actions'])}건\n\n"
-        f"전체 리포트: report/{payload['report_month']}.md (GitHub Pages: docs/report.html)"
+        f"{report_lines}"
     )
     try:
         notify.build_channel().send(subject, body)
