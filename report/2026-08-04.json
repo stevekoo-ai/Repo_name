@@ -2,9 +2,9 @@
   "report_month": "2026-08",
   "report_readiness": "final",
   "macro_us": {
-    "regime": "Slowdown",
+    "regime": "Recession",
     "previous_regime": "Slowdown",
-    "transition": null,
+    "transition": "downgrade",
     "score": -1,
     "weighted_score": -0.8,
     "score_band": "slowdown",
@@ -2615,7 +2615,7 @@
     {
       "key": "trade_balance",
       "indicator": "미국 무역수지 (3개월 평균, 백만달러)",
-      "current": -77585.0,
+      "current": -73261.0,
       "previous": -77585.0,
       "previous_source": "snapshot",
       "trend": "→",
@@ -3089,7 +3089,11 @@
         },
         {
           "date": "2026-05-01",
-          "value": -77585.0
+          "value": -77647.0
+        },
+        {
+          "date": "2026-06-01",
+          "value": -73261.0
         }
       ],
       "history_years": 10
@@ -13103,10 +13107,10 @@
   ],
   "kr_us_comparison": {
     "kr_regime": "Recovery",
-    "us_regime": "Slowdown",
+    "us_regime": "Recession",
     "kr_score_band": "unbalanced_expansion",
     "us_score_band": "slowdown",
-    "cycle_gap": -4,
+    "cycle_gap": -5,
     "alignment": "kr_behind",
     "indicator_pairs": [
       {
@@ -13169,11 +13173,11 @@
         "kr_score": 1,
         "us_score": 0,
         "kr_value": 38607.4,
-        "us_value": -77585.0,
+        "us_value": -73261.0,
         "relationship": "diverge"
       }
     ],
-    "narrative": "미국은 현재 Slowdown 국면, 한국은 Recovery 국면입니다. 한국이 사이클상 미국보다 뒤처져 있어, 미국에서 먼저 나타난 흐름이 시차를 두고 한국에 파급될 가능성을 주시할 필요가 있습니다. 비교 가능한 6개 핵심 지표 중 83%가 미국과 같은 방향으로 움직이고 있습니다. 미국과 한국 모두 뚜렷한 경고 신호는 없는 상태입니다. 방향이 엇갈린 지표: 산업생산 — 이 부분이 한국이 미국과 다르게 가는 지점입니다."
+    "narrative": "미국은 현재 Recession 국면, 한국은 Recovery 국면입니다. 한국이 사이클상 미국보다 뒤처져 있어, 미국에서 먼저 나타난 흐름이 시차를 두고 한국에 파급될 가능성을 주시할 필요가 있습니다. 비교 가능한 6개 핵심 지표 중 83%가 미국과 같은 방향으로 움직이고 있습니다. 미국과 한국 모두 뚜렷한 경고 신호는 없는 상태입니다. 방향이 엇갈린 지표: 산업생산 — 이 부분이 한국이 미국과 다르게 가는 지점입니다."
   },
   "macro": {
     "regime": "Recovery",
@@ -16619,152 +16623,410 @@
     }
   },
   "real_estate": {
-    "fetch_status": "source_error",
-    "fetch_note": "MOLIT unreachable (probe call failed after retry): HTTPSConnectionPool(host='apis.data.go.kr', port=443): Max retries exceeded with url: /1613000/RTMSDataSvcAptTradeDev/getRTMSDataSvcAptTradeDev?serviceKey=751fd46ea503be38c38d3b466987abf162c356f40a2e060ef7fb7953fb5ca078&LAWD_CD=11110&DEAL_YMD=202607&pageNo=1&numOfRows=1000&type=json (Caused by ConnectTimeoutError(<HTTPSConnection(host='apis.data.go.kr', port=443) at 0x7f0e68528ec0>, 'Connection to apis.data.go.kr timed out. (connect timeout=8)')) — skipped remaining regions to avoid a long CI stall",
-    "regions_covered": 0,
+    "fetch_status": "ok",
+    "fetch_note": null,
+    "regions_covered": 50,
     "regions_total": 55,
     "tiers": {
       "seoul": {
-        "data_status": "pending",
+        "data_status": "ok",
+        "reference_month": "2026-07",
+        "price_per_pyeong_manwon": 4382.0,
+        "mom_change_pct": 1.84,
+        "trend_3m_pct": 1.59,
+        "transaction_count": 3886,
+        "volume_mom_change_pct": -26.9,
+        "market_heat": "보합",
         "tier": "seoul",
         "label": "서울"
       },
       "capital_area": {
-        "data_status": "pending",
+        "data_status": "ok",
+        "reference_month": "2026-07",
+        "price_per_pyeong_manwon": 3078.0,
+        "mom_change_pct": -1.38,
+        "trend_3m_pct": -6.99,
+        "transaction_count": 9006,
+        "volume_mom_change_pct": -27.6,
+        "market_heat": "냉각",
         "tier": "capital_area",
         "label": "수도권"
       },
       "nationwide": {
-        "data_status": "pending",
+        "data_status": "ok",
+        "reference_month": "2026-07",
+        "price_per_pyeong_manwon": 2602.0,
+        "mom_change_pct": -2.36,
+        "trend_3m_pct": -9.77,
+        "transaction_count": 11707,
+        "volume_mom_change_pct": -26.4,
+        "market_heat": "냉각",
         "tier": "nationwide",
         "label": "전국(대표표본)"
       }
     },
     "highlight": {
-      "data_status": "pending",
+      "data_status": "ok",
+      "reference_month": "2026-07",
+      "price_per_pyeong_manwon": 2357.0,
+      "mom_change_pct": 1.32,
+      "trend_3m_pct": 8.63,
+      "transaction_count": 232,
+      "volume_mom_change_pct": -76.8,
+      "market_heat": "보합",
       "region_name": "용인 기흥구",
       "note": "용인 플랫폼시티 인근 — 청약 타겟 지역"
     },
     "seoul_district_movers": {
-      "data_status": "pending",
-      "gainers": [],
-      "decliners": []
+      "data_status": "ok",
+      "gainers": [
+        {
+          "name": "중랑구",
+          "price_per_pyeong_manwon": 4680.0,
+          "mom_change_pct": 45.03
+        },
+        {
+          "name": "용산구",
+          "price_per_pyeong_manwon": 9044.0,
+          "mom_change_pct": 19.22
+        },
+        {
+          "name": "금천구",
+          "price_per_pyeong_manwon": 2965.0,
+          "mom_change_pct": 8.67
+        }
+      ],
+      "decliners": [
+        {
+          "name": "서초구",
+          "price_per_pyeong_manwon": 6311.0,
+          "mom_change_pct": -24.4
+        },
+        {
+          "name": "종로구",
+          "price_per_pyeong_manwon": 4192.0,
+          "mom_change_pct": -15.89
+        },
+        {
+          "name": "도봉구",
+          "price_per_pyeong_manwon": 2488.0,
+          "mom_change_pct": -8.4
+        }
+      ]
     }
   },
   "real_estate_rent": {
-    "fetch_status": "source_error",
-    "fetch_note": "MOLIT rent (전월세) unreachable (probe call failed after retry): HTTPSConnectionPool(host='apis.data.go.kr', port=443): Max retries exceeded with url: /1613000/RTMSDataSvcAptRent/getRTMSDataSvcAptRent?serviceKey=751fd46ea503be38c38d3b466987abf162c356f40a2e060ef7fb7953fb5ca078&LAWD_CD=11110&DEAL_YMD=202607&pageNo=1&numOfRows=1000&type=json (Caused by ConnectTimeoutError(<HTTPSConnection(host='apis.data.go.kr', port=443) at 0x7f0e68529df0>, 'Connection to apis.data.go.kr timed out. (connect timeout=8)')) — skipped remaining regions to avoid a long CI stall",
-    "regions_covered": 0,
+    "fetch_status": "ok",
+    "fetch_note": null,
+    "regions_covered": 50,
     "regions_total": 55,
     "jeonse_tiers": {
       "seoul": {
-        "data_status": "pending",
+        "data_status": "ok",
+        "reference_month": "2026-07",
+        "price_per_pyeong_manwon": 2587.0,
+        "mom_change_pct": -2.5,
+        "trend_3m_pct": 1.24,
+        "transaction_count": 7262,
+        "volume_mom_change_pct": -1.0,
+        "market_heat": "냉각",
         "tier": "seoul",
         "label": "서울"
       },
       "capital_area": {
-        "data_status": "pending",
+        "data_status": "ok",
+        "reference_month": "2026-07",
+        "price_per_pyeong_manwon": 2129.0,
+        "mom_change_pct": -0.47,
+        "trend_3m_pct": 1.36,
+        "transaction_count": 12430,
+        "volume_mom_change_pct": -4.8,
+        "market_heat": "보합",
         "tier": "capital_area",
         "label": "수도권"
       },
       "nationwide": {
-        "data_status": "pending",
+        "data_status": "ok",
+        "reference_month": "2026-07",
+        "price_per_pyeong_manwon": 1939.0,
+        "mom_change_pct": 0.47,
+        "trend_3m_pct": 3.39,
+        "transaction_count": 14518,
+        "volume_mom_change_pct": -7.2,
+        "market_heat": "보합",
         "tier": "nationwide",
         "label": "전국(대표표본)"
       }
     },
     "wolse_tiers": {
       "seoul": {
-        "data_status": "pending",
+        "data_status": "ok",
         "tier": "seoul",
-        "label": "서울"
+        "label": "서울",
+        "reference_month": "2026-07",
+        "deposit_per_pyeong_manwon": 913.0,
+        "deposit_mom_change_pct": 9.48,
+        "rent_per_pyeong_manwon": 5.0,
+        "rent_mom_change_pct": -1.13,
+        "transaction_count": 6797
       },
       "capital_area": {
-        "data_status": "pending",
+        "data_status": "ok",
         "tier": "capital_area",
-        "label": "수도권"
+        "label": "수도권",
+        "reference_month": "2026-07",
+        "deposit_per_pyeong_manwon": 649.0,
+        "deposit_mom_change_pct": 16.54,
+        "rent_per_pyeong_manwon": 4.3,
+        "rent_mom_change_pct": -3.68,
+        "transaction_count": 10790
       },
       "nationwide": {
-        "data_status": "pending",
+        "data_status": "ok",
         "tier": "nationwide",
-        "label": "전국(대표표본)"
+        "label": "전국(대표표본)",
+        "reference_month": "2026-07",
+        "deposit_per_pyeong_manwon": 522.0,
+        "deposit_mom_change_pct": 19.46,
+        "rent_per_pyeong_manwon": 4.2,
+        "rent_mom_change_pct": -2.47,
+        "transaction_count": 12821
       }
     },
     "jeonse_highlight": {
-      "data_status": "pending",
+      "data_status": "ok",
+      "reference_month": "2026-07",
+      "price_per_pyeong_manwon": 1555.0,
+      "mom_change_pct": -0.41,
+      "trend_3m_pct": 3.65,
+      "transaction_count": 390,
+      "volume_mom_change_pct": -12.9,
+      "market_heat": "보합",
       "region_name": "용인 기흥구",
       "note": "용인 플랫폼시티 인근 — 청약 타겟 지역"
     },
     "seoul_jeonse_district_movers": {
-      "data_status": "pending",
-      "gainers": [],
-      "decliners": []
+      "data_status": "ok",
+      "gainers": [
+        {
+          "name": "서대문구",
+          "price_per_pyeong_manwon": 2956.0,
+          "mom_change_pct": 7.99
+        },
+        {
+          "name": "종로구",
+          "price_per_pyeong_manwon": 2960.0,
+          "mom_change_pct": 7.24
+        },
+        {
+          "name": "도봉구",
+          "price_per_pyeong_manwon": 1748.0,
+          "mom_change_pct": 7.13
+        }
+      ],
+      "decliners": [
+        {
+          "name": "은평구",
+          "price_per_pyeong_manwon": 1781.0,
+          "mom_change_pct": -20.98
+        },
+        {
+          "name": "강서구",
+          "price_per_pyeong_manwon": 1938.0,
+          "mom_change_pct": -18.3
+        },
+        {
+          "name": "동대문구",
+          "price_per_pyeong_manwon": 2560.0,
+          "mom_change_pct": -10.55
+        }
+      ]
     }
   },
   "real_estate_villa": {
-    "fetch_status": "source_error",
-    "fetch_note": "MOLIT villa (연립다세대) unreachable (probe call failed after retry): HTTPSConnectionPool(host='apis.data.go.kr', port=443): Max retries exceeded with url: /1613000/RTMSDataSvcRHTrade/getRTMSDataSvcRHTrade?serviceKey=751fd46ea503be38c38d3b466987abf162c356f40a2e060ef7fb7953fb5ca078&LAWD_CD=11110&DEAL_YMD=202607&pageNo=1&numOfRows=1000&type=json (Caused by ConnectTimeoutError(<HTTPSConnection(host='apis.data.go.kr', port=443) at 0x7f0e6852ac00>, 'Connection to apis.data.go.kr timed out. (connect timeout=8)')) — skipped remaining regions to avoid a long CI stall",
-    "regions_covered": 0,
+    "fetch_status": "ok",
+    "fetch_note": null,
+    "regions_covered": 50,
     "regions_total": 55,
     "tiers": {
       "seoul": {
-        "data_status": "pending",
+        "data_status": "ok",
+        "reference_month": "2026-07",
+        "price_per_pyeong_manwon": 2767.0,
+        "mom_change_pct": -6.05,
+        "trend_3m_pct": 2.51,
+        "transaction_count": 1971,
+        "volume_mom_change_pct": -39.3,
+        "market_heat": "냉각",
         "tier": "seoul",
         "label": "서울"
       },
       "capital_area": {
-        "data_status": "pending",
+        "data_status": "ok",
+        "reference_month": "2026-07",
+        "price_per_pyeong_manwon": 2258.0,
+        "mom_change_pct": -7.39,
+        "trend_3m_pct": -1.0,
+        "transaction_count": 2677,
+        "volume_mom_change_pct": -38.1,
+        "market_heat": "냉각",
         "tier": "capital_area",
         "label": "수도권"
       },
       "nationwide": {
-        "data_status": "pending",
+        "data_status": "ok",
+        "reference_month": "2026-07",
+        "price_per_pyeong_manwon": 2121.0,
+        "mom_change_pct": -6.84,
+        "trend_3m_pct": -2.52,
+        "transaction_count": 2879,
+        "volume_mom_change_pct": -37.7,
+        "market_heat": "냉각",
         "tier": "nationwide",
         "label": "전국(대표표본)"
       }
     },
     "highlight": {
-      "data_status": "pending",
+      "data_status": "ok",
+      "reference_month": "2026-07",
+      "price_per_pyeong_manwon": 1252.0,
+      "mom_change_pct": -15.61,
+      "trend_3m_pct": -5.62,
+      "transaction_count": 16,
+      "volume_mom_change_pct": -66.7,
+      "market_heat": "냉각",
       "region_name": "용인 기흥구",
       "note": "용인 플랫폼시티 인근 — 청약 타겟 지역"
     },
     "seoul_district_movers": {
-      "data_status": "pending",
-      "gainers": [],
-      "decliners": []
+      "data_status": "ok",
+      "gainers": [
+        {
+          "name": "영등포구",
+          "price_per_pyeong_manwon": 3930.0,
+          "mom_change_pct": 13.1
+        },
+        {
+          "name": "은평구",
+          "price_per_pyeong_manwon": 2227.0,
+          "mom_change_pct": 12.67
+        },
+        {
+          "name": "도봉구",
+          "price_per_pyeong_manwon": 1940.0,
+          "mom_change_pct": 10.27
+        }
+      ],
+      "decliners": [
+        {
+          "name": "동대문구",
+          "price_per_pyeong_manwon": 2629.0,
+          "mom_change_pct": -37.67
+        },
+        {
+          "name": "중구",
+          "price_per_pyeong_manwon": 3355.0,
+          "mom_change_pct": -25.15
+        },
+        {
+          "name": "노원구",
+          "price_per_pyeong_manwon": 2060.0,
+          "mom_change_pct": -23.15
+        }
+      ]
     }
   },
   "real_estate_officetel": {
-    "fetch_status": "source_error",
-    "fetch_note": "MOLIT officetel (오피스텔) unreachable (probe call failed after retry): HTTPSConnectionPool(host='apis.data.go.kr', port=443): Max retries exceeded with url: /1613000/RTMSDataSvcOffiTrade/getRTMSDataSvcOffiTrade?serviceKey=751fd46ea503be38c38d3b466987abf162c356f40a2e060ef7fb7953fb5ca078&LAWD_CD=11110&DEAL_YMD=202607&pageNo=1&numOfRows=1000&type=json (Caused by ConnectTimeoutError(<HTTPSConnection(host='apis.data.go.kr', port=443) at 0x7f0e68679250>, 'Connection to apis.data.go.kr timed out. (connect timeout=8)')) — skipped remaining regions to avoid a long CI stall",
-    "regions_covered": 0,
+    "fetch_status": "ok",
+    "fetch_note": null,
+    "regions_covered": 50,
     "regions_total": 55,
     "tiers": {
       "seoul": {
-        "data_status": "pending",
+        "data_status": "ok",
+        "reference_month": "2026-07",
+        "price_per_pyeong_manwon": 2504.0,
+        "mom_change_pct": -5.61,
+        "trend_3m_pct": -9.14,
+        "transaction_count": 598,
+        "volume_mom_change_pct": -45.6,
+        "market_heat": "냉각",
         "tier": "seoul",
         "label": "서울"
       },
       "capital_area": {
-        "data_status": "pending",
+        "data_status": "ok",
+        "reference_month": "2026-07",
+        "price_per_pyeong_manwon": 1959.0,
+        "mom_change_pct": -8.98,
+        "trend_3m_pct": -13.8,
+        "transaction_count": 1111,
+        "volume_mom_change_pct": -36.3,
+        "market_heat": "냉각",
         "tier": "capital_area",
         "label": "수도권"
       },
       "nationwide": {
-        "data_status": "pending",
+        "data_status": "ok",
+        "reference_month": "2026-07",
+        "price_per_pyeong_manwon": 1728.0,
+        "mom_change_pct": -16.88,
+        "trend_3m_pct": -20.45,
+        "transaction_count": 1291,
+        "volume_mom_change_pct": -36.6,
+        "market_heat": "냉각",
         "tier": "nationwide",
         "label": "전국(대표표본)"
       }
     },
     "highlight": {
-      "data_status": "pending",
+      "data_status": "ok",
+      "reference_month": "2026-07",
+      "price_per_pyeong_manwon": 1278.0,
+      "mom_change_pct": -26.38,
+      "trend_3m_pct": -7.97,
+      "transaction_count": 7,
+      "volume_mom_change_pct": -68.2,
+      "market_heat": "냉각",
       "region_name": "용인 기흥구",
       "note": "용인 플랫폼시티 인근 — 청약 타겟 지역"
     },
     "seoul_district_movers": {
-      "data_status": "pending",
-      "gainers": [],
-      "decliners": []
+      "data_status": "ok",
+      "gainers": [
+        {
+          "name": "강북구",
+          "price_per_pyeong_manwon": 1769.0,
+          "mom_change_pct": 33.35
+        },
+        {
+          "name": "동작구",
+          "price_per_pyeong_manwon": 2630.0,
+          "mom_change_pct": 26.12
+        },
+        {
+          "name": "종로구",
+          "price_per_pyeong_manwon": 2777.0,
+          "mom_change_pct": 20.87
+        }
+      ],
+      "decliners": [
+        {
+          "name": "서대문구",
+          "price_per_pyeong_manwon": 1258.0,
+          "mom_change_pct": -57.24
+        },
+        {
+          "name": "서초구",
+          "price_per_pyeong_manwon": 2859.0,
+          "mom_change_pct": -56.82
+        },
+        {
+          "name": "중구",
+          "price_per_pyeong_manwon": 3162.0,
+          "mom_change_pct": -15.8
+        }
+      ]
     }
   },
   "daily_history_summary": {
