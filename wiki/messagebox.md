@@ -35,6 +35,21 @@ tags: [messagebox, sync, multi-client, ops, priority]
 ## 현재 메시지
 
 <!-- 새 메시지는 아래 양식을 복사해 위에 추가. 가장 최근가 맨 위. -->
+
+### 🟦 daily-brief-report.yml 메일 본문 버그 수정 — mobile 2026-08-04T10:24Z
+
+- **who**: mobile
+- **when_utc**: 2026-08-04T10:24:00Z
+- **expires_utc**: 2026-08-05T10:24:00Z
+- **what**: 사용자 요청으로 `.github/workflows/daily-brief-report.yml`의 이메일 본문
+  버그를 검토·수정. `html_body: ${{ steps.find.outputs.file }}`가 파일 경로
+  문자열을 그대로 본문에 넣던 문제(desktop의 직전 수정 `ce6e460`에서 발생) —
+  `html_body: file://${{ steps.find.outputs.file }}` + `attachments: ${{ steps.find.outputs.file }}`로
+  수정(본문+첨부 둘 다). `report/daily-brief-2026-08-04.html`에 트리거용 코멘트를
+  추가해 실제 테스트 발송까지 완료(run 30900432671, success). desktop이 이 파일을
+  계속 손보고 있었어서(같은 날 3회 수정) 다음 편집 전에 이 변경사항 참고 바람.
+- **read_first**: `.github/workflows/daily-brief-report.yml` 최신 diff, [wiki/log.md](log.md) 2026-08-04 19:2x 항목
+- **status**: active
 <!--
 ### [배지] 한 줄 제목 — <client> <UTC 시각>
 
