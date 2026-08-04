@@ -24,7 +24,8 @@ LLM does the bookkeeping.
 ```
 wiki/
   index.md            content-oriented catalog: every page, one line each
-  log.md              chronological, append-only event log
+  log.md              chronological, append-only event log (current month only — see rotation below)
+  log-archive/         log.md rotated out by month: YYYY-MM.md, cold storage
   summaries/           one page per ingested source, distilled
   entities/            one page per recurring person/org/product/thing
   concepts/            one page per recurring idea/topic/theme
@@ -73,6 +74,39 @@ YYYY-MM-DD HH:MM UTC — INGEST sources/foo.md → created entities/foo.md, upda
 YYYY-MM-DD HH:MM UTC — QUERY "question text" → cited entities/foo.md, concepts/bar.md
 YYYY-MM-DD HH:MM UTC — LINT → 2 issues found (see report)
 ```
+
+### Log rotation (introduced 2026-08-04 — token/size management)
+
+`log.md` grew to 193KB / 225 lines in its first 3 weeks (3x/day automated
+routines + ad-hoc queries, never pruned) — expensive to read every session
+and a real contributor to hitting context limits. This follows the
+established "hot/warm/cold tiered memory" pattern for agent memory files
+(recent = hot/live, history = cold/archived, nothing deleted):
+
+- `wiki/log.md` holds **only the current calendar month's entries**.
+- At the start of the first session in a new month (any client, whoever
+  notices first): move the previous month's entries verbatim into
+  `wiki/log-archive/YYYY-MM.md` (create the file, give it standard
+  frontmatter + a one-line note that it's a rotated-out archive of
+  `log.md`), leaving `log.md` with just the header/rotation-note and the
+  new month's entries so far. Never edit entries during the move — copy
+  exactly, this is a cut not a rewrite.
+- Looking for old history: check `log.md` first, then
+  `log-archive/YYYY-MM.md` for the relevant month.
+- This is purely a size/token optimization — it changes nothing about
+  *what* gets logged or when (still append-only, still one line per
+  event, still every ingest/query/lint). Multi-client note: since the
+  rotation is a monthly one-time cut (not a per-entry operation), it
+  doesn't interact with the append-only auto-merge property the
+  [multi-client-conflict-prevention.md](wiki/concepts/multi-client-conflict-prevention.md)
+  doc relies on for concurrent sessions — just do it early in the month
+  before much new content has piled up, same as any other edit to
+  `log.md`'s non-append parts (the header).
+
+If other pages grow to a size where this becomes worth doing to them too
+(dense concept/entity pages that keep appending dated sections rather than
+updating in place), apply the same hot/cold split on a page-by-page basis
+when asked — this isn't automatic for pages other than `log.md`.
 
 ## Workflows
 

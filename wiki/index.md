@@ -5,6 +5,7 @@ Catalog of every page in the wiki. See `../CLAUDE.md` for conventions.
 ### ops (운영 — sync 전 가장 먼저 읽을 것)
 
 - [메세지박스](messagebox.md) — 🔴 다중 클라이언트(mobile+desktop) 동기화 전 우선 확인 게시판. 활성 HALT/CAUTION/INFO 메시지, 모바일 대행 작업 지시(action_for_mobile). [CLAUDE.md 동기화 규칙](../CLAUDE.md)에 따라 세션 시작·sync 전 가장 먼저 읽는다.
+- [로그 아카이브 2026-07](log-archive/2026-07.md) — 🆕 2026-08-04 로그 로테이션 도입(hot/cold tiered memory 패턴, [CLAUDE.md](../CLAUDE.md) 참고) — `log.md`가 193KB까지 커져 토큰 비용 문제로 매월 첫 세션에 지난달 몫을 여기로 이관하기 시작. `log.md`는 이제 당월 항목만 유지(193KB→43KB로 축소).
 
 ### summaries
 
