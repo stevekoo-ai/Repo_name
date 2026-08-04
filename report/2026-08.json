@@ -16782,14 +16782,26 @@
         "investment_env_score": 69.9,
         "semiconductor_score": 79.6,
         "bond_score": 42.7
+      },
+      {
+        "date": "2026-08-04",
+        "kr_regime": "Recovery",
+        "kr_score": 1.0,
+        "kr_confidence": 90.5,
+        "us_regime": "Slowdown",
+        "us_score": -1.0,
+        "us_confidence": 96.9,
+        "investment_env_score": 70.1,
+        "semiconductor_score": 79.6,
+        "bond_score": 44.8
       }
     ],
     "trend_summary": {
-      "kr_regime_stable": true,
+      "kr_regime_stable": false,
       "kr_confidence_change": 0.0,
       "us_regime_stable": true,
       "us_confidence_change": 0.0,
-      "investment_env_trend": 0.0,
+      "investment_env_trend": 0.19999999999998863,
       "semiconductor_trend": 0.0
     }
   }
