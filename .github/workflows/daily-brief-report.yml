@@ -16,7 +16,9 @@ jobs:
         shell: bash
         run: |
           FILE=$(ls -t report/daily-brief-*.html 2>/dev/null | head -1)
+          DATE=$(basename "$FILE" | sed 's/^daily-brief-//;s/\.html$//')
           echo "file=$FILE" >> "$GITHUB_OUTPUT"
+          echo "date=$DATE" >> "$GITHUB_OUTPUT"
 
       - name: Send email
         env:
@@ -28,7 +30,7 @@ jobs:
           server_port: 465
           username: ${{ secrets.GMAIL_ADDRESS }}
           password: ${{ secrets.GMAIL_APP_PASSWORD }}
-          subject: "[Daily Brief] ${{ github.event.head_commit.message }}"
+          subject: "[Daily Brief] ${{ steps.find.outputs.date }}"
           to: ${{ secrets.GMAIL_ADDRESS }}
           from: Daily Brief Bot
           html_body: file://${{ steps.find.outputs.file }}
