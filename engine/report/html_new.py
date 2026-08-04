@@ -154,12 +154,12 @@ def _render_sale_trend_section(re_data: dict, title: str, icon: str = "🏘️")
         return ""
 
     if re_data.get("fetch_status") == "pending":
-        return _render_real_estate_placeholder("Pending", re_data.get('fetch_note', 'DATA_GO_KR_KEY 미설정'), title, icon)
+        return _render_real_estate_placeholder("Pending", re_data.get('fetch_note') or 'DATA_GO_KR_KEY 미설정', title, icon)
 
     tiers = re_data.get("tiers", {})
     any_ok = any(t.get("data_status") == "ok" for t in tiers.values())
     if not any_ok:
-        return _render_real_estate_placeholder("Source Error", re_data.get('fetch_note', '국토교통부 API 응답 없음'), title, icon)
+        return _render_real_estate_placeholder("Source Error", re_data.get('fetch_note') or '국토교통부 API 응답 없음', title, icon)
 
     coverage = re_data.get("regions_covered")
     total = re_data.get("regions_total")
@@ -237,12 +237,12 @@ def _render_rent_section(re_data: dict) -> str:
         return ""
 
     if re_data.get("fetch_status") == "pending":
-        return _render_real_estate_placeholder("Pending", re_data.get('fetch_note', 'DATA_GO_KR_KEY 미설정'), "아파트 전월세", icon="🏠")
+        return _render_real_estate_placeholder("Pending", re_data.get('fetch_note') or 'DATA_GO_KR_KEY 미설정', "아파트 전월세", icon="🏠")
 
     jeonse_tiers = re_data.get("jeonse_tiers", {})
     any_ok = any(t.get("data_status") == "ok" for t in jeonse_tiers.values())
     if not any_ok:
-        return _render_real_estate_placeholder("Source Error", re_data.get('fetch_note', '국토교통부 API 응답 없음'), "아파트 전월세", icon="🏠")
+        return _render_real_estate_placeholder("Source Error", re_data.get('fetch_note') or '국토교통부 API 응답 없음', "아파트 전월세", icon="🏠")
 
     coverage = re_data.get("regions_covered")
     total = re_data.get("regions_total")

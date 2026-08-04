@@ -99,6 +99,13 @@ def _fetch_region_month(lawd_cd: str, deal_ymd: str, api_key: str) -> list[dict[
         raise RuntimeError(f"MOLIT error response: {header.get('resultMsg')}")
     items = payload.get("response", {}).get("body", {}).get("items")
     if not items:
+        # TEMP DIAGNOSTIC (remove once confirmed working) — resultCode 00 with empty items is
+        # ambiguous: could be a genuinely empty month, or a not-yet-fully-propagated 활용신청
+        # approval, or a body shape we're not parsing. Surface the full envelope once per call
+        # so a live run makes the cause visible instead of silently degrading to "no data".
+        log_event("collector.molit_empty_items_diagnostic", level="warning",
+                  lawd_cd=lawd_cd, deal_ymd=deal_ymd, result_code=header.get("resultCode"),
+                  result_msg=header.get("resultMsg"), body_snippet=base.redact_url(resp.text[:500]))
         return []
     rows = items.get("item", []) if isinstance(items, dict) else items
     return rows if isinstance(rows, list) else [rows]

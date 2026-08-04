@@ -506,9 +506,9 @@ def _sale_trend_section(re_data: dict | None, title: str, highlight_label: str =
     )
     if is_pending or is_dead_source_error:
         if is_pending:
-            lines.append(f"- [사실] 데이터 상태: Pending — {re_data.get('fetch_note', 'DATA_GO_KR_KEY 미설정')}")
+            lines.append(f"- [사실] 데이터 상태: Pending — {re_data.get('fetch_note') or 'DATA_GO_KR_KEY 미설정'}")
         else:
-            lines.append(f"- [사실] 데이터 상태: Source Error — {re_data.get('fetch_note', '국토교통부 API 응답 없음')}")
+            lines.append(f"- [사실] 데이터 상태: Source Error — {re_data.get('fetch_note') or '국토교통부 API 응답 없음'}")
         lines.append("")
         lines.append("**데이터 준비 중:** 다음 리포트에서 재시도됩니다. 아래는 채워질 정보의 형식입니다.")
         lines.append("")
@@ -603,9 +603,9 @@ def _rent_trend(payload: dict) -> str:
     )
     if is_pending or is_dead_source_error:
         if is_pending:
-            lines.append(f"- [사실] 데이터 상태: Pending — {re_data.get('fetch_note', 'DATA_GO_KR_KEY 미설정')}")
+            lines.append(f"- [사실] 데이터 상태: Pending — {re_data.get('fetch_note') or 'DATA_GO_KR_KEY 미설정'}")
         else:
-            lines.append(f"- [사실] 데이터 상태: Source Error — {re_data.get('fetch_note', '국토교통부 API 응답 없음')}")
+            lines.append(f"- [사실] 데이터 상태: Source Error — {re_data.get('fetch_note') or '국토교통부 API 응답 없음'}")
         lines.append("")
         lines.append("**데이터 준비 중:** 다음 리포트에서 재시도됩니다.")
         return "\n".join(lines)
