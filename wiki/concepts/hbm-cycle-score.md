@@ -34,7 +34,7 @@ tags: [hbm, cycle-score, nvidia, cowos, early-warning, sk-hynix, daily-tracking]
 | 외국인 보유율 변화(전일 대비 %p) | 15 | KRX, FnGuide |
 | HBM ASP(주간 %변화) | 25 | TrendForce, DRAMeXchange, SemiAnalysis |
 | 엔비디아 주문 & CoWoS 활용률 (§2 참고) | 25 | The Information, DigiTimes, SemiAnalysis, TSMC 발표 |
-| 공급 확대 위험(경쟁사 캐파 증설, 수요증가율 대비) | 10 | 체크포인트 [⑦CXMT](sk-hynix-analyst-thesis-checkpoints.md)·⑧마이크론과 연동 |
+| 공급 확대 위험(경쟁사 캐파 증설, 수요증가율 대비) | 10 | 체크포인트 [⑦CXMT](sk-hynix-analyst-thesis-checkpoints.md)·⑧마이크론과 연동. **🔴 2026-08-04 신규 리스크 반영 필요**: UBS가 2027년 HBM 점유율을 삼성 41%·SK하이닉스 39%·마이크론 20%로 전망(SK하이닉스 1위 상실) — CXMT(범용 D램)와는 다른 **동급 경쟁사 기술 추격** 리스크, [체크포인트②](sk-hynix-analyst-thesis-checkpoints.md) 참고. 점수는 예측치 1건만으로 즉시 반영하지 않고 다음 체크에서 추가 검증 후 조정 여부 판단 |
 | 고객사 재고 센티먼트(하이퍼스케일러 실적콜 키워드) | 10 | [하이퍼스케일러 고객 동향](sk-hynix-analyst-thesis-checkpoints.md) 섹션과 연동 |
 
 **판정 기준**: 80점 이상 = 강세 유지 / 60~80점 = 경계 / 60점 미만 = 사이클

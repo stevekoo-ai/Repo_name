@@ -113,6 +113,20 @@ tags: [market-cycles, leverage, risk, seasonality, semiconductor]
 같은 낙관 시나리오이나, **검증된 사실이 아니라 예측**이므로 8월 실측
 데이터(외국인 수급 지속성·Fed 정책)로 다음 체크에서 교차확인 필요.
 
+**🏦 2026-08-04 추가 — 모건스탠리가 이 "레버리지發" 서사를 기관 레벨에서
+독립 검증**: 사용자가 공유한 요약노트를 웹서치로 원문 대조한 결과,
+모건스탠리가 2026-07-22 노트에서 한국 증시를 Equalweight→**Overweight**로
+상향하며 근거로 **"최근 급락은 레버리지·쏠림 청산(leverage washout)에
+의한 기술적 조정이지 기업 실적·펀더멘털 훼손이 아니다"**를 명시적으로
+제시([Bloomberg](https://www.bloomberg.com/news/articles/2026-08-02/morgan-stanley-sees-36-upside-to-korean-stocks-after-washout)).
+이 위키가 이 섹션·[SA 헤지펀드 강제청산](situational-awareness-fund-liquidation.md)·
+신용융자잔고 데이터로 추적해온 "이번 변동성은 업황이 아니라 수급·
+레버리지發"라는 결론과 **정확히 같은 방향의 독립적 기관 검증**이다 —
+특히 모건스탠리는 이 위키의 [체크포인트 목표가 스펙트럼](sk-hynix-analyst-thesis-checkpoints.md)에서
+전통적으로 가장 보수적인(비중축소 성향) 축이었던 기관이라, 그 진영이
+이동했다는 사실 자체가 무겁다. 상세는
+[checkpoints.md 2026-08-04 밤 INGEST 항목](sk-hynix-analyst-thesis-checkpoints.md) 참고.
+
 ### 1-3. 계절적 요인 + 거시 이슈
 
 **계절성:**
