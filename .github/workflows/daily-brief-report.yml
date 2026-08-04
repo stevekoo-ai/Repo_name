@@ -14,9 +14,8 @@
         - name: Find latest daily brief
           id: find
           run: |
-            echo "file=$(ls -t report/daily-brief-*.html 2>/dev/null | head -1)" >> "$GITHUB_OUTPUT"
-            echo "filename=$(basename $(ls -t report/daily-brief-*.html 2>/dev/null | head -1))" >>
-  "$GITHUB_OUTPUT"
+            FILE=$(ls -t report/daily-brief-*.html 2>/dev/null | head -1)
+            echo "file=$FILE" >> "$GITHUB_OUTPUT"
 
         - name: Send email
           env:
