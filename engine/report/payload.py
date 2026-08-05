@@ -20,6 +20,7 @@ from engine.personal import mapping
 from engine.rate_analysis import scoring as rate_scoring
 from engine.crisis_analysis import scoring as cci_scoring
 from engine.real_estate import market_trend as real_estate_trend
+from engine.real_estate import officetel_trend, rent_trend, villa_trend
 from . import discussion as discussion_mod
 from . import scenario as scenario_mod
 
@@ -264,8 +265,13 @@ def build_report_payload(month_key: str | None = None) -> dict:
     cci_analysis = _cci_section()
     payload["cci_analysis"] = cci_analysis
 
-    # Add real estate transaction price trend (서울/수도권/전국)
+    # Add real estate transaction price trend (서울/수도권/전국) — 아파트 매매/전월세/
+    # 연립다세대 매매/오피스텔 매매 4종. 각 collector는 별도 data.go.kr 활용신청이 필요해
+    # 승인 전까지는 개별적으로 "pending"일 수 있다 (7.9 — 소스 없다고 파이프라인이 막히지 않음).
     payload["real_estate"] = real_estate_trend.compute_real_estate_trend()
+    payload["real_estate_rent"] = rent_trend.compute_rent_trend()
+    payload["real_estate_villa"] = villa_trend.compute_villa_trend()
+    payload["real_estate_officetel"] = officetel_trend.compute_officetel_trend()
 
     # Add daily dashboard history integration
     payload["daily_history_summary"] = _daily_history_summary(month_key)

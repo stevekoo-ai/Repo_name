@@ -103,6 +103,40 @@ def test_fetch_region_month_surfaces_non_json_body_as_likely_auth_error(monkeypa
         molit._fetch_region_month("11110", "202601", "fake-key")
 
 
+def test_fetch_region_month_parses_flat_envelope_not_wrapped_in_response(monkeypatch):
+    """Regression test for a real incident (2026-08-04 live run): the actual API JSON is
+    {"header": ..., "body": ...} — flat, not wrapped in {"response": {...}} the way this code
+    originally assumed. That bug made every call look like a valid-but-empty response
+    (resultCode read as None, which passes the error check, then items read as None too),
+    so real transactions were silently discarded even once the key/활용신청 was fully working."""
+    body = (
+        '{"header": {"resultCode": "000", "resultMsg": "OK"}, '
+        '"body": {"items": {"item": [{"dealAmount": "110,000", "excluUseAr": "59.92"}]}, '
+        '"totalCount": 1}}'
+    )
+    monkeypatch.setattr(molit.requests, "get", lambda *a, **k: _FakeResponse(body))
+
+    rows = molit._fetch_region_month("11110", "202607", "fake-key")
+
+    assert len(rows) == 1
+    assert rows[0]["dealAmount"] == "110,000"
+
+
+def test_fetch_region_month_still_parses_wrapped_response_envelope(monkeypatch):
+    """The flat-envelope fix (above) must not break a hypothetical MOLIT product that does wrap
+    its JSON in a top-level "response" key — both shapes should keep working."""
+    body = (
+        '{"response": {"header": {"resultCode": "00", "resultMsg": "OK"}, '
+        '"body": {"items": {"item": [{"dealAmount": "50,000", "excluUseAr": "84.5"}]}}}}'
+    )
+    monkeypatch.setattr(molit.requests, "get", lambda *a, **k: _FakeResponse(body))
+
+    rows = molit._fetch_region_month("11110", "202607", "fake-key")
+
+    assert len(rows) == 1
+    assert rows[0]["dealAmount"] == "50,000"
+
+
 def test_fetch_region_month_never_leaks_the_real_key_on_http_error(monkeypatch):
     """Regression test for a real incident: a 401 from data.go.kr surfaced the raw
     DATA_GO_KR_KEY value (from requests' HTTPError embedding the full request URL) into
