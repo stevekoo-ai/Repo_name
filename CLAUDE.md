@@ -108,6 +108,35 @@ If other pages grow to a size where this becomes worth doing to them too
 updating in place), apply the same hot/cold split on a page-by-page basis
 when asked — this isn't automatic for pages other than `log.md`.
 
+**Before rotating any page other than `log.md` (2026-08-04 refinement, user
+feedback):** a pure calendar-month cut is too blunt on its own — age isn't
+the same as irrelevance. Before archiving a table/section's old rows,
+check whether they're still load-bearing:
+
+1. Grep the rest of the wiki (including the file's own still-live prose
+   sections) for anything that cites or depends on the specific old
+   entries being cut — table rows in this wiki have no per-row anchors, so
+   in practice this means checking whether the *fact* in that row is only
+   ever stated there, or whether it's already been promoted into a durable
+   "current state" prose section elsewhere on the page (checkpoints.md's
+   "핵심 체크포인트", macro-regime-history.md's "0."/"4." sections, etc.
+   already work this way — dated tables are an audit trail, not the
+   only copy of the finding).
+2. If a fact is *only* in the row about to be archived and nothing else
+   currently cites or restates it, don't just cut it — either fold a
+   one-line durable summary into the relevant prose section first (so the
+   knowledge survives the cut even if the row's full detail goes cold),
+   or leave that row live one more rotation cycle.
+3. Report what you checked, not just what you cut — e.g. "verified 0
+   pages link to a specific archived row; the facts in it are already
+   restated in section X" — so this stays auditable rather than assumed.
+
+This is why `log.md`'s own rotation doesn't need this extra check — it's
+a pure chronological diary with no "current state" duplicate elsewhere by
+design, so age and staleness are the same thing there. That's not true for
+concept/entity pages, which mix a changelog-shaped table with durable
+prose that the changelog feeds into.
+
 ## Workflows
 
 ### Ingest (`/ingest <path-or-text>`)
