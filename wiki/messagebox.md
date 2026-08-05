@@ -36,6 +36,15 @@ tags: [messagebox, sync, multi-client, ops, priority]
 
 <!-- 새 메시지는 아래 양식을 복사해 위에 추가. 가장 최근가 맨 위. -->
 
+### 🟦 3개 자동 루틴 트리거 재생성 + HBM Cycle Score 붕괴조건 4→5 — mobile 2026-08-05T09:37Z
+
+- **who**: mobile
+- **when_utc**: 2026-08-05T09:37:00Z
+- **expires_utc**: 2026-08-12T00:00:00Z
+- **what**: 사용자 요청("반도체 수출 증가율을 daily report에 추가, 10% 밑으로 꺾이면 경고")으로 (1) `concepts/hbm-cycle-score.md`의 투자가설 붕괴조건이 **4개(0~4) → 5개(0~5)**로 변경됨(⑤ 반도체수출 YoY 10%미만 추가, 기준선 2026-07 +178.8%) — 앞으로 이 페이지 언급 시 분모가 5인지 확인할 것. (2) `concepts/macro-indicators.md`에 "반도체 수출 증가율 추적" 신규 섹션 추가. (3) **3개 자동 루틴(아침07:00/장초반10:00/저녁19:00) 트리거가 이 세션 밖에서 이미 삭제돼 있던 것을 발견**(이 세션 내 삭제 이력 없음, 원인 불명 — 이 대화 안에서도 과거 여러 차례 재발된 패턴) → 동일 name/cron으로 재생성, **신규 트리거 ID**: 아침=`trig_01CCKjPS2YWUVDsJQv1X4Av1`, 장초반=`trig_01XYoqaUmThk6DyPtTbSY3xN`, 저녁=`trig_018Hg9mtr43LnM7s6dZw789p` (구 ID `trig_01XMw5UJbjXa4Ko2di8XWgXw` 등은 더 이상 유효하지 않음). desktop이 트리거를 직접 조작할 일이 있으면 새 ID 참고.
+- **read_first**: [wiki/concepts/hbm-cycle-score.md](concepts/hbm-cycle-score.md) "3. 가설이 깨지는 조건", [wiki/concepts/macro-indicators.md](concepts/macro-indicators.md) "반도체 수출 증가율 추적", [wiki/log.md](log.md) 2026-08-05 09:3x UTC 항목
+- **status**: active
+
 ### 🟡 log.md 로그 로테이션 도입 — mobile 2026-08-04T12:xxZ
 
 - **who**: mobile
