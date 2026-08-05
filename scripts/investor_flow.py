@@ -990,6 +990,95 @@ def read_latest_price_snapshot(ticker):
     return rows[-1]
 
 
+def read_price_snapshot_rows(ticker):
+    """스냅샷 CSV에서 해당 종목 행만 날짜순 정렬 — 외국인보유율 추세(daily_report.py
+    HBM 축 채점) 계산용. 2026-08-05 신설."""
+    rows = [r for (d, t), r in _read_price_snapshot_csv().items() if t == ticker]
+    rows.sort(key=lambda r: r["date"])
+    return rows
+
+
+def foreign_hold_pct_trend(ticker, days=5):
+    """외국인 보유율(%)의 최근 N일 스냅샷과, 최신 1건의 전일 대비 %p 변화를 반환.
+    2026-08-05 신설 — HBM Cycle Score "외국인 보유율 변화(전일 대비 %p)" 축(15점,
+    hbm-cycle-score.md "1." 참고)을 매일 웹검색/수기 판단 없이 스냅샷 CSV만으로
+    채점하기 위한 헬퍼. 스냅샷이 매일 쌓이지 않으면(휴장일 등) None을 반환 —
+    값을 지어내지 않는다."""
+    rows = read_price_snapshot_rows(ticker)
+    if len(rows) < 2:
+        return {"trend": [], "latest_change_pp": None}
+    recent = rows[-days:] if len(rows) >= days else rows
+    trend = [(r["date"], float(r["foreign_hold_pct"])) for r in recent]
+    latest_change_pp = trend[-1][1] - trend[-2][1] if len(trend) >= 2 else None
+    return {"trend": trend, "latest_change_pp": latest_change_pp}
+
+
+def read_credit_balance_rows(ticker):
+    """신용잔고 CSV에서 해당 종목 행만 날짜순 정렬. 2026-08-05 신설."""
+    if not CREDIT_BALANCE_CSV_PATH.exists():
+        return []
+    rows = []
+    with CREDIT_BALANCE_CSV_PATH.open(newline="", encoding="utf-8") as f:
+        for row in csv.DictReader(f):
+            if row["ticker"] == ticker:
+                rows.append(row)
+    rows.sort(key=lambda r: r["date"])
+    return rows
+
+
+def credit_balance_streak(ticker):
+    """융자잔고(loan_balance_qty) N거래일 연속 증가/감소 판정. 2026-08-05 신설 —
+    그동안 daily 체크에서 "3거래일 연속 감소 확정" 같은 판단을 사람이 CSV를
+    눈으로 훑어 손으로 세던 것을 대체. 데이터 2건 미만이면 미확인."""
+    rows = read_credit_balance_rows(ticker)
+    if len(rows) < 2:
+        return {"direction": None, "streak_days": 0, "latest": rows[-1] if rows else None}
+    qtys = [int(r["loan_balance_qty"]) for r in rows]
+    latest = rows[-1]
+    diffs = [qtys[i] - qtys[i - 1] for i in range(1, len(qtys))]
+    last_sign = 1 if diffs[-1] > 0 else (-1 if diffs[-1] < 0 else 0)
+    streak = 0
+    for d in reversed(diffs):
+        sign = 1 if d > 0 else (-1 if d < 0 else 0)
+        if sign == last_sign and sign != 0:
+            streak += 1
+        else:
+            break
+    direction = {1: "증가", -1: "감소", 0: "보합"}.get(last_sign)
+    return {"direction": direction, "streak_days": streak, "latest": latest}
+
+
+def read_latest_short_sale(ticker):
+    """공매도 CSV에서 해당 종목 최신 행. 2026-08-05 신설."""
+    if not SHORT_SALE_CSV_PATH.exists():
+        return None
+    rows = []
+    with SHORT_SALE_CSV_PATH.open(newline="", encoding="utf-8") as f:
+        for row in csv.DictReader(f):
+            if row["ticker"] == ticker:
+                rows.append(row)
+    if not rows:
+        return None
+    rows.sort(key=lambda r: r["date"])
+    return rows[-1]
+
+
+def read_latest_index(index_code):
+    """지수 CSV에서 해당 업종코드 최신 행(코스피=0001/코스닥=1001/코스피200=2001).
+    2026-08-05 신설."""
+    if not INDEX_CSV_PATH.exists():
+        return None
+    rows = []
+    with INDEX_CSV_PATH.open(newline="", encoding="utf-8") as f:
+        for row in csv.DictReader(f):
+            if row["index_code"] == index_code:
+                rows.append(row)
+    if not rows:
+        return None
+    rows.sort(key=lambda r: r["date"])
+    return rows[-1]
+
+
 def read_ticker_rows(ticker):
     """CSV에서 해당 종목 행만 날짜순으로 정렬해 반환 — 다른 스크립트에서도 재사용."""
     rows = [r for (d, t), r in _read_csv().items() if t == ticker]

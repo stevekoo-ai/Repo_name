@@ -120,15 +120,53 @@ ASP25+엔비디아&CoWoS25+공급확대10+고객재고10=100점, 등급 임계�
 나머지는 전부 코드 생성 텍스트로 전환해, 최종적으로 리포트의 상당 부분이
 Claude 세션 없이도(GitHub Actions 크론만으로) 생성 가능한 상태를 목표로 한다.
 
-## 다음 액션 (사용자 우선순위 확인 대기 중)
+## 진행 상황 (2026-08-05/06 갱신)
 
-- [ ] 1단계 범위 확정: 어느 섹션부터 템플릿화할지 (외국인수급/HBM Cycle
-      Score 2축이 ROI 가장 높음)
-- [ ] SEC EDGAR 프로토타입 착수 여부
-- [ ] data.go.kr/KIS 목표주가 TR 직접 확인 여부
-- [ ] PEOS 스타일 아키텍처(`collectors/` → `engine/rule/` → `engine/report/`)를
-      SK하이닉스 쪽에도 그대로 이식할지, 아니면 `scripts/` 스타일 확장으로
-      유지할지 — 구조적 결정 필요
+사용자 결정: **1단계+2단계(SEC EDGAR) 동시 착수**, 아키텍처는 **`scripts/`
+스타일 확장 유지**(PEOS `engine/` 계층 이식 안 함) — 아래 완료.
+
+### ✅ 1단계 완료 — `scripts/daily_report.py` 확장
+
+기존에 이미 시세·외국인보유율·ADR·투자자별순매수·붕괴조건④를 다루고 있던
+`build_report()`에 5개 섹션을 신규 추가(`scripts/investor_flow.py`에 리더
+헬퍼 8개 신설: `read_price_snapshot_rows`·`foreign_hold_pct_trend`·
+`read_credit_balance_rows`·`credit_balance_streak`·`read_latest_short_sale`·
+`read_latest_index`):
+- **HBM Cycle Score 외국인수급·보유율 2축(30/100점) 초안 자동채점** —
+  `score_foreign_flow_axis()`(20일 누적 부호8점+5일모멘텀4점+당일부호3점),
+  `score_foreign_holding_axis()`(전일대비%p10점+5일평균추세5점). ⚠ 세부
+  배점은 hbm-cycle-score.md에 공식 문서화된 적 없는 **초안** — 사람이
+  매일 정성판단하던 걸 재현 가능한 규칙으로 처음 코드화한 것, 검증/조정 필요.
+- 신용융자잔고 연속증감 판정(`credit_balance_streak`, N거래일 연속 자동 카운트)
+- 공매도 추이, 코스피/코스닥 지수(+상한/하한종목수), 포트폴리오 평가금액
+  (계좌별 SK하이닉스 비중 자동계산, 데이터 없으면 섹션 자체 생략)
+
+**검증**: 저장소에 이미 커밋된 실제 CSV로 end-to-end 실행 확인 —
+신용융자잔고 "3거래일 연속 감소"(2026-08-04 기준) 등 그동안 사람이 CSV를
+눈으로 훑어 손으로 도출하던 판정과 일치. 산출물:
+`sources/sk-hynix-auto-report-2026-08-06-0843.md`.
+
+### ✅ 2단계 착수 — `scripts/sec_edgar_capex.py` 신설
+
+SEC EDGAR XBRL Company Concept API로 4대 하이퍼스케일러(GOOGL/MSFT/AMZN/META)
+분기 CapEx 실측치 자동 수집. CIK 4개(1652044/789019/1018724/1326801) 웹조사
+교차검증 완료, 응답 JSON 구조(units.USD의 val/end/fy/fp/form/filed)도 SEC
+공식문서·튜토리얼로 확인. `.github/workflows/sec-edgar-capex.yml` 신설
+(주1회 자동 + workflow_dispatch 수동/--raw 진단, ecos-lookup.yml과 동일 패턴).
+
+**⚠ 미검증 상태**: 이 세션 샌드박스는 SEC 도메인 아웃바운드가 막혀 있어
+(직접 curl·WebFetch 둘 다 실패 확인) **실호출 테스트를 못 했다** — CIK·JSON
+구조는 문서 교차검증했지만, XBRL 태그명(PaymentsToAcquire...)이 회사마다
+실제로 맞는지는 GitHub Actions 러너(`workflow_dispatch` + `raw: true`)에서
+최초 실행해 확인 필요. 실패 시 CAPEX_TAG_CANDIDATES 보정.
+
+### 다음 액션
+
+- [ ] GitHub Actions에서 `sec-edgar-capex.yml`을 `raw: true`로 최초 실행 →
+      필드명/태그 검증
+- [ ] 검증 통과하면 정기 스케줄 가동 확인(주1회, 월요일 21:00 UTC)
+- [ ] hbm-cycle-score.md에 위 2축 초안 배점 규칙을 공식 반영할지 사용자 검토
+- [ ] data.go.kr 반도체수출, KIS 목표주가 TR, Polymarket 트럼프확률 — 아직 미착수
 
 ## Sources
 
