@@ -128,10 +128,10 @@ def _render_district_movers(movers: dict) -> str:
         <div class="metric"><span class="metric-label">하락 TOP</span><span>{_row(movers['decliners'], '#60A5FA')}</span></div>"""
 
 
-def _render_real_estate_placeholder(status_label: str, note: str) -> str:
+def _render_real_estate_placeholder(status_label: str, note: str, title: str = "부동산", icon: str = "🏘️") -> str:
     return f"""
         <div class="card" style="margin-bottom: 30px;">
-            <h2>🏘️ 부동산 실거래가 동향 (국토교통부 실거래가 공개시스템)</h2>
+            <h2>{icon} {title} 실거래가 동향 (국토교통부 실거래가 공개시스템)</h2>
             <p style="color: #94A3B8;">{status_label} — {note}</p>
             <p style="color: #64748B; font-size: 0.9em; margin-top: 8px;">데이터 준비 중: 다음 리포트에서 재시도됩니다. 아래는 채워질 정보의 형식입니다.</p>
             <table>
@@ -147,17 +147,19 @@ def _render_real_estate_placeholder(status_label: str, note: str) -> str:
         </div>"""
 
 
-def _render_real_estate_section(re_data: dict) -> str:
+def _render_sale_trend_section(re_data: dict, title: str, icon: str = "🏘️") -> str:
+    """국토교통부 실거래가 매매 섹션 — 아파트/연립다세대/오피스텔이 데이터 소스만 다르고
+    형식은 동일해서 공용으로 뺐다."""
     if not re_data:
         return ""
 
     if re_data.get("fetch_status") == "pending":
-        return _render_real_estate_placeholder("Pending", re_data.get('fetch_note', 'MOLIT_API_KEY 미설정'))
+        return _render_real_estate_placeholder("Pending", re_data.get('fetch_note') or 'DATA_GO_KR_KEY 미설정', title, icon)
 
     tiers = re_data.get("tiers", {})
     any_ok = any(t.get("data_status") == "ok" for t in tiers.values())
     if not any_ok:
-        return _render_real_estate_placeholder("Source Error", re_data.get('fetch_note', '국토교통부 API 응답 없음'))
+        return _render_real_estate_placeholder("Source Error", re_data.get('fetch_note') or '국토교통부 API 응답 없음', title, icon)
 
     coverage = re_data.get("regions_covered")
     total = re_data.get("regions_total")
@@ -176,7 +178,7 @@ def _render_real_estate_section(re_data: dict) -> str:
 
     return f"""
         <div class="card" style="margin-bottom: 30px;">
-            <h2>🏘️ 부동산 실거래가 동향 (국토교통부 실거래가 공개시스템)</h2>
+            <h2>{icon} {title} 실거래가 동향 (국토교통부 실거래가 공개시스템)</h2>
             <p style="color: #94A3B8; margin-bottom: 15px;">{coverage_note} · '전국'은 전수조사가 아닌 8개 특·광역시+주요 도청소재지 대표 표본 기준 추정치</p>
             <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 25px;">
                 {_render_tier_card(tiers.get('seoul', {}))}
@@ -195,12 +197,108 @@ def _render_real_estate_section(re_data: dict) -> str:
         </div>"""
 
 
+def _render_real_estate_section(re_data: dict) -> str:
+    return _render_sale_trend_section(re_data, "아파트 매매")
+
+
+def _render_villa_section(re_data: dict) -> str:
+    return _render_sale_trend_section(re_data, "연립다세대(빌라) 매매", icon="🏚️")
+
+
+def _render_officetel_section(re_data: dict) -> str:
+    return _render_sale_trend_section(re_data, "오피스텔 매매", icon="🏢")
+
+
+def _render_wolse_tier_card(tier: dict) -> str:
+    """전월세 월세 지역군 카드 — 매매용 _render_tier_card와 달리 시장 온도가 없고
+    보증금/월세 두 숫자를 같이 보여준다."""
+    if tier.get("data_status") != "ok":
+        return f"""
+        <div style="background: rgba(51, 65, 85, 0.3); padding: 20px; border-radius: 8px;">
+            <div style="font-size: 1.1em; color: #F1F5F9; font-weight: 600; margin-bottom: 10px;">{tier['label']}</div>
+            <div style="color: #94A3B8;">Pending — 데이터 확보 전</div>
+        </div>"""
+
+    deposit_mom = tier.get("deposit_mom_change_pct")
+    deposit_mom_color = "#F87171" if (deposit_mom or 0) > 0 else "#60A5FA" if (deposit_mom or 0) < 0 else "#94A3B8"
+
+    return f"""
+        <div style="background: rgba(51, 65, 85, 0.3); padding: 20px; border-radius: 8px;">
+            <div style="font-size: 1.1em; color: #F1F5F9; font-weight: 600; margin-bottom: 12px;">{tier['label']}</div>
+            <div style="font-size: 1.4em; font-weight: bold; color: #F1F5F9;">보증금 {_fmt(tier['deposit_per_pyeong_manwon'])}만원<span style="font-size: 0.5em; color: #94A3B8;">/평</span></div>
+            <div style="margin-top: 4px; color: {deposit_mom_color}; font-weight: 600;">MoM {_fmt_pct(deposit_mom)}</div>
+            <div style="margin-top: 10px; font-size: 1.1em; color: #F1F5F9;">월세 {_fmt(tier.get('rent_per_pyeong_manwon'))}만원<span style="font-size: 0.6em; color: #94A3B8;">/평</span></div>
+            <div style="margin-top: 4px; color: #94A3B8; font-size: 0.9em;">거래 {_fmt(tier.get('transaction_count'))}건 ({tier.get('reference_month', '')})</div>
+        </div>"""
+
+
+def _render_rent_section(re_data: dict) -> str:
+    if not re_data:
+        return ""
+
+    if re_data.get("fetch_status") == "pending":
+        return _render_real_estate_placeholder("Pending", re_data.get('fetch_note') or 'DATA_GO_KR_KEY 미설정', "아파트 전월세", icon="🏠")
+
+    jeonse_tiers = re_data.get("jeonse_tiers", {})
+    any_ok = any(t.get("data_status") == "ok" for t in jeonse_tiers.values())
+    if not any_ok:
+        return _render_real_estate_placeholder("Source Error", re_data.get('fetch_note') or '국토교통부 API 응답 없음', "아파트 전월세", icon="🏠")
+
+    coverage = re_data.get("regions_covered")
+    total = re_data.get("regions_total")
+    coverage_note = f"조회 지역 {coverage}/{total}개" if coverage is not None and total else ""
+
+    wolse_tiers = re_data.get("wolse_tiers", {})
+    hl = re_data.get("jeonse_highlight", {})
+    hl_body = ""
+    if hl.get("data_status") == "ok":
+        hl_body = (
+            f"{hl['reference_month']} 기준 평당 보증금 <strong style=\"color:#F1F5F9;\">{_fmt(hl['price_per_pyeong_manwon'])}만원</strong>"
+            f" (MoM {_fmt_pct(hl.get('mom_change_pct'))}), 거래 {_fmt(hl.get('transaction_count'))}건, "
+            f"시장 온도 <span style=\"color:{_HEAT_COLOR.get(hl.get('market_heat'), '#94A3B8')};\">{hl.get('market_heat', 'N/A')}</span>"
+        )
+    else:
+        hl_body = "최근 조회 기간 내 확인된 전세 실거래가 없습니다."
+
+    return f"""
+        <div class="card" style="margin-bottom: 30px;">
+            <h2>🏠 아파트 전월세 실거래가 동향 (국토교통부 실거래가 공개시스템)</h2>
+            <p style="color: #94A3B8; margin-bottom: 15px;">{coverage_note} · '전국'은 전수조사가 아닌 8개 특·광역시+주요 도청소재지 대표 표본 기준 추정치</p>
+
+            <h3 style="margin-bottom: 10px; color: #CBD5E1;">전세 (평당 보증금)</h3>
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 25px;">
+                {_render_tier_card(jeonse_tiers.get('seoul', {}))}
+                {_render_tier_card(jeonse_tiers.get('capital_area', {}))}
+                {_render_tier_card(jeonse_tiers.get('nationwide', {}))}
+            </div>
+
+            <h3 style="margin-bottom: 10px; color: #CBD5E1;">월세 (평당 보증금 + 평당 월세)</h3>
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 25px;">
+                {_render_wolse_tier_card(wolse_tiers.get('seoul', {}))}
+                {_render_wolse_tier_card(wolse_tiers.get('capital_area', {}))}
+                {_render_wolse_tier_card(wolse_tiers.get('nationwide', {}))}
+            </div>
+
+            <div class="portfolio-section" style="border-left-color: #A855F7;">
+                <strong style="color: #D8B4FE;">📍 현 거주 지역군(청약 타겟 인근) 전세 — {hl.get('region_name', '')}</strong>
+                {f'<div style="color: #94A3B8; font-size: 0.9em; margin-top: 4px;">{hl["note"]}</div>' if hl.get('note') else ''}
+                <div style="margin-top: 10px;">{hl_body}</div>
+            </div>
+
+            <h3 style="margin-top: 25px; margin-bottom: 10px; color: #CBD5E1;">서울 자치구 전세 MoM 상승/하락 TOP</h3>
+            {_render_district_movers(re_data.get('seoul_jeonse_district_movers', {}))}
+        </div>"""
+
+
 def render_html(payload: dict) -> str:
     """Render comprehensive PEOS report as beautiful, responsive HTML."""
     month = payload["report_month"]
     cci = payload.get("cci_analysis", {})
     rate = payload.get("rate_analysis", {})
     real_estate = payload.get("real_estate", {})
+    real_estate_rent = payload.get("real_estate_rent", {})
+    real_estate_villa = payload.get("real_estate_villa", {})
+    real_estate_officetel = payload.get("real_estate_officetel", {})
 
     state_color = {"GREEN": "#10B981", "YELLOW": "#F59E0B", "RED": "#EF4444"}
     cci_state = cci.get("state", "UNKNOWN")
@@ -458,6 +556,9 @@ def render_html(payload: dict) -> str:
 
         <!-- 부동산 실거래가 동향 -->
         {_render_real_estate_section(real_estate)}
+        {_render_rent_section(real_estate_rent)}
+        {_render_villa_section(real_estate_villa)}
+        {_render_officetel_section(real_estate_officetel)}
 
         <!-- 포트폴리오 추천 -->
         <div class="card" style="margin-bottom: 30px;">

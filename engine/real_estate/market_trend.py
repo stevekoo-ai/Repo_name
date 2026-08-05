@@ -7,7 +7,7 @@ MOLIT 실거래가는 개별 거래 원자료라 사전 계산된 지수가 없�
 from __future__ import annotations
 
 from collectors import base as collector_base
-from collectors import molit
+from collectors import kr_regions, molit
 
 _MANWON = 10_000
 
@@ -62,25 +62,28 @@ def _market_heat(mom_pct: float | None, volume_mom_pct: float | None) -> str:
     return "보합"
 
 
-def _tier_trend(tier: str) -> dict:
-    result = _price_and_volume(f"molit_{tier}_price_pyeong", f"molit_{tier}_volume")
+def _tier_trend(tier: str, series_prefix: str = "molit", tier_labels: dict | None = None) -> dict:
+    labels = tier_labels if tier_labels is not None else kr_regions.TIER_LABELS
+    result = _price_and_volume(f"{series_prefix}_{tier}_price_pyeong", f"{series_prefix}_{tier}_volume")
     result["tier"] = tier
-    result["label"] = molit.TIER_LABELS[tier]
+    result["label"] = labels[tier]
     return result
 
 
-def _highlight_region() -> dict:
-    result = _price_and_volume("molit_highlight_price_pyeong", "molit_highlight_volume")
-    result["region_name"] = molit.HIGHLIGHT_REGION["name"]
-    result["note"] = molit.HIGHLIGHT_REGION.get("highlight")
+def _highlight_region(series_prefix: str = "molit", highlight_region: dict | None = None) -> dict:
+    region = highlight_region if highlight_region is not None else kr_regions.HIGHLIGHT_REGION
+    result = _price_and_volume(f"{series_prefix}_highlight_price_pyeong", f"{series_prefix}_highlight_volume")
+    result["region_name"] = region["name"]
+    result["note"] = region.get("highlight")
     return result
 
 
-def _district_movers(limit: int = 3) -> dict:
+def _district_movers(limit: int = 3, series_prefix: str = "molit", seoul_districts: list | None = None) -> dict:
     """서울 25개 자치구 중 최근월 평당가 MoM 상승률 상위/하위 지역."""
+    districts = seoul_districts if seoul_districts is not None else kr_regions.SEOUL_DISTRICTS
     rows = []
-    for region in molit.SEOUL_DISTRICTS:
-        df = collector_base.read_normalized(f"molit_district_{region['code']}_price_pyeong")
+    for region in districts:
+        df = collector_base.read_normalized(f"{series_prefix}_district_{region['code']}_price_pyeong")
         if df.empty or len(df) < 2:
             continue
         df = df.sort_values("date").reset_index(drop=True)
@@ -106,17 +109,24 @@ def _district_movers(limit: int = 3) -> dict:
     }
 
 
-def compute_real_estate_trend() -> dict:
-    """Main entry point — triggers the MOLIT fetch, then reads back accumulated
-    normalized history to build the report-ready trend payload."""
-    fetch_summary = molit.fetch_and_store()
+def compute_sale_trend(fetch_and_store_fn, series_prefix: str) -> dict:
+    """Generic 매매 trend builder shared by 아파트(molit)/연립다세대(molit_villa)/오피스텔
+    (molit_officetel) — they differ only in which collector fetches the data and which
+    normalized-series prefix it wrote to; region tiers/labels are shared (collectors/kr_regions.py)."""
+    fetch_summary = fetch_and_store_fn()
 
     return {
         "fetch_status": fetch_summary["status"],
         "fetch_note": fetch_summary.get("note"),
         "regions_covered": fetch_summary.get("regions_covered"),
         "regions_total": fetch_summary.get("regions_total"),
-        "tiers": {tier: _tier_trend(tier) for tier in molit.REGION_TIERS},
-        "highlight": _highlight_region(),
-        "seoul_district_movers": _district_movers(),
+        "tiers": {tier: _tier_trend(tier, series_prefix=series_prefix) for tier in kr_regions.REGION_TIERS},
+        "highlight": _highlight_region(series_prefix=series_prefix),
+        "seoul_district_movers": _district_movers(series_prefix=series_prefix),
     }
+
+
+def compute_real_estate_trend() -> dict:
+    """Main entry point — triggers the MOLIT(아파트 매매) fetch, then reads back accumulated
+    normalized history to build the report-ready trend payload."""
+    return compute_sale_trend(molit.fetch_and_store, "molit")

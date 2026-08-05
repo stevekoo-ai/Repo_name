@@ -1,0 +1,33 @@
+name: MOLIT 실거래가 API diagnostic
+
+on:
+  workflow_dispatch:
+    inputs:
+      lawd_cd:
+        description: "법정동코드 5자리 (기본값: 종로구 11110)"
+        required: false
+        default: "11110"
+      deal_ymd:
+        description: "계약년월 6자리 (기본값: 202606)"
+        required: false
+        default: "202606"
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install requests
+
+      - name: Hit each MOLIT endpoint directly
+        env:
+          DATA_GO_KR_KEY: ${{ secrets.DATA_GO_KR_KEY }}
+        run: python -m scripts.molit_diagnostic "${{ github.event.inputs.lawd_cd }}" "${{ github.event.inputs.deal_ymd }}"
