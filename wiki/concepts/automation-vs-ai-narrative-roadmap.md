@@ -171,10 +171,32 @@ diff 확인 결과 순수 추가 diff(충돌 없음). **2026-08-06 merge 완료*
 GitHub Actions API로 "SEC EDGAR Hyperscaler CapEx"(id 328256655, active)가
 `main`에 정상 등록됨을 재확인.
 
+### 403 발견 + PR #48 (2026-08-06) — User-Agent 이메일 형식 누락 ✅ merged
+
+merge 후 raw:true 최초 실행 결과 4개사 전부 **403 "Undeclared Automated
+Tool"**([run 31063296132](https://github.com/stevekoo-ai/Repo_name/actions/runs/31063296132))
+— 원인은 XBRL 태그명이 아니라 **User-Agent에 이메일 형식이 없었던 것**(SEC
+공정접근 정책은 "이름 email@domain.com" 형식을 명시적으로 요구, 단순 식별
+문자열로는 부족). 개인 이메일을 공개 저장소 코드에 커밋하지 않기 위해
+`SEC_EDGAR_CONTACT` GitHub Secret으로 주입하도록 수정 →
+https://github.com/stevekoo-ai/Repo_name/pull/48, **2026-08-06 merge 완료**.
+
+### 재실행 삽질 + PR #49 (2026-08-06) — GMAIL_ADDRESS 재사용으로 시크릿 단순화
+
+PR #48 merge 후 사용자가 재실행했으나 여전히 403 — 원인 분석 결과 **"Re-run
+failed jobs" 버튼이 PR #48 merge 이전 커밋(같은 run id, attempt 2)을 다시
+돌린 것**이었음(새 dispatch가 아니었음). 이 과정에서 사용자가 신규 시크릿
+등록 대신 **이미 있는 `GMAIL_ADDRESS` 시크릿 재사용을 제안** — 워크플로의
+env를 `SEC_EDGAR_CONTACT: "PEOS-research ${{ secrets.GMAIL_ADDRESS }}"`로
+변경해 반영: https://github.com/stevekoo-ai/Repo_name/pull/49 (merge 후
+**추가 시크릿 설정 불필요**). 구독 중.
+
 ### 다음 액션
 
-- [ ] GitHub Actions → "SEC EDGAR Hyperscaler CapEx" → Run workflow →
-      `raw: true`로 최초 실행 → 필드명/태그 검증 (사용자 액션 필요)
+- [ ] PR #49 merge
+- [ ] merge 후 GitHub Actions → "SEC EDGAR Hyperscaler CapEx" →
+      **"Run workflow"로 새로 실행**(과거 실행의 "Re-run" 버튼 아님 — 이
+      버튼은 옛 커밋을 재사용해 반영 안 됨) → `raw: true`로 XBRL 태그명 검증
 - [ ] 검증 통과하면 정기 스케줄 가동 확인(주1회, 월요일 21:00 UTC)
 - [ ] hbm-cycle-score.md에 위 2축 초안 배점 규칙을 공식 반영할지 사용자 검토
 - [ ] data.go.kr 반도체수출, KIS 목표주가 TR, Polymarket 트럼프확률 — 아직 미착수

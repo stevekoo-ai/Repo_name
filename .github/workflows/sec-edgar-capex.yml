@@ -4,9 +4,9 @@ name: SEC EDGAR Hyperscaler CapEx
 # "2단계") — 최초 raw:true 실행에서 4개사 전부 403("Undeclared Automated
 # Tool") 확인: data.sec.gov는 API 키는 불필요하지만 User-Agent에 실제
 # 이메일이 포함된 "이름 email@domain.com" 형식을 요구한다(없으면 봇으로
-# 판정해 차단). 개인 이메일을 코드에 커밋하지 않기 위해 SEC_EDGAR_CONTACT
-# 시크릿으로 주입 — repo Settings → Secrets and variables → Actions에서
-# 등록 필요(예: "PEOS-research your-email@example.com").
+# 판정해 차단). 별도 SEC_EDGAR_CONTACT 시크릿을 새로 만드는 대신 이미 등록된
+# GMAIL_ADDRESS 시크릿(daily-brief-report.yml 등에서 발신 메일 계정으로 이미
+# 사용 중)을 재사용 — 사용자 제안(2026-08-06)으로 시크릿 중복 생성 방지.
 
 on:
   workflow_dispatch:
@@ -44,7 +44,7 @@ jobs:
       - name: Fetch (raw diagnostic mode)
         if: ${{ github.event.inputs.raw == 'true' }}
         env:
-          SEC_EDGAR_CONTACT: ${{ secrets.SEC_EDGAR_CONTACT }}
+          SEC_EDGAR_CONTACT: "PEOS-research ${{ secrets.GMAIL_ADDRESS }}"
         run: |
           if [ -n "${{ github.event.inputs.company }}" ]; then
             python3 scripts/sec_edgar_capex.py fetch --company "${{ github.event.inputs.company }}" --raw
@@ -55,7 +55,7 @@ jobs:
       - name: Fetch (normal mode, upsert CSV)
         if: ${{ github.event.inputs.raw != 'true' }}
         env:
-          SEC_EDGAR_CONTACT: ${{ secrets.SEC_EDGAR_CONTACT }}
+          SEC_EDGAR_CONTACT: "PEOS-research ${{ secrets.GMAIL_ADDRESS }}"
         run: |
           if [ -n "${{ github.event.inputs.company }}" ]; then
             python3 scripts/sec_edgar_capex.py fetch --company "${{ github.event.inputs.company }}"
