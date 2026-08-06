@@ -1,11 +1,12 @@
 name: SEC EDGAR Hyperscaler CapEx
 
-# 2026-08-05 신설 (automation-vs-ai-narrative-roadmap.md "2단계") — 이 저장소
-# 샌드박스는 SEC 도메인 아웃바운드가 막혀 있어 scripts/sec_edgar_capex.py를
-# 실호출 검증하지 못했다. 이 워크플로는 (a) 최초 1회 --raw 진단(수동 실행,
-# ecos-lookup.yml과 동일 패턴)과 (b) 이후 정기 자동 수집을 모두 담당한다.
-# data.sec.gov는 API 키 불필요(공개) — 인증 시크릿 없음, User-Agent만 필요
-# (스크립트 내부에 하드코딩돼 있어 여기서 별도 설정 불필요).
+# 2026-08-05 신설, 2026-08-06 수정 (automation-vs-ai-narrative-roadmap.md
+# "2단계") — 최초 raw:true 실행에서 4개사 전부 403("Undeclared Automated
+# Tool") 확인: data.sec.gov는 API 키는 불필요하지만 User-Agent에 실제
+# 이메일이 포함된 "이름 email@domain.com" 형식을 요구한다(없으면 봇으로
+# 판정해 차단). 개인 이메일을 코드에 커밋하지 않기 위해 SEC_EDGAR_CONTACT
+# 시크릿으로 주입 — repo Settings → Secrets and variables → Actions에서
+# 등록 필요(예: "PEOS-research your-email@example.com").
 
 on:
   workflow_dispatch:
@@ -42,6 +43,8 @@ jobs:
 
       - name: Fetch (raw diagnostic mode)
         if: ${{ github.event.inputs.raw == 'true' }}
+        env:
+          SEC_EDGAR_CONTACT: ${{ secrets.SEC_EDGAR_CONTACT }}
         run: |
           if [ -n "${{ github.event.inputs.company }}" ]; then
             python3 scripts/sec_edgar_capex.py fetch --company "${{ github.event.inputs.company }}" --raw
@@ -51,6 +54,8 @@ jobs:
 
       - name: Fetch (normal mode, upsert CSV)
         if: ${{ github.event.inputs.raw != 'true' }}
+        env:
+          SEC_EDGAR_CONTACT: ${{ secrets.SEC_EDGAR_CONTACT }}
         run: |
           if [ -n "${{ github.event.inputs.company }}" ]; then
             python3 scripts/sec_edgar_capex.py fetch --company "${{ github.event.inputs.company }}"

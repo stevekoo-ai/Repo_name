@@ -12,21 +12,28 @@ wiki/concepts/automation-vs-ai-narrative-roadmap.md "2단계"에서 조사한 �
 범위 밖 — 자동화 불가 항목으로 로드맵 문서에 명시돼 있다.)
 
 data.sec.gov는 인증(API 키) 없이 완전 무료로 XBRL 데이터를 제공하지만, SEC의
-공정접근 정책(https://www.sec.gov/os/webmaster-faq#developers)상 **모든 요청에
-식별 가능한 User-Agent(회사/개인명 + 연락처)를 반드시 포함**해야 한다 — 없으면
-403이 돌아온다(이 저장소 collectors/fred.py의 범용 UA 관례와 달리, 여기서는
-SEC 요구사항에 맞춘 전용 UA를 쓴다).
+공정접근 정책(https://www.sec.gov/os/webmaster-faq#developers)상 **모든 요청의
+User-Agent에 실제 이메일 주소가 포함된 "이름/조직 email@domain.com" 형식**을
+요구한다 — 단순히 식별 가능한 문자열이면 되는 게 아니라, 이메일 패턴이 없으면
+"Undeclared Automated Tool"로 간주해 403을 반환한다(2026-08-06 GitHub Actions
+실제 실행 로그로 확인 — 아래 "실행 이력" 참고). 개인 이메일을 공개 저장소
+코드에 평문으로 커밋하지 않기 위해, 이 값은 **GitHub Secret
+`SEC_EDGAR_CONTACT`**(예: "PEOS-research your-email@example.com")로 주입한다
+— 이 저장소의 다른 API 키(KIS_APP_KEY 등)와 동일한 방식. 시크릿이 없으면
+즉시 에러로 중단(investor_flow.py의 `_get_env_or_die` 패턴과 동일 — 값을
+지어내거나 조용히 실패하지 않는다).
 
-⚠ 이 샌드박스는 아웃바운드 네트워크가 SEC 도메인에 막혀 있어(2026-08-05 확인:
-직접 curl → 프록시 자체 차단, WebFetch 도구 → 403 — 둘 다 이 코드 작성 전
-직접 검증 시도했으나 실패) **실호출 검증을 못 한 상태로 작성됐다**. CIK
-번호(구글 1652044/MS 789019/아마존 1018724/메타 1326801)와 응답 JSON 구조
-(units.USD 배열의 val/end/fy/fp/form/filed/accn 필드)는 SEC 공식문서·다수
-튜토리얼 교차검증으로 확인했지만, XBRL 태그명(PaymentsToAcquire...) 자체가
-회사마다 다를 수 있어 **최초 실행 시 반드시 --raw로 원본을 확인**하고,
-아래 CAPEX_TAG_CANDIDATES에 없는 태그를 쓰는 회사가 있으면 그 회사만 실패
-목록에 남기고 나머지는 계속 진행한다(투자자_flow.py와 동일 원칙 — 지어낸
-값을 채우지 않고 실패는 눈에 띄게 남긴다).
+⚠ 실행 이력: 2026-08-06 GitHub Actions에서 `raw:true` 최초 실행 → 4개사 전부
+403("Your Request Originates from an Undeclared Automated Tool")로 실패,
+원인은 XBRL 태그명이 아니라 **User-Agent에 이메일 형식이 없었던 것**으로
+확인(SEC 공식 요구사항 재확인 + 다수 사례 교차검증). CIK 번호(구글 1652044/
+MS 789019/아마존 1018724/메타 1326801)와 응답 JSON 구조(units.USD 배열의
+val/end/fy/fp/form/filed/accn 필드)는 이 403 자체와는 무관해 여전히 미검증
+상태 — `SEC_EDGAR_CONTACT` 시크릿 등록 후 재실행 시 확인 필요. XBRL 태그명
+(PaymentsToAcquire...) 자체가 회사마다 다를 수 있어 **최초 통과 시 반드시
+--raw로 원본을 확인**하고, 아래 CAPEX_TAG_CANDIDATES에 없는 태그를 쓰는
+회사가 있으면 그 회사만 실패 목록에 남기고 나머지는 계속 진행한다
+(investor_flow.py와 동일 원칙 — 지어낸 값을 채우지 않고 실패는 눈에 띄게 남긴다).
 
 사용법:
   # 4개 회사 최근 8개 분기 CapEx를 가져와 CSV에 upsert
@@ -41,6 +48,7 @@ SEC 요구사항에 맞춘 전용 UA를 쓴다).
 import argparse
 import csv
 import json
+import os
 import sys
 import urllib.request
 import urllib.error
@@ -53,9 +61,29 @@ CSV_FIELDS = [
     "end_date", "filed_date", "value_usd", "tag", "accn", "source", "fetched_at",
 ]
 
-# SEC 공정접근 정책 요구사항 — 식별 가능한 UA(https://www.sec.gov/os/webmaster-faq#developers).
-# 저장소를 연락 채널로 명시(collectors/fred.py의 "+https://github.com" 관례와 동일 정신).
-HEADERS = {"User-Agent": "PEOS-wiki-research/1.0 (+https://github.com/stevekoo-ai/Repo_name)"}
+
+def _get_headers():
+    """SEC 공정접근 정책(https://www.sec.gov/os/webmaster-faq#developers)이 요구하는
+    "이름/조직 email@domain.com" 형식 User-Agent — GitHub Secret에서 읽는다(개인
+    이메일을 공개 저장소 코드에 평문 커밋하지 않기 위함, investor_flow.py의
+    _get_env_or_die 패턴과 동일). 2026-08-06 실호출 확인: 이메일 형식이 없으면
+    "Undeclared Automated Tool" 403."""
+    contact = os.environ.get("SEC_EDGAR_CONTACT")
+    if not contact:
+        sys.exit(
+            "환경변수 SEC_EDGAR_CONTACT이(가) 설정되지 않았습니다. SEC EDGAR는 "
+            "User-Agent에 실제 이메일이 포함된 형식(예: \"PEOS-research "
+            "your-email@example.com\")을 요구합니다(없으면 403) — GitHub Secrets에 "
+            "SEC_EDGAR_CONTACT를 등록하고 .github/workflows/sec-edgar-capex.yml의 "
+            "env로 주입하세요. 이 값을 저장소 파일에 절대 커밋하지 마세요."
+        )
+    if "@" not in contact:
+        sys.exit(
+            f"SEC_EDGAR_CONTACT 값에 '@'(이메일)이 없습니다: {contact!r} — SEC가 "
+            "이메일 형식 없는 User-Agent를 자동화 도구로 판정해 403을 반환합니다. "
+            "\"이름/조직 email@domain.com\" 형식으로 다시 설정하세요."
+        )
+    return {"User-Agent": contact}
 
 # 2026-08-05 웹검색으로 교차검증된 CIK — Alphabet/Meta는 실제 SEC 문서 URL
 # (sec.gov/Archives/edgar/data/1652044/..., CIK-0001326801)에서 직접 확인,
@@ -82,14 +110,21 @@ def fetch_company_concept(cik, tag, raw=False):
     """단일 (CIK, 태그) 조합의 companyconcept 응답을 가져온다. 실패하면 None."""
     cik_padded = cik.zfill(10)
     url = f"https://data.sec.gov/api/xbrl/companyconcept/CIK{cik_padded}/us-gaap/{tag}.json"
-    req = urllib.request.Request(url, headers=HEADERS)
+    req = urllib.request.Request(url, headers=_get_headers())
     try:
         with urllib.request.urlopen(req, timeout=30) as resp:
             data = json.loads(resp.read())
     except urllib.error.HTTPError as e:
         if e.code == 404:
             return None  # 이 회사가 이 태그를 안 쓴다 — 다음 후보 태그로 넘어감
-        sys.exit(f"SEC EDGAR API 호출 실패({tag}): {e.code} {e.read().decode(errors='replace')}")
+        body = e.read().decode(errors="replace")
+        hint = (
+            "\n힌트: 403 + \"Undeclared Automated Tool\"이면 태그 문제가 아니라 "
+            "SEC_EDGAR_CONTACT의 User-Agent에 이메일 형식이 없는 경우입니다(2026-08-06 "
+            "실사례) — \"이름 email@domain.com\" 형식인지 확인하세요."
+            if e.code == 403 and "Undeclared Automated Tool" in body else ""
+        )
+        sys.exit(f"SEC EDGAR API 호출 실패({tag}): {e.code} {body}{hint}")
     except urllib.error.URLError as e:
         sys.exit(f"SEC EDGAR 접속 실패: {e.reason} — data.sec.gov 접근 가능 여부(방화벽/프록시)를 확인하세요.")
 
