@@ -1,0 +1,46 @@
+오늘 자 데일리 브리프 보고서를 자율 사이클로 완성·발송해. CLAUDE.md와 위키는 이미 자동 로드됐으므로 그 맥락을 그대로 활용해.
+
+절차 (순서대로):
+1. `git fetch origin && git checkout claude/ai-agent-impl-002tip && git pull --rebase origin claude/ai-agent-impl-002tip` 로 회사망→GitHub GET(73KB 제약 없음)으로 최신 DB md 파일 회수. (실패 시 git status로 원인 확인, 위키 페이지가 낡으면 보고서 품질이 떨어지므로 반드시 최신화.)
+2. 위키 맥락 종합 → 오늘 데일리 브리프 HTML 작성 → `report/daily-brief-YYYY-MM-DD.html` 저장.
+3. `python dispatch.sh report/daily-brief-YYYY-MM-DD.html` 실행 (gzip+base64 → repository_dispatch 발송).
+
+==============================
+디자인 기준 (반드시 준수) — Apple-style 템플릿
+==============================
+기준 템플릿: `wiki/cxl-daily-report-2026-08-06-0600.html` (CXL Daily Update 3호)과 `report/daily-brief-2026-08-06.html` (품질 기준본)을 먼저 Read해서 구조·색·컴포넌트를 그대로 준용할 것.
+- Tailwind CDN (`https://cdn.tailwindcss.com`) + tailwind.config extend colors (canvas #f5f5f7 / ink #1d1d1f / sub #6e6e73 / indigo DEFAULT #4f46e5).
+- 폰트: -apple-system, BlinkMacSystemFont, SF Pro Display, Segoe UI, Malgun Gothic.
+- 카드: bg-white rounded-2xl shadow-card border border-gray-100, hover 시 translateY(-3px)+인디고 글로우 shadow-hover.
+- pill chips, row-h hover(배경 #eef2ff), fade-in 애니메이션, auto-pill(ap-green/ap-red/ap-yellow) 출처 라벨.
+- 다크 테마 절대 금지. 미니멀 화이트 + 인디고 포인트만.
+- 레이아웃 순서: HERO(제목+메타 pill) → 통합 한 줄 진단 → 핵심 지표 카드 4종 → 거시(PEOS) → SK하이닉스 → HBM Cycle Score → 정치 오버레이 → 다음 관전 포인트 → 품질기준 폴더블.
+
+==============================
+데이터 품질 기준 (반드시 반영)
+==============================
+하이브리드 원칙 ([wiki/concepts/automation-vs-ai-narrative-roadmap.md]):
+- 🟢 자동화(사실층): KIS API CSV 6종(가격/수급/신용/공매도/지수/포트폴리오), PEOS 거시, 반도체수출 통계. CSV 그대로 인용, 매 섹션에 🟢 자동화 라벨.
+- 🔴 LLM 종합(해석층): 위키 서사 기반. 매 섹션에 🔴 LLM 종합 라벨.
+
+반드시 종합할 위키 페이지 (grep wiki/ 로 최신 확정치 확인):
+- hbm-cycle-score — 오늘 점수(/100), 6축별 배점·점수·방향, 붕괴조건 N/5. 70점대는 "경계" 라벨.
+- panic-recovery-signals — 패닉회복 종합판정(바닥다지기/초입/회복/완료), 찐반등 4대 신호(①빚청산 ②개미항복 ③외국인귀환 ④미국동반) 충족 여부.
+- sk-hynix-analyst-thesis-checkpoints — 외국인 20일 누적 순매수(붕괴조건④ 핵심), 보유율, 거래량, ADR MISMATCH.
+- trump-midterm-tracker — 정치 5카테고리 판정 + 오늘 가장 중요한 변화(이란 축 개선 신호 등).
+- macro-regime-history / macro-indicators — 국면(Slowdown/Early Expansion 등), 위기지수 CCI, 금리 스프레드.
+- cxl-next-gen-memory — HBF, HBM4, CXL 등 중기 엔진. 최근 INGEST 있으면 별도 카드로.
+- summaries/ 하위 최근 INGEST (오늘 또는 전일 날짜 파일) — 외부 교차검증 데이터(예: edgewater-memory-market-analysis — HBM ASP $30~40/GB, 서버 DRAM $2.4/Gb, 3사 LTA/CapEx). 반드시 "🆕" 라벨과 "외부 교차검증" 프레임으로 별도 인디고 카드 배치.
+- fundamentals-vs-sentiment-derating, situational-awareness-fund-liquidation — 신중론·숏커버링 일회성 가능성 등 균형 시각.
+
+핵심: 단순 데이터 나열 금지. 데이터에 대한 "평가/해석"을 반드시 포함 — 왜 이 숫자가 중요한지, 어느 붕괴조건/찐반등 신호와 연결되는지, 외부 소스(Edgewater 등)와 교차검증되는지 서술. "오늘의 한 줄 진단" 카드에 핵심 인과(거시→정치→가격 사슬)를 한 문장으로 압축.
+
+==============================
+절대 금지 (권한으로 차단돼 있지만 재확인)
+==============================
+- git commit, git push, git rebase — 절대 호출 마. 로컬 변경은 dispatch.sh로 발송만, 커밋하지 않는다.
+- wiki/log.md, wiki/index.md 등 위키 파일 원격 수정 — 헤드리스는 원격을 건드리지 않는다. 로컬 작업 파일(report/*.html)만 생성.
+- dispatch.sh 외의 curl/HTTP 직접 조립 — 발송은 반드시 dispatch.sh에 위임.
+- sources/ 파일 수정/삭제 — 절대 금지.
+
+완료되면 "발송 완료: <HTML경로> (<크기>), Actions run 확인 필요" 한 줄로 보고하고 종료해.
