@@ -1,0 +1,131 @@
+{
+  "timestamp": "2026-08-02T02:14:10.445783+09:00",
+  "version": "v3_hybrid",
+  "hypothesis": "이번 반도체 반등이 과거 엔비디아 급등 시작과 같은가?",
+  "method": "3가지 조건 모두 추적 (거래량배수+종가위치+10일고점)",
+  "data_quality": {
+    "measured_from_websearch_chart": 3,
+    "estimated_from_public_sources": 5,
+    "total": 8
+  },
+  "nvidia_cases": [
+    {
+      "period": "2017-03 ~ 2017-06",
+      "description": "AI 칩 수요 본격화 (Tesla, 클라우드)",
+      "vol_ratio": 1.5,
+      "vol_source": "chart_estimate_long_term",
+      "price_position_pct": 85,
+      "broke_high_10d": true,
+      "sustained_rally": true,
+      "notes": "AI 인식 시작, 지속 상승"
+    },
+    {
+      "period": "2021-04 ~ 2021-05",
+      "description": "암호화폐/GPU 채굴 붐",
+      "vol_ratio": 2.1,
+      "vol_source": "websearch_chart_measured",
+      "price_position_pct": 75,
+      "broke_high_10d": true,
+      "sustained_rally": true,
+      "notes": "단기 호황, RTX 30 채굴 열풍 (실측: 2020년 10월 기준점 100M → 2021년 5월 220M)"
+    },
+    {
+      "period": "2021-09 ~ 2021-11",
+      "description": "데이터센터 + 게이밍 수요 겹침",
+      "vol_ratio": 2.3,
+      "vol_source": "chart_estimate",
+      "price_position_pct": 88,
+      "broke_high_10d": true,
+      "sustained_rally": true,
+      "notes": "공급 부족 본격화"
+    },
+    {
+      "period": "2023-01 ~ 2023-03",
+      "description": "ChatGPT 열풍 & AI 인프라 투자",
+      "vol_ratio": 2.15,
+      "vol_source": "websearch_chart_measured",
+      "price_position_pct": 82,
+      "broke_high_10d": true,
+      "sustained_rally": true,
+      "notes": "메가 트렌드 시작, 1년 이상 지속 (실측: 2022년 11월 기준점 350M → 2023년 3월 700M 평상시, 1000M+ 피크)"
+    },
+    {
+      "period": "2023-05 ~ 2023-07",
+      "description": "H100/H200 판매 가시화",
+      "vol_ratio": 2.4,
+      "vol_source": "chart_estimate",
+      "price_position_pct": 90,
+      "broke_high_10d": true,
+      "sustained_rally": true,
+      "notes": "가이던스 상향, 주문 대기열 확인"
+    },
+    {
+      "period": "2023-11 ~ 2024-01",
+      "description": "엔터프라이즈 AI 대규모 투자 선언",
+      "vol_ratio": 2.2,
+      "vol_source": "chart_estimate",
+      "price_position_pct": 87,
+      "broke_high_10d": true,
+      "sustained_rally": true,
+      "notes": "AWS/Azure/Google 대규모 발표"
+    },
+    {
+      "period": "2024-02 ~ 2024-04",
+      "description": "GB200 Superchip 소식 + 가이던스 상향",
+      "vol_ratio": 1.9,
+      "vol_source": "websearch_chart_measured",
+      "price_position_pct": 92,
+      "broke_high_10d": true,
+      "sustained_rally": true,
+      "notes": "다음 세대 칩 기대감, 주가 계속 상승 (실측: 2024년 1월 기준점 350M → 2024년 3월 평상시 550M, 피크 900M+)"
+    },
+    {
+      "period": "2024-07 ~ 2024-08",
+      "description": "GDPR 이슈 후 반등 (최근)",
+      "vol_ratio": 1.9,
+      "vol_source": "chart_estimate",
+      "price_position_pct": 79,
+      "broke_high_10d": false,
+      "sustained_rally": null,
+      "notes": "단기 조정 후 회복 신호, 진행 중"
+    }
+  ],
+  "nvidia_stats": {
+    "vol_ge_2x_pct": 62.5,
+    "vol_mean": 2.0562500000000004,
+    "vol_range": [
+      1.5,
+      2.4
+    ],
+    "price_high_pct": 75.0,
+    "price_mean": 84.75,
+    "broke_10d_pct": 87.5,
+    "sustained_pct": 87.5,
+    "all_three_conditions_pct": 50.0
+  },
+  "sk_hynix_current": {
+    "date": "2026-07-31",
+    "current_price": 1718000,
+    "day250_high": 2987000,
+    "day250_high_date": "2026-06-25",
+    "vs_day250_high_pct": -42.48,
+    "week_52_high": 3002000,
+    "week_52_low": 244000,
+    "week_52_low_confidence": "broker_quote_screen_confirmed",
+    "price_position_pct": 53.44,
+    "vol_ratio": 1.79,
+    "vol_source": "kis_api_inferred"
+  },
+  "verdict": "MOSTLY_MISMATCH_V3_FINAL — 거래량부족✗, 가격위치53.44%부족✗(CONFIRMED), 고점미확정?",
+  "trust_score": 25,
+  "known_issues": [
+    "2026-08-01 1차 수정: SK_HYNIX_CURRENT가 실제 가격(1,718,000원대)과 56배 다른 플레이스홀더 숫자(31,100원대)를 쓰고 있어 종가위치 84.8%가 오류였음 — 수정 완료",
+    "2026-08-01 2차 수정(사용자 지적으로 증거 재검토): 52주 최저가 245,000원을 최초엔 근거 빈약한 과거 메모만으로 기각했으나, 독립된 두 웹검색이 재확인한 것을 반영해 채택 — price_position_pct 53.7%로 재계산, 80% 기준 미충족으로 전환",
+    "2026-08-01 3차 수정(최종): 사용자가 실제 시세창(52주 범위 244,000~3,002,000원)을 직접 캡처해 제공 — 웹서치 추정치와 거의 일치해 교차검증 완료, price_position_pct 53.44%로 확정(CONFIRMED). 잔여 불확실성 해소"
+  ],
+  "next_checkpoints": [
+    "08-12 고점돌파 판정",
+    "거래량 추적",
+    "09-01 3개월 지속성 검증"
+  ]
+}

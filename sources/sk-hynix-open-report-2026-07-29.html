@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>[SK하이닉스 Daily Monitor] 장초반 - 2026-07-29 10:13</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif; background:linear-gradient(135deg,#667eea 0%,#764ba2 100%); padding:20px; min-height:100vh; color:#333; }
+.container { max-width:1000px; margin:0 auto; background:white; border-radius:12px; box-shadow:0 20px 60px rgba(0,0,0,0.3); overflow:hidden; }
+.header { background:linear-gradient(135deg,#1e3c72 0%,#2a5298 100%); color:white; padding:28px; text-align:center; }
+.header h1 { font-size:22px; margin-bottom:8px; font-weight:700; }
+.header .date { font-size:13px; opacity:0.9; }
+.weekend-banner { background:#fff3cd; color:#856404; text-align:center; font-size:12.5px; font-weight:600; padding:11px; line-height:1.6; }
+.content { padding:28px; }
+.section { margin-bottom:24px; }
+.section-title { font-size:17px; font-weight:700; color:#1e3c72; margin-bottom:12px; padding-bottom:8px; border-bottom:3px solid #667eea; }
+.metric { background:#f8f9fa; padding:14px; border-radius:8px; margin-bottom:10px; border-left:4px solid #667eea; }
+.metric.quiet { border-left-color:#adb5bd; }
+.metric.positive { border-left-color:#27ae60; } .metric.warn { border-left-color:#f39c12; } .metric.negative { border-left-color:#e74c3c; }
+.metric-label { font-size:11px; color:#666; text-transform:uppercase; font-weight:600; letter-spacing:0.03em; }
+.metric-value { font-size:18px; font-weight:700; color:#1e3c72; margin-top:4px; }
+.positive { color:#27ae60; } .negative { color:#e74c3c; } .warn { color:#f39c12; }
+.fact { display:inline-block; background:#1e3c72; color:white; font-size:10px; font-weight:700; padding:2px 7px; border-radius:4px; margin-right:6px; }
+.opinion { display:inline-block; background:#8e6bbf; color:white; font-size:10px; font-weight:700; padding:2px 7px; border-radius:4px; margin-right:6px; }
+.footer { background:#f8f9fa; padding:16px; text-align:center; border-top:1px solid #e9ecef; font-size:11px; color:#999; line-height:1.7; }
+table { width:100%; border-collapse:collapse; font-size:13px; }
+th { padding:9px; text-align:left; font-weight:600; background:#f8f9fa; }
+td { padding:9px; border-bottom:1px solid #e9ecef; vertical-align:top; }
+.scorebox { background:linear-gradient(135deg,#1e3c72 0%,#2a5298 100%); color:white; border-radius:10px; padding:18px; text-align:center; margin-bottom:10px; }
+.scorebox .num { font-size:38px; font-weight:800; line-height:1; }
+.scorebox .grade { font-size:13px; font-weight:700; margin-top:5px; opacity:0.95; }
+.breakcond { display:flex; gap:8px; margin-top:10px; flex-wrap:wrap; }
+.breakcond .pill { flex:1; min-width:170px; background:#f8f9fa; border-radius:8px; padding:8px 10px; font-size:11px; border-left:3px solid #27ae60; line-height:1.5; }
+.breakcond .pill.hit { border-left-color:#e74c3c; background:#fdecea; }
+.table-wrap { overflow-x:auto; }
+.cal { width:100%; border-collapse:collapse; font-size:12.5px; }
+.cal th { background:#1e3c72; color:white; padding:8px; }
+.cal td { padding:8px; border-bottom:1px solid #e9ecef; }
+.cal tr.hot td { background:#fff6e9; font-weight:600; }
+.macro-headline { background:linear-gradient(135deg,#2a3b8f10 0%,#1e3c7210 100%); border:1px solid #d8dcf0; border-radius:10px; padding:18px; }
+.gil-row { display:flex; gap:10px; margin-bottom:14px; flex-wrap:wrap; }
+.gil-gauge { flex:1; min-width:140px; background:white; border-radius:8px; padding:12px; text-align:center; border:1px solid #e5e7f5; }
+.gil-gauge .label { font-size:10px; color:#888; font-weight:700; letter-spacing:0.05em; }
+.gil-gauge .val { font-size:22px; font-weight:800; color:#1e3c72; margin:4px 0; }
+.gil-gauge .arrow { font-size:11px; }
+.gil-gauge .prev { font-size:10px; color:#999; margin-top:2px; }
+.quadrant-badge { display:inline-block; background:#f39c12; color:white; font-size:12px; font-weight:700; padding:4px 12px; border-radius:20px; }
+.analogue-card { background:white; border:1px solid #e5e7f5; border-radius:8px; padding:13px; margin-bottom:9px; }
+.analogue-card .period { font-size:14px; font-weight:800; color:#1e3c72; }
+.analogue-card .dist { font-size:11px; color:#999; margin-left:6px; }
+.compare-row { display:flex; gap:8px; margin:7px 0 9px; flex-wrap:wrap; }
+.compare-box { flex:1; min-width:210px; border-radius:6px; padding:8px 10px; font-size:11.5px; line-height:1.5; }
+.compare-box.same { background:#eef1fb; color:#33395c; }
+.compare-box.diff { background:#fff6e9; color:#6b4f1f; }
+.compare-box .tag { font-size:9px; font-weight:800; text-transform:uppercase; letter-spacing:0.04em; display:block; margin-bottom:3px; opacity:0.65; }
+.scenario-grid { display:grid; grid-template-columns:1fr 1fr; gap:6px; }
+.scenario-cell { border-radius:6px; padding:8px 9px; font-size:11px; line-height:1.5; }
+.scenario-cell.risk-up { background:#fdecea; color:#8a2b1f; }
+.scenario-cell.risk-down { background:#eaf7ef; color:#1f6b3a; }
+.scenario-cell.up-up { background:#eef3ff; color:#1f3f8a; }
+.scenario-cell.up-down { background:#f4f1fb; color:#4a3a7a; }
+.scenario-cell b { display:block; font-size:10px; margin-bottom:2px; }
+.conv { text-align:center; margin-top:10px; padding:10px; background:#fdecea; border-radius:8px; font-size:12px; color:#8a2b1f; font-weight:600; line-height:1.6; }
+.deepdive { background:linear-gradient(135deg,#1e3c7208 0%,#8e6bbf10 100%); border:2px dashed #8e6bbf; border-radius:10px; padding:16px; }
+.deepdive .section-title { border-bottom-color:#8e6bbf; }
+.item { font-size:13px; line-height:1.6; margin-bottom:8px; }
+.pricepath { width:100%; border-collapse:collapse; font-size:12.5px; }
+.pricepath th { background:#1e3c72; color:white; padding:7px; }
+.pricepath td { padding:7px; border-bottom:1px solid #e9ecef; }
+@media (max-width:600px){ .scenario-grid{grid-template-columns:1fr;} }
+</style>
+</head>
+<body>
+<div class="container">
+<div class="header">
+<h1>[SK하이닉스 Daily Monitor] 장초반</h1>
+<div class="date">2026-07-29 10:13 KST (수)</div>
+</div>
+<div class="content">
+
+<div class="section">
+<div class="section-title">1. SK하이닉스 주가 현황 — 실적 발표 후 왕복</div>
+<div class="metric negative">
+<div class="metric-label">현재가 (09:37 KST, 사용자 실시간 차트 실측)</div>
+<div class="metric-value negative">1,537,000원 (-0.84%)</div>
+<div style="font-size:12px; color:#666; margin-top:6px;">전일종가 1,550,000원 기준. RSI(14) 24.24까지 하락(과매도권).</div>
+</div>
+<div class="table-wrap">
+<table class="pricepath">
+<tr><th>시각</th><th>가격</th><th>등락률</th><th>비고</th></tr>
+<tr><td>08:03</td><td>1,426,000원</td><td class="negative">-7.22%</td><td>개장 전, 컨센서스 미달 우려 선반영 추정</td></tr>
+<tr><td>09:00</td><td>-</td><td>-</td><td><b>2Q 실적 발표</b></td></tr>
+<tr><td>09:13</td><td>1,619,000원</td><td class="positive">+5.34%</td><td>"사상 최대 실적" 헤드라인에 반사적 급등</td></tr>
+<tr><td>09:20</td><td>1,599,000원</td><td class="positive">+3.16%</td><td>이미 고점 대비 되돌림 시작(뉴스 기사 확인)</td></tr>
+<tr><td>09:37</td><td>1,537,000원</td><td class="negative">-0.84%</td><td><b>24분 만에 급등분 대부분 반납</b></td></tr>
+</table>
+</div>
+<div class="metric warn">
+<div class="metric-label">💡 해석</div>
+<div style="font-size:13px; margin-top:4px; line-height:1.6;">"사상 최대 실적인데 컨센서스는 못 채웠다"는 디테일이 소화되며 반등이 짧게 끝난 패턴 — 7/23 알파벳 실적(컨센서스 상회에도 FCF마진 우려로 급락)의 거울상. ⚠️ 09:37 이후 재검색한 일부 결과는 등락률·절대가 산수가 맞지 않아 채택하지 않음(스테일 데이터 의심) — 09:37 사용자 실측치를 현재 최신 신뢰치로 유지.</div>
+</div>
+</div>
+
+<div class="section">
+<div class="section-title">2. 🌐 오늘의 매크로 헤드라인 (아침 체크 카드 재사용, 재검색 없음)</div>
+<div class="macro-headline">
+<div class="gil-row">
+<div class="gil-gauge"><div class="label">G · 성장</div><div class="val">-0.1</div><div class="arrow">변동없음</div></div>
+<div class="gil-gauge"><div class="label">I · 물가</div><div class="val">+0.0083</div><div class="arrow">변동없음</div></div>
+<div class="gil-gauge"><div class="label">L · 유동성</div><div class="val">+0.13</div><div class="arrow">변동없음</div></div>
+</div>
+<div style="text-align:center; margin-bottom:14px;"><span class="quadrant-badge">⚠ STAGFLATION (유지)</span> <span style="font-size:11px; color:#999; margin-left:8px;">target 2026-06 · 수렴도 -25% · 오늘 특대형 거시 이벤트 없음(FOMC는 내일 새벽 03:00)</span></div>
+<div class="analogue-card"><span class="period">① 1957년 1월</span><span class="dist">거리 0.145 · 최근접</span></div>
+<div class="analogue-card"><span class="period">② 1968년 1월</span><span class="dist">거리 0.396</span></div>
+<div class="analogue-card"><span class="period">③ 2005년 11월</span><span class="dist">거리 0.423</span></div>
+<div class="conv">📉 수렴도: <b>-25% 유지</b> — 오늘의 이벤트는 거시가 아니라 SK하이닉스 개별 실적</div>
+</div>
+</div>
+
+<div class="section">
+<div class="section-title">3. 🚨 HBM Cycle Score</div>
+<div class="scorebox">
+<div class="num">63<span style="font-size:20px;">/100</span></div>
+<div class="grade">⚠ 경계 하단 · 변동없음(어제 저녁 확정치 유지)</div>
+</div>
+<div class="breakcond">
+<div class="pill">①ASP5%+하락 <b class="positive">미충족</b></div>
+<div class="pill">②엔비디아주문-10% <b class="positive">미충족</b></div>
+<div class="pill">③CoWoS95%이하 <b class="positive">미충족</b></div>
+<div class="pill hit">④외국인20일순매도 <b class="negative">🔴 충족</b></div>
+</div>
+<div style="font-size:12px; color:#666; margin-top:8px;">붕괴조건 🔴 1/4 유지. 오늘 오전 정보(실적·컨콜·CoWoS)로는 축 변경 없음 — 컨콜의 "하반기 개선" 가이던스는 선행지표 성격이라 당장 점수엔 미반영, 저녁 체크에서 재평가.</div>
+</div>
+
+<div class="section">
+<div class="section-title">4. ⚡ 엔비디아 &amp; CoWoS — 신규</div>
+<div class="item"><span class="fact">FACT</span>TSMC CoWoS <b>2027년 공급 전망이 65만→110만 개 인터포저로 대폭 상향</b>(2026년은 65만 유지) — Vera Rubin 연간 양산 확대 반영.</div>
+<div class="item"><span class="opinion">OPINION</span>판정 <b class="positive">Bullish 강화</b> — 2027년 공급 계획 자체가 상향된 건 그만큼 수요가 강하다는 방증.</div>
+</div>
+
+<div class="section">
+<div class="section-title">5. 🌐 하이퍼스케일러 동향 — 간략</div>
+<div class="item">오늘 오전 특이사항 없음. 메타·MS 실적은 오늘 미국 장마감 후(한국시간 밤) 예정, 아직 결과 없음.</div>
+</div>
+
+<div class="section">
+<div class="section-title">6. 어제 저녁 체크 이후 변화</div>
+<div class="item"><span class="fact">FACT</span><b>2Q 실적 확정 발표</b>(매출 79.32조·영업익 60.54조·OPM76%, 사상 최대이나 컨센서스 -5.5% 미달) + <b>컨콜에서 하반기 개선 가이던스</b>(HBM4 판매 본격화, 하반기 비트그로스 상반기 상회 전망) 제시. 상세는 <a href="../wiki/concepts/sk-hynix-analyst-thesis-checkpoints.md">checkpoints.md ⑨</a> 참고.</div>
+</div>
+
+<div class="section">
+<div class="section-title">7. 🎯 찐반등 4대 신호</div>
+<table>
+<tr><th>신호</th><th>상태</th></tr>
+<tr><td>①빚의 청산</td><td class="warn">부분확인·미확정</td></tr>
+<tr><td>②개미의 항복</td><td class="negative">불충족(어제 유지)</td></tr>
+<tr><td>③외국인 귀환</td><td class="warn">오늘자 미확인(저녁 체크 대기)</td></tr>
+<tr><td>④미국빅테크 동반상승</td><td class="warn">오늘 밤 메타·MS 실적 대기</td></tr>
+</table>
+<div style="font-size:12px; color:#666; margin-top:8px;">특기사항: 오늘 09:13 실적 헤드라인에 대한 반사적 매수 시도가 있었으나 24분 만에 되돌려짐 — 데드캣 성격에 가까운 짧은 반등이었다는 관찰만 추가(신호 판정 자체는 변경 없음).</div>
+</div>
+
+<div class="section deepdive">
+<div class="section-title">8. [Deep Dive] CXL &amp; 차세대 메모리 트랙</div>
+<div class="item"><span style="color:#666;">오늘 신규 소식 없음 — 삼성 1TB CXL 풀·SK하이닉스 256GB CMM-DDR5·3사 컨트롤러 자사화 중단 등 기존 확인분(7/19~21)의 재확인 수준.</span></div>
+</div>
+
+</div>
+<div class="footer">2026-07-29 10:13 KST | 데이터 출처: 사용자 실시간 차트(주가) · 웹검색(실적·컨콜·CoWoS·CXL) | 외국인 수급 자동수집은 19:10 KST 저녁 체크에서 반영 | 다음 체크: 오늘 19:00 저녁</div>
+</div>
+</body>
+</html>

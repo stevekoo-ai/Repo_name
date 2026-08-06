@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>[SK하이닉스 Daily Monitor] 아침 - 2026-07-29 07:26</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif; background:linear-gradient(135deg,#667eea 0%,#764ba2 100%); padding:20px; min-height:100vh; color:#333; }
+.container { max-width:1000px; margin:0 auto; background:white; border-radius:12px; box-shadow:0 20px 60px rgba(0,0,0,0.3); overflow:hidden; }
+.header { background:linear-gradient(135deg,#1e3c72 0%,#2a5298 100%); color:white; padding:28px; text-align:center; }
+.header h1 { font-size:22px; margin-bottom:8px; font-weight:700; }
+.header .date { font-size:13px; opacity:0.9; }
+.weekend-banner { background:#fff3cd; color:#856404; text-align:center; font-size:12px; font-weight:600; padding:10px; }
+.content { padding:28px; }
+.section { margin-bottom:26px; }
+.section-title { font-size:17px; font-weight:700; color:#1e3c72; margin-bottom:12px; padding-bottom:8px; border-bottom:3px solid #667eea; }
+.metric { background:#f8f9fa; padding:14px; border-radius:8px; margin-bottom:10px; border-left:4px solid #667eea; }
+.metric.positive { border-left-color:#27ae60; } .metric.warn { border-left-color:#f39c12; } .metric.negative { border-left-color:#e74c3c; }
+.metric-label { font-size:11px; color:#666; text-transform:uppercase; font-weight:600; }
+.metric-value { font-size:18px; font-weight:700; color:#1e3c72; margin-top:4px; }
+.positive { color:#27ae60; } .negative { color:#e74c3c; } .warn { color:#f39c12; }
+.new-badge { display:inline-block; background:#e74c3c; color:white; font-size:10px; padding:2px 8px; border-radius:10px; margin-left:6px; }
+.fact { display:inline-block; background:#1e3c72; color:white; font-size:10px; font-weight:700; padding:2px 7px; border-radius:4px; margin-right:6px; }
+.opinion { display:inline-block; background:#8e6bbf; color:white; font-size:10px; font-weight:700; padding:2px 7px; border-radius:4px; margin-right:6px; }
+.diagnosis { background:linear-gradient(135deg,#667eea15 0%,#764ba215 100%); border-left:4px solid #667eea; padding:18px; border-radius:8px; }
+.diagnosis-title { font-size:13px; color:#666; text-transform:uppercase; font-weight:600; margin-bottom:8px; }
+.diagnosis-text { font-size:15px; font-weight:600; color:#1e3c72; line-height:1.7; }
+.footer { background:#f8f9fa; padding:16px; text-align:center; border-top:1px solid #e9ecef; font-size:11px; color:#999; }
+table { width:100%; border-collapse:collapse; font-size:13px; }
+th { padding:9px; text-align:left; font-weight:600; background:#f8f9fa; }
+td { padding:9px; border-bottom:1px solid #e9ecef; vertical-align:top; }
+.deepdive { background:linear-gradient(135deg,#1e3c7208 0%,#8e6bbf10 100%); border:2px dashed #8e6bbf; border-radius:10px; padding:20px; }
+.deepdive .section-title { border-bottom-color:#8e6bbf; }
+.item { font-size:13px; line-height:1.6; margin-bottom:8px; }
+.scorebox { background:linear-gradient(135deg,#1e3c72 0%,#2a5298 100%); color:white; border-radius:10px; padding:20px; text-align:center; margin-bottom:12px; }
+.scorebox .num { font-size:40px; font-weight:800; line-height:1; }
+.scorebox .grade { font-size:13px; font-weight:700; margin-top:5px; opacity:0.95; }
+.breakcond { display:flex; gap:8px; margin-top:10px; flex-wrap:wrap; }
+.breakcond .pill { flex:1; min-width:180px; background:#f8f9fa; border-radius:8px; padding:8px 10px; font-size:11px; border-left:3px solid #27ae60; }
+.breakcond .pill.hit { border-left-color:#e74c3c; background:#fdecea; }
+.alert-banner { background:linear-gradient(135deg,#c0392b 0%,#8e2f22 100%); color:white; border-radius:10px; padding:16px 20px; margin-bottom:20px; font-size:14px; font-weight:700; text-align:center; line-height:1.6; }
+.table-wrap { overflow-x:auto; }
+.cal { width:100%; border-collapse:collapse; font-size:12.5px; }
+.cal th { background:#1e3c72; color:white; padding:8px; }
+.cal td { padding:8px; border-bottom:1px solid #e9ecef; }
+.cal tr.hot td { background:#fff6e9; font-weight:600; }
+
+/* macro headline */
+.macro-headline { background:linear-gradient(135deg,#2a3b8f10 0%,#1e3c7210 100%); border:1px solid #d8dcf0; border-radius:10px; padding:20px; }
+.macro-story { font-size:14px; line-height:1.75; color:#2a2f4a; margin-bottom:16px; }
+.macro-story .sign { font-style:italic; color:#8e6bbf; font-size:12px; display:block; margin-top:8px; text-align:right; }
+.gil-row { display:flex; gap:10px; margin-bottom:16px; flex-wrap:wrap; }
+.gil-gauge { flex:1; min-width:140px; background:white; border-radius:8px; padding:12px; text-align:center; border:1px solid #e5e7f5; }
+.gil-gauge.flip { border:2px solid #e74c3c; background:#fdecea; }
+.gil-gauge .label { font-size:10px; color:#888; font-weight:700; letter-spacing:0.05em; }
+.gil-gauge .val { font-size:22px; font-weight:800; color:#1e3c72; margin:4px 0; }
+.gil-gauge .arrow { font-size:11px; }
+.gil-gauge .prev { font-size:10px; color:#999; margin-top:2px; }
+.quadrant-badge { display:inline-block; background:#f39c12; color:white; font-size:12px; font-weight:700; padding:4px 12px; border-radius:20px; }
+.analogue-card { background:white; border:1px solid #e5e7f5; border-radius:8px; padding:14px; margin-bottom:10px; }
+.analogue-card .period { font-size:14px; font-weight:800; color:#1e3c72; }
+.analogue-card .dist { font-size:11px; color:#999; margin-left:6px; }
+.analogue-card .story { font-size:12px; color:#555; line-height:1.6; margin:6px 0 10px; }
+.conv { text-align:center; margin-top:12px; padding:10px; background:#fdecea; border-radius:8px; font-size:12px; color:#8a2b1f; font-weight:600; line-height:1.6; }
+.portfolio-row td.fav { color:#27ae60; font-weight:700; }
+.portfolio-row td.unfav { color:#e74c3c; font-weight:700; }
+.portfolio-row td.neu { color:#888; font-weight:700; }
+@media (max-width:600px){ .scenario-grid{grid-template-columns:1fr;} }
+</style>
+</head>
+<body>
+<div class="container">
+<div class="header">
+<h1>[SK하이닉스 Daily Monitor] 아침</h1>
+<div class="date">2026-07-29 07:26 KST (수)</div>
+</div>
+<div class="content">
+
+<div class="alert-banner">🎯 2Q 실적 D-day — 09:00 KST 발표 예정 (아직 미발표)<br><span style="font-weight:500;font-size:12.5px;opacity:0.95;">컨센서스 매출 84.06~84.1조 · 영업이익 64.09~64.1조 · OPM 75~77% · CXMT 쇼크 이후 첫 펀더멘털 검증대</span></div>
+
+<div class="section">
+<div class="section-title">1. SK하이닉스 주가 현황</div>
+<div class="metric negative">
+<div class="metric-label">마지막 확정 종가 (7/28 화, 정규장 개장 전이라 변동 없음)</div>
+<div class="metric-value negative">1,550,000원 (-14.65%)</div>
+<div style="font-size:12px; color:#666; margin-top:6px;">250일 최고가(2,987,000원, 6/25) 대비 드로다운 <b>-48.11%</b>(KIS API 실측, d250_hgpr_vrss_prpr_rate). 외국인 보유율 52.11%.</div>
+</div>
+<div class="metric warn">
+<div class="metric-label">외국인 수급 (KIS API 자동수집)</div>
+<div style="font-size:13px; margin-top:6px; line-height:1.7;">
+1일 <b class="negative">-2조 9,200억원</b> · 5일 <b class="negative">-3조 1,900억원</b> · <b>20일 <span class="negative">-11조 4,700억원</span></b>(창 이동으로 -13.06조→-11.75조→-11.47조 완만히 축소) · 개인 5일 <b class="positive">+4조 2,600억원</b>·20일 <b class="positive">+14조 3,400억원</b><br>
+<span style="color:#666;">붕괴조건④(외국인 20일 순매도) 여전히 충족. 개인이 전형적 한계매수자 패턴으로 흡수 중.</span>
+</div>
+</div>
+<div class="metric">
+<div class="metric-label">ADR (KIS API 완전 자동계산)</div>
+<div style="font-size:13px; margin-top:4px; line-height:1.6;">$132.74(-7.19%, 전일종가 $143.02) · 이론 ADR ≈$105.77(원/달러 1,465.4 적용) → <b>프리미엄 25.5%</b>(7/26 29.0%에서 축소 — 본주가 ADR보다 훨씬 크게 빠지며 괴리가 좁혀짐, "안정~높음" 경계)</div>
+</div>
+</div>
+
+<div class="section">
+<div class="section-title">2. 🌐 오늘의 매크로 헤드라인</div>
+<div class="macro-headline">
+<div class="macro-story">
+"거시 쪽은 오늘 <b>조용합니다</b> — G/I/L 전부 어제와 동일하고, 유가(브렌트·WTI) 신규 데이터는 아직도 안 들어왔어요. 대신 오늘의 주인공은 <b>거시가 아니라 개별 종목</b>입니다: SK하이닉스가 9시에 실적을 발표하고, 밤에는 메타·MS 실적이, 내일은 아마존 실적과 FOMC가 줄줄이 이어집니다. 순서가 중요한데, <b>실적(분자)이 FOMC(분모)보다 먼저</b> 나옵니다."
+<span class="sign">— 오늘의 브리핑, 비서 올림</span>
+</div>
+
+<div class="gil-row">
+<div class="gil-gauge"><div class="label">G · 성장</div><div class="val">-0.1</div><div class="arrow">변동없음</div><div class="prev">어제와 동일</div></div>
+<div class="gil-gauge"><div class="label">I · 물가</div><div class="val">+0.0083</div><div class="arrow">변동없음</div><div class="prev">어제와 동일</div></div>
+<div class="gil-gauge"><div class="label">L · 유동성</div><div class="val">+0.13</div><div class="arrow">변동없음</div><div class="prev">어제와 동일</div></div>
+</div>
+<div style="text-align:center; margin-bottom:16px;"><span class="quadrant-badge">⚠ STAGFLATION (유지)</span> <span style="font-size:11px; color:#999; margin-left:8px;">target 2026-06 그대로(1개월 뒤처짐, append 기준 2개월 미달) · 유가 프리셋 여전히 0행(다음 07:10 동기화 대기)</span></div>
+
+<div style="font-size:13px; font-weight:700; color:#1e3c72; margin-bottom:8px;">가장 닮은 과거 시기 TOP 3 (변동없음)</div>
+<div class="analogue-card"><span class="period">① 1957년 1월</span><span class="dist">거리 0.145</span></div>
+<div class="analogue-card"><span class="period">② 1968년 1월</span><span class="dist">거리 0.396</span></div>
+<div class="analogue-card"><span class="period">③ 2005년 11월</span><span class="dist">거리 0.423</span></div>
+
+<div class="conv">📉 수렴도(convergence): <b>-25% 유지</b>(위험 쪽)<br><span style="font-weight:500;font-size:11.5px;">어제 CXMT 쇼크로 재악화된 수준 유지 — 오늘은 거시가 아니라 SK하이닉스 개별 실적이 주된 이벤트라 이 페이지 범위 밖. 7/30 03:00 FOMC가 다음 검증일</span></div>
+</div>
+</div>
+
+<div class="section">
+<div class="section-title">3. 🚨 HBM Cycle Score</div>
+<div class="scorebox">
+<div class="num">63<span style="font-size:20px;">/100</span></div>
+<div class="grade">⚠ 경계 하단(60~80) · 변동없음</div>
+</div>
+<div class="table-wrap">
+<table>
+<tr><th>축</th><th>배점</th><th>비고</th></tr>
+<tr><td>외국인수급</td><td>3/15</td><td>20일 -11.47조, 붕괴조건④ 충족 유지</td></tr>
+<tr><td>보유율</td><td>8/15</td><td>52.11%, 변동없음</td></tr>
+<tr><td>ASP</td><td>20/25</td><td>TrendForce Q3 재확인(DRAM+13~18%·NAND+10~15% QoQ, HBM3E+20%·HBM4가격 2배 전망), 3주연속하락 미해당</td></tr>
+<tr><td>엔비디아&amp;CoWoS</td><td>20/25</td><td>3사 HBM4 인증 통과 재확인(SK 60~70%로 1위), CoWoS sold out 유지</td></tr>
+<tr><td>공급확대</td><td>2/10</td><td>CXMT 2일차 뉴스는 신규 심각도 추가 없음(day-1 폭등이 이미 반영된 최저치)</td></tr>
+<tr><td>고객재고</td><td>10/10</td><td>메타·MS 실적 대기중(오늘 밤)</td></tr>
+</table>
+</div>
+<div class="breakcond">
+<div class="pill">①ASP5%+하락 <b class="positive">미충족</b></div>
+<div class="pill">②엔비디아주문-10% <b class="positive">미충족</b></div>
+<div class="pill">③CoWoS95%이하 <b class="positive">미충족</b></div>
+<div class="pill hit">④외국인20일순매도 <b class="negative">🔴 충족</b></div>
+</div>
+<div style="font-size:12px; color:#666; margin-top:8px;"><b>붕괴조건 🔴 1/4 유지</b>. Goldman "HBM 10%대 하락" 인용은 <b>2025-07 기사 재유통</b>으로 확인돼 붕괴조건①에 반영하지 않음(오판 방지).</div>
+</div>
+
+<div class="section">
+<div class="section-title">4. ⚡ 선행지표: 엔비디아 주문 &amp; CoWoS</div>
+<div class="item"><span class="fact">FACT</span>엔비디아 CEO가 삼성·SK하이닉스·마이크론 <b>3사 모두 Vera Rubin향 HBM4 인증 통과</b>를 공식 확인, SK하이닉스 배분 추정 <b>60~70%</b>로 여전히 1위.</div>
+<div class="item"><span class="opinion">OPINION</span>CoWoS는 sold out 유지 — 붕괴조건③ 여유 있게 미충족, 판정 <b class="positive">Bullish 유지</b>.</div>
+</div>
+
+<div class="section">
+<div class="section-title">5. 🌐 하이퍼스케일러 고객 동향</div>
+<div class="item">🇺🇸 <span class="fact">FACT</span><b>오늘 미국 장마감 후 메타·MS 실적 발표</b> — 메타는 지난 분기 이미 2026 CapEx $125~145B 가이던스 제시, 오늘 추가 상향/하향 여부가 관건. 아마존은 내일(7/30) 발표.</div>
+<div class="item"><span class="warn">신규 약세 신호</span>UBS는 하이퍼스케일러 CapEx 성장률이 <b>2026 +76% → 2027 +25% → 2028 +6%로 급감속</b> 전망 — ROIC규율 개입 시나리오를 뒷받침하는 첫 정량 신호. BofA 7월 펀드매니저 설문 82%가 반도체를 "가장 쏠린 트레이드"로 지목.</div>
+<div class="item">🇨🇳 <span class="fact">FACT</span>CXMT 상장 2일차(7/29) 주가 47위안대로 전일 대비 약 -4% 되돌림(단일 스냅샷, 미확정). 애널리스트 평가는 여전히 "범용 DRAM 실질 위협·HBM은 수년 격차"로 일관.</div>
+</div>
+
+<div class="section">
+<div class="section-title">6. 9개 체크포인트 요약</div>
+<div class="table-wrap">
+<table>
+<tr><th>#</th><th>항목</th><th>확인된 사실 [FACT]</th><th>판정 [OPINION]</th></tr>
+<tr><td>①</td><td>DRAM/NAND</td><td>TrendForce Q3 상승세 지속(둔화 신호도 병존)</td><td class="positive">긍정</td></tr>
+<tr><td>②</td><td>HBM4</td><td>3사 모두 인증 통과, SK 60~70% 배분</td><td class="positive">긍정</td></tr>
+<tr><td>③</td><td><b>CapEx(분기점)</b></td><td>오늘 메타·MS D-day, UBS는 2027~28 감속 전망</td><td class="warn">혼재, D-day</td></tr>
+<tr><td>④</td><td>LTA</td><td>변동 없음</td><td class="positive">긍정</td></tr>
+<tr><td>⑤</td><td>주주환원</td><td>변동 없음</td><td class="positive">긍정</td></tr>
+<tr><td>⑥</td><td><b>ADR(분기점)</b></td><td>프리미엄 25.5%(KIS API 완전자동)</td><td class="warn">안정~높음 경계</td></tr>
+<tr><td>⑦</td><td>중국산DRAM</td><td><b>🔴 격상</b> — 조달 86억달러(중국 반도체 사상 최대), 시총 한때 A주 1위</td><td class="negative">부정, 훼손</td></tr>
+<tr><td>⑧</td><td>마이크론할인</td><td>선행PER SK 4.8배 vs 마이크론 6.6배</td><td class="positive">긍정</td></tr>
+<tr><td>⑨</td><td><b>실적(D-day)</b></td><td>컨센 84.06~84.1조/64.09~64.1조/OPM75~77%, 09:00 발표</td><td class="warn">D-day, 미발표</td></tr>
+</table>
+</div>
+</div>
+
+<div class="section">
+<div class="section-title">📅 이번 주 남은 일정</div>
+<div class="table-wrap">
+<table class="cal">
+<tr><th>날짜</th><th>이벤트</th><th>영향</th></tr>
+<tr class="hot"><td><b>7/29(수, 오늘)</b></td><td><b>SK하이닉스 2Q 실적 09:00</b> + 메타·MS 실적(미국 장마감 후)</td><td>⑥⑨ 동시 검증</td></tr>
+<tr class="hot"><td>7/30(목)</td><td><b>FOMC 결과 03:00</b> + 아마존 실적</td><td>거시 분기점</td></tr>
+</table>
+</div>
+<div style="font-size:12px; color:#666; margin-top:8px;">⚠ 실적(오늘 아침)이 FOMC 결과(내일 새벽)보다 <b>먼저</b> 나옵니다.</div>
+</div>
+
+<div class="section">
+<div class="section-title">7. 🎯 찐반등 4대 신호 체크</div>
+<table>
+<tr><th>신호</th><th>상태</th></tr>
+<tr><td>①빚의 청산</td><td class="warn">부분확인·미확정</td></tr>
+<tr><td>②개미의 항복</td><td class="negative">불충족 — 개인 5일 +4.26조로 오히려 반대방향</td></tr>
+<tr><td>③외국인 귀환</td><td class="negative">불충족 — 20일 누적 -11.47조</td></tr>
+<tr><td>④미국빅테크 동반상승</td><td class="warn">오늘 밤 메타·MS 실적 대기</td></tr>
+</table>
+<div style="font-size:12px; color:#666; margin-top:8px;">4개 중 충족 <b>0개</b> — ②③이 명확히 역방향 유지. 오늘 밤·내일 실적/FOMC가 검증 재료.</div>
+</div>
+
+<div class="section deepdive">
+<div class="section-title">8. [Deep Dive] CXL &amp; 차세대 메모리 트랙</div>
+<div class="item"><span style="color:#666;">오늘 신규 소식 없음 — ⓐ~ⓓ 전 항목이 7/19~21에 이미 기록된 내용의 재확인 수준(삼성 CMM-D 로드맵·SK하이닉스 256GB CMM-DDR5·3사 컨트롤러 자사화 중단 등).</span></div>
+</div>
+
+<div class="section">
+<div class="diagnosis">
+<div class="diagnosis-title">🧭 한줄 진단 &amp; 관전 포인트</div>
+<div class="diagnosis-text">
+오늘은 거시가 아니라 <b>펀더멘털이 시험대에 오르는 날</b>이다 — 09:00 SK하이닉스 실적이 CXMT 쇼크 이후 "AI 메모리 매도 논제"의 첫 검증대이고, 숫자(컨센 OPM 75~77%)보다 <b>컨콜에서 경영진이 중국 경쟁·HBM4 물량을 어떻게 언급하는지</b>가 더 중요할 수 있다. 밤엔 메타·MS 실적, 내일은 아마존과 FOMC까지 사흘 안에 분자(실적)와 분모(금리) 양쪽이 모두 확인된다. HBM Cycle Score(63점·붕괴조건 1/4)와 찐반등(0/4)은 어제와 동일 — 오늘의 변화는 점수가 아니라 <b>검증의 실행</b>이다.
+</div>
+</div>
+</div>
+
+<div class="section">
+<div class="section-title">10. 📂 보유 포트폴리오 유불리 체크 — GEN+ISA+IRP 3계좌</div>
+<div style="font-size:12px; color:#666; margin-bottom:10px;">3계좌 합산 <b>329,109,835원(7/27 확정, DC 제외)</b>. <b>⚠ 데이터 신선도</b>: portfolio-holdings.csv 7/28 19:10 동기화 재차 미도착(2회 연속 지연) — CXMT 쇼크(7/28, SK하이닉스 -14.65%) 반영 전 금액이다. SK하이닉스분만 별도로 7/28 실제 종가(1,550,000원)를 적용하면 GEN 계좌 기준 약 <b>184,450,000원</b>(7/27의 216,104,000원 대비 -3,165만원)으로 추정 — 계좌 전체 재계산은 다음 동기화 도착 후 확정.</div>
+<div class="table-wrap">
+<table>
+<tr><th>계좌</th><th>종목</th><th>평가금액(7/27)</th><th>유불리</th><th>전망 · 체크포인트</th></tr>
+<tr class="portfolio-row"><td>GEN</td><td><b>SK하이닉스</b> 119주</td><td>216,104,000원</td><td class="unfav">🔴 불리</td><td>오늘 실적 D-day. HBM Cycle Score 63/100·붕괴조건 1/4 유지</td></tr>
+<tr class="portfolio-row"><td>GEN</td><td>제주반도체 20주</td><td>1,480,000원</td><td class="unfav">🔴 불리</td><td>동일 반도체 섹터 민감도, 소형주라 변동성 더 큼</td></tr>
+<tr class="portfolio-row"><td>GEN</td><td>롯데렌탈 4주</td><td>160,000원</td><td class="neu">⚪ 판단보류</td><td>비중 미미(0.1%)</td></tr>
+<tr class="portfolio-row"><td>GEN</td><td>우리금융지주 4주</td><td>132,400원</td><td class="fav">🟢 유리</td><td>금융지주는 장기금리 상승 국면에서 이자마진 수혜</td></tr>
+<tr class="portfolio-row"><td>ISA</td><td><b>SK하이닉스</b> 19주</td><td>34,504,000원</td><td class="unfav">🔴 불리</td><td>GEN과 동일 사유</td></tr>
+<tr class="portfolio-row"><td>ISA</td><td>삼성전자 108주</td><td>27,432,000원</td><td class="unfav">🔴 불리</td><td>반도체 동일 민감도(7/28 CXMT 쇼크로 -13.39% 동반 급락)</td></tr>
+<tr class="portfolio-row"><td>ISA</td><td>ACE AI반도체TOP3+ 297주</td><td>16,663,185원</td><td class="unfav">🔴 불리</td><td>AI반도체 테마 ETF, 수익률 최고(+215.30%) — 리밸런싱 검토 1순위</td></tr>
+<tr class="portfolio-row"><td>ISA</td><td>KODEX 글로벌비만치료제 440주</td><td>5,185,400원</td><td class="fav">🟢 유리</td><td>헬스케어 방어주 성격</td></tr>
+<tr class="portfolio-row"><td>ISA</td><td>ACE KRX금현물 113주</td><td>3,031,790원</td><td class="fav">🟢 유리</td><td>stagflation·리스크오프 국면 전통적 헤지자산</td></tr>
+<tr class="portfolio-row"><td>ISA</td><td>기타(SOL·차이나전기차·우주테크·이노진 등)</td><td>7,196,020원</td><td class="unfav">🔴 대체로 불리</td><td>고밸류 성장주·반도체 섹터 민감도, 일부 판단보류</td></tr>
+<tr class="portfolio-row"><td>IRP</td><td>KODEX 인도Nifty50 544주</td><td>6,696,640원</td><td class="fav">🟢 유리</td><td>반도체·미국금리와 상관 낮은 최대 분산 자산</td></tr>
+<tr class="portfolio-row"><td>IRP</td><td>KODEX 미국AI전력핵심인프라 134주</td><td>2,991,550원</td><td class="neu">⚪ 중립</td><td>AI CapEx 수혜이나 센티먼트 훼손 이벤트엔 함께 노출</td></tr>
+<tr class="portfolio-row"><td>IRP</td><td>기타(SOL넥스트테크·TIME·KIWOOM혼합 등)</td><td>6,373,450원</td><td class="neu">⚪ 혼재</td><td>고밸류 성장주(불리)와 채권혼합(부분방어) 혼재</td></tr>
+</table>
+</div>
+<div style="font-size:12px; color:#666; margin-top:10px;">SK하이닉스 138주(GEN 119+ISA 19) = <b>250,608,000원 = 76.1%</b>(7/25 75.8%에서 소폭 상승). 계좌별 집중도: GEN 99.2%·ISA 82.6%(삼성전자·ACE·SOL 3종 합산)·IRP 직접 반도체 없음. 방어자산 합계 약 1,540만원(4.7%)으로 SK하이닉스 실적 결과의 분산 효과는 제한적. 상세는 <a href="../../wiki/entities/my-portfolio.md">entities/my-portfolio.md</a>.</div>
+</div>
+
+</div>
+<div class="footer">2026-07-29 07:26 KST | 데이터 출처: KIS API(시세·수급·ADR·보유율) · FRED API(거시) · 웹검색(체크포인트·CXMT·CXL) | 다음 체크: 오늘 19:00 저녁(실적 확정치 포함)</div>
+</div>
+</body>
+</html>

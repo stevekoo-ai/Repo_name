@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>[SK하이닉스 Daily Monitor] 장초반 - 2026-08-03 10:15</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif; background:linear-gradient(135deg,#667eea 0%,#764ba2 100%); padding:20px; min-height:100vh; color:#333; }
+.container { max-width:1000px; margin:0 auto; background:white; border-radius:12px; box-shadow:0 20px 60px rgba(0,0,0,0.3); overflow:hidden; }
+.header { background:linear-gradient(135deg,#1e3c72 0%,#2a5298 100%); color:white; padding:28px; text-align:center; }
+.header h1 { font-size:22px; margin-bottom:8px; font-weight:700; }
+.header .date { font-size:13px; opacity:0.9; }
+.content { padding:28px; }
+.section { margin-bottom:26px; }
+.section-title { font-size:17px; font-weight:700; color:#1e3c72; margin-bottom:12px; padding-bottom:8px; border-bottom:3px solid #667eea; }
+.subsection-title { font-size:14px; font-weight:700; color:#1e3c72; margin:16px 0 8px; }
+.metric { background:#f8f9fa; padding:14px; border-radius:8px; margin-bottom:10px; border-left:4px solid #667eea; }
+.metric.positive { border-left-color:#27ae60; } .metric.warn { border-left-color:#f39c12; } .metric.negative { border-left-color:#e74c3c; }
+.metric-label { font-size:11px; color:#666; text-transform:uppercase; font-weight:600; }
+.metric-value { font-size:18px; font-weight:700; color:#1e3c72; margin-top:4px; }
+.positive { color:#27ae60; } .negative { color:#e74c3c; } .warn { color:#f39c12; }
+.fact { display:inline-block; background:#1e3c72; color:white; font-size:10px; font-weight:700; padding:2px 7px; border-radius:4px; margin-right:6px; }
+.opinion { display:inline-block; background:#8e6bbf; color:white; font-size:10px; font-weight:700; padding:2px 7px; border-radius:4px; margin-right:6px; }
+.unver { display:inline-block; background:#c0561a; color:white; font-size:10px; font-weight:700; padding:2px 7px; border-radius:4px; margin-right:6px; }
+.diagnosis { background:linear-gradient(135deg,#667eea15 0%,#764ba215 100%); border-left:4px solid #667eea; padding:18px; border-radius:8px; }
+.diagnosis-title { font-size:13px; color:#666; text-transform:uppercase; font-weight:600; margin-bottom:8px; }
+.diagnosis-text { font-size:15px; font-weight:600; color:#1e3c72; line-height:1.7; }
+.footer { background:#f8f9fa; padding:16px; text-align:center; border-top:1px solid #e9ecef; font-size:11px; color:#999; }
+table { width:100%; border-collapse:collapse; font-size:13px; }
+th { padding:9px; text-align:left; font-weight:600; background:#f8f9fa; }
+td { padding:9px; border-bottom:1px solid #e9ecef; vertical-align:top; }
+.deepdive { background:linear-gradient(135deg,#1e3c7208 0%,#8e6bbf10 100%); border:2px dashed #8e6bbf; border-radius:10px; padding:20px; }
+.deepdive .section-title { border-bottom-color:#8e6bbf; }
+.item { font-size:13px; line-height:1.6; margin-bottom:8px; }
+.scorebox { background:linear-gradient(135deg,#2e7d4f 0%,#1e5c38 100%); color:white; border-radius:10px; padding:20px; text-align:center; margin-bottom:12px; }
+.scorebox .num { font-size:40px; font-weight:800; line-height:1; }
+.scorebox .grade { font-size:13px; font-weight:700; margin-top:5px; opacity:0.95; }
+.breakcond { display:flex; gap:8px; margin-top:10px; flex-wrap:wrap; }
+.breakcond .pill { flex:1; min-width:180px; background:#f8f9fa; border-radius:8px; padding:8px 10px; font-size:11px; border-left:3px solid #27ae60; }
+.breakcond .pill.hit { border-left-color:#e74c3c; background:#fdecea; }
+.table-wrap { overflow-x:auto; }
+.macro-headline { background:linear-gradient(135deg,#2a3b8f10 0%,#1e3c7210 100%); border:1px solid #d8dcf0; border-radius:10px; padding:20px; }
+.gil-row { display:flex; gap:10px; margin-bottom:16px; flex-wrap:wrap; }
+.gil-gauge { flex:1; min-width:140px; background:white; border-radius:8px; padding:12px; text-align:center; border:1px solid #e5e7f5; }
+.gil-gauge .label { font-size:10px; color:#888; font-weight:700; letter-spacing:0.05em; }
+.gil-gauge .val { font-size:22px; font-weight:800; color:#1e3c72; margin:4px 0; }
+.quadrant-badge { display:inline-block; background:#f39c12; color:white; font-size:12px; font-weight:700; padding:4px 12px; border-radius:20px; }
+.analogue-card { background:white; border:1px solid #e5e7f5; border-radius:8px; padding:14px; margin-bottom:10px; }
+.analogue-card .period { font-size:14px; font-weight:800; color:#1e3c72; }
+.analogue-card .dist { font-size:11px; color:#999; margin-left:6px; }
+.scenario-grid { display:flex; flex-direction:column; gap:8px; margin-top:10px; }
+.scenario-cell { border-radius:6px; padding:10px 12px; font-size:12px; line-height:1.6; }
+.scenario-cell.risk-up { background:#fdecea; color:#8a2b1f; }
+.scenario-cell.risk-down { background:#eaf7ef; color:#1f6b3a; }
+.scenario-cell.up-up { background:#eef3ff; color:#1f3f8a; }
+.scenario-cell.up-down { background:#f4f1fb; color:#4a3a7a; }
+.scenario-cell b { display:block; font-size:10.5px; margin-bottom:3px; }
+.conv { text-align:center; margin-top:12px; padding:10px; background:#fdecea; border-radius:8px; font-size:12px; color:#8a2b1f; font-weight:600; line-height:1.6; }
+.alert-banner { background:linear-gradient(135deg,#c0392b 0%,#8a2b1f 100%); color:white; border-radius:10px; padding:16px 20px; margin-bottom:20px; font-size:14px; font-weight:700; text-align:center; line-height:1.6; }
+.recovery-banner { background:linear-gradient(135deg,#8e6bbf 0%,#5f4487 100%); color:white; border-radius:10px; padding:16px 20px; margin-bottom:20px; font-size:14px; font-weight:700; text-align:center; line-height:1.6; }
+.recovery-box { background:#fff8ee; border:1px solid #f0dfc0; border-radius:10px; padding:16px; }
+.tier1 { border-left:4px solid #27ae60; background:#eaf7ef; padding:10px 12px; border-radius:6px; margin-bottom:6px; font-size:12.5px; line-height:1.6; }
+.tier2 { border-left:4px solid #f39c12; background:#fff6e5; padding:10px 12px; border-radius:6px; margin-bottom:6px; font-size:12.5px; line-height:1.6; }
+.verdict-banner { background:linear-gradient(135deg,#8e6bbf 0%,#5f4487 100%); color:white; border-radius:10px; padding:14px 18px; text-align:center; font-size:14px; font-weight:700; margin-top:12px; line-height:1.6; }
+.kr-outlook { background:#fff4f0; border-left:4px solid #c0561a; padding:14px 16px; border-radius:8px; font-size:13px; line-height:1.75; color:#5a3420; }
+.trump-timeline-cat { margin-bottom:16px; }
+.trump-timeline-cat .cat-head { font-size:13.5px; font-weight:800; color:#c0392b; margin-bottom:6px; }
+.trump-timeline-cat table { font-size:11.5px; }
+.trump-timeline-cat td.tdate { white-space:nowrap; color:#888; font-size:11px; }
+.trump-timeline-cat td.tstat { white-space:nowrap; font-weight:700; }
+.peos-section-head { font-size:12.5px; font-weight:700; color:#4a3a7a; margin:12px 0 6px; }
+.peos-dash-table { font-size:11.5px; }
+.peos-dash-table td, .peos-dash-table th { padding:5px 7px; }
+.peos-regime-box { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:10px; }
+.peos-regime-box .box { flex:1; min-width:150px; background:white; border:1px solid #e0d8f5; border-radius:8px; padding:10px 12px; text-align:center; }
+.peos-regime-box .box .r { font-size:16px; font-weight:800; color:#4a3a7a; margin:2px 0; }
+.peos-regime-box .box .c { font-size:11px; color:#888; }
+.peos-action { font-size:12px; line-height:1.7; margin-bottom:4px; }
+</style>
+</head>
+<body>
+<div class="container">
+<div class="header">
+<h1>[SK하이닉스 Daily Monitor] 장초반</h1>
+<div class="date">2026-08-03 10:15 KST (월) — 09:00 개장 첫 실측</div>
+</div>
+<div class="content">
+
+<div class="alert-banner">🔴 예상됐던 되돌림 — SK하이닉스 -2.44%(1,676,000원), 코스피 -4.23%(6316.49)<br><span style="font-weight:500;font-size:12.5px;opacity:0.95;">코스피 전체 외국인 -1조 1,229억 순매도 · 어젯밤 신중론(SA규모오류·박세익·숏커버링경고)이 경고한 시나리오가 오늘 실제로 확인되는 중 · "회복 진행중" 승격은 오늘 데이터로 보류</span></div>
+
+<div class="section">
+<div class="section-title">1. SK하이닉스 주가 현황 — 오늘 개장~10시</div>
+<div class="metric negative">
+<div class="metric-label">현재가 (웹서치 교차확인, 09:xx~10:xx KST 스냅샷)</div>
+<div class="metric-value negative">1,676,000원 (-42,000원, -2.44%)</div>
+<div style="font-size:12px; color:#666; margin-top:6px;">전일(7/31) 종가 1,718,000원(상한가 +29.95%) 대비 되돌림. GitHub Actions CSV는 장중 미갱신이라 웹서치(뉴스핌 특징주 기사) 우선 사용 — 저녁 체크에서 종가 확정.</div>
+</div>
+<div class="metric">
+<div class="metric-label">💡 한줄 핵심</div>
+<div style="font-size:13px; margin-top:4px; line-height:1.6;">7/31 폭등 다음 첫 거래일에 나온 통상적인 차익실현 매물입니다 — 새로운 펀더멘털 악재는 확인되지 않았습니다. 다만 <b>어젯밤부터 여러 독립 소스가 경고했던 "일회성 효과가 빠지면 되돌림이 온다"는 신중론이 오늘 실제로 검증되는 중</b>입니다. SK하이닉스가 코스피(-4.23%)보다 덜 빠진 것(-2.44%)은 상대적 강세로 볼 여지가 있습니다.</div>
+</div>
+</div>
+
+<div class="section">
+<div class="section-title">2. 🌐 오늘의 매크로 헤드라인</div>
+<div class="macro-headline">
+<div class="subsection-title">2-1. 🇺🇸 미국 시장 진행상황 (아침 체크 재사용)</div>
+<div style="font-size:13px; line-height:1.7; color:#1f2a52;"><span class="fact">FACT</span>마지막 확정 세션 7/31: SOX +8.19%. SK그룹-엔비디아 $500B 파트너십(7/24~25 소재) 사후발견 — 배경 증거로 유효.</div>
+
+<div class="subsection-title">2-2. 🇰🇷 오늘 한국장 전망 (개장 실측으로 [FACT] 갱신)</div>
+<div class="kr-outlook">
+<span class="fact">FACT</span>코스피 개장 -3.60%(6358.27) → 09:10 기준 -4.23%(6316.49). SK하이닉스 -2.44%(1,676,000원). 코스피 전체 수급: 외국인 -1조 1,229억·기관 -3,929억 순매도, 개인 +1조 5,685억 순매수. 삼성전기는 +2.71%로 반대 흐름.
+<br><br><span class="opinion">OPINION</span>언론은 원인을 일관되게 "7/31 폭등 뒤 차익실현·속도조절 매물"로 설명 — 펀더멘털 훼손 신호는 아직 없음. 다만 외국인이 시장 전체적으로 순매도 전환한 것은 찐반등 신호③(외국인 귀환)에 정면으로 반하는 방향이라, "회복 진행중" 승격 논의는 오늘 데이터로 명백히 보류해야 함.
+</div>
+
+<div class="gil-row">
+<div class="gil-gauge"><div class="label">G · 성장</div><div class="val">-0.1</div></div>
+<div class="gil-gauge"><div class="label">I · 물가</div><div class="val">+0.0083</div></div>
+<div class="gil-gauge"><div class="label">L · 유동성</div><div class="val">+0.13</div></div>
+</div>
+<div style="text-align:center; margin-bottom:16px;"><span class="quadrant-badge">⚠ STAGFLATION (아침 확정치 재사용)</span></div>
+<div class="analogue-card">
+<span class="period">① 1957년 1월</span><span class="dist">거리 0.145 · 최근접</span>
+<div class="scenario-grid">
+<div class="scenario-cell risk-up"><b>🔴 위험↑</b>신용스프레드 확대+산업생산·소비심리 둔화 (⏳ 미확인)</div>
+<div class="scenario-cell risk-down"><b>🟢 위험↓</b>브렌트유 레벨다운, 6월 PCE 디스인플레 지속</div>
+<div class="scenario-cell up-up"><b>🚀 상승기대↑</b>4대 CapEx 유지, SK-엔비디아 $500B 파트너십</div>
+<div class="scenario-cell up-down"><b>📉 상승기대↓</b>이란 확전 리스크(지속 분쟁, 8~9월 감시)</div>
+</div>
+</div>
+<div class="conv">📉 수렴도: <b>-25% 유지</b></div>
+</div>
+</div>
+
+<div class="section">
+<div class="section-title">3. 🚨 HBM Cycle Score</div>
+<div class="scorebox">
+<div class="num">70<span style="font-size:20px;">/100</span></div>
+<div class="grade">경계(60~80), 잠정 유지 — 저녁 확정 대기</div>
+</div>
+<div class="breakcond">
+<div class="pill">①ASP5%+하락 <b class="positive">미충족</b></div>
+<div class="pill">②엔비디아주문-10% <b class="positive">미충족</b></div>
+<div class="pill">③CoWoS95%이하 <b class="positive">미충족</b></div>
+<div class="pill hit">④외국인20일순매도 <b class="negative">🔴 충족(오늘 순매도 추가 시 재악화 가능)</b></div>
+</div>
+<div style="font-size:12px; color:#666; margin-top:8px;">외국인수급 축(8점)은 오늘 코스피 전체 순매도 전환으로 하향 압력 — SK하이닉스 종목 특정 수치 확정 전이라 이 체크에서는 점수 유지, 저녁 체크에서 재평가.</div>
+</div>
+
+<div class="section">
+<div class="section-title">4. 🔄 패닉 회복 신호 체크</div>
+<div class="recovery-box">
+<div class="tier1"><span class="fact">Tier1</span>6건 유지, 신규 반박 없음(아침 확정치 재사용). SK-엔비디아 $500B 파트너십도 유효.</div>
+<div class="tier2"><span class="opinion">Tier2</span>신규 목표가 변경 미확인(아침 확정치 재사용)</div>
+<div class="item" style="font-size:12px; color:#666;">🔴 관찰기준 4개 중 확인 가능한 2개(상한가 되돌림·외국인 독립지속)가 모두 부정적으로 나옴 — 오늘 아침 신중론이 경고했던 정확히 그 패턴.</div>
+<div class="verdict-banner">🟣 종합판정: <b>회복 초입</b> (유지) — "회복 진행중" 승격은 오늘 데이터로 명백히 보류<br><span style="font-weight:500;font-size:12px;">Tier1 펀더멘털 반박신호 자체는 무효화되지 않음 — 저녁 체크에서 종가·수급 기준 최종 확정</span></div>
+</div>
+</div>
+
+<div class="section">
+<div class="section-title">5~6. 선행지표 · 하이퍼스케일러 (간략, 변화 없음)</div>
+<div class="item"><span class="fact">FACT</span>엔비디아&amp;CoWoS·하이퍼스케일러 CapEx 관련 오늘 신규 뉴스 없음 — 아침 확정치 유지(Bullish).</div>
+</div>
+
+<div class="section">
+<div class="section-title">7. 어제 저녁 체크 이후 변화</div>
+<div class="item">신용융자잔고 최초 감소(-7.84%, 7/31 데이터), ADR 크로스체크 재수정($145.90→$143.73, MISMATCH), SK-엔비디아 $500B 파트너십 사후발견 — 아침 체크에서 이미 반영. 장초반 신규 변화는 <b>가격·수급 실측</b>(위 1·2번 섹션)이 핵심.</div>
+</div>
+
+<div class="section">
+<div class="section-title">8. 🎯 찐반등 4대 신호 체크 — 오늘 변화</div>
+<table>
+<tr><th>신호</th><th>상태</th></tr>
+<tr><td>①빚의 청산</td><td class="warn">초기신호(신용잔고 -7.84%, 7/31) — 오늘 데이터는 저녁 확정</td></tr>
+<tr><td>②개미의 항복</td><td class="negative">미충족(성격 다름) — 오늘 개인은 오히려 순매수(+1.57조, 시장전체)</td></tr>
+<tr><td>③외국인 귀환</td><td class="negative">🔴 오늘 정반대(코스피 전체 -1.12조 순매도) — 신호 후퇴</td></tr>
+<tr><td>④미국빅테크·반도체 동반상승</td><td class="positive">✅ 유지(SOX+8.19%, 7/31 확정치)</td></tr>
+</table>
+<div style="font-size:12px; color:#666; margin-top:8px;">4개 중 명확 충족 1개(④) 그대로지만, ③이 오늘 부정 방향으로 전환 — 전체적으로 "찐반등" 근거가 약화된 하루.</div>
+</div>
+
+<div class="section deepdive">
+<div class="section-title">9. [Deep Dive] CXL &amp; 차세대 메모리 트랙</div>
+<div class="item"><span style="color:#666;">오늘 신규 소식 없음 — 아침 확정치 재사용.</span></div>
+</div>
+
+<div class="section deepdive" style="border-color:#c0392b;">
+<div class="section-title" style="border-bottom-color:#c0392b;">10. 🇺🇸 트럼프 2026 중간선거 트래커 — 카테고리별 타임라인</div>
+<div style="font-size:12px; color:#666; margin-bottom:10px;">어제 저녁 확정치 재사용, 재검색 없음.</div>
+<div class="trump-timeline-cat">
+<div class="cat-head">🏛️ 정치</div>
+<table><tr><th>날짜</th><th>상태</th><th>비고</th></tr>
+<tr><td class="tdate">08-02 저녁</td><td class="tstat negative">🔴↘(변화없음)</td><td>FiftyPlusOne 39.0%·순지지율-19, 제네릭밸럿 D+8 — 지지율 32~39% 범위 재확인, 순지지율 -17~-22</td></tr>
+</table>
+</div>
+<div class="trump-timeline-cat">
+<div class="cat-head">💰 경제</div>
+<table><tr><th>날짜</th><th>상태</th><th>비고</th></tr>
+<tr><td class="tdate">08-02 저녁</td><td class="tstat negative">🔴↘(변화없음)</td><td>한국·일본 포함 14개국 신규 관세 발효(8/1) 국면 유지, 관세 재추진+환급 압박 지속</td></tr>
+</table>
+</div>
+<div class="trump-timeline-cat">
+<div class="cat-head">⚔️ 전쟁/외교</div>
+<table><tr><th>날짜</th><th>상태</th><th>비고</th></tr>
+<tr><td class="tdate">08-02 저녁</td><td class="tstat negative">🔴🔴↘↘(중요 정정)</td><td>이란-쿠웨이트 충돌이 2월말부터 이어진 지속 무력분쟁("US-Israel war on Iran")임을 재인식 — 3/1 포트슈아이바 공격 미군 6명 사망 확인</td></tr>
+</table>
+</div>
+<div class="trump-timeline-cat">
+<div class="cat-head">🛂 이민</div>
+<table><tr><th>날짜</th><th>상태</th><th>비고</th></tr>
+<tr><td class="tdate">08-02 저녁</td><td class="tstat negative">🔴↘(변화없음)</td><td>강제추방 60만+·자진출국 190만+ 누적 250만+ 출국, 강한 반대 여론 49% 유지</td></tr>
+</table>
+</div>
+<div class="trump-timeline-cat">
+<div class="cat-head">🥊 경쟁구도</div>
+<table><tr><th>날짜</th><th>상태</th><th>비고</th></tr>
+<tr><td class="tdate">08-02 저녁</td><td class="tstat negative">🔴⏳(변화없음)</td><td>미시간·버지니아 8/4 예비선거 D-1, 상원 경합주 4곳 민주 우위 유지</td></tr>
+</table>
+</div>
+</div>
+
+<div class="section">
+<div class="section-title">11. 🌡️ 경제계절 참고 (PEOS / Investment Clock)</div>
+<div style="font-size:12px; color:#8a6d1f; margin-bottom:10px;">아침 체크 확인분(2026-08-02자) 재사용 — 이 페이지 자체의 G/I/L 판정(Stagflation)과는 독립적으로 병기.</div>
+<div class="peos-regime-box">
+<div class="box"><div class="c">🇺🇸 미국 국면</div><div class="r">Slowdown</div><div class="c">총점 -1 · 신뢰도 96.9점</div></div>
+<div class="box"><div class="c">🇰🇷 한국 국면</div><div class="r">Early Expansion</div><div class="c">총점 +1 · 신뢰도 90.5점</div></div>
+<div class="box"><div class="c">🕐 Investment Clock</div><div class="r">Overheat(과열)</div><div class="c">유리자산: 원자재</div></div>
+</div>
+<div class="peos-section-head">주요 지표 (요약)</div>
+<div class="table-wrap">
+<table class="peos-dash-table">
+<tr><th>지표</th><th>미국</th><th>한국</th></tr>
+<tr><td>실질GDP/반도체수출</td><td>1.50</td><td>24.70</td></tr>
+<tr><td>CPI</td><td>332.57</td><td>118.85</td></tr>
+<tr><td>실업률(3M평균변화)</td><td>4.20</td><td>2.80</td></tr>
+</table>
+</div>
+<div class="peos-action">금리 점수 <b>60.0/100</b>(중립~약한완화). 위기지수 <b>🟢 GREEN 5/100</b>. SK하이닉스 상승 가능성: 3개월 65% · 6개월 58% · 12개월 60%.</div>
+</div>
+
+<div class="section">
+<div class="diagnosis">
+<div class="diagnosis-title">🧭 한줄 진단</div>
+<div class="diagnosis-text">
+오늘 개장은 지난 며칠간 쌓인 신중론(SA규모오류정정·박세익 체슬리AI 약세장 분류·숏커버링 경고)이 옳았음을 보여주는 첫 실측이다 — 7/31 급등의 상당 부분이 일회성 요인과 겹쳐 있었다면, 그 효과가 빠지자 시장은 되돌림으로 반응했다. 다만 이건 <b>펀더멘털 붕괴가 아니라 예상된 차익실현</b>이고, SK하이닉스가 코스피보다 덜 빠진 것은 상대적 강세다. "회복 초입"은 유지하되 "회복 진행중"으로의 승격은 오늘로 명백히 보류 — 저녁 체크가 종가·수급 최종 확정치로 이 판단을 마무리한다.
+</div>
+</div>
+</div>
+
+</div>
+<div class="footer">2026-08-03 10:15 KST | 데이터 출처: 웹서치(newspim·newsis·etoday, 개장 실측) · KIS API CSV(장중 미갱신) · report/2026-08-02.md(PEOS) | 다음 체크: 19:00 저녁 — 종가·수급 최종 확정</div>
+</div>
+</body>
+</html>

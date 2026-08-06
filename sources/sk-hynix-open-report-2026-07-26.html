@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>[SK하이닉스 Daily Monitor] 장초반 - 2026-07-26 10:00</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif; background:linear-gradient(135deg,#667eea 0%,#764ba2 100%); padding:20px; min-height:100vh; color:#333; }
+.container { max-width:1000px; margin:0 auto; background:white; border-radius:12px; box-shadow:0 20px 60px rgba(0,0,0,0.3); overflow:hidden; }
+.header { background:linear-gradient(135deg,#1e3c72 0%,#2a5298 100%); color:white; padding:28px; text-align:center; }
+.header h1 { font-size:22px; margin-bottom:8px; font-weight:700; }
+.header .date { font-size:13px; opacity:0.9; }
+.weekend-banner { background:#fff3cd; color:#856404; text-align:center; font-size:12.5px; font-weight:600; padding:11px; line-height:1.6; }
+.content { padding:28px; }
+.section { margin-bottom:24px; }
+.section-title { font-size:17px; font-weight:700; color:#1e3c72; margin-bottom:12px; padding-bottom:8px; border-bottom:3px solid #667eea; }
+.metric { background:#f8f9fa; padding:14px; border-radius:8px; margin-bottom:10px; border-left:4px solid #667eea; }
+.metric.quiet { border-left-color:#adb5bd; }
+.metric-label { font-size:11px; color:#666; text-transform:uppercase; font-weight:600; letter-spacing:0.03em; }
+.metric-value { font-size:18px; font-weight:700; color:#1e3c72; margin-top:4px; }
+.positive { color:#27ae60; } .negative { color:#e74c3c; } .warn { color:#f39c12; }
+.fact { display:inline-block; background:#1e3c72; color:white; font-size:10px; font-weight:700; padding:2px 7px; border-radius:4px; margin-right:6px; }
+.opinion { display:inline-block; background:#8e6bbf; color:white; font-size:10px; font-weight:700; padding:2px 7px; border-radius:4px; margin-right:6px; }
+.footer { background:#f8f9fa; padding:16px; text-align:center; border-top:1px solid #e9ecef; font-size:11px; color:#999; line-height:1.7; }
+table { width:100%; border-collapse:collapse; font-size:13px; }
+th { padding:9px; text-align:left; font-weight:600; background:#f8f9fa; }
+td { padding:9px; border-bottom:1px solid #e9ecef; vertical-align:top; }
+.scorebox { background:linear-gradient(135deg,#1e3c72 0%,#2a5298 100%); color:white; border-radius:10px; padding:18px; text-align:center; margin-bottom:10px; }
+.scorebox .num { font-size:38px; font-weight:800; line-height:1; }
+.scorebox .grade { font-size:13px; font-weight:700; margin-top:5px; opacity:0.95; }
+.breakcond { display:flex; gap:8px; margin-top:10px; flex-wrap:wrap; }
+.breakcond .pill { flex:1; min-width:170px; background:#f8f9fa; border-radius:8px; padding:8px 10px; font-size:11px; border-left:3px solid #27ae60; line-height:1.5; }
+.breakcond .pill.hit { border-left-color:#e74c3c; background:#fdecea; }
+.table-wrap { overflow-x:auto; }
+.cal { width:100%; border-collapse:collapse; font-size:12.5px; }
+.cal th { background:#1e3c72; color:white; padding:8px; }
+.cal td { padding:8px; border-bottom:1px solid #e9ecef; }
+.cal tr.hot td { background:#fff6e9; font-weight:600; }
+.macro-headline { background:linear-gradient(135deg,#2a3b8f10 0%,#1e3c7210 100%); border:1px solid #d8dcf0; border-radius:10px; padding:18px; }
+.gil-row { display:flex; gap:10px; margin-bottom:14px; flex-wrap:wrap; }
+.gil-gauge { flex:1; min-width:140px; background:white; border-radius:8px; padding:12px; text-align:center; border:1px solid #e5e7f5; }
+.gil-gauge .label { font-size:10px; color:#888; font-weight:700; letter-spacing:0.05em; }
+.gil-gauge .val { font-size:22px; font-weight:800; color:#1e3c72; margin:4px 0; }
+.gil-gauge .arrow { font-size:11px; }
+.gil-gauge .prev { font-size:10px; color:#999; margin-top:2px; }
+.quadrant-badge { display:inline-block; background:#f39c12; color:white; font-size:12px; font-weight:700; padding:4px 12px; border-radius:20px; }
+.analogue-card { background:white; border:1px solid #e5e7f5; border-radius:8px; padding:13px; margin-bottom:9px; }
+.analogue-card .period { font-size:14px; font-weight:800; color:#1e3c72; }
+.analogue-card .dist { font-size:11px; color:#999; margin-left:6px; }
+.compare-row { display:flex; gap:8px; margin:7px 0 9px; flex-wrap:wrap; }
+.compare-box { flex:1; min-width:210px; border-radius:6px; padding:8px 10px; font-size:11.5px; line-height:1.5; }
+.compare-box.same { background:#eef1fb; color:#33395c; }
+.compare-box.diff { background:#fff6e9; color:#6b4f1f; }
+.compare-box .tag { font-size:9px; font-weight:800; text-transform:uppercase; letter-spacing:0.04em; display:block; margin-bottom:3px; opacity:0.65; }
+.scenario-grid { display:grid; grid-template-columns:1fr 1fr; gap:6px; }
+.scenario-cell { border-radius:6px; padding:8px 9px; font-size:11px; line-height:1.5; }
+.scenario-cell.risk-up { background:#fdecea; color:#8a2b1f; }
+.scenario-cell.risk-down { background:#eaf7ef; color:#1f6b3a; }
+.scenario-cell.up-up { background:#eef3ff; color:#1f3f8a; }
+.scenario-cell.up-down { background:#f4f1fb; color:#4a3a7a; }
+.scenario-cell b { display:block; font-size:10px; margin-bottom:2px; }
+.conv { text-align:center; margin-top:12px; padding:10px; background:#fff8ec; border-radius:8px; font-size:12px; color:#7a5a1f; font-weight:600; line-height:1.6; }
+.corrbox { border:2px solid #e67e22; background:#fff6ec; border-radius:8px; padding:14px 16px; margin-bottom:16px; font-size:12.5px; line-height:1.7; }
+.corrbox .t { font-weight:700; color:#c0561a; margin-bottom:6px; font-size:13px; }
+.top5 { counter-reset:t5; }
+.top5 .row { display:flex; gap:10px; align-items:flex-start; padding:10px 0; border-bottom:1px solid #eef0f5; }
+.top5 .row:last-child { border-bottom:none; }
+.top5 .rk { flex:0 0 30px; height:30px; border-radius:50%; background:#1e3c72; color:white; font-weight:800; font-size:13px; display:flex; align-items:center; justify-content:center; }
+.top5 .bd { flex:1; font-size:12.5px; line-height:1.6; }
+.top5 .nm { font-weight:700; color:#1e3c72; font-size:13.5px; }
+.chip { display:inline-block; font-size:10px; font-weight:700; padding:2px 7px; border-radius:4px; margin-left:6px; }
+.chip.den { background:#fdecea; color:#8a2b1f; }
+.chip.num { background:#eaf7ef; color:#1f6b3a; }
+.chip.both { background:#f4f1fb; color:#4a3a7a; }
+@media (max-width:600px){ .scenario-grid{grid-template-columns:1fr;} }
+</style>
+</head>
+<body>
+<div class="container">
+<div class="weekend-banner">🗓 오늘(7/26)은 <b>일요일 — 한국·미국 양국 모두 휴장</b>. 신규 시세·수급·뉴스 이벤트 없음 → 규정대로 <b>초간단 리포트</b>입니다. 다만 오늘 오전 대화에서 <b>거시 해석 두 건이 정정</b>되어 그 내용만 반영했습니다.</div>
+<div class="header">
+<h1>[SK하이닉스 Daily Monitor] 장초반</h1>
+<div class="date">2026-07-26 10:00 KST (일) · 휴장(정상)</div>
+</div>
+<div class="content">
+
+<div class="section">
+<div class="section-title">1. SK하이닉스 주가 현황</div>
+<div class="metric quiet">
+<div class="metric-label">본주 000660 — 휴장(정상)</div>
+<div class="metric-value">1,759,000원 <span class="negative">(-8.34%)</span></div>
+<div style="font-size:12px; color:#666; margin-top:5px;"><span class="fact">FACT</span>7/24(금) 확정 종가 그대로. 6월 ATH(2,987,000원) 대비 드로다운 <b class="negative">-41.1%</b>. 다음 시세는 <b>7/27(월) 09:00</b>부터.</div>
+</div>
+<div class="metric quiet">
+<div class="metric-label">ADR (SKHY) — 미국도 휴장</div>
+<div class="metric-value">$154.40 <span class="negative">(-8.91%)</span></div>
+<div style="font-size:12px; color:#666; margin-top:5px;"><span class="fact">FACT</span>7/25 09:06 KST 사용자 확인분이 마지막. ADR 프리미엄 약 29.9%("높음" 구간). <span class="opinion">OPINION</span> 환율 1,480원은 <b>추정치</b>이며 아래 데이터 갭 참고.</div>
+</div>
+</div>
+
+<div class="section">
+<div class="section-title">2. 🌐 오늘의 매크로 헤드라인</div>
+
+<div class="corrbox">
+<div class="t">⚠️ 오늘 오전 정정 2건 — 아침 리포트의 거시 서술을 바로잡았습니다</div>
+<b>정정 ①  "실질금리 자동 플러스 전환 = Fed가 손도 안 댔는데 긴축"</b> → 과도 해석이었습니다.
+<ul style="margin:5px 0 10px 18px;">
+<li><b>0선 통과 ≠ 중립금리 통과.</b> r\*(+0.5~1.0% 추정) 대비 지금 <b>+0.13%</b> — "완화적 → 덜 완화적"인 정상화이지 긴축 구간이 아닙니다.</li>
+<li><b>헤드라인 ≠ 근원.</b> 6월 하락 주범은 <b>에너지 −5.7%</b>. 근원(2.6%) 기준 실질금리는 이미 오래전부터 플러스였습니다.</li>
+<li><b>Fed 반응함수 누락.</b> <b>물가가 내려가면 인상 압력은 줄어듭니다</b> — 방향은 완화적입니다.</li>
+</ul>
+<b>정정 ②  "7월 유가 급등"</b> → 레벨이 아니라 <b>속도</b>였습니다.
+<ul style="margin:5px 0 10px 18px;">
+<li>브렌트 7/25 종가 <b>$98.70</b>은 <b>4월($100~111)·5월 고점(~$115)보다 오히려 낮습니다.</b> 움직인 건 3주 만의 <b>+38%($71→$98.7)</b>. 인용해온 "$100.39"는 7/24 <b>장중 터치값</b>입니다.</li>
+<li><b>🔑 CPI는 월평균 기준</b> — 7월은 $71 바닥에서 시작해 하순에야 올랐으므로 <b>7월 평균 ≈ $85로 6월(≈$85)과 사실상 동일</b>. <b>7월 CPI에 스파이크는 거의 안 잡힙니다.</b></li>
+</ul>
+<div style="background:#fff; border-left:3px solid #27ae60; padding:8px 10px;">→ <b>캘린더 수정</b>: 1979형(오일쇼크) 복귀 분기점을 <b>8월 중순 → <span style="color:#1e8449;">9월 중순(8월 CPI)</span></b>으로 이동(조건: 브렌트 8월 $95+ 유지). <b>8월 중순 발표될 7월 CPI는 오히려 온건하게 나와 안도 재료가 될 여지</b>가 있습니다.</div>
+<div style="margin-top:8px; font-size:11.5px; color:#8a6a4a;"><b>정밀도 한계</b>: 7월 평균 $85는 차트 육안 판독 기반 추정(±$3), 6월 $85는 웹검색 인용 EIA 수치 — 둘 다 API 수집 원자료가 아닙니다. 재발 방지로 <code>macro_data.py</code>에 브렌트/WTI 일별 시리즈(FRED)를 프리셋 추가했습니다.</div>
+</div>
+
+<div class="macro-headline">
+<div style="font-size:12px; color:#666; margin-bottom:10px;">아침 체크(07:10)에서 계산한 카드를 <b>그대로 재사용</b>합니다 — G/I/L은 하루 안에 바뀌지 않고, 오늘은 거시 이벤트도 없었습니다(재검색·재계산 안 함).</div>
+
+<div class="gil-row">
+<div class="gil-gauge"><div class="label">G · 성장</div><div class="val">-0.1</div><div class="arrow">🔻 소폭 악화</div><div class="prev">이전 -0.0</div></div>
+<div class="gil-gauge"><div class="label">I · 물가</div><div class="val" style="color:#27ae60;">+0.008</div><div class="arrow">🟢 가속 둔화</div><div class="prev">이전 +0.015</div></div>
+<div class="gil-gauge"><div class="label">L · 유동성</div><div class="val">+0.13</div><div class="arrow">⚪ 부호전환(중립 미만)</div><div class="prev">이전 -0.62</div></div>
+</div>
+
+<div style="text-align:center; margin-bottom:14px;"><span class="quadrant-badge">4분면: stagflation (유지)</span> <span style="font-size:11.5px; color:#666; margin-left:6px;">CPI YoY 3.5% · 실효금리 3.63% · 실업률 4.2%</span></div>
+
+<div class="analogue-card">
+<div><span class="period">① 1957-01형</span><span class="dist">거리 0.145 · 1순위</span> — "침체 7개월 전"</div>
+<div class="compare-row">
+<div class="compare-box same"><span class="tag">공통점</span>물가 가속 둔화(I +0.0075 vs 지금 +0.0083) + 고용은 악화 시작(G -0.2 vs -0.1). 실질금리가 0선 부근(L <b>-0.145</b>)에서 완만히 올라오던 지점 — <b>당시도 지금도 중립 미만</b></div>
+<div class="compare-box diff"><span class="tag">차이점</span>1957년 둔화는 전후 설비투자 사이클의 자연 소진. 지금은 <b>AI 데이터센터·HBM 투자가 한창 진행 중</b>이라 거시가 식어도 버틸 여지가 큼</div>
+</div>
+<div class="scenario-grid">
+<div class="scenario-cell risk-up"><b>🔴 위험↑</b>신용스프레드 확대 + 산업생산·소비심리 동시 둔화</div>
+<div class="scenario-cell risk-down"><b>🟢 위험↓</b>고용 반등으로 G가 플러스 복귀 → 애널로그 거리 자체가 멀어짐</div>
+<div class="scenario-cell up-up"><b>🚀 상승기대↑</b>거시 둔화에도 하이퍼스케일러 CapEx 유지 → 디커플링</div>
+<div class="scenario-cell up-down"><b>📉 상승기대↓</b>침체 신호가 데이터센터 투자 둔화로 전이 → HBM 수요 훼손(최악 조합)</div>
+</div>
+</div>
+
+<div class="analogue-card">
+<div><span class="period">② 1968-01형</span><span class="dist">2순위</span> — "긴축은 시작됐는데 물가는 아직 안 잡힘"</div>
+<div class="compare-row">
+<div class="compare-box same"><span class="tag">공통점</span>물가 가속은 둔화 중이나 목표까진 안 내려온 어중간한 국면. 단 L <b>+0.963</b>으로 <b>지금(+0.13)보다 훨씬 긴축적</b>이었음</div>
+<div class="compare-box diff"><span class="tag">차이점</span>1968년은 베트남전+Great Society의 <b>재정발 수요 인플레</b>. 지금은 공급충격(유가)+AI 설비투자로 성격이 다르고 Fed 대응 속도도 비교 불가</div>
+</div>
+<div class="scenario-grid">
+<div class="scenario-cell risk-up"><b>🔴 위험↑</b>유가가 2차 효과(임금·기대인플레)로 번져 Fed 긴축 재개</div>
+<div class="scenario-cell risk-down"><b>🟢 위험↓</b>유가 스파이크 단기 소멸 + 근원(2.6%) 안정 → 인상 명분 소멸</div>
+<div class="scenario-cell up-up"><b>🚀 상승기대↑</b>물가 상승분이 AI 전력·설비 수요發로 확인 → 메모리 수요 강세 방증</div>
+<div class="scenario-cell up-down"><b>📉 상승기대↓</b>7월 FOMC 실제 인상 → 저PER(6.8배) 유지돼도 리레이팅 지연</div>
+</div>
+</div>
+
+<div class="analogue-card">
+<div><span class="period">③ 2005-11형</span><span class="dist">3순위</span> — "긴축 후반, 자산가격은 아직 버티는 중"</div>
+<div class="compare-row">
+<div class="compare-box same"><span class="tag">공통점</span>실질금리가 플러스(L <b>+0.545</b>, 지금보다 높음)인데도 <b>성장은 양호(G +0.4)</b>했던 국면. 지금도 미 성장이 급격히 꺾이진 않음</div>
+<div class="compare-box diff"><span class="tag">차이점</span>2005년 버팀목은 <b>주택버블(부채 레버리지)</b>. 지금은 AI 인프라 투자를 <b>빅테크 영업현금흐름으로 조달</b> — 이게 결정적 차이</div>
+</div>
+<div class="scenario-grid">
+<div class="scenario-cell risk-up"><b>🔴 위험↑</b>AI 투자가 회사채·부채 기반으로 이동(메타 $120억 회사채형 사례 확산)</div>
+<div class="scenario-cell risk-down"><b>🟢 위험↓</b>하이퍼스케일러 FCF가 CapEx를 계속 감당</div>
+<div class="scenario-cell up-up"><b>🚀 상승기대↑</b>긴축 후반에도 성장 유지 = 연착륙 → 고멀티플 자산 전반 리레이팅</div>
+<div class="scenario-cell up-down"><b>📉 상승기대↓</b>긴축 누적 효과가 시차 두고 실물 전이(2005→2007 패턴)</div>
+</div>
+</div>
+
+<div style="font-size:11.5px; color:#666; margin:10px 0; padding:9px 11px; background:#f8f9fa; border-radius:6px; line-height:1.65;">
+<b>⚠️ 세 카드를 묶어 읽을 때 주의</b>: 세 시기 모두 <b>1~2년 안에 리세션이 왔다</b>는 건 불편하지만 정직하게 기록해야 할 신호입니다. 다만 <b>L 값 자체는 셋이 꽤 다르고</b>(-0.145 / +0.963 / +0.545), <b>모두 지금(+0.13)보다 긴축적이거나 비슷</b>했습니다 — "셋 다 실질금리 플러스 전환 직후"라고 묶는 건 사실과 다릅니다(1957-01은 마이너스). 매칭은 L 단독이 아니라 <b>G·I·L 3차원 거리</b>로 이뤄집니다. 그리고 <b>세 시기 어디에도 AI CapEx 사이클은 없었습니다</b> — 이게 유일하고 가장 중요한 차이점입니다.
+</div>
+
+<div class="conv">📊 수렴도(convergence): <b>0% → -12.5%</b> (오늘 오전 재판정 — 최초 발행본은 -25%)<br><span style="font-weight:500;font-size:11.5px;">1979형 🔴위험↑ 트리거를 "발동"으로 기록했던 것을 <b>미발동으로 정정</b>(판정 기준을 스팟 변화율 → "월평균 전월비 상승"으로 명확화, 7월 ≈ 6월). 단 <b>미 국채 30년물 5.19%·10년물 4.7%·7월 FOMC 인상확률 38%</b>는 실재하는 사실이라 중립까지 되돌리지 않고 위험 쪽에 절반만 남깁니다.</span></div>
+</div>
+</div>
+
+<div class="section">
+<div class="section-title">2-1. 🎯 지금 하이닉스에 영향 큰 매크로 변수 TOP5</div>
+<div style="font-size:12px; color:#666; margin-bottom:10px;">오늘 오전 사용자 질의로 정리한 결과입니다. 기준은 <b>주가 = 이익(분자) × 멀티플(분모)</b> 중 어느 쪽을 얼마나 세게 건드리는가.</div>
+<div class="top5">
+<div class="row"><div class="rk">1</div><div class="bd"><span class="nm">미 국채 장기금리 (10Y 4.7% / 30Y 5.19%)</span><span class="chip den">분모</span><br>이익이 2027~28년에 몰린 <b>장기 듀레이션 자산</b>이라 할인율 민감도가 코스피 평균보다 훨씬 큼. <b>-41% 드로다운의 주된 설명.</b> 30년물은 2007년 이후 최고 근접. → <b>7/30 03:00 FOMC</b></div></div>
+<div class="row"><div class="rk">2</div><div class="bd"><span class="nm">AI CapEx (하이퍼스케일러 설비투자)</span><span class="chip num">분자</span><br><b>분자를 움직이는 사실상 유일한 매크로 변수.</b> 애널로그 3개가 전부 리세션으로 갔는데 지금과의 유일한 차이가 <b>"그때는 이 엔진이 없었다"</b>는 것 — 이게 살아있는 한 애널로그 결말이 그대로 복제되지 않음. 4사 합산 $725B(+77% YoY), 메타 $125~145B 상향. → <b>7/29 메타·MS, 7/30 아마존</b></div></div>
+<div class="row"><div class="rk">3</div><div class="bd"><span class="nm">원/달러 환율</span><span class="chip both">양방향</span><br>DRAM은 달러 결제·원가는 원화 → 원화 약세는 <b>이익에 +</b>. 그러나 외국인엔 환손실이라 <b>수급에 −</b>. 외국인 20일 누적 -13.06조와 직결. <b>TOP5 중 유일한 양방향 변수.</b></div></div>
+<div class="row"><div class="rk">4</div><div class="bd"><span class="nm">유가 (브렌트)</span><span class="chip den">분모(상류)</span><br>1·2위의 상류 변수지만 <b>경로가 길다</b> — 오늘 확인대로 7월 CPI엔 거의 안 잡히고 실제 반영은 <b>8월 CPI(9월 중순)</b>. 지금 당장이 아니라 <b>8월 한 달을 지켜볼 변수.</b></div></div>
+<div class="row"><div class="rk">5</div><div class="bd"><span class="nm">미국 고용·성장 (G -0.0 → -0.1)</span><span class="chip den">꼬리위험</span><br>확률은 낮으나 실현되면 <b>2위(AI CapEx)까지 훼손</b>해 분자·분모가 동시에 맞는 유일한 시나리오. 애널로그 3개 공통 결말이 리세션이라는 게 근거.</div></div>
+</div>
+<div style="font-size:11.5px; color:#666; margin-top:10px; padding:9px 11px; background:#f8f9fa; border-radius:6px; line-height:1.65;">
+<b>순위에서 뺀 것</b> — <b>한은 기준금리</b>(2.5% 동결; 순현금 35조·부채비율 20%대라 원화 조달 의존도가 낮아 민감도가 구조적으로 작음) / <b>미중 수출규제·CXMT</b>(2028~29 중기 이슈, 7/27 상장은 헤드라인 리스크지 이번 분기 실적 변수 아님) / <b>외국인 수급</b>(매크로 변수가 아니라 1·3위의 <b>결과변수</b> — 따로 세면 이중계상).
+</div>
+<div style="font-size:11.5px; color:#8a2b1f; margin-top:9px; padding:9px 11px; background:#fdecea; border-radius:6px; line-height:1.65;">
+<b>🔴 데이터 갭(오늘 발견)</b>: <code>sources/macro-series.csv</code>의 <code>kr_usdkrw</code>가 <b>2020-08-12에서 멈춰 있습니다</b>(1,000행). 7/25 워크플로 로그엔 "1,468개 upsert(~2026-07-25)"로 찍혔으나 그 실행이 <b>push 레이스로 밀린 건</b>이라 리포지토리에 반영되지 않았습니다(PR #23 재시도 로직 적용 후 다음 스케줄 실행에서 백필 예상). 따라서 <b>위키가 인용해온 환율 1,480원은 API 실측이 아니라 추정치</b>이며, <b>TOP5 3위 변수를 자체 데이터로 검증하지 못하는 상태</b>입니다.
+</div>
+</div>
+
+<div class="section">
+<div class="section-title">3. 🚨 HBM Cycle Score</div>
+<div class="scorebox">
+<div class="num">70<span style="font-size:19px; opacity:0.7;">/100</span></div>
+<div class="grade">⚠️ 경계 — 어제 저녁 확정치 유지 (휴장으로 신규 입력 없음)</div>
+</div>
+<div class="breakcond">
+<div class="pill hit"><b>④ 외국인 수급 🔴 충족</b><br>20일 누적 <b>-13조 641억원</b>(KIS API 실측). 단 KSD 보유율(결제 기준)은 52.60%로 순증 중 → <b>7/28 갱신이 진짜 검증일</b></div>
+<div class="pill"><b>① ASP 🟢 미충족</b><br>HBM 가격 하락 신호 없음</div>
+<div class="pill"><b>② 고객 재고 🟢 미충족</b><br>재고 급증 신호 없음</div>
+<div class="pill"><b>③ CoWoS 여유 🟢 미충족</b><br>활용률 95% 훨씬 상회·완전예약·리드타임 52~78주</div>
+</div>
+<div style="font-size:12px; color:#666; margin-top:9px;"><b>붕괴조건 🔴 1/4 유지</b> — 투자 가설 [유지, 단 1개 경계신호]. <span class="opinion">OPINION</span> 이 6축은 <b>산업 지표</b>라 위 거시 변수(장기금리)는 직접 반영되지 않습니다 — <b>멀티플 압박은 이 점수 밖에서 별도로 작용 중</b>입니다.</div>
+</div>
+
+<div class="section">
+<div class="section-title">4~8. 나머지 트랙 — 휴장으로 신규 없음</div>
+<table>
+<tr><th style="width:34%;">트랙</th><th>오늘 상태</th></tr>
+<tr><td>⚡ 엔비디아 &amp; CoWoS</td><td><b>Neutral</b> — 휴장, 신규 뉴스 없음. 아침 체크의 "CoWoS 22 유지·완전예약" 판정 그대로. ⚠ 감시항목 "Rubin Ultra CoWoS-L 패키징 이슈"는 원문 검증 전이라 점수 미반영</td></tr>
+<tr><td>🌐 하이퍼스케일러 동향</td><td>휴장·주말이라 신규 없음. 아침 확인분(메타 CapEx $125~145B 상향, MS AI 런레이트 $37B) 유지. <b>본격 검증은 7/29~30 실적</b></td></tr>
+<tr><td>📊 외국인 수급</td><td>휴장으로 신규 체결 없음. 20일 누적 -13.06조(7/24 확정) 그대로. <b>다음 갱신 7/27(월) 장중</b></td></tr>
+<tr><td>🔄 찐반등 4대 신호</td><td><b>0/4</b> — 휴장으로 검증 불가, 7/24 저녁 확정치 유지</td></tr>
+<tr><td>💾 [Deep Dive] CXL</td><td><b>오늘 신규 소식 없음</b>. "2026 21억달러 → 2028 1,600억달러" 시장전망은 증가율이 비현실적이라 <b>원출처·정의 확인 전까지 미채택</b> 유지</td></tr>
+<tr><td>📌 어제 저녁 이후 변화</td><td><b>시세·수급 측 특이사항 없음</b>(휴장). 변화는 위 <b>거시 해석 정정 2건</b>과 <b>환율 데이터 갭 발견</b>뿐</td></tr>
+</table>
+</div>
+
+<div class="section">
+<div class="section-title">📅 이번 주 — 일정 밀도가 이례적으로 높습니다</div>
+<div class="table-wrap">
+<table class="cal">
+<tr><th>날짜</th><th>이벤트</th><th>왜 중요한가</th></tr>
+<tr><td><b>7/27 (월)</b></td><td>CXMT 상장</td><td>중국 DRAM 국가전략 가시화 — 헤드라인 리스크(중기 이슈)</td></tr>
+<tr class="hot"><td><b>7/28 (화)</b></td><td>FOMC 1일차 + <b>KSD 보유율 갱신</b></td><td><b>붕괴조건④ 체결↔결제 시차 가설의 진짜 검증일</b></td></tr>
+<tr class="hot"><td><b>7/29 (수)</b></td><td><b>09:00 SK하이닉스 2Q 실적</b> + ADR 양방향 전환 개시 + 메타·MS 실적</td><td>컨센서스 매출 83.9조·영업익 64.2조·OPM 76.5%. <b>분자(이익) 검증</b></td></tr>
+<tr class="hot"><td><b>7/30 (목)</b></td><td><b>03:00 FOMC 결과</b> + 아마존 실적</td><td><b>분모(할인율) 검증.</b> 인상확률 38%</td></tr>
+</table>
+</div>
+<div style="font-size:12px; color:#666; margin-top:9px;"><b>순서에 주의</b>: <b>실적(7/29)이 FOMC(7/30)보다 먼저</b>입니다 — 실적이 아무리 잘 나와도 발표 시점엔 <b>금리 불확실성이 안 풀린 상태</b>입니다. 사흘 안에 <b>①수급(7/28) ②펀더멘털(7/29) ③할인율(7/30)</b> 세 축이 전부 확인됩니다.</div>
+</div>
+
+</div>
+<div class="footer">
+자동 생성 · SK하이닉스 Daily Monitor(장초반) · 2026-07-26 10:00 KST<br>
+휴장일 규정에 따른 <b>초간단 리포트</b> — 시세 재검색·G/I/L 재계산은 수행하지 않았습니다(아침 체크 카드 재사용).<br>
+데이터 출처: 종가·ADR는 기존 확정치, 외국인 수급은 <b>KIS API</b>(GitHub Actions 수집), 거시는 <b>FRED API</b> + 웹검색(CPI YoY·유가).
+</div>
+</div>
+</body>
+</html>

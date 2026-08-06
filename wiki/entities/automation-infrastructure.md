@@ -27,6 +27,7 @@ GitHub이 절대 다시 보여주지 않는다** — Settings → Secrets 화면
 | `subscription-schema-probe.yml` | 수동 | SK하이닉스 모니터링 | `DATA_GO_KR_KEY` |
 | `ecos-lookup.yml` / `kosis-lookup.yml` | 수동 | 공용 유틸(통계표 코드 조회) | `ECOS_API_KEY` / `KOSIS_API_KEY` |
 | `network-diagnostic.yml` | 수동 | 진단용 | 없음 |
+| `daily-brief-report.yml` | push 트리거(`report/daily-brief-*.html`) | 공용(PEOS+SK하이닉스+청약 통합) | `GMAIL_ADDRESS`, `GMAIL_APP_PASSWORD` |
 
 ## 시크릿 인벤토리 (이름 + 용도만 — 값 없음)
 
@@ -48,6 +49,14 @@ GitHub이 절대 다시 보여주지 않는다** — Settings → Secrets 화면
 - `GMAIL_ADDRESS` / `GMAIL_APP_PASSWORD` — 알림 메일 발신용 Gmail 계정(앱 비밀번호 인증). `sk-hynix-daily-report.yml`·`subscription-monitor.yml`이 이미 사용 중이며, `core/notify.py`(PEOS/Investment Clock 공용 알림 모듈)도 2026-07-31부터 이 두 시크릿을 인식해 자동으로 이메일 채널을 켠다 — 별도 `SMTP_*` 시크릿을 새로 만들 필요 없음.
 - `SLACK_WEBHOOK_URL` / `SMTP_HOST`/`SMTP_PORT`/`SMTP_USER`/`SMTP_PASSWORD`/`NOTIFY_EMAIL_TO` — `core/notify.py`가 지원하는 대안 채널(우선순위: Slack > 범용 SMTP > Gmail > 무발송). 2026-07-31 기준 이 이름의 시크릿은 등록돼 있지 않은 것으로 보임(등록돼 있다면 Gmail보다 우선 적용됨).
 - `GITHUB_TOKEN` — 청약 알림에서 GitHub Issue 자동 생성용(워크플로우 기본 제공 토큰, 별도 등록 불필요).
+
+## `daily-brief-report.yml` (2026-08-04 신규)
+
+PEOS 매크로 + SK하이닉스 + 청약 모니터를 합친 **통합 데일리 브리프** HTML을
+`report/daily-brief-*.html` push 시 Gmail로 발송. `dawidd6/action-send-mail@v3`
+사용. **디버깅 경위는 [Daily Brief 이메일 전송 — 디버깅 경위](../concepts/daily-brief-email-workflow-debug.md)
+참고** — 핵심: `body_file`은 존재하지 않는 파라미터, `html_body` 사용,
+git push 막히면 Contents API PUT으로 remote 직접 덮어쓰기(push_workflow.py).
 
 ## 알아둘 것
 
