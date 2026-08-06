@@ -36,6 +36,16 @@ tags: [messagebox, sync, multi-client, ops, priority]
 
 <!-- 새 메시지는 아래 양식을 복사해 위에 추가. 가장 최근가 맨 위. -->
 
+### 🟦 3번째 편집 채널 인지 필요(사용자가 다른 AI Agent로도 위키 직접 수정 가능) + HBM ASP 웹조사 반영 — desktop 2026-08-06T06:03Z
+
+- **who**: desktop
+- **when_utc**: 2026-08-06T06:03:00Z
+- **expires_utc**: 2026-08-20T00:00:00Z
+- **what**: **사용자가 "내가 다른 AI Agent를 통해 우리가 같이 보는 위키에 내용을 update할 수 있다"고 명시** — 지금까지 이 프로토콜은 mobile/desktop Claude Code 두 클라이언트만 가정했는데(`multi-client-conflict-prevention.md`), **제3의 편집 채널(사용자가 직접 운용하는 다른 AI Agent)이 있을 수 있다는 뜻**. 이 세션은 큰 쓰기 작업 전 `git fetch`로 원격 상태를 먼저 확인하는 습관은 유지했지만(이번에도 확인, 충돌 없었음), 기존 프로토콜의 "mobile/desktop 둘 중 하나"라는 전제는 더 이상 완전하지 않다 — **다음 세션(mobile이든 desktop이든)도 fetch/pull 시 낯선 커밋 author가 보여도 이상한 게 아니라 이 채널일 수 있음을 알고 있을 것**. 프로토콜 문서 자체를 지금 재작성하진 않음(CLAUDE.md "스키마는 사용자 지시 없이 재구성 안 함" 원칙) — 필요하면 사용자가 다음에 명시적으로 요청.
+- **별도 내용**: 같은 세션에서 "HBM ASP 등 확인 가능한 내용 다 가져와봐" 요청에 응해 웹조사 수행 — HBM Cycle Score 72점(69→72, ASP축+공급확대축 상향), SK하이닉스·샌디스크 HBF 표준 발표(FMS 2026) 신규 반영, CXMT HBM3 재지연 재확인. 상세는 [hbm-cycle-score.md](concepts/hbm-cycle-score.md) 2026-08-06 체크 행 참고.
+- **read_first**: [wiki/log.md](log.md) 2026-08-06 06:03 UTC 항목, [concepts/hbm-cycle-score.md](concepts/hbm-cycle-score.md), [concepts/cxl-next-gen-memory.md](concepts/cxl-next-gen-memory.md), [concepts/us-china-tech-competition-hbm.md](concepts/us-china-tech-competition-hbm.md)
+- **status**: active
+
 ### 🟦 HBM Cycle Score 2축 채점방식 z-score 연속스케일로 개정 + D/C 정정 — desktop 2026-08-06T05:08Z
 
 - **who**: desktop
