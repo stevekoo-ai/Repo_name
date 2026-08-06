@@ -1,0 +1,20 @@
+company,ticker,cik,fiscal_year,fiscal_period,form,end_date,filed_date,value_usd,tag,accn,source,fetched_at
+Amazon,AMZN,1018724,2016,Q2,10-Q,2016-06-30,2016-07-29,1711000000,PaymentsToAcquirePropertyPlantAndEquipment,0001018724-16-000286,sec_edgar_xbrl,2026-08-06T03:03:57+00:00
+Amazon,AMZN,1018724,2016,Q3,10-Q,2016-09-30,2016-10-28,1841000000,PaymentsToAcquirePropertyPlantAndEquipment,0001018724-16-000324,sec_edgar_xbrl,2026-08-06T03:03:57+00:00
+Amazon,AMZN,1018724,2017,Q1,10-Q,2017-03-31,2017-04-28,1861000000,PaymentsToAcquirePropertyPlantAndEquipment,0001018724-17-000051,sec_edgar_xbrl,2026-08-06T03:03:57+00:00
+Alphabet (Google),GOOGL,1652044,2024,Q3,10-Q,2024-09-30,2024-10-30,38259000000,PaymentsToAcquirePropertyPlantAndEquipment,0001652044-24-000118,sec_edgar_xbrl,2026-08-06T03:03:57+00:00
+Alphabet (Google),GOOGL,1652044,2025,Q1,10-Q,2025-03-31,2025-04-25,17197000000,PaymentsToAcquirePropertyPlantAndEquipment,0001652044-25-000043,sec_edgar_xbrl,2026-08-06T03:03:57+00:00
+Alphabet (Google),GOOGL,1652044,2025,Q2,10-Q,2025-06-30,2025-07-24,39643000000,PaymentsToAcquirePropertyPlantAndEquipment,0001652044-25-000062,sec_edgar_xbrl,2026-08-06T03:03:57+00:00
+Alphabet (Google),GOOGL,1652044,2025,Q3,10-Q,2025-09-30,2025-10-30,63596000000,PaymentsToAcquirePropertyPlantAndEquipment,0001652044-25-000091,sec_edgar_xbrl,2026-08-06T03:03:57+00:00
+Alphabet (Google),GOOGL,1652044,2026,Q1,10-Q,2025-03-31,2026-04-30,17197000000,PaymentsToAcquirePropertyPlantAndEquipment,0001652044-26-000048,sec_edgar_xbrl,2026-08-06T03:03:57+00:00
+Alphabet (Google),GOOGL,1652044,2026,Q2,10-Q,2025-06-30,2026-07-23,39643000000,PaymentsToAcquirePropertyPlantAndEquipment,0001652044-26-000071,sec_edgar_xbrl,2026-08-06T03:03:57+00:00
+Meta Platforms,META,1326801,2024,Q2,10-Q,2024-06-30,2024-08-01,14573000000,PaymentsToAcquirePropertyPlantAndEquipment,0001326801-24-000069,sec_edgar_xbrl,2026-08-06T03:03:57+00:00
+Meta Platforms,META,1326801,2024,Q3,10-Q,2024-09-30,2024-10-31,22831000000,PaymentsToAcquirePropertyPlantAndEquipment,0001326801-24-000081,sec_edgar_xbrl,2026-08-06T03:03:57+00:00
+Meta Platforms,META,1326801,2025,Q1,10-Q,2025-03-31,2025-05-01,12941000000,PaymentsToAcquirePropertyPlantAndEquipment,0001326801-25-000054,sec_edgar_xbrl,2026-08-06T03:03:57+00:00
+Meta Platforms,META,1326801,2025,Q2,10-Q,2025-06-30,2025-07-31,29479000000,PaymentsToAcquirePropertyPlantAndEquipment,0001628280-25-036791,sec_edgar_xbrl,2026-08-06T03:03:57+00:00
+Meta Platforms,META,1326801,2025,Q3,10-Q,2024-09-30,2025-10-30,22831000000,PaymentsToAcquirePropertyPlantAndEquipment,0001628280-25-047240,sec_edgar_xbrl,2026-08-06T03:03:57+00:00
+Meta Platforms,META,1326801,2026,Q1,10-Q,2025-03-31,2026-04-30,12941000000,PaymentsToAcquirePropertyPlantAndEquipment,0001628280-26-028526,sec_edgar_xbrl,2026-08-06T03:03:57+00:00
+Microsoft,MSFT,789019,2025,Q3,10-Q,2025-03-31,2025-04-30,16745000000,PaymentsToAcquirePropertyPlantAndEquipment,0000950170-25-061046,sec_edgar_xbrl,2026-08-06T03:03:57+00:00
+Microsoft,MSFT,789019,2026,Q1,10-Q,2025-09-30,2025-10-29,19394000000,PaymentsToAcquirePropertyPlantAndEquipment,0001193125-25-256321,sec_edgar_xbrl,2026-08-06T03:03:57+00:00
+Microsoft,MSFT,789019,2026,Q2,10-Q,2025-12-31,2026-01-28,29876000000,PaymentsToAcquirePropertyPlantAndEquipment,0001193125-26-027207,sec_edgar_xbrl,2026-08-06T03:03:57+00:00
+Microsoft,MSFT,789019,2026,Q3,10-Q,2025-03-31,2026-04-29,47472000000,PaymentsToAcquirePropertyPlantAndEquipment,0001193125-26-191507,sec_edgar_xbrl,2026-08-06T03:03:57+00:00
