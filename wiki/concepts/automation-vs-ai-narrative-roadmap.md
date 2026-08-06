@@ -160,21 +160,21 @@ SEC EDGAR XBRL Company Concept API로 4대 하이퍼스케일러(GOOGL/MSFT/AMZN
 실제로 맞는지는 GitHub Actions 러너(`workflow_dispatch` + `raw: true`)에서
 최초 실행해 확인 필요. 실패 시 CAPEX_TAG_CANDIDATES 보정.
 
-### PR #47 (2026-08-06) — main 반영
+### PR #47 (2026-08-06) — main 반영 ✅ merged
 
 `sec-edgar-capex.yml`이 서사 브랜치에만 있어 Actions 탭에 안 보이는 문제
 발견(workflow_dispatch는 default branch에 있어야 등록됨) — CLAUDE.md
 "main 직접 커밋 금지" 규칙에 따라 `main` 기준 새 브랜치(`feat/sec-edgar-capex`)
 분리 후 자동화 관련 4개 파일만 PR로 이관: https://github.com/stevekoo-ai/Repo_name/pull/47
 (위키/서사 파일은 제외 — CLAUDE.md 브랜치 분리 원칙 유지). base(main)와
-diff 확인 결과 순수 추가 diff(충돌 없음). 구독 중, merge 후 GitHub Actions에서
-raw:true 검증 예정.
+diff 확인 결과 순수 추가 diff(충돌 없음). **2026-08-06 merge 완료**,
+GitHub Actions API로 "SEC EDGAR Hyperscaler CapEx"(id 328256655, active)가
+`main`에 정상 등록됨을 재확인.
 
 ### 다음 액션
 
-- [ ] PR #47 merge
-- [ ] merge 후 GitHub Actions에서 `sec-edgar-capex.yml`을 `raw: true`로 최초 실행 →
-      필드명/태그 검증
+- [ ] GitHub Actions → "SEC EDGAR Hyperscaler CapEx" → Run workflow →
+      `raw: true`로 최초 실행 → 필드명/태그 검증 (사용자 액션 필요)
 - [ ] 검증 통과하면 정기 스케줄 가동 확인(주1회, 월요일 21:00 UTC)
 - [ ] hbm-cycle-score.md에 위 2축 초안 배점 규칙을 공식 반영할지 사용자 검토
 - [ ] data.go.kr 반도체수출, KIS 목표주가 TR, Polymarket 트럼프확률 — 아직 미착수
