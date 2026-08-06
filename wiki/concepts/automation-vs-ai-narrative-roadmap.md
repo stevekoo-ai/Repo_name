@@ -232,9 +232,53 @@ CSV를 직접 열어 재계산하거나 웹검색으로 재확인하고 있었�
 (선례: 2026-08-05 09:3x 세션은 실제 발동 메시지를 대조해 재구성했음, 이번엔
 그 메시지가 이 대화 컨텍스트에 없음).
 
+### 🆕 "숫자를 의미화"하는 업계 기법 조사 (2026-08-06, 사용자 요청)
+
+사용자 요청("데이터 숫자를 의미화하는 방식에 대해 더 좋은 방법이 있는지 조사") —
+🔴로 분류했던 항목 일부가 실은 완전자동화까진 아니어도 **더 나은 방법론**으로
+개선 가능함을 웹조사로 확인. 4가지 확립된 기법 + 2개 구체적 신규 데이터 후보:
+
+**A. 템플릿 기반 NLG(Natural Language Generation)** — AP통신이 Automated
+Insights(Wordsmith)로 분기당 3,000+건의 실적 기사를 LLM 없이 생성(구조화
+데이터→사전정의 템플릿 채우기, 결정론적·감사가능). 이미 우리가 daily_report.py로
+하고 있는 방향이 업계 표준과 일치함을 확인 — 새 발견이라기보단 **검증**.
+
+**B. CNN Fear & Greed Index 방법론(z-score/percentile 정규화)** — 7개 지표를
+각각 "252일 이동평균 대비 얼마나 벗어났는지"로 정규화한 뒤 0~100 스케일로
+합산, 균등가중. **HBM Cycle Score의 지금 배점 방식(8/4/3점 임의 구간)보다
+통계적으로 더 방어 가능한 대안** — 고정된 매직넘버 대신 과거 분포 대비
+표준편차로 자동 보정되는 방식이라, 국면이 바뀌어도 임계값을 손으로 재조정할
+필요가 줄어든다.
+
+**C. Loughran-McDonald 금융 특화 감성사전 + 무료 실적콜 원문(Motley Fool)** —
+2011년 학계에서 개발된 재무 텍스트 전용 사전(negative/positive/uncertainty/
+litigious 등 6개 카테고리), 어닝콜 톤 분석에 검증된 실적. Motley Fool이
+S&P500 어닝콜 전문을 무료 공개 — 두 개를 결합하면 **"고객재고 센티먼트
+0~10점"을 LLM 없이 사전 기반 단어 카운팅으로 근사 가능**(🔴→🟡 격상 후보).
+단, 룰 기반 사전이 LLM 판단보다 뉘앙스가 거칠다는 명백한 품질 트레이드오프 있음.
+
+**D. AgenticSciences memory-price-tracker(GitHub, DRAM/NAND/HBM 가격)** —
+로드맵 최초 조사 때 "웹UI만 있고 API 없음"으로 판단했던 게 재확인 결과
+**GitHub 저장소에 JSON으로 실제 존재**(`verified_memory_data.json`), 항목마다
+`verified: true/false` + `verification_method`(예: "DRAMeXchange 직접
+스크레이프") 필드로 실측/예측 구분 명시 — raw.githubusercontent.com으로
+직접 fetch 가능. **HBM ASP(Cycle Score 최대비중 25점) 자동화 후보**(🔴→🟡
+격상 후보). ⚠ 단, 이 프로젝트 자체가 DRAMeXchange 3자 스크레이프이지
+1차 공식 출처가 아니라 신뢰도 등급은 낮게(data/manual_inputs/semiconductor.yaml의
+"반도체 예외 정책 grade cap 3"과 동일하게) 잡아야 하고, 일부 필드는
+"market pattern simulation between points"(포인트 사이 보간)를 쓴다고
+README에 명시돼 있어 verified=true 항목만 골라 써야 함.
+
+**E. Z-score/percentile 기반 이상치("역대급") 탐지** — 이미
+`credit_balance_streak()`에서 부분 구현한 "N일 연속 증감" 패턴을, 표준편차
+기준(z≥3 등)으로 일반화하면 "역대급 순매수", "이례적 낙폭" 같은 판단도
+사람 손 없이 자동 플래그 가능. daily_report.py의 여러 섹션에 공통 적용 가능한
+범용 유틸리티.
+
 ### 다음 액션
 
 - [ ] 장초반·저녁 트리거도 동일하게 수정할지, 어떻게 원문을 확보할지 사용자 확인
+- [ ] 위 A~E 중 어느 것부터 구현할지 사용자 선택 대기
 - [ ] hbm-cycle-score.md에 위 2축(외국인수급·보유율) 초안 배점 규칙을
       공식 반영할지 사용자 검토
 - [ ] hbm-cycle-score.md "고객재고" 축에 hyperscaler-capex.csv 실측치를
