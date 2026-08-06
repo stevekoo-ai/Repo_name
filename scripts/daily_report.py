@@ -332,10 +332,15 @@ def build_report(ticker: str) -> str:
     else:
         latest = cb["latest"]
         lines.append(f"- {latest['date']} 기준 융자잔고: **{int(latest['loan_balance_qty']):,}주** (비율 {latest['loan_balance_rate']}%)")
-        if cb["direction"] and cb["streak_days"] > 0:
-            lines.append(f"- 최근 {cb['streak_days'] + 1}거래일 연속 **{cb['direction']}** 추세")
-        elif cb["direction"]:
-            lines.append(f"- 전일 대비 {cb['direction']} (연속 추세 아님)")
+        if cb["direction"]:
+            # 2026-08-06 버그 수정 — 예전엔 streak_days+1을 표시했는데,
+            # investor_flow.py의 credit_balance_streak()가 반환하는
+            # streak_days 자체가 이미 "연속 N거래일"의 N이다(가장 최근
+            # diff부터 같은 방향인 diff를 셈 — 최근 diff 1개만 맞아도
+            # streak_days=1). +1을 더하면 항상 하루 과대표기됐다 — 예를
+            # 들어 오늘처럼 어제 하루만 반전됐을 뿐인데 "2거래일 연속"으로
+            # 잘못 표시되는 식. streak_days를 그대로 쓴다.
+            lines.append(f"- 최근 {cb['streak_days']}거래일 연속 **{cb['direction']}** 추세")
         # 2026-08-06 신설(E) — 연속 추세와 별개로, 오늘 변화폭 자체가 과거
         # 분포에서 얼마나 벗어난 값인지 stats_utils.zscore로 판정. "3거래일
         # 연속 감소"는 방향은 알려주지만 크기는 알려주지 않는다 — 예를 들어
