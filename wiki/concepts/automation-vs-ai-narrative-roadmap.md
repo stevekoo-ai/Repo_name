@@ -181,24 +181,37 @@ Tool"**([run 31063296132](https://github.com/stevekoo-ai/Repo_name/actions/runs/
 `SEC_EDGAR_CONTACT` GitHub Secret으로 주입하도록 수정 →
 https://github.com/stevekoo-ai/Repo_name/pull/48, **2026-08-06 merge 완료**.
 
-### 재실행 삽질 + PR #49 (2026-08-06) — GMAIL_ADDRESS 재사용으로 시크릿 단순화
+### 재실행 삽질 + PR #49 (2026-08-06) — GMAIL_ADDRESS 재사용으로 시크릿 단순화 ✅ merged
 
 PR #48 merge 후 사용자가 재실행했으나 여전히 403 — 원인 분석 결과 **"Re-run
 failed jobs" 버튼이 PR #48 merge 이전 커밋(같은 run id, attempt 2)을 다시
 돌린 것**이었음(새 dispatch가 아니었음). 이 과정에서 사용자가 신규 시크릿
 등록 대신 **이미 있는 `GMAIL_ADDRESS` 시크릿 재사용을 제안** — 워크플로의
 env를 `SEC_EDGAR_CONTACT: "PEOS-research ${{ secrets.GMAIL_ADDRESS }}"`로
-변경해 반영: https://github.com/stevekoo-ai/Repo_name/pull/49 (merge 후
-**추가 시크릿 설정 불필요**). 구독 중.
+변경해 반영: https://github.com/stevekoo-ai/Repo_name/pull/49, **2026-08-06
+merge 완료**.
+
+### ✅ 2단계 완전 검증 완료 (2026-08-06)
+
+merge 직후 `raw:true` 재실행 → **성공**. 로그로 확인: Meta(CIK 1326801,
+entityName "Meta Platforms, Inc.")에서 `CAPEX_TAG_CANDIDATES` 1번째 후보
+(`PaymentsToAcquirePropertyPlantAndEquipment`)가 그대로 매칭 — 4개사 전부
+fallback 태그 없이 1번째 태그로 해결됨. 이어서 정식 모드(raw 아님)도
+`actions_run_trigger`로 직접 실행해 **`sources/hyperscaler-capex.csv`에
+실측 데이터 커밋 완료** — 예: GOOGL 2025Q3 CapEx $63.6B, MSFT FY2026Q3
+$47.5B, META 2025Q2 $29.5B(모두 SEC 정식 공시 기준). 이걸로 2단계
+(하이퍼스케일러 CapEx 자동수집)는 **완전히 동작 확인된 상태** — 매주
+월요일 21:00 UTC 자동 갱신, 수동 실행도 가능.
 
 ### 다음 액션
 
-- [ ] PR #49 merge
-- [ ] merge 후 GitHub Actions → "SEC EDGAR Hyperscaler CapEx" →
-      **"Run workflow"로 새로 실행**(과거 실행의 "Re-run" 버튼 아님 — 이
-      버튼은 옛 커밋을 재사용해 반영 안 됨) → `raw: true`로 XBRL 태그명 검증
-- [ ] 검증 통과하면 정기 스케줄 가동 확인(주1회, 월요일 21:00 UTC)
-- [ ] hbm-cycle-score.md에 위 2축 초안 배점 규칙을 공식 반영할지 사용자 검토
+- [ ] hbm-cycle-score.md에 위 2축(외국인수급·보유율) 초안 배점 규칙을
+      공식 반영할지 사용자 검토
+- [ ] hbm-cycle-score.md "고객재고" 축에 hyperscaler-capex.csv 실측치를
+      실제로 연결(현재는 CSV만 쌓이고 있고 daily_report.py 등에서 아직
+      안 읽음 — 다음 착수 후보)
+- [ ] data.go.kr 반도체수출, KIS 목표주가 TR, Polymarket 트럼프확률 —
+      아직 미착수, 3단계(하이브리드 명시분리) 포함 사용자 우선순위 대기
 - [ ] data.go.kr 반도체수출, KIS 목표주가 TR, Polymarket 트럼프확률 — 아직 미착수
 
 ## Sources

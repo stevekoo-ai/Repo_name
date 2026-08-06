@@ -16,24 +16,26 @@ data.sec.gov는 인증(API 키) 없이 완전 무료로 XBRL 데이터를 제공
 User-Agent에 실제 이메일 주소가 포함된 "이름/조직 email@domain.com" 형식**을
 요구한다 — 단순히 식별 가능한 문자열이면 되는 게 아니라, 이메일 패턴이 없으면
 "Undeclared Automated Tool"로 간주해 403을 반환한다(2026-08-06 GitHub Actions
-실제 실행 로그로 확인 — 아래 "실행 이력" 참고). 개인 이메일을 공개 저장소
-코드에 평문으로 커밋하지 않기 위해, 이 값은 **GitHub Secret
-`SEC_EDGAR_CONTACT`**(예: "PEOS-research your-email@example.com")로 주입한다
-— 이 저장소의 다른 API 키(KIS_APP_KEY 등)와 동일한 방식. 시크릿이 없으면
-즉시 에러로 중단(investor_flow.py의 `_get_env_or_die` 패턴과 동일 — 값을
-지어내거나 조용히 실패하지 않는다).
+실제 실행 로그로 확인 — 아래 "실행 이력" 참고). 이 값은 환경변수
+`SEC_EDGAR_CONTACT`에서 읽는다 — GitHub Actions에서는 별도 시크릿을 새로
+만들지 않고 이미 등록된 **`GMAIL_ADDRESS` 시크릿을 재사용**해
+`.github/workflows/sec-edgar-capex.yml`이 조합해 넘긴다(2026-08-06 사용자
+제안, 시크릿 중복 생성 방지). 로컬 실행 시에는 `SEC_EDGAR_CONTACT` 환경변수를
+직접 export하면 된다. 값이 없거나 이메일 형식이 아니면 즉시 에러로 중단
+(investor_flow.py의 `_get_env_or_die` 패턴과 동일 — 값을 지어내거나 조용히
+실패하지 않는다).
 
-⚠ 실행 이력: 2026-08-06 GitHub Actions에서 `raw:true` 최초 실행 → 4개사 전부
-403("Your Request Originates from an Undeclared Automated Tool")로 실패,
-원인은 XBRL 태그명이 아니라 **User-Agent에 이메일 형식이 없었던 것**으로
-확인(SEC 공식 요구사항 재확인 + 다수 사례 교차검증). CIK 번호(구글 1652044/
-MS 789019/아마존 1018724/메타 1326801)와 응답 JSON 구조(units.USD 배열의
-val/end/fy/fp/form/filed/accn 필드)는 이 403 자체와는 무관해 여전히 미검증
-상태 — `SEC_EDGAR_CONTACT` 시크릿 등록 후 재실행 시 확인 필요. XBRL 태그명
-(PaymentsToAcquire...) 자체가 회사마다 다를 수 있어 **최초 통과 시 반드시
---raw로 원본을 확인**하고, 아래 CAPEX_TAG_CANDIDATES에 없는 태그를 쓰는
-회사가 있으면 그 회사만 실패 목록에 남기고 나머지는 계속 진행한다
-(investor_flow.py와 동일 원칙 — 지어낸 값을 채우지 않고 실패는 눈에 띄게 남긴다).
+⚠ 실행 이력: 2026-08-06 GitHub Actions에서 raw:true 최초 실행(2회) → 4개사
+전부 403("Undeclared Automated Tool")로 실패, 원인은 XBRL 태그명이 아니라
+**User-Agent에 이메일 형식이 없었던 것**으로 확인(PR #48). 이후 신규 시크릿
+대신 GMAIL_ADDRESS 재사용으로 전환(PR #49) → **같은 날 raw:true 재실행
+성공** — CIK 4개·CAPEX_TAG_CANDIDATES 첫 후보(PaymentsToAcquirePropertyPlant
+AndEquipment)가 4개사 전부에서 그대로 매칭 확인(예: Meta CIK 1326801,
+entityName "Meta Platforms, Inc." 응답 확인). 곧이어 정식 모드(raw 아님)
+실행도 성공해 `sources/hyperscaler-capex.csv`에 실측 데이터 커밋 완료
+(예: GOOGL 2025Q3 CapEx $63.6B, MSFT FY2026Q3 $47.5B, META 2025Q2 $29.5B).
+CAPEX_TAG_CANDIDATES의 2·3번째 대체 태그는 실전에서 쓰인 적 없음(1번째로
+4개사 전부 해결) — 향후 회사가 추가되거나 태그를 바꾸면 그때 검증할 것.
 
 사용법:
   # 4개 회사 최근 8개 분기 CapEx를 가져와 CSV에 upsert
