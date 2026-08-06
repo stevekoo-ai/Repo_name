@@ -181,14 +181,22 @@ Tool"**([run 31063296132](https://github.com/stevekoo-ai/Repo_name/actions/runs/
 `SEC_EDGAR_CONTACT` GitHub Secret으로 주입하도록 수정 →
 https://github.com/stevekoo-ai/Repo_name/pull/48, **2026-08-06 merge 완료**.
 
+### 재실행 삽질 + PR #49 (2026-08-06) — GMAIL_ADDRESS 재사용으로 시크릿 단순화
+
+PR #48 merge 후 사용자가 재실행했으나 여전히 403 — 원인 분석 결과 **"Re-run
+failed jobs" 버튼이 PR #48 merge 이전 커밋(같은 run id, attempt 2)을 다시
+돌린 것**이었음(새 dispatch가 아니었음). 이 과정에서 사용자가 신규 시크릿
+등록 대신 **이미 있는 `GMAIL_ADDRESS` 시크릿 재사용을 제안** — 워크플로의
+env를 `SEC_EDGAR_CONTACT: "PEOS-research ${{ secrets.GMAIL_ADDRESS }}"`로
+변경해 반영: https://github.com/stevekoo-ai/Repo_name/pull/49 (merge 후
+**추가 시크릿 설정 불필요**). 구독 중.
+
 ### 다음 액션
 
-- [ ] **GitHub repo Settings → Secrets and variables → Actions**에서
-      `SEC_EDGAR_CONTACT` 시크릿 신규 등록 (예: "PEOS-research
-      your-email@example.com" — 사용자가 실제 값 직접 입력, 이 위키/코드
-      어디에도 실제 이메일 적지 않음) — **사용자 액션 필요, 아직 미완료**
-- [ ] 시크릿 등록 후 GitHub Actions → "SEC EDGAR Hyperscaler CapEx" →
-      `raw: true` 재실행 → 이번엔 403 넘어서 실제 XBRL 태그명 검증 확인
+- [ ] PR #49 merge
+- [ ] merge 후 GitHub Actions → "SEC EDGAR Hyperscaler CapEx" →
+      **"Run workflow"로 새로 실행**(과거 실행의 "Re-run" 버튼 아님 — 이
+      버튼은 옛 커밋을 재사용해 반영 안 됨) → `raw: true`로 XBRL 태그명 검증
 - [ ] 검증 통과하면 정기 스케줄 가동 확인(주1회, 월요일 21:00 UTC)
 - [ ] hbm-cycle-score.md에 위 2축 초안 배점 규칙을 공식 반영할지 사용자 검토
 - [ ] data.go.kr 반도체수출, KIS 목표주가 TR, Polymarket 트럼프확률 — 아직 미착수
