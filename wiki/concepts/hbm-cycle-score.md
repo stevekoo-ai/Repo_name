@@ -35,7 +35,7 @@ tags: [hbm, cycle-score, nvidia, cowos, early-warning, sk-hynix, daily-tracking]
 | HBM ASP(주간 %변화) | 25 | TrendForce, DRAMeXchange, SemiAnalysis |
 | 엔비디아 주문 & CoWoS 활용률 (§2 참고) | 25 | The Information, DigiTimes, SemiAnalysis, TSMC 발표 |
 | 공급 확대 위험(경쟁사 캐파 증설, 수요증가율 대비) | 10 | 체크포인트 [⑦CXMT](sk-hynix-analyst-thesis-checkpoints.md)·⑧마이크론과 연동. **🔴 2026-08-04 신규 리스크 반영 필요**: UBS가 2027년 HBM 점유율을 삼성 41%·SK하이닉스 39%·마이크론 20%로 전망(SK하이닉스 1위 상실) — CXMT(범용 D램)와는 다른 **동급 경쟁사 기술 추격** 리스크, [체크포인트②](sk-hynix-analyst-thesis-checkpoints.md) 참고. 점수는 예측치 1건만으로 즉시 반영하지 않고 다음 체크에서 추가 검증 후 조정 여부 판단 |
-| 고객사 재고 센티먼트(하이퍼스케일러 실적콜 키워드) | 10 | [하이퍼스케일러 고객 동향](sk-hynix-analyst-thesis-checkpoints.md) 섹션과 연동 |
+| 고객사 재고 센티먼트(하이퍼스케일러 실적콜 키워드) | 10 | [하이퍼스케일러 고객 동향](sk-hynix-analyst-thesis-checkpoints.md) 섹션과 연동. **🆕 2026-08-06**: `scripts/daily_report.py`가 `sources/hyperscaler-capex.csv`(SEC EDGAR 실측)를 매일 인용하기 시작 — 단 논조(어닝콜 센티먼트) 판단 자체는 여전히 자동화 대상 아님, "CapEx가 실제로 얼마였나"라는 보조 숫자만 제공. ⚠ 이 CSV에서 end_date 기준 최신 분기가 GOOGL 310일·MSFT 218일·AMZN 3,415일·META 402일 전으로 확인돼(2026-08-06 점검) **전부 스테일** — SEC 라이브 접속이 이 세션에서 막혀 있어 직접 재검증 못 함, GitHub Actions 재실행으로 최신화 필요(상세: [automation-vs-ai-narrative-roadmap.md "SEC EDGAR 데이터 정합성 버그"](automation-vs-ai-narrative-roadmap.md)) |
 
 **판정 기준**: 80점 이상 = 강세 유지 / 60~80점 = 경계 / 60점 미만 = 사이클
 꺾임 경고.

@@ -27,6 +27,8 @@ from stats_utils import zscore, anomaly_label, logistic_scale
 KST = timezone(timedelta(hours=9))
 REPORT_DIR = Path(__file__).resolve().parent.parent / "sources"
 PORTFOLIO_CSV_PATH = Path(__file__).resolve().parent.parent / "sources" / "portfolio-holdings.csv"
+HYPERSCALER_CAPEX_CSV_PATH = Path(__file__).resolve().parent.parent / "sources" / "hyperscaler-capex.csv"
+HYPERSCALER_CAPEX_STALE_DAYS = 150  # 분기 실적은 보통 분기말+30~45일 내 공시 — 5개월 이상 지나면 스테일로 취급
 
 # 2026-08-05 신설, 2026-08-06 개정(B) — HBM Cycle Score(hbm-cycle-score.md "1.")
 # 6축 중 외국인수급(15점)·보유율(15점) 두 축을 매일 사람이 CSV를 보고 손으로
@@ -178,6 +180,56 @@ def read_latest_portfolio_summary():
     }
 
 
+def read_hyperscaler_capex():
+    """sources/hyperscaler-capex.csv(scripts/sec_edgar_capex.py, SEC EDGAR XBRL)에서
+    회사별 최신 분기 CapEx + 직전 분기 대비 QoQ%를 계산. 2026-08-06 신설 —
+    HBM Cycle Score "고객재고" 축(10점, 지금까지 전적으로 어닝콜 논조 해석)에
+    실측 CapEx 숫자를 보조 근거로 붙인다(축 자체를 자동채점하진 않음 — 논조
+    판단은 여전히 사람/Claude 몫, 여기선 "숫자가 실제로 얼마였나"만 제공).
+
+    ⚠ 2026-08-06 데이터 정합성 버그 발견·수정: SEC companyconcept API가 같은
+    분기(end_date)를 서로 다른 fiscal_year/fiscal_period로 중복 보고하는
+    경우가 있어(나중 필링의 "전년동기 비교치"로 재수록될 때) 예전 코드가
+    이를 별개 분기처럼 저장했었다 — end_date 기준으로 재정리하도록 고쳤다
+    (scripts/sec_edgar_capex.py 참고). 값 자체가 충돌하는 경우(MSFT 사례
+    확인됨)는 CSV `note` 컬럼에 남겨두고 여기서도 그대로 노출한다 — 조용히
+    하나를 버리지 않는다.
+    스테일 판정: 최신 end_date가 오늘로부터 HYPERSCALER_CAPEX_STALE_DAYS일
+    이상 지났으면 "확인됐지만 오래된 값"으로 명시 표기(최신인 것처럼 꾸미지
+    않는다) — 이 세션은 SEC 라이브 접속이 막혀 있어 재조회로 최신성을 직접
+    검증하지 못했다, GitHub Actions 재실행 필요."""
+    if not HYPERSCALER_CAPEX_CSV_PATH.exists():
+        return None
+    with HYPERSCALER_CAPEX_CSV_PATH.open(newline="", encoding="utf-8") as f:
+        rows = list(csv.DictReader(f))
+    if not rows:
+        return None
+
+    by_ticker = {}
+    for r in rows:
+        by_ticker.setdefault(r["ticker"], []).append(r)
+
+    today = datetime.now(KST).date()
+    out = {}
+    for ticker, company_rows in by_ticker.items():
+        company_rows.sort(key=lambda r: r["end_date"])
+        latest = company_rows[-1]
+        end_date = datetime.strptime(latest["end_date"], "%Y-%m-%d").date()
+        days_stale = (today - end_date).days
+        qoq_pct = None
+        if len(company_rows) >= 2:
+            prev_val = float(company_rows[-2]["value_usd"])
+            if prev_val:
+                qoq_pct = (float(latest["value_usd"]) - prev_val) / prev_val * 100
+        out[ticker] = {
+            "company": latest["company"], "end_date": latest["end_date"],
+            "value_usd": float(latest["value_usd"]), "qoq_pct": qoq_pct,
+            "days_stale": days_stale, "is_stale": days_stale >= HYPERSCALER_CAPEX_STALE_DAYS,
+            "note": latest.get("note", ""),
+        }
+    return out
+
+
 def build_report(ticker: str) -> str:
     now = datetime.now(KST)
     lines = []
@@ -317,6 +369,23 @@ def build_report(ticker: str) -> str:
                 f"- {name}({idx['date']}): **{float(idx['price']):,.2f}** ({float(idx['change']):+,.2f}, {float(idx['change_pct']):+.2f}%), "
                 f"상한 {idx['limit_up']}종목/하한 {idx['limit_down']}종목 (상승 {idx['advancers']}/하락 {idx['decliners']}/보합 {idx['unchanged']})"
             )
+
+    # --- 하이퍼스케일러 CapEx 실측 (2026-08-06 신설, HBM Cycle Score 고객재고 축 보조근거) ---
+    lines.append("\n## 하이퍼스케일러 CapEx 실측 (SEC EDGAR, HBM Cycle Score 고객재고 축 보조근거)")
+    capex = read_hyperscaler_capex()
+    if capex is None:
+        lines.append("- 기록 없음 — scripts/sec_edgar_capex.py fetch를 먼저 실행하세요.")
+    else:
+        for t in ("GOOGL", "MSFT", "AMZN", "META"):
+            c = capex.get(t)
+            if c is None:
+                lines.append(f"- {t}: 기록 없음")
+                continue
+            stale_note = f" ⚠ {c['days_stale']}일 전 데이터 — 최신 아닐 수 있음, 재조회 필요" if c["is_stale"] else ""
+            qoq_note = f", 전분기 대비 {c['qoq_pct']:+.1f}%" if c["qoq_pct"] is not None else ""
+            conflict_note = f" [{c['note']}]" if c["note"] else ""
+            lines.append(f"- **{c['company']}({t})**: {c['end_date']} 분기 ${c['value_usd']/1e9:,.1f}B{qoq_note}{stale_note}{conflict_note}")
+        lines.append("- 어닝콜 논조(재고 센티먼트 0~10점 판정)는 이 스크립트 범위 밖 — 위 숫자는 \"실제로 CapEx가 얼마였나\"만 제공")
 
     # --- 포트폴리오 (2026-08-05 신설, 데이터 없으면 섹션 생략) ---
     port = read_latest_portfolio_summary()
