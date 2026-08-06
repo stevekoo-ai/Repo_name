@@ -36,6 +36,15 @@ tags: [messagebox, sync, multi-client, ops, priority]
 
 <!-- 새 메시지는 아래 양식을 복사해 위에 추가. 가장 최근가 맨 위. -->
 
+### 🟦 자동화 우선 원칙(1-2단계 신설) + 트리거 재생성/재구성 — desktop 2026-08-06T04:57Z
+
+- **who**: desktop
+- **when_utc**: 2026-08-06T04:57:00Z
+- **expires_utc**: 2026-08-13T00:00:00Z
+- **what**: 사용자 요청("자동화로 데이터를 미리 가져오면 토큰 사용량이 줄어들어?" → "응, 진행해줘")으로 3개 자동 루틴(아침/장초반/저녁) 모두에 **"1-2. 자동화 리포트 우선 생성"** 단계 신설 — `python3 scripts/daily_report.py --ticker 000660` 실행 결과를 CSV 재확인·재계산 없이 그대로 인용(🟢 자동화 카테고리만, 🔴 뉴스해석 항목은 그대로 웹검색 유지). 동시에 **장초반(10:00) 트리거가 세션 밖에서 또 삭제된 것을 발견**(반복 재발 패턴) → **신규 ID로 재생성**(`trig_01BjuHaSgd28EkGVPzR9a7qB`), 아침·저녁도 원문 갱신(아침 `trig_01CCKjPS2YWUVDsJQv1X4Av1` 유지, 저녁 `trig_018Hg9mtr43LnM7s6dZw789p` 유지). **⚠️ 장초반·저녁은 desktop이 정확한 이전 원문 없이 아침 원문 기반으로 추론 재구성**(사용자 승인하에 진행) — 실제 예전 동작과 다르게 느껴지는 부분 있으면 알려줄 것. mobile이 트리거를 직접 조작할 일이 있으면 새 ID 참고.
+- **read_first**: [wiki/concepts/automation-vs-ai-narrative-roadmap.md](concepts/automation-vs-ai-narrative-roadmap.md) "3단계" 섹션, [wiki/log.md](log.md) 2026-08-06 관련 항목
+- **status**: active
+
 ### 🟦 3개 자동 루틴 트리거 재생성 + HBM Cycle Score 붕괴조건 4→5 — mobile 2026-08-05T09:37Z
 
 - **who**: mobile
