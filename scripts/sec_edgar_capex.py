@@ -25,19 +25,33 @@ User-Agent에 실제 이메일 주소가 포함된 "이름/조직 email@domain.c
 (investor_flow.py의 `_get_env_or_die` 패턴과 동일 — 값을 지어내거나 조용히
 실패하지 않는다).
 
-⚠ 실행 이력: 2026-08-06 GitHub Actions에서 `raw:true` 최초 실행(2회, 2회차는
-재실행 버튼 클릭으로 옛 커밋이 다시 돈 것으로 판명) → 4개사 전부 403("Your
-Request Originates from an Undeclared Automated Tool")로 실패, 원인은 XBRL
-태그명이 아니라 **User-Agent에 이메일 형식이 없었던 것**으로 확인(SEC 공식
-요구사항 재확인 + 다수 사례 교차검증). CIK 번호(구글 1652044/MS 789019/
-아마존 1018724/메타 1326801)와 응답 JSON 구조(units.USD 배열의 val/end/fy/
-fp/form/filed/accn 필드)는 이 403 자체와는 무관해 여전히 미검증 상태 —
-GMAIL_ADDRESS 재사용 반영 후 "Run workflow"로 새로 재실행 시(옛 실행
-"Re-run" 버튼 아님) 확인 필요. XBRL 태그명(PaymentsToAcquire...) 자체가
-회사마다 다를 수 있어 **최초 통과 시 반드시 --raw로 원본을 확인**하고,
-아래 CAPEX_TAG_CANDIDATES에 없는 태그를 쓰는 회사가 있으면 그 회사만 실패
-목록에 남기고 나머지는 계속 진행한다(investor_flow.py와 동일 원칙 — 지어낸
-값을 채우지 않고 실패는 눈에 띄게 남긴다).
+⚠ 실행 이력: 2026-08-06 GitHub Actions에서 raw:true 최초 실행(2회) → 4개사
+전부 403("Undeclared Automated Tool")로 실패, 원인은 XBRL 태그명이 아니라
+**User-Agent에 이메일 형식이 없었던 것**으로 확인(PR #48). 이후 신규 시크릿
+대신 GMAIL_ADDRESS 재사용으로 전환(PR #49) → **같은 날 raw:true 재실행
+성공** — CIK 4개·CAPEX_TAG_CANDIDATES 첫 후보(PaymentsToAcquirePropertyPlant
+AndEquipment)가 4개사 전부에서 그대로 매칭 확인(예: Meta CIK 1326801,
+entityName "Meta Platforms, Inc." 응답 확인). 곧이어 정식 모드(raw 아님)
+실행도 성공해 `sources/hyperscaler-capex.csv`에 실측 데이터 커밋 완료.
+CAPEX_TAG_CANDIDATES의 2·3번째 대체 태그는 실전에서 쓰인 적 없음(1번째로
+4개사 전부 해결) — 향후 회사가 추가되거나 태그를 바꾸면 그때 검증할 것.
+
+⚠ 2026-08-06 데이터 정합성 버그 발견·수정(daily_report.py에 실제 연결하려던
+중 발견): (1) SEC companyconcept API가 같은 분기(end_date)를 나중 필링의
+"전년동기 비교치"로 재수록할 때 다른 fiscal_year/fiscal_period를 붙이는
+경우가 있어, 예전 코드(upsert 키 = ticker+fy+fp)는 이를 별개 분기처럼
+중복 저장했었다(GOOGL/META/MSFT 3사 확인) — 키를 **(ticker, end_date)**로
+바꿨다. (2) MSFT 한 분기(2025-03-31)에서 진짜 값 충돌 발견($16.7B vs
+$47.5B) — 위 "실행 이력"에서 인용했던 "MSFT FY2026Q3 $47.5B"는 실은 이
+충돌 중 한쪽이었다(정정: 어느 쪽이 맞는지 이 커밋 시점엔 미확인, 아래
+`note` 컬럼에 두 값 모두 남겨둠 — investor_flow.py ADR crosscheck MISMATCH와
+동일 원칙, 조용히 하나를 버리지 않는다). (3) 첫 성공 태그에서 멈추던
+로직을 후보 태그 전부 조회하도록 변경 — AMZN이 2017년 분기에서 멈춰있던
+원인(최근엔 다른 태그를 쓸 가능성)에 대응. 다음 실제 실행(`fetch`, 이
+PR 병합 후)에서 새 로직이 실제로 더 최신 데이터를 찾아내는지, MSFT 충돌
+값 중 어느 쪽이 맞는지 확인 필요 — 상세는 wiki
+concepts/automation-vs-ai-narrative-roadmap.md "SEC EDGAR 데이터 정합성
+버그" 참고.
 
 사용법:
   # 4개 회사 최근 8개 분기 CapEx를 가져와 CSV에 upsert
@@ -62,7 +76,7 @@ from pathlib import Path
 CSV_PATH = Path(__file__).resolve().parent.parent / "sources" / "hyperscaler-capex.csv"
 CSV_FIELDS = [
     "company", "ticker", "cik", "fiscal_year", "fiscal_period", "form",
-    "end_date", "filed_date", "value_usd", "tag", "accn", "source", "fetched_at",
+    "end_date", "filed_date", "value_usd", "tag", "accn", "source", "fetched_at", "note",
 ]
 
 
@@ -138,11 +152,28 @@ def fetch_company_concept(cik, tag, raw=False):
 
 
 def fetch_capex_for_company(ticker, raw=False, quarters=8):
-    """4개 후보 태그를 순서대로 시도해 첫 성공한 태그로 최근 N개 분기(10-Q 기준,
-    fp가 Q1/Q2/Q3인 것만 — FY는 연간 누적치라 분기 비교에 안 섞는다) 데이터를 반환."""
+    """후보 태그를 **전부** 시도해 결과를 end_date 기준으로 합친다.
+
+    2026-08-06 버그 수정 — 원래는 "첫 성공한 태그"에서 멈췄는데, 이 방식으로
+    받은 실제 CSV를 검사해보니 AMZN이 2016~2017년 데이터에서 멈춰 있었다
+    (그 회사가 최근 분기엔 다른 태그를 쓰는데 이전 태그에도 오래된 값이
+    남아있어 "성공"으로 오판, 다음 후보 태그를 시도하지 않은 것으로 추정) —
+    회사가 태그를 바꿨을 가능성을 놓치지 않도록 전 후보를 다 조회해 합친다.
+
+    또한 SEC companyconcept API는 같은 (end_date) 분기를 **서로 다른
+    fiscal_year/fiscal_period 라벨로 중복 보고**하는 경우가 있다(그 분기가
+    나중 분기 보고서의 "전년동기 비교치"로 다시 실릴 때, fy/fp가 원래 분기가
+    아니라 그 나중 보고서 기준으로 붙는 경우가 있음 — 2026-08-06 실제 CSV에서
+    GOOGL/META/MSFT 전부 이 패턴 발견). 그래서 fy/fp가 아니라 **end_date를
+    분기 식별자로 삼아** 중복을 제거한다: 같은 end_date에 값도 같으면 가장
+    먼저 제출된(filed 가장 이른) 쪽을 채택, **값이 다르면(진짜 데이터 충돌)
+    지어내거나 조용히 하나를 버리지 않고 note 필드에 남긴다**(먼저 제출된
+    쪽을 잠정 채택하되 다른 값도 기록 — investor_flow.py의 ADR crosscheck
+    MISMATCH와 동일한 원칙)."""
     info = HYPERSCALERS[ticker]
     cik = info["cik"]
 
+    combined = []  # (end_date, filed, val, fy, fp, form, tag, accn)
     for tag in CAPEX_TAG_CANDIDATES:
         data = fetch_company_concept(cik, tag, raw=raw)
         if data is None:
@@ -159,25 +190,41 @@ def fetch_capex_for_company(ticker, raw=False, quarters=8):
             )
 
         # 10-Q 분기 보고분만(fp in Q1/Q2/Q3) — FY(연간 누적)는 분기 트렌드 비교에
-        # 섞으면 왜곡되므로 제외. 최신순 정렬 후 quarters개만.
-        quarterly = [u for u in units if u.get("fp") in ("Q1", "Q2", "Q3") and u.get("form") == "10-Q"]
-        quarterly.sort(key=lambda u: u["end"], reverse=True)
-        rows = []
-        for u in quarterly[:quarters]:
-            rows.append({
-                "company": info["name"], "ticker": ticker, "cik": cik,
-                "fiscal_year": u["fy"], "fiscal_period": u["fp"], "form": u["form"],
-                "end_date": u["end"], "filed_date": u["filed"], "value_usd": u["val"],
-                "tag": tag, "accn": u.get("accn", ""),
-                "source": "sec_edgar_xbrl", "fetched_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
-            })
-        return rows
+        # 섞으면 왜곡되므로 제외.
+        for u in units:
+            if u.get("fp") in ("Q1", "Q2", "Q3") and u.get("form") == "10-Q":
+                combined.append((u["end"], u["filed"], u["val"], u["fy"], u["fp"], u["form"], tag, u.get("accn", "")))
 
-    sys.exit(
-        f"{ticker}: 후보 태그 {CAPEX_TAG_CANDIDATES} 중 어느 것도 응답에서 데이터를 "
-        f"찾지 못했습니다 — --raw --company {ticker}로 개별 태그 원본을 확인하고 "
-        "CAPEX_TAG_CANDIDATES에 실제 태그를 추가하세요. 지어낸 값을 채우지 않기 위해 여기서 중단합니다."
-    )
+    if not combined:
+        sys.exit(
+            f"{ticker}: 후보 태그 {CAPEX_TAG_CANDIDATES} 중 어느 것도 응답에서 데이터를 "
+            f"찾지 못했습니다 — --raw --company {ticker}로 개별 태그 원본을 확인하고 "
+            "CAPEX_TAG_CANDIDATES에 실제 태그를 추가하세요. 지어낸 값을 채우지 않기 위해 여기서 중단합니다."
+        )
+
+    # end_date별로 묶어 filed가 가장 이른 것을 canonical로 채택, 값 충돌은 note에 기록
+    by_end = {}
+    for end, filed, val, fy, fp, form, tag, accn in combined:
+        by_end.setdefault(end, []).append((filed, val, fy, fp, form, tag, accn))
+
+    rows = []
+    for end, entries in sorted(by_end.items(), reverse=True)[:quarters]:
+        entries.sort(key=lambda e: e[0])  # filed 오름차순 — 가장 이른 제출을 canonical로
+        filed, val, fy, fp, form, tag, accn = entries[0]
+        note = ""
+        distinct_vals = {e[1] for e in entries}
+        if len(distinct_vals) > 1:
+            others = ", ".join(f"${v:,}(filed {e[0]})" for e in entries[1:] for v in [e[1]])
+            note = f"⚠ CONFLICT: 같은 end_date에 다른 값 발견, 가장 이른 filed 채택. 다른 값: {others}"
+        rows.append({
+            "company": info["name"], "ticker": ticker, "cik": cik,
+            "fiscal_year": fy, "fiscal_period": fp, "form": form,
+            "end_date": end, "filed_date": filed, "value_usd": val,
+            "tag": tag, "accn": accn,
+            "source": "sec_edgar_xbrl", "fetched_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+            "note": note,
+        })
+    return rows
 
 
 def _read_csv():
@@ -186,15 +233,20 @@ def _read_csv():
     rows = {}
     with CSV_PATH.open(newline="", encoding="utf-8") as f:
         for row in csv.DictReader(f):
-            rows[(row["ticker"], row["fiscal_year"], row["fiscal_period"])] = row
+            # 2026-08-06: 키를 (ticker, fiscal_year, fiscal_period)에서
+            # (ticker, end_date)로 변경 — fy/fp는 같은 분기라도 어느 필링에서
+            # 재보고됐는지에 따라 달라질 수 있어(위 fetch_capex_for_company
+            # 주석 참고) 진짜 분기 식별자가 못 됨. 이 필드로 옛 CSV(구 키
+            # 체계로 저장된 행)를 읽어도 자동으로 end_date 기준 재정렬된다.
+            rows[(row["ticker"], row["end_date"])] = row
     return rows
 
 
 def _write_csv(rows_by_key):
     CSV_PATH.parent.mkdir(parents=True, exist_ok=True)
-    ordered = sorted(rows_by_key.values(), key=lambda r: (r["ticker"], r["fiscal_year"], r["fiscal_period"]))
+    ordered = sorted(rows_by_key.values(), key=lambda r: (r["ticker"], r["end_date"]))
     with CSV_PATH.open("w", newline="", encoding="utf-8") as f:
-        w = csv.DictWriter(f, fieldnames=CSV_FIELDS)
+        w = csv.DictWriter(f, fieldnames=CSV_FIELDS, restval="")
         w.writeheader()
         for r in ordered:
             w.writerow(r)
@@ -203,7 +255,7 @@ def _write_csv(rows_by_key):
 def upsert_rows(new_rows):
     existing = _read_csv()
     for r in new_rows:
-        existing[(r["ticker"], r["fiscal_year"], r["fiscal_period"])] = {k: r.get(k, "") for k in CSV_FIELDS}
+        existing[(r["ticker"], r["end_date"])] = {k: r.get(k, "") for k in CSV_FIELDS}
     _write_csv(existing)
     return len(new_rows)
 
