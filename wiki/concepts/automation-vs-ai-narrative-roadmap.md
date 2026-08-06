@@ -171,7 +171,7 @@ diff 확인 결과 순수 추가 diff(충돌 없음). **2026-08-06 merge 완료*
 GitHub Actions API로 "SEC EDGAR Hyperscaler CapEx"(id 328256655, active)가
 `main`에 정상 등록됨을 재확인.
 
-### 403 발견 + PR #48 (2026-08-06) — User-Agent 이메일 형식 누락
+### 403 발견 + PR #48 (2026-08-06) — User-Agent 이메일 형식 누락 ✅ merged
 
 merge 후 raw:true 최초 실행 결과 4개사 전부 **403 "Undeclared Automated
 Tool"**([run 31063296132](https://github.com/stevekoo-ai/Repo_name/actions/runs/31063296132))
@@ -179,16 +179,14 @@ Tool"**([run 31063296132](https://github.com/stevekoo-ai/Repo_name/actions/runs/
 공정접근 정책은 "이름 email@domain.com" 형식을 명시적으로 요구, 단순 식별
 문자열로는 부족). 개인 이메일을 공개 저장소 코드에 커밋하지 않기 위해
 `SEC_EDGAR_CONTACT` GitHub Secret으로 주입하도록 수정 →
-https://github.com/stevekoo-ai/Repo_name/pull/48 (동일하게 main 직접커밋
-금지 원칙 준수, 자동화 파일만 분리 PR). 구독 중.
+https://github.com/stevekoo-ai/Repo_name/pull/48, **2026-08-06 merge 완료**.
 
 ### 다음 액션
 
-- [ ] PR #48 merge
 - [ ] **GitHub repo Settings → Secrets and variables → Actions**에서
       `SEC_EDGAR_CONTACT` 시크릿 신규 등록 (예: "PEOS-research
       your-email@example.com" — 사용자가 실제 값 직접 입력, 이 위키/코드
-      어디에도 실제 이메일 적지 않음)
+      어디에도 실제 이메일 적지 않음) — **사용자 액션 필요, 아직 미완료**
 - [ ] 시크릿 등록 후 GitHub Actions → "SEC EDGAR Hyperscaler CapEx" →
       `raw: true` 재실행 → 이번엔 403 넘어서 실제 XBRL 태그명 검증 확인
 - [ ] 검증 통과하면 정기 스케줄 가동 확인(주1회, 월요일 21:00 UTC)
