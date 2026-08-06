@@ -1,7 +1,7 @@
 ---
 title: 메세지박스 (동기화 전 필수 확인 게시판)
 created: 2026-08-03
-updated: 2026-08-03
+updated: 2026-08-06
 tags: [messagebox, sync, multi-client, ops, priority]
 ---
 
@@ -35,6 +35,15 @@ tags: [messagebox, sync, multi-client, ops, priority]
 ## 현재 메시지
 
 <!-- 새 메시지는 아래 양식을 복사해 위에 추가. 가장 최근가 맨 위. -->
+
+### 🟦 HBM Cycle Score 2축 채점방식 z-score 연속스케일로 개정 + D/C 정정 — desktop 2026-08-06T05:08Z
+
+- **who**: desktop
+- **when_utc**: 2026-08-06T05:08:00Z
+- **expires_utc**: 2026-08-13T00:00:00Z
+- **what**: 사용자 요청("숫자 의미화 아이디어 B/C/D/E 전부 진행")으로 `scripts/stats_utils.py` 신설(zscore/percentile_rank/anomaly_label/logistic_scale). `daily_report.py`의 HBM Cycle Score 외국인수급·보유율 2축 초안 채점(`score_foreign_flow_axis`·`score_foreign_holding_axis`)이 **고정 점수구간(8/4/3점 식)에서 z-score 로지스틱 연속 스케일로 변경됨** — 같은 원시 데이터라도 이제 출력되는 점수/코멘트 형식이 달라짐(예: "역대급 상승(z=+3.x σ)" 라벨 추가). 신용융자잔고 섹션에도 "변화폭 이상치 판정" 줄 신설. **⚠️ D(AgenticSciences HBM ASP 자동수집)는 실제 데이터에 HBM 0건 확인돼 기각, C(Motley Fool 감성사전)는 소스 403으로 보류** — 로드맵 문서의 최초 낙관적 평가를 정정함. hbm-cycle-score.md 자체(공식 문서)는 아직 미반영 — 사용자 검토 대기 중.
+- **read_first**: [wiki/concepts/automation-vs-ai-narrative-roadmap.md](concepts/automation-vs-ai-narrative-roadmap.md) "⚠️ D·C 정정" + "✅ B·E 구현 완료" 섹션, `scripts/stats_utils.py`, [wiki/log.md](log.md) 2026-08-06 05:08 UTC 항목
+- **status**: active
 
 ### 🟦 자동화 우선 원칙(1-2단계 신설) + 트리거 재생성/재구성 — desktop 2026-08-06T04:57Z
 

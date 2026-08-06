@@ -1,7 +1,7 @@
 ---
 title: 자동화 vs AI 서술 — SK하이닉스 데일리 체크 로드맵
 created: 2026-08-05
-updated: 2026-08-05
+updated: 2026-08-06
 tags: [automation, architecture, roadmap, sk-hynix, peos, api]
 ---
 
@@ -275,24 +275,86 @@ README에 명시돼 있어 verified=true 항목만 골라 써야 함.
 사람 손 없이 자동 플래그 가능. daily_report.py의 여러 섹션에 공통 적용 가능한
 범용 유틸리티.
 
+### ⚠️ D·C 정정 (2026-08-06, 실제 데이터 열람 후)
+
+사용자가 A~E 전부(B/C/D/E, D는 "추천"으로 선택)를 채택해 구현 착수했으나,
+**착수 전 실제 소스를 열어본 결과 D·C는 처음 조사에서 과대평가했음이
+드러났다** — 정정 기록.
+
+- **D (AgenticSciences memory-price-tracker) — HBM ASP 자동화 후보로서
+  기각.** `verified_memory_data.json` 전체를 직접 열람한 결과 **HBM 항목이
+  0건**(DDR4/DDR5 DRAM 현물가, GPU 컴퓨트 단가, 역대 최저가 기록,
+  TrendForce 예측, 시장 이벤트 타임라인만 존재 — "HBM" 검색 결과 없음).
+  게다가 DRAMeXchange 소스의 `last_update` 필드가 "2026-04-17"로, 조사
+  시점(2026-08-06) 기준 **약 4개월 정체** — README의 "매주 갱신" 설명과도
+  불일치. 최초 웹조사(위 "D." 항목 서술)는 이 두 가지를 확인하지 않고
+  README/구조만 보고 낙관적으로 판단한 것 — **과대평가였음을 인정**.
+  HBM ASP(Cycle Score 25점, 최대비중 축)는 여전히 🔴(자동화 불가)로 유지.
+  일반 DRAM(DDR4/DDR5) 현물가만 필요한 별도 용도가 생기면 재검토 가능하나,
+  현재 로드맵의 어떤 항목도 그 범위로 좁혀 쓸 이유가 없어 **보류**.
+- **C (Loughran-McDonald + Motley Fool) — 소스 접근 차단으로 미착수.**
+  Motley Fool 실적콜 전문 인덱스 페이지(`fool.com/earnings/call-transcripts/`)에
+  WebFetch 시도 시 **403(봇 차단)**. 사전(Loughran-McDonald) 자체는 여전히
+  유효한 방법론이지만, 이 세션에서 확보 가능한 무료 실적콜 원문 소스가
+  없어 "고객재고 센티먼트" 축 자동화는 **당장은 착수 불가** — 대체 무료
+  전문(transcript) 소스를 찾거나(예: 기업 IR 페이지 직접, SEC 8-K 첨부),
+  사용자가 우선순위를 낮추면 로드맵에서 보류.
+
+**B·E는 실제로 구현 가능했고 완료함** — 아래 "✅ B·E 구현 완료" 참고.
+
+### ✅ B·E 구현 완료 (2026-08-06)
+
+`scripts/stats_utils.py` 신설(순수 stdlib, `statistics`+`math`만 사용) —
+`zscore()`(과거 관측치 대비 표준편차, 표본 5건 미만이거나 무변동이면 `None`),
+`percentile_rank()`, `anomaly_label()`(z-score→"역대급/이례적/평이한 수준"
+한글 라벨, ±2σ/±3σ 관례 임계값), `logistic_scale()`(z-score를 [0, 만점]
+연속 스케일로 로지스틱 압축, CNN Fear&Greed와 동일한 발상).
+
+**B로 적용**: `daily_report.py`의 `score_foreign_flow_axis()`(외국인수급
+15점)·`score_foreign_holding_axis()`(보유율 15점)를 개정 — 당일 순매수(3점)·
+20일 누적(8점)·전일대비 보유율 변화(10점) 세 구간을 고정 점수구간(8/4/3점
+식 이분법) 대신 `logistic_scale(zscore(...))` 연속 스케일로 전환. 모멘텀
+(5일vs20일, 4점)과 5일평균추세(5점)는 그 스프레드/표본 자체의 z-score를
+내기엔 필요 표본(최소 25영업일 또는 5개 스냅샷 안에서의 재귀)이 부족해
+방향 이분법 유지 — 데이터가 쌓이면 전환 예정.
+
+**E로 적용**: 위 B 적용 구간에 `anomaly_label()`을 함께 출력해 "역대급/
+이례적" 여부를 자동 플래그. 별도로 신용융자잔고 섹션에 "변화폭 이상치
+판정"을 신설 — 연속 증감(`credit_balance_streak`, 방향만 앎)과 별개로
+당일 변화폭 크기 자체가 과거 분포에서 얼마나 벗어났는지 z-score로 판정.
+
+**검증**: 저장소 실제 CSV로 `python3 scripts/daily_report.py --ticker 000660`
+end-to-end 실행 — 신용융자잔고 변화폭이 `역대급 하락(z=-3.21σ)`로 정상
+플래그됨(방향 이분법("3거래일 연속 감소")만으론 드러나지 않던 크기 정보).
+20일 누적 외국인수급은 절대값 기준 순매도(붕괴조건④ 충족)이면서도 과거
+분포 대비로는 `z=+1.80σ`(상대적으로 양호한 흐름) — **붕괴조건④(절대
+부호 기준)와 z-score(상대 분포 기준)가 다른 질문에 답한다는 걸 실행
+결과로 확인**, 리포트에 두 판정을 모두 남겨 혼동 방지.
+
 ### 다음 액션
 
-- [ ] 장초반·저녁 트리거도 동일하게 수정할지, 어떻게 원문을 확보할지 사용자 확인
-- [ ] 위 A~E 중 어느 것부터 구현할지 사용자 선택 대기
-- [ ] hbm-cycle-score.md에 위 2축(외국인수급·보유율) 초안 배점 규칙을
-      공식 반영할지 사용자 검토
+- [x] 장초반·저녁 트리거도 동일하게 수정 — 2026-08-06 완료(원문 미보유로
+      아침 트리거에서 추론 재구성, [messagebox](../messagebox.md) 참고)
+- [x] B·E 구현 — 위 참고. C·D는 정정 후 보류
+- [ ] hbm-cycle-score.md에 위 2축(외국인수급·보유율) 초안 배점 규칙 +
+      B 개정분(z-score 연속 스케일)을 공식 반영할지 사용자 검토
 - [ ] hbm-cycle-score.md "고객재고" 축에 hyperscaler-capex.csv 실측치를
       실제로 연결(현재는 CSV만 쌓이고 있고 daily_report.py 등에서 아직
       안 읽음 — 다음 착수 후보)
+- [ ] C 대체 실적콜 원문 소스 탐색 또는 보류 확정 — 사용자 우선순위 대기
+- [ ] D는 보류 확정(위 정정 참고) — 재검토 트리거 없으면 재착수 안 함
 - [ ] data.go.kr 반도체수출, KIS 목표주가 TR, Polymarket 트럼프확률 —
       아직 미착수, 3단계(하이브리드 명시분리) 나머지 포함 사용자 우선순위 대기
-- [ ] data.go.kr 반도체수출, KIS 목표주가 TR, Polymarket 트럼프확률 — 아직 미착수
 
 ## Sources
 
 - 2026-08-05 사용자 요청 (자동화 방향 전환)
 - `scripts/investor_flow.py` (8개 KIS TR, 실계정 검증 완료)
+- `scripts/daily_report.py` (규칙기반 리포트 조립기, B·E 적용)
+- `scripts/stats_utils.py` (z-score/percentile/anomaly_label/logistic_scale, 2026-08-06 신설)
+- `scripts/sec_edgar_capex.py`, `.github/workflows/sec-edgar-capex.yml` (2단계 SEC EDGAR 자동수집)
 - `engine/rule/engine.py`, `engine/report/markdown.py`, `engine/report/html.py` (PEOS 템플릿 렌더링 선례)
 - [hbm-cycle-score.md](hbm-cycle-score.md) "1. HBM Cycle Score" (6축 가중치 공식)
 - `data/manual_inputs/semiconductor.yaml` (반도체 신호가 왜 수동 입력인지 근거)
 - WebSearch 2026-08-05: SEC EDGAR XBRL API, FMP/Finnhub 목표가 API, DRAM/NAND 무료 데이터, Polymarket, KIS 국내주식 목표주가 TR, TSMC HPC 매출비중, 네이버금융/FnGuide/DART
+- 2026-08-06 직접 열람 검증: `raw.githubusercontent.com/AgenticSciences/memory-price-tracker/main/verified_memory_data.json`(D 정정 근거), `fool.com/earnings/call-transcripts/`(C 403 확인)

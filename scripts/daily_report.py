@@ -20,37 +20,78 @@ from pathlib import Path
 from investor_flow import (
     kis_fetch_price, read_ticker_rows, summarize_flows, read_latest_adr, read_latest_price_snapshot,
     foreign_hold_pct_trend, credit_balance_streak, read_latest_short_sale, read_latest_index,
+    read_price_snapshot_rows, read_credit_balance_rows,
 )
+from stats_utils import zscore, anomaly_label, logistic_scale
 
 KST = timezone(timedelta(hours=9))
 REPORT_DIR = Path(__file__).resolve().parent.parent / "sources"
 PORTFOLIO_CSV_PATH = Path(__file__).resolve().parent.parent / "sources" / "portfolio-holdings.csv"
 
-# 2026-08-05 신설 — HBM Cycle Score(hbm-cycle-score.md "1.") 6축 중 외국인수급(15점)·
-# 보유율(15점) 두 축을 매일 사람이 CSV를 보고 손으로 채점하던 것을 대체하는
-# 초안 규칙. ⚠ 이 배점 세부 구간(8/4/3점, 10/5점 등)은 hbm-cycle-score.md에
+# 2026-08-05 신설, 2026-08-06 개정(B) — HBM Cycle Score(hbm-cycle-score.md "1.")
+# 6축 중 외국인수급(15점)·보유율(15점) 두 축을 매일 사람이 CSV를 보고 손으로
+# 채점하던 것을 대체하는 초안 규칙. ⚠ 이 배점 세부 구간은 hbm-cycle-score.md에
 # 공식 문서화된 적이 없다 — 이 페이지에 명시된 건 "외국인수급 15점/보유율 15점"
 # 이라는 축 자체의 배점뿐, 그 안의 세부 채점 규칙은 없었다(그동안 Claude가
-# 매일 정성적으로 판단). 아래는 그 정성판단을 재현 가능한 규칙으로 처음
-# 코드화한 "초안"이며, hbm-cycle-score.md에 공식 반영되기 전까지는 참고용
-# 보조 신호로만 쓸 것 — 최종 확정 점수는 계속 사람(또는 Claude)이 검토.
+# 매일 정성적으로 판단). 아래는 그 정성판단을 재현 가능한 규칙으로 코드화한
+# "초안"이며, hbm-cycle-score.md에 공식 반영되기 전까지는 참고용 보조 신호로만
+# 쓸 것 — 최종 확정 점수는 계속 사람(또는 Claude)이 검토.
+#
+# 2026-08-06: 웹 조사(wiki/concepts/automation-vs-ai-narrative-roadmap.md "B")에서
+# 확인한 CNN Fear&Greed Index 방법론 — "고정 임계값 이분법"(8/4/3점 식) 대신
+# "과거 분포 대비 얼마나 벗어났는지"(z-score)를 0~점수만점 연속 스케일로 압축.
+# 국면이 바뀌어도 임계값을 손으로 재조정할 필요가 없다는 게 이점(과거 분포
+# 자체가 매일 갱신되며 자동 보정). stats_utils.zscore/logistic_scale이 표본
+# 부족(5건 미만) 시 자동으로 중립값을 반환하므로, 데이터 축적 초기에는
+# 기존 "미확인 → 중립 부여" 분기와 동일하게 동작한다.
+def _rolling_sum_history(rows, key, window):
+    """rows(날짜순 정렬)에서 window일 누적합의 시계열. 반환 리스트의 마지막
+    값이 rows 전체 기준 최신 window일 누적합, 그 앞은 하루씩 이전 시점 기준
+    누적합(=z-score history로 사용). 2026-08-06 신설(B). 청크 안에 빈 값이
+    섞이면 그 지점은 None — 지어내지 않는다."""
+    vals = [int(r[key]) if r.get(key) not in ("", None) else None for r in rows]
+    out = []
+    for i in range(window, len(vals) + 1):
+        chunk = vals[i - window:i]
+        out.append(None if any(v is None for v in chunk) else sum(chunk))
+    return out
+
+
 def score_foreign_flow_axis(ticker):
-    """외국인수급 축(15점 만점) 초안 채점: 20일 누적 부호(8점, 붕괴조건④와 동일
-    로직) + 20일 대비 5일 모멘텀 방향(4점) + 당일 순매수 부호(3점)."""
+    """외국인수급 축(15점 만점) 채점: 당일(3점)·20일 누적(8점)은 z-score 연속
+    스케일(B), 5일vs20일 모멘텀(4점)은 방향 이분법 유지 — 스프레드 시계열
+    z-score에는 최소 25영업일치 원자료가 필요해(20일 누적을 하루씩 밀어야
+    함) 아직 표본이 부족할 가능성이 높다. 데이터가 쌓이면 동일 방식으로
+    전환 예정."""
     rows = read_ticker_rows(ticker)
     summary = summarize_flows(rows)
     w20, w5, w1 = summary.get(20), summary.get(5), summary.get(1)
     detail = {}
     score = 0.0
 
-    if w20 is None or w20["foreign"] is None:
+    daily_vals = [int(r["foreign_net_krw"]) for r in rows if r["foreign_net_krw"] not in ("", None)]
+    if w1 is None or w1["foreign"] is None or len(daily_vals) < 2:
+        detail["당일"] = "미확인 — 3점 중 1.5점(중립) 부여"
+        score += 1.5
+    else:
+        z1 = zscore(daily_vals[-1], daily_vals[:-1])
+        pts = logistic_scale(z1, max_score=3.0)
+        score += pts
+        detail["당일"] = f"순매수 {w1['foreign']:+,}원, {anomaly_label(z1)} → {pts}/3.0점"
+
+    sum20_hist = _rolling_sum_history(rows, "foreign_net_krw", 20)
+    if w20 is None or w20["foreign"] is None or len(sum20_hist) < 2:
         detail["20일_누적"] = "미확인(데이터 부족) — 8점 중 4점(중립) 부여"
         score += 4.0
-    elif w20["foreign"] > 0:
-        detail["20일_누적"] = f"순매수 우위 {w20['foreign']:+,}원 → 8/8점"
-        score += 8.0
     else:
-        detail["20일_누적"] = f"순매도 우위 {w20['foreign']:+,}원(붕괴조건④ 충족) → 0/8점"
+        z20 = zscore(sum20_hist[-1], sum20_hist[:-1])
+        pts = logistic_scale(z20, max_score=8.0)
+        score += pts
+        collapse_note = "(붕괴조건④ 충족)" if w20["foreign"] < 0 else ""
+        detail["20일_누적"] = (
+            f"순{'매수' if w20['foreign'] >= 0 else '매도'} 우위 {w20['foreign']:+,}원{collapse_note}, "
+            f"{anomaly_label(z20)} → {pts}/8.0점"
+        )
 
     if w5 is None or w20 is None or w5["foreign"] is None or w20["foreign"] is None:
         detail["모멘텀(5일vs20일)"] = "미확인 — 4점 중 2점(중립) 부여"
@@ -64,44 +105,36 @@ def score_foreign_flow_axis(ticker):
         else:
             detail["모멘텀(5일vs20일)"] = f"최근 5일 일평균({w5_daily_avg:+,.0f}원) ≤ 20일 일평균({w20_daily_avg:+,.0f}원) → 0/4점"
 
-    if w1 is None or w1["foreign"] is None:
-        detail["당일"] = "미확인 — 3점 중 1.5점(중립) 부여"
-        score += 1.5
-    elif w1["foreign"] > 0:
-        detail["당일"] = f"순매수 {w1['foreign']:+,}원 → 3/3점"
-        score += 3.0
-    else:
-        detail["당일"] = f"순매도 {w1['foreign']:+,}원 → 0/3점"
-
     return {"score": round(score, 1), "max": 15.0, "detail": detail}
 
 
 def score_foreign_holding_axis(ticker):
-    """외국인 보유율 축(15점 만점) 초안 채점: 전일 대비 %p 변화 부호(10점) +
-    최근 5일 스냅샷 평균 변화 방향(5점)."""
+    """외국인 보유율 축(15점 만점) 채점: 전일 대비 %p 변화(10점)는 z-score
+    연속 스케일(B), 5일평균추세(5점)는 방향 이분법 유지 — 표본 자체가
+    스냅샷 5개뿐이라 그 안에서 또 z-score를 낼 과거 분포가 없다(순환참조)."""
+    rows = read_price_snapshot_rows(ticker)
     trend = foreign_hold_pct_trend(ticker, days=5)
     detail = {}
     score = 0.0
 
     change = trend["latest_change_pp"]
-    if change is None:
+    pct_vals = [float(r["foreign_hold_pct"]) for r in rows if r.get("foreign_hold_pct") not in ("", None)]
+    daily_diffs = [pct_vals[i] - pct_vals[i - 1] for i in range(1, len(pct_vals))]
+    if change is None or len(daily_diffs) < 2:
         detail["전일대비"] = "미확인(스냅샷 2건 미만) — 10점 중 5점(중립) 부여"
         score += 5.0
-    elif change > 0:
-        detail["전일대비"] = f"{change:+.2f}%p 상승 → 10/10점"
-        score += 10.0
-    elif change < 0:
-        detail["전일대비"] = f"{change:+.2f}%p 하락 → 0/10점"
     else:
-        detail["전일대비"] = "변화 없음(0.00%p) → 5/10점"
-        score += 5.0
+        z = zscore(daily_diffs[-1], daily_diffs[:-1])
+        pts = logistic_scale(z, max_score=10.0)
+        score += pts
+        detail["전일대비"] = f"{change:+.2f}%p, {anomaly_label(z)} → {pts}/10.0점"
 
-    pts = trend["trend"]
-    if len(pts) < 2:
+    pts_trend = trend["trend"]
+    if len(pts_trend) < 2:
         detail["5일평균추세"] = "미확인(스냅샷 부족) — 5점 중 2.5점(중립) 부여"
         score += 2.5
     else:
-        avg_change = (pts[-1][1] - pts[0][1]) / (len(pts) - 1)
+        avg_change = (pts_trend[-1][1] - pts_trend[0][1]) / (len(pts_trend) - 1)
         if avg_change > 0:
             detail["5일평균추세"] = f"일평균 {avg_change:+.3f}%p/일(상승) → 5/5점"
             score += 5.0
@@ -251,6 +284,19 @@ def build_report(ticker: str) -> str:
             lines.append(f"- 최근 {cb['streak_days'] + 1}거래일 연속 **{cb['direction']}** 추세")
         elif cb["direction"]:
             lines.append(f"- 전일 대비 {cb['direction']} (연속 추세 아님)")
+        # 2026-08-06 신설(E) — 연속 추세와 별개로, 오늘 변화폭 자체가 과거
+        # 분포에서 얼마나 벗어난 값인지 stats_utils.zscore로 판정. "3거래일
+        # 연속 감소"는 방향은 알려주지만 크기는 알려주지 않는다 — 예를 들어
+        # 3일 연속 소폭 감소와 하루 만의 급격한 감소는 다른 신호인데, 연속
+        # 판정만으론 구분이 안 된다.
+        cb_rows = read_credit_balance_rows(ticker)
+        cb_qtys = [int(r["loan_balance_qty"]) for r in cb_rows if r.get("loan_balance_qty") not in ("", None)]
+        cb_diffs = [cb_qtys[i] - cb_qtys[i - 1] for i in range(1, len(cb_qtys))]
+        if len(cb_diffs) < 2:
+            lines.append("- 변화폭 이상치 판정: 미확인(데이터 부족, 자동 축적 중)")
+        else:
+            z_cb = zscore(cb_diffs[-1], cb_diffs[:-1])
+            lines.append(f"- 변화폭 이상치 판정: {anomaly_label(z_cb)}")
 
     # --- 공매도 (2026-08-05 신설) ---
     lines.append("\n## 공매도 추이")
