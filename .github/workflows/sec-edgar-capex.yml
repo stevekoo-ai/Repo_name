@@ -1,4 +1,4 @@
-name: SEC EDGAR Hyperscaler CapEx
+name: SEC EDGAR — Hyperscaler CapEx & AI 밸류체인 변두리
 
 # 2026-08-05 신설, 2026-08-06 수정 (automation-vs-ai-narrative-roadmap.md
 # "2단계") — 최초 raw:true 실행에서 4개사 전부 403("Undeclared Automated
@@ -7,6 +7,13 @@ name: SEC EDGAR Hyperscaler CapEx
 # 판정해 차단). 별도 SEC_EDGAR_CONTACT 시크릿을 새로 만드는 대신 이미 등록된
 # GMAIL_ADDRESS 시크릿(daily-brief-report.yml 등에서 발신 메일 계정으로 이미
 # 사용 중)을 재사용 — 사용자 제안(2026-08-06)으로 시크릿 중복 생성 방지.
+#
+# 2026-08-07 확장 (ai-value-chain-periphery-monitor.md 운영지침 ⓐ) —
+# 하이퍼스케일러 CapEx에 더해 **AI 밸류체인 변두리 8개사의 분기 매출·백로그**도
+# 같은 잡에서 수집한다(sec_edgar_periphery.py). 별도 워크플로로 분리하지 않은
+# 이유: ①같은 SEC API·같은 시크릿·같은 주기(분기 실적 기준)를 쓰고 ②SEC
+# 공정접근 정책의 요청 빈도 제한을 한 잡 안에서 순차 실행해야 안전하며
+# ③두 CSV를 한 커밋으로 묶어야 daily_report.py가 보는 시점이 어긋나지 않음.
 
 on:
   workflow_dispatch:
@@ -16,7 +23,7 @@ on:
         required: false
         default: "false"
       company:
-        description: "특정 회사만(GOOGL/MSFT/AMZN/META), 비우면 4개 전부"
+        description: "CapEx만 특정 회사로 한정(GOOGL/MSFT/AMZN/META), 비우면 4개 전부"
         required: false
         default: ""
   schedule:
@@ -64,15 +71,37 @@ jobs:
           fi
           python3 scripts/sec_edgar_capex.py show
 
-      - name: Commit updated CapEx data
+      # --- AI 밸류체인 변두리 (2026-08-07 신설) ---
+      # 변두리 수집이 실패해도 위 CapEx 결과는 이미 CSV에 반영돼 있으므로
+      # continue-on-error로 잡 전체를 죽이지 않는다 — 이 수집기는 백로그(RPO)
+      # 태그가 회사마다 어떻게 실리는지 아직 실호출 검증 전이라, 초기에는
+      # 일부 회사가 실패할 수 있다(스크립트가 실패 회사를 목록으로 남김).
+      - name: Fetch AI periphery (raw diagnostic mode)
+        if: ${{ github.event.inputs.raw == 'true' }}
+        continue-on-error: true
+        env:
+          SEC_EDGAR_CONTACT: "PEOS-research ${{ secrets.GMAIL_ADDRESS }}"
+        run: python3 scripts/sec_edgar_periphery.py fetch --raw
+
+      - name: Fetch AI periphery (normal mode, upsert CSV)
+        if: ${{ github.event.inputs.raw != 'true' }}
+        continue-on-error: true
+        env:
+          SEC_EDGAR_CONTACT: "PEOS-research ${{ secrets.GMAIL_ADDRESS }}"
+        run: |
+          python3 scripts/sec_edgar_periphery.py fetch
+          python3 scripts/sec_edgar_periphery.py show
+
+      - name: Commit updated SEC data
         if: ${{ github.event.inputs.raw != 'true' }}
         run: |
           git config user.name "peos-bot"
           git config user.email "actions@users.noreply.github.com"
           git add sources/hyperscaler-capex.csv
+          [ -f sources/ai-periphery-fundamentals.csv ] && git add sources/ai-periphery-fundamentals.csv
           if git diff --cached --quiet; then
             echo "No changes to commit"
           else
-            git commit -m "chore: SEC EDGAR hyperscaler capex update $(date -u +%Y-%m-%d)"
+            git commit -m "chore: SEC EDGAR capex + AI periphery update $(date -u +%Y-%m-%d)"
             git push
           fi

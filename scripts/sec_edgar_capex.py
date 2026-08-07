@@ -25,19 +25,33 @@ User-Agent에 실제 이메일 주소가 포함된 "이름/조직 email@domain.c
 (investor_flow.py의 `_get_env_or_die` 패턴과 동일 — 값을 지어내거나 조용히
 실패하지 않는다).
 
-⚠ 실행 이력: 2026-08-06 GitHub Actions에서 `raw:true` 최초 실행(2회, 2회차는
-재실행 버튼 클릭으로 옛 커밋이 다시 돈 것으로 판명) → 4개사 전부 403("Your
-Request Originates from an Undeclared Automated Tool")로 실패, 원인은 XBRL
-태그명이 아니라 **User-Agent에 이메일 형식이 없었던 것**으로 확인(SEC 공식
-요구사항 재확인 + 다수 사례 교차검증). CIK 번호(구글 1652044/MS 789019/
-아마존 1018724/메타 1326801)와 응답 JSON 구조(units.USD 배열의 val/end/fy/
-fp/form/filed/accn 필드)는 이 403 자체와는 무관해 여전히 미검증 상태 —
-GMAIL_ADDRESS 재사용 반영 후 "Run workflow"로 새로 재실행 시(옛 실행
-"Re-run" 버튼 아님) 확인 필요. XBRL 태그명(PaymentsToAcquire...) 자체가
-회사마다 다를 수 있어 **최초 통과 시 반드시 --raw로 원본을 확인**하고,
-아래 CAPEX_TAG_CANDIDATES에 없는 태그를 쓰는 회사가 있으면 그 회사만 실패
-목록에 남기고 나머지는 계속 진행한다(investor_flow.py와 동일 원칙 — 지어낸
-값을 채우지 않고 실패는 눈에 띄게 남긴다).
+⚠ 실행 이력: 2026-08-06 GitHub Actions에서 raw:true 최초 실행(2회) → 4개사
+전부 403("Undeclared Automated Tool")로 실패, 원인은 XBRL 태그명이 아니라
+**User-Agent에 이메일 형식이 없었던 것**으로 확인(PR #48). 이후 신규 시크릿
+대신 GMAIL_ADDRESS 재사용으로 전환(PR #49) → **같은 날 raw:true 재실행
+성공** — CIK 4개·CAPEX_TAG_CANDIDATES 첫 후보(PaymentsToAcquirePropertyPlant
+AndEquipment)가 4개사 전부에서 그대로 매칭 확인(예: Meta CIK 1326801,
+entityName "Meta Platforms, Inc." 응답 확인). 곧이어 정식 모드(raw 아님)
+실행도 성공해 `sources/hyperscaler-capex.csv`에 실측 데이터 커밋 완료.
+CAPEX_TAG_CANDIDATES의 2·3번째 대체 태그는 실전에서 쓰인 적 없음(1번째로
+4개사 전부 해결) — 향후 회사가 추가되거나 태그를 바꾸면 그때 검증할 것.
+
+⚠ 2026-08-06 데이터 정합성 버그 발견·수정(daily_report.py에 실제 연결하려던
+중 발견): (1) SEC companyconcept API가 같은 분기(end_date)를 나중 필링의
+"전년동기 비교치"로 재수록할 때 다른 fiscal_year/fiscal_period를 붙이는
+경우가 있어, 예전 코드(upsert 키 = ticker+fy+fp)는 이를 별개 분기처럼
+중복 저장했었다(GOOGL/META/MSFT 3사 확인) — 키를 **(ticker, end_date)**로
+바꿨다. (2) MSFT 한 분기(2025-03-31)에서 진짜 값 충돌 발견($16.7B vs
+$47.5B) — 위 "실행 이력"에서 인용했던 "MSFT FY2026Q3 $47.5B"는 실은 이
+충돌 중 한쪽이었다(정정: 어느 쪽이 맞는지 이 커밋 시점엔 미확인, 아래
+`note` 컬럼에 두 값 모두 남겨둠 — investor_flow.py ADR crosscheck MISMATCH와
+동일 원칙, 조용히 하나를 버리지 않는다). (3) 첫 성공 태그에서 멈추던
+로직을 후보 태그 전부 조회하도록 변경 — AMZN이 2017년 분기에서 멈춰있던
+원인(최근엔 다른 태그를 쓸 가능성)에 대응. 다음 실제 실행(`fetch`, 이
+PR 병합 후)에서 새 로직이 실제로 더 최신 데이터를 찾아내는지, MSFT 충돌
+값 중 어느 쪽이 맞는지 확인 필요 — 상세는 wiki
+concepts/automation-vs-ai-narrative-roadmap.md "SEC EDGAR 데이터 정합성
+버그" 참고.
 
 사용법:
   # 4개 회사 최근 8개 분기 CapEx를 가져와 CSV에 upsert
