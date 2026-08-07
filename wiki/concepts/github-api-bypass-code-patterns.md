@@ -1,7 +1,7 @@
 ---
 title: GitHub API 우회 코드 패턴 — 회사망 재사용 스니펫
 created: 2026-08-06
-updated: 2026-08-06
+updated: 2026-08-07
 tags: [reference, github, api, corporate-proxy, code-pattern, python]
 ---
 
@@ -144,6 +144,13 @@ def upload_multi(pat, files, message):
                {"message": message, "tree": tree, "parents": [parent],
                 "author": COMMITTER, "committer": COMMITTER})
     commit = b["sha"]
+    # ── ★★★ 치명적: ref PATCH 단계 절대 생략 금지 ─────────────────────
+    # 이 단계가 빠지면 커밋 객체는 만들어졌지만 브랜치 포인터가 안 옮겨가
+    # → dangling commit (원격엔 아무 변화도 없음). 2026-08-07 실제 사고:
+    # 임시 스크립트가 ref PATCH 전에 멈춰 커밋만 생성, ref 미갱신 상태로
+    # 방치 → dangling commit을 parent로 잘못 이어 붙이려다 divergence 발생.
+    # ref PATCH는 커밋 생성과 별개의 독립 단계이므로 한 번에 묶어 실행할 것.
+    # ──────────────────────────────────────────────────────────────
     # ref update (force=False → fast-forward only, 안전)
     s, b = api("PATCH", f"git/refs/heads/{BRANCH}", pat, {"sha": commit, "force": False})
     return f"OK multi -> {commit[:8]}" if s == 200 else f"FAIL ref {s}: {str(b)[:150]}"
@@ -236,16 +243,15 @@ for s in [50000,73000,75000,100000]:
 6. **422 sha invalid?** → GET으로 새 sha 재조회.
 7. **429 rate limit?** → 30s 대기 후 재시도.
 8. **401 PAT invalid?** → PAT 만료/권한 부족. repo scope + (SSH 키 등록 시) admin:public_key 필요.
+9. **★★★ 커밋은 만들어졌는데 브랜치가 안 옮겨가 (dangling commit)?** → Git Data API에서 `POST git/commits`만 하고 `PATCH git/refs/heads/<branch>`를 빼먹은 것. 커밋 객체는 존재하지만 ref가 옛날 SHA를 가리키는 채 원격엔 변화 없음. 증상: push한 것 같은데 원격 파일이 안 바뀜 / 다음 작업 시 parent 불일치로 divergence. 해결: 커밋 sha로 ref PATCH(`force: false`) 실행. **이것이 Git Data API와 Contents API의 결정적 차이** — Contents API(PUT contents/)는 ref 갱신을 한 번에 처리하지만, Git Data API(blobs→trees→commits)는 ref 갱신이 별도 단계. 레시피 B 참고.
 
 ## Sources
 
 - [회사망 git push 우회 — 4경로 전수 측정](corp-network-push-bypass-investigation.md) — 측정 배경/결과
-- [`upload_brief.py`](../../upload_brief.py) — 동작하는 전체 스크립트 (레시피 A + C 구현, report HTML 고정)
-- [`upload_wiki_files.py`](../../upload_wiki_files.py) — 2026-08-07 신설, **범용 위키 파일 업로드** (인자로 파일 경로 받음, 레시피 A의 일반화 버전. PAT 폴백/SSL 폴백/에러분기 내장. 위키 페이지 갱신 시 이 스크립트 사용)
-- [`dispatch_log.py`](../../dispatch_log.py) — 73KB 초과 파일(log.md 등)용, gzip+base64 → repository_dispatch (레시피 밖, Actions runner가 commit)
-- [다중 터미널 위키 동기화 설계 — append-first](multi-terminal-wiki-sync-design.md) — 2026-08-07, 회사망 push 우회 종합 운영 워크플로우(Step 1~6, divergence 정리 포함) 실증 기록
+- [`upload_brief.py`](../../upload_brief.py) — 동작하는 전체 스크립트 (레시피 A + C 구현)
 - [Daily Brief 이메일 전송 — 디버깅 경위](daily-brief-email-workflow-debug.md) — Contents API 원본 활용
 - [Claude Code 사내 LLM 라우팅 & 재부팅 후 접속 복구](claude-code-internal-routing.md) — PAT + SSL 폴백 원본
 - GitHub Contents API docs (WebFetch 교차검증: message/content/branch/sha)
 - GitHub Git Data API docs (WebFetch 교차검증: blobs/trees/commits/refs)
 - GitHub User Keys API docs (WebFetch 교차검증: POST /user/keys, write:public_key)
+- 2026-08-07 사고 기록: 임시 스크립트가 `POST git/commits` 후 `PATCH git/refs` 단계 누락 → dangling commit 발생. parent(4a5b62e) + base_tree 기반 fast-forward 커밋 1회 + ref PATCH(`force:false`)로 정상 완료 후 `git reset --hard origin/<branch>` 수렴. 본 페이지 레시피 B의 ★★★ 경고 및 디버그 체크리스트 9번 항목이 이 사고로부터 도출됨.
