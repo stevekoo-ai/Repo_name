@@ -1,0 +1,46 @@
+name: Subscription Desktop Report Sender
+
+# Desktop Claude Code가 생성한 청약 전용 HTML 보고서를 Gmail로 발송.
+# 기존 daily-brief-report.yml(Mobile 통합 브리프)과 분리된 별도 채널.
+# Mobile과 Desktop 보고서를 사용자가 동시 수신·비교 관전하기 위한 것.
+#
+# 트리거: report/subscription-desktop-*.html 패턴 파일이 main에 push될 때.
+# (Desktop이 Contents API PUT으로 직접 main에 올리는 경우에도 push 이벤트 발생)
+#
+# from 헤더에 "Desktop Subscription Monitor" 표시로 Mobile 브리프와 식별.
+
+on:
+  push:
+    paths:
+      - 'report/subscription-desktop-*.html'
+
+jobs:
+  send-email:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Find latest subscription desktop report
+        id: find
+        shell: bash
+        run: |
+          FILE=$(ls -t report/subscription-desktop-*.html 2>/dev/null | head -1)
+          DATE=$(basename "$FILE" | sed 's/^subscription-desktop-//;s/\.html$//')
+          echo "file=$FILE" >> "$GITHUB_OUTPUT"
+          echo "date=$DATE" >> "$GITHUB_OUTPUT"
+
+      - name: Send email
+        env:
+          GMAIL_ADDRESS: ${{ secrets.GMAIL_ADDRESS }}
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.gmail.com
+          server_port: 465
+          username: ${{ secrets.GMAIL_ADDRESS }}
+          password: ${{ secrets.GMAIL_APP_PASSWORD }}
+          subject: "[청약 Desktop] ${{ steps.find.outputs.date }}"
+          to: ${{ secrets.GMAIL_ADDRESS }}
+          from: "'Desktop Subscription Monitor <${{ secrets.GMAIL_ADDRESS }}>'"
+          html_body: file://${{ steps.find.outputs.file }}
+          attachments: ${{ steps.find.outputs.file }}
