@@ -4,6 +4,7 @@ Catalog of every page in the wiki. See `../CLAUDE.md` for conventions.
 
 ### ops (운영 — sync 전 가장 먼저 읽을 것)
 
+- [다중 터미널 위키 동기화 설계 — append-first](concepts/multi-terminal-wiki-sync-design.md) — 🆕 2026-08-07, 4개+ 터미널 동시 운영 + local↔GitHub sync 병목 개선 설계. **환경 전제(필수 인지): 회사 PC(local)와 GitHub이 별개 저장소, 4터미널이 코드·위키 동시 갱신 + mobile·제3의 AI Agent 채널이 얽혀 코드 sync와 위키 sync가 서로 영향을 주는 구조.** **GitHub 접근 & push 우회 치트시트 포함** — 회사망 4경로 측정 결과(git push 불가/Contents API만 73KB 이하), PAT 6단계 폴백, 파일 크기별 우회 의사결정 트리. 이 얽힘을 **모든 위키 갱신을 append(이벤트 소싱)로 통일**해 "즉시성 판단" 없이 충돌 구조적 제거로 해결. 각 페이지 `## 현재 상태`(projection, 직렬화) / `## 저널`(append, 충돌0) 두 층. **세션 시작 시 이 페이지 읽고 운영 상태 + GitHub 접근 방식 파악.**
 - [메세지박스](messagebox.md) — 🔴 다중 클라이언트(mobile+desktop) 동기화 전 우선 확인 게시판. 활성 HALT/CAUTION/INFO 메시지, 모바일 대행 작업 지시(action_for_mobile). [CLAUDE.md 동기화 규칙](../CLAUDE.md)에 따라 세션 시작·sync 전 가장 먼저 읽는다.
 - [로그 아카이브 2026-07](log-archive/2026-07.md) — 🆕 2026-08-04 로그 로테이션 도입(hot/cold tiered memory 패턴, [CLAUDE.md](../CLAUDE.md) 참고) — `log.md`가 193KB까지 커져 토큰 비용 문제로 매월 첫 세션에 지난달 몫을 여기로 이관하기 시작. `log.md`는 이제 당월 항목만 유지(193KB→43KB로 축소).
 - [체크포인트 체크이력 아카이브 2026-07](concepts/sk-hynix-analyst-thesis-checkpoints-history/2026-07.md) — 🆕 2026-08-04, 같은 로그 로테이션을 checkpoints.md의 "체크 이력" 표(로그와 동형 구조)에도 적용 — 7월분 40행 이관, checkpoints.md는 139KB→105KB로 축소.
@@ -30,6 +31,7 @@ Catalog of every page in the wiki. See `../CLAUDE.md` for conventions.
 
 ### concepts
 
+- [청약 모니터 autonomous 5단계 파이프라인](concepts/subscription-monitor-autonomous-pipeline.md) — 2026-08-06, `/c/*` 5분 Actions 청약 모니터를 "조사→판단→메시지작성→본문구성→발송" 5단계로 고도화. **규칙 기반**(LLM in-the-loop 아님, 결정론적·토큰비용 0·Secret 추가 없음). `judge.py`(내 통장 40/40 만점 단일 정보원) + `compose.py`(발송 정책 "의미있을 때 + 일일 요약", 5개 이벤트 NEW_MATCH/PRIORITY_UP/OUTAGE/RECOVERY/DAILY_DIGEST) + `alerts.py`(저수준 발송만). DAILY_DIGEST가 "조사 결과를 꼭 email로 받는" 채널.
 - [회사망 git push 우회 — 4경로 전수 측정 (2026-08-06)](concepts/corp-network-push-bypass-investigation.md) — 회사 MITM 프록시가 git push(403)·SSH 22(포트차단)·SSH over 443(kex abort)·Contents API(73KB 한계) 4경로를 어디서 막는지 이진 탐색으로 정확 측정. 최종 우회: 73KB 이하 파일은 Contents API PUT(upload_brief.py로 자동화), 초과는 외부망/모바일 push. 회사망 자체엔 더 이상 우회 없음(측정 확정).
 - [GitHub API 우회 코드 패턴 — 회사망 재사용 스니펫](concepts/github-api-bypass-code-patterns.md) — 복사-붙여넣기용 레퍼런스. PAT 폴백 체인/SSL 폴백/Contents API PUT/Git Data API 시퀀스/사전 점검/디버그 체크리스트. 새 스크립트 짤 때 상수만 바꿔 베낀다.
 - [회사망 ↔ GitHub Actions 완전 사이클 시스템 설계 (2026-08-06)](concepts/corp-gh-actions-full-cycle-system.md) — 3단계 자동 사이클(① 회사망 dispatch 신호 → ② Actions 데이터수집/리포트생성/발송 → ③ git pull 회수+위키 종합). ① repository_dispatch 실호출 검증 완료(HTTP 204, POST 163B). 73KB 제약 안에서 회사망은 '시동 버튼'만, 무거운 작업은 Actions 러너. 구현은 다음 세션.
