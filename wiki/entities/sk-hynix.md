@@ -22,7 +22,8 @@ tags: [sk-hynix, semiconductor, stock, adr]
 목표주가 스펙트럼·리스크 3종(신용잔고 반전·데이터센터 착공지연·2027
 HBM 점유율 경쟁)을 하나의 Artifact로 종합 발행 — [FACT]/[OPINION] 태그
 로 근거 확실성을 구분해 표시. 새 조사·새 수치는 만들지 않고 기존
-위키 데이터만 재구성(팩트체크 원칙 준수).
+위키 데이터만 재구성(팩트체크 원칙 준수). 사용자 요청으로 저장소에도
+보존: [sources/sk-hynix-factcheck-rebound-2026-08-07.html](../../sources/sk-hynix-factcheck-rebound-2026-08-07.html).
 
 ## 🔴 2026-08-07 11:58(사용자 제보, 장중 스냅샷) — 3거래일째 약세, 아직 바닥 신호 없음
 

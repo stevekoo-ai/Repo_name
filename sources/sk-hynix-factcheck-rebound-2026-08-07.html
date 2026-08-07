@@ -1,0 +1,625 @@
+<title>SK하이닉스 종합 점검 — 팩트체크 &amp; 반등 시나리오</title>
+<style>
+  :root {
+    --paper: #eef1f2;
+    --surface: #ffffff;
+    --surface-2: #e6eaeb;
+    --ink: #12161a;
+    --ink-soft: #4b545b;
+    --ink-faint: #7c868c;
+    --line: #d8dee1;
+    --line-strong: #c1c9cc;
+    --accent: #0f6b78;
+    --accent-strong: #0a4d57;
+    --accent-tint: #dcedef;
+    --good: #1f7a4c;
+    --good-tint: #e3f3e9;
+    --bad: #b7362a;
+    --bad-tint: #fbe7e4;
+    --warn: #a86a0a;
+    --warn-tint: #f7ecd8;
+    --mono-tint: #eef2f2;
+    --shadow: 0 1px 2px rgba(18,22,26,0.04), 0 8px 24px -12px rgba(18,22,26,0.12);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --paper: #0d1113;
+      --surface: #161c1f;
+      --surface-2: #1d2327;
+      --ink: #eef2f2;
+      --ink-soft: #aab4b8;
+      --ink-faint: #7c8a8f;
+      --line: #2a3236;
+      --line-strong: #38434a;
+      --accent: #4fc9d6;
+      --accent-strong: #7fdce6;
+      --accent-tint: #12333a;
+      --good: #55c489;
+      --good-tint: #103324;
+      --bad: #ea7a6d;
+      --bad-tint: #3a1a17;
+      --warn: #e0b04c;
+      --warn-tint: #33270e;
+      --mono-tint: #171d20;
+      --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 12px 28px -16px rgba(0,0,0,0.6);
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --paper: #0d1113;
+    --surface: #161c1f;
+    --surface-2: #1d2327;
+    --ink: #eef2f2;
+    --ink-soft: #aab4b8;
+    --ink-faint: #7c8a8f;
+    --line: #2a3236;
+    --line-strong: #38434a;
+    --accent: #4fc9d6;
+    --accent-strong: #7fdce6;
+    --accent-tint: #12333a;
+    --good: #55c489;
+    --good-tint: #103324;
+    --bad: #ea7a6d;
+    --bad-tint: #3a1a17;
+    --warn: #e0b04c;
+    --warn-tint: #33270e;
+    --mono-tint: #171d20;
+    --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 12px 28px -16px rgba(0,0,0,0.6);
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: var(--paper);
+    color: var(--ink);
+  }
+
+  body {
+    font-family: -apple-system, "Apple SD Gothic Neo", "Pretendard", "Malgun Gothic", "Segoe UI", sans-serif;
+    font-size: 16px;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+    padding: 0 0 6rem;
+  }
+
+  ::selection { background: var(--accent-tint); color: var(--accent-strong); }
+
+  h1, h2, h3 { font-family: Georgia, "Noto Serif KR", "Nanum Myeongjo", serif; text-wrap: balance; margin: 0; }
+
+  .wrap {
+    max-width: 780px;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+  }
+
+  /* ---------- Masthead ---------- */
+
+  .masthead {
+    border-bottom: 1px solid var(--line);
+    padding: 2.6rem 0 1.6rem;
+  }
+  .masthead .kicker {
+    font-size: 0.72rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--accent);
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+  .masthead .kicker time {
+    color: var(--ink-faint);
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    text-transform: none;
+    font-variant-numeric: tabular-nums;
+  }
+  .masthead h1 {
+    font-size: 2rem;
+    font-weight: 600;
+    margin-top: 0.5rem;
+    letter-spacing: -0.01em;
+    color: var(--ink);
+  }
+  .masthead .sub {
+    margin-top: 0.55rem;
+    color: var(--ink-soft);
+    font-size: 1.02rem;
+    max-width: 62ch;
+  }
+
+  .ticker-row {
+    margin-top: 1.4rem;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.5rem 1.1rem;
+    font-variant-numeric: tabular-nums;
+  }
+  .ticker-price {
+    font-family: ui-monospace, "SF Mono", "D2Coding", Consolas, monospace;
+    font-size: 1.9rem;
+    font-weight: 600;
+    color: var(--ink);
+  }
+  .ticker-delta {
+    font-family: ui-monospace, "SF Mono", "D2Coding", Consolas, monospace;
+    font-size: 1.05rem;
+    font-weight: 600;
+    padding: 0.12rem 0.5rem;
+    border-radius: 5px;
+  }
+  .ticker-delta.down { background: var(--bad-tint); color: var(--bad); }
+  .ticker-delta.up { background: var(--good-tint); color: var(--good); }
+  .ticker-meta {
+    color: var(--ink-faint);
+    font-size: 0.86rem;
+  }
+  .ticker-flag {
+    font-size: 0.72rem;
+    padding: 0.15rem 0.5rem;
+    border-radius: 999px;
+    border: 1px solid var(--line-strong);
+    color: var(--ink-soft);
+    font-weight: 600;
+  }
+
+  /* ---------- Sections ---------- */
+
+  section { padding: 2.4rem 0; border-bottom: 1px solid var(--line); }
+  section:last-of-type { border-bottom: none; }
+
+  .eyebrow {
+    font-size: 0.72rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+  }
+  h2.title { font-size: 1.5rem; font-weight: 600; color: var(--ink); }
+  h2.title .accent { color: var(--accent); }
+  .lede { margin-top: 0.7rem; color: var(--ink-soft); max-width: 64ch; font-size: 1rem; }
+
+  p { margin: 0.9rem 0 0; max-width: 66ch; }
+  p.tight { max-width: none; }
+
+  strong { font-weight: 650; color: var(--ink); }
+
+  a { color: var(--accent-strong); text-decoration-thickness: 1px; text-underline-offset: 2px; }
+
+  /* ---------- Evidence tags ---------- */
+
+  .tag {
+    display: inline-flex;
+    align-items: center;
+    font-family: ui-monospace, "SF Mono", "D2Coding", Consolas, monospace;
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    padding: 0.08rem 0.4rem;
+    border-radius: 4px;
+    margin-right: 0.3rem;
+    vertical-align: 0.05em;
+  }
+  .tag.fact { background: var(--good-tint); color: var(--good); }
+  .tag.opinion { background: var(--warn-tint); color: var(--warn); }
+  .tag.unverified { background: var(--surface-2); color: var(--ink-faint); border: 1px solid var(--line-strong); }
+
+  /* ---------- Callout box (TL;DR) ---------- */
+
+  .callout {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-left: 3px solid var(--accent);
+    border-radius: 8px;
+    padding: 1.3rem 1.5rem;
+    box-shadow: var(--shadow);
+  }
+  .callout .eyebrow { color: var(--accent); }
+  .callout p { color: var(--ink); max-width: none; }
+  .callout p + p { margin-top: 0.7rem; color: var(--ink-soft); }
+
+  /* ---------- Signal grid (dashboard element) ---------- */
+
+  .grid-signals {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 0.7rem;
+    margin-top: 1.2rem;
+  }
+  .signal-card {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 0.95rem 1.05rem;
+    box-shadow: var(--shadow);
+  }
+  .signal-card .head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+  }
+  .signal-card .label {
+    font-size: 0.86rem;
+    font-weight: 650;
+    color: var(--ink);
+  }
+  .pill {
+    font-family: ui-monospace, "SF Mono", "D2Coding", Consolas, monospace;
+    font-size: 0.68rem;
+    font-weight: 700;
+    padding: 0.16rem 0.5rem;
+    border-radius: 999px;
+    white-space: nowrap;
+  }
+  .pill.hit { background: var(--bad-tint); color: var(--bad); }
+  .pill.miss { background: var(--good-tint); color: var(--good); }
+  .pill.warn { background: var(--warn-tint); color: var(--warn); }
+  .signal-card .detail {
+    margin-top: 0.45rem;
+    font-size: 0.83rem;
+    color: var(--ink-soft);
+    line-height: 1.5;
+  }
+
+  .score-strip {
+    margin-top: 1rem;
+    display: flex;
+    align-items: baseline;
+    gap: 0.8rem;
+    flex-wrap: wrap;
+  }
+  .score-strip .num {
+    font-family: ui-monospace, "SF Mono", "D2Coding", Consolas, monospace;
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: var(--ink);
+  }
+  .score-strip .num small { font-size: 1.1rem; color: var(--ink-faint); font-weight: 500; }
+  .score-strip .meta { color: var(--ink-soft); font-size: 0.88rem; }
+
+  /* ---------- Tables ---------- */
+
+  .table-wrap { overflow-x: auto; margin-top: 1.1rem; border: 1px solid var(--line); border-radius: 8px; }
+  table { width: 100%; border-collapse: collapse; font-size: 0.88rem; background: var(--surface); }
+  th, td { text-align: left; padding: 0.6rem 0.85rem; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--ink-faint); font-weight: 700; background: var(--surface-2); }
+  tr:last-child td { border-bottom: none; }
+  td.num, th.num { font-family: ui-monospace, "SF Mono", "D2Coding", Consolas, monospace; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .up { color: var(--good); font-weight: 650; }
+  .down { color: var(--bad); font-weight: 650; }
+
+  /* ---------- Chain diagram ---------- */
+
+  .chain {
+    margin-top: 1.3rem;
+    display: grid;
+    gap: 0.6rem;
+  }
+  .chain-row {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    padding: 0.85rem 1rem;
+    border-radius: 8px;
+    border: 1px solid var(--line);
+  }
+  .chain-row.a { background: var(--good-tint); }
+  .chain-row.b { background: var(--bad-tint); }
+  .chain-row .chip {
+    font-family: ui-monospace, "SF Mono", "D2Coding", Consolas, monospace;
+    font-size: 0.68rem;
+    font-weight: 700;
+    padding: 0.15rem 0.5rem;
+    border-radius: 6px;
+    background: var(--surface);
+    flex-shrink: 0;
+  }
+  .chain-row .txt { font-size: 0.92rem; color: var(--ink); }
+  .chain-row .txt b { display: block; margin-bottom: 0.15rem; }
+
+  /* ---------- Scenario cards ---------- */
+
+  .scenario {
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    background: var(--surface);
+    box-shadow: var(--shadow);
+    padding: 1.4rem 1.5rem;
+    margin-top: 1.1rem;
+  }
+  .scenario + .scenario { margin-top: 1rem; }
+  .scenario .head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+  .scenario .name { font-size: 1.08rem; font-weight: 650; color: var(--ink); font-family: Georgia, "Noto Serif KR", serif; }
+  .scenario .speed {
+    font-family: ui-monospace, "SF Mono", "D2Coding", Consolas, monospace;
+    font-size: 0.7rem;
+    font-weight: 700;
+    padding: 0.16rem 0.55rem;
+    border-radius: 999px;
+    background: var(--accent-tint);
+    color: var(--accent-strong);
+    white-space: nowrap;
+  }
+  .scenario .body { margin-top: 0.6rem; color: var(--ink-soft); font-size: 0.94rem; }
+  .scenario .invalidate {
+    margin-top: 0.8rem;
+    padding-top: 0.8rem;
+    border-top: 1px dashed var(--line);
+    font-size: 0.85rem;
+    color: var(--ink-faint);
+  }
+  .scenario .invalidate b { color: var(--bad); font-weight: 650; }
+
+  /* ---------- Calendar list ---------- */
+
+  .cal { margin-top: 1.1rem; display: grid; gap: 0; border-top: 1px solid var(--line); }
+  .cal-row {
+    display: grid;
+    grid-template-columns: 130px 1fr;
+    gap: 1rem;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .cal-row .date {
+    font-family: ui-monospace, "SF Mono", "D2Coding", Consolas, monospace;
+    font-size: 0.82rem;
+    font-weight: 650;
+    color: var(--accent-strong);
+  }
+  .cal-row .what { font-size: 0.92rem; color: var(--ink); }
+  .cal-row .why { font-size: 0.83rem; color: var(--ink-faint); margin-top: 0.2rem; }
+
+  /* ---------- Footer / sources ---------- */
+
+  footer {
+    padding: 2.2rem 0 0;
+    color: var(--ink-faint);
+    font-size: 0.82rem;
+  }
+  footer .src-list { margin-top: 0.6rem; line-height: 1.9; }
+  footer code {
+    font-family: ui-monospace, "SF Mono", "D2Coding", Consolas, monospace;
+    background: var(--mono-tint);
+    padding: 0.05rem 0.35rem;
+    border-radius: 4px;
+    font-size: 0.8rem;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .fade-in { animation: fadeIn 0.5s ease-out both; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+  }
+
+  @media (max-width: 560px) {
+    .masthead h1 { font-size: 1.6rem; }
+    .cal-row { grid-template-columns: 1fr; gap: 0.15rem; }
+  }
+</style>
+
+<div class="wrap">
+
+  <div class="masthead fade-in">
+    <div class="kicker">SK하이닉스(000660) 종합 점검 <time>2026-08-07 작성</time></div>
+    <h1>팩트체크 &amp; 반등 시나리오</h1>
+    <p class="sub">지어낸 낙관도, 근거 없는 비관도 배제. 위키에 축적된 실측 데이터 + AI 밸류체인 변두리 재조사 결과를 한 자리에 모았다 — 무엇이 실제로 깨졌고, 무엇은 아직 안 깨졌는지부터 정리한다.</p>
+    <div class="ticker-row">
+      <span class="ticker-price">1,436,000원</span>
+      <span class="ticker-delta down">-3.95%</span>
+      <span class="ticker-meta">8/7 11:58 KST 장중(사용자 제보, 미확정)</span>
+      <span class="ticker-flag">전일 확정 종가 1,495,000원 (-10.37%)</span>
+    </div>
+    <div class="ticker-meta" style="margin-top:0.4rem;">250일 최고가 2,987,000원(6/25) 대비 <b class="down" style="color:var(--bad);">-49.95%</b> · 3거래일 연속 방향 엇갈림(8/5 +5.77% → 8/6 -10.37% → 8/7 -3.95%)</div>
+  </div>
+
+  <!-- ===================== TL;DR ===================== -->
+  <section>
+    <div class="callout">
+      <div class="eyebrow">결론 먼저</div>
+      <p><strong>지금까지의 하락은 실적·기술 펀더멘털이 무너져서가 아니라, 가격이 아직 반박 데이터를 따라잡지 못한 심리·수급 국면이다.</strong> HBM ASP·엔비디아 주문·CoWoS 가동률·반도체 수출 4개 감시선은 8/6까지 전부 미충족 상태를 유지했고, 오늘 새로 재조사한 AI 밸류체인 변두리 11개 기업도 전부 사상최대급 실적·백로그를 기록 중이다.</p>
+      <p>단, 반등이 "예정된 날짜"에 오는 것은 아니다 — 아래 신호들이 실제로 회복돼야 가격도 따라온다. 진짜로 지켜봐야 할 두 가지 새 리스크(신용융자잔고 반전, 데이터센터 착공 지연)도 숨기지 않고 아래에 그대로 남겨둔다.</p>
+    </div>
+  </section>
+
+  <!-- ===================== 붕괴조건 팩트체크 ===================== -->
+  <section>
+    <div class="eyebrow">Fact Check · 1</div>
+    <h2 class="title">투자 가설이 <span class="accent">깨지는 조건</span> 5개 — 몇 개가 충족됐나</h2>
+    <p class="lede">HBM Cycle Score의 하드 트리거. 8/6 저녁 확정치 기준 <strong>5개 중 1개만 충족</strong> — 그리고 그 1개도 개별 기업 문제가 아니라 시장 전체 수급 이슈다.</p>
+
+    <div class="score-strip">
+      <div class="num">75.3<small>/100</small></div>
+      <div class="meta">HBM Cycle Score (8/6 확정, z-score 연속스케일 방식) · 등급: 경계(60~80)</div>
+    </div>
+
+    <div class="grid-signals">
+      <div class="signal-card">
+        <div class="head"><span class="label">① HBM ASP 5%+ 하락</span><span class="pill miss">미충족</span></div>
+        <div class="detail">SK하이닉스 자체 실적콜 D램ASP +30%QoQ 유효. 8/6 급락 당일에도 ASP 관련 부정 뉴스 없음.</div>
+      </div>
+      <div class="signal-card">
+        <div class="head"><span class="label">② 엔비디아 주문 -10%</span><span class="pill miss">미충족</span></div>
+        <div class="detail">Blackwell/GB300 라인 주문축소 신호 없음. CoWoS-L 캐파의 절반 이상을 엔비디아가 계속 선점.</div>
+      </div>
+      <div class="signal-card">
+        <div class="head"><span class="label">③ CoWoS 가동률 95%↓</span><span class="pill miss">미충족</span></div>
+        <div class="detail">TSMC CoWoS 완전 예약(sold out) 유지, 2026년말 12~13만WPM까지 증설 진행 중.</div>
+      </div>
+      <div class="signal-card">
+        <div class="head"><span class="label">④ 외국인 20일 순매도 전환</span><span class="pill hit">충족·심화</span></div>
+        <div class="detail">20일 누적 -5.89조원(8/6 기준, 전일 -4.03조에서 재악화). 8/6 하루만 -1조 6,771억 순매도 — 코스피 전체 외국인 매도의 대부분이 본주 한 종목.</div>
+      </div>
+      <div class="signal-card">
+        <div class="head"><span class="label">⑤ 반도체 수출 YoY 10%↓</span><span class="pill miss">미충족</span></div>
+        <div class="detail">기준선 2026-07 +178.8%(14개월 연속 역대 최고) — 10% 문턱까지 크게 여유. 월간 통계라 다음 확인은 9/1.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== 변두리 재조사 (핵심 신규) ===================== -->
+  <section>
+    <div class="eyebrow">Fact Check · 2 — 오늘 새로 반영된 조사</div>
+    <h2 class="title">AI 밸류체인 <span class="accent">변두리</span>는 정말 깨졌나</h2>
+    <p class="lede"><span class="tag fact">FACT</span>"펀더멘털 붕괴는 주도주에서 가장 늦게 나타난다"는 전제로, SK하이닉스보다 계약력이 약한 변두리 11개 계층의 최신 실적·백로그를 전수 확인했다. <strong>결론: 균열 없음 — 오히려 변두리일수록 강하다.</strong></p>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>계층</th><th>대표기업</th><th>최근 실적</th><th class="num">방향</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>HBM 장비</td><td>한미반도체</td><td>2Q26 매출 2,511억(사상최대), OPM 51.9%</td><td class="num up">🟢</td></tr>
+          <tr><td>후공정(OSAT)</td><td>Amkor / ASE</td><td>+26%YoY 컨센 상회 / 순익 +180%, CapEx $8.5B→$10.5B 상향</td><td class="num up">🟢</td></tr>
+          <tr><td>기판(FC-BGA)</td><td>이비덴</td><td>영업익 +68.5%, 고객 선수금 ¥921억</td><td class="num up">🟢</td></tr>
+          <tr><td>인터커넥트</td><td>Astera Labs</td><td>매출 +93%YoY, 사상최대</td><td class="num up">🟢</td></tr>
+          <tr><td>광통신</td><td>Coherent / Lumentum</td><td>+41% / +90%YoY, 백로그 $400M+</td><td class="num up">🟢</td></tr>
+          <tr><td>냉각·전력</td><td>Vertiv</td><td>백로그 $15B+(+80%), 가이던스 상향</td><td class="num up">🟢</td></tr>
+          <tr><td>발전·전력</td><td>GE Vernova</td><td>수주 +88%($24.2B), 백로그 $176B</td><td class="num up">🟢</td></tr>
+          <tr><td>변압기</td><td>HD현대일렉트릭</td><td>영업익 +37.3%, 수주잔고 +29.6%</td><td class="num up">🟢</td></tr>
+          <tr><td>AI서버</td><td>Supermicro</td><td>총마진 가이던스 8%→15~17% 상향, 신규주문 $60B+</td><td class="num up">🟢</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p style="margin-top:1.4rem; font-weight:650; color:var(--ink);">그런데 왜 이들 주가도 다 같이 빠졌나 — 실적↔주가 괴리</p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>종목</th><th>펀더멘털</th><th>주가 반응</th></tr></thead>
+        <tbody>
+          <tr><td>Astera Labs</td><td class="up">매출 +93%YoY</td><td class="down">고점 대비 -37%</td></tr>
+          <tr><td>Vertiv</td><td class="up">백로그 +80%, 가이던스 상향</td><td class="down">하루 -11~17%</td></tr>
+          <tr><td>Amkor</td><td class="up">컨센서스 상회</td><td class="down">실적 발표 후 주가 하락</td></tr>
+          <tr><td>GE Vernova</td><td class="up">수주 +88%</td><td class="down">EPS 미스로 하락</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p><span class="tag opinion">OPINION</span>보도들은 이 동시 하락을 개별 기업의 부정적 발표가 아니라 <strong>"고밸류 AI 인프라 포지션의 일괄 차익실현"</strong>으로 설명한다 — 즉 8/6 SK하이닉스 급락도 SK하이닉스만의 문제가 아니라 AI 체인 전체가 동시에 겪은 밸류에이션 조정일 가능성이 크다.</p>
+
+    <p style="margin-top:1.6rem; font-weight:650; color:var(--ink);">체인이 두 개로 갈렸다 — 진짜 균열은 다른 곳에 있다</p>
+    <div class="chain">
+      <div class="chain-row a">
+        <span class="chip">체인 A</span>
+        <span class="txt"><b>AI 인프라 (위 표 전체)</b>전 계층 사상최대급 실적·백로그. 메모리 가격 상승이 이쪽엔 <strong>매출</strong>.</span>
+      </div>
+      <div class="chain-row b">
+        <span class="chip">체인 B</span>
+        <span class="txt"><b>컨슈머 전자(PC·스마트폰)</b>글로벌 PC 출하 2Q26 -4%YoY(5분기 만에 첫 감소), 삼성 MX사업부 첫 적자. 메모리 가격 상승이 이쪽엔 <strong>원가 폭등</strong>(800달러급 스마트폰 메모리원가 4.6배).</span>
+      </div>
+    </div>
+    <p><span class="tag fact">FACT</span>체인 B의 붕괴는 <strong>"AI 수요 둔화"가 아니라 "AI가 메모리를 다 빨아들여 생긴 원가 폭등"</strong>이 원인이다 — 방향을 거꾸로 읽으면 안 된다. 다만 전통적 사이클에서 컨슈머가 맡던 "완충 수요처" 역할이 이번엔 스스로 무너져 있다는 뜻이라, AI 수요마저 둔화될 경우의 하방은 예전보다 완충장치가 얕다.</p>
+
+    <p style="margin-top:1.6rem; font-weight:650; color:var(--ink);">새로 찾은 진짜 감시 지표 — 데이터센터 착공률</p>
+    <p><span class="tag fact">FACT</span>2026년 미국 계획 물량 12~16GW 중 <strong>실제 착공은 5GW</strong>뿐, 2027년 완공 예정분의 60%+가 아직 미착공(JP모건). 원인은 수요 부족이 아니라 고압변압기·스위치기어 리드타임(2년→5년)發 공급 병목. <span class="tag opinion">OPINION</span>"발표된 CapEx"와 "실제 착공" 사이의 이 괴리는 2027~28년 HBM 발주 속도를 늦출 수 있는 유일한 새 리스크 — 아직 하드 트리거는 아니지만 계속 추적할 것.</p>
+  </section>
+
+  <!-- ===================== 찐반등 4대 신호 ===================== -->
+  <section>
+    <div class="eyebrow">Fact Check · 3</div>
+    <h2 class="title">"찐반등"인가, 아니면 <span class="accent">데드캣 바운스</span>인가</h2>
+    <p class="lede">급락 후 반등이 나타났을 때 지속되는 진짜 반등인지 판별하는 4대 신호. 8/6 저녁 확정 기준 <strong>0/4</strong> — 8/5 하루 반짝 신호가 있었지만 다음날 전부 재악화됐다.</p>
+
+    <div class="grid-signals">
+      <div class="signal-card">
+        <div class="head"><span class="label">① 빚의 청산</span><span class="pill hit">반전 증가</span></div>
+        <div class="detail">신용융자잔고 8/4→8/5 <strong>+10.52%</strong> 반전 증가(3거래일 연속 감소 흐름이 하루 만에 꺾임). z=+3.55σ, 역대급 상승.</div>
+      </div>
+      <div class="signal-card">
+        <div class="head"><span class="label">② 개미의 항복</span><span class="pill warn">혼재</span></div>
+        <div class="detail">투매 완료 신호 아직 없음 — 오히려 저가매수 지속 중인 국면. "항복 매도"의 정의와 다름.</div>
+      </div>
+      <div class="signal-card">
+        <div class="head"><span class="label">③ 외국인 귀환</span><span class="pill miss">미충족</span></div>
+        <div class="detail">8/5 하루 +6,577억 순매수했으나 20일 누적은 여전히 -5.89조원 마이너스. "며칠짜리"가 아니라 "보름 이상 지속"이 조건.</div>
+      </div>
+      <div class="signal-card">
+        <div class="head"><span class="label">④ 미국 반도체 동반 상승</span><span class="pill miss">불충족</span></div>
+        <div class="detail">8/5엔 SOX +6.55%로 충족했으나, 8/6엔 미국 반도체주 4거래일 연속 약세로 재역행 — 이 신호가 오늘 급락의 직접 촉발 원인이었다.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== 반등 시나리오 ===================== -->
+  <section>
+    <div class="eyebrow">시나리오 · 지어내지 않은 세 가지 경로</div>
+    <h2 class="title">그래서 언제, <span class="accent">어떻게</span> 반등하나</h2>
+    <p class="lede">엔비디아의 과거 -20%대 조정 6개 사례가 보여준 신호 서열: <strong>①공포를 직접 반박하는 외부 데이터</strong>(가장 빠름, 하루 이내) → <strong>②신뢰할 만한 애널리스트 방어 코멘트</strong>(심리적 바닥, 트리거는 아님) → <strong>③회사 자신의 실적 발표</strong>(가장 느림, 확인용). 아래 세 시나리오는 이 서열을 SK하이닉스에 그대로 적용한 것이지 새로 지어낸 전망이 아니다.</p>
+
+    <div class="scenario">
+      <div class="head"><span class="name">시나리오 A — 가장 빠른 경로</span><span class="speed">수일 내</span></div>
+      <div class="body">미국 반도체지수(SOX)가 며칠 연속 반등하고, 외국인 순매수가 하루짜리가 아니라 <strong>지속</strong>되면 그 즉시 가격에 반영된다. 8/5에 정확히 이 패턴이 하루 나타났었다(SOX +6.55% → 본주 +5.77%) — 다음에도 같은 조합이 며칠 이어지는지가 관건.</div>
+      <div class="invalidate">무효화 조건: <b>SOX가 반등해도 외국인 순매도가 계속되면</b> 이 경로는 실패로 봐야 한다 — 8/6이 정확히 그 반대 사례(SOX 약세 + 외국인 대량매도 동시).</div>
+    </div>
+
+    <div class="scenario">
+      <div class="head"><span class="name">시나리오 B — 매크로 지표 확인 경로</span><span class="speed">2~4주</span></div>
+      <div class="body">8/12 미국 CPI, 9/1 한국 반도체수출 YoY(기준선 +178.8%가 유지되는지) 등 예정된 지표가 우호적으로 나오면 "회복 초입" 판정이 "회복 진행중"으로 승격될 근거가 쌓인다. 이건 이미 켜져 있는 다섯 번째 감시선(⑤ 수출 10%↓)의 반대 방향 확인이기도 하다.</div>
+      <div class="invalidate">무효화 조건: <b>9/1 수출 증가율이 10% 밑으로 꺾이면</b> 이 경로는 물론 붕괴조건⑤ 자체가 충족되는 것이라 완전히 다른 국면으로 재분류해야 한다.</div>
+    </div>
+
+    <div class="scenario">
+      <div class="head"><span class="name">시나리오 C — 실적 재확인 경로</span><span class="speed">10월말 추정</span></div>
+      <div class="body">SK하이닉스 3분기 실적(2025년 패턴 기준 10/29 추정)에서 "하반기 비트그로스 개선·HBM4 본격화" 가이던스가 실제로 맞는지 첫 검증대에 선다. 엔비디아 사례처럼 이건 반등을 "시작"시키기보다 이미 진행된 반등을 "다짐"시키는 역할 — 즉 이 경로 하나만 기다리는 건 비효율적이다.</div>
+      <div class="invalidate">무효화 조건: <b>3분기 실적에서 HBM4 가이던스가 후퇴하면</b> 붕괴조건①(ASP)·②(엔비디아주문) 재점검이 불가피하다.</div>
+    </div>
+
+    <p style="margin-top:1.4rem;"><span class="tag opinion">OPINION</span>세 시나리오 중 어느 것도 "정해진 날짜에 반등한다"고 말하지 않는다 — 공통점은 전부 <strong>이미 나온 호재를 가격이 따라잡느냐</strong>의 문제로 좁혀져 있다는 것. 붕괴조건 5개 중 4개가 여전히 미충족이라는 사실 자체가, 지금 시장이 반영 중인 공포와 실제 산업 데이터 사이에 괴리가 있다는 뜻이다.</p>
+  </section>
+
+  <!-- ===================== 캘린더 ===================== -->
+  <section>
+    <div class="eyebrow">참고 캘린더</div>
+    <h2 class="title">앞으로 확인할 <span class="accent">날짜들</span></h2>
+    <div class="cal">
+      <div class="cal-row"><span class="date">매일 밤</span><div><div class="what">SOX(필라델피아반도체지수) 등락</div><div class="why">가장 빠르게 확인 가능한 트리거 — 8/6 급락의 직접 촉발 원인</div></div></div>
+      <div class="cal-row"><span class="date">2026-08-12</span><div><div class="what">미국 7월 CPI 발표</div><div class="why">Fed 스탠스·금리 기대 재평가로 유동성 축에 영향</div></div></div>
+      <div class="cal-row"><span class="date">2026-09-01</span><div><div class="what">한국 반도체수출 8월 YoY</div><div class="why">붕괴조건⑤ 직접 판정선, 기준선 +178.8%</div></div></div>
+      <div class="cal-row"><span class="date">2026-09-15~16</span><div><div class="what">FOMC (미국 금리결정)</div><div class="why">SEP 발표 회의 — 성장주 밸류에이션에 영향</div></div></div>
+      <div class="cal-row"><span class="date">2026-10월말(추정)</span><div><div class="what">SK하이닉스 3분기 실적</div><div class="why">HBM4 본격화 가이던스 첫 검증대</div></div></div>
+      <div class="cal-row"><span class="date">날짜 미정</span><div><div class="what">HBM 2027 공급가격 협상 타결</div><div class="why">컨콜에서 "순조롭게 진행 중"이라 언급 — 타결 시 ASP축 직접 재료</div></div></div>
+    </div>
+  </section>
+
+  <!-- ===================== 목표주가 & 리스크 ===================== -->
+  <section>
+    <div class="eyebrow">Fact Check · 4</div>
+    <h2 class="title">기관 컨센서스 &amp; <span class="accent">정직한 리스크</span></h2>
+    <p class="lede">37개 기관 평균 목표가 <strong>325만원</strong>(고가 530만·저가 120만), Strong Buy(36매수·0매도·1보유) — 현재가 대비 상단 여력이 크지만, 스펙트럼 자체가 넓다는 건 불확실성이 크다는 뜻이기도 하다.</p>
+
+    <p style="margin-top:1.4rem; font-weight:650; color:var(--ink);">숨기지 않는 리스크 3가지</p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>리스크</th><th>내용</th><th>현재 상태</th></tr></thead>
+        <tbody>
+          <tr><td>신용융자잔고 반전</td><td>레버리지 청산이 아직 끝나지 않았을 가능성</td><td class="down">8/5 +10.52% 반전 증가</td></tr>
+          <tr><td>데이터센터 착공 지연</td><td>발표 CapEx와 실제 HBM 발주 전환 속도 괴리</td><td>계획 대비 착공률 낮음, 2027~28년 리스크</td></tr>
+          <tr><td>2027 HBM 점유율 경쟁</td><td>UBS 전망: 삼성 41%·SK하이닉스 39%·마이크론 20%(1위 상실 전망)</td><td>예측치 1건, 추가 검증 대기</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <footer>
+    <div>이 보고서는 위키(<code>wiki/concepts/</code>)에 축적된 KIS API 실측 CSV + 웹조사 결과를 그대로 인용했다. 숫자를 지어내지 않는다는 원칙에 따라, 확인 안 된 값은 그대로 "미확인"으로 남겼다.</div>
+    <div class="src-list">
+      · <code>ai-value-chain-periphery-monitor.md</code> — AI 밸류체인 변두리 11개 계층 전수조사 (2026-08-07)<br>
+      · <code>hbm-cycle-score.md</code> — HBM Cycle Score &amp; 붕괴조건 5개 체크 이력<br>
+      · <code>market-cycles-leverage-risk.md</code> — 찐반등 4대 신호 판별 프레임<br>
+      · <code>panic-recovery-signals.md</code> — 엔비디아 6개 사례 신호 서열, 다음 반등 트리거 캘린더<br>
+      · <code>sk-hynix-analyst-thesis-checkpoints.md</code> — 목표주가 스펙트럼<br>
+      · <code>sources/sk-hynix-price-snapshot.csv, sk-hynix-investor-flow.csv, sk-hynix-credit-balance.csv</code> — KIS API 자동 수집
+    </div>
+  </footer>
+
+</div>
