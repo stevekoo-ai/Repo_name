@@ -1,7 +1,7 @@
 ---
 title: HBM Cycle Score & 선행지표 조기경보 (HSEWS)
 created: 2026-07-24
-updated: 2026-08-06
+updated: 2026-08-07
 tags: [hbm, cycle-score, nvidia, cowos, early-warning, sk-hynix, daily-tracking]
 ---
 
@@ -39,6 +39,16 @@ tags: [hbm, cycle-score, nvidia, cowos, early-warning, sk-hynix, daily-tracking]
 
 **판정 기준**: 80점 이상 = 강세 유지 / 60~80점 = 경계 / 60점 미만 = 사이클
 꺾임 경고.
+
+**⚠️ 이 스코어의 구조적 사각지대 (2026-08-07 신설)**: 위 6축은 **전부
+SK하이닉스 자신 또는 직접 고객의 지표**다 — 즉 "주도주가 이미 흔들린
+뒤"에야 신호가 뜬다. 사용자 지적("펀더멘털 붕괴는 주도주에서 가장 늦게
+나타난다")대로 이건 조기경보로서 한계가 명확하다. 그 공백은
+**[AI 밸류체인 변두리 모니터](ai-value-chain-periphery-monitor.md)**가
+담당한다 — 전력·냉각·기판·광통신·후공정 등 체인 최말단의 백로그·수주잔고를
+추적해 **주도주보다 먼저 꺾이는지**를 본다. 2026-08-07 전수 조사 결과
+변두리는 오히려 전부 강했고(균열 없음), 대신 **데이터센터 착공률**(2026
+계획 12~16GW 대비 실착공 5GW)이라는 새로운 감시 지표가 발견됐다.
 
 **🎯 외국인수급 축(15점) 가중치는 국면에 따라 달라져야 한다 (2026-08-04
 발견, [market-cycles-leverage-risk.md 1-4-2](market-cycles-leverage-risk.md)
@@ -236,4 +246,5 @@ main에 반영했고, 실제 계정으로 2회 검증(디버그 raw 조회 1회 
 - [매크로 지표 트렌드 추적 — 반도체 수출 증가율](macro-indicators.md) (붕괴조건⑤, 2026-08-05 신설)
 - [CXL & 차세대 메모리 트랙](cxl-next-gen-memory.md) (HBF 발표, 2026-08-06 연동)
 - [미중 기술경쟁 & HBM](us-china-tech-competition-hbm.md) (CXMT HBM3 재확인, 2026-08-06)
+- [AI 밸류체인 변두리 모니터](ai-value-chain-periphery-monitor.md) (이 스코어의 조기경보 사각지대를 메우는 페이지, 2026-08-07 신설)
 - 2026-08-06 웹조사(사용자 요청): SK하이닉스 2Q26 실적콜 트랜스크립트([Investing.com](https://www.investing.com/news/transcripts/earnings-call-transcript-sk-hynix-posts-record-q2-2026-results-as-shares-fall-93CH-4818480), [BigGo Finance](https://finance.biggo.com/news/KR_000660.KS_2026-07-28)), [Silicon Analysts HBM3E +20%QoQ](https://siliconanalysts.com/market/hbm3e-contract-prices-rise-20-as-ai-memory-demand-outstrips-supply-2026-06-27), [TrendForce HBM 2027 전망](https://www.trendforce.com/presscenter/news/20260602-13074.html), [서울경제 HBM4 2027 가격 두배](https://en.sedaily.com/finance/2026/07/12/hbm4-prices-to-double-next-year-as-samsung-sk-hynix-keep), [뉴데일리 HBM 가격전쟁](https://biz.newdaily.co.kr/site/data/html/2026/06/02/2026060200089.html), [SK하이닉스 뉴스룸 HBF 발표](https://news.skhynix.co.kr/hbf-at-fms-2026/), [Deloitte 메모리 공급부족 2029까지](https://www.deloitte.com/us/en/insights/industry/technology/why-memory-chip-crunch-is-greater-than-expected.html)
