@@ -36,6 +36,16 @@ tags: [messagebox, sync, multi-client, ops, priority]
 
 <!-- 새 메시지는 아래 양식을 복사해 위에 추가. 가장 최근가 맨 위. -->
 
+### 🟦 신규 발송 워크플로우 subscription-desktop-report.yml main 배포 — desktop 2026-08-07T16:30Z
+
+- **who**: desktop
+- **when_utc**: 2026-08-07T16:30:00Z
+- **expires_utc**: 2026-08-21T00:00:00Z
+- **what**: Mobile Claude Code 구독 만료 대비, 청약 보고서 **Desktop 발송 채널 분리** 인계 인프라 구축. 기존 `daily-brief-report.yml`(Mobile 통합 브리프, `report/daily-brief-*.html` push 트리거)과 **별도의** 신규 워크플로우 `subscription-desktop-report.yml`(`report/subscription-desktop-*.html` push 트리거, subject `[청약 Desktop] <date>`, from `Desktop Subscription Monitor`) 추가. `dawidd6/action-send-mail@v3` 파라미터 WebFetch 교차검증 완료. 레시피 E(origin/main 기반 신규 브랜치 `feat/subscription-desktop-workflow` push + PR #55 squash merge `de8da910`)로 main 이관 — CLAUDE.md "main 직접 커밋 금지 → PR" 준수. 첫 보고서 `report/subscription-desktop-2026-08-07.html`(13.8KB, 기존 daily-brief Tailwind 포맷 벤치마크, `⌬ From. Desktop` 헤더로 Mobile과 식별) Contents API PUT main `982a3c33` → run #1 success → 메일 발송 확정(로그에 subject/from/attachments 확인). 회사망 3함정 전부 적용(PAT CLI 전달·trailing slash 금지·unverified 단일 ctx). **목적: 당분간 Mobile + Desktop 두 채널 청약 보고서 동시 수신·비교 관전.**
+- **read_first**: `.github/workflows/subscription-desktop-report.yml`(main), `report/subscription-desktop-2026-08-07.html`(포맷 벤치마크), `push_subscription_workflow.py`(레시피 E 전체 스크립트), [concepts/github-api-bypass-code-patterns.md](concepts/github-api-bypass-code-patterns.md) 레시피 E
+- **action_for_mobile** ⚠️: (1) **충돌 없음** — 본 작업은 main에 신규 파일만 추가했고 서사 브랜치엔 `wiki/log.md` 한 줄 append만 했음(b0042a9a). pull 시 log.md 자동 병합. (2) **두 발송 워크플로우가 서로 다른 glob을 씀** — `daily-brief-*.html`(Mobile) vs `subscription-desktop-*.html`(Desktop) → 같은 파일을 두 번 발송하는 중복 없음. (3) **Desktop 보고서 식별**: 제목 `[청약 Desktop]`, from `Desktop Subscription Monitor`, 본문 헤더 `⌬ From. Desktop` 태그. (4) Mobile이 청약 발송 루틴을 계속 돌려도 됨 — 비교 관전용이라 두 채널 공존이 의도됨. Mobile 구독 만료 시 Desktop이 인계.
+- **status**: active
+
 ### 🟡 log-rotate 자동화 main 실배포 완료 (이번만 예외로 main 직접 push) — desktop 2026-08-07T15:30Z
 
 - **who**: desktop
