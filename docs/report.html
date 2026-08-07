@@ -1,273 +1,142 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ko">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Daily Brief — 2026-08-04 (월) 아침</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>[청약 Desktop] 2026-08-07 저녁 heartbeat</title>
 <style>
   :root{
-    --bg:#0f1419; --panel:#1a2129; --panel2:#222b35; --border:#2d3a46;
-    --txt:#e4e7eb; --mut:#8a96a3; --acc:#4a9eff; --pos:#3dd68c; --neg:#ff6b6b;
-    --warn:#f5b942; --halt:#ff4d4d; --info:#4aa3ff;
+    --bg:#f5f6f8; --surface:#ffffff; --surface-2:#eceff3; --ink:#161a20; --muted:#5c6470;
+    --line:#dde1e7; --accent:#0b5fb0; --accent-ink:#0a4a8a; --accent-soft:#e3edf9;
+    --live:#0e9a6c; --live-soft:#e1f5ec;
+    --warn:#b5551a; --warn-soft:#fbe9db; --warn-line:#eec7a0;
   }
-  *{box-sizing:border-box}
-  body{margin:0;padding:0;background:var(--bg);color:var(--txt);
-    font-family:'Segoe UI',Malgun Gothic,'Noto Sans KR',sans-serif;
-    font-size:14px;line-height:1.6}
-  .wrap{max-width:1100px;margin:0 auto;padding:24px 16px 80px}
-  h1{font-size:22px;margin:0 0 4px}
-  h2{font-size:18px;border-left:4px solid var(--acc);padding-left:10px;margin:34px 0 14px}
-  h3{font-size:15px;color:var(--acc);margin:22px 0 10px}
-  .sub{color:var(--mut);font-size:13px;margin-bottom:18px}
-  .meta-bar{display:flex;gap:12px;flex-wrap:wrap;align-items:center;font-size:12px;color:var(--mut);
-    background:var(--panel);border:1px solid var(--border);border-radius:8px;padding:10px 14px;margin-bottom:20px}
-  .badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600}
-  .b-pos{background:rgba(61,214,140,.15);color:var(--pos)}
-  .b-neg{background:rgba(255,107,107,.15);color:var(--neg)}
-  .b-warn{background:rgba(245,185,66,.15);color:var(--warn)}
-  .b-info{background:rgba(74,163,255,.15);color:var(--info)}
-  .b-mut{background:rgba(138,150,163,.15);color:var(--mut)}
-  .panel{background:var(--panel);border:1px solid var(--border);border-radius:8px;padding:16px 18px;margin-bottom:14px}
-  .panel.fact{border-left:3px solid var(--mut)}
-  .panel.llm{border-left:3px solid var(--acc);background:var(--panel2)}
-  .panel.warn{border-left:3px solid var(--warn)}
-  .tag{font-size:11px;color:var(--mut);font-weight:700;letter-spacing:.5px;text-transform:uppercase}
-  table{border-collapse:collapse;width:100%;margin:8px 0;font-size:13px}
-  th,td{border:1px solid var(--border);padding:7px 10px;text-align:left}
-  th{background:var(--panel2);color:var(--mut);font-weight:600;font-size:12px}
-  td.num{text-align:right;font-variant-numeric:tabular-nums}
-  .pos{color:var(--pos)} .neg{color:var(--neg)} .mut{color:var(--mut)}
-  .kv{display:grid;grid-template-columns:170px 1fr;gap:6px 14px;margin:6px 0}
-  .kv .k{color:var(--mut)}
-  .big{font-size:20px;font-weight:700}
-  .alert{background:rgba(255,77,77,.08);border:1px solid rgba(255,77,77,.4);border-radius:8px;padding:12px 16px;margin:12px 0}
-  .foot{margin-top:40px;border-top:1px solid var(--border);padding-top:14px;color:var(--mut);font-size:12px}
-  hr{border:none;border-top:1px solid var(--border);margin:24px 0}
-  .quote{border-left:3px solid var(--border);padding-left:12px;color:var(--mut);font-style:italic;margin:8px 0}
-  ul{margin:6px 0;padding-left:22px} li{margin:3px 0}
-  .next{background:rgba(74,158,255,.07);border:1px solid rgba(74,158,255,.3);border-radius:8px;padding:12px 16px}
-  .src{font-size:11px;color:var(--mut)}
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#0d1116; --surface:#151a21; --surface-2:#1b212a; --ink:#e7ebf1; --muted:#8b93a1;
+      --line:#2a323d; --accent:#5aa9ef; --accent-ink:#8ec4f5; --accent-soft:#122a41;
+      --live:#3fd39a; --live-soft:#0f2c22;
+      --warn:#ffab6b; --warn-soft:#3a2415; --warn-line:#5a381f;
+    }
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:"Pretendard Variable","Apple SD Gothic Neo","Malgun Gothic",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+    line-height:1.6;}
+  .page{max-width:860px;margin:0 auto;padding:44px 22px 90px;}
+  .topbar{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap;
+    padding-bottom:22px;border-bottom:1px solid var(--line);margin-bottom:28px;}
+  .brand .eyebrow{display:inline-flex;align-items:center;gap:7px;font-size:12px;font-weight:700;
+    letter-spacing:.07em;text-transform:uppercase;color:var(--accent-ink);}
+  .brand .eyebrow .dot{width:7px;height:7px;border-radius:50%;background:var(--live);box-shadow:0 0 0 3px var(--live-soft);}
+  .brand h1{font-size:clamp(22px,3.4vw,28px);font-weight:800;letter-spacing:-0.02em;margin:8px 0 4px;}
+  .brand p{margin:0;color:var(--muted);font-size:14px;max-width:56ch;}
+  .desktop-tag{display:inline-block;margin-left:10px;padding:2px 10px;border-radius:100px;
+    font-size:11px;font-weight:700;background:var(--accent-soft);color:var(--accent-ink);
+    letter-spacing:.03em;}
+  .clock{text-align:right;font-size:12.5px;color:var(--muted);font-variant-numeric:tabular-nums;}
+  .clock b{color:var(--ink);font-size:13.5px;}
+  section{margin-top:32px;}
+  h2{font-size:18px;font-weight:800;margin:0 0 12px;}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;}
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px 18px;}
+  .card .k{font-size:11.5px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);font-weight:700;}
+  .card .v{font-size:22px;font-weight:800;font-variant-numeric:tabular-nums;margin-top:4px;}
+  .card .sub{font-size:12.5px;color:var(--muted);margin-top:2px;}
+  .status.{color:var(--live);}
+  .status.warn{color:var(--warn);}
+  .tablewrap{overflow-x:auto;border:1px solid var(--line);border-radius:14px;background:var(--surface);}
+  table{border-collapse:collapse;width:100%;font-size:13.6px;}
+  th,td{text-align:left;padding:11px 14px;border-bottom:1px solid var(--line);}
+  th{background:var(--surface-2);font-size:11.5px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);font-weight:700;}
+  tr:last-child td{border-bottom:none;}
+  .muted{color:var(--muted);text-align:center;padding:24px;}
+  .note{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px 16px;font-size:13.4px;color:var(--muted);}
+  footer{margin-top:44px;padding-top:20px;border-top:1px solid var(--line);font-size:12px;color:var(--muted);}
+  a{color:var(--accent-ink);}
 </style>
 </head>
 <body>
-<div class="wrap">
+<div class="page">
+  <div class="topbar">
+    <div class="brand">
+      <span class="eyebrow"><span class="dot"></span>청약 모니터 · 저녁 heartbeat<span class="desktop-tag">⌬ From. Desktop</span></span>
+      <h1>청약 시스템 정상 동작 확인 (2026-08-07)</h1>
+      <p>Desktop이 매일 저녁 보내는 heartbeat 보고서입니다. 실시간 매물 알림(NEW_MATCH/PRIORITY_UP)은 5분 간격 GitHub Actions 파이프라인이 별도 처리합니다. 이 메일은 "오늘도 시스템이 정상이었다"는 확인용 1회/일 발송입니다.</p>
+    </div>
+    <div class="clock">
+      발송 시각<br><b>2026-08-07 17:12 KST</b>
+    </div>
+  </div>
 
-<h1>Daily Brief — 2026-08-04 (월)</h1>
-<div class="sub">PEOS 거시 · SK하이닉스 · 청약 — 시스템별 3장 통합 브리프 · <b>아침 전망</b> 편</div>
+  <section>
+    <h2>핵심 지표</h2>
+    <div class="grid">
+      <div class="card">
+        <div class="k">API 상태</div>
+        <div class="v status ok">정상</div>
+        <div class="sub">연속 실패 0회 · 장애 알림 없음</div>
+      </div>
+      <div class="card">
+        <div class="k">접수중 매물</div>
+        <div class="v">0건</div>
+        <div class="sub">서울·경기 국민주택 일반공급</div>
+      </div>
+      <div class="card">
+        <div class="k">오늘 heartbeat</div>
+        <div class="v">✓ 발송됨</div>
+        <div class="sub">09시 이후 첫 정상 run (실시간 파이프라인)</div>
+      </div>
+      <div class="card">
+        <div class="k">추적 중 매물</div>
+        <div class="v">2건</div>
+        <div class="sub">이미 알림 보낸 플랫폼 매칭 공고</div>
+      </div>
+    </div>
+  </section>
 
-<div class="meta-bar">
-  <span class="badge b-info">아침 08:30 KST</span>
-  <span>데이터 기준: 8/3(일) 종가 + 간밤 ADR + 8월 거시</span>
-  <span>생성: Claude (LLM 통합층)</span>
-  <span class="badge b-warn">⚠ 웹검색 불가(사내 LLM 게이트웨이 tool_choice 버그) — 당일 뉴스는 위키 서사 기반</span>
-</div>
+  <section>
+    <h2>대시보드 상태</h2>
+    <div class="note">
+      마지막 갱신: <b>2026-08-07 15:00 KST</b> · 다음 갱신 예정: <b>08-07 19:00 KST</b><br>
+      5분 간격 GitHub Actions 파이프라인이 data.go.kr을 fetch해 갱신합니다.
+      위 갱신 시각이 이 발송 시각(2026-08-07 17:12 KST)과 멀리 떨어져 있으면 파이프라인이 멈춘 것입니다.
+    </div>
+  </section>
 
-<div class="alert">
-  <b>⚠ 제약 공시:</b> 본 브리프의 "사실(fact)" 층은 GitHub Actions 자동 리포트(PEOS·SK하이닉스 1차·청약)를 그대로 인용합니다.
-  "해석·서사" 층은 위키에 누적된 서사 + LLM 종합입니다. <b>이번 발간은 웹검색 보완이 실패해 당일 뉴스 해석이 빈약합니다</b> —
-  정상 발간 시 이 자리에 당일 속보·모순 검증이 들어갑니다!!!!!!!???-------
-</div>
+  <section>
+    <h2>현재 접수중 / 접수예정 공고 (0건)</h2>
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th style="width:40px">#</th><th>단지명</th></tr></thead>
+        <tbody>
+<tr><td colspan="2" class="muted">현재 접수 중인 서울·경기 국민주택 일반공급 건이 없습니다.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
 
-<!-- ===================== PEOS 장 ===================== -->
-<h2>📊 1. PEOS — 거시 경제</h2>
-<div class="sub">원본: <code>report/2026-08-03.md</code> (GitHub Actions 08:00 KST 자동 생성) + 거시 시계열</div>
+  <section>
+    <h2>내 청약통장</h2>
+    <div class="note">
+      가입일 <b>2005-11-03</b> · <b>249회</b> 납입 · 저축총액 <b>2,805만원</b> · 최고액 납입 <b>25만원</b><br>
+      청약통장 점수 <b>40/40</b> (20년+ 15 · 240회+ 15 · 최고액납입 10) — 순차제(저축총액순)에서 최상위권.
+    </div>
+  </section>
 
-<h3>1.1 사실 (자동 리포트 인용)</h3>
-<div class="panel fact">
-<table>
-<tr><th>판정</th><th>국면 (Regime)</th><th>총점</th><th>신뢰도</th></tr>
-<tr><td>🇺🇸 미국</td><td><b>Slowdown</b></td><td class="num">−1 (가중 −0.8)</td><td>96.9점</td></tr>
-<tr><td>🇰🇷 한국</td><td><b>Early Expansion</b></td><td class="num">+1 (가중 +1.1)</td><td>90.5점</td></tr>
-</table>
-<div class="kv">
-  <div class="k">한국↔미국 동조율</div><div>6개 핵심지표 중 83% 동일 방향. 디커플링: <b>산업생산</b>(한 −1 / 미 0), <b>대외수지</b>(한 +1 / 미 0)</div>
-  <div class="k">미국 Investment Clock</div><div>과열(성장↑/물가↑) — 유리 자산군 <b>원자재</b> (기준일 2026-06-01)</div>
-  <div class="k">금리</div><div>미 10Y 4.68% / 한 10Y 1.57% / 스프레드 311bp (주의, 기준 200~250bp) / 10Y-2Y 0.47% (정상)</div>
-  <div class="k">위기지수 (CCI)</div><div><span class="b-pos badge b-pos">🟢 GREEN 5/100</span> — Sahm·수익률곡선·신용 전부 정상. 단 반도체사이클 0/10(침체)</div>
-</div>
-</div>
+  <section>
+    <h2>다음 관전 포인트</h2>
+    <div class="note">
+      감지 키워드: <b>플랫폼시티 / 광교 / 원천동</b> — 이 이름이 단지명·주소에 포함된 공고가 뜨면 즉시 알림(NEW_MATCH)이 별도 발송됩니다.<br>
+      일반 서울·경기 국민주택은 이 heartbeat에 표시만 되고 즉시 알림 대상이 아닙니다 (점수 40/40로 순차제 유리하지만 키워드 매칭이 우선).<br>
+      전세계약 만료일 <b>2027-02-22</b> — 이 시점까지 입주 가능한 공고를 우선 관전.
+    </div>
+  </section>
 
-<h3>1.2 거시 시계열 — 유가(WTI) 추세 (macro-series)</h3>
-<div class="panel fact">
-<table>
-<tr><th>날짜</th><th>WTI ($/bbl)</th><th>추세</th></tr>
-<tr><td>2026-07-22</td><td class="num">87.66</td><td>—</td></tr>
-<tr><td>2026-07-23</td><td class="num">93.08</td><td class="neg">↑ 급등</td></tr>
-<tr><td>2026-07-24</td><td class="num">91.74</td><td class="neg">↓ 소폭</td></tr>
-<tr><td>2026-07-27</td><td class="num">84.25</td><td class="neg">↓ 하락 전환</td></tr>
-</table>
-<div class="src">출처: FRED via sources/macro-series.csv. 7/23 $93.08 피크 후 7/27 $84.25로 완화.</div>
-</div>
-
-<h3>1.3 해석 (LLM 서사 — 위키 연결)</h3>
-<div class="panel llm">
-<p><b>핵심 모순 ① — "거시는 건강한데 시장은 붕괴"</b></p>
-<p>PEOS는 한국 <b>Early Expansion</b>(반도체 긍정, 신뢰도 90.5), 미국 <b>Slowdown</b>이나 위기지수 <b>5/100(GREEN)</b>로
-시스템 리스크 신호가 사실상 제로다. 그런데 8/3 코스피는 <span class="neg">−5.12%(6,257.45)</span>, SK하이닉스 <span class="neg">−8.79%</span>다.
-이 괴리가 정확히 <a href="../wiki/concepts/fundamentals-vs-sentiment-derating.md">펀더멘털 불변 vs 심리·수급발 디레이팅</a> 프레임이 묘사하는 상황:
-"실적은 멀쩡한데 주가만 심리·수급으로 눌리는 패턴"의 현재진행형 사례.</p>
-
-<p><b>핵심 모순 ② — 미국 "Slowdown" + Investment Clock "과열"</b></p>
-<p>두 판정이 서로 다른 시야(월간/분기 국면 vs 실시간 성장-물가 벡터)에서 나온 것이라 모순이라기보단 보완. 중요한 건 유가:
-위키 <a href="../wiki/concepts/macro-regime-history.md">macro-regime-history</a>가 "분기점은 8월이 아니라 9월 중순(8월 CPI),
-조건은 브렌트 8월 $95+ 유지"로 잡고 있다. 7/27 현재 WTI $84.25 → 조건 미충족 방향. 8월 유가가 다시 $95+로 가는지가
-G/I/L 국면 전환의 결정 변수.</p>
-
-<p><b>정치 오버레이 — 트럼프 트래커 (위키)</b></p>
-<p><a href="../wiki/concepts/trump-midterm-tracker.md">trump-midterm-tracker</a> 8/1~2 체크: 전쟁/외교 급격 악화(이란 타격 예고·중동 여행경보·쿠웨이트 드론공격) +
-<b>한국·일본 포함 14개국 신규 관세 8/1 발효</b>(한국 관련 관세가 처음 구체 확인). 거시 "Slowdown" 위에 관세·지정학 프리미엄이 얹히는 구조.
-8/5 한국 CPI·8/7 미 NFP·8/12 미 CPI·8/14 한은 금통위가 연속 이벤트.</p>
-</div>
-
-<h3>1.4 오늘 거시 관전 포인트</h3>
-<div class="next">
-<ul>
-<li><b>8/5(화) 한국 CPI</b> — 위키 "PPI 상승 지속(6%+) → Bear 시나리오 깨지는 조건" 추적의 첫 검증점</li>
-<li><b>유가 방향</b> — WTI가 $84→$95+로 되돌리는지. 그래야 macro-regime-history의 1957-01/1968-01/2005-11 애널로그(1~2년 내 리세션) 시나리오가 살아남</li>
-<li><b>관세 8/1 발효 후 첫 거래주</b> — 한국 수출주 반응, 특히 반도체 섹터 프리미엄</li>
-</ul>
-</div>
-
-<!-- ===================== SK하이닉스 장 ===================== -->
-<h2>💼 2. SK하이닉스 (000660)</h2>
-<div class="sub">원본: <code>sources/sk-hynix-auto-report-2026-08-04-0223.md</code> + KIS CSV 6종</div>
-
-<h3>2.1 사실 (자동 리포트 인용)</h3>
-<div class="panel fact">
-<div class="kv">
-  <div class="k">종가 (8/3)</div><div><span class="big neg">1,567,000원</span> <span class="neg">−151,000 (−8.79%) 🚨</span></div>
-  <div class="k">거래량</div><div>5,432,833주</div>
-  <div class="k">외국인 보유율</div><div>51.04% (372,854,122주) — 7/31 51.22% 대비 <span class="neg">−0.18%p</span></div>
-  <div class="k">250일 고가 대비</div><div>2,987,000원(6/25) 대비 <span class="neg">−47.54%</span> (7/31 −42.48% → 추가 확대)</div>
-  <div class="k">ADR (8/3)</div><div>$141.36 (전일 $138.99) — ⚠ 등락률 크로스체크 불일치(rate −1.65 / calc +1.71 / hist −1.65), 미확정</div>
-</div>
-</div>
-
-<h3>2.2 수급 — 투자자별 순매수 (investor-flow.csv)</h3>
-<div class="panel fact">
-<table>
-<tr><th>누적</th><th>외국인</th><th>기관</th><th>개인</th></tr>
-<tr><td><b>1일 (8/3)</b></td><td class="num neg">−1,760.8억</td><td class="num neg">−456.0억</td><td class="num pos">+2,174.5억</td></tr>
-<tr><td>5일</td><td class="num neg">−1,693.1억</td><td class="num pos">+1,699.6억</td><td class="num neg">−105.7억</td></tr>
-<tr><td>20일</td><td class="num neg">−5,280.4억</td><td class="num neg">−1,780.5억</td><td class="num pos">+6,666.5억</td></tr>
-</table>
-<div class="src">출처: sources/sk-hynix-investor-flow.csv (KIS API). 단위: 원.</div>
-</div>
-
-<h3>2.3 시장 지표 — 코스피/코스닥·신용잔고·ETF NAV</h3>
-<div class="panel fact">
-<table>
-<tr><th>지표</th><th>값</th><th>등락</th></tr>
-<tr><td>코스피 (8/3)</td><td class="num">6,257.45</td><td class="neg">−5.12%</td></tr>
-<tr><td>코스닥 (8/3)</td><td class="num">737.35</td><td class="pos">+2.44%</td></tr>
-<tr><td>신용융자잔고 (7/31)</td><td class="num">452,143,092천원</td><td class="mut">잔여비율 0.42 (7/29 0.45→감소)</td></tr>
-<tr><td>SOL AI반도체소부장 (455850, 8/3)</td><td class="num">19,880</td><td class="neg">−1.18% (NAV 괴리 +0.02%)</td></tr>
-<tr><td>ACE AI반도체TOP3+ (469150, 8/3)</td><td class="num">51,470</td><td class="neg">−6.35% (NAV 괴리 +0.13%)</td></tr>
-</table>
-<div class="src">출처: kr-index-quote.csv / sk-hynix-credit-balance.csv / portfolio-etf-nav.csv</div>
-</div>
-
-<h3>2.4 해석 (LLM 서사 — 위키 연결)</h3>
-<div class="panel llm">
-<p><b>HBM Cycle Score 붕괴조건 ④ — 🔴 충족 (1/4)</b></p>
-<p>외국인 20일 누적 순매도 <b>−5,280억원</b>. 위키 <a href="../wiki/concepts/hbm-cycle-score.md">hbm-cycle-score</a> 8/2 기준
-<b>70점(경계 60~80)</b>에서 붕괴조건 1/4 유지. 8/3 데이터로 외국인 수급은 더 악화했으나, 보유율은 51.04%로 아직 50% 선 위.
-<b>체결↔결제 시차</b>(위키 entities/sk-hynix.md) 때문에 KSD 보유율은 순증 중이라 점수 단기 하락이 사이클 꺾임 확정을 의미하진 않음.</p>
-
-<p><b>엔비디아 패턴 가설 — 0/3 확정, 수렴 중</b></p>
-<p><a href="../wiki/concepts/nvidia-pattern-hypothesis.md">nvidia-pattern-hypothesis</a> v3-final: 8/3 기준 종가위치 <b>~52%</b>(기준 80% 미달✗),
-거래량 1.79배(기준 2.0배 미달✗), 고점돌파 사실상 불가능 궤도. 신뢰도 25점(최종). 8/3 −8.79%로 종가위치 51.92%로 추가 하락 —
-<b>"엔비디아 급등 패턴과 비슷한가" → "비슷하지 않다"</b>로 답변 수렴.</p>
-
-<p><b>SA 강제청산 — 규모 정정된 "여러 요인 중 하나"</b></p>
-<p><a href="../wiki/concepts/situational-awareness-fund-liquidation.md">situational-awareness-fund-liquidation</a>: SA의 SK하이닉스 포지션은 시총 1% 미만으로
-코스피·삼성전자 전체 랠리를 설명하기엔 규모 작음(사용자 지적으로 정정). 7/31 급등(+29.95%)이 SA overhang 해소·숏커버링 일회성 요인일 수 있다는 신중론이
-독립 소스 2곳에서 겹침 — <a href="../wiki/concepts/market-cycles-leverage-risk.md">"글로벌 디레버리징+숏커버링 반등" 프레임</a>.</p>
-
-<p><b>패닉 회복 신호 — Tier1 미충족, "바닥다지기" 후퇴 가능성</b></p>
-<p><a href="../wiki/concepts/panic-recovery-signals.md">panic-recovery-signals</a>: 7/31 급등 시 4단계 판정 "회복초입"이었으나
-8/3 −8.79% 재하락으로 신중론 반영(규모 하향 조정 포함). Tier1(공포 직접반박 외부데이터) 확정 신호 아직 없음.
-<b>8/12 고점돌파 여부만 남은 변수</b>이나 사실상 불가능 궤도.</p>
-</div>
-
-<h3>2.5 포트폴리오 영향</h3>
-<div class="panel fact">
-<div class="kv">
-  <div class="k">SK하이닉스 (일반, 120주)</div><div>평가액 188,040,000원 / 손익 +153,026,000 (+437.04%) — 매입원가 291,783원</div>
-  <div class="k">제주반도체 (20주)</div><div class="neg">−29.02%</div>
-  <div class="k">롯데렌탈 (4주)</div><div class="neg">−33.98%</div>
-  <div class="k">KODEX 글로벌비만치료제 (ISA, 440주)</div><div class="pos">+21.49%</div>
-</div>
-<div class="src">출처: sources/portfolio-holdings.csv (8/3 19:10 동기화). 집중도(SK하이닉스) 약 75.8% 유지.</div>
-</div>
-
-<h3>2.6 오늘 SK하이닉스 관전 포인트</h3>
-<div class="next">
-<ul>
-<li><b>월요일(8/4) 개장 갭</b> — 간밤 ADR $141.36(불일치라 방향 미확정). 7/31 +29.95% 급등 후 8/1 보합·8/3 −8.79%의 "3막 롤러코스터" 후속</li>
-<li><b>외국인 20일 누적 −5,280억</b>가 다시 −6,000억(위키 threshold)으로 깊어지는지 — HBM Cycle Score 경계→꺾임경고 이탈 기준</li>
-<li><b>신용융자잔고 0.42</b> — 찐반등 신호①(빚의 청산) 진행 중. 0.30 미만 진입 시 신호 충족 후보</li>
-<li><b>ADR 프리미엄</b> — 7/31 21.6~30.7%에서 8/3 시점 불일치. 동시 거래 시점에서 재측정 필요</li>
-</ul>
-</div>
-
-<!-- ===================== 청약 장 ===================== -->
-<h2>🏠 3. 청약 모니터 — 플랫폼시티</h2>
-<div class="sub">원본: <code>collectors/subscription_monitor/</code> + <code>docs/subscription-monitor.html</code> (5분 폴링)</div>
-
-<h3>3.1 사실 (자동 모니터 인용)</h3>
-<div class="panel fact">
-<div class="kv">
-  <div class="k">알림 발송된 공고</div><div>2건 (alerted_state.json: 2026000313, 2026000320)</div>
-  <div class="k">폴링 주기</div><div>5분 간격 (concurrency 그룹으로 중복 실행 방지)</div>
-  <div class="k">데이터 소스</div><div>data.go.kr 공공데이터포털 (DATA_GO_KR_KEY) — 서울/경기 국민주택</div>
-  <div class="k">알림 채널</div><div>Gmail + GitHub Issue 자동 생성 (GITHUB_TOKEN)</div>
-</div>
-<div class="alert" style="margin-top:10px">
-  <b>참고:</b> 자동 모니터는 "플랫폼시티" 키워드 매칭 공고만 알림. 상세 단지/분양일정은
-  <code>docs/subscription-monitor.html</code>(GitHub Pages)에서 확인. 이번 발간 시점엔 신규 매칭 변동 없음.
-</div>
-</div>
-
-<h3>3.2 해석 (LLM 서사 — 위키 연결)</h3>
-<div class="panel llm">
-<p>청약은 본질적으로 <b>이벤트 드리븐</b>이라 일일 브리프에서는 "당일 매칭 변화가 있을 때만" 의미가 있음(아침엔 보통 변동 없음).
-사용자 맥락(<a href="../wiki/entities/user-profile.md">user-profile</a>): 용인 수지구 거주, 전세 만료 2027-02-22(갱신 불가), 플랫폼시티 공공분양 대기,
-청약통장 249회 납입(잔액 28,050,000원, 가입 2005-11-03).</p>
-
-<p>거시 연결: 위키 <a href="../wiki/concepts/macro-regime-history.md">macro-regime-history</a>의 "수도권 공급절벽(2026 −35%) vs 금리인상 역풍 충돌" —
-8/14 한은 금통위(금리 인상 유력)가 청약 자금 계획에 직결. 청약통장 납입액 2,805만원은 위키가 "커트라인 경계 구간"으로 분류.</p>
-</div>
-
-<h3>3.3 오늘 청약 관전 포인트</h3>
-<div class="next">
-<ul>
-<li><b>신규 공고 매칭</b> — 5분 폴링이 자동 감지하므로 브리프에서는 "전일 대비 alerted_state.json 변화"만 보고</li>
-<li><b>8/14 한은 금통위</b> — 금리 인상 시 청약·주택자금 버킷 재판정 필요(<a href="../wiki/concepts/portfolio-rebalancing-strategy.md">portfolio-rebalancing-strategy</a>)</li>
-</ul>
-</div>
-
-<!-- ===================== 통합 ===================== -->
-<hr>
-<h2>🧭 통합 한 줄 진단</h2>
-<div class="panel" style="border-left:3px solid var(--acc)">
-<p><b>거시는 건강한데(Early Expansion·CCI 5), 시장은 수급·심리로 붕괴(코스피 −5.12%·하이닉스 −8.79%)</b> —
-<a href="../wiki/concepts/fundamentals-vs-sentiment-derating.md">디레이팅 프레임</a>의 진행형. HBM Cycle Score 70(경계)·붕괴조건 1/4 유지,
-엔비디아 패턴 0/3으로 "이번이 급등 시작" 신호 아님. 7/31 급등은 SA overhang 해소·숏커버링 일회성 가능성.
-<b>다음 검증대는 8/5 한국 CPI·8/12 미 CPI·8/14 한은 금통위</b> — 이 지점들이 "디레이팅 → 리레이팅" 전환을 가른다.</p>
-</div>
-
-<div class="foot">
-<b>생성 정보</b><br>
-- 사실층: GitHub Actions 자동 리포트(PEOS 2026-08-03.md, SK하이닉스 2026-08-04-0223.md, 청약 alerted_state.json)<br>
-- 해석층: wiki/ 서사(hbm-cycle-score, panic-recovery-signals, nvidia-pattern-hypothesis, situational-awareness-fund-liquidation, trump-midterm-tracker, fundamentals-vs-sentiment-derating, macro-regime-history)<br>
-- ⚠ <b>웹검색 보완 실패</b>(사내 LLM 게이트웨이 GLM-5.2 tool_choice 버그) — 당일 속보·모순검증 누락. 정상 발간 시 이 자리 채움.<br>
-- 본 브리프는 프로토타입(첫 발간). 형식·품질 피드백 환영.<br>
-- 파일: <code>report/daily-brief-2026-08-04.html</code> (local + 서사 브랜치 push 예정)
-</div>
-
+  <footer>
+    발송 주체: Desktop (Windows Task Scheduler → Python 스크립트 → Contents API PUT → GitHub Actions 발송 워크플로우).<br>
+    모바일 Claude Code 구독 만료와 무관 — 실시간 매물 알림은 GitHub Actions Python이 처리합니다.
+  </footer>
 </div>
 </body>
 </html>
-<!-- email-fix-test 2026-08-04T10:23:09Z -->
-<!-- email-subject-fix-test 2026-08-04T10:28:06Z -->
