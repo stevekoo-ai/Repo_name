@@ -36,6 +36,16 @@ tags: [messagebox, sync, multi-client, ops, priority]
 
 <!-- 새 메시지는 아래 양식을 복사해 위에 추가. 가장 최근가 맨 위. -->
 
+### 🟡 log-rotate 자동화 main 실배포 완료 (이번만 예외로 main 직접 push) — desktop 2026-08-07T15:30Z
+
+- **who**: desktop
+- **when_utc**: 2026-08-07T15:30:00Z
+- **expires_utc**: 2026-08-14T00:00:00Z (첫 자정 자동 run 며칠 검증 후 acknowledge)
+- **what**: 사용자 "GitHub에서 자정 지나면 log.md 일자별 정리 task, 그렇게 구현 안 되어 있어?" → 진단 결과 **코드는 있으나 main에 push 안 돼 schedule이 0회 발화** 확정 → 사용자 결정 "이번만 Contents API로 main 직접 push" (CLAUDE.md "main 직접 커밋 금지" 예외 승인). main에 `log-rotate.yml`+`log_rotate.py` 배포(9889eba/c6d8a19), 첫 run 실패(서사 브랜치 checkout 시 스크립트 없음) → 서사에도 4종 배포(f9f7b78 등) → 두 번째 run **성공**(id 31153363185, commit cbf80c2, `log-archive/2026-08/2026-08-06.md` 생성, log.md 72KB→25KB). 매일 00:20 KST 자동 실행 확정. 신규 concept 페이지 [concepts/log-rotation-3hybrid-infra.md](concepts/log-rotation-3hybrid-infra.md)에 산출물·배포 이력 정리.
+- **read_first**: [concepts/log-rotation-3hybrid-infra.md](concepts/log-rotation-3hybrid-infra.md) — 인프라 산출물·배포 상태·미구현, [CLAUDE.md](../CLAUDE.md) "Log rotation" 섹션(설계·degradation 표)
+- **action_for_other_terminals** ⚠️: (1) **pull 전 반드시 stash** — desktop이 Contents API로 main+서사에 여러 별개 커밋을 올림(log-rotate 파일 6개, 위키 3개). pull 시 divergence/충돌 가능 → `git fetch && git reset --soft origin/claude/ai-agent-impl-002tip`로 정리 권장. (2) **log.md 구조 변경 없음**(이전 13:50Z 메시지와 동일 — 3층 구조 이미 적용). (3) **Windows 층(log_summarize_routine.bat)은 여전히 schtasks 미등록** — `## 당월 요약` 갱신은 아직 수동. (4) **`2026-08-early.md`는 규칙 밖 임시 파일** — 다음 정리 시 정식 구조로 통합 필요(미해결).
+- **status**: active
+
 ### 🟦 다중 터미널 위키 동기화 설계(append-first) + 회사망 push 우회 종합 워크플로우 신설 — desktop 2026-08-07T01:44Z
 
 - **who**: desktop
