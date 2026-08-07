@@ -240,7 +240,10 @@ for s in [50000,73000,75000,100000]:
 ## Sources
 
 - [회사망 git push 우회 — 4경로 전수 측정](corp-network-push-bypass-investigation.md) — 측정 배경/결과
-- [`upload_brief.py`](../../upload_brief.py) — 동작하는 전체 스크립트 (레시피 A + C 구현)
+- [`upload_brief.py`](../../upload_brief.py) — 동작하는 전체 스크립트 (레시피 A + C 구현, report HTML 고정)
+- [`upload_wiki_files.py`](../../upload_wiki_files.py) — 2026-08-07 신설, **범용 위키 파일 업로드** (인자로 파일 경로 받음, 레시피 A의 일반화 버전. PAT 폴백/SSL 폴백/에러분기 내장. 위키 페이지 갱신 시 이 스크립트 사용)
+- [`dispatch_log.py`](../../dispatch_log.py) — 73KB 초과 파일(log.md 등)용, gzip+base64 → repository_dispatch (레시피 밖, Actions runner가 commit)
+- [다중 터미널 위키 동기화 설계 — append-first](multi-terminal-wiki-sync-design.md) — 2026-08-07, 회사망 push 우회 종합 운영 워크플로우(Step 1~6, divergence 정리 포함) 실증 기록
 - [Daily Brief 이메일 전송 — 디버깅 경위](daily-brief-email-workflow-debug.md) — Contents API 원본 활용
 - [Claude Code 사내 LLM 라우팅 & 재부팅 후 접속 복구](claude-code-internal-routing.md) — PAT + SSL 폴백 원본
 - GitHub Contents API docs (WebFetch 교차검증: message/content/branch/sha)
