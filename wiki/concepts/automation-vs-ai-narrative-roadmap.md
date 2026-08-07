@@ -1,7 +1,7 @@
 ---
 title: 자동화 vs AI 서술 — SK하이닉스 데일리 체크 로드맵
 created: 2026-08-05
-updated: 2026-08-05
+updated: 2026-08-06
 tags: [automation, architecture, roadmap, sk-hynix, peos, api]
 ---
 
@@ -181,31 +181,277 @@ Tool"**([run 31063296132](https://github.com/stevekoo-ai/Repo_name/actions/runs/
 `SEC_EDGAR_CONTACT` GitHub Secret으로 주입하도록 수정 →
 https://github.com/stevekoo-ai/Repo_name/pull/48, **2026-08-06 merge 완료**.
 
-### 재실행 삽질 + PR #49 (2026-08-06) — GMAIL_ADDRESS 재사용으로 시크릿 단순화
+### 재실행 삽질 + PR #49 (2026-08-06) — GMAIL_ADDRESS 재사용으로 시크릿 단순화 ✅ merged
 
 PR #48 merge 후 사용자가 재실행했으나 여전히 403 — 원인 분석 결과 **"Re-run
 failed jobs" 버튼이 PR #48 merge 이전 커밋(같은 run id, attempt 2)을 다시
 돌린 것**이었음(새 dispatch가 아니었음). 이 과정에서 사용자가 신규 시크릿
 등록 대신 **이미 있는 `GMAIL_ADDRESS` 시크릿 재사용을 제안** — 워크플로의
 env를 `SEC_EDGAR_CONTACT: "PEOS-research ${{ secrets.GMAIL_ADDRESS }}"`로
-변경해 반영: https://github.com/stevekoo-ai/Repo_name/pull/49 (merge 후
-**추가 시크릿 설정 불필요**). 구독 중.
+변경해 반영: https://github.com/stevekoo-ai/Repo_name/pull/49, **2026-08-06
+merge 완료**.
+
+### ✅ 2단계 완전 검증 완료 (2026-08-06)
+
+merge 직후 `raw:true` 재실행 → **성공**. 로그로 확인: Meta(CIK 1326801,
+entityName "Meta Platforms, Inc.")에서 `CAPEX_TAG_CANDIDATES` 1번째 후보
+(`PaymentsToAcquirePropertyPlantAndEquipment`)가 그대로 매칭 — 4개사 전부
+fallback 태그 없이 1번째 태그로 해결됨. 이어서 정식 모드(raw 아님)도
+`actions_run_trigger`로 직접 실행해 **`sources/hyperscaler-capex.csv`에
+실측 데이터 커밋 완료** — 예: GOOGL 2025Q3 CapEx $63.6B, MSFT FY2026Q3
+$47.5B, META 2025Q2 $29.5B(모두 SEC 정식 공시 기준). 이걸로 2단계
+(하이퍼스케일러 CapEx 자동수집)는 **완전히 동작 확인된 상태** — 매주
+월요일 21:00 UTC 자동 갱신, 수동 실행도 가능.
+
+### ⚠️ SEC EDGAR 데이터 정합성 버그 발견·수정 (2026-08-06, "숙제 점검" 중 발견)
+
+위 "완전히 동작 확인된 상태"라는 판정은 **"API 호출이 성공하고 숫자가
+CSV에 들어왔다"까지만 검증한 것**이었다 — 사용자가 "숙제 다 했는지" 재점검을
+요청해 daily_report.py에 실제로 연결하려던 중, 커밋된 `hyperscaler-capex.csv`를
+자세히 들여다보니 두 가지 실제 문제를 발견:
+
+1. **같은 분기가 다른 fiscal_year/fiscal_period로 중복 저장됨**: SEC의
+   companyconcept API는 한 분기(예: GOOGL 2025-03-31 마감)가 **나중 필링의
+   "전년동기 비교치"로 다시 보고될 때 그 나중 필링의 fy/fp를 붙여서** 내려주는
+   경우가 있다 — 이전 코드는 upsert 키가 `(ticker, fiscal_year,
+   fiscal_period)`였는데, 같은 분기가 "2025Q1"과 "2026Q1"이라는 서로 다른
+   키로 각각 저장돼 **가짜 중복 행**이 생겼다(GOOGL·META·MSFT 3사 전부에서
+   확인, 19행 중 5행이 중복).
+2. **MSFT 한 분기(2025-03-31 마감)에서 진짜 값 충돌**: 같은 end_date인데
+   한쪽 필링은 $16.7B, 다른 쪽은 $47.5B — **위 "MSFT FY2026Q3 $47.5B"로
+   인용했던 수치가 실은 이 충돌 중 한쪽이었다**(어느 쪽이 맞는지는 이
+   세션에서 재확인 못함, 아래 참고). 이전 코드는 어느 쪽이 진짜인지 검증
+   없이 최신 fy/fp로 보이는 쪽을 그대로 썼다 — 이 위키·roadmap 문서에
+   "검증 완료"로 인용했던 이 특정 수치는 **정정 필요**로 낮춘다.
+3. **AMZN이 2017-03-31 마감 분기에서 멈춰있음**(9년 전) — 첫 성공한 후보
+   태그(`PaymentsToAcquirePropertyPlantAndEquipment`)에서 데이터를 찾으면
+   바로 멈추고 나머지 후보 태그를 시도하지 않던 게 원인으로 추정(Amazon이
+   최근엔 다른 태그를 쓸 가능성). 재검증은 SEC 라이브 접속이 필요.
+
+**수정한 내용** (`scripts/sec_edgar_capex.py`):
+- upsert 키를 `(ticker, fiscal_year, fiscal_period)` → **`(ticker,
+  end_date)`**로 변경 — end_date가 진짜 분기 식별자, fy/fp는 필링마다
+  달라질 수 있어 신뢰 불가.
+- 같은 end_date에 값이 다르면(진짜 충돌) **가장 먼저 제출된(filed 이른)
+  값을 채택하되, 다른 값도 새 `note` 컬럼에 남긴다** — investor_flow.py의
+  ADR crosscheck MISMATCH와 동일한 원칙(조용히 하나를 버리지 않음).
+- 첫 성공 태그에서 멈추지 않고 **후보 태그 전부를 조회해 합친다** — 회사가
+  최근 다른 태그로 바꿨을 가능성을 놓치지 않기 위함.
+- 기존 CSV(19행)를 이 로직으로 로컬 재처리해 14행으로 정리, MSFT 충돌은
+  `note`에 명시적으로 남겨둠(`sources/hyperscaler-capex.csv` 참고).
+
+**⚠️ 아직 남은 문제 — 이 세션은 검증 못 함**: 위 표에 정리했듯 4개사
+전부 end_date가 150일 이상 지나 스테일(GOOGL 310일·MSFT 218일·AMZN
+3,415일·META 402일, 2026-08-06 기준) — 이 세션은 SEC 도메인 아웃바운드가
+막혀 있어(WebFetch도 403 확인) **재조회로 진짜 최신 분기를 직접 확인하지
+못했다**. `daily_report.py`에는 스테일 여부를 자동 판정해 "⚠ 재조회
+필요" 라벨을 붙이도록만 반영(아래 참고) — 다음으로 필요한 건 **이 수정을
+PR #51로 main에 올린 뒤(https://github.com/stevekoo-ai/Repo_name/pull/51,
+병합 대기) GitHub Actions로 실제 재실행**(SEC 접속이 되는 러너에서),
+MSFT 충돌 값 중 어느 쪽이 맞는지, AMZN이 정말 최신 데이터가 없는지,
+GOOGL 등 나머지 3사도 2025-09/12월 이후 분기가 실제로 없는지(있는데
+못 가져온 건지) 확인하는 것.
+
+### 🆕 3단계 착수 — 체크 프롬프트를 실제로 자동화 인프라에 연결 (2026-08-06)
+
+사용자 질문("자동화로 데이터를 미리 가져오면 토큰 사용량이 줄어들어?")에 대한
+답: **부분적으로만** — 🟢 자동화 가능 섹션은 GitHub Actions가 미리 계산해두면
+그 부분 토큰은 0이거나(Claude 미호출) 최소화되지만(CSV 원본 대신 완성된
+한 줄만 인용), 🔴 뉴스해석 섹션(HBM ASP·엔비디아&CoWoS·CXL·국제매체·트럼프
+서술·목표가 근거)은 여전히 웹검색+판단이 본질이라 줄지 않는다. 특히 HBM Cycle
+Score 최대비중 두 축(ASP25+엔비디아25=50점)이 여기 해당돼 절반은 못 줄인다.
+**핵심 병목 발견**: 인프라(`daily_report.py`, `sec_edgar_capex.py`)는 이미
+완성·실전검증됐는데, 하루 3회 도는 체크 프롬프트 자체가 그동안 이를 안 쓰고
+CSV를 직접 열어 재계산하거나 웹검색으로 재확인하고 있었다 — 이게 진짜 낭비.
+
+**아침(07:00 KST) 트리거 수정 완료**(`trig_01CCKjPS2YWUVDsJQv1X4Av1`,
+`update_trigger`로 반영): 신설 단계 "1-2"에서 `python3 scripts/daily_report.py
+--ticker 000660`을 먼저 실행하고 그 출력을 시세/외국인보유율/ADR/투자자별
+순매수/붕괴조건④/HBM 외국인축2개/신용융자잔고/공매도/코스피코스닥지수/
+포트폴리오평가금액의 1차 근거로 그대로 인용하도록 지시, 기존 2-4(외국인
+수급)·2-1(하이퍼스케일러 CapEx FACT)·3-1(HBM 2축)·3-2(포트폴리오) 단계에
+"재계산·재검색 대신 1-2 출력 재사용" 포인터 삽입. 🔴 항목은 원래 지시 그대로
+유지(수정 안 함).
+
+**장초반(10:00)·저녁(19:00) 트리거는 아직 미착수** — 이 세션은 두 트리거의
+정확한 현재 프롬프트 원문을 갖고 있지 않아(list_triggers API가 prompt 필드를
+반환하지 않음, 이 대화 안에서 두 트리거가 실제 발동한 메시지도 없었음),
+추측으로 전체 덮어쓰기하면 각 루틴 고유 내용(예: 저녁의 "카테고리별 타임라인
+본격 갱신" 담당 문구 등)을 날릴 위험이 있어 보류 — 사용자 확인 후 진행
+(선례: 2026-08-05 09:3x 세션은 실제 발동 메시지를 대조해 재구성했음, 이번엔
+그 메시지가 이 대화 컨텍스트에 없음).
+
+### 🆕 "숫자를 의미화"하는 업계 기법 조사 (2026-08-06, 사용자 요청)
+
+사용자 요청("데이터 숫자를 의미화하는 방식에 대해 더 좋은 방법이 있는지 조사") —
+🔴로 분류했던 항목 일부가 실은 완전자동화까진 아니어도 **더 나은 방법론**으로
+개선 가능함을 웹조사로 확인. 4가지 확립된 기법 + 2개 구체적 신규 데이터 후보:
+
+**A. 템플릿 기반 NLG(Natural Language Generation)** — AP통신이 Automated
+Insights(Wordsmith)로 분기당 3,000+건의 실적 기사를 LLM 없이 생성(구조화
+데이터→사전정의 템플릿 채우기, 결정론적·감사가능). 이미 우리가 daily_report.py로
+하고 있는 방향이 업계 표준과 일치함을 확인 — 새 발견이라기보단 **검증**.
+
+**B. CNN Fear & Greed Index 방법론(z-score/percentile 정규화)** — 7개 지표를
+각각 "252일 이동평균 대비 얼마나 벗어났는지"로 정규화한 뒤 0~100 스케일로
+합산, 균등가중. **HBM Cycle Score의 지금 배점 방식(8/4/3점 임의 구간)보다
+통계적으로 더 방어 가능한 대안** — 고정된 매직넘버 대신 과거 분포 대비
+표준편차로 자동 보정되는 방식이라, 국면이 바뀌어도 임계값을 손으로 재조정할
+필요가 줄어든다.
+
+**C. Loughran-McDonald 금융 특화 감성사전 + 무료 실적콜 원문(Motley Fool)** —
+2011년 학계에서 개발된 재무 텍스트 전용 사전(negative/positive/uncertainty/
+litigious 등 6개 카테고리), 어닝콜 톤 분석에 검증된 실적. Motley Fool이
+S&P500 어닝콜 전문을 무료 공개 — 두 개를 결합하면 **"고객재고 센티먼트
+0~10점"을 LLM 없이 사전 기반 단어 카운팅으로 근사 가능**(🔴→🟡 격상 후보).
+단, 룰 기반 사전이 LLM 판단보다 뉘앙스가 거칠다는 명백한 품질 트레이드오프 있음.
+
+**D. AgenticSciences memory-price-tracker(GitHub, DRAM/NAND/HBM 가격)** —
+로드맵 최초 조사 때 "웹UI만 있고 API 없음"으로 판단했던 게 재확인 결과
+**GitHub 저장소에 JSON으로 실제 존재**(`verified_memory_data.json`), 항목마다
+`verified: true/false` + `verification_method`(예: "DRAMeXchange 직접
+스크레이프") 필드로 실측/예측 구분 명시 — raw.githubusercontent.com으로
+직접 fetch 가능. **HBM ASP(Cycle Score 최대비중 25점) 자동화 후보**(🔴→🟡
+격상 후보). ⚠ 단, 이 프로젝트 자체가 DRAMeXchange 3자 스크레이프이지
+1차 공식 출처가 아니라 신뢰도 등급은 낮게(data/manual_inputs/semiconductor.yaml의
+"반도체 예외 정책 grade cap 3"과 동일하게) 잡아야 하고, 일부 필드는
+"market pattern simulation between points"(포인트 사이 보간)를 쓴다고
+README에 명시돼 있어 verified=true 항목만 골라 써야 함.
+
+**E. Z-score/percentile 기반 이상치("역대급") 탐지** — 이미
+`credit_balance_streak()`에서 부분 구현한 "N일 연속 증감" 패턴을, 표준편차
+기준(z≥3 등)으로 일반화하면 "역대급 순매수", "이례적 낙폭" 같은 판단도
+사람 손 없이 자동 플래그 가능. daily_report.py의 여러 섹션에 공통 적용 가능한
+범용 유틸리티.
+
+### ⚠️ D·C 정정 (2026-08-06, 실제 데이터 열람 후)
+
+사용자가 A~E 전부(B/C/D/E, D는 "추천"으로 선택)를 채택해 구현 착수했으나,
+**착수 전 실제 소스를 열어본 결과 D·C는 처음 조사에서 과대평가했음이
+드러났다** — 정정 기록.
+
+- **D (AgenticSciences memory-price-tracker) — HBM ASP 자동화 후보로서
+  기각.** `verified_memory_data.json` 전체를 직접 열람한 결과 **HBM 항목이
+  0건**(DDR4/DDR5 DRAM 현물가, GPU 컴퓨트 단가, 역대 최저가 기록,
+  TrendForce 예측, 시장 이벤트 타임라인만 존재 — "HBM" 검색 결과 없음).
+  게다가 DRAMeXchange 소스의 `last_update` 필드가 "2026-04-17"로, 조사
+  시점(2026-08-06) 기준 **약 4개월 정체** — README의 "매주 갱신" 설명과도
+  불일치. 최초 웹조사(위 "D." 항목 서술)는 이 두 가지를 확인하지 않고
+  README/구조만 보고 낙관적으로 판단한 것 — **과대평가였음을 인정**.
+  HBM ASP(Cycle Score 25점, 최대비중 축)는 여전히 🔴(자동화 불가)로 유지.
+  일반 DRAM(DDR4/DDR5) 현물가만 필요한 별도 용도가 생기면 재검토 가능하나,
+  현재 로드맵의 어떤 항목도 그 범위로 좁혀 쓸 이유가 없어 **보류**.
+- **C (Loughran-McDonald + Motley Fool) — 소스 접근 차단으로 미착수.**
+  Motley Fool 실적콜 전문 인덱스 페이지(`fool.com/earnings/call-transcripts/`)에
+  WebFetch 시도 시 **403(봇 차단)**. 사전(Loughran-McDonald) 자체는 여전히
+  유효한 방법론이지만, 이 세션에서 확보 가능한 무료 실적콜 원문 소스가
+  없어 "고객재고 센티먼트" 축 자동화는 **당장은 착수 불가** — 대체 무료
+  전문(transcript) 소스를 찾거나(예: 기업 IR 페이지 직접, SEC 8-K 첨부),
+  사용자가 우선순위를 낮추면 로드맵에서 보류.
+
+**B·E는 실제로 구현 가능했고 완료함** — 아래 "✅ B·E 구현 완료" 참고.
+
+### ✅ B·E 구현 완료 (2026-08-06)
+
+`scripts/stats_utils.py` 신설(순수 stdlib, `statistics`+`math`만 사용) —
+`zscore()`(과거 관측치 대비 표준편차, 표본 5건 미만이거나 무변동이면 `None`),
+`percentile_rank()`, `anomaly_label()`(z-score→"역대급/이례적/평이한 수준"
+한글 라벨, ±2σ/±3σ 관례 임계값), `logistic_scale()`(z-score를 [0, 만점]
+연속 스케일로 로지스틱 압축, CNN Fear&Greed와 동일한 발상).
+
+**B로 적용**: `daily_report.py`의 `score_foreign_flow_axis()`(외국인수급
+15점)·`score_foreign_holding_axis()`(보유율 15점)를 개정 — 당일 순매수(3점)·
+20일 누적(8점)·전일대비 보유율 변화(10점) 세 구간을 고정 점수구간(8/4/3점
+식 이분법) 대신 `logistic_scale(zscore(...))` 연속 스케일로 전환. 모멘텀
+(5일vs20일, 4점)과 5일평균추세(5점)는 그 스프레드/표본 자체의 z-score를
+내기엔 필요 표본(최소 25영업일 또는 5개 스냅샷 안에서의 재귀)이 부족해
+방향 이분법 유지 — 데이터가 쌓이면 전환 예정.
+
+**E로 적용**: 위 B 적용 구간에 `anomaly_label()`을 함께 출력해 "역대급/
+이례적" 여부를 자동 플래그. 별도로 신용융자잔고 섹션에 "변화폭 이상치
+판정"을 신설 — 연속 증감(`credit_balance_streak`, 방향만 앎)과 별개로
+당일 변화폭 크기 자체가 과거 분포에서 얼마나 벗어났는지 z-score로 판정.
+
+**검증**: 저장소 실제 CSV로 `python3 scripts/daily_report.py --ticker 000660`
+end-to-end 실행 — 신용융자잔고 변화폭이 `역대급 하락(z=-3.21σ)`로 정상
+플래그됨(방향 이분법("3거래일 연속 감소")만으론 드러나지 않던 크기 정보).
+20일 누적 외국인수급은 절대값 기준 순매도(붕괴조건④ 충족)이면서도 과거
+분포 대비로는 `z=+1.80σ`(상대적으로 양호한 흐름) — **붕괴조건④(절대
+부호 기준)와 z-score(상대 분포 기준)가 다른 질문에 답한다는 걸 실행
+결과로 확인**, 리포트에 두 판정을 모두 남겨 혼동 방지.
+
+### 🚨 2026-08-07 최대 발견 — 서사 브랜치 개선분이 main에 하나도 반영 안 돼 있었다
+
+변두리 모니터를 daily report에 태우려고 배선을 확인하던 중 발견:
+**`sk-hynix-daily-report.yml`은 `main` 기준으로 하루 3회(07/10/19시 KST)
+지금도 돌고 있는데, `main`의 `daily_report.py`가 서사 브랜치보다 159줄
+뒤처져 있었다.** 즉 이 로드맵이 그동안 "완료"로 기록한 것들 —
+`stats_utils.py`(z-score), HBM 2축 연속스케일 채점, 하이퍼스케일러 CapEx
+섹션, 신용잔고 +1 과대표기 버그 수정 — 이 **전부 실제 리포트에서 작동한
+적이 없다.** 서사 브랜치에만 있었기 때문.
+
+**교훈(구조적)**: 이 저장소는 CLAUDE.md 브랜치 전략상 코드가 `main`에서
+실행되는데, 작업은 서사 브랜치에서 한다. **그래서 "커밋했다"와 "실제로
+돌고 있다" 사이에 PR이라는 필수 관문이 있는데, 이 로드맵은 그동안 커밋
+시점을 완료로 기록해왔다.** 앞으로 스크립트 변경은 **"main 머지 완료"를
+확인해야 완료로 기록**할 것 — 이 페이지의 기존 "✅ 완료" 표기 중
+스크립트 관련 항목은 PR #51 머지 전까지 **"작성 완료·미가동"**으로
+읽어야 정확하다.
+
+→ [PR #51](https://github.com/stevekoo-ai/Repo_name/pull/51)이 이 격차를
+한 번에 해소하도록 범위를 확대했다(원래는 SEC EDGAR 버그 수정 1건이었음).
+
+### ✅ 변두리 조기경보 자동화 (2026-08-07) — 🔴로 분류했던 영역의 일부를 🟢로 전환
+
+이 로드맵은 "하이퍼스케일러 CapEx 금액"만 🟡(SEC EDGAR로 자동화 가능)으로
+보고, 나머지 밸류체인 정보는 전부 🔴(뉴스해석 본질)로 분류했었다.
+2026-08-07 [변두리 조사](ai-value-chain-periphery-monitor.md)에서
+**그 분류가 과소평가였음이 드러났다** — 변두리 8개사(VRT/GEV/AMKR/ALAB/
+CRDO/COHR/LITE/SMCI)는 전부 미국 상장 10-Q 제출사라 **분기 매출·백로그를
+SEC EDGAR XBRL로 그대로 받을 수 있다**(CapEx와 똑같은 API·인증).
+
+`scripts/sec_edgar_periphery.py` 신설로 이 부분이 🟢(완전 자동, 토큰 0)로
+전환됐고, `daily_report.py`가 **백로그 감소 시 🔴를 자동으로 띄운다** —
+이 저장소에서 처음으로 "자동화된 판정"이 조기경보 역할까지 하는 사례.
+운영 방식은 [변두리 모니터 §5-1 운영지침](ai-value-chain-periphery-monitor.md)
+참고(자동 ⓐ / 반자동 ⓑ / 수동 ⓒ 3계층 + 에스컬레이션 임계).
+
+단 **한국·일본·대만 상장사(한미반도체·HD현대일렉트릭·이비덴·ASE)는
+SEC 미제출이라 여전히 🔴** — DART/일본/대만 공시는 별도 API 조사가
+필요하며 이번 범위 밖.
 
 ### 다음 액션
 
-- [ ] PR #49 merge
-- [ ] merge 후 GitHub Actions → "SEC EDGAR Hyperscaler CapEx" →
-      **"Run workflow"로 새로 실행**(과거 실행의 "Re-run" 버튼 아님 — 이
-      버튼은 옛 커밋을 재사용해 반영 안 됨) → `raw: true`로 XBRL 태그명 검증
-- [ ] 검증 통과하면 정기 스케줄 가동 확인(주1회, 월요일 21:00 UTC)
-- [ ] hbm-cycle-score.md에 위 2축 초안 배점 규칙을 공식 반영할지 사용자 검토
-- [ ] data.go.kr 반도체수출, KIS 목표주가 TR, Polymarket 트럼프확률 — 아직 미착수
+- [x] 장초반·저녁 트리거도 동일하게 수정 — 2026-08-06 완료(원문 미보유로
+      아침 트리거에서 추론 재구성, [messagebox](../messagebox.md) 참고)
+- [x] B·E 구현 — 위 참고. C·D는 정정 후 보류
+- [x] hbm-cycle-score.md "고객재고" 축에 hyperscaler-capex.csv 실측치
+      연결 — 2026-08-06 완료(`daily_report.py`에 `read_hyperscaler_capex()`
+      신설). **연결 도중 SEC EDGAR 데이터 정합성 버그 발견·수정**(위
+      "⚠️ SEC EDGAR 데이터 정합성 버그" 섹션) — 이전에 "완전 검증 완료"로
+      기록했던 게 API 호출 성공까지만이었고 실제 값 정합성은 안 봤던 것으로
+      드러남. 지금은 스테일(전부 150일↑ 경과) 상태로 연결돼 있어 다음
+      단계는 ↓
+- [ ] **위 버그 수정 PR #51 병합 대기 → 병합 후 GitHub Actions 재실행
+      필요**(https://github.com/stevekoo-ai/Repo_name/pull/51, SEC 접속이
+      막힌 이 세션 대신 Actions 러너에서) — MSFT 값 충돌 중 어느 쪽이
+      맞는지, AMZN·GOOGL 등이 정말 최근 분기 데이터가 없는 건지 확인
+- [ ] hbm-cycle-score.md에 위 2축(외국인수급·보유율) 초안 배점 규칙 +
+      B 개정분(z-score 연속 스케일)을 공식 반영할지 사용자 검토
+- [ ] C 대체 실적콜 원문 소스 탐색 또는 보류 확정 — 사용자 우선순위 대기
+- [ ] D는 보류 확정(위 정정 참고) — 재검토 트리거 없으면 재착수 안 함
+- [ ] data.go.kr 반도체수출, KIS 목표주가 TR, Polymarket 트럼프확률 —
+      아직 미착수, 3단계(하이브리드 명시분리) 나머지 포함 사용자 우선순위 대기
 
 ## Sources
 
 - 2026-08-05 사용자 요청 (자동화 방향 전환)
 - `scripts/investor_flow.py` (8개 KIS TR, 실계정 검증 완료)
+- `scripts/daily_report.py` (규칙기반 리포트 조립기, B·E 적용)
+- `scripts/stats_utils.py` (z-score/percentile/anomaly_label/logistic_scale, 2026-08-06 신설)
+- `scripts/sec_edgar_capex.py`, `.github/workflows/sec-edgar-capex.yml` (2단계 SEC EDGAR 자동수집)
 - `engine/rule/engine.py`, `engine/report/markdown.py`, `engine/report/html.py` (PEOS 템플릿 렌더링 선례)
 - [hbm-cycle-score.md](hbm-cycle-score.md) "1. HBM Cycle Score" (6축 가중치 공식)
 - `data/manual_inputs/semiconductor.yaml` (반도체 신호가 왜 수동 입력인지 근거)
 - WebSearch 2026-08-05: SEC EDGAR XBRL API, FMP/Finnhub 목표가 API, DRAM/NAND 무료 데이터, Polymarket, KIS 국내주식 목표주가 TR, TSMC HPC 매출비중, 네이버금융/FnGuide/DART
+- 2026-08-06 직접 열람 검증: `raw.githubusercontent.com/AgenticSciences/memory-price-tracker/main/verified_memory_data.json`(D 정정 근거), `fool.com/earnings/call-transcripts/`(C 403 확인)

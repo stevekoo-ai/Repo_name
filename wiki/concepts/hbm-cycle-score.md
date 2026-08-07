@@ -1,7 +1,7 @@
 ---
 title: HBM Cycle Score & 선행지표 조기경보 (HSEWS)
 created: 2026-07-24
-updated: 2026-08-05
+updated: 2026-08-07
 tags: [hbm, cycle-score, nvidia, cowos, early-warning, sk-hynix, daily-tracking]
 ---
 
@@ -35,10 +35,20 @@ tags: [hbm, cycle-score, nvidia, cowos, early-warning, sk-hynix, daily-tracking]
 | HBM ASP(주간 %변화) | 25 | TrendForce, DRAMeXchange, SemiAnalysis |
 | 엔비디아 주문 & CoWoS 활용률 (§2 참고) | 25 | The Information, DigiTimes, SemiAnalysis, TSMC 발표 |
 | 공급 확대 위험(경쟁사 캐파 증설, 수요증가율 대비) | 10 | 체크포인트 [⑦CXMT](sk-hynix-analyst-thesis-checkpoints.md)·⑧마이크론과 연동. **🔴 2026-08-04 신규 리스크 반영 필요**: UBS가 2027년 HBM 점유율을 삼성 41%·SK하이닉스 39%·마이크론 20%로 전망(SK하이닉스 1위 상실) — CXMT(범용 D램)와는 다른 **동급 경쟁사 기술 추격** 리스크, [체크포인트②](sk-hynix-analyst-thesis-checkpoints.md) 참고. 점수는 예측치 1건만으로 즉시 반영하지 않고 다음 체크에서 추가 검증 후 조정 여부 판단 |
-| 고객사 재고 센티먼트(하이퍼스케일러 실적콜 키워드) | 10 | [하이퍼스케일러 고객 동향](sk-hynix-analyst-thesis-checkpoints.md) 섹션과 연동 |
+| 고객사 재고 센티먼트(하이퍼스케일러 실적콜 키워드) | 10 | [하이퍼스케일러 고객 동향](sk-hynix-analyst-thesis-checkpoints.md) 섹션과 연동. **🆕 2026-08-06**: `scripts/daily_report.py`가 `sources/hyperscaler-capex.csv`(SEC EDGAR 실측)를 매일 인용하기 시작 — 단 논조(어닝콜 센티먼트) 판단 자체는 여전히 자동화 대상 아님, "CapEx가 실제로 얼마였나"라는 보조 숫자만 제공. ⚠ 이 CSV에서 end_date 기준 최신 분기가 GOOGL 310일·MSFT 218일·AMZN 3,415일·META 402일 전으로 확인돼(2026-08-06 점검) **전부 스테일** — SEC 라이브 접속이 이 세션에서 막혀 있어 직접 재검증 못 함, GitHub Actions 재실행으로 최신화 필요(상세: [automation-vs-ai-narrative-roadmap.md "SEC EDGAR 데이터 정합성 버그"](automation-vs-ai-narrative-roadmap.md)) |
 
 **판정 기준**: 80점 이상 = 강세 유지 / 60~80점 = 경계 / 60점 미만 = 사이클
 꺾임 경고.
+
+**⚠️ 이 스코어의 구조적 사각지대 (2026-08-07 신설)**: 위 6축은 **전부
+SK하이닉스 자신 또는 직접 고객의 지표**다 — 즉 "주도주가 이미 흔들린
+뒤"에야 신호가 뜬다. 사용자 지적("펀더멘털 붕괴는 주도주에서 가장 늦게
+나타난다")대로 이건 조기경보로서 한계가 명확하다. 그 공백은
+**[AI 밸류체인 변두리 모니터](ai-value-chain-periphery-monitor.md)**가
+담당한다 — 전력·냉각·기판·광통신·후공정 등 체인 최말단의 백로그·수주잔고를
+추적해 **주도주보다 먼저 꺾이는지**를 본다. 2026-08-07 전수 조사 결과
+변두리는 오히려 전부 강했고(균열 없음), 대신 **데이터센터 착공률**(2026
+계획 12~16GW 대비 실착공 5GW)이라는 새로운 감시 지표가 발견됐다.
 
 **🎯 외국인수급 축(15점) 가중치는 국면에 따라 달라져야 한다 (2026-08-04
 발견, [market-cycles-leverage-risk.md 1-4-2](market-cycles-leverage-risk.md)
@@ -185,6 +195,10 @@ Score의 다른 5축(외국인수급·보유율·ASP·엔비디아&CoWoS·공급
 | **2026-08-04 16:xx(세션 공백 후 캐치업)** | **68/100(변동없음, 종가 미확정으로 잠정 이월)** | 경계(60~80) | 🔴 **1/4(④ 유지, 추정)** | 08-03 19:00·08-04 07:00·08-04 10:00 자동 루틴 3건이 큐잉되다 이 시각 한꺼번에 도착 — 개별 리포트 재현 대신 캐치업 1건으로 통합(상세 경위는 [entities/sk-hynix.md](../entities/sk-hynix.md) 최상단 참고). 웹검색으로 확인된 8/4 장중(11:18 KST): 코스피 6,228.21(-0.47%), 삼성전자·SK하이닉스 동반 약세로 "6100선 후퇴" 헤드라인 — 단 **15:30 마감 확정 종가는 이번 검색으로 확보 못함**, 6축 전부 8/3 저녁 확정치 임시 이월. 다음 체크(정상 스케줄 복귀분)에서 8/4 확정 종가·수급으로 재평가 필요. 별도로 desktop 세션이 병행 구축한 `report/daily-brief-2026-08-04.html`(통합 Daily Brief)이 존재 — 교차참고 가능하나 이 페이지의 6축 점수 산정 방식은 독립 유지 | |
 | **2026-08-05 19:xx(저녁 자동체크, 수, 하루 최종 확정치) — 급반등, `main` 재동기화로 8/4·8/5 CSV 확보** | **69/100** 🔺**+1** | 경계(60~80) | 🔴 **1/5(④ 유지, ⑤ 미충족)** | `git merge origin/main`으로 8/4·8/5 확정 CSV 일괄 확보(직전 캐치업이 놓쳤던 8/4 종가 포함). **본주 8/4 1,577,000원(+0.64%) → 8/5 1,668,000원(+5.77%) 확정** — 간밤 미국 반도체 랠리(SOX +6.55%, 호르무즈 해협 개방 협상 진전 기대로 유가 급락)가 그대로 전이, 코스피도 +3.76%(6,598.26) 동반 상승([파이낸셜뉴스](https://www.fnnews.com/news/202608051557281792), [한국경제](https://www.hankyung.com/article/2026080554876)). **외국인수급 6→7**(🟢 소폭 상향 — 8/5 종목별 외국인 순매수 +6,576.9억원[체결], 뉴스의 "6,595억원 순매수 1위" 보도와 근접 일치해 교차검증 성공. 다만 20일 누적은 여전히 **-4.03조원**으로 마이너스 유지 — 붕괴조건④ 계속 충족). 보유율 6 유지(50.95%, 변동 없음). ASP·엔비디아&CoWoS·공급확대 3축은 신규 반증 없어 유지(20/20/6) — CoWoS는 TSMC가 8/4 CoW 공정을 ASE 등 외주로 대규모 개방했다는 뉴스로 여전히 강한 Bullish 재확인(엔비디아 CoWoS 약 60%[59.5만장] 확보, 수요가 공급을 40~50% 초과). **고객재고 10 유지**(Meta CapEx $130~145B로 재상향, Amazon도 +$20B를 "AI서버 메모리 비용" 요인으로 명시 — 메타(7/26)·MS(8/2)에 이은 세 번째 하이퍼스케일러의 메모리가 인정 사례, 고객재고 축 우호적 방증 추가이나 이미 만점이라 점수 반영 없음). **붕괴조건⑤(신규) 신설 판정**: 반도체 수출 YoY +178.8%(2026-07 기준) — 10% 문턱까지 크게 여유, 미충족([macro-indicators.md](macro-indicators.md) 참고). **⚠️ ADR MISMATCH**: `sk-hynix-adr-quote.csv` 8/5행이 $154.38·변동률 0.0%로 기록됐으나, 뉴스는 "월가 비중확대 보고서에 ADR +8.17% 급등"이라고 명시([fnnews](https://www.fnnews.com/news/202608051006208499)) — CSV의 0.0%는 명백히 의심스러움(3개 크로스체크 필드 전부 +0.00으로 동일해 데이터 정체/수집 타이밍 문제로 추정), HBM Cycle Score엔 직접 영향 없으나(ADR 비포함 축) [checkpoints.md ⑥](sk-hynix-analyst-thesis-checkpoints.md)에 별도 기록 필요. 신용융자잔고는 7/31→8/3(2,976,151주)→8/4(2,783,996주)로 **3거래일 연속 감소 확정**([찐반등 신호①](market-cycles-leverage-risk.md) 참고, 이 프레임 점수엔 비포함). |
 
+| **2026-08-06(사용자 요청 특별조사 — 자동루틴 아님, "HBM ASP 등 확인 가능한 내용을 다 가져와봐")** | **72/100** 🔺**+3** | 경계(60~80) | 🔴 **1/5(④ 유지, ⑤ 미충족, 변동 없음)** | 외국인수급·보유율은 신규 시세/수급 데이터 조회 없이 8/5 저녁 확정치 그대로 이월(7·6) — 이번 조사는 순수 웹서치 기반 정성 갱신. **ASP 20→22**(🟢 상향 — SK하이닉스 자체 2분기 실적콜(2026-07-29, 공식 컨퍼런스콜 트랜스크립트)에서 **D램 ASP 전분기 대비 약 +30%, 낸드 mid-50%대 상승 공식 확인**[사상 최대 폭], HBM3E 컨트랙트 가격도 QoQ 약 +20%(Silicon Analysts 2026-06-27) — "3주 연속 하락" 붕괴조건①과 정반대 방향으로 사상 최고 강도의 근거. 2027년 HBM 가격 전망도 "최소 50%대 인상"(뉴데일리 2026-06-02)~"거의 두 배"(서울경제 2026-07-12, HBM4 ~$500/스택→2027 $2~4~5/GB 수준) 등 복수 소스 수렴. 경영진은 컨콜에서 HBM 가격을 "범용 D램 가격+공급망 여력+기술복잡도+고객가치"로 산정하며 "차별화된 가치에 상응하는 적정 수익성 확보"가 목표라고 명시 — commodity화로 빠르게 회귀하지 않을 것이라는 시그널. 단 3주 연속 갱신을 세는 붕괴조건①의 "주간 %변화" 원자료(TrendForce 유료) 자체는 여전히 미보유라 정성 판단 상향에 그침. **엔비디아&CoWoS 20 유지**(TSMC CoWoS가 2026년말 13~15만 웨이퍼/월로 확장[2024년말 대비 약 4배], 엔비디아가 2026 패키징 캐파의 60%+·CoWoS-L 51만장 확보 재확인 — 기존 확인분과 동일 방향, 신규 부정 신호 없음). **공급확대 6→7**(🟢 CXMT HBM3 양산 일정이 이번 조사에서도 계속 밀리는 것으로 재확인 — "연내 양산 불가능해 보임, HBM3/HBM3E가 초기 제품이 될 가능성, SK하이닉스·삼성 대비 1~2세대 뒤처짐"(TechPowerUp/Digitimes 4월 기사 재확인 + 8월 재검색 동일 결론), 여기에 Deloitte·Silicon Motion 등 독립 리서치가 "메모리 공급 부족이 2028~2029년까지 지속될 것"이라고 전망 — 근접미래 공급과잉 리스크를 오히려 낮추는 방향의 재료가 누적. ⚠️ **미채택**: wccftech 기사 제목("중국이 HBM 격차를 3년으로 좁히고 HBM3 기술 동등 달성")이 검색 결과에 노출됐으나 **본문 접근이 403으로 차단돼 근거·정의를 확인하지 못함** — 제목만으로는 "HBM3 동등"의 정의(양산 동등인지 R&D 샘플 동등인지)를 알 수 없어 점수에 미반영, 대체 소스로 재확인 전까지 보류. 자세한 CXMT 재확인은 [us-china-tech-competition-hbm.md "5-⑤"](us-china-tech-competition-hbm.md) 참고). **고객재고 10 유지**(이미 만점 — Deloitte "하이퍼스케일러 2026 CapEx가 $1조 초과 전망, 2026년 1월 계획 대비 2배 이상", Big Five 합산 $600B+ 인프라 지출[약 75%가 AI 인프라] 재확인, 기존 확인분과 같은 방향). **🆕 참고(붕괴조건 밖, cxl-next-gen-memory.md 연동)**: SK하이닉스가 8/4~6 'FMS 2026'(산타클라라)에서 샌디스크와 **HBF(High Bandwidth Flash) 세계 최초 표준 규격을 공식 발표**(SK하이닉스 뉴스룸 1차 소스 확인) — HBM 이후 첫 공식 차세대 메모리 로드맵. 상세는 아래 링크. |
+
+| **2026-08-06 19:xx(저녁 자동체크, 목, 하루 최종 확정치) — 🚨 매도 사이드카·-10.37% 급락, B(z-score) 방식 첫 실전 적용** | **75.3/100** | 경계(60~80) | 🔴 **1/5(④ 유지·심화, ⑤ 미충족)** | ⚠️ **방법론 전환 안내**: 이 행부터 외국인수급·보유율 2축은 `daily_report.py`의 **z-score 로지스틱 연속 스케일(B)**로 채점 — 오늘 아침 특별조사 행의 "72점"은 이 2축을 8/5 저녁의 구(舊) 고정점수 방식 수치(7+6=13)로 이월한 것이었고, 이 행은 오늘 마감 CSV로 새 방식을 처음 실전 적용한 수치(16.3/30)라 **직접 비교 시 방법론 차이를 감안할 것** — 앞으로 이 방식이 표준. 축별: **외국인수급 10.8/15**(당일 -1조 6,771억 순매도 z=-0.75σ→1.1, 20일누적 -5.89조 z=+1.34σ→5.7, 모멘텀 4→4점), **보유율 5.5/15**(전일대비 +0.00%p z=+0.28σ→5.5, 5일평균추세 하락→0점), ASP·CoWoS·공급확대·고객재고는 오늘 아침 조사치 유지(22/20/7/10, 오늘 새로 확인된 부정 신호 없음 — 아래 참고). **소계(자동2축) 16.3/30**. 총점 75.3 = 16.3+22+20+7+10. **붕괴조건④ 심화**: 외국인 20일 누적 -4.03조→**-5.89조**(오늘 하루 대량매도로 재악화). ①②③⑤는 미충족 유지(오늘 뉴스 검색에서 ASP·엔비디아주문·CoWoS 관련 부정 신호 없음 — **오늘의 급락은 펀더멘털 훼손이 아니라 거시심리·수급發임을 명확히 구분**, 상세는 [market-cycles-leverage-risk.md](market-cycles-leverage-risk.md) 2026-08-06 저녁 항목). **사건**: 코스피 -4.58%(6,296.38, 매도 사이드카 10:18 발동), 본주 -10.37%(1,495,000원, CSV 확정), 삼성전자 -6.30%. 촉발: 간밤 미국 반도체주 4거래일 연속 약세(나스닥100 조정권 진입 우려, "AI 인프라 지출 정점론" 재부상)+외국인 대량매도(코스피 전체 1.7조 중 본주가 1.68조로 대부분 차지)([이투데이](https://www.etoday.co.kr/news/view/2611682), [한국경제](https://www.hankyung.com/article/202608068183i)). **찐반등 4대 신호는 0/4로 전면 재악화**(신용융자잔고도 오늘 daily_report.py에서 "N거래일 연속" 표시가 원래 +1 과대표기되던 버그를 발견·수정 — 실제는 1일 반전, [market-cycles-leverage-risk.md](market-cycles-leverage-risk.md) 참고). |
+
 **⚠ 이력 참고**: 붕괴조건④는 2026-07-24 17:33 기준으로는 "미충족"이었다
 (당시엔 20거래일 누적 정밀치를 KRX/FnGuide 원자료로 확정하지 못한
 상태였음). 이후 2026-07-25 저녁 체크에서 `sources/sk-hynix-investor-flow.csv`
@@ -230,3 +244,7 @@ main에 반영했고, 실제 계정으로 2회 검증(디버그 raw 조회 1회 
 - [반도체 시장의 단기 수급 싸이클 vs 장기 펀더멘털](market-cycles-leverage-risk.md)
 - [CXL & 차세대 메모리 트랙](cxl-next-gen-memory.md)
 - [매크로 지표 트렌드 추적 — 반도체 수출 증가율](macro-indicators.md) (붕괴조건⑤, 2026-08-05 신설)
+- [CXL & 차세대 메모리 트랙](cxl-next-gen-memory.md) (HBF 발표, 2026-08-06 연동)
+- [미중 기술경쟁 & HBM](us-china-tech-competition-hbm.md) (CXMT HBM3 재확인, 2026-08-06)
+- [AI 밸류체인 변두리 모니터](ai-value-chain-periphery-monitor.md) (이 스코어의 조기경보 사각지대를 메우는 페이지, 2026-08-07 신설)
+- 2026-08-06 웹조사(사용자 요청): SK하이닉스 2Q26 실적콜 트랜스크립트([Investing.com](https://www.investing.com/news/transcripts/earnings-call-transcript-sk-hynix-posts-record-q2-2026-results-as-shares-fall-93CH-4818480), [BigGo Finance](https://finance.biggo.com/news/KR_000660.KS_2026-07-28)), [Silicon Analysts HBM3E +20%QoQ](https://siliconanalysts.com/market/hbm3e-contract-prices-rise-20-as-ai-memory-demand-outstrips-supply-2026-06-27), [TrendForce HBM 2027 전망](https://www.trendforce.com/presscenter/news/20260602-13074.html), [서울경제 HBM4 2027 가격 두배](https://en.sedaily.com/finance/2026/07/12/hbm4-prices-to-double-next-year-as-samsung-sk-hynix-keep), [뉴데일리 HBM 가격전쟁](https://biz.newdaily.co.kr/site/data/html/2026/06/02/2026060200089.html), [SK하이닉스 뉴스룸 HBF 발표](https://news.skhynix.co.kr/hbf-at-fms-2026/), [Deloitte 메모리 공급부족 2029까지](https://www.deloitte.com/us/en/insights/industry/technology/why-memory-chip-crunch-is-greater-than-expected.html)

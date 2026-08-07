@@ -121,3 +121,7 @@ rebase 중 충돌이 나면:
 - [CLAUDE.md 7-3 브랜치 분리, 9-3 브랜치 전략](../CLAUDE.md)
 - [사내 LLM 라우팅 & GitHub API 검증](claude-code-internal-routing.md)
 - [wiki/log.md 2026-08-03 PR #23 재시도 로직 선례](../log.md)
+- [다중 터미널 위키 동기화 설계 — append-first](multi-terminal-wiki-sync-design.md) — 2026-08-07, 본 프로토콜(2클라이언트 전제)을 N터미널 환경으로 일반화한 후속 설계. 본 문서의 기준선 확립·branch 격리·force push 금지는 여전히 유효.
+- [동시 실행 중인 다른 Agent를 고려한 코딩 규칙](concurrent-agent-aware-coding.md)
+  — 본 페이지는 git **파일** 동시 편집 레이어, 저 페이지는 프로세스
+  동시 실행 레이어. "동시 사용자 고려" 철학은 공유하되 영역이 다름.

@@ -1,7 +1,7 @@
 ---
 title: 미중 기술 경쟁과 HBM 시장의 미래
 created: 2026-07-21
-updated: 2026-08-01
+updated: 2026-08-06
 tags: [us-china-competition, hbm-market, cxmt-threat, tech-autonomy, long-term-risk]
 ---
 
@@ -158,6 +158,29 @@ HBM 시장 규모(TAM) 자체가 훨씬 크게 성장한다면 점유율이 50%�
 - 대형 고객(텐센트 등)의 정부 후원 구매
 - 기술 이전·협력에 대한 정부 인센티브
 
+### ⑤ 2026-08-06 재확인(사용자 요청 웹조사) — HBM3 일정 계속 지연, 단 상반된 제목 미검증 건 있음
+- **[FACT] CXMT HBM3 양산 시점이 이번 조사에서도 계속 밀림**: "연내
+  (2026년) 양산 가능성 낮음", 초기 제품은 HBM3E 또는 HBM3 수준일
+  가능성이 높아 SK하이닉스·삼성의 HBM4 전환과 비교하면 **1~2세대
+  뒤처짐**(TechPowerUp·Digitimes, 4월 기사 원 내용을 8월 재검색으로
+  재확인 — 신규 반박 없음). 위 ③ "하반기 2026 HBM3 진입 계획 공식화"
+  대비 진도가 늦어지고 있다는 뜻.
+- **[FACT, HBM 무관] LPDDR6 R&D 검증은 오히려 순조로움**: CXMT 계열사가
+  2026-08-01 기준 LPDDR6(최대 12.8Gbps) R&D 검증을 거의 완료, 양산 전
+  최종 단계 진입 — 단 이건 **범용 모바일 D램 로드맵**이지 HBM이 아니다.
+  이 페이지 전체가 반복 강조하는 원칙("범용 D램 위협과 HBM 위협을
+  구분해서 볼 것")과 정확히 같은 구분이 이번에도 유효 — LPDDR6 진전을
+  HBM 위협 격상 근거로 쓰지 않는다.
+- **⚠️ [미검증] 상반된 방향의 헤드라인 존재**: 검색 결과에 "중국이 HBM
+  격차를 3년으로 좁히고 HBM3 기술 동등(parity)을 달성했다"는 취지의
+  기사 제목(wccftech)이 노출됐으나, **본문 페이지가 403(봇 차단)으로
+  접근 불가**해 "동등"의 정의(양산 수율 기준인지 R&D 샘플 기준인지),
+  1차 출처, 게재일을 확인하지 못했다. 위 두 [FACT] 항목(양산 지연
+  재확인)과 정면으로 배치되는 주장이라 **채택하지 않고 보류** — 이
+  숫자를 지어내지 않는다는 위키 원칙상, 대체 소스로 원문을 확보하기
+  전까지는 체크포인트⑦ 판정에 반영하지 않는다. 다음 조사에서 원문
+  확보 시도 필요.
+
 ---
 
 ## 6. SK하이닉스의 대응 필요성
@@ -230,3 +253,4 @@ HBM 시장 규모(TAM) 자체가 훨씬 크게 성장한다면 점유율이 50%�
 - [Research Insight: CXMT reaches 7.67% DRAM share with US$4.4B IPO, 2028 tech roadmap - DigiTimes](https://www.digitimes.com/news/a20260731PD207/cxmt-dram-ipo-technology-2028.html)
 - [China's CXMT Is Set to Challenge DRAM Incumbents - SemiAnalysis](https://newsletter.semianalysis.com/p/chinas-cxmt-is-set-to-challenge-dram)
 - [CXMT IPO: Where China's Largest DRAM Maker Stands? - EE Times](https://www.eetimes.com/cxmt-ipo-where-chinas-largest-dram-maker-stands/)
+- 2026-08-06 웹조사(사용자 요청): [CXMT HBM3 timeline slips - Digitimes](https://www.digitimes.com/news/a20260421PD230/cxmt-hbm3-dram-production-2026.html), [CXMT dedicates 20% capacity to HBM3 - TechPowerUp](https://www.techpowerup.com/346207/cxmt-reportedly-plans-to-dedicate-20-of-mass-production-capacity-to-hbm3-line-in-2026), wccftech "3-year gap" 기사(본문 403 차단, 제목만 확인·미채택)

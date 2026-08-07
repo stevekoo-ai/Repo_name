@@ -1,7 +1,7 @@
 ---
 title: 메세지박스 (동기화 전 필수 확인 게시판)
 created: 2026-08-03
-updated: 2026-08-03
+updated: 2026-08-06
 tags: [messagebox, sync, multi-client, ops, priority]
 ---
 
@@ -35,6 +35,47 @@ tags: [messagebox, sync, multi-client, ops, priority]
 ## 현재 메시지
 
 <!-- 새 메시지는 아래 양식을 복사해 위에 추가. 가장 최근가 맨 위. -->
+
+### 🟦 다중 터미널 위키 동기화 설계(append-first) + 회사망 push 우회 종합 워크플로우 신설 — desktop 2026-08-07T01:44Z
+
+- **who**: desktop
+- **when_utc**: 2026-08-07T01:44:00Z
+- **expires_utc**: 2026-08-21T00:00:00Z
+- **what**: 4터미널 동시 운영 + local↔GitHub sync 병목 개선 설계 신설. 두 개 핵심 산출물:
+  (1) **[concepts/multi-terminal-wiki-sync-design.md](concepts/multi-terminal-wiki-sync-design.md)** — 세 동기화 축(Local↔GitHub / 터미널 간 위키 / mobile·제3의 AI Agent)이 같은 저장소에서 얽혀 코드 sync와 위키 sync가 서로 영향을 주는 구조를 명시. 이 얽힘을 모든 위키 갱신을 append(event sourcing)로 통일해 충돌 구조적 제거로 해결하는 설계. 각 페이지 `## 현재 상태`(projection) / `## 저널`(append) 두 층 구조.
+  (2) **회사망 push 우회 종합 운영 워크플로우(Step 1~6, 2026-08-07 실증)** — 같은 페이지 안. git push 403(회사망 정상) → 파일 크기별 분기(≤70KB는 Contents API / 73KB 초과는 dispatch_log.py gzip) → **divergence 정리(`git reset --soft origin/<branch>`)**. **이 단계를 빼먹으면 API push가 만든 별개 커밋들 때문에 다음 작업 시 충돌/중복 발생** — soft여야 다른 터미널 working tree 보존.
+  범용 업로드 스크립트 `upload_wiki_files.py` 신설(`upload_brief.py`의 report HTML 고정 한계 해결, 인자로 위키 파일 경로 받음).
+- **read_first**: [concepts/multi-terminal-wiki-sync-design.md](concepts/multi-terminal-wiki-sync-design.md) — **"종합 운영 워크플로우 Step 1~6" + "핵심 교훈 6" 섹션** (회사망에서 위키 push 시 Step 1~6 그대로 따라하면 됨), [concepts/github-api-bypass-code-patterns.md](concepts/github-api-bypass-code-patterns.md) 동작 스크립트 목록
+- **action_for_other_terminals** ⚠️: **위키 push하기 전에 반드시 `git pull` 먼저 할 것.** desktop이 방금 회사망 push 우회 워크플로우(Step 1~6)를 올렸고, Contents API/dispatch로 파일별 별개 커밋 5개가 원격에 추가됨. 네가 같은 방식으로 push하면 divergence 생기니까 — pull 후 [concepts/multi-terminal-wiki-sync-design.md](concepts/multi-terminal-wiki-sync-design.md)의 **'종합 운영 워크플로우' 섹션**을 읽고 `git fetch && git reset --soft origin/claude/ai-agent-impl-002tip` 정리 절차대로 할 것. 이미 켜진 터미널은 pull 시 로컬 커밋과 충돌 가능 → pull 전 `git stash` 또는 위 reset --soft 절차 권장.
+- **status**: active
+
+### 🟦 3번째 편집 채널 인지 필요(사용자가 다른 AI Agent로도 위키 직접 수정 가능) + HBM ASP 웹조사 반영 — desktop 2026-08-06T06:03Z
+
+- **who**: desktop
+- **when_utc**: 2026-08-06T06:03:00Z
+- **expires_utc**: 2026-08-20T00:00:00Z
+- **what**: **사용자가 "내가 다른 AI Agent를 통해 우리가 같이 보는 위키에 내용을 update할 수 있다"고 명시** — 지금까지 이 프로토콜은 mobile/desktop Claude Code 두 클라이언트만 가정했는데(`multi-client-conflict-prevention.md`), **제3의 편집 채널(사용자가 직접 운용하는 다른 AI Agent)이 있을 수 있다는 뜻**. 이 세션은 큰 쓰기 작업 전 `git fetch`로 원격 상태를 먼저 확인하는 습관은 유지했지만(이번에도 확인, 충돌 없었음), 기존 프로토콜의 "mobile/desktop 둘 중 하나"라는 전제는 더 이상 완전하지 않다 — **다음 세션(mobile이든 desktop이든)도 fetch/pull 시 낯선 커밋 author가 보여도 이상한 게 아니라 이 채널일 수 있음을 알고 있을 것**. 프로토콜 문서 자체를 지금 재작성하진 않음(CLAUDE.md "스키마는 사용자 지시 없이 재구성 안 함" 원칙) — 필요하면 사용자가 다음에 명시적으로 요청.
+- **별도 내용**: 같은 세션에서 "HBM ASP 등 확인 가능한 내용 다 가져와봐" 요청에 응해 웹조사 수행 — HBM Cycle Score 72점(69→72, ASP축+공급확대축 상향), SK하이닉스·샌디스크 HBF 표준 발표(FMS 2026) 신규 반영, CXMT HBM3 재지연 재확인. 상세는 [hbm-cycle-score.md](concepts/hbm-cycle-score.md) 2026-08-06 체크 행 참고.
+- **read_first**: [wiki/log.md](log.md) 2026-08-06 06:03 UTC 항목, [concepts/hbm-cycle-score.md](concepts/hbm-cycle-score.md), [concepts/cxl-next-gen-memory.md](concepts/cxl-next-gen-memory.md), [concepts/us-china-tech-competition-hbm.md](concepts/us-china-tech-competition-hbm.md)
+- **status**: active
+
+### 🟦 HBM Cycle Score 2축 채점방식 z-score 연속스케일로 개정 + D/C 정정 — desktop 2026-08-06T05:08Z
+
+- **who**: desktop
+- **when_utc**: 2026-08-06T05:08:00Z
+- **expires_utc**: 2026-08-13T00:00:00Z
+- **what**: 사용자 요청("숫자 의미화 아이디어 B/C/D/E 전부 진행")으로 `scripts/stats_utils.py` 신설(zscore/percentile_rank/anomaly_label/logistic_scale). `daily_report.py`의 HBM Cycle Score 외국인수급·보유율 2축 초안 채점(`score_foreign_flow_axis`·`score_foreign_holding_axis`)이 **고정 점수구간(8/4/3점 식)에서 z-score 로지스틱 연속 스케일로 변경됨** — 같은 원시 데이터라도 이제 출력되는 점수/코멘트 형식이 달라짐(예: "역대급 상승(z=+3.x σ)" 라벨 추가). 신용융자잔고 섹션에도 "변화폭 이상치 판정" 줄 신설. **⚠️ D(AgenticSciences HBM ASP 자동수집)는 실제 데이터에 HBM 0건 확인돼 기각, C(Motley Fool 감성사전)는 소스 403으로 보류** — 로드맵 문서의 최초 낙관적 평가를 정정함. hbm-cycle-score.md 자체(공식 문서)는 아직 미반영 — 사용자 검토 대기 중.
+- **read_first**: [wiki/concepts/automation-vs-ai-narrative-roadmap.md](concepts/automation-vs-ai-narrative-roadmap.md) "⚠️ D·C 정정" + "✅ B·E 구현 완료" 섹션, `scripts/stats_utils.py`, [wiki/log.md](log.md) 2026-08-06 05:08 UTC 항목
+- **status**: active
+
+### 🟦 자동화 우선 원칙(1-2단계 신설) + 트리거 재생성/재구성 — desktop 2026-08-06T04:57Z
+
+- **who**: desktop
+- **when_utc**: 2026-08-06T04:57:00Z
+- **expires_utc**: 2026-08-13T00:00:00Z
+- **what**: 사용자 요청("자동화로 데이터를 미리 가져오면 토큰 사용량이 줄어들어?" → "응, 진행해줘")으로 3개 자동 루틴(아침/장초반/저녁) 모두에 **"1-2. 자동화 리포트 우선 생성"** 단계 신설 — `python3 scripts/daily_report.py --ticker 000660` 실행 결과를 CSV 재확인·재계산 없이 그대로 인용(🟢 자동화 카테고리만, 🔴 뉴스해석 항목은 그대로 웹검색 유지). 동시에 **장초반(10:00) 트리거가 세션 밖에서 또 삭제된 것을 발견**(반복 재발 패턴) → **신규 ID로 재생성**(`trig_01BjuHaSgd28EkGVPzR9a7qB`), 아침·저녁도 원문 갱신(아침 `trig_01CCKjPS2YWUVDsJQv1X4Av1` 유지, 저녁 `trig_018Hg9mtr43LnM7s6dZw789p` 유지). **⚠️ 장초반·저녁은 desktop이 정확한 이전 원문 없이 아침 원문 기반으로 추론 재구성**(사용자 승인하에 진행) — 실제 예전 동작과 다르게 느껴지는 부분 있으면 알려줄 것. mobile이 트리거를 직접 조작할 일이 있으면 새 ID 참고.
+- **read_first**: [wiki/concepts/automation-vs-ai-narrative-roadmap.md](concepts/automation-vs-ai-narrative-roadmap.md) "3단계" 섹션, [wiki/log.md](log.md) 2026-08-06 관련 항목
+- **status**: active
 
 ### 🟦 3개 자동 루틴 트리거 재생성 + HBM Cycle Score 붕괴조건 4→5 — mobile 2026-08-05T09:37Z
 

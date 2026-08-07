@@ -75,38 +75,87 @@ YYYY-MM-DD HH:MM UTC — QUERY "question text" → cited entities/foo.md, concep
 YYYY-MM-DD HH:MM UTC — LINT → 2 issues found (see report)
 ```
 
-### Log rotation (introduced 2026-08-04 — token/size management)
+### Log rotation (3인 하이브리드 자동화 — 2026-08-07 개정, 2026-08-04 도입)
 
 `log.md` grew to 193KB / 225 lines in its first 3 weeks (3x/day automated
 routines + ad-hoc queries, never pruned) — expensive to read every session
-and a real contributor to hitting context limits. This follows the
-established "hot/warm/cold tiered memory" pattern for agent memory files
-(recent = hot/live, history = cold/archived, nothing deleted):
+and a real contributor to hitting context limits. The first cut at
+2026-08-04 was a monthly manual cut. As of 2026-08-07 this is fully
+automated via a **3-way collaboration** (GitHub Actions + Windows Task
+Scheduler + live Claude session), each covering the others' gaps:
 
-- `wiki/log.md` holds **only the current calendar month's entries**.
-- At the start of the first session in a new month (any client, whoever
-  notices first): move the previous month's entries verbatim into
-  `wiki/log-archive/YYYY-MM.md` (create the file, give it standard
-  frontmatter + a one-line note that it's a rotated-out archive of
-  `log.md`), leaving `log.md` with just the header/rotation-note and the
-  new month's entries so far. Never edit entries during the move — copy
-  exactly, this is a cut not a rewrite.
-- Looking for old history: check `log.md` first, then
-  `log-archive/YYYY-MM.md` for the relevant month.
-- This is purely a size/token optimization — it changes nothing about
-  *what* gets logged or when (still append-only, still one line per
-  event, still every ingest/query/lint). Multi-client note: since the
-  rotation is a monthly one-time cut (not a per-entry operation), it
-  doesn't interact with the append-only auto-merge property the
-  [multi-client-conflict-prevention.md](wiki/concepts/multi-client-conflict-prevention.md)
-  doc relies on for concurrent sessions — just do it early in the month
-  before much new content has piled up, same as any other edit to
-  `log.md`'s non-append parts (the header).
+- **GitHub Actions (`log-rotate.yml`, 00:20 KST daily, on `main`)** — the
+  always-on backbone. Deterministic Python (`scripts/log_rotate.py`, no
+  LLM): cuts yesterday's (KST) entries from `log.md` into
+  `wiki/log-archive/YYYY-MM/YYYY-MM-DD.md` and pushes (runner is on GitHub
+  infra → no 73KB corp-net limit; large monthly archives go up here too).
+  On the 1st of each month it also consolidates the previous month's daily
+  archive folder into `wiki/log-archive/YYYY-MM.md` and deletes the daily
+  files. Idempotent (archive already exists → skip cut), so GitHub's
+  documented schedule delays/drops are safe: a late or missed run just
+  runs again the next day and catches up. Immune to the local-daemon
+  self-restart ("자폭") problem — GitHub schedule runs on GitHub infra,
+  outside the local daemon's blast radius.
+- **Windows Task Scheduler (`scripts/log_summarize_routine.bat`, 00:40 KST
+  daily, laptop ON assumed)** — the free-LLM layer. After pulling the cut
+  the GitHub layer made, `claude -p` routes to the corp GLM gateway ($0,
+  no personal API cost) and writes a 2~3-line Korean prose summary of
+  yesterday's archive into `log.md`'s `## 당월 요약 (YYYY-MM)` section
+  (idempotent: same-day re-run replaces that day's line). On the 1st it
+  also promotes last month's summary to `## 직전월 요약 (YYYY-MM)` as a
+  "this month's key shifts" 10~15-line narrative, and starts a fresh
+  `## 당월 요약` for the new month. Uploads `log.md` via Contents API PUT
+  (<73KB after cut → corp-net safe). If the GitHub layer didn't run, this
+  layer does its own fallback cut directly from `log.md`.
+- **Live Claude session** — quality + recovery. On session start, if
+  `wc -c wiki/log.md > 50000`, run the cut immediately (safety net if both
+  auto layers missed). Optionally promote a stub summary line to richer
+  prose. Fix either auto layer when present. This is best-effort, not
+  load-bearing — the system works without any session present.
 
-If other pages grow to a size where this becomes worth doing to them too
-(dense concept/entity pages that keep appending dated sections rather than
-updating in place), apply the same hot/cold split on a page-by-page basis
-when asked — this isn't automatic for pages other than `log.md`.
+**Graceful degradation** (all operations idempotent — who runs first or
+whether runs overlap doesn't matter, results are the same):
+
+| situation | GitHub | Windows | result |
+|---|---|---|---|
+| laptop OFF (weekend/holiday) | cut OK | doesn't run | size control OK, that day's prose summary skipped (full text still in archive) |
+| GitHub delayed/dropped | doesn't run | own cut + summary | fully covered |
+| both down | — | — | log.md +~17KB/day, next run's idempotent cut catches up (safe) |
+| 자폭 (daemon self-restart) | immune | immune (OS-level) | both survive |
+
+**`log.md` structure (3 tiers):**
+```
+# Log
+[header + rotation note]
+## 직전월 요약 (YYYY-MM)   ← narrative, ~10-15 lines (Windows layer, month-start)
+## 당월 요약 (YYYY-MM) — 진행중   ← one 2-3 line entry per day (Windows layer, daily)
+## 당일 log (append-only)   ← raw dated entries, today + any not-yet-cut days
+2026-08-07 09:50 KST — QUERY ...
+```
+The `## 당일 log` section (raw `^YYYY-MM-DD` entries) is append-only and
+**never edited by rotation** — rotation only *moves* whole past days out
+to archive and *writes/updates* the two summary sections. Live sessions
+still append to the bottom as before.
+
+**Archive structure (2 tiers):**
+- `wiki/log-archive/YYYY-MM.md` — completed-month cold archive (GitHub
+  layer consolidates the daily folder into this at month start).
+- `wiki/log-archive/YYYY-MM/YYYY-MM-DD.md` — current month's past days
+  (GitHub layer cuts here daily). Folder is deleted after consolidation.
+
+Looking for old history: check `log.md`'s `## 직전월 요약` first (narrative
+summary), then `## 당월 요약` (current month's daily summaries), then
+`log-archive/YYYY-MM/YYYY-MM-DD.md` (that day's full entries), then
+`log-archive/YYYY-MM.md` (consolidated month).
+
+**What this does *not* change:** still append-only, still one line per
+event, still every ingest/query/lint. The 3-tier summary is a
+size/rotation optimization + context-preservation layer on top of the
+same log. Multi-client note: the daily cut is per-day-idempotent and runs
+in a low-activity window (00:20~00:40 KST), so it doesn't conflict with
+the append-only auto-merge property the
+[multi-client-conflict-prevention.md](wiki/concepts/multi-client-conflict-prevention.md)
+doc relies on for concurrent sessions.
 
 **Before rotating any page other than `log.md` (2026-08-04 refinement, user
 feedback):** a pure calendar-month cut is too blunt on its own — age isn't
@@ -242,6 +291,25 @@ lost. No need to ask permission first — record, then move on.
 
 ### 코드 작성 품질 (Code Quality Protocol)
 
+- **🔴 최상위 상위 규칙 — 동시 실행 중인 다른 Agent를 고려하라 (가장 먼저 적용)**:
+  코드가 **동시에 실행 중일 수 있는 다른 프로세스를 죽이거나 방해하지
+  않도록** 작성한다. 특히 headless 자동화 스크립트(`claude -p` 래퍼,
+  스케줄러, bat/ps1 루틴)에서 `taskkill`/`Stop-Process`/`Get-CimInstance
+  Win32_Process`로 프로세스를 정리(sweep)할 때, 매칭 조건이 **좁아야**
+  한다 — generic keyword(`'claude'`, `'node'`) 부분 문자열 매칭만으로는
+  **사용자의 live interactive Claude Code 세션과 다른 Agent의 진행 중
+  작업까지 `taskkill /F`로 통째로 강제 종료**한다 (2026-08-07 실제 사건:
+  래퍼 타임아웃 sweep이 interactive 창을 죽임 → 대화 컨텍스트 상실,
+  되돌릴 불가). 안전장치: (1) spawn한 PID 직접 추적, (2) CreationDate
+  시간 창(내 job 시작 이후만 타겟 — interactive 세션은 그 전부터 존재해
+  자동 제외), (3) headless 고유 시그니처로 좁히기. **sweep이 위험하면
+  sweep 자체를 빼고 `Stop-Job`만 남겨라** — 고아 자식 프로세스가 남는
+  것이 다른 Agent 작업을 죽이는 것보다 안전하다. 좁은 타임아웃(예: 90초)
+  으로 무거운 headless 작업을 테스트하지 마라 (타임아웃 분기 발동 →
+  sweep 위험). git 동시 편집 충돌([multi-client-conflict-prevention](wiki/concepts/multi-client-conflict-prevention.md))과는
+  **다른 프로세스 레이어** 규칙. 상세·체크리스트는
+  [wiki/concepts/concurrent-agent-aware-coding.md](wiki/concepts/concurrent-agent-aware-coding.md).
+  API 오류(아래 cross-check)보다 **먼저** 적용 — 치명도가 더 높다.
 - **코드 작성 전 반드시 cross-check 수행**: 외부 라이브러리 API, 파라미터명, 설정파일 키 이름 등은 **실제 documentation/소스 코드를 먼저 읽고** 작성 — 기억이나 추측으로 코드 생성 금지.
 - **Double/triple check 원칙**:
   1. 첫 번째: `Glob`/`Grep`으로 관련 파일 구조 확인
