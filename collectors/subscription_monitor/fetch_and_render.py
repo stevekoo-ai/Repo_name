@@ -13,16 +13,15 @@ import urllib.parse
 import urllib.request
 from datetime import datetime, timedelta, timezone
 
-from alerts import run_alerts, run_health_monitor
+# 5단계 autonomous 파이프라인: fetch(judge import) -> judge -> compose(run_pipeline) -> alerts(low-level send)
+# My profile constants live in judge.py as the single source of truth.
+from judge import judge_listings, MY_SAVINGS_TOTAL, MY_SAVINGS_ROUNDS, MY_JOIN_DATE
+from compose import run_pipeline
 
 KST = timezone(timedelta(hours=9))
 BASE_URL = "https://api.odcloud.kr/api/ApplyhomeInfoDetailSvc/v1/getAPTLttotPblancDetail"
 TARGET_REGIONS = {"서울", "경기"}
 OUTPUT_PATH = os.path.join(os.path.dirname(__file__), "..", "..", "docs", "subscription-monitor.html")
-
-MY_SAVINGS_TOTAL = 28_050_000
-MY_SAVINGS_ROUNDS = 249
-MY_JOIN_DATE = "2005-11-03"
 
 
 def fetch_page(service_key: str, today: str, page: int, per_page: int = 200) -> dict:
@@ -239,15 +238,20 @@ def main() -> None:
             "risk missing a real 플랫폼시티 match. Previous docs/subscription-monitor.html "
             "and alerted_state.json are left untouched."
         )
-        run_health_monitor(healthy=False, now_kst=now_kst, seoul_gyeonggi_count=0)
+        # Mark the API unhealthy so the compose pipeline can fire an OUTAGE alert
+        # after FAILURE_THRESHOLD consecutive bad runs. Judge over an empty set.
+        run_pipeline([], healthy=False, now_kst=now_kst, seoul_gyeonggi_count=0)
         return
 
     rows = [r for r in all_rows if r.get("SUBSCRPT_AREA_CODE_NM") in TARGET_REGIONS]
-    run_health_monitor(healthy=True, now_kst=now_kst, seoul_gyeonggi_count=len(rows))
 
-    fired = run_alerts(all_rows)
-    if fired:
-        print(f"fired {fired} new 플랫폼시티 alert(s)")
+    # Step 2 — judge every fetched row (deterministic verdicts), then Steps 3-5
+    # (compose policy + send) in one call. EXTRA_TEST_KEYWORD flows through to
+    # judge via env var.
+    verdicts = judge_listings(rows, now_kst)
+    fired = run_pipeline(verdicts, healthy=True, now_kst=now_kst, seoul_gyeonggi_count=len(rows))
+    if fired and (fired.get("new_match") or fired.get("priority_up") or fired.get("outage") or fired.get("recovery")):
+        print(f"pipeline fired: {fired}")
 
     html_out = render(rows, now_kst)
     out_path = os.path.normpath(OUTPUT_PATH)
