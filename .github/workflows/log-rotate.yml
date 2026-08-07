@@ -1,0 +1,85 @@
+name: Log Rotate
+
+# wiki/log.md deterministic rotation — 3인 하이브리드 콜라보레이션의
+# GitHub Actions 층 (항상 켜져 있는 뼈대).
+#
+# 매일 00:20 KST(15:20 UTC) 실행:
+#   - 어제(KST) 날짜 로그 항목을 log.md에서 잘라
+#     wiki/log-archive/YYYY-MM/YYYY-MM-DD.md로 이관
+#   - 월말(1일) 분기: 전월 일일 아카이브 → 전월 월 아카이브 병합
+#   - LLM 없음 (순수 Python). 요약 서술은 Windows 측(claude -p → GLM) 담당.
+#
+# runner는 GitHub 인프라에 있어 git push 한계 없음 (회사망 73KB 제약 해당 없음).
+# idempotent: 어제 아카이브 이미 존재 시 cut skip → GitHub 지연/누락 시 재실행 안전.
+#
+# 발화 조건: schedule은 default branch(main)에 있어야 함 → 이 파일은 main에.
+# 단 checkout/commit 대상은 서사 브랜치(log.md/log-archive가 있는 곳).
+#
+# 자폭 면역: GitHub schedule은 로컬 daemon self-restart 영향권 밖 (OS 수준).
+# 지연 허용: log 분할은 deadline 없음 + idempotent → 부하 지연/드롭 안전.
+#
+# 설계: CLAUDE.md "Log rotation" 섹션 (3인 하이브리드), scripts/log_rotate.py
+
+on:
+  schedule:
+    # 15:20 UTC = 00:20 KST (next day). off-minute (GitHub 부하 집중 회피).
+    # 07:00 KST 첫 자동루틴 전에 cut 완료.
+    - cron: "20 15 * * *"
+  workflow_dispatch:
+    inputs:
+      target_date:
+        description: "대상 날짜 YYYY-MM-DD (비우면 KST 어제 자동)"
+        required: false
+        default: ""
+
+permissions:
+  contents: write
+
+jobs:
+  rotate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout 서사 브랜치 (log.md/log-archive가 있는 곳)
+        uses: actions/checkout@v4
+        with:
+          ref: claude/ai-agent-impl-002tip
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Run log rotation
+        id: rotate
+        run: |
+          set -e
+          if [ -n "${{ inputs.target_date }}" ]; then
+            python scripts/log_rotate.py --date "${{ inputs.target_date }}" --repo-root .
+          else
+            python scripts/log_rotate.py --repo-root .
+          fi
+          # changed 여부는 스크립트 출력 마지막 줄에서 확인
+          # log_rotate.py는 항상 exit 0 (changed=True/False 모두 정상)
+
+      - name: Commit + push (서사 브랜치)
+        run: |
+          set -e
+          git config user.name "Log Rotate Bot"
+          git config user.email "noreply@anthropic.com"
+          git add wiki/log.md wiki/log-archive/
+          if git diff --cached --quiet; then
+            echo "::notice::log rotate: no changes (idempotent skip or noop) — nothing to commit"
+          else
+            git commit -m "log: rotate $(date -u +%Y-%m-%d) — 어제 항목 아카이브 이관 (3인 하이브리드 자동)
+
+          Co-Authored-By: Claude <noreply@anthropic.com>"
+            git push
+            echo "::notice::log rotate: committed + pushed to claude/ai-agent-impl-002tip"
+          fi
+
+      - name: Report
+        if: always()
+        run: |
+          echo "::notice::log rotate 완료 (또는 위 단계 에러 확인)"
