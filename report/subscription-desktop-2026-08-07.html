@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>[청약 Desktop] 2026-08-07 (금) 청약 모니터 종합</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      colors: {
+        canvas: '#f5f5f7',
+        ink: '#1d1d1f',
+        sub: '#6e6e73',
+        indigo: { DEFAULT:'#4f46e5', 600:'#4f46e5', 700:'#4338ca', 50:'#eef2ff', 100:'#e0e7ff' },
+        star: '#f59e0b',
+        warn: '#b45309',
+        warnbg: '#fffbeb',
+        ok: '#047857',
+        okbg: '#ecfdf5',
+        bad: '#be123c',
+        badbg: '#fff1f2',
+        mute: '#9ca3af',
+      },
+      fontFamily: {
+        sans: ['-apple-system','BlinkMacSystemFont','SF Pro Display','Segoe UI','Malgun Gothic','Helvetica Neue','Arial','sans-serif'],
+      },
+      boxShadow: {
+        card: '0 1px 3px rgba(0,0,0,0.04), 0 10px 30px rgba(0,0,0,0.06)',
+        hover:'0 4px 12px rgba(79,70,229,0.18), 0 20px 50px rgba(0,0,0,0.10)',
+      },
+      borderRadius: { '2xl':'1.25rem' },
+    }
+  }
+}
+</script>
+<style>
+  html{scroll-behavior:smooth}
+  body{background:
+    radial-gradient(1200px 600px at 50% -10%, #ffffff 0%, #f5f5f7 60%) fixed;
+    -webkit-font-smoothing:antialiased}
+  .card{transition:transform .35s cubic-bezier(.22,1,.36,1), box-shadow .35s cubic-bezier(.22,1,.36,1)}
+  .card:hover{transform:translateY(-3px);box-shadow:0 4px 12px rgba(79,70,229,0.18),0 20px 50px rgba(0,0,0,0.10)}
+  .fade-in{animation:fadeIn .6s ease both}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+  .desktop-tag{display:inline-block;background:linear-gradient(90deg,#4f46e5,#4338ca);color:#fff;font-size:11px;font-weight:700;letter-spacing:.5px;padding:3px 10px;border-radius:100px}
+  .auto-pill{display:inline-block;padding:1px 7px;border-radius:8px;font-size:10px;font-weight:700;letter-spacing:.3px}
+  .ap-green{background:rgba(4,120,87,.12);color:#047857;border:1px solid rgba(4,120,87,.3)}
+  .ap-mut{background:rgba(156,163,175,.15);color:#6e6e73;border:1px solid rgba(156,163,175,.35)}
+  .ap-yellow{background:rgba(180,83,9,.12);color:#b45309;border:1px solid rgba(180,83,9,.3)}
+</style>
+</head>
+<body class="font-sans text-ink">
+<div class="max-w-3xl mx-auto px-5 py-10">
+
+  <!-- ============ 헤더 ============ -->
+  <section class="mb-8 fade-in">
+    <div class="flex items-center gap-3 mb-3">
+      <span class="desktop-tag">⌬ From. Desktop</span>
+      <span class="text-xs text-sub">청약 모니터 종합</span>
+    </div>
+    <h1 class="text-3xl font-bold tracking-tight mb-2">청약 모니터 일일 요약</h1>
+    <p class="text-base text-sub">
+      2026-08-07 (금) · KST 15:00 기준 ·
+      <span class="text-indigo-600 font-medium">서울·경기 국민주택 일반공급</span>
+    </p>
+    <p class="text-sm text-mute mt-2">
+      본 보고서는 Desktop Claude Code가 GitHub Actions 수집 데이터를 바탕으로 생성·발송했습니다.
+      Mobile Claude Code가 보내는 기존 통합 Daily Brief와 <b>비교 관전용</b>입니다.
+    </p>
+  </section>
+
+  <!-- ============ 핵심 지표 카드 ============ -->
+  <section class="mb-10 fade-in">
+    <h2 class="text-sm font-semibold tracking-widest text-sub uppercase mb-4 text-center">핵심 지표</h2>
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+      <div class="card bg-white rounded-2xl p-5 shadow-card border border-gray-100 text-center">
+        <div class="text-xs text-sub mb-1">접수 중 공고</div>
+        <div class="text-2xl font-bold text-ink">0건</div>
+        <div class="text-sm text-sub font-medium mt-1">서울·경기 국민</div>
+      </div>
+      <div class="card bg-white rounded-2xl p-5 shadow-card border border-gray-100 text-center">
+        <div class="text-xs text-sub mb-1">내 청약통장</div>
+        <div class="text-2xl font-bold text-ok">40<span class="text-base text-sub">/40</span></div>
+        <div class="text-sm text-ok font-medium mt-1">만점 (경쟁력 최상)</div>
+      </div>
+      <div class="card bg-white rounded-2xl p-5 shadow-card border border-gray-100 text-center">
+        <div class="text-xs text-sub mb-1">NEW_MATCH</div>
+        <div class="text-2xl font-bold text-mute">0</div>
+        <div class="text-sm text-sub font-medium mt-1">키워드 매칭 없음</div>
+      </div>
+      <div class="card bg-white rounded-2xl p-5 shadow-card border border-gray-100 text-center">
+        <div class="text-xs text-sub mb-1">시스템 상태</div>
+        <div class="text-2xl font-bold text-ok">정상</div>
+        <div class="text-sm text-ok font-medium mt-1">API healthy</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 내 청약통장 프로필 ============ -->
+  <section class="mb-10 fade-in">
+    <h2 class="text-lg font-bold mb-4 flex items-center gap-2">
+      <span>🏦 내 청약통장 — 경쟁력 분석</span>
+    </h2>
+    <div class="card bg-white rounded-2xl p-6 shadow-card border border-gray-100">
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 text-sm">
+        <div>
+          <div class="text-xs text-sub">가입일</div>
+          <div class="font-semibold mt-1">2005-11-03</div>
+          <div class="text-xs text-mute">20년 8개월</div>
+        </div>
+        <div>
+          <div class="text-xs text-sub">누적 납입</div>
+          <div class="font-semibold mt-1">249회</div>
+          <div class="text-xs text-mute">240회+ 만점</div>
+        </div>
+        <div>
+          <div class="text-xs text-sub">저축총액</div>
+          <div class="font-semibold mt-1">2,805만원</div>
+          <div class="text-xs text-mute">순차제 유리</div>
+        </div>
+        <div>
+          <div class="text-xs text-sub">월 납입액</div>
+          <div class="font-semibold mt-1">25만원</div>
+          <div class="text-xs text-mute">납입인정 최고액</div>
+        </div>
+      </div>
+      <div class="mt-5 pt-4 border-t border-gray-100">
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-sm font-medium text-ink">통장 점수 (국민주택 순위·가점)</span>
+          <span class="auto-pill ap-green">40/40 만점</span>
+        </div>
+        <div class="w-full bg-gray-100 rounded-full h-2.5">
+          <div class="bg-gradient-to-r from-indigo-500 to-indigo-700 h-2.5 rounded-full" style="width:100%"></div>
+        </div>
+        <p class="text-xs text-sub mt-3">
+          가점 3축(가입기간 15점 + 납입회차 15점 + 납입액 10점) 모두 만점.
+          서울·경기 국민주택 순차제(저축총액순)에서 <b>경쟁력 최상위권</b>.
+          소득제한 없는 전용 84㎡ 이상 일반공급 유형이 유리.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 오늘 조사 결과 ============ -->
+  <section class="mb-10 fade-in">
+    <h2 class="text-lg font-bold mb-4 flex items-center gap-2">
+      <span>📋 오늘 조사 결과 (2026-08-07 15:00 KST)</span>
+    </h2>
+    <div class="card bg-white rounded-2xl p-6 shadow-card border border-gray-100">
+      <div class="flex items-center justify-between mb-4 pb-3 border-b border-gray-100">
+        <span class="font-medium">서울·경기 국민주택 접수 중/예정</span>
+        <span class="auto-pill ap-mut">0건</span>
+      </div>
+      <p class="text-sm text-sub mb-4">
+        현재 접수 마감 전인 서울·경기 국민주택 일반공급 공고가 없습니다.
+        청약Home API(data.go.kr) 기준이며, 5분마다 자동 갱신됩니다.
+      </p>
+      <div class="grid grid-cols-3 gap-3 text-center">
+        <div class="bg-gray-50 rounded-xl p-3">
+          <div class="text-xs text-sub">HIGH 우선순위</div>
+          <div class="text-xl font-bold mt-1">0</div>
+        </div>
+        <div class="bg-gray-50 rounded-xl p-3">
+          <div class="text-xs text-sub">MED 우선순위</div>
+          <div class="text-xl font-bold mt-1">0</div>
+        </div>
+        <div class="bg-gray-50 rounded-xl p-3">
+          <div class="text-xs text-sub">접수 임박 (D-3)</div>
+          <div class="text-xl font-bold mt-1">0</div>
+        </div>
+      </div>
+      <div class="mt-4 p-3 rounded-xl bg-indigo-50 border border-indigo-100">
+        <p class="text-xs text-indigo-700">
+          <b>감지 키워드:</b> 플랫폼시티 · 광교 · 원천동
+          — 해당 키워드 매칭 공고가 등장하면 즉시 알림(NEW_MATCH)이 별도 발송됩니다.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 발송 파이프라인 상태 ============ -->
+  <section class="mb-10 fade-in">
+    <h2 class="text-lg font-bold mb-4 flex items-center gap-2">
+      <span>⚙️ 발송 파이프라인 상태</span>
+    </h2>
+    <div class="card bg-white rounded-2xl p-6 shadow-card border border-gray-100">
+      <table class="w-full text-sm">
+        <tbody>
+        <tr class="row-h border-b border-gray-100">
+          <td class="py-2.5 text-sub">데이터 소스</td>
+          <td class="py-2.5 text-right font-medium">data.go.kr 청약Home Open API</td>
+        </tr>
+        <tr class="row-h border-b border-gray-100">
+          <td class="py-2.5 text-sub">수집 주기</td>
+          <td class="py-2.5 text-right font-medium">5분 (GitHub Actions cron)</td>
+        </tr>
+        <tr class="row-h border-b border-gray-100">
+          <td class="py-2.5 text-sub">판단 엔진</td>
+          <td class="py-2.5 text-right font-medium">judge.py (규칙 기반, 토큰 0)</td>
+        </tr>
+        <tr class="row-h border-b border-gray-100">
+          <td class="py-2.5 text-sub">발송 정책</td>
+          <td class="py-2.5 text-right font-medium">의미있을 때 + 일일 요약</td>
+        </tr>
+        <tr class="row-h border-b border-gray-100">
+          <td class="py-2.5 text-sub">이메일 발송</td>
+          <td class="py-2.5 text-right font-medium">Gmail SMTP (Actions Secrets)</td>
+        </tr>
+        <tr class="row-h">
+          <td class="py-2.5 text-sub">본 보고서 발송 주체</td>
+          <td class="py-2.5 text-right font-medium">
+            <span class="desktop-tag">Desktop</span>
+          </td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ============ 관전 포인트 ============ -->
+  <section class="mb-10 fade-in">
+    <h2 class="text-lg font-bold mb-4 flex items-center gap-2">
+      <span>🔭 다음 관전 포인트</span>
+    </h2>
+    <div class="card bg-white rounded-2xl p-6 shadow-card border border-gray-100">
+      <ul class="space-y-3 text-sm text-ink">
+        <li class="flex gap-2">
+          <span class="text-indigo-600 font-bold mt-0.5">▸</span>
+          <span><b>플랫폼시티 공공분양 공고 개시</b> — 접수 시작 D-1 도래 시 HIGH 우선순위 자동 승격 + 즉시 알림 발송.</span>
+        </li>
+        <li class="flex gap-2">
+          <span class="text-indigo-600 font-bold mt-0.5">▸</span>
+          <span><b>전세 만료 2027-02-22</b> (갱신청구권 이미 사용) — 그 이전 신규 분양 입주가 필요. 남은 약 6.5개월.</span>
+        </li>
+        <li class="flex gap-2">
+          <span class="text-indigo-600 font-bold mt-0.5">▸</span>
+          <span><b>Mobile vs Desktop 비교</b> — 당분간 두 채널의 보고서를 동시 수신·비교. Desktop은 본 헤더("⌬ From. Desktop")로 식별.</span>
+        </li>
+        <li class="flex gap-2">
+          <span class="text-indigo-600 font-bold mt-0.5">▸</span>
+          <span><b>API 장애 감지</b> — 6회 연속 실패(≈30분) 시 OUTAGE 알림, 복구 시 RECOVERY 알림 자동 발송.</span>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============ 직접 확인 채널 ============ -->
+  <section class="mb-10 fade-in">
+    <h2 class="text-lg font-bold mb-4 flex items-center gap-2">
+      <span>🔗 직접 확인 채널</span>
+    </h2>
+    <div class="card bg-white rounded-2xl p-6 shadow-card border border-gray-100">
+      <ul class="space-y-2 text-sm">
+        <li>
+          <a href="https://www.applyhome.co.kr/ai/aib/selectSubscrptCalenderView.do" class="text-indigo-600 hover:text-indigo-700">청약홈 청약캘린더</a>
+          <span class="text-sub"> — 관심지역 알림(이메일/문자) 신청</span>
+        </li>
+        <li>
+          <a href="https://apply.lh.or.kr/" class="text-indigo-600 hover:text-indigo-700">LH청약플러스</a>
+          <span class="text-sub"> — LH 공공분양</span>
+        </li>
+        <li>
+          <a href="https://apply.gh.or.kr/" class="text-indigo-600 hover:text-indigo-700">GH 경기주택도시공사 청약센터</a>
+          <span class="text-sub"> — 경기 공공분양</span>
+        </li>
+        <li>
+          <a href="https://stevekoo-ai.github.io/Repo_name/subscription-monitor.html" class="text-indigo-600 hover:text-indigo-700">실시간 대시보드 (GitHub Pages)</a>
+          <span class="text-sub"> — 5분마다 자동 갱신</span>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============ 푸터 ============ -->
+  <footer class="pt-6 border-t border-gray-200 text-xs text-mute text-center">
+    <p class="mb-1">
+      <span class="desktop-tag">⌬ From. Desktop</span> ·
+      Generated by Desktop Claude Code · 청약 모니터 autonomous pipeline
+    </p>
+    <p class="mb-1">
+      데이터 출처: 한국부동산원 청약Home 분양정보 조회 서비스 (공공데이터포털 Open API)
+    </p>
+    <p>
+      계약·청약 신청 전 반드시 청약홈 원문 공고를 확인하세요.
+      본 보고서는 Mobile Claude Code 통합 Daily Brief와의 비교 관전용입니다.
+    </p>
+  </footer>
+
+</div>
+</body>
+</html>
