@@ -29,6 +29,8 @@ REPORT_DIR = Path(__file__).resolve().parent.parent / "sources"
 PORTFOLIO_CSV_PATH = Path(__file__).resolve().parent.parent / "sources" / "portfolio-holdings.csv"
 HYPERSCALER_CAPEX_CSV_PATH = Path(__file__).resolve().parent.parent / "sources" / "hyperscaler-capex.csv"
 HYPERSCALER_CAPEX_STALE_DAYS = 150  # 분기 실적은 보통 분기말+30~45일 내 공시 — 5개월 이상 지나면 스테일로 취급
+AI_PERIPHERY_CSV_PATH = Path(__file__).resolve().parent.parent / "sources" / "ai-periphery-fundamentals.csv"
+AI_PERIPHERY_STALE_DAYS = 150  # 위와 동일 기준(분기 공시 주기)
 
 # 2026-08-05 신설, 2026-08-06 개정(B) — HBM Cycle Score(hbm-cycle-score.md "1.")
 # 6축 중 외국인수급(15점)·보유율(15점) 두 축을 매일 사람이 CSV를 보고 손으로
@@ -230,6 +232,49 @@ def read_hyperscaler_capex():
     return out
 
 
+def read_ai_periphery():
+    """sources/ai-periphery-fundamentals.csv(scripts/sec_edgar_periphery.py 수집)에서
+    변두리 기업별 최신 분기 매출·백로그와 직전분기 대비 증감을 계산.
+    2026-08-07 신설 — wiki/concepts/ai-value-chain-periphery-monitor.md 운영지침 ⓐ.
+
+    **이 섹션의 존재 이유**: HBM Cycle Score 6축은 전부 주도주(SK하이닉스)
+    자신의 지표라 "주도주가 이미 흔들린 뒤"에야 신호가 뜬다. 백로그(이미
+    계약된 미래 매출)는 주문이 끊길 때 **가장 먼저** 꺾이는 자리라 조기경보로
+    쓴다 — 그래서 아래 판정에서 backlog 감소를 revenue 감소보다 무겁게 본다.
+
+    데이터가 없으면 None(섹션 자체 생략) — 억지로 만들지 않는다."""
+    if not AI_PERIPHERY_CSV_PATH.exists():
+        return None
+    with AI_PERIPHERY_CSV_PATH.open(newline="", encoding="utf-8") as f:
+        rows = list(csv.DictReader(f))
+    if not rows:
+        return None
+
+    series = {}
+    for r in rows:
+        series.setdefault((r["ticker"], r["metric"]), []).append(r)
+
+    today = datetime.now(KST).date()
+    out = {}
+    for (tk, metric), rs in series.items():
+        rs.sort(key=lambda r: r["end_date"])
+        latest = rs[-1]
+        qoq = None
+        if len(rs) >= 2:
+            prev = float(rs[-2]["value_usd"])
+            if prev:
+                qoq = (float(latest["value_usd"]) - prev) / prev * 100
+        end_date = datetime.strptime(latest["end_date"], "%Y-%m-%d").date()
+        days_stale = (today - end_date).days
+        out.setdefault(tk, {"company": latest["company"], "layer": latest["layer"], "metrics": {}})
+        out[tk]["metrics"][metric] = {
+            "end_date": latest["end_date"], "value_usd": float(latest["value_usd"]),
+            "qoq_pct": qoq, "days_stale": days_stale,
+            "is_stale": days_stale >= AI_PERIPHERY_STALE_DAYS, "note": latest.get("note", ""),
+        }
+    return out
+
+
 def build_report(ticker: str) -> str:
     now = datetime.now(KST)
     lines = []
@@ -391,6 +436,37 @@ def build_report(ticker: str) -> str:
             conflict_note = f" [{c['note']}]" if c["note"] else ""
             lines.append(f"- **{c['company']}({t})**: {c['end_date']} 분기 ${c['value_usd']/1e9:,.1f}B{qoq_note}{stale_note}{conflict_note}")
         lines.append("- 어닝콜 논조(재고 센티먼트 0~10점 판정)는 이 스크립트 범위 밖 — 위 숫자는 \"실제로 CapEx가 얼마였나\"만 제공")
+
+    # --- AI 밸류체인 변두리 조기경보 (2026-08-07 신설) ---
+    periphery = read_ai_periphery()
+    if periphery is not None:
+        lines.append("\n## AI 밸류체인 변두리 조기경보 (SEC EDGAR, 주도주보다 먼저 꺾이는 자리)")
+        alerts = []
+        for tk in ("VRT", "GEV", "AMKR", "ALAB", "CRDO", "COHR", "LITE", "SMCI"):
+            info = periphery.get(tk)
+            if info is None:
+                continue
+            parts = []
+            for metric, label in (("backlog", "백로그"), ("revenue", "매출")):
+                m = info["metrics"].get(metric)
+                if m is None:
+                    continue
+                qoq = f"{m['qoq_pct']:+.1f}%" if m["qoq_pct"] is not None else "QoQ 미확인"
+                stale = " ⚠스테일" if m["is_stale"] else ""
+                parts.append(f"{label} ${m['value_usd']/1e9:,.2f}B({qoq}){stale}")
+                # 조기경보 판정 — 백로그 감소가 이 섹션의 핵심 신호
+                if m["qoq_pct"] is not None and m["qoq_pct"] < 0:
+                    sev = "🔴" if metric == "backlog" else "🟡"
+                    alerts.append(f"{sev} {info['company']}({tk}) {label} 전분기 대비 {m['qoq_pct']:+.1f}%")
+            if parts:
+                lines.append(f"- **{info['company']}({tk})** [{info['layer']}]: " + " / ".join(parts))
+        if alerts:
+            lines.append("\n**⚠ 감소 전환 감지 — 아래 항목은 사람이 원인 확인 필요:**")
+            for a in alerts:
+                lines.append(f"  - {a}")
+        else:
+            lines.append("- ✅ 감소 전환 없음 — 변두리 백로그·매출 전부 증가 또는 유지")
+        lines.append("- 한미반도체·HD현대일렉트릭(한국)·이비덴(일본)·ASE(대만)는 SEC 미제출이라 자동수집 대상 밖 — wiki/concepts/ai-value-chain-periphery-monitor.md에서 수동 추적")
 
     # --- 포트폴리오 (2026-08-05 신설, 데이터 없으면 섹션 생략) ---
     port = read_latest_portfolio_summary()
