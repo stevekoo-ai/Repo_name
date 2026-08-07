@@ -174,6 +174,7 @@ claude -p --dangerously-skip-permissions \
 1. **bat 파일 한글 주석 인코딩 깨짐**: Write 도구가 UTF-8로 저장, cmd는 cp949로 읽어 `^` 줄연속과 한글이 깨짐 → ASCII 주석 + CRLF 보장으로 수정.
 2. **git pull --rebase, unstaged changes로 실패**: 이전 세션 잔여 변경(index.md, log.md)이 있으면 rebase 불가 → `git stash push -u` → pull → `git stash pop` 순으로 수정 (run_daily.bat).
 3. **`--allowedTools` variadic 인자 파싱**: 프롬프트를 인자로 주면 도구명으로 파싱해버림 → 프롬프트는 **stdin**으로 전달 (bat에선 `< prompts\...txt`).
+4. **`--append-system-prompt-file` 부재 → 빈 stdout (2026-08-07, log-summarize 실증)**: `run_log_summarize_bounded.ps1`이 `claude -p`를 rc=0, 18.1s로 완료하나 stdout 완전히 빔 → log.md 요약 갱신 안 됨. 원인: 성공 패턴 `run_cxl_claude_bounded.ps1`은 `.claude/prompts/cxl-daily-update.md`를 `--append-system-prompt-file`로 주입하는데, log-summarize엔 이 인자가 빠져 있었음. **사내 GLM 라우팅 환경에서 system prompt 주입이 응답 생성의 실질적 트리거** — 빠지면 rc=0인데 응답 안 나옴. 해결: system prompt 파일(`.claude/prompts/log-summarize.md`) 신규 생성 후 `--append-system-prompt-file`로 주입 + `--allowedTools`에 `Write WebFetch` 추가(성공 패턴과 동일화) → 즉시 189.6s 정상 응답, ## 당월 요약 idempotent 갱신 성공. **교훈: 헤드리스 claude -p가 빈 stdout이면 system prompt 주입 여부부터 의심. 성공 패턴과의 argv diff를 파일 실측으로 확정한 뒤 동일화.** 부분 테스트→실패→수정 사이클(CLAUDE.md 진단형 규칙 위반) 없이 한 번에 메꿈.
 
 ### 다음 단계 (사용자 결정 필요)
 
