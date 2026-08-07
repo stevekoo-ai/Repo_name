@@ -1,293 +1,142 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ko">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>[청약 Desktop] 2026-08-07 (금) 청약 모니터 종합</title>
-<script src="https://cdn.tailwindcss.com"></script>
-<script>
-tailwind.config = {
-  theme: {
-    extend: {
-      colors: {
-        canvas: '#f5f5f7',
-        ink: '#1d1d1f',
-        sub: '#6e6e73',
-        indigo: { DEFAULT:'#4f46e5', 600:'#4f46e5', 700:'#4338ca', 50:'#eef2ff', 100:'#e0e7ff' },
-        star: '#f59e0b',
-        warn: '#b45309',
-        warnbg: '#fffbeb',
-        ok: '#047857',
-        okbg: '#ecfdf5',
-        bad: '#be123c',
-        badbg: '#fff1f2',
-        mute: '#9ca3af',
-      },
-      fontFamily: {
-        sans: ['-apple-system','BlinkMacSystemFont','SF Pro Display','Segoe UI','Malgun Gothic','Helvetica Neue','Arial','sans-serif'],
-      },
-      boxShadow: {
-        card: '0 1px 3px rgba(0,0,0,0.04), 0 10px 30px rgba(0,0,0,0.06)',
-        hover:'0 4px 12px rgba(79,70,229,0.18), 0 20px 50px rgba(0,0,0,0.10)',
-      },
-      borderRadius: { '2xl':'1.25rem' },
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>[청약 Desktop] 2026-08-07 저녁 heartbeat</title>
+<style>
+  :root{
+    --bg:#f5f6f8; --surface:#ffffff; --surface-2:#eceff3; --ink:#161a20; --muted:#5c6470;
+    --line:#dde1e7; --accent:#0b5fb0; --accent-ink:#0a4a8a; --accent-soft:#e3edf9;
+    --live:#0e9a6c; --live-soft:#e1f5ec;
+    --warn:#b5551a; --warn-soft:#fbe9db; --warn-line:#eec7a0;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#0d1116; --surface:#151a21; --surface-2:#1b212a; --ink:#e7ebf1; --muted:#8b93a1;
+      --line:#2a323d; --accent:#5aa9ef; --accent-ink:#8ec4f5; --accent-soft:#122a41;
+      --live:#3fd39a; --live-soft:#0f2c22;
+      --warn:#ffab6b; --warn-soft:#3a2415; --warn-line:#5a381f;
     }
   }
-}
-</script>
-<style>
-  html{scroll-behavior:smooth}
-  body{background:
-    radial-gradient(1200px 600px at 50% -10%, #ffffff 0%, #f5f5f7 60%) fixed;
-    -webkit-font-smoothing:antialiased}
-  .card{transition:transform .35s cubic-bezier(.22,1,.36,1), box-shadow .35s cubic-bezier(.22,1,.36,1)}
-  .card:hover{transform:translateY(-3px);box-shadow:0 4px 12px rgba(79,70,229,0.18),0 20px 50px rgba(0,0,0,0.10)}
-  .fade-in{animation:fadeIn .6s ease both}
-  @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
-  .desktop-tag{display:inline-block;background:linear-gradient(90deg,#4f46e5,#4338ca);color:#fff;font-size:11px;font-weight:700;letter-spacing:.5px;padding:3px 10px;border-radius:100px}
-  .auto-pill{display:inline-block;padding:1px 7px;border-radius:8px;font-size:10px;font-weight:700;letter-spacing:.3px}
-  .ap-green{background:rgba(4,120,87,.12);color:#047857;border:1px solid rgba(4,120,87,.3)}
-  .ap-mut{background:rgba(156,163,175,.15);color:#6e6e73;border:1px solid rgba(156,163,175,.35)}
-  .ap-yellow{background:rgba(180,83,9,.12);color:#b45309;border:1px solid rgba(180,83,9,.3)}
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:"Pretendard Variable","Apple SD Gothic Neo","Malgun Gothic",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+    line-height:1.6;}
+  .page{max-width:860px;margin:0 auto;padding:44px 22px 90px;}
+  .topbar{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap;
+    padding-bottom:22px;border-bottom:1px solid var(--line);margin-bottom:28px;}
+  .brand .eyebrow{display:inline-flex;align-items:center;gap:7px;font-size:12px;font-weight:700;
+    letter-spacing:.07em;text-transform:uppercase;color:var(--accent-ink);}
+  .brand .eyebrow .dot{width:7px;height:7px;border-radius:50%;background:var(--live);box-shadow:0 0 0 3px var(--live-soft);}
+  .brand h1{font-size:clamp(22px,3.4vw,28px);font-weight:800;letter-spacing:-0.02em;margin:8px 0 4px;}
+  .brand p{margin:0;color:var(--muted);font-size:14px;max-width:56ch;}
+  .desktop-tag{display:inline-block;margin-left:10px;padding:2px 10px;border-radius:100px;
+    font-size:11px;font-weight:700;background:var(--accent-soft);color:var(--accent-ink);
+    letter-spacing:.03em;}
+  .clock{text-align:right;font-size:12.5px;color:var(--muted);font-variant-numeric:tabular-nums;}
+  .clock b{color:var(--ink);font-size:13.5px;}
+  section{margin-top:32px;}
+  h2{font-size:18px;font-weight:800;margin:0 0 12px;}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;}
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px 18px;}
+  .card .k{font-size:11.5px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);font-weight:700;}
+  .card .v{font-size:22px;font-weight:800;font-variant-numeric:tabular-nums;margin-top:4px;}
+  .card .sub{font-size:12.5px;color:var(--muted);margin-top:2px;}
+  .status.{color:var(--live);}
+  .status.warn{color:var(--warn);}
+  .tablewrap{overflow-x:auto;border:1px solid var(--line);border-radius:14px;background:var(--surface);}
+  table{border-collapse:collapse;width:100%;font-size:13.6px;}
+  th,td{text-align:left;padding:11px 14px;border-bottom:1px solid var(--line);}
+  th{background:var(--surface-2);font-size:11.5px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);font-weight:700;}
+  tr:last-child td{border-bottom:none;}
+  .muted{color:var(--muted);text-align:center;padding:24px;}
+  .note{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px 16px;font-size:13.4px;color:var(--muted);}
+  footer{margin-top:44px;padding-top:20px;border-top:1px solid var(--line);font-size:12px;color:var(--muted);}
+  a{color:var(--accent-ink);}
 </style>
 </head>
-<body class="font-sans text-ink">
-<div class="max-w-3xl mx-auto px-5 py-10">
-
-  <!-- ============ 헤더 ============ -->
-  <section class="mb-8 fade-in">
-    <div class="flex items-center gap-3 mb-3">
-      <span class="desktop-tag">⌬ From. Desktop</span>
-      <span class="text-xs text-sub">청약 모니터 종합</span>
+<body>
+<div class="page">
+  <div class="topbar">
+    <div class="brand">
+      <span class="eyebrow"><span class="dot"></span>청약 모니터 · 저녁 heartbeat<span class="desktop-tag">⌬ From. Desktop</span></span>
+      <h1>청약 시스템 정상 동작 확인 (2026-08-07)</h1>
+      <p>Desktop이 매일 저녁 보내는 heartbeat 보고서입니다. 실시간 매물 알림(NEW_MATCH/PRIORITY_UP)은 5분 간격 GitHub Actions 파이프라인이 별도 처리합니다. 이 메일은 "오늘도 시스템이 정상이었다"는 확인용 1회/일 발송입니다.</p>
     </div>
-    <h1 class="text-3xl font-bold tracking-tight mb-2">청약 모니터 일일 요약</h1>
-    <p class="text-base text-sub">
-      2026-08-07 (금) · KST 15:00 기준 ·
-      <span class="text-indigo-600 font-medium">서울·경기 국민주택 일반공급</span>
-    </p>
-    <p class="text-sm text-mute mt-2">
-      본 보고서는 Desktop Claude Code가 GitHub Actions 수집 데이터를 바탕으로 생성·발송했습니다.
-      Mobile Claude Code가 보내는 기존 통합 Daily Brief와 <b>비교 관전용</b>입니다.
-    </p>
-  </section>
+    <div class="clock">
+      발송 시각<br><b>2026-08-07 17:12 KST</b>
+    </div>
+  </div>
 
-  <!-- ============ 핵심 지표 카드 ============ -->
-  <section class="mb-10 fade-in">
-    <h2 class="text-sm font-semibold tracking-widest text-sub uppercase mb-4 text-center">핵심 지표</h2>
-    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
-      <div class="card bg-white rounded-2xl p-5 shadow-card border border-gray-100 text-center">
-        <div class="text-xs text-sub mb-1">접수 중 공고</div>
-        <div class="text-2xl font-bold text-ink">0건</div>
-        <div class="text-sm text-sub font-medium mt-1">서울·경기 국민</div>
+  <section>
+    <h2>핵심 지표</h2>
+    <div class="grid">
+      <div class="card">
+        <div class="k">API 상태</div>
+        <div class="v status ok">정상</div>
+        <div class="sub">연속 실패 0회 · 장애 알림 없음</div>
       </div>
-      <div class="card bg-white rounded-2xl p-5 shadow-card border border-gray-100 text-center">
-        <div class="text-xs text-sub mb-1">내 청약통장</div>
-        <div class="text-2xl font-bold text-ok">40<span class="text-base text-sub">/40</span></div>
-        <div class="text-sm text-ok font-medium mt-1">만점 (경쟁력 최상)</div>
+      <div class="card">
+        <div class="k">접수중 매물</div>
+        <div class="v">0건</div>
+        <div class="sub">서울·경기 국민주택 일반공급</div>
       </div>
-      <div class="card bg-white rounded-2xl p-5 shadow-card border border-gray-100 text-center">
-        <div class="text-xs text-sub mb-1">NEW_MATCH</div>
-        <div class="text-2xl font-bold text-mute">0</div>
-        <div class="text-sm text-sub font-medium mt-1">키워드 매칭 없음</div>
+      <div class="card">
+        <div class="k">오늘 heartbeat</div>
+        <div class="v">✓ 발송됨</div>
+        <div class="sub">09시 이후 첫 정상 run (실시간 파이프라인)</div>
       </div>
-      <div class="card bg-white rounded-2xl p-5 shadow-card border border-gray-100 text-center">
-        <div class="text-xs text-sub mb-1">시스템 상태</div>
-        <div class="text-2xl font-bold text-ok">정상</div>
-        <div class="text-sm text-ok font-medium mt-1">API healthy</div>
+      <div class="card">
+        <div class="k">추적 중 매물</div>
+        <div class="v">2건</div>
+        <div class="sub">이미 알림 보낸 플랫폼 매칭 공고</div>
       </div>
     </div>
   </section>
 
-  <!-- ============ 내 청약통장 프로필 ============ -->
-  <section class="mb-10 fade-in">
-    <h2 class="text-lg font-bold mb-4 flex items-center gap-2">
-      <span>🏦 내 청약통장 — 경쟁력 분석</span>
-    </h2>
-    <div class="card bg-white rounded-2xl p-6 shadow-card border border-gray-100">
-      <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 text-sm">
-        <div>
-          <div class="text-xs text-sub">가입일</div>
-          <div class="font-semibold mt-1">2005-11-03</div>
-          <div class="text-xs text-mute">20년 8개월</div>
-        </div>
-        <div>
-          <div class="text-xs text-sub">누적 납입</div>
-          <div class="font-semibold mt-1">249회</div>
-          <div class="text-xs text-mute">240회+ 만점</div>
-        </div>
-        <div>
-          <div class="text-xs text-sub">저축총액</div>
-          <div class="font-semibold mt-1">2,805만원</div>
-          <div class="text-xs text-mute">순차제 유리</div>
-        </div>
-        <div>
-          <div class="text-xs text-sub">월 납입액</div>
-          <div class="font-semibold mt-1">25만원</div>
-          <div class="text-xs text-mute">납입인정 최고액</div>
-        </div>
-      </div>
-      <div class="mt-5 pt-4 border-t border-gray-100">
-        <div class="flex items-center justify-between mb-2">
-          <span class="text-sm font-medium text-ink">통장 점수 (국민주택 순위·가점)</span>
-          <span class="auto-pill ap-green">40/40 만점</span>
-        </div>
-        <div class="w-full bg-gray-100 rounded-full h-2.5">
-          <div class="bg-gradient-to-r from-indigo-500 to-indigo-700 h-2.5 rounded-full" style="width:100%"></div>
-        </div>
-        <p class="text-xs text-sub mt-3">
-          가점 3축(가입기간 15점 + 납입회차 15점 + 납입액 10점) 모두 만점.
-          서울·경기 국민주택 순차제(저축총액순)에서 <b>경쟁력 최상위권</b>.
-          소득제한 없는 전용 84㎡ 이상 일반공급 유형이 유리.
-        </p>
-      </div>
+  <section>
+    <h2>대시보드 상태</h2>
+    <div class="note">
+      마지막 갱신: <b>2026-08-07 15:00 KST</b> · 다음 갱신 예정: <b>08-07 19:00 KST</b><br>
+      5분 간격 GitHub Actions 파이프라인이 data.go.kr을 fetch해 갱신합니다.
+      위 갱신 시각이 이 발송 시각(2026-08-07 17:12 KST)과 멀리 떨어져 있으면 파이프라인이 멈춘 것입니다.
     </div>
   </section>
 
-  <!-- ============ 오늘 조사 결과 ============ -->
-  <section class="mb-10 fade-in">
-    <h2 class="text-lg font-bold mb-4 flex items-center gap-2">
-      <span>📋 오늘 조사 결과 (2026-08-07 15:00 KST)</span>
-    </h2>
-    <div class="card bg-white rounded-2xl p-6 shadow-card border border-gray-100">
-      <div class="flex items-center justify-between mb-4 pb-3 border-b border-gray-100">
-        <span class="font-medium">서울·경기 국민주택 접수 중/예정</span>
-        <span class="auto-pill ap-mut">0건</span>
-      </div>
-      <p class="text-sm text-sub mb-4">
-        현재 접수 마감 전인 서울·경기 국민주택 일반공급 공고가 없습니다.
-        청약Home API(data.go.kr) 기준이며, 5분마다 자동 갱신됩니다.
-      </p>
-      <div class="grid grid-cols-3 gap-3 text-center">
-        <div class="bg-gray-50 rounded-xl p-3">
-          <div class="text-xs text-sub">HIGH 우선순위</div>
-          <div class="text-xl font-bold mt-1">0</div>
-        </div>
-        <div class="bg-gray-50 rounded-xl p-3">
-          <div class="text-xs text-sub">MED 우선순위</div>
-          <div class="text-xl font-bold mt-1">0</div>
-        </div>
-        <div class="bg-gray-50 rounded-xl p-3">
-          <div class="text-xs text-sub">접수 임박 (D-3)</div>
-          <div class="text-xl font-bold mt-1">0</div>
-        </div>
-      </div>
-      <div class="mt-4 p-3 rounded-xl bg-indigo-50 border border-indigo-100">
-        <p class="text-xs text-indigo-700">
-          <b>감지 키워드:</b> 플랫폼시티 · 광교 · 원천동
-          — 해당 키워드 매칭 공고가 등장하면 즉시 알림(NEW_MATCH)이 별도 발송됩니다.
-        </p>
-      </div>
-    </div>
-  </section>
-
-  <!-- ============ 발송 파이프라인 상태 ============ -->
-  <section class="mb-10 fade-in">
-    <h2 class="text-lg font-bold mb-4 flex items-center gap-2">
-      <span>⚙️ 발송 파이프라인 상태</span>
-    </h2>
-    <div class="card bg-white rounded-2xl p-6 shadow-card border border-gray-100">
-      <table class="w-full text-sm">
+  <section>
+    <h2>현재 접수중 / 접수예정 공고 (0건)</h2>
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th style="width:40px">#</th><th>단지명</th></tr></thead>
         <tbody>
-        <tr class="row-h border-b border-gray-100">
-          <td class="py-2.5 text-sub">데이터 소스</td>
-          <td class="py-2.5 text-right font-medium">data.go.kr 청약Home Open API</td>
-        </tr>
-        <tr class="row-h border-b border-gray-100">
-          <td class="py-2.5 text-sub">수집 주기</td>
-          <td class="py-2.5 text-right font-medium">5분 (GitHub Actions cron)</td>
-        </tr>
-        <tr class="row-h border-b border-gray-100">
-          <td class="py-2.5 text-sub">판단 엔진</td>
-          <td class="py-2.5 text-right font-medium">judge.py (규칙 기반, 토큰 0)</td>
-        </tr>
-        <tr class="row-h border-b border-gray-100">
-          <td class="py-2.5 text-sub">발송 정책</td>
-          <td class="py-2.5 text-right font-medium">의미있을 때 + 일일 요약</td>
-        </tr>
-        <tr class="row-h border-b border-gray-100">
-          <td class="py-2.5 text-sub">이메일 발송</td>
-          <td class="py-2.5 text-right font-medium">Gmail SMTP (Actions Secrets)</td>
-        </tr>
-        <tr class="row-h">
-          <td class="py-2.5 text-sub">본 보고서 발송 주체</td>
-          <td class="py-2.5 text-right font-medium">
-            <span class="desktop-tag">Desktop</span>
-          </td>
-        </tr>
+<tr><td colspan="2" class="muted">현재 접수 중인 서울·경기 국민주택 일반공급 건이 없습니다.</td></tr>
         </tbody>
       </table>
     </div>
   </section>
 
-  <!-- ============ 관전 포인트 ============ -->
-  <section class="mb-10 fade-in">
-    <h2 class="text-lg font-bold mb-4 flex items-center gap-2">
-      <span>🔭 다음 관전 포인트</span>
-    </h2>
-    <div class="card bg-white rounded-2xl p-6 shadow-card border border-gray-100">
-      <ul class="space-y-3 text-sm text-ink">
-        <li class="flex gap-2">
-          <span class="text-indigo-600 font-bold mt-0.5">▸</span>
-          <span><b>플랫폼시티 공공분양 공고 개시</b> — 접수 시작 D-1 도래 시 HIGH 우선순위 자동 승격 + 즉시 알림 발송.</span>
-        </li>
-        <li class="flex gap-2">
-          <span class="text-indigo-600 font-bold mt-0.5">▸</span>
-          <span><b>전세 만료 2027-02-22</b> (갱신청구권 이미 사용) — 그 이전 신규 분양 입주가 필요. 남은 약 6.5개월.</span>
-        </li>
-        <li class="flex gap-2">
-          <span class="text-indigo-600 font-bold mt-0.5">▸</span>
-          <span><b>Mobile vs Desktop 비교</b> — 당분간 두 채널의 보고서를 동시 수신·비교. Desktop은 본 헤더("⌬ From. Desktop")로 식별.</span>
-        </li>
-        <li class="flex gap-2">
-          <span class="text-indigo-600 font-bold mt-0.5">▸</span>
-          <span><b>API 장애 감지</b> — 6회 연속 실패(≈30분) 시 OUTAGE 알림, 복구 시 RECOVERY 알림 자동 발송.</span>
-        </li>
-      </ul>
+  <section>
+    <h2>내 청약통장</h2>
+    <div class="note">
+      가입일 <b>2005-11-03</b> · <b>249회</b> 납입 · 저축총액 <b>2,805만원</b> · 최고액 납입 <b>25만원</b><br>
+      청약통장 점수 <b>40/40</b> (20년+ 15 · 240회+ 15 · 최고액납입 10) — 순차제(저축총액순)에서 최상위권.
     </div>
   </section>
 
-  <!-- ============ 직접 확인 채널 ============ -->
-  <section class="mb-10 fade-in">
-    <h2 class="text-lg font-bold mb-4 flex items-center gap-2">
-      <span>🔗 직접 확인 채널</span>
-    </h2>
-    <div class="card bg-white rounded-2xl p-6 shadow-card border border-gray-100">
-      <ul class="space-y-2 text-sm">
-        <li>
-          <a href="https://www.applyhome.co.kr/ai/aib/selectSubscrptCalenderView.do" class="text-indigo-600 hover:text-indigo-700">청약홈 청약캘린더</a>
-          <span class="text-sub"> — 관심지역 알림(이메일/문자) 신청</span>
-        </li>
-        <li>
-          <a href="https://apply.lh.or.kr/" class="text-indigo-600 hover:text-indigo-700">LH청약플러스</a>
-          <span class="text-sub"> — LH 공공분양</span>
-        </li>
-        <li>
-          <a href="https://apply.gh.or.kr/" class="text-indigo-600 hover:text-indigo-700">GH 경기주택도시공사 청약센터</a>
-          <span class="text-sub"> — 경기 공공분양</span>
-        </li>
-        <li>
-          <a href="https://stevekoo-ai.github.io/Repo_name/subscription-monitor.html" class="text-indigo-600 hover:text-indigo-700">실시간 대시보드 (GitHub Pages)</a>
-          <span class="text-sub"> — 5분마다 자동 갱신</span>
-        </li>
-      </ul>
+  <section>
+    <h2>다음 관전 포인트</h2>
+    <div class="note">
+      감지 키워드: <b>플랫폼시티 / 광교 / 원천동</b> — 이 이름이 단지명·주소에 포함된 공고가 뜨면 즉시 알림(NEW_MATCH)이 별도 발송됩니다.<br>
+      일반 서울·경기 국민주택은 이 heartbeat에 표시만 되고 즉시 알림 대상이 아닙니다 (점수 40/40로 순차제 유리하지만 키워드 매칭이 우선).<br>
+      전세계약 만료일 <b>2027-02-22</b> — 이 시점까지 입주 가능한 공고를 우선 관전.
     </div>
   </section>
 
-  <!-- ============ 푸터 ============ -->
-  <footer class="pt-6 border-t border-gray-200 text-xs text-mute text-center">
-    <p class="mb-1">
-      <span class="desktop-tag">⌬ From. Desktop</span> ·
-      Generated by Desktop Claude Code · 청약 모니터 autonomous pipeline
-    </p>
-    <p class="mb-1">
-      데이터 출처: 한국부동산원 청약Home 분양정보 조회 서비스 (공공데이터포털 Open API)
-    </p>
-    <p>
-      계약·청약 신청 전 반드시 청약홈 원문 공고를 확인하세요.
-      본 보고서는 Mobile Claude Code 통합 Daily Brief와의 비교 관전용입니다.
-    </p>
+  <footer>
+    발송 주체: Desktop (Windows Task Scheduler → Python 스크립트 → Contents API PUT → GitHub Actions 발송 워크플로우).<br>
+    모바일 Claude Code 구독 만료와 무관 — 실시간 매물 알림은 GitHub Actions Python이 처리합니다.
   </footer>
-
 </div>
 </body>
 </html>
