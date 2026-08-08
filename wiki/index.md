@@ -41,6 +41,15 @@ Catalog of every page in the wiki. See `../CLAUDE.md` for conventions.
 
 ### concepts
 
+#### Architecture & Knowledge Model (4-Layer System Foundation — 2026-08-08)
+
+- [Knowledge Model — 4-Layer Wiki Architecture](concepts/knowledge-model.md) — 🆕 2026-08-08, 4-layer 분리 설계의 목적·구조·각 레이어 정의; Entity vs Entity-Journal, Concept vs Monitoring의 차이와 읽기 경로(current state/history/framework/daily tracking)
+- [Entity Lifecycle — Discovery to Mature State](concepts/entity-lifecycle-maturity.md) — 🆕 2026-08-08, 엔티티가 Mention→Discovery→Observation→Pattern Anchor→Decision Signal→Maturity 6단계로 전환되는 과정, 각 단계의 체크리스트
+- [Reporting Framework — Wiki Data to Reports](concepts/reporting-framework.md) — 🆕 2026-08-08, 4-layer 데이터가 morning brief/weekly review/monthly archive 등 리포트로 어떻게 흘러가는지, layer별 쿼리 패턴
+- [Decision Intelligence — Reading the Wiki for Decision-Making](concepts/decision-intelligence.md) — 🆕 2026-08-08, 사용자가 위키를 읽고 의사결정하는 워크플로우(5가지 decision type → layer mapping → reading guide)
+
+#### Concept Modification Discipline
+
 - [Concept Lifecycle Maturity — Change Justification Framework](concepts/concept-lifecycle-maturity.md) — 🆕 2026-08-08, Concept 수정의 정당성 4조건 (3회+ 반복 + 기존 가정 위반 + 신변수 발견 + 통계유의성, AND rule). Event→State Change→Pattern→Concept 4단계 lifecycle. SK하이닉스 HBM4 공급 확정(2026-08-08)은 Event+State Change만, Concept 변경 비정당화 사례로 검증 — 향후 모든 Concept 수정은 이 4-condition 체크 후만 진행.
 - [동시 실행 중인 다른 Agent를 고려한 코딩 규칙](concepts/concurrent-agent-aware-coding.md) — 🔴 **최상 우선순위**. 코드 작성 시 반드시 먼저 적용. headless 래퍼의 process sweep(`taskkill`로 `claude.exe`/`node.exe` 전역 매칭)이 사용자의 live interactive 세션과 다른 Agent 작업을 통째로 강제 종료한 실제 사건(2026-08-07)에서 도출. 프로세스 kill 매칭 좁히기(PID/CreationDate), sweep보다 고아를 남기는 쪽이 안전하면 sweep 제거, 좁은 타임아웃 테스트 금지. git 충돌([multi-client-conflict-prevention.md](concepts/multi-client-conflict-prevention.md))과는 다른 프로세스 레이어 규칙. [CLAUDE.md 코드 작성 품질](../CLAUDE.md) 최상위 상위 규칙.
 - [청약 모니터 autonomous 5단계 파이프라인](concepts/subscription-monitor-autonomous-pipeline.md) — 2026-08-06, `/c/*` 5분 Actions 청약 모니터를 "조사→판단→메시지작성→본문구성→발송" 5단계로 고도화. **규칙 기반**(LLM in-the-loop 아님, 결정론적·토큰비용 0·Secret 추가 없음). `judge.py`(내 통장 40/40 만점 단일 정보원) + `compose.py`(발송 정책 "의미있을 때 + 일일 요약", 5개 이벤트 NEW_MATCH/PRIORITY_UP/OUTAGE/RECOVERY/DAILY_DIGEST) + `alerts.py`(저수준 발송만). DAILY_DIGEST가 "조사 결과를 꼭 email로 받는" 채널.

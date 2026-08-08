@@ -19,26 +19,36 @@ LLM does the bookkeeping.
    Update it yourself when the wiki's shape needs to change; the agent
    should not restructure the schema unprompted.
 
-## Wiki structure
+## Wiki structure (4-layer architecture)
 
 ```
 wiki/
-  index.md            content-oriented catalog: every page, one line each
-  log.md              chronological, append-only event log (current month only — see rotation below)
-  log-archive/         log.md rotated out by month: YYYY-MM.md, cold storage
-  summaries/           one page per ingested source, distilled
-  entities/            one page per recurring person/org/product/thing
-  concepts/            one page per recurring idea/topic/theme
+  index.md              content-oriented catalog: every page, one line each
+  log.md                chronological, append-only event log (current month only — see rotation below)
+  log-archive/          log.md rotated out by month: YYYY-MM.md, cold storage
+  summaries/            one page per ingested source (distilled summary)
+  entities/             one page per entity: CURRENT STATE ONLY (no dated entries)
+  entity-journals/      one page per entity: HISTORICAL TIMELINE (all state changes, audit trail)
+  concepts/             one page per concept: FRAMEWORK ONLY (no daily tracking data)
+  monitoring/           one page per framework: DAILY TRACKING & STATUS (append-only)
 ```
 
-Only create a new top-level folder under `wiki/` if an existing one clearly
-doesn't fit — don't fragment the taxonomy further than this.
+**4-Layer Model**: The wiki now implements a 4-layer separation of concerns to eliminate data duplication:
+- **Layer 1 (Entity)**: Current state snapshot (~50–300 lines, updated only when state changes)
+- **Layer 2 (Entity Journal)**: Complete historical timeline (append-only, audit trail)
+- **Layer 3 (Concept)**: Framework definition and methodology (updated rarely when concept itself evolves)
+- **Layer 4 (Monitoring)**: Daily tracking scores and status (append-only, synchronized with Layer 3)
+
+**Folder Creation Rule**: Only create a new top-level folder under `wiki/` if an existing one clearly
+doesn't fit — don't fragment the taxonomy further. **Exception**: `entity-journals/` and `monitoring/` 
+are structural complements to `entities/` and `concepts/` respectively, required by the 4-layer model. 
+Always use both pairs together.
 
 ## Page conventions
 
 - Filenames: kebab-case, `.md`.
 - Every page starts with frontmatter:
-  ```
+  ```yaml
   ---
   title: <Title>
   created: <YYYY-MM-DD>
@@ -46,14 +56,27 @@ doesn't fit — don't fragment the taxonomy further than this.
   tags: [tag1, tag2]
   ---
   ```
-- Body is distilled prose an LLM would actually want to re-read later — not a
-  dump of the source. Preserve exact quotes, numbers, or dates only where
-  precision matters.
+  **Layer-specific `updated` semantics:**
+  - **Entity**: Last time current state actually changed (not when reviewed)
+  - **Entity-Journal**: When last journal entry was added (tracks entry frequency)
+  - **Concept**: When framework definition itself evolved (rare updates)
+  - **Monitoring**: When daily status was last updated (frequent updates)
+
+- **Body conventions (layer-specific)**:
+  - **Entity**: Current state summary only (~50–300 lines). No dated entries or historical narrative.
+    Include "Last verified" metadata and link to entity-journals/ for full history.
+  - **Entity-Journal**: Reverse-chronological timeline of all state changes (audit trail, append-only).
+    Link back to entity current-state page.
+  - **Concept**: Framework definition, methodology, and invariant thresholds. No daily tracking data
+    or dated entries. Link to monitoring/ for daily status.
+  - **Monitoring**: Today's status + dated change log (append-only). Link back to concept for framework.
+
 - Every page ends with a `## Sources` section listing the `sources/` files
   (and/or other wiki pages) it was derived from.
 - Cross-link liberally using standard relative markdown links, e.g.
   `[Some Entity](../entities/some-entity.md)`. When you update a page, check
-  whether pages it now relates to should link back.
+  whether pages it now relates to should link back. **Inter-layer links**:
+  Entity ↔ Entity-Journal (always pair); Concept ↔ Monitoring (always pair).
 
 ## index.md conventions
 
@@ -68,12 +91,16 @@ One line per wiki page, grouped by folder:
 
 ## log.md conventions
 
-Append-only, newest entry at the bottom. One line per event:
+Append-only, newest entry at the bottom. One line per event. **Note the 4-layer model:**
 ```
-YYYY-MM-DD HH:MM UTC — INGEST sources/foo.md → created entities/foo.md, updated concepts/bar.md
-YYYY-MM-DD HH:MM UTC — QUERY "question text" → cited entities/foo.md, concepts/bar.md
+YYYY-MM-DD HH:MM UTC — INGEST sources/foo.md → created entities/foo.md (current state) + entity-journals/foo-journal.md (history), updated concepts/bar.md
+YYYY-MM-DD HH:MM UTC — UPDATE monitoring/hbm-score-status.md → daily status (score 75/100, 2026-08-08)
+YYYY-MM-DD HH:MM UTC — QUERY "question text" → cited entities/foo.md, entity-journals/foo-journal.md, concepts/bar.md, monitoring/bar-status.md
 YYYY-MM-DD HH:MM UTC — LINT → 2 issues found (see report)
 ```
+
+When ingesting sources that affect entities, always create/update both entity (current state) and
+entity-journal (history). When updating monitoring pages, link back to the concept framework.
 
 ### Log rotation (3인 하이브리드 자동화 — 2026-08-07 개정, 2026-08-04 도입)
 
@@ -157,34 +184,37 @@ the append-only auto-merge property the
 [multi-client-conflict-prevention.md](wiki/concepts/multi-client-conflict-prevention.md)
 doc relies on for concurrent sessions.
 
-**Before rotating any page other than `log.md` (2026-08-04 refinement, user
-feedback):** a pure calendar-month cut is too blunt on its own — age isn't
-the same as irrelevance. Before archiving a table/section's old rows,
-check whether they're still load-bearing:
+**Rotation strategy by layer (2026-08-08 refinement for 4-layer model):**
 
-1. Grep the rest of the wiki (including the file's own still-live prose
-   sections) for anything that cites or depends on the specific old
-   entries being cut — table rows in this wiki have no per-row anchors, so
-   in practice this means checking whether the *fact* in that row is only
-   ever stated there, or whether it's already been promoted into a durable
-   "current state" prose section elsewhere on the page (checkpoints.md's
-   "핵심 체크포인트", macro-regime-history.md's "0."/"4." sections, etc.
-   already work this way — dated tables are an audit trail, not the
-   only copy of the finding).
-2. If a fact is *only* in the row about to be archived and nothing else
-   currently cites or restates it, don't just cut it — either fold a
-   one-line durable summary into the relevant prose section first (so the
-   knowledge survives the cut even if the row's full detail goes cold),
-   or leave that row live one more rotation cycle.
-3. Report what you checked, not just what you cut — e.g. "verified 0
-   pages link to a specific archived row; the facts in it are already
-   restated in section X" — so this stays auditable rather than assumed.
+1. **Log entries (`log.md`)**: Pure chronological diary → rotate aggressively (daily/weekly)
+   - Age = Staleness. No "current state" duplicate elsewhere by design.
+   - Safe to archive immediately. No "load-bearing" check needed.
 
-This is why `log.md`'s own rotation doesn't need this extra check — it's
-a pure chronological diary with no "current state" duplicate elsewhere by
-design, so age and staleness are the same thing there. That's not true for
-concept/entity pages, which mix a changelog-shaped table with durable
-prose that the changelog feeds into.
+2. **Entity-journals & Monitoring (append-only audit trails)** → rotate conservatively (monthly)
+   - These ARE the "current state" for history/tracking. Never delete.
+   - Monthly rotation OK when file >100KB (e.g., move to `entity-journals/sk-hynix-2026-07.md`)
+   - Archive old months but keep in repo (audit trail is durable)
+
+3. **Entity current-state (single snapshot)** → no rotation
+   - One page per entity, always current. ~50–300 lines.
+   - If page grows beyond current-state size, formalize new state changes as journal entries.
+
+4. **Concept (framework)** → no rotation
+   - Framework updates only (rare). Tracking data moved to monitoring/.
+   - If concept framework itself evolves, document the change in Sources.
+
+5. **Before rotating any dated table or section in concepts/entities (legacy)**:
+   This check only applies to pages created before 4-layer split.
+   - If in entity-journals or monitoring → OK to rotate, it's audit trail (no "load-bearing" check needed)
+   - If in concept or entity current-state → Check if facts are duplicated elsewhere
+   - Grep the rest of the wiki (including the file's own still-live prose sections) for references
+   - If a fact is *only* in the row about to be archived and nothing else cites it, either:
+     a) Fold a one-line summary into the relevant prose section first, or
+     b) Leave that row live one more rotation cycle
+   - Report what you checked, not just what you cut
+
+**Note**: `log.md`'s rotation is the pure case with no complications. Entity-journals and monitoring
+were designed append-only to avoid the "load-bearing" problem entirely.
 
 ## Workflows
 
@@ -195,12 +225,24 @@ prose that the changelog feeds into.
    otherwise treat the argument as inline source text and save it to
    `sources/` first (pick a sensible filename) before proceeding.
 3. Read `wiki/index.md` and grep `wiki/` for topics the source touches.
-4. Prefer updating an existing page over creating a new one when the source
-   adds to something already covered. Only create a new page when nothing
-   existing fits — don't create near-duplicate pages.
-5. Update every cross-reference the change touches, in both directions.
-6. Update `wiki/index.md` and append one line to `wiki/log.md`.
-7. Report which pages were created vs. updated.
+4. **Classify the update** (4-layer model):
+   - Does this update an **entity** (a recurring person/org/product/thing)? → Update Layer 1+2
+   - Does this update a **concept** (a recurring idea/framework)? → Update Layer 3 only (with Lifecycle check)
+   - Does this add daily tracking/status? → Update Layer 4 (monitoring, append-only)
+5. **For entity updates**:
+   - Summarize current state → update `entities/foo.md` (keep ≤300 lines, no dated entries)
+   - Add dated entry → append `entity-journals/foo-journal.md` with new state change
+   - Update "last verified" metadata in entity frontmatter
+6. **For concept updates**:
+   - Update framework definition only in `concepts/foo.md`
+   - **Check [Concept Lifecycle Maturity](../concepts/concept-lifecycle-maturity.md)** — is this change justified?
+     (Requires 3+ occurrences + pattern, not a single event)
+   - **Do NOT manually edit `monitoring/` pages** — they are auto-generated or updated by separate routines
+7. Prefer updating an existing page over creating a new one when the source adds to something already 
+   covered. Only create a new page when nothing existing fits — don't create near-duplicate pages.
+8. Update every cross-reference the change touches, in both directions.
+9. Update `wiki/index.md` and append one line to `wiki/log.md` (show which entity-journals/monitoring were touched).
+10. Report which entity-journals were appended, which concepts updated, and which monitoring pages were affected.
 
 ### Query (`/query <question>`, and ordinary conversation)
 
@@ -210,27 +252,35 @@ exchange must leave a trace in the wiki; nothing gets discussed and then
 lost. No need to ask permission first — record, then move on.
 
 1. Read `wiki/index.md` and grep `wiki/` for pages relevant to the question.
-2. Answer the question, citing which wiki page(s) support each claim.
+2. Answer the question, citing which wiki page(s) support each claim (cite the appropriate layer).
 3. **Always record the exchange — recording is mandatory, never optional.**
    Judge how much it matters and size the write-up accordingly:
-   - Important/new/insight-bearing: write a proper entry into the relevant
-     existing page (new page only if nothing fits) — include the reasoning
-     or insight behind it, not just the bare fact, cross-linked as usual.
-   - Minor, a repeat, or adds nothing new: a brief note is enough (a short
-     line on the relevant page, or just the `log.md` entry if there's truly
-     nothing page-worthy) — don't skip it, just don't over-write it.
+   - **State change + measurable** (e.g., "score changed from 70 to 75") → append to monitoring page (Layer 4)
+   - **Entity fact + recurring** (e.g., "HBM4 confirmed") → update entity current state + append journal (Layers 1+2)
+   - **Framework insight** (e.g., "new pattern in macro cycle") → update concept with Lifecycle check (Layer 3)
+   - **Important/new insight-bearing** (not categorized above) → write proper entry into relevant page — include reasoning
+   - **Minor/repeat/no new content** → just `log.md` entry, no page update
    - Write first; don't wait for the user to confirm before recording.
-4. Append one line to `wiki/log.md` describing what happened either way.
+4. Append one line to `wiki/log.md` describing what happened, noting which layers were updated.
 
 ### Lint (`/lint`)
 
 1. Walk every page under `wiki/`.
-2. Flag: contradictions between pages, claims no longer supported by any
-   source, orphaned pages (not reachable from `index.md`), missing
-   cross-references (two pages clearly about the same thing that don't link
-   to each other), and broken links.
-3. Report findings as a list; don't auto-fix without confirmation.
-4. Append one line to `wiki/log.md` summarizing the count of issues found.
+2. Flag standard issues: contradictions between pages, claims no longer supported by any
+   source, orphaned pages (not reachable from `index.md`), missing cross-references 
+   (two pages clearly about the same thing that don't link to each other), and broken links.
+3. **Flag 4-layer violations**:
+   - Dated entries in `entities/` → should be in `entity-journals/`
+   - Daily scores/tracking in `concepts/` → should be in `monitoring/`
+   - Manually edited `monitoring/` pages → should be append-only
+   - Entity current-state >300 lines → possible timeline creep (should formalize as journal entries)
+   - `monitoring/` pages without backlink to concept → missing relationship
+   - Concept pages with today's score → should be in monitoring, not concept
+   - Entity pages without link to their journal → missing discovery path
+   - Entity-journal or monitoring pages not linked from their counterpart → broken inter-layer link
+4. Report findings as a list; don't auto-fix without confirmation. Separate 4-layer violations 
+   from legacy issues (some pre-2026-08-08 pages may mix layers).
+5. Append one line to `wiki/log.md` summarizing the count of issues found (by category if many).
 
 ---
 
