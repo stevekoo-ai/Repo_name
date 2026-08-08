@@ -36,6 +36,77 @@ tags: [messagebox, sync, multi-client, ops, priority]
 
 <!-- 새 메시지는 아래 양식을 복사해 위에 추가. 가장 최근가 맨 위. -->
 
+### Steve's Wiki Architecture v1 도입 완료 — desktop 2026-08-08Txx:xxZ
+- who: desktop
+- when_utc: 2026-08-08T13:59:00Z
+- expires_utc: 2026-08-22T00:00:00Z
+- status: active
+
+what:
+
+Steve's Wiki 구조를 전면 재정리.
+
+CLAUDE.md를 "운영 커널(Mission / Prime Directive / Constitution / Startup Protocol)" 중심으로 축소하고,
+
+상세 설계 문서를 wiki/architecture/ 하위로 분리:
+
+- knowledge-model.md
+- agent-workflow.md
+- operating-system.md
+- reporting-framework.md
+- concept-lifecycle.md
+- entity-lifecycle.md
+- decision-intelligence.md
+
+핵심 변경:
+
+1. Concept-Centric 구조 명문화
+2. Memory Hierarchy 명문화
+   MessageBox
+      ↓
+   log.md
+      ↓
+   log-archive
+      ↓
+   Concepts
+      ↓
+   Entities
+
+3. Concept 생성 기준 강화
+   - Event ≠ Concept
+   - 반복 검증된 패턴만 Concept 승격
+
+4. CLAUDE.md 역할 변경
+   - 과거: 운영 매뉴얼 + 설계서
+   - 현재: 헌법 + 진입점
+
+read_first:
+
+- CLAUDE.md
+- wiki/architecture/knowledge-model.md
+- wiki/architecture/operating-system.md
+- wiki/architecture/concept-lifecycle.md
+
+action_for_other_agents:
+
+새 분석 시:
+
+Source
+↓
+Summary
+↓
+Entity
+
+까지는 기본 수행.
+
+Concept 업데이트는:
+
+- 반복 패턴 확인
+- 재사용 가능성 검증
+- Concept Lifecycle 기준 충족 시에만 수행.
+
+---
+
 ### 🟦 신규 발송 워크플로우 subscription-desktop-report.yml main 배포 — desktop 2026-08-07T16:30Z
 
 - **who**: desktop
