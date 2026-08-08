@@ -31,20 +31,7 @@ Finance·Forbes·Benzinga·CNN 등 다수 독립 매체 일치)해 사건 자체
 AI 전문 헤지펀드. 2026년 6월까지 누적 수익률 약 **+439%~1,500%+**,
 운용자산 **약 $45B**까지 성장 — 단 **약 4배 레버리지**로 달성한 수치.
 
-### 타임라인
 
-⏳ **Event timeline moved to monitoring page** — See [monitoring/situational-awareness-fund-liquidation-status.md](../../monitoring/situational-awareness-fund-liquidation-status.md) for complete timeline (Layer 4)
-
-### 타임라인
-| 시점 | 사건 |
-| --- | --- |
-| 2024-09 | SA 설립, 초기자본 약 $225M |
-| ~2026-06월말 | 누적수익률 +439%(수수료 후), AUM $45B로 성장 |
-| **2026-07-29(수)** | 나스닥 -1.7~2.1%. 촉발: **SK하이닉스 2분기 실적 컨센서스 미달**(이 위키가 이미 추적 중이던 사건, [체크포인트⑨](sk-hynix-analyst-thesis-checkpoints.md) 참고) + 유가 급등 + 매파적 FOMC 서프라이즈 |
-| 2026-07(한달간) | SA 집중 보유종목(**SK하이닉스**·CoreWeave·Nebius·Micron·Bloom Energy)이 **35~47% 하락**, Adobe 등 소프트웨어 숏포지션도 역방향으로 손실 — 4배 레버리지 구조에서 담보가치 붕괴 |
-| **2026-07-29~30** | 3개 프라임브로커(골드만삭스·JP모건·BofA) 동시 마진콜 발동, 24시간 긴급 협상 |
-| **2026-07-30** | SA가 전체 공개주식 포트폴리오를 **켄 그리핀의 시타델(Citadel)에 통째로 매각** — 규모 약 **$16B**, **월가 역사상 최대 긴급 블록딜**. SA는 앤트로픽 비상장 지분($5B) 등을 남기고 소형 사모 비히클로 축소(AUM $45B→약 $10B) |
-| **2026-07-31** | 강제매도 공포(overhang)가 해소되며 **SOX +8.19%, 코스피 +17.91%(역대최고), 삼성전자 +27%, SK하이닉스(국내) +29.95%(17년만 상한가)** — SA가 보유했던 종목들이 정확히 이 방향으로 가장 강하게 반등 |
 
 ### SK하이닉스와의 직접 연결고리
 
