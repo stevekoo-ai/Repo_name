@@ -37,7 +37,7 @@ Catalog of every page in the wiki. See `../CLAUDE.md` for conventions.
 
 ### monitoring (일일 추적 & 점수)
 
-*추진 중: HBM Cycle Score, 패닉회복신호, 시장사이클 리스크 등의 일일 모니터링 대시보드를 concepts/에서 분리하여 현재 상태만 기록*
+- [HBM Cycle Score — Daily Status & Tracking](monitoring/hbm-cycle-score-status.md) — 🆕 2026-08-08, 4-layer 구조화에 따라 concepts/hbm-cycle-score.md에서 분리된 일일 점수 및 체크 이력(append-only). 2026-07-24 이후 모든 체크 기록(70+ 항목), 거시 상황·시장심리·펀더멘털 분석 포함. Framework 정의는 concepts/hbm-cycle-score.md 참고
 
 ### concepts
 
