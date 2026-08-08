@@ -80,19 +80,28 @@ REVENUE_TAG_CANDIDATES = [
 ]
 
 # 백로그 = ASC 606의 "잔여 수행의무(RPO)". 이게 이 스크립트의 존재 이유
-# (매출은 후행, 백로그는 선행)지만 **가장 검증이 덜 된 부분**이다:
-# RPO는 duration 컨텍스트를 갖고 한 필링에 여러 건(12개월 내/이후/합계)이
-# 동시에 실릴 수 있어, 같은 end_date에 값이 여러 개 나올 수 있다.
-# 아래 _pick_fact()가 그 경우를 지어내지 않고 note에 남긴다.
+# (매출은 후행, 백로그는 선행)다. RPO는 한 필링에 여러 건(12개월 내/이후/
+# 합계)이 실릴 수 있어 같은 end_date에 값이 여러 개 나오며, 아래
+# _pick_fact()가 총액(최대값)을 채택하고 나머지를 note에 남긴다.
+#
+# ⚠ 2026-08-07 실호출 검증 후 수정 — `ContractWithCustomerLiability`를
+# 후보에서 **제거**했다. 최초 실행에서 COHR/CRDO/LITE가 RPO를 태깅하지
+# 않아 이 태그로 폴백됐는데, 이건 **이연수익(선수금 부채)이지 백로그가
+# 아니다**(COHR $70M, LITE $7M, CRDO $3M — 백로그라면 조 단위여야 함).
+# 개념이 다른 값을 "백로그"로 리포트에 띄우면 오경보가 나므로, 폴백하느니
+# **아예 없는 게 낫다**(숫자를 지어내지 않는다는 원칙의 연장).
 BACKLOG_TAG_CANDIDATES = [
     "RevenueRemainingPerformanceObligation",
-    "ContractWithCustomerLiability",  # 일부 회사는 선수금으로만 공시
 ]
 
 METRICS = {
     "revenue": REVENUE_TAG_CANDIDATES,
     "backlog": BACKLOG_TAG_CANDIDATES,
 }
+
+# 분기 duration으로 인정할 일수 범위. 회계분기는 13주(91일)가 표준이나
+# 4-4-5 주기·윤년 등으로 88~98일까지 흔들린다.
+QUARTER_MIN_DAYS, QUARTER_MAX_DAYS = 80, 100
 
 
 def resolve_ciks(tickers):
@@ -119,22 +128,49 @@ def resolve_ciks(tickers):
     return found, missing
 
 
-def _pick_fact(entries):
-    """같은 end_date에 잡힌 여러 XBRL fact 중 하나를 고르고, 고르지 않은 값도
-    투명하게 남긴다. 규칙: 값이 하나면 그대로, 여러 개면 **가장 큰 값**을 채택
-    (RPO는 총액과 12개월내/이후 분할이 함께 실리므로 총액이 최대) 하되,
-    다른 후보들을 note에 기록한다 — 조용히 버리지 않는다는 원칙
-    (investor_flow.py ADR crosscheck MISMATCH와 동일)."""
-    entries.sort(key=lambda e: e["val"], reverse=True)
+def _is_quarterly(fact):
+    """duration fact가 '한 분기'인지 판정. SEC companyconcept은 duration 개념
+    (매출 등)에 start/end를 함께 주는데, 같은 end에 3개월·6개월·9개월(YTD)
+    fact가 **동시에** 실린다.
+
+    ⚠ 2026-08-07 실호출에서 드러난 버그 — 이 필터가 없어서 최대값을 고르는
+    바람에 **매출이 전부 누적(YTD)으로 수집됐다**: ALAB 2026-06-30이
+    $0.701B(6개월)로 잡혔으나 실제 분기는 $0.392B, COHR은 $5.07B(9개월)
+    vs 실제 $1.81B, GEV $20.4B vs $11.1B, SMCI $27.9B vs $10.2B.
+    QoQ 증감이 이 프레임의 핵심 판정인데 누적을 쓰면 분기마다 계단식으로
+    부풀어 **항상 증가로 보이는 치명적 오판**이 된다."""
+    s, e = fact.get("start"), fact.get("end")
+    if not s or not e:
+        return False
+    try:
+        days = (datetime.strptime(e, "%Y-%m-%d") - datetime.strptime(s, "%Y-%m-%d")).days
+    except ValueError:
+        return False
+    return QUARTER_MIN_DAYS <= days <= QUARTER_MAX_DAYS
+
+
+def _pick_fact(entries, metric):
+    """같은 end_date에 잡힌 여러 fact 중 하나를 고르고, 고르지 않은 값도 note에
+    남긴다(조용히 버리지 않는다 — investor_flow.py ADR crosscheck와 동일 원칙).
+
+    지표별로 규칙이 다르다:
+    - **backlog(RPO)**: 총액과 "12개월 내/이후" 분할이 함께 실리므로 **최대값**이
+      총액이다.
+    - **revenue**: 위 _is_quarterly로 이미 분기분만 남았으므로, 남은 복수 건은
+      같은 분기를 여러 필링이 재보고한 것(정정 포함)이다. 이땐 **가장 이른
+      filed**를 채택 — sec_edgar_capex.py와 같은 처리."""
+    if metric == "backlog":
+        entries.sort(key=lambda e: e["val"], reverse=True)
+        label = "최대값(RPO 총액) 채택"
+    else:
+        entries.sort(key=lambda e: e["filed"])
+        label = "최초 보고분 채택"
     chosen = entries[0]
     note = ""
     others = [e for e in entries[1:] if e["val"] != chosen["val"]]
     if others:
         detail = ", ".join(f"${e['val']:,}" for e in others[:4])
-        note = (
-            f"⚠ 같은 end_date에 {len(entries)}건(분할 공시 추정) — 최대값 채택. "
-            f"나머지: {detail}"
-        )
+        note = f"⚠ 같은 end_date에 {len(entries)}건 — {label}. 나머지: {detail}"
     return chosen, note
 
 
@@ -148,7 +184,7 @@ def fetch_metric_for_company(ticker, cik, metric, raw=False, quarters=8):
     4개사 전용이라 sys.exit이었지만 여기선 부분 실패를 허용)."""
     info = PERIPHERY[ticker]
     by_end = {}
-    used_tag = None
+    tag_hits = {}  # 어느 태그가 실제로 데이터를 줬는지 — 실패 진단용
 
     for tag in METRICS[metric]:
         data = fetch_company_concept(cik, tag, raw=raw)
@@ -157,7 +193,7 @@ def fetch_metric_for_company(ticker, cik, metric, raw=False, quarters=8):
         units = data.get("units", {}).get("USD", [])
         if not units:
             continue
-        used_tag = used_tag or tag
+        kept = 0
         for u in units:
             if u.get("fp") not in ("Q1", "Q2", "Q3") or u.get("form") != "10-Q":
                 continue
@@ -165,14 +201,25 @@ def fetch_metric_for_company(ticker, cik, metric, raw=False, quarters=8):
             if missing:
                 print(f"  ⚠ {ticker}/{metric}/{tag}: 필드 누락 {missing} — 이 fact 건너뜀", file=sys.stderr)
                 continue
+            # 매출은 분기분만 — YTD 누적을 섞으면 QoQ가 무의미해진다(위 주석 참고).
+            # 백로그(RPO)는 instant성이라 duration 필터를 적용하지 않는다.
+            if metric == "revenue" and not _is_quarterly(u):
+                continue
+            kept += 1
             by_end.setdefault(u["end"], []).append({
                 "val": u["val"], "filed": u["filed"], "fy": u["fy"], "fp": u["fp"],
                 "form": u["form"], "tag": tag, "accn": u.get("accn", ""),
             })
+        if kept:
+            tag_hits[tag] = kept
+
+    if tag_hits:
+        print(f"  · {metric} 태그별 채택 fact: " +
+              ", ".join(f"{t}={n}" for t, n in tag_hits.items()), file=sys.stderr)
 
     rows = []
     for end, entries in sorted(by_end.items(), reverse=True)[:quarters]:
-        chosen, note = _pick_fact(entries)
+        chosen, note = _pick_fact(entries, metric)
         rows.append({
             "company": info["name"], "ticker": ticker, "cik": cik, "layer": info["layer"],
             "metric": metric, "fiscal_year": chosen["fy"], "fiscal_period": chosen["fp"],
