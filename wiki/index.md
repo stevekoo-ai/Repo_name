@@ -7,6 +7,7 @@ Catalog of every page in the wiki. See `../CLAUDE.md` for conventions.
 - [로그 로테이션 3인 하이브리드 자동화 — 인프라](concepts/log-rotation-3hybrid-infra.md) — 🆕 2026-08-07, wiki/log.md를 매일 00:20 KST에 GitHub Actions(`.github/workflows/log-rotate.yml`, main 배포 완료)가 자동으로 일자별 cut → `log-archive/YYYY-MM/YYYY-MM-DD.md` 이관. 실배포 완료(2026-08-07 run id 31153363185 success, commit cbf80c2). 스크립트: `scripts/log_rotate.py`(deterministic, LLM 없음, dry-run 지원). Windows 층(`scripts/log_summarize_routine.bat`, 00:40 KST)은 미등록 — `## 당월 요약` 갱신은 아직 수동. 설계·규칙·degradation 표는 [CLAUDE.md](../CLAUDE.md) "Log rotation" 섹션.
 - [다중 터미널 위키 동기화 설계 — append-first](concepts/multi-terminal-wiki-sync-design.md) — 🆕 2026-08-07, 4개+ 터미널 동시 운영 + local↔GitHub sync 병목 개선 설계. **환경 전제(필수 인지): 회사 PC(local)와 GitHub이 별개 저장소, 4터미널이 코드·위키 동시 갱신 + mobile·제3의 AI Agent 채널이 얽혀 코드 sync와 위키 sync가 서로 영향을 주는 구조.** **GitHub 접근 & push 우회 치트시트 + 종합 운영 워크플로우(Step 1~6, 2026-08-07 실증) 포함** — 회사망 4경로 측정 결과(git push 불가/Contents API만 73KB 이하), PAT 6단계 폴백, 파일 크기별 우회 의사결정, divergence 정리(`git reset --soft origin`). 다른 Agent가 그대로 따라하면 회사망에서 문제 없이 위키 sync 가능. 이 얽힘을 **모든 위키 갱신을 append(이벤트 소싱)로 통일**해 충돌 구조적 제거로 해결. **세션 시작 시 이 페이지 읽고 운영 상태 + GitHub 접근 방식 파악.**
 - [메세지박스](messagebox.md) — 🔴 다중 클라이언트(mobile+desktop) 동기화 전 우선 확인 게시판. 활성 HALT/CAUTION/INFO 메시지, 모바일 대행 작업 지시(action_for_mobile). [CLAUDE.md 동기화 규칙](../CLAUDE.md)에 따라 세션 시작·sync 전 가장 먼저 읽는다.
+- [Wiki Architecture Amendment — 4-Layer Reorganization (2026-08-08)](architecture-amendment-4layer.md) — 🆕 2026-08-08, 원래 2-layer 설계(entities/+concepts/)가 timeline-archive(역사 기록)와 dashboard(일일 모니터링)로 분화하면서 Single Source of Truth 원칙 위반 → 4-layer로 재조직: **Entity(현재상태만)**→**Entity Journal(역사타임라인)**, **Concept(불변프레임워크)**→**Monitoring(일일 점수/추적)**. 완전 정의·모형·CLAUDE.md 규칙 업데이트 포함. 실행 계획: sk-hynix.md부터 migration 진행 중.
 - [로그 아카이브 2026-07](log-archive/2026-07.md) — 🆕 2026-08-04 로그 로테이션 도입(hot/cold tiered memory 패턴, [CLAUDE.md](../CLAUDE.md) 참고) — `log.md`가 193KB까지 커져 토큰 비용 문제로 매월 첫 세션에 지난달 몫을 여기로 이관하기 시작. `log.md`는 이제 당월 항목만 유지(193KB→43KB로 축소).
 - [체크포인트 체크이력 아카이브 2026-07](concepts/sk-hynix-analyst-thesis-checkpoints-history/2026-07.md) — 🆕 2026-08-04, 같은 로그 로테이션을 checkpoints.md의 "체크 이력" 표(로그와 동형 구조)에도 적용 — 7월분 40행 이관, checkpoints.md는 139KB→105KB로 축소.
 - [Macro Regime History 이력 아카이브 2026-07](concepts/macro-regime-history-history/2026-07.md) — 🆕 2026-08-04, "체크 이력" 표 로그 로테이션 — 7월분 10행 이관, macro-regime-history.md는 43KB→30KB로 축소.
@@ -26,9 +27,17 @@ Catalog of every page in the wiki. See `../CLAUDE.md` for conventions.
 ### entities
 
 - [자동화 인프라 — GitHub Actions 워크플로우 & 시크릿 인벤토리](entities/automation-infrastructure.md) — 저장소 내 10개 워크플로우(PEOS + SK하이닉스 모니터링 두 시스템 공유)와 시크릿 이름·용도 전체 목록(값은 GitHub이 절대 노출 안 함); GMAIL_ADDRESS/GMAIL_APP_PASSWORD·KIS_* 등 이미 등록된 시크릿과 각각이 어느 워크플로우에서 쓰이는지 한눈에 정리
-- [SK하이닉스](entities/sk-hynix.md) — 반도체 종목. **최신(2026-08-05 저녁 CSV 확정): 종가 1,668,000원(+5.77%), 코스피 6,598.26(+3.76%)** — 호르무즈 해협 개방 협상 진전 기대→유가 급락→SOX+6.55%→한국 반도체주 동반 급등, 외국인 종목별 +6,576.9억 순매수 전환(20일 누적은 -4.03조로 여전히 마이너스). 8/4 확정 종가(1,577,000원/+0.64%)도 이번에 함께 확보. (과거 7/13~7/25 초기 급락기 서사는 "히스토리" 링크 참고)
+- [SK하이닉스](entities/sk-hynix.md) — **반도체 종목, 현재 상태만 기록** (역사기록은 entity-journals/sk-hynix-journal.md 참고). **최신(2026-08-07 11:58 사용자 제보): 1,436,000원(-3.95%)** — 8/5 급반등(+5.77%)→8/6 급락(-10.37%)→8/7 추가 약세(-3.95%)로 조정 진행 중. 구조: 현재상태 + Watch List(Concept Lifecycle 추적) + 다음에 볼 것 + 개인 보유현황. 🆕 2026-08-08 4-layer 구조화 실행(entity-journals 분리 완료)
 - [나의 투자 포트폴리오](entities/my-portfolio.md) — **2026-07-26 저녁: 원/달러 실측(1,469.4원) 반영해 유불리 재판정 — 원화 강세가 이익엔 역풍인데 방어자산(금·인도·비만치료제 합계 약 1,529만원)은 전체의 4.8%뿐이라 상쇄 불가.** — 4개 계좌 총 4.5억원(2026-07-13 기준), SK하이닉스가 약 65% 차지하는 집중 포지션; **2026-07-25 KIS API 완전 자동화(GEN+ISA+IRP, DC만 API 공식 미지원으로 제외)** — 앱키가 계좌번호 단위로 발급된다는 게 핵심 원인이었음(계좌별 전용 앱키 등록으로 해결). 3개 계좌 합산 약 3.20억원, SK하이닉스(GEN+ISA 138주)가 약 75.8% 차지, 종목별 거시국면 대비 유불리 판단 포함
 - [사용자 프로필](entities/user-profile.md) — SK하이닉스 재직/고소득, 장기투자 성향, 용인 수지구 거주(전세만료 2027-02-22, 갱신불가) 및 플랫폼시티 공공분양 대기; 청약통장 249회 납입(잔액 28,050,000원, 가입일 2005-11-03 확정). PEOS `config/user.yaml`과 상호 참조
+
+### entity-journals (엔티티 역사 기록)
+
+- [SK하이닉스 — 주가·펀더멘털 변화 일지](entity-journals/sk-hynix-journal.md) — 🆕 2026-08-08, SK하이닉스의 모든 시점별 상태 변화 기록 (2026-07-13~현재). 1,188줄, 역시간순(최신→과거). entities/sk-hynix.md의 현재상태에서 "전체 기록 보기" 링크로 접근. 감사추적용 정정사항 포함(예: 같은 날 미정정→정정되는 과정).
+
+### monitoring (일일 추적 & 점수)
+
+*추진 중: HBM Cycle Score, 패닉회복신호, 시장사이클 리스크 등의 일일 모니터링 대시보드를 concepts/에서 분리하여 현재 상태만 기록*
 
 ### concepts
 
