@@ -1195,6 +1195,15 @@ HBM3 시장 진입 계획까지 보도. 7/16 급락 원인에 "CXMT 14조 실탄
 상세는
 [목표주가 근거 체크리스트](../concepts/sk-hynix-analyst-thesis-checkpoints.md).
 
+## 🔍 Watch List: Concept Lifecycle 추적
+
+**HBM4 공급 확정 (2026-08-08): Event → State Change 단계**
+- SK하이닉스 HBM4 공급 확정 [1회] ✓
+- CXMT HBM4 신호 [기대중] ⏳
+- 삼성 HBM4 신호 [기대중] ⏳
+
+**계획**: 3회+ 반복 시 `hbm-cycle-score.md` Concept 재평가 검토. 참고: [Concept Lifecycle Maturity](../concepts/concept-lifecycle-maturity.md).
+
 ## 다음에 볼 것
 
 - 2,122,000~2,143,000원대 위에서 지지되는지
