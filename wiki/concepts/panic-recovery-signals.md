@@ -1,8 +1,8 @@
 ---
-title: 패닉 회복 신호 추적 프레임
+title: 패닉 회복 신호 추적 프레임 — Framework Definition
 created: 2026-07-30
-updated: 2026-08-07
-tags: [concept, recovery-signals, sk-hynix, nvidia, daily-tracking]
+updated: 2026-08-08
+tags: [concept, framework, recovery-signals, sk-hynix, nvidia, early-warning]
 ---
 
 엔비디아의 최근 3년간 -20%대 조정 6개 사례를 케이스별로 분석해(2026-07-29
@@ -72,12 +72,7 @@ tags: [concept, recovery-signals, sk-hynix, nvidia, daily-tracking]
 ### 현재(2026-07-31 저녁 기준) — 두 공포 모두 가격으로 반박된 하루, 종합판정 "회복 초입"
 
 > ⚠️ **판정 갱신 안내**: 아래는 7/31 저녁 시점 기록(보존). **최신 종합판정은
-> "체크 이력" 표의 2026-08-05 19:xx 행 — 8/5 종가 +5.77%(외국인 +6,576.9억
-> 순매수)로 가격이 다시 Tier1 신호와 같은 방향으로 움직여 "바닥 다지기
-> 진행중"→"회복 초입"으로 재상향됨.** (경위: 7/31 "회복 초입" →
-> 8/3 "바닥 다지기 진행중"으로 하향 → 8/5 "회복 초입"으로 재상향 — 아직
-> "회복 진행중"까지는 아님, 찐반등 4대 신호가 여전히 1/4이라 오늘의
-> 반응이 하루짜리인지 지속되는지 다음 체크가 관건.)
+> 모니터링 페이지 참고** (아래 "📊 Monitoring" 섹션).
 
 1. **"AI 메모리 수요가 피크아웃했다"** — SK하이닉스 실적이 컨센서스에
    못 미치며 촉발, 7/29~30 미국 반도체 섹터 전체 동반매도로 확산.
@@ -247,25 +242,15 @@ Score·붕괴조건 4개와는 별개 트랙**이지만, Tier 1의 첫 번째·�
 항목은 HBM Cycle Score의 엔비디아&CoWoS·고객재고 축과 데이터를
 공유한다 — 중복 조사 없이 교차 인용할 것.
 
-## 체크 이력
+---
 
-**로그 로테이션(2026-08-04 도입)**: 이전 달 행은 [panic-recovery-signals-history/2026-07.md](panic-recovery-signals-history/2026-07.md)로 이관된다 — [CLAUDE.md 로그 로테이션 규칙](../../CLAUDE.md) 참고. 아래 표는 당월(hot) 행만 유지, 매월 첫 세션이 지난달 몫을 archive로 옮긴다.
+## 📊 Monitoring: Daily Status & Check History
 
-| 날짜 | Tier1 신호 | Tier2 신호 | 종합 판정 | 비고 |
-| --- | --- | --- | --- | --- |
-| **2026-08-01 아침(토, 휴장)** | Tier1 6건 유지(변동없음) | 변화 없음 | **"회복 초입" 판정 유지, 이월** — 양국 시장 휴장이라 신규 웹검색 없음. 별도로 [찐반등 신호①(빚의 청산)](market-cycles-leverage-risk.md)이 신용융자잔고 데이터로 "미충족 확정"됨 — 레버리지가 완전히 정리되지 않았다는 뜻이라, "회복 초입"의 지속성 판단에 신중론 근거로 병기 | `sk-hynix-credit-balance.csv`(PR #39 최초 검증) |
-| **2026-08-02 아침(일, 휴장, Full Version 리서치)** | **Tier1 6건 유지, 국제 교차검증 추가 보강**(대만·미국 소스가 CXMT 기존 수치 독립 재확인 — 위 "2-1" 섹션 참고) — 신규 반박 신호 없음, 기존 판단이 재확인됨 | 신규 목표가 변경 없음(주말이라 예상대로) — 37개 기관 컨센서스 애그리게이터 재확인(평균 325만원, Strong Buy) | **"회복 초입" 판정 유지, 이월** — 양국 시장 휴장 2일차. 이번 체크는 단순 재사용이 아니라 실제 웹리서치로 "새로운 반박·새로운 악재가 없다"는 것 자체를 검증(하이퍼스케일러·CXL·엔비디아&CoWoS·CXMT 국제매체 전부 확인, 상세는 [hbm-cycle-score.md](hbm-cycle-score.md) 8/2 항목 참고). 신용융자잔고發 신중론(8/1 발견)도 그대로 유지 — **월요일(8/3) 개장 후 실제 가격이 "회복 초입"을 넘어 "회복 진행중"으로 이어지는지가 다음 핵심 관찰점**, 특히 지난주 상한가의 되돌림 여부와 신용융자잔고 청산 개시 여부를 함께 볼 것 | 웹리서치(2026-08-02, 국제매체·컨센서스 애그리게이터) |
-| **2026-08-02 밤(사용자 제보) — 🚨 새로운 신중 요인 발견** | 변화 없음(6건 유지) | 변화 없음 | **판정("회복 초입") 자체는 유지하되 신중론 대폭 강화**: SK하이닉스를 핵심 집중종목으로 보유하던 헤지펀드 Situational Awareness LP(4배 레버리지, AUM $45B)가 7/29~30 마진콜로 시타델에 전체 포지션 강제매각($16B 블록딜) — 7/31 급등의 상당 부분이 이 "강제매도 overhang 해소"라는 **일회성 안도 랠리** 요인일 가능성이 새로 확인됨(상세: [situational-awareness-fund-liquidation.md](situational-awareness-fund-liquidation.md)). 기존 Tier1 신호(CapEx·CXMT 반박 등)는 여전히 진짜 펀더멘털 근거로 유효하나, **7/31 가격 반응의 크기를 순수 펀더멘털 재평가로만 해석하면 과대평가 위험** — 신용융자잔고發 신중론(8/1)에 이은 두 번째 신중 요인으로 병기. "회복 진행중"으로의 추가 승격은 이 일회성 효과가 빠진 이후에도 강세가 유지되는지로 판단할 것 | 웹서치 교차검증(CNBC·Bloomberg·TechTimes·SpotGamma·CNN 등) |
-| **2026-08-02 밤(사용자 재질문) — ⚠️ 위 신중 요인 규모 정정** | 변화 없음(6건 유지) | 변화 없음 | 사용자가 "SA의 청산 규모가 하이닉스 시총의 몇 %냐"고 재질문 → 실제 계산 결과 SA의 SK하이닉스 특정 포지션은 SK하이닉스 시총의 **1% 미만**, 코스피·삼성전자 전체 대비로는 **거의 무시할 수준**임을 확인. 즉 **바로 위 행의 "7/31 급등의 상당 부분을 이 사건이 설명한다"는 표현은 과대해석이었다** — SK하이닉스 개별 가격에는 여전히 일부 관여했을 수 있으나(일평균 거래대금 대비로는 큰 규모), 코스피·삼성전자 전체 랠리를 이 사건으로 설명하는 것은 규모상 근거 없음. 신중 요인으로서의 존재 자체는 유지하되 그 설명력의 "몫"을 하향 조정. 계산 상세는 [situational-awareness-fund-liquidation.md](situational-awareness-fund-liquidation.md) "규모 재검증" 섹션 | 사용자 재질문 + 자체 계산(SK하이닉스 시총 $865.5B vs SA 블록딜 $16B) |
-| **2026-08-02 19:xx(저녁 자동체크, 하루 최종 확정치)** | **Tier1 6건 유지 + 신규 반박 신호 확인**(HBM4 수율 HBM3E 근접·조기양산, MS CapEx $25B 메모리비용 귀속 — [checkpoints.md](sk-hynix-analyst-thesis-checkpoints.md) 8/2 저녁 항목) | 변화 없음 | **"회복 초입" 판정 유지, 이월** — 휴장 2일차 마지막 체크, 신규 거래일 없음. SA 사건 규모 재검증을 cornerstone investor 실보도 수치($7B/$5B)로 완결(추정→실증, 결론은 동일: 1% 미만). 신중 요인 두 가지(신용융자잔고 8/1, SA규모오류정정 8/2)는 그대로 병기, 신규 반박 신호는 Tier1을 더 두텁게 하는 방향(추가 승격 근거는 아님). **월요일(8/3) 개장이 "회복 초입→회복 진행중" 승격 여부의 첫 실측** — 관찰점: (1) 상한가 되돌림 여부 (2) 외국인 순매수가 SA overhang 해소 없이도 독립 지속되는지 (3) 신용융자잔고 감소 개시 여부 | 웹서치(2026-08-02 저녁, HBM4·CapEx), 자체 계산(SA 규모) |
-| **2026-08-02 밤(사용자 제보) — 체슬리 박세익 전무 기술적 분석 INGEST** | 변화 없음(6건 유지) | **🆕 독립 시장분석가 기술적 코멘트 추가** — 체슬리투자자문 박세익 전무: 최근 급락을 구조적 약세장이 아닌 **"한국발 블랙먼데이"**(일시적 패닉)로 진단, 주봉 긴 꼬리를 바닥 신호로 해석, 피보나치 되돌림상 낙폭의 50~63% 반등 가능 구간 언급 — Dan Niles(8/1 이전 편입)에 이은 두 번째 독립 시장분석가 방어적 코멘트로 Tier2 편입 | **판정 변경 없음("회복 초입" 유지)** — 다만 **혼재 신호 명시적 병기 필요**: 같은 영상 내 "체슬리 AI 신호"는 코스피/코스닥을 이미 **약세장으로 분류**했다고 밝힘 — 이는 이 페이지의 "회복 초입" 판정과 결이 다른, 더 보수적인 별도 방법론의 판정이다(통일하지 않고 병기, [macro-regime-history.md](macro-regime-history.md)의 "PEOS/Investment Clock vs 이 페이지 G/I/L" 병기 원칙과 동일 적용). 반면 같은 AI 신호가 "**외국인 현선물 포지션이 플러스로 전환**"했다고도 언급 — [market-cycles-leverage-risk.md](market-cycles-leverage-risk.md) 찐반등 신호③(외국인 귀환, 현물 기준 20일 미충족)과 **결이 비슷하나 동일 지표는 아님**(현선물 통합 vs 현물 단독) — 교차검증 가치는 있으나 원 지표·계산식 미공개라 [미검증]으로 표기, 우리 자체 CSV 기반 판정을 대체하지 않음. 상세: [sources/park-seick-cheslie-technical-analysis-2026-08.md](../../sources/park-seick-cheslie-technical-analysis-2026-08.md) | 사용자 제보(유튜브 영상 요약) |
-| **2026-08-02 밤(사용자 제보) — "숏커버링 반등" 경고 INGEST, 월요일 관찰기준 구체화** | 변화 없음(6건 유지) | **🆕 신규 독립 소스**: 7/31 급등을 **"숏 커버링(공매도 청산 매수)에 의한 반등"**으로 명시 규정, "월요일 흐름 확인 후 추가 탄력 없으면 현금 확보"를 제안 — 키옥시아 NAND+70%QoQ·2027년까지 수급경색 전망, 아마존 "데이터센터 투자 3년 회수" 로직도 함께 언급([checkpoints.md](sk-hynix-analyst-thesis-checkpoints.md) 8/2 밤 항목에 편입) | **판정 변경 없음("회복 초입" 유지)** — 다만 이 소스의 "숏커버링" 규정은 오늘 밤 이미 진행한 [SA 헤지펀드 overhang 해소 규모 정정](situational-awareness-fund-liquidation.md)과 **같은 방향의 독립적 신중론**(7/31 급등의 상당 부분이 펀더멘털 재평가가 아니라 기술적·일회성 요인일 수 있음) — 서로 다른 소스가 겹치는 결론에 도달했다는 점에서 신중론 신뢰도가 강화됨. 위 8/2 저녁 확정치의 월요일 관찰점(1)(2)(3)에 **(4) 찐반등 4대 신호 중 추가 충족 여부**를 더해 "회복 진행중" 승격 기준을 구체화 — [market-cycles-leverage-risk.md](market-cycles-leverage-risk.md) 8/2 밤 항목 참고 | 사용자 제보(유튜브 영상 요약), [sources/july-selloff-deleveraging-analysis-2026-08.md](../../sources/july-selloff-deleveraging-analysis-2026-08.md) |
-| **2026-08-03 07:xx(아침 자동체크, 월, 개장 전)** | **Tier1 6건 유지 + 신규 배경 확인**(SK그룹-엔비디아 $500B 파트너십, 7/24~25 소재 — [checkpoints.md](sk-hynix-analyst-thesis-checkpoints.md) 참고) | 변화 없음(신규 목표가 미확인) | **"회복 초입" 판정 유지** — 09:00 KST 개장 전이라 오늘 가격·수급 데이터 아직 없음. 다만 `main` 재동기화로 확보한 **7/31 신용융자잔고 데이터에서 신호①(빚의 청산)이 이 프레임 이래 최초로 감소 전환**(-7.84%, [market-cycles-leverage-risk.md](market-cycles-leverage-risk.md) 8/3 아침 항목 참고) — 8/1 발견한 신용잔고發 신중론을 일부 완화하는 방향. 동시에 ADR 크로스체크가 실제로 MISMATCH를 잡아내 7/31 종가를 $145.90→$143.73로 재수정(등락률은 공란 처리) — 데이터 신뢰도 관리 측면에서는 긍정적 사례. **장초반(10:00) 체크가 이번 승격 판정의 진짜 분기점**. 관찰기준 4개(상한가 되돌림·외국인 독립지속·신용융자 감소 "추세" 확인·찐반등 신호 추가충족) 그대로 적용 | `main` 재동기화(sources/sk-hynix-credit-balance.csv·sk-hynix-adr-quote.csv, 8/2 23:47 KST 수집분) |
-| **🔴 2026-08-03 10:xx(장초반 자동체크, 월) — 관찰기준 4개 중 다수 미충족으로 판명** | 변화 없음(6건 유지, 신규 반박 없음) | 재사용(아침 확정치와 동일) | **판정 재검토 필요 — "회복 초입" 유지하되 다음 승격은 명백히 보류.** 09:00 개장 실측: ① 상한가 되돌림 → **되돌림 발생**(SK하이닉스 -2.44%, 1,676,000원) ② 외국인 독립지속 → **불충족**(코스피 전체 외국인 -1조 1,229억 순매도, SA overhang 없이도 지속은커녕 정반대) ③ 신용융자 감소 추세 확인 → 오늘 데이터는 장중이라 미확정(저녁 확정) ④ 찐반등 신호 추가충족 → **없음**. 4개 관찰기준 중 확인 가능한 2개가 모두 부정적 — 이는 어젯밤 신중론(SA규모오류정정·박세익 체슬리AI·숏커버링 경고)이 정확히 우려했던 패턴이 실제로 나타난 것으로, **신중론 쪽이 오늘은 더 정확했다**. 다만 언론은 원인을 "차익실현·속도조절"(펀더멘털 훼손 아님)로 일관되게 설명 중이고, SK하이닉스가 코스피(-4.23%)보다 덜 빠진 것(-2.44%)은 상대적 강세 — Tier1 펀더멘털 반박신호 자체가 무효화된 건 아니므로 "회복 초입" 판정 자체는 유지하되 **"회복 진행중" 승격 기준을 명백히 충족 못 했음을 오늘 실측으로 확정**. 저녁 체크에서 종가·SK하이닉스 특정 수급으로 최종 확정 | 웹서치(newspim·newsis·etoday, 2026-08-03 특징주 기사) |
-| **🔻 2026-08-03 19:xx(저녁 자동체크, 하루 최종 확정치) — CSV 확정, 가격이 Tier1과 반대로 하루 종일 이탈** | 변화 없음(6건 유지, Tier1 자체는 반박되지 않음) | 변화 없음 | **"회복 초입"→"바닥 다지기 진행중"으로 하향.** CSV 확정: 본주 -8.79%(1,567,000원), 코스피 -5.12%(6,257.45), 외국인 -1조 7,608억 순매도(5일 누적도 마이너스 전환). 장초반의 "관망 아니라 매도 확대"가 종가까지 이어짐 — 종합판정 정의(Tier1 확인+**가격 동반 반응**)에서 "가격 동반 반응" 조건이 오늘은 정반대로 나타남. **다만 Tier1 신호 자체(CapEx 유지·엔비디아&CoWoS 견조·HBM4 반박신호)는 오늘 하루도 반박되지 않았다** — 이는 "펀더멘털 붕괴"가 아니라 "가격이 신호를 아직 안 따라가는 소화 지연·단기 수급(차익실현+외국인 매도) 우위" 국면으로 해석, 완전한 "패닉 지속"으로의 재역행은 아니라고 판단해 한 단계만 하향. 다음 상향 조건: 외국인 순매도가 재차 순매수로 전환하거나, Tier1에 새로운 확인 신호가 추가되며 가격이 동반 반응하는 날 | CSV(sk-hynix-price-snapshot.csv·investor-flow.csv 8/3 확정행) |
-| **🟠 2026-08-04 16:xx(세션 공백 후 캐치업)** | 변화 없음(6건 유지) | 변화 없음 | **판정 유지("바닥 다지기 진행중")** — 08-03 19:00·08-04 07:00·08-04 10:00 루틴 3건이 큐잉되다 이 시각 도착해 캐치업 1건으로 통합. 웹검색상 8/4 오전 11:18 KST 코스피 -0.47%(6,228.21), 삼성전자·SK하이닉스 동반 약세로 "6100선 후퇴" — 전일 대비 낙폭은 축소됐으나 반등이라 부를 근거는 아직 약함. **15:30 마감 확정치는 이번 검색으로 확보하지 못해 판정을 정식 재평가하지 않고 이월** — 다음 정상 체크에서 확정 종가·수급으로 재판정 | 웹검색(fnnews, 2026-08-04 오전 시황) |
-| **🟢 2026-08-05 19:xx(저녁 자동체크, 수, 하루 최종 확정치) — 가격 동반 반응 재확인, "회복 초입"으로 재상향** | **Tier1 6건 유지 + 신규 확인**(TSMC가 8/4 CoW 공정을 ASE 등 외주로 대규모 개방[CoWoS Bullish 재확인], Amazon이 CapEx +$20B를 "AI서버 메모리 비용"으로 명시 귀속[메타 7/26·MS 8/2에 이은 세 번째 하이퍼스케일러 메모리가 인정 사례]) | 변화 없음(신규 목표가 변경 미확인, 기존 스펙트럼 유지) | **"바닥 다지기 진행중" → "회복 초입"으로 재상향.** `git merge origin/main`으로 확보한 CSV 확정: 본주 +5.77%(1,668,000원), 코스피 +3.76%(6,598.26), 외국인 종목별 +6,576.9억원 순매수(뉴스 "6,595억 순매수 1위" 보도와 근접 일치) — 종합판정 정의(Tier1 확인+**가격 동반 반응**)의 두 조건이 오늘 모두 충족됨. 촉발 원인은 간밤 SOX +6.55% 급등(호르무즈 해협 개방 협상 진전 기대→유가 급락→리스크온)으로, [찐반등 신호④](market-cycles-leverage-risk.md)와 동일 재료. **다만 "회복 진행중"으로의 추가 승격은 보류** — [찐반등 4대 신호](market-cycles-leverage-risk.md)가 여전히 1/4(외국인 20일 누적 -4.03조 마이너스 지속, 오늘 하루 매수전환일 뿐)이고, 신용융자잔고는 3일 연속 감소로 개선 중이나 원인(강제청산 vs 자발상환)이 미분리라 — 내일 이후 오늘의 반응이 하루짜리인지 지속되는지가 다음 핵심 관찰점. **⚠️ ADR MISMATCH**: CSV는 8/5 ADR 변동률을 0.0%로 기록했으나 뉴스는 "월가 비중확대 리포트에 +8.17% 급등"이라 명시 — 상충, [checkpoints.md ⑥](sk-hynix-analyst-thesis-checkpoints.md) 참고 | CSV(sk-hynix-price-snapshot.csv·investor-flow.csv 8/5 확정행), 웹검색([fnnews](https://www.fnnews.com/news/202608051557281792), [한국경제](https://www.hankyung.com/article/2026080554876)) |
-| **🔴🔴 2026-08-06 19:xx(저녁 자동체크, 목, 하루 최종 확정치) — 매도 사이드카·-10.37% 급락, "회복 초입"→"바닥 다지기 진행중"으로 재하향** | **Tier1 6건 유지, 오늘 새로 반박된 항목 없음** — 오늘 뉴스 검색에서 SK하이닉스 ASP·엔비디아주문·CoWoS·CapEx 관련 부정 신호는 확인 안 됨(어제 확인한 D램ASP +30%QoQ 등은 오늘도 유효). 즉 **오늘의 급락은 Tier1이 반박된 결과가 아니다** | 변화 없음(신규 목표가 변경 미확인) | CSV 확정: 본주 **-10.37%(1,495,000원)**, 코스피 **-4.58%(6,296.38, 10:18 매도 사이드카 발동)**, 삼성전자 -6.30%. 종합판정 정의(Tier1 확인+**가격 동반 반응**)에서 "가격 동반 반응"이 오늘은 정반대(대량 이탈)로 나타남 — 8/3 패턴과 동일한 구조이나 **낙폭은 더 크고(-10.37% vs -8.79%) 사이드카까지 발동**된 점에서 더 심각. 촉발은 간밤 미국 반도체주 4거래일 연속 약세("AI 인프라 지출 정점론" 재부상, 나스닥100 조정권 진입 우려)+외국인 대량매도(코스피 전체 1.7조 중 본주가 1조 6,771억으로 대부분)([이투데이](https://www.etoday.co.kr/news/view/2611682), [한국경제](https://www.hankyung.com/article/202608068183i)) — **한국 개별 요인이 아니라 미국發 AI 반도체 섹터 전반의 재료**라는 점은 8/3(차익실현·속도조절)보다 오히려 [찐반등 신호④](market-cycles-leverage-risk.md)의 "미국 동반" 정의에 더 가깝게 들어맞는 패턴(다만 방향이 정반대). Tier1 자체가 안 깨졌다는 이유로 "패닉 지속"까지 재역행시키지는 않고, 8/3과 같은 논리로 **"회복 초입"→"바닥 다지기 진행중"으로 한 단계만 하향** — 단 사이드카 발동이라는 시장 전체 서킷브레이커 이벤트는 이 프레임 도입(7/24) 이래 두 번째(7/28~29 이후)로 강도가 세, 다음 상향 조건을 다시 엄격히 적용: 외국인이 재차 순매수 전환하거나 가격이 Tier1을 다시 따라붙는 날. [찐반등 4대 신호](market-cycles-leverage-risk.md)도 오늘 0/4로 전면 재악화 | CSV(sk-hynix-price-snapshot.csv·investor-flow.csv 8/6 확정행), 웹검색([이투데이](https://www.etoday.co.kr/news/view/2611682), [한국경제](https://www.hankyung.com/article/202608068183i)) |
+Framework definition only. For daily judgment entries, status updates, and complete check history, see:
+
+**→ [패닉 회복 신호 — 일일 체크 이력 및 현황](../monitoring/panic-recovery-signals-status.md)** (Layer 4: Monitoring, append-only audit trail)
+
+---
 
 ## Sources
 
@@ -277,14 +262,7 @@ Score·붕괴조건 4개와는 별개 트랙**이지만, Tier 1의 첫 번째·�
 - [SK Hynix and Memory Chip Makers Hope AI Breaks the Boom and Bust Cycle - Bloomberg](https://www.bloomberg.com/news/newsletters/2026-07-27/sk-hynix-and-memory-chip-makers-hope-ai-breaks-the-boom-and-bust-cycle)
 - [SK Hynix's $570 Billion Selloff Shows Cracks in Memory-Chip Boom - Bloomberg](https://www.bloomberg.com/news/articles/2026-07-27/sk-hynix-s-rebound-from-470-billion-rout-hinges-on-ai-spending)
 - [Chip stocks shed more than $1 trillion - CNBC](https://www.cnbc.com/2026/07/29/chip-selloff-sk-hynix-samsung-softbank.html)
-- [sources/park-seick-cheslie-technical-analysis-2026-08.md](../../sources/park-seick-cheslie-technical-analysis-2026-08.md) (2026-08-02 인제스트, 체슬리투자자문 박세익 전무 기술적 분석)
-- [sources/july-selloff-deleveraging-analysis-2026-08.md](../../sources/july-selloff-deleveraging-analysis-2026-08.md) (2026-08-02 인제스트, 글로벌 디레버리징·숏커버링 반등 경고)
-- [SK Hynix Slump Marks 'Short-Term Bottom' in AI Stocks, Says Dan Niles - Benzinga](https://www.benzinga.com/markets/equities/26/07/60787722/sk-hynix-slump-marks-short-term-bottom-in-ai-stocks-fueled-by-forced-liquidations-says-dan-niles)
+- [Sk Hynix Slump Marks 'Short-Term Bottom' in AI Stocks, Says Dan Niles - Benzinga](https://www.benzinga.com/markets/equities/26/07/60787722/sk-hynix-slump-marks-short-term-bottom-in-ai-stocks-fueled-by-forced-liquidations-says-dan-niles)
 - [China's CXMT Is Set to Challenge DRAM Incumbents - SemiAnalysis](https://newsletter.semianalysis.com/p/chinas-cxmt-is-set-to-challenge-dram)
-- [CXMT Debuts at $489B: DoD Ban and Three-Year HBM Deficit Trail the Pop - TechTimes](https://www.techtimes.com/articles/321667/20260727/cxmt-debuts-489b-dod-ban-three-year-hbm-deficit-trail-pop.htm)
-- [Amazon Q2 Earnings Meet: Revenue, AWS Beat; 2026 Capex Guide Jumps - ValueSense](https://valuesense.io/news/amazon-q2-earnings-meet-revenue-aws-beat-2026-capex-guide-jumps)
-- [Is SK Hynix Stock a Buy After Its Latest Earnings Report? - The Motley Fool](https://www.fool.com/investing/2026/07/29/is-sk-hynix-stock-a-buy-after-its-latest-earnings-report/)
-- [China's DRAM milestone arrives with CXMT IPO; HBM now separates contenders from leaders - DigiTimes](https://www.digitimes.com/news/a20260717VL203/cxmt-ipo-dram-hbm-manufacturing-ymtc.html)
 - [CXMT HBM3 timeline slips, mass production unlikely in 2026 - DigiTimes](https://www.digitimes.com/news/a20260421PD230/cxmt-hbm3-dram-production-2026.html)
 - [CXMT targets 12-layer HBM production by 2027 - DigiTimes](https://www.digitimes.com/news/a20260409PD229/cxmt-hbm-production-2027-market.html)
-- [SK海力士放缓HBM4、加码常规DRAM，存储产能分配正在发生变化 - 国际电子商情(esmchina.com, 미검증·단일소스)](https://www.esmchina.com/news/14294.html)
