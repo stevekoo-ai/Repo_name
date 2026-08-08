@@ -31,7 +31,7 @@ Finance·Forbes·Benzinga·CNN 등 다수 독립 매체 일치)해 사건 자체
 AI 전문 헤지펀드. 2026년 6월까지 누적 수익률 약 **+439%~1,500%+**,
 운용자산 **약 $45B**까지 성장 — 단 **약 4배 레버리지**로 달성한 수치.
 
-
+📊 **일일 추적 데이터**: [monitoring/situational-awareness-fund-liquidation-status.md](../monitoring/situational-awareness-fund-liquidation-status.md)
 
 ### SK하이닉스와의 직접 연결고리
 
