@@ -1,9 +1,11 @@
 ---
-title: SK하이닉스 목표주가 근거 체크리스트
+title: SK하이닉스 목표주가 근거 체크리스트 — Framework Definition
 created: 2026-07-15
-updated: 2026-08-06
-tags: [sk-hynix, checkpoints, analyst, daily-tracking, roic-framework]
+updated: 2026-08-08
+tags: [sk-hynix, checkpoints, analyst, concept, framework, roic-framework]
 ---
+
+📊 **Daily tracking data moved to**: [monitoring/sk-hynix-analyst-thesis-checkpoints-status.md](../../monitoring/sk-hynix-analyst-thesis-checkpoints-status.md) (Layer 4 monitoring page)
 
 애널리스트들의 목표주가 근거를 항목별로 쪼개, 시간이 지나며 유지되는지
 훼손되는지 확인하기 위한 체크리스트. 사용자가 제공한 11개 기관 리포트
@@ -349,11 +351,9 @@ KOSPI 목표 9,000(36% 상승여력)** — 위 "변동 없음" 표의 기존 "�
 더 많은 정보를 담고 있다. 앞으로 이 표에 신규 행을 추가할 때 **등급
 변경 여부를 목표가 변경보다 먼저 강조**할 것.
 
-### 현재 스코어보드 (2026-07-15 최초 작성, 이후 매일 체크마다 갱신)
+### 현재 스코어보드
 
-| # | 체크포인트 | 유형 | 최신 상태 | 마지막 확인일 |
-| --- | --- | --- | --- | --- |
-| ① | DRAM/NAND 가격 모멘텀 | 컨센서스 | **긍정 강화, 분기 단위 정량 데이터 확보**(2026-07-23 낮 인제스트) — D5 RDIMM ASP C3Q26 +20~25% QoQ(~$2.4/Gb), 서버 수요 ≥65%YoY vs 공급 ~40~45%YoY로 공급부족 지속 정량 확인. NAND DC/eSSD ASP +25~30% QoQ 유지, 수요 >80%YoY vs 출하 <50%YoY로 20%p+ 갭 지속. PC/모바일은 상대적으로 약한 +18~22%/+저중10% QoQ — **CY27 할당량 25~35%+ 축소 가능성**(서버·데이터센터 우선 배정, PC/모바일 후순위). KB증권 2026년 연간 전망(DRAM+199%·NAND+255% YoY)과 정합적. | 2026-07-23 낮 |
+⏳ **Daily updated scoreboard moved to monitoring page** — See [monitoring/sk-hynix-analyst-thesis-checkpoints-status.md](../../monitoring/sk-hynix-analyst-thesis-checkpoints-status.md)
 | ① | DRAM/NAND 가격 모멘텀(속보) | 컨센서스 | **🟢 초강력 반증 사례 — 삼성전자 자사 완제품 사업부가 메모리 가격에 압박당함**(2026-07-30, 독립 검증 완료) — 삼성전자 2Q 잠정실적: DS(반도체) 영업이익 89.2조원(영업이익률 약 70%, 전사 영업이익의 약 99.7%) vs **MX(모바일) 영업손실 7,000억원(집계 이후 첫 적자)·DX(완제품 전체) 영업손실 8,000억원(부문 출범 이후 첫 적자)**. 원인은 D램·낸드 가격 급등에 따른 부품 원가 상승(칩플레이션)으로 공식 언급됨. **[OPINION] 같은 회사 안에서 반도체 사업부가 완제품 사업부의 마진을 흡수할 정도로 D램/낸드 가격결정력이 강하다는 뜻** — 외부 3자 데이터가 아니라 삼성 내부 손익에서 직접 확인된 사례라 신뢰도가 높음. | 2026-07-30 낮 |
 | ① | DRAM/NAND 공급부족 장기화 가이던스(신규) | 컨센서스 | **🟢🟢 삼성전자가 2Q 컨콜(2026-07-30)에서 "2028년까지 메모리 공급부족 지속" 공식 가이던스** — 경쟁사가 직접 낸 장기 공급부족 확언으로 지금까지 나온 반증 중 시계열이 가장 긴 사례(단순 이번 분기가 아니라 앞으로 최소 2년). 2026-07-31 오후 SK하이닉스·삼성전자·삼성전기가 동반 상한가에 오른 촉발 재료 중 하나로 확인([entities/sk-hynix.md](../entities/sk-hynix.md) 참고). | 2026-07-31 오후 |
 | ① | **키옥시아(Kioxia) 실적 — NAND 가격 +70% QoQ, 2027년까지 수급경색 전망(신규 소스)** | 컨센서스 | [사용자 제보, 영상 요약] 키옥시아(일본 NAND 3위) 2Q 실적: 매출은 컨센서스 하회했으나 **NAND 가격이 전분기 대비 +70% 급등**했다고 발표, **2027년까지 수급 경색 지속** 전망 — 7/31 반등 촉발 재료 중 하나로 언급됨. 기존 체크(7/23)의 "NAND DC/eSSD ASP +25~30% QoQ"보다 훨씬 강한 수치라 **다른 제품군(범용 소비자용 NAND 등) 또는 다른 집계 방식일 가능성** — 원문 확인 전까지 [미검증]으로 표기, 다음 체크에서 1차 소스(키옥시아 IR) 대조 필요. 방향(NAND 공급부족 심화) 자체는 기존 체크와 일치. | 2026-08-02 밤(사용자 제보) |
@@ -733,21 +733,8 @@ DRAM 뉴스·판정(긍정/중립/훼손)·메모 컬럼으로 구성됨. 원본
 
 ## 체크 이력
 
-**로그 로테이션(2026-08-04 도입)**: 이전 달 행은
-[checkpoints-history/YYYY-MM.md](sk-hynix-analyst-thesis-checkpoints-history/2026-07.md)로
-이관된다 — [CLAUDE.md 로그 로테이션 규칙](../../CLAUDE.md) 참고. 아래
-표는 당월(hot) 행만 유지, 매월 첫 세션이 지난달 몫을 archive로 옮긴다.
+⏳ **Check history moved to monitoring page** — See [monitoring/sk-hynix-analyst-thesis-checkpoints-status.md](../../monitoring/sk-hynix-analyst-thesis-checkpoints-status.md) for complete dated record (Layer 4)
 
-| 날짜 | 항목 | 상태 | 비고 |
-| --- | --- | --- | --- |
-| **2026-08-01 07:xx** | PR#39 실전검증 완료, 신용융자잔고 미청산 발견(신호①확정), ⑥ADR 부호버그 재발견(PR#40), KOSPI/KOSDAQ 정밀종가 | 아침 자동체크(토, 휴장) | **양국 시장 휴장** — 9개 체크포인트 전부 7/31 저녁 확정치 이월, 신규 웹검색 없음(휴장일 원칙). GitHub MCP로 **PR #35 병합 완료 재확인**(main 기준). **🆕 신용융자잔고 데이터 최초 확보**(`sk-hynix-credit-balance.csv`, PR #39 4개 신규 TR 첫 실전검증 — 필드명 오류 없이 전부 정상 작동): `loan_balance_qty`가 3일 연속 서킷브레이커 구간(7/28→7/30)에 3,318,929→3,402,382→3,357,135→3,400,437주로 **감소가 아니라 오히려 소폭 증가** — [찐반등 신호①(빚의 청산)](market-cycles-leverage-risk.md)을 처음으로 "미확인"에서 "미충족"으로 확정 판정. **🔴 ⑥ADR 부호버그 재발견**: 위 7/31 저녁 행에 기록한 "$158.20(+6.17%)"가 실제 CSV(`sk-hynix-adr-quote.csv`, close=145.9/change=+3.10/prev_close=142.8)와 불일치 — CSV 자체의 `change_pct` 필드도 -2.08%로 `change`(+3.10)와 부호가 반대인 별도 버그 확인, `change`/`prev_close` 재계산으로 정정하면 **+2.17%**. 수정 [PR #40](https://github.com/stevekoo-ai/Repo_name/pull/40) 오픈(병합 대기, 사용자 승인 필요). `kr-index-quote.csv` 실측으로 **KOSPI +17.91%(6,595.45, 상한가12)·KOSDAQ +11.63%(719.76, 상한가14)** 정밀 종가도 확인(기존 웹검색 추정보다 더 극단적). `regime_engine.py` 재실행 결과 target 여전히 2026-06, G/I/L·애널로그 변동 없음. HBM Cycle Score 69/100·찐반등 1/4(④)·패닉회복 "회복초입" 전부 변동 없이 이월. | 2026-08-01 아침(휴장) |
-| **2026-08-01/02 주말 체크** | 신규 목표가 변경 없음(예상대로), 컨센서스 애그리게이터 재확인, 국제매체 CXMT 교차검증(대만·미국) | 사용자 요청(일요일 리서치, 월요일 개장 대비) | **목표가**: Investing.com계 애그리게이터 기준 **37개 기관 평균 3,251,340원**(고가 5,300,000·저가 1,200,000), Strong Buy(36매수/0매도/1보유) — 7/15 확인치(평균 339만원)와 방향·규모 정합, 신규 변경 기관은 미확인(주말이라 예상된 결과). ADR(SKHY) 별도 컨센서스도 Buy(6개 기관 중 3매수/1보유). **[미검증]** "오버솔드" 논조를 명시한 신규 기사는 이번 검색에서 못 찾음 — 다만 위 목표가 스펙트럼(148만~470만) 자체가 여전히 유효. **CXMT 국제 교차검증**([상세: us-china-tech-competition-hbm.md](us-china-tech-competition-hbm.md)): 대만 DigiTimes(7/31)·Taipei Times(7/28), 미국 EE Times/SemiAnalysis가 기존 수치(점유율 7.6~7.67%, IPO 규모)를 독립 재확인 — 신규 반박·신규 약세 논조는 검색되지 않음. 🇺🇸Bloomberg/Reuters/CNBC·🇯🇵닛케이의 지난 2~3일 내 SK하이닉스 단독 신규 기사는 **미확인**(주말 발행량 감소 영향 추정, 검색된 기사는 대부분 7/29~30 실적 재유통). 🇨🇳중국 도메스틴(esmchina·163.com) 직접 확인도 **미확인**. | 웹서치(2026-08-01) |
-| **2026-08-03 19:xx** | ⑥ADR 크로스체크 실전 2연속 MISMATCH, 종가 CSV 확정 | 저녁 자동체크(월, 하루 최종 확정치) | **본주 종가 CSV 확정: 1,567,000원(-8.79%)** — 어제 저녁 웹검색 추정(1,582,000/-7.97%)보다 낙폭 더 큼, 정밀 수치는 CSV로 교체([entities/sk-hynix.md](../entities/sk-hynix.md) 참고). **⑥ADR — PR #40 크로스체크가 8/3도 MISMATCH 판정**: $141.36(전일 $138.99), rate:-1.65%/calc:+1.71%/hist:-1.65% — 7/31에 이어 두 번째 실전 MISMATCH 사례, 3방법 중 2개가 -1.65%로 수렴해 방향은 음(-)에 무게를 두되 change_pct는 공란 유지가 원칙(설계대로 작동 중). 나머지 8개 체크포인트 신규 변경 없음(목표가 스펙트럼 정지, 하이퍼스케일러 CapEx 재료 소진). | CSV(sk-hynix-price-snapshot.csv·adr-quote.csv, 8/3 확정행) |
-| **2026-08-05 19:xx** | ⑥ADR — 새로운 유형의 상충(크로스체크는 통과했지만 뉴스와 어긋남), 목표가 상향/하향 혼재 재확인 | 저녁 자동체크(수, 하루 최종 확정치, `main` 재동기화로 8/4·8/5 CSV 확보) | **본주 종가 CSV 확정: 8/4 1,577,000원(+0.64%) → 8/5 1,668,000원(+5.77%)** — 간밤 SOX+6.55% 급등(호르무즈 해협 개방 협상 진전 기대)이 그대로 전이, 외국인 종목별 +6,576.9억원 순매수(뉴스 "6,595억 순매수 1위"와 근접 일치)([fnnews](https://www.fnnews.com/news/202608051557281792)). **⑥ADR — 지금까지와 다른 새로운 유형의 문제 발견**: `sk-hynix-adr-quote.csv` 8/5행은 $154.38·rate/calc/hist **세 방법 전부 +0.00%로 일치**해 크로스체크 로직상 `MISMATCH`가 아니라 `OK`로 통과됐다 — 그런데 같은 시각 뉴스는 "SKHY가 월가 비중확대 권고 보고서에 힘입어 **+8.17% 급등**"이라고 명시([fnnews](https://www.fnnews.com/news/202608051006208499)). **3방법이 서로 합의해도 실제와 다를 수 있다는 뜻** — PR #40의 크로스체크는 "3방법이 서로 다른 값을 낼 때"만 잡아내도록 설계돼 있어, "3방법이 전부 틀린 같은 값에 합의"하는 이번 케이스는 원천적으로 못 잡는다. 원인 추정([미검증]): 수집 시각(16:49 KST)이 나스닥 8/5 정규장 개장(23:30 KST) 전이라, 일별 확정시세 TR이 아직 갱신 안 된 8/4 종가를 그대로 반환했을 가능성 — 8/4 확정치($151.17)와도 다른 $154.38이 어디서 왔는지는 미상. **채택하지 않음, 양쪽 다 "미확인"으로 병기** — 다음 체크(정규장 마감 이후)에서 재확인 필요. 목표가 스펙트럼은 신규 변경 미확인(기존 7/31 재구성 표 그대로 — 한투 470만 상향 vs 미래에셋·BNK 등 다수 하향 혼재 구도 유지). | CSV(sk-hynix-price-snapshot.csv·adr-quote.csv, 8/4·8/5 확정행), 웹검색([fnnews](https://www.fnnews.com/news/202608051006208499)) |
-| **2026-08-04 16:xx(세션 공백 후 캐치업)** | 신규 체크포인트 변경 없음, 8/4 확정 종가 미확보 | 세션 공백 캐치업(3개 루틴 통합) | 08-03 19:00·08-04 07:00·08-04 10:00 루틴 3건이 큐잉되다 이 시각 도착 — 상세 경위는 [entities/sk-hynix.md](../entities/sk-hynix.md) 최상단 참고. 웹검색상 8/4 오전 11:18 KST 코스피 -0.47%(6,228.21), 삼성전자·SK하이닉스 동반 약세("6100선 후퇴") — 9개 체크포인트에 영향 줄 신규 목표가·실적·CapEx 재료는 확인 안 됨(재료 공백 구간). 15:30 마감 확정 종가·수급은 미확보, 다음 정상 체크에서 재확인. 별도로 desktop 세션이 `report/daily-brief-2026-08-04.html`(PEOS/SK하이닉스/청약 통합)을 신설 — 이 페이지의 9개 체크포인트 프레임과는 별개 트랙으로 유지, 교차참고만. | 웹검색(fnnews, 2026-08-04 오전) |
-| **2026-08-04 밤(사용자 INGEST)** | ②HBM4 신규 리스크(삼성 2027 역전 전망), 목표가 스펙트럼 신규 2건, IB 트래킹 원칙 신설 | 사용자 제공 요약노트("Memory Supercycle Update") 웹서치 원문 교차검증 | 사용자가 공유한 정리노트의 핵심 수치 2건을 웹서치로 검증(원 노트에 출처 URL이 없어 필수 절차) — **둘 다 실제 존재하는 리포트로 확인**: ①**UBS: 2027년 HBM 점유율 삼성 41%·SK하이닉스 39%·마이크론 20%** 전망(2026-07 리포트, Investing.com·bloomingbit 교차확인) — 체크포인트②에 신규 리스크로 반영, 단 같은 UBS가 SKHY Buy·$204 유지 중이라는 점과 병기. ②**모건스탠리 한국 증시 Equalweight→Overweight 상향**(2026-07-22, KOSPI 9000 목표, "레버리지 청산=매수기회" 프레이밍) — Bloomberg·Yahoo Finance 교차확인, 이 위키의 SA헤지펀드·신용융자잔고 기반 "레버리지發 변동성" 서사와 독립적으로 정합. ③**UBS SKHY ADR 신규 커버리지**(Buy, $204, 분석가 Nicolas Gaudois, ROE 40.2% 2027-31 전망) — Investing.com·TipRanks 교차확인. Goldman "Memory Supercycle"·Citi·JPMorgan 개별 스탠스는 이번 검색으로 구체적 원문 확인 못 해 [미검증]으로 병기(원 노트의 방향성 자체는 기존 컨센서스와 정합). **"목표가보다 등급변경이 중요하다"는 IB 트래킹 원칙을 신설**해 이후 목표가 스펙트럼 갱신 방식에 반영. | 웹서치(Bloomberg, Investing.com, TipRanks, bloomingbit, Yahoo Finance) |
-
-| **🔴 2026-08-06 19:xx** | 🚨 매도 사이드카·-10.37% 급락, ③CapEx SEC EDGAR 데이터 정합성 버그 수정, ⑥ADR 여전히 0.0%(정규장 전 스냅샷) | 저녁 자동체크(목, 하루 최종 확정치) | **본주 종가 CSV 확정: -10.37%(1,495,000원)**, 코스피 -4.58%(6,296.38, 10:18 매도 사이드카), 삼성전자 -6.30%. 촉발: 간밤 미국 반도체주 4거래일 연속 약세("AI 인프라 지출 정점론" 재부상)+외국인 대량매도(코스피 전체 1.7조 중 본주가 1조 6,771억으로 대부분)([이투데이](https://www.etoday.co.kr/news/view/2611682), [한국경제](https://www.hankyung.com/article/202608068183i)) — 상세는 [market-cycles-leverage-risk.md](market-cycles-leverage-risk.md)·[panic-recovery-signals.md](panic-recovery-signals.md) 2026-08-06 항목. **①ASP는 오늘도 반증 없음**(어제 확인한 SK하이닉스 자체 실적콜 D램ASP+30%QoQ 등 유효) — 오늘의 급락이 펀더멘털 재료가 아니라는 근거. **③CapEx**: `scripts/sec_edgar_capex.py`를 daily_report.py에 실제 연결하려다 데이터 정합성 버그 발견·수정(같은 분기가 다른 fy/fp로 중복 저장, MSFT 한 분기 값 자체 충돌 — 이전에 인용한 "MSFT FY2026Q3 $47.5B"는 이 충돌 중 한쪽이었음, 정정) — PR #51 병합 대기, 현재 4개사 데이터 전부 150일+ 경과라 daily_report.py가 자동으로 "재조회 필요" 표시. **⑥ADR**: 8/6행 $151.03·0.0%·crosscheck=OK로 기록 — 나스닥 정규장(22:30 KST~) 개시 전 수집(16:49 KST)이라 전일종가 반환하는 기존 패턴과 일치, 새로운 버그는 아님(내일 정규장 이후 재확인). **⑦CXMT**: HBM3 양산 재지연 재확인(연내 양산 불투명), 단 "격차 3년으로 좁혀짐" 취지의 wccftech 기사는 본문 403으로 미검증·미채택 — 상세 [us-china-tech-competition-hbm.md](us-china-tech-competition-hbm.md). 목표가 스펙트럼 신규 변경 미확인. | CSV(sk-hynix-price-snapshot.csv·investor-flow.csv 8/6 확정행), 웹검색([이투데이](https://www.etoday.co.kr/news/view/2611682), [한국경제](https://www.hankyung.com/article/202608068183i)) |
 
 ## 투자 프레임: Buffett의 ROIC 기준과의 정렬 (2026-07-20 신규)
 

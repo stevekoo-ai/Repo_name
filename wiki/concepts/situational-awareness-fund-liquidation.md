@@ -1,8 +1,8 @@
 ---
 title: Situational Awareness LP 강제청산 — 7월 급락·급반등의 숨은 원인
 created: 2026-08-02
-updated: 2026-08-02
-tags: [hedge-fund, leverage, margin-call, citadel, sk-hynix, market-mechanics, daily-tracking]
+updated: 2026-08-08
+tags: [hedge-fund, leverage, margin-call, citadel, sk-hynix, market-mechanics, concept, framework]
 ---
 
 ## 핵심 요약
@@ -33,6 +33,9 @@ AI 전문 헤지펀드. 2026년 6월까지 누적 수익률 약 **+439%~1,500%+*
 
 ### 타임라인
 
+⏳ **Event timeline moved to monitoring page** — See [monitoring/situational-awareness-fund-liquidation-status.md](../../monitoring/situational-awareness-fund-liquidation-status.md) for complete timeline (Layer 4)
+
+### 타임라인
 | 시점 | 사건 |
 | --- | --- |
 | 2024-09 | SA 설립, 초기자본 약 $225M |
