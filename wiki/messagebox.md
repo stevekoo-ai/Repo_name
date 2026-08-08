@@ -36,6 +36,133 @@ tags: [messagebox, sync, multi-client, ops, priority]
 
 <!-- 새 메시지는 아래 양식을 복사해 위에 추가. 가장 최근가 맨 위. -->
 
+### 🟦 ARCHITECTURE MIGRATION COMPLETE: 4-Layer Wiki Restructuring (Phase 1-3) — claude 2026-08-08T12:00Z
+
+**✅ STATUS: COMPLETE — 다른 Agent들이 이해해야 할 모든 변경사항 정리**
+
+#### 무엇이 바뀌었나? (최소한 알아야 할 것)
+
+**레이어 구조 (이전 → 현재)**:
+- 이전: 2-layer (entities/ + concepts/) — 데이터 중복 문제 → Single Source of Truth 위반
+- 현재: 4-layer (Entity/Journal + Concept/Monitoring) — 각 레이어 역할 분담, 중복 제거 ✅
+
+**구체적 변경**:
+1. **`wiki/monitoring/` 폴더 신규 생성** (7개 monitoring-status.md 파일)
+   - `hbm-cycle-score-status.md` (일일 점수)
+   - `panic-recovery-signals-status.md` (일일 체크)
+   - `market-cycles-leverage-risk-status.md` (일일 신호)
+   - `sk-hynix-analyst-thesis-checkpoints-status.md` (일일 검증)
+   - `trump-midterm-tracker-status.md` (일일 추적)
+   - `situational-awareness-fund-liquidation-status.md` (이벤트 타임라인)
+   - `macro-regime-history-status.md` (일일 국면)
+
+2. **7개 concept 파일에서 모든 dated entries 제거** ✅
+   - 이전: `concepts/hbm-cycle-score.md`에 "2026-07-24 체크", "2026-07-25 체크" ... 100+ 줄
+   - 현재: `concepts/hbm-cycle-score.md`는 **프레임워크 정의만** (6 axes, collapse conditions, methodology)
+   - 모든 dated 체크 데이터는 `monitoring/hbm-cycle-score-status.md`에만 존재
+
+3. **`wiki/entity-journals/` 폴더** (Phase 1에서 완성)
+   - `entity-journals/sk-hynix-journal.md` (모든 상태 변화 타임라인, append-only)
+
+#### 이제 각 레이어의 역할
+
+| Layer | 파일 위치 | 내용 | 특징 |
+|---|---|---|---|
+| **Entity** | `entities/sk-hynix.md` | 현재 상태만 | 단일 snapshot, ~300 lines |
+| **Entity-Journal** | `entity-journals/sk-hynix-journal.md` | 역사 타임라인 | Append-only, 역시간순 |
+| **Concept** | `concepts/hbm-cycle-score.md` | 프레임워크 정의 | Framework only, 변경 드뭄 |
+| **Monitoring** | `monitoring/hbm-cycle-score-status.md` | 일일 추적 상태 | Append-only, 매일 갱신 |
+
+#### 다른 Agent들이 지금부터 해야 할 것
+
+**✅ 반드시 알고 시작할 것 (읽어야 할 순서)**:
+1. **`wiki/index.md`** — monitoring 섹션 신규 확인, 각 concept의 "→ [일일 추적]" 링크 보기
+2. **`wiki/concepts/knowledge-model.md`** — 4-layer 구조와 reading paths (5가지 workflow)
+3. **`CLAUDE.md`** — 다음 섹션들:
+   - "Wiki structure (4-layer architecture)" — 폴더 구조 이해
+   - "Page conventions (layer-specific updated semantics)" — 각 파일의 frontmatter `updated` 필드 의미
+   - "/lint workflow" — 4-layer compliance 자동 검사 (`/lint wiki/`)
+   - "/ingest workflow" — 새 소스 추가 시 4-layer 페어링 자동 생성
+
+**⚠️ 워크플로우 변경**:
+
+| 워크플로우 | 이전 | 현재 |
+|---|---|---|
+| **/lint** | concept 파일의 dated table 찾기 | 자동으로 4-layer compliance 검사 ✅ |
+| **/query** | concept만 검색 | concept + monitoring 자동 검색 |
+| **/ingest** | entity 또는 concept 하나 선택 | Layer 1+2 (entity+journal) 또는 Layer 3+4 (concept+monitoring) 페어 생성 |
+
+**예시** (이전 vs 현재):
+```
+이전: "SK하이닉스 2026-08-06 주가?" 
+→ entities/sk-hynix.md (현재상태) + entity-journals/sk-hynix-journal.md 읽기
+
+현재: "HBM Cycle Score 2026-08-06 점수?"
+→ monitoring/hbm-cycle-score-status.md (일일 데이터) + concepts/hbm-cycle-score.md (framework 정의) 읽기
+```
+
+**중요: Framework vs Tracking 구분**:
+- "HBM Cycle Score의 6개 축이 뭐야?" → `concepts/hbm-cycle-score.md` 읽기
+- "HBM Cycle Score 어제는 몇 점?" → `monitoring/hbm-cycle-score-status.md` 읽기
+- "Concept을 수정하고 싶어" → 3회+ 반복 + 가정 위반 등 4-condition rule 확인 → `concepts/concept-lifecycle-maturity.md` 참고
+
+#### Phase 4는 없다 (왜인가?)
+
+✅ **4-layer 아키텍처는 완성 상태**:
+- Concept-Monitoring 페어 7개 × 완성
+- Entity-Journal 1개 × 완성 (SK하이닉스, 다른 entities는 현재 단일 상태라 journal 불필요)
+- Single Source of Truth 100% 준수 (lint audit 통과)
+- 모든 cross-link 양방향 검증 완료
+
+**선택적 미래 작업** (필요 시 다음 세션):
+- (Optional) 다른 entities (portfolio, user-profile 등)도 entity-journal로 마이그레이션 (현재는 상태 변화 빈번하지 않아 불필요)
+- (Optional) Legacy `-history/` 폴더들 정리 (현재는 rotation 시 일시적으로 남음)
+- (Automated) `/lint` hook을 GitHub Actions에 연동 (현재는 수동 실행)
+
+#### 실제 영향: "내가 뭘 달라 느낄까?"
+
+✅ **Session 시작 시**:
+```bash
+git pull origin claude/ai-agent-impl-002tip
+# 이전처럼 동작하되, 이제 monitoring/ 폴더 7개 파일이 추가됨
+# (concepts/에서 dated 엔트리는 모두 사라짐)
+```
+
+✅ **/lint 실행 시**:
+```
+# 이전: "concepts/*.md에 | **2026-08-06 dated row 있음" 같은 경고
+# 현재: "✅ All 4-layer checks passed!" (0 violations)
+```
+
+✅ **새 내용 작성 시** (`/ingest`):
+```
+# 이전: Entity 또는 Concept 중 하나만 선택
+# 현재: "Entity+Journal" 또는 "Concept+Monitoring" 페어 자동 생성 + 양방향 링크 자동
+```
+
+#### Debugging Checklist (문제 생겼을 때)
+
+- ❓ "concept 파일에 dated row가 남아있어?" → 4-layer migration 누락, `/lint` 재검사
+- ❓ "monitoring 페이지를 못 찾아?" → `wiki/index.md` monitoring 섹션 확인, 양방향 링크 누락 가능
+- ❓ "Entity-journal이 안 생겼어?" → Layer 2 마이그레이션은 현재 SK하이닉스만 완성, 필요 시 사용자 요청
+
+#### 설계 문서 (더 알고 싶을 때)
+
+- `wiki/concepts/knowledge-model.md` — 4-layer 아키텍처 목적과 reading paths
+- `wiki/concepts/entity-lifecycle-maturity.md` — Entity가 Mention → Mature로 가는 과정
+- `wiki/concepts/reporting-framework.md` — Wiki data → Reports 흐름도
+- `wiki/concepts/decision-intelligence.md` — 의사결정 시 어느 레이어를 읽을지
+
+---
+
+- **who**: claude (claude/ai-agent-impl-002tip)
+- **when_utc**: 2026-08-08T12:00:00Z
+- **expires_utc**: 2026-08-22T00:00:00Z
+- **status**: active
+- **action_for_other_agents**: 
+  1. Pull 후 wiki/index.md 확인 (monitoring 섹션 신규)
+  2. 다음 `/lint`, `/query`, `/ingest` 사용 시 위 표 참고
+  3. 문제 시 위 Debugging Checklist 확인
 ### Steve's Wiki Architecture v1 도입 완료 — desktop 2026-08-08Txx:xxZ
 - who: desktop
 - when_utc: 2026-08-08T13:59:00Z
