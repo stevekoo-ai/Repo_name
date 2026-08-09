@@ -56,9 +56,11 @@ Catalog of every page in the wiki. See `../CLAUDE.md` for conventions.
 - [Real Estate Market Entry Framework](concepts/real-estate-market-framework.md) — 🆕 2026-08-09, 부동산 시장 진입/대기 의사결정 프레임워크. 금리환경(완화/중립/긴축) → 거시국면(상승/조정/약세/위기) → 전세가 트렌드(상승/보합/하강) → 이벤트 트리거(기준금리 25bp인하·플랫폼시티 청약공시·강남전세가+5%) 4계층 의사결정 로직. 플랫폼시티 공공분양 추적 포함. 일일 추적은 monitoring/real-estate-decision-tracker.md
 - [Economic Calendar Framework](concepts/economic-events-framework.md) — 🆕 2026-08-09, 거시경제 이벤트(CPI/PPI·기준금리·고용) 통합 프레임워크. 사건 중요도 분류(🔴Critical/🟡High/🟢Medium) + 신호 영향도 매핑(SK하이닉스 HOLD/BUY/SELL ↔ 실제 차이 > 0.5%p) + 시나리오 계획(Downside/Base/Upside 확률·신호변화) + 사후분석 체크리스트. Phase 3a 구현: engine/report/economic_events.py 모듈 신설, Section 3.5로 보고서 통합. 일일 추적은 monitoring/economic-events-status.md
 
-#### Phase 3b: Rolling Aggregation (Signal Trending — 2026-08-09)
+#### Phase 3a+3b: Economic Events & Rolling Aggregation (Complete — 2026-08-09)
 
-- [Rolling Aggregation Framework](concepts/rolling-aggregation-framework.md) — 🆕 2026-08-09, 일일 의사결정 신호(SK하이닉스 HOLD/BUY/SELL + 신뢰도, 부동산 WAIT/ENTER + 신뢰도)를 롤링윈도우(주/월/분기/연)로 집계해 추이를 파악하는 프레임워크. engine/report/signal_recorder.py(CSV append-only 저장소) + engine/report/rolling_aggregator.py(집계·비교·markdown 생성) 2개 모듈, 신뢰도 추세(↑/→/↓) 자동 감지, 기간별 비교(improved/same/declined). Phase 3b 구현: 신호 기록 인프라 완성, 7/7 테스트 pass, 다음 마일스톤은 engine/report/payload.py + markdown.py 통합.
+- [PEOS Phase 3 Completion Summary](concepts/peos-phase-3-completion-summary.md) — 🆕 2026-08-09, Phase 3a(경제달력) + 3b(신호추이) 완료 종합 문서. 문제정의·구현상세·테스트결과·영향분석·아키텍처·Phase 3c 로드맵 포함.
+- [Economic Calendar Framework](concepts/economic-events-framework.md) — Phase 3a, CPI/PPI·기준금리·고용 이벤트의 SK/RE 신호 영향도 매핑, Downside/Base/Upside 시나리오 계획, 사후분석 체크리스트. engine/report/economic_events.py(290줄, 신호변환로직 포함) 모듈 + Section 3.5 보고서 통합 완료.
+- [Rolling Aggregation Framework](concepts/rolling-aggregation-framework.md) — Phase 3b, 일일 신호 기록 → 롤링윈도우(주/월/분기/연) 집계 → 추이 감지(↑/→/↓). engine/report/signal_recorder.py(CSV append-only 저장) + engine/report/rolling_aggregator.py(집계·비교·markdown) 모듈, 7/7 테스트 pass. Phase 3c: payload.py + markdown.py 통합 남음.
 
 #### Architecture & Knowledge Model (4-Layer System Foundation — 2026-08-08)
 
