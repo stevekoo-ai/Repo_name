@@ -205,6 +205,36 @@ claude -p --dangerously-skip-permissions \
 
 → `prompts/daily-brief-headless.txt` v2로 갱신. 헤드리스 다음 사이클부터 이 품질 reproduce.
 
+## 개명: 데일리 브리프 → POET Daily Intelligence (2026-08-09)
+
+사용자 지적: "'데일리 브리프' 이름을 더 이상 브리프라고 부를 수 없을 것 같다.
+아주 방대한 거시적, 미시적, 다채로운 평가 기법들이 담겨있는 새로운 daily
+보고서이다." — 아래 §데이터 소스 카드 5종 통합으로 위키 서사 요약을
+넘어 8개 독립 파이프라인(KIS API·FRED/ECOS·MOLIT·SEC EDGAR·투자시계·
+KOSPI 밸류에이션 근사 엔진·PEOS 거시엔진·정치 트래커)을 종합하는
+리포트가 됐으니 타당한 지적.
+
+**새 이름 "POET"의 출처**: 새로 지어낸 이름이 아니라, `run_daily.bat`에
+사용자가 이미 붙여둔 로컬 Task Scheduler 작업명 **"Steve_Daily_POET"**
+(2026-08-06 설정)를 그대로 리포트 브랜드로 승격. 정확한 원의미는
+불명이나(사용자가 로컬에서 지은 이름), 기존 결정을 존중해 재사용.
+
+**변경 범위**: 표시 브랜드명만 변경 — 파일 경로(`report/daily-brief-YYYY-MM-DD.html`)와
+이메일 발송 워크플로우(`daily-brief-report.yml`/`daily-brief-dispatch.yml`)의
+path 트리거는 그대로 유지(자동화 배관을 건드리면 이메일 발송이 끊길
+위험). `prompts/daily-brief-headless.txt`에 HTML `<title>`/HERO eyebrow에
+"POET DAILY INTELLIGENCE" 명시 지시 추가.
+
+**2026-08-09 첫 발행**: 위키 실제 근거자료로 오늘자 리포트를 직접 조립해
+Artifact로 발행 — https://claude.ai/code/artifact/94f21e7b-c717-4d56-80a2-713d6616ed33
+동일 내용을 `report/daily-brief-2026-08-09.html`(라이트 전용, 이메일
+호환)로도 저장해 다음 헤드리스 실행의 품질 기준본으로 삼음. 구성:
+HERO+한줄진단 → 헤드라인 4타일 → 거시(G/I/L·투자시계·거시지표·KOSPI PE
+그래프) → SK하이닉스(HBM Score·패닉회복·찐반등·체크포인트) → SEC
+EDGAR+변두리 → 부동산 → 정치오버레이 → 다음관전포인트 → 품질기준
+폴더블. dataviz 스킬 절차 준수(인라인 SVG 차트), headless Chromium으로
+라이트/다크 렌더링 검증 완료.
+
 ## 데이터 소스 카드 5종 통합 (2026-08-09 추가)
 
 사용자 검토 요청("이미 구현된 건 회신, 안 된 건 추가") 결과, 다음 4개

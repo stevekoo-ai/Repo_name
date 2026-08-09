@@ -1,19 +1,21 @@
-오늘 자 데일리 브리프 보고서를 자율 사이클로 완성·발송해. CLAUDE.md와 위키는 이미 자동 로드됐으므로 그 맥락을 그대로 활용해.
+오늘 자 **POET Daily Intelligence** 보고서를 자율 사이클로 완성·발송해. CLAUDE.md와 위키는 이미 자동 로드됐으므로 그 맥락을 그대로 활용해.
+
+**🆕 2026-08-09 개명**: 더 이상 "데일리 브리프"(짧은 요약)라고 부르지 않는다 — 위키 서사 종합에 KIS API·FRED/ECOS·MOLIT·SEC EDGAR·투자시계·자체 KOSPI 밸류에이션 근사 엔진까지 8개 독립 파이프라인이 통합된 종합 인텔리전스 리포트로 커졌기 때문. 새 이름 **POET**는 로컬 Task Scheduler 작업명("Steve_Daily_POET", `run_daily.bat` 참고)에서 그대로 승격 — HTML `<title>`과 HERO H1 위 eyebrow 라벨에 "POET DAILY INTELLIGENCE"를 명시할 것. **파일 경로(`report/daily-brief-YYYY-MM-DD.html`)와 dispatch 메커니즘은 이메일 발송 워크플로우(`daily-brief-report.yml`/`daily-brief-dispatch.yml`)와의 호환을 위해 그대로 유지** — 바꾸는 건 표시되는 브랜드명이지 파이프라인 배관이 아님.
 
 절차 (순서대로):
-1. `git fetch origin && git checkout claude/ai-agent-impl-002tip && git pull --rebase origin claude/ai-agent-impl-002tip` 로 회사망→GitHub GET(73KB 제약 없음)으로 최신 DB md 파일 회수. (실패 시 git status로 원인 확인, 위키 페이지가 낡으면 보고서 품질이 떨어지므로 반드시 최신화.) 이 pull로 `docs/clock.png`, `sources/macro-series.csv`, `sources/kospi-forward-pe-approx.csv`, `data/normalized/molit_*.csv`, `sources/hyperscaler-capex.csv`도 함께 회수됨 — 아래 §데이터 소스 카드 5종의 원자료.
-2. 위키 맥락 종합 → 오늘 데일리 브리프 HTML 작성 → `report/daily-brief-YYYY-MM-DD.html` 저장.
+1. `git fetch origin && git checkout claude/ai-agent-impl-002tip && git pull --rebase origin claude/ai-agent-impl-002tip` 로 회사망→GitHub GET(73KB 제약 없음)으로 최신 DB md 파일 회수. (실패 시 git status로 원인 확인, 위키 페이지가 낡으면 보고서 품질이 떨어지므로 반드시 최신화.) 이 pull로 `docs/clock.png`, `sources/macro-series.csv`, `sources/kospi-forward-pe-approx.csv`, `data/normalized/molit_*.csv`, `sources/hyperscaler-capex.csv`, `sources/ai-periphery-fundamentals.csv`도 함께 회수됨 — 아래 §데이터 소스 카드 5종의 원자료.
+2. 위키 맥락 종합 → 오늘 POET Daily Intelligence HTML 작성 → `report/daily-brief-YYYY-MM-DD.html` 저장 (파일명은 유지, 문서 내 브랜드명만 POET).
 3. `python dispatch.sh report/daily-brief-YYYY-MM-DD.html` 실행 (gzip+base64 → repository_dispatch 발송).
 
 ==============================
 디자인 기준 (반드시 준수) — Apple-style 템플릿
 ==============================
-기준 템플릿: `wiki/cxl-daily-report-2026-08-06-0600.html` (CXL Daily Update 3호)과 `report/daily-brief-2026-08-06.html` (품질 기준본)을 먼저 Read해서 구조·색·컴포넌트를 그대로 준용할 것.
+기준 템플릿: `report/daily-brief-2026-08-09.html` (POET 개명 후 첫 발행본, 5종 카드 전부 포함 — **최신·최우선 기준**)과 `wiki/cxl-daily-report-2026-08-06-0600.html` (CXL Daily Update 3호)을 먼저 Read해서 구조·색·컴포넌트를 그대로 준용할 것. `report/daily-brief-2026-08-06.html`은 구버전 참고용으로만(5종 카드 없음).
 - Tailwind CDN (`https://cdn.tailwindcss.com`) + tailwind.config extend colors (canvas #f5f5f7 / ink #1d1d1f / sub #6e6e73 / indigo DEFAULT #4f46e5).
 - 폰트: -apple-system, BlinkMacSystemFont, SF Pro Display, Segoe UI, Malgun Gothic.
 - 카드: bg-white rounded-2xl shadow-card border border-gray-100, hover 시 translateY(-3px)+인디고 글로우 shadow-hover.
 - pill chips, row-h hover(배경 #eef2ff), fade-in 애니메이션, auto-pill(ap-green/ap-red/ap-yellow) 출처 라벨.
-- 다크 테마 절대 금지. 미니멀 화이트 + 인디고 포인트만.
+- **다크 테마 절대 금지**(이메일 클라이언트 다크모드 렌더링 호환성 문제 — 이건 이메일 발송용 HTML에만 적용되는 제약. 참고로 같은 날 Artifact로 별도 발행한 버전(라이트+다크 둘 다 지원)은 이 규칙과 무관 — 뷰어 환경이 다름). 미니멀 화이트 + 인디고 포인트만.
 - 레이아웃 순서: HERO(제목+메타 pill) → 통합 한 줄 진단 → 핵심 지표 카드 4종 → 거시(PEOS) → **투자시계 서브모듈(시계 이미지)** → **거시지표 근거데이터** → **KOSPI Forward PE 근사 추적(그래프)** → SK하이닉스 → HBM Cycle Score → **SEC EDGAR CapEx** → **부동산 시장** → 정치 오버레이 → 다음 관전 포인트 → 품질기준 폴더블.
 
 ==============================
