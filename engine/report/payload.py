@@ -276,6 +276,26 @@ def build_report_payload(month_key: str | None = None) -> dict:
     # Add daily dashboard history integration
     payload["daily_history_summary"] = _daily_history_summary(month_key)
 
+    # Add decision engines (Phase 2 integration)
+    from engine.exporters.sk_hynix_decision import compute_sk_hynix_decision
+    from engine.exporters.real_estate_decision import compute_real_estate_decision
+
+    try:
+        payload["sk_hynix_decision"] = compute_sk_hynix_decision(payload)
+        log_event("sk_hynix_decision.computed", signal=payload["sk_hynix_decision"].signal,
+                  confidence=payload["sk_hynix_decision"].confidence)
+    except Exception as exc:
+        log_event("sk_hynix_decision.failed", error=str(exc), level="warning")
+        payload["sk_hynix_decision"] = None
+
+    try:
+        payload["real_estate_decision"] = compute_real_estate_decision(payload)
+        log_event("real_estate_decision.computed", signal=payload["real_estate_decision"].signal,
+                  confidence=payload["real_estate_decision"].confidence)
+    except Exception as exc:
+        log_event("real_estate_decision.failed", error=str(exc), level="warning")
+        payload["real_estate_decision"] = None
+
     log_event("report_payload.built", month=month_key, readiness=readiness, action_count=len(actions))
     return payload
 
