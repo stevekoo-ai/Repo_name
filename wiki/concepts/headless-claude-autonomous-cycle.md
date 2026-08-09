@@ -219,11 +219,15 @@ claude -p --dangerously-skip-permissions \
 | 부동산 데이터 | `real-estate-sync.yml` → `data/normalized/molit_*.csv` | 데일리 브리프 미언급 |
 | SEC EDGAR CapEx | `sec-edgar-capex.yml` → `sources/hyperscaler-capex.csv` | 데일리 브리프 미언급, 하이라이트/영향판단 로직 없음 |
 
-**부수 발견**: `sources/ai-periphery-fundamentals.csv`(AI 밸류체인 변두리
-8개사 수집, `sec_edgar_periphery.py`)는 워크플로우는 있으나 **파일 자체가
-아직 한 번도 생성된 적이 없음** — continue-on-error로 감싸져 있어 실패가
-조용히 넘어가고 있었을 가능성. 프롬프트에는 "있으면 인용, 없으면 조용히
-생략"으로 방어적으로 반영, 별도 디버깅은 향후 과제로 남김.
+**부수 발견 → 해결 완료 (2026-08-09 같은 세션)**: `sources/ai-periphery-fundamentals.csv`가
+없어서 조사한 결과, 버그가 아니라 **다른 세션이 데이터 정합성 버그(매출
+YTD 오수집·백로그 개념오류) 수정 후 오염된 CSV를 의도적으로 삭제**했고,
+주 1회(월요일)만 도는 워크플로우라 재생성이 지연되고 있었던 것으로 확인.
+`sec-edgar-capex.yml` 수동 재실행(run 31318833237)으로 88건 정상
+재생성 완료, `git merge origin/main`으로 작업 브랜치에 반영. 상세 경위는
+[ai-value-chain-periphery-monitor.md §5-1](ai-value-chain-periphery-monitor.md) 참고.
+카드 ⑤를 "SEC EDGAR CapEx & AI 밸류체인 변두리"로 확장 — 8개사 매출·백로그
+(QoQ 변화 우선 해석)까지 daily brief에 통합.
 
 **반영 내용** (`prompts/daily-brief-headless.txt` §데이터 소스 카드 5종):
 1. **투자시계 서브모듈**: `docs/clock.png`를 base64 data URI로 인라인(이메일

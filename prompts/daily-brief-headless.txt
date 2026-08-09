@@ -59,10 +59,11 @@
 - `monitoring/real-estate-automation-summary.md`의 자동화 완성도(현재 31%, 4/13 자동화)를 카드 하단에 병기해 "이 데이터만으로 경기판단 완결이 아님"을 매번 고지.
 - 부동산 decision tracker(`monitoring/real-estate-decision-tracker.md`)가 아직 pending 상태면 그 사실도 함께 밝힐 것 — 신호가 있는 것처럼 지어내지 말 것.
 
-**⑤ SEC EDGAR CapEx** (sources/hyperscaler-capex.csv 기반, 🟢 자동화 + 🔴 LLM 영향판단)
-- 4개 하이퍼스케일러(MSFT/GOOGL/AMZN/META) 최신 분기 CapEx를 표로 인용.
-- **하이라이트 로직**: `report/daily-brief-*.html` 중 오늘 것을 제외한 가장 최근 파일을 Read해서 그때 인용했던 CapEx 수치와 비교. 새 분기 데이터가 추가됐거나 값이 바뀌었으면 🆕 라벨 + 인디고 강조 카드로 배치하고, HBM/서버 D램 수요에 미치는 영향을 1~2문장으로 판단해 서술(예: "MSFT CapEx가 전분기 대비 +X% → HBM 수요 확장 신호, ASP 축 상향 가능성"). 변동 없으면 평시 라벨로만 표시하고 과장하지 말 것.
-- `sources/ai-periphery-fundamentals.csv`(AI 밸류체인 변두리 8개사)는 **아직 파일이 생성되지 않은 상태(2026-08-09 확인)** — 존재하면 인용, 없으면 이 카드에서 조용히 생략(에러로 만들지 말 것, 있는 척하지 말 것).
+**⑤ SEC EDGAR CapEx & AI 밸류체인 변두리** (sources/hyperscaler-capex.csv + sources/ai-periphery-fundamentals.csv 기반, 🟢 자동화 + 🔴 LLM 영향판단)
+- **하이퍼스케일러 CapEx**: 4개사(MSFT/GOOGL/AMZN/META) 최신 분기 CapEx를 표로 인용.
+- **AI 밸류체인 변두리 8개사** (Vertiv/GE Vernova/Amkor/Astera Labs/Credo/Coherent/Lumentum/Supermicro): `sources/ai-periphery-fundamentals.csv`에서 회사별 최신 분기 매출·**백로그(RPO)**를 인용. 백로그는 이미 계약된 미래 매출이라 "주문이 끊겼다"는 신호가 가장 먼저 나타나는 자리(concepts/ai-value-chain-periphery-monitor.md §운영지침 ⓐ) — 매출보다 백로그 QoQ 변화를 우선 해석할 것. 값이 없는 회사(백로그 미태깅 등)는 조용히 생략, 지어내지 말 것.
+- **하이라이트 로직(양쪽 공통)**: `report/daily-brief-*.html` 중 오늘 것을 제외한 가장 최근 파일을 Read해서 그때 인용했던 수치와 비교. 새 분기 데이터가 추가됐거나 값이 바뀌었으면 🆕 라벨 + 인디고 강조 카드로 배치하고, HBM/서버 D램 수요에 미치는 영향을 1~2문장으로 판단해 서술(예: "MSFT CapEx가 전분기 대비 +X% → HBM 수요 확장 신호" / "GE Vernova 백로그 +8% → 데이터센터 전력 인프라 수요 견조, 변두리 균열 없음"). 변동 없으면 평시 라벨로만 표시하고 과장하지 말 것.
+- **데이터 이력 주의**: 이 CSV는 2026-08-07 최초 실호출에서 매출 YTD 오수집·백로그 개념오류(이연수익을 백로그로 오인)가 발견돼 스크립트 수정 후 재생성됨(2026-08-09) — 과거 daily-brief에 구버전 수치가 인용됐다면 이번 회차부터 정정치로 교체됐음을 인지하고 재정정 표시는 하지 않되(사용자 혼란 방지), 값 차이가 크게 나도 "오류였다"고 진단하지 말고 그냥 최신 정정치를 사실로 취급.
 
 ==============================
 절대 금지 (권한으로 차단돼 있지만 재확인)
