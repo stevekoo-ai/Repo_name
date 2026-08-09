@@ -45,6 +45,7 @@ Catalog of every page in the wiki. See `../CLAUDE.md` for conventions.
 - [Situational Awareness 헤지펀드 청산 — 사건 진행](monitoring/situational-awareness-fund-liquidation-status.md) — 🆕 2026-08-08, 4-layer 구조화에 따라 concepts/situational-awareness-fund-liquidation.md에서 분리된 이벤트 타임라인(append-only). 2026-09 설립부터 7/30 시타델 인수까지 5개 주요 사건 + 규모 재검증(SK하이닉스 시총 1% 미만) 기록. Framework 정의는 concepts/situational-awareness-fund-liquidation.md 참고
 - [SK Hynix Daily Decision Tracker](monitoring/sk-hynix-decision-tracker.md) — 🆕 2026-08-09, SK하이닉스 보유/매도 의사결정 일일 추적(append-only). HOLD/BUY/SELL 신호, 신뢰도, 주요 드라이버(거시·반도체·금리), 조건부 트리거 기록. Framework 정의는 concepts/sk-hynix-investment-thesis.md 참고
 - [Real Estate Daily Decision Tracker](monitoring/real-estate-decision-tracker.md) — 🆕 2026-08-09, 부동산 시장 진입/대기 의사결정 일일 추적(append-only). WAIT/ENTER 신호, 신뢰도, 금리·거시·전세가 트렌드, 이벤트 트리거(기준금리·플랫폼시티 공시) 기록. Framework 정의는 concepts/real-estate-market-framework.md 참고
+- [Economic Calendar Status & Tracking](monitoring/economic-events-status.md) — 🆕 2026-08-09, 거시경제 이벤트 추적(append-only). 다음 14일 Critical 이벤트 테이블(미국CPI·한국은행기준금리·미국PPI)·Downside/Base/Upside 시나리오 확률·역사적 패턴 분석·신호변경이력·일일 모니터링 체크리스트. Framework 정의는 concepts/economic-events-framework.md 참고
 
 
 ### concepts
@@ -53,6 +54,7 @@ Catalog of every page in the wiki. See `../CLAUDE.md` for conventions.
 
 - [SK Hynix Investment Thesis](concepts/sk-hynix-investment-thesis.md) — 🆕 2026-08-09, SK하이닉스 1,200주(180M원, 포트폴리오 35%) 보유/매도 의사결정 프레임워크. 거시국면(상승/조정/약세/위기) → 반도체밴드(양호/정상/부진/극악) → 금리환경(완화/중립/긴축) → 외부신호(외국인수급·HBM ASP·CapEx) 4계층 의사결정 로직 + 조건부 트리거(가격·신호). 일일 추적은 monitoring/sk-hynix-decision-tracker.md
 - [Real Estate Market Entry Framework](concepts/real-estate-market-framework.md) — 🆕 2026-08-09, 부동산 시장 진입/대기 의사결정 프레임워크. 금리환경(완화/중립/긴축) → 거시국면(상승/조정/약세/위기) → 전세가 트렌드(상승/보합/하강) → 이벤트 트리거(기준금리 25bp인하·플랫폼시티 청약공시·강남전세가+5%) 4계층 의사결정 로직. 플랫폼시티 공공분양 추적 포함. 일일 추적은 monitoring/real-estate-decision-tracker.md
+- [Economic Calendar Framework](concepts/economic-events-framework.md) — 🆕 2026-08-09, 거시경제 이벤트(CPI/PPI·기준금리·고용) 통합 프레임워크. 사건 중요도 분류(🔴Critical/🟡High/🟢Medium) + 신호 영향도 매핑(SK하이닉스 HOLD/BUY/SELL ↔ 실제 차이 > 0.5%p) + 시나리오 계획(Downside/Base/Upside 확률·신호변화) + 사후분석 체크리스트. Phase 3a 구현: engine/report/economic_events.py 모듈 신설, Section 3.5로 보고서 통합. 일일 추적은 monitoring/economic-events-status.md
 
 #### Architecture & Knowledge Model (4-Layer System Foundation — 2026-08-08)
 

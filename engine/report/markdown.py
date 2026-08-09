@@ -8,6 +8,7 @@ sentence structure required by 17.2 wherever a judgment is being stated.
 from __future__ import annotations
 
 from core.models import DataStatus
+from engine.report.economic_events import generate_event_section
 
 STATUS_KR = {
     DataStatus.OK.value: "OK",
@@ -946,11 +947,12 @@ def render_markdown(payload: dict) -> str:
     """
     header = f"# PEOS 일일 리포트 - {payload['report_month']}\n"
 
-    # NEW 5-SECTION STRUCTURE (Primary Report)
+    # NEW 5-SECTION STRUCTURE + ECONOMIC EVENTS (Primary Report)
     main_sections = [
         _macro_dashboard_section(payload),
         _sk_hynix_decision_section(payload),
         _real_estate_decision_section(payload),
+        generate_event_section(payload),  # 경제 달력 통합 (Section 3.5)
         _unified_action_plan_section(payload),
         _decision_rationale_summary(payload),
     ]
