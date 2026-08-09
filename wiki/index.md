@@ -46,6 +46,7 @@ Catalog of every page in the wiki. See `../CLAUDE.md` for conventions.
 - [SK Hynix Daily Decision Tracker](monitoring/sk-hynix-decision-tracker.md) — 🆕 2026-08-09, SK하이닉스 보유/매도 의사결정 일일 추적(append-only). HOLD/BUY/SELL 신호, 신뢰도, 주요 드라이버(거시·반도체·금리), 조건부 트리거 기록. Framework 정의는 concepts/sk-hynix-investment-thesis.md 참고
 - [Real Estate Daily Decision Tracker](monitoring/real-estate-decision-tracker.md) — 🆕 2026-08-09, 부동산 시장 진입/대기 의사결정 일일 추적(append-only). WAIT/ENTER 신호, 신뢰도, 금리·거시·전세가 트렌드, 이벤트 트리거(기준금리·플랫폼시티 공시) 기록. Framework 정의는 concepts/real-estate-market-framework.md 참고
 - [Economic Calendar Status & Tracking](monitoring/economic-events-status.md) — 🆕 2026-08-09, 거시경제 이벤트 추적(append-only). 다음 14일 Critical 이벤트 테이블(미국CPI·한국은행기준금리·미국PPI)·Downside/Base/Upside 시나리오 확률·역사적 패턴 분석·신호변경이력·일일 모니터링 체크리스트. Framework 정의는 concepts/economic-events-framework.md 참고
+- [부동산 자동화 파이프라인 — 수집 현황 & 경기판단 데이터 갭 분석](monitoring/real-estate-automation-summary.md) — 🆕 2026-08-09, MOLIT 부동산 데이터 자동 수집 파이프라인 구축 완료 리포트. 현재 자동화 4개 지표(거래가·금리·통화·신용) + 미자동화 22개 항목 상세 분류(심리지수·신규공급·정책변수 등) + Phase 1~3 개발 로드맵. 경기판단 완성도 현재 31% (거래가+금리만으로는 부족), 우선 개발 순서 3단계 정의.
 
 
 ### concepts

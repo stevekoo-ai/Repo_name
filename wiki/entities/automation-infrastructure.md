@@ -1,8 +1,8 @@
 ---
 title: 자동화 인프라 — GitHub Actions 워크플로우 & 시크릿 인벤토리
 created: 2026-07-31
-updated: 2026-07-31
-tags: [infrastructure, secrets, github-actions, automation]
+updated: 2026-08-09
+tags: [infrastructure, secrets, github-actions, automation, real-estate]
 ---
 
 이 저장소(`stevekoo-ai/Repo_name`)에는 서로 다른 두 시스템(PEOS 거시경제
@@ -21,6 +21,7 @@ GitHub이 절대 다시 보여주지 않는다** — Settings → Secrets 화면
 | `monthly-peos-report.yml` | 수동(workflow_dispatch) — 과거 월 재실행용 | PEOS | 위와 동일 |
 | `daily-clock-report.yml` | 매일 08:00 KST | PEOS(Investment Clock 서브모듈) | `FRED_API_KEY`, 알림 시크릿(위와 동일) |
 | `macro-data-sync.yml` | 매일 07:10 KST | SK하이닉스 모니터링 | `FRED_API_KEY`, `ECOS_API_KEY` |
+| **`real-estate-sync.yml`** | **매일 03:00 KST** | **PEOS 부동산 모니터링** | **`DATA_GO_KR_KEY`** |
 | `sk-hynix-daily-report.yml` | 하루 3회(07/10/19시 KST) | SK하이닉스 모니터링 | `KIS_APP_KEY`, `KIS_APP_SECRET`, `GMAIL_ADDRESS`, `GMAIL_APP_PASSWORD` |
 | `portfolio-holdings-sync.yml` | 매일 19:10 KST | SK하이닉스 모니터링 | `KIS_APP_KEY`(+`_ISP`/`_IRP` 계좌별 오버라이드), `KIS_APP_SECRET`(+`_ISP`/`_IRP`), `KIS_ACCOUNT_GEN`/`_ISP`/`_DC`/`_IRP` |
 | `subscription-monitor.yml` | 5분마다 | SK하이닉스 모니터링(청약 알림) | `DATA_GO_KR_KEY`, `GMAIL_ADDRESS`, `GMAIL_APP_PASSWORD` |
@@ -49,6 +50,32 @@ GitHub이 절대 다시 보여주지 않는다** — Settings → Secrets 화면
 - `GMAIL_ADDRESS` / `GMAIL_APP_PASSWORD` — 알림 메일 발신용 Gmail 계정(앱 비밀번호 인증). `sk-hynix-daily-report.yml`·`subscription-monitor.yml`이 이미 사용 중이며, `core/notify.py`(PEOS/Investment Clock 공용 알림 모듈)도 2026-07-31부터 이 두 시크릿을 인식해 자동으로 이메일 채널을 켠다 — 별도 `SMTP_*` 시크릿을 새로 만들 필요 없음.
 - `SLACK_WEBHOOK_URL` / `SMTP_HOST`/`SMTP_PORT`/`SMTP_USER`/`SMTP_PASSWORD`/`NOTIFY_EMAIL_TO` — `core/notify.py`가 지원하는 대안 채널(우선순위: Slack > 범용 SMTP > Gmail > 무발송). 2026-07-31 기준 이 이름의 시크릿은 등록돼 있지 않은 것으로 보임(등록돼 있다면 Gmail보다 우선 적용됨).
 - `GITHUB_TOKEN` — 청약 알림에서 GitHub Issue 자동 생성용(워크플로우 기본 제공 토큰, 별도 등록 불필요).
+
+## `real-estate-sync.yml` (2026-08-09 신규 추가)
+
+MOLIT(국토교통부) 부동산 실거래가 데이터 자동 수집. 다음 4개 카테고리 매일 자동 수집:
+
+- **아파트 매매 실거래가** (`collectors.molit.fetch_and_store()`)
+  - 저장 위치: `data/normalized/molit_*.csv`, `sources/molit_apartment_*.csv`
+  - 지표: 월 중 위치별 중간거래가(만원/평), 거래건수
+
+- **아파트 전월세(전세+월세)** (`collectors.molit_rent.fetch_and_store()`)
+  - 저장 위치: `data/normalized/molit_rent_*.csv`, `sources/molit_rent_*.csv`
+  - 지표: 월 중 위치별 중간거래가, 거래건수
+
+- **연립다세대/빌라 매매** (`collectors.molit_villa.fetch_and_store()`)
+  - 저장 위치: `data/normalized/molit_villa_*.csv`, `sources/molit_villa_*.csv`
+
+- **오피스텔 매매** (`collectors.molit_officetel.fetch_and_store()`)
+  - 저장 위치: `data/normalized/molit_officetel_*.csv`, `sources/molit_officetel_*.csv`
+
+**스케줄:** 매일 03:00 KST(18:00 UTC) — MOLIT 데이터는 당월 또는 이전월 기준 누적이므로 매일 체크 필요
+**git 처리:** 데이터 변경 시 자동 commit+push, push 충돌 시 rebase 재시도(5회 지수백오프)
+**데이터 검증:** CSV 파일 존재 및 형식 확인 스텝 포함 → 수집 성공/실패 자동 로깅
+
+**핵심 제약:** data.go.kr은 활용신청이 API 상품 단위이므로, 각 4개 MOLIT 상품(매매/전월세/빌라/오피스텔)이 별도 승인되어야 한다. 승인 안 된 상품 호출 시 XML 에러 응답이 온다([`collectors/molit.py`](../../collectors/molit.py) 참고).
+
+**사용 사례:** PEOS 부동산 시장 판단(경기판단) → 금리·거시국면·전세가 추이와 함께 경제 모니터링의 필수 입력.
 
 ## `daily-brief-report.yml` (2026-08-04 신규)
 
