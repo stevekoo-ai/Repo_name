@@ -63,6 +63,12 @@ update` 재실행 필요, 아직 GitHub Actions 워크플로우 자동 연동은
 
 ---
 
+## 시각화
+
+꺾은선 그래프로 앵커 대비 트렌드를 보는 리포트(인터랙티브, 크로스헤어
+툴팁 포함): https://claude.ai/code/artifact/abdae139-1b39-49fc-a4d9-7e5218cf81fc
+(2026-08-09 발행, dataviz 팔레트 검증 완료)
+
 ## Sources
 
 - [SK하이닉스 주가 상승의 정당성 분석](../concepts/rally-justification-analysis.md) — framework, 앵커 정의
