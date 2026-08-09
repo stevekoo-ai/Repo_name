@@ -43,9 +43,16 @@ Catalog of every page in the wiki. See `../CLAUDE.md` for conventions.
 - [SK하이닉스 분석가 의견 체크포인트 — 일일 상태](monitoring/sk-hynix-analyst-thesis-checkpoints-status.md) — 🆕 2026-08-08, 4-layer 구조화에 따라 concepts/sk-hynix-analyst-thesis-checkpoints.md에서 분리된 일일 체크 이력(append-only). 2026-07-15~08-06 40+ 항목 종합 검증(①ASP/②HBM4공급/③CapEx/⑥ADR/⑦CXMT 등), 체크포인트별 최신상태 + 분석가 의견 변동 추적. Framework 정의는 concepts/sk-hynix-analyst-thesis-checkpoints.md 참고
 - [트럼프 2026 중간선거 — 일일 추적 상태](monitoring/trump-midterm-tracker-status.md) — 🆕 2026-08-08, 4-layer 구조화에 따라 concepts/trump-midterm-tracker.md에서 분리된 일일 추적 데이터(append-only). 5개 카테고리(정치·경제·전쟁외교·이민·경쟁구도) × 4개 체크(2026-08-01/02주말·8/2저녁·8/5저녁·8/6저녁) 타임라인 테이블. Framework 정의는 concepts/trump-midterm-tracker.md 참고
 - [Situational Awareness 헤지펀드 청산 — 사건 진행](monitoring/situational-awareness-fund-liquidation-status.md) — 🆕 2026-08-08, 4-layer 구조화에 따라 concepts/situational-awareness-fund-liquidation.md에서 분리된 이벤트 타임라인(append-only). 2026-09 설립부터 7/30 시타델 인수까지 5개 주요 사건 + 규모 재검증(SK하이닉스 시총 1% 미만) 기록. Framework 정의는 concepts/situational-awareness-fund-liquidation.md 참고
+- [SK Hynix Daily Decision Tracker](monitoring/sk-hynix-decision-tracker.md) — 🆕 2026-08-09, SK하이닉스 보유/매도 의사결정 일일 추적(append-only). HOLD/BUY/SELL 신호, 신뢰도, 주요 드라이버(거시·반도체·금리), 조건부 트리거 기록. Framework 정의는 concepts/sk-hynix-investment-thesis.md 참고
+- [Real Estate Daily Decision Tracker](monitoring/real-estate-decision-tracker.md) — 🆕 2026-08-09, 부동산 시장 진입/대기 의사결정 일일 추적(append-only). WAIT/ENTER 신호, 신뢰도, 금리·거시·전세가 트렌드, 이벤트 트리거(기준금리·플랫폼시티 공시) 기록. Framework 정의는 concepts/real-estate-market-framework.md 참고
 
 
 ### concepts
+
+#### Personal Investment Decisions (User-Centric Decision Engines — 2026-08-09)
+
+- [SK Hynix Investment Thesis](concepts/sk-hynix-investment-thesis.md) — 🆕 2026-08-09, SK하이닉스 1,200주(180M원, 포트폴리오 35%) 보유/매도 의사결정 프레임워크. 거시국면(상승/조정/약세/위기) → 반도체밴드(양호/정상/부진/극악) → 금리환경(완화/중립/긴축) → 외부신호(외국인수급·HBM ASP·CapEx) 4계층 의사결정 로직 + 조건부 트리거(가격·신호). 일일 추적은 monitoring/sk-hynix-decision-tracker.md
+- [Real Estate Market Entry Framework](concepts/real-estate-market-framework.md) — 🆕 2026-08-09, 부동산 시장 진입/대기 의사결정 프레임워크. 금리환경(완화/중립/긴축) → 거시국면(상승/조정/약세/위기) → 전세가 트렌드(상승/보합/하강) → 이벤트 트리거(기준금리 25bp인하·플랫폼시티 청약공시·강남전세가+5%) 4계층 의사결정 로직. 플랫폼시티 공공분양 추적 포함. 일일 추적은 monitoring/real-estate-decision-tracker.md
 
 #### Architecture & Knowledge Model (4-Layer System Foundation — 2026-08-08)
 

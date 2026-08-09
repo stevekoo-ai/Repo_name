@@ -677,16 +677,306 @@ def _tier_label(tier: str) -> str:
     return {"seoul": "서울", "capital_area": "수도권", "nationwide": "전국(대표표본)"}.get(tier, tier)
 
 
-def render_markdown(payload: dict) -> str:
-    header = f"# PEOS 일일 리포트 - {payload['report_month']}\n"
-    sections = [
-        _us_macro_dashboard(payload), _us_regime_judgement(payload),
-        _macro_dashboard(payload), _regime_judgement(payload), _kr_us_comparison(payload),
-        _executive_summary(payload), _monthly_key_changes(payload),
-        _rate_analysis(payload), _cci_analysis(payload), _real_estate_trend(payload),
-        _rent_trend(payload), _villa_trend(payload), _officetel_trend(payload),
-        _indicator_deep_dive(payload), _personal_analysis(payload),
-        _asset_impact(payload), _scenario_analysis(payload), _discussion_points(payload),
-        _action_plan(payload), _calendar(payload), _personal_brief(payload), _appendix(payload),
+# ========== NEW 5-SECTION STRUCTURE (Phase 1 Refactoring) ==========
+
+
+def _macro_dashboard_section(payload: dict) -> str:
+    """Section 1: 거시 경제 대시보드 (2-3 min read).
+
+    Consolidates Korea + US macro indicators, regimes, and cross-regime analysis.
+    """
+    macro = payload["macro"]
+    macro_us = payload["macro_us"]
+    kr_us_comparison = payload.get("kr_us_comparison", {})
+
+    lines = [
+        "# 1. 거시 경제 대시보드",
+        "",
+        "## 한국 거시 상황",
+        f"**국면**: {macro['regime']} (총점 {macro['score']}, 신뢰도 {macro['confidence']:.0f}%)",
+        f"**주요 신호**: {macro.get('transition', '변동 없음')}",
+        "### 주요 지표",
+        "",
     ]
-    return header + "\n\n" + "\n\n".join(sections) + "\n"
+    lines.extend(_macro_dashboard_rows(payload["macro_dashboard"]))
+    lines.extend([
+        "",
+        "## 미국 거시 상황",
+        f"**국면**: {macro_us['regime']} (총점 {macro_us['score']}, 신뢰도 {macro_us['confidence']:.0f}%)",
+        f"**주요 신호**: {macro_us.get('transition', '변동 없음')}",
+        "### 주요 지표",
+        "",
+    ])
+    lines.extend(_macro_dashboard_rows(payload["us_macro_dashboard"]))
+
+    # Add kr-us comparison
+    if kr_us_comparison.get("indicator_pairs"):
+        lines.extend([
+            "",
+            "## 한국 ↔ 미국 동향 분석",
+            f"**한국**: {kr_us_comparison.get('kr_regime')}, **미국**: {kr_us_comparison.get('us_regime')}",
+        ])
+
+    return "\n".join(lines)
+
+
+def _sk_hynix_decision_section(payload: dict) -> str:
+    """Section 2: SK Hynix 보유/매도 판단 (3-5 min read).
+
+    Decision engine output with macro-semiconductor linkage analysis, risk assessment,
+    FINAL DECISION (HOLD/BUY/SELL), and conditional triggers.
+    """
+    from engine.exporters.sk_hynix_decision import compute_sk_hynix_decision
+
+    decision = compute_sk_hynix_decision(payload)
+    personal = payload["personal"]
+    rate_analysis = payload.get("rate_analysis", {})
+
+    # Decision signal with emoji
+    signal_emoji = {"HOLD": "🟢", "BUY": "📈", "SELL": "📉"}
+    signal_text = signal_emoji.get(decision.signal, "?") + " " + decision.signal
+
+    lines = [
+        "# 2. SK Hynix 보유/매도 판단",
+        "",
+        f"**최종 의사결정: [{signal_text}] (신뢰도 {decision.confidence:.0f}%)**",
+        f"**근거**: {decision.rationale}",
+        "",
+        "## 현재 상태",
+        f"- 보유 수량: 1,200주",
+        f"- 반도체 점수: {_fmt(personal.get('semiconductor_score'))} ({personal.get('semiconductor_band')})",
+        f"- 금리 환경: {_fmt(rate_analysis.get('total_score'), '/100점')} ({_interpret_rate_score(rate_analysis.get('total_score', 50))})",
+        "",
+        "## 거시-반도체 연결 분석",
+        f"{decision.macro_linkage}",
+        "",
+        "## 위험 신호",
+        "",
+    ]
+
+    if decision.risk_flags:
+        for flag in decision.risk_flags:
+            lines.append(f"- ⚠️ {flag}")
+    else:
+        lines.append("- 주요 위험 신호 없음")
+
+    # Conditional triggers
+    if decision.triggers:
+        lines.extend([
+            "",
+            "## 조건부 액션 트리거",
+            "",
+        ])
+        for trigger in decision.triggers:
+            action_emoji = "📍" if "매수" in trigger.get("action", "") else "❌" if "매도" in trigger.get("action", "") else "⏸"
+            price_note = f" (기준가: {trigger.get('price_level')}K)" if trigger.get("price_level") else ""
+            lines.append(f"**{trigger.get('condition')}**")
+            lines.append(f"  {action_emoji} {trigger.get('action')}{price_note}")
+            lines.append("")
+
+    lines.extend([
+        "## 다음 재점검 시기",
+        f"{decision.next_check}",
+        "",
+    ])
+
+    return "\n".join(lines)
+
+
+def _real_estate_decision_section(payload: dict) -> str:
+    """Section 3: 부동산 진입/대기 판단 (3-5 min read).
+
+    Decision engine output with macro-real estate linkage, current housing status,
+    FINAL DECISION (WAIT/ENTER), and event-based triggers.
+    """
+    from engine.exporters.real_estate_decision import compute_real_estate_decision
+
+    decision = compute_real_estate_decision(payload)
+    rate_analysis = payload.get("rate_analysis", {})
+    housing = payload.get("housing", {})
+
+    # Decision signal with emoji
+    signal_emoji = {"WAIT": "⏸", "ENTER": "🚀"}
+    signal_text = signal_emoji.get(decision.signal, "?") + " " + decision.signal
+
+    lines = [
+        "# 3. 부동산 진입/대기 판단",
+        "",
+        f"**최종 의사결정: [{signal_text}] (신뢰도 {decision.confidence:.0f}%)**",
+        f"**근거**: {decision.rationale}",
+        "",
+        "## 현재 상황",
+        f"- 거주 현황: {decision.current_situation}",
+        f"- 금리 환경: {_fmt(rate_analysis.get('total_score'), '/100점')} ({_interpret_rate_score(rate_analysis.get('total_score', 50))})",
+        "",
+        "## 거시-부동산 연결 분석",
+        f"{decision.macro_linkage}",
+        "",
+        "## 주요 이벤트 트리거",
+        "",
+    ]
+
+    if decision.event_triggers:
+        for trigger in decision.event_triggers[:4]:  # Top 4 triggers
+            urgency_emoji = "🔥" if trigger.get("urgency") == "최고" else "⚡" if trigger.get("urgency") == "높음" else "👀"
+            lines.append(f"**{urgency_emoji} {trigger.get('event')}**")
+            lines.append(f"  → {trigger.get('action')}")
+            lines.append("")
+    else:
+        lines.append("- 현재 활성 이벤트 없음 (정기 모니터링 중)")
+
+    lines.extend([
+        "## 다음 재점검 시기",
+        f"{decision.next_check}",
+        "",
+    ])
+
+    return "\n".join(lines)
+
+
+def _unified_action_plan_section(payload: dict) -> str:
+    """Section 4: 통합 액션 플랜 (2 min read).
+
+    Consolidated action checklist derived from SK Hynix decision + real estate decision + macro signals.
+    """
+    lines = [
+        "# 4. 통합 액션 플랜",
+        "",
+    ]
+
+    actions = payload.get("actions", [])
+    if not actions:
+        lines.append("- 이번 달은 별도로 즉시 실행할 액션이 없습니다.")
+        lines.append("")
+        return "\n".join(lines)
+
+    # Group by priority
+    tiers = [
+        (5, "🔴 반드시 확인 / 실행"),
+        (4, "🟠 검토 필요"),
+        (3, "🟡 관찰"),
+    ]
+    actions_by_tier = {t: [] for t, _ in tiers}
+    for a in actions:
+        actions_by_tier.setdefault(a["priority"], []).append(a)
+
+    for tier, tier_label in tiers:
+        items = actions_by_tier.get(tier, [])
+        if not items:
+            continue
+        lines.append(f"## {tier_label}")
+        lines.append("")
+        for a in items[:3]:  # Top 3 per tier
+            lines.append(f"- **{a['title']}**")
+            lines.append(f"  사유: {a.get('reason', 'N/A')}")
+            lines.append("")
+
+    return "\n".join(lines)
+
+
+def _decision_rationale_summary(payload: dict) -> str:
+    """Section 5: 의사결정 기저 (3-line summary).
+
+    One-line summary per decision (SK Hynix, Real Estate), plus one-line next focus.
+    """
+    from engine.exporters.sk_hynix_decision import compute_sk_hynix_decision
+    from engine.exporters.real_estate_decision import compute_real_estate_decision
+
+    hynix_decision = compute_sk_hynix_decision(payload)
+    realestate_decision = compute_real_estate_decision(payload)
+    macro = payload["macro"]
+
+    lines = [
+        "# 5. 의사결정 기저 (3줄 요약)",
+        "",
+        "## 이번 달 최종 판단",
+        "",
+        f"**SK Hynix**: {hynix_decision.rationale}",
+        f"**부동산**: {realestate_decision.rationale}",
+        f"**거시 신호**: {_one_line_macro_summary(macro)}",
+        "",
+        "## 다음 주 우선 포커스",
+        "",
+        f"- {macro['warnings'][0] if macro.get('warnings') else '거시 신뢰도 변화 추이'}",
+        f"- SK Hynix {hynix_decision.next_check.split(';')[0]}",
+        f"- 부동산 {realestate_decision.next_check.split(';')[0]}",
+        "",
+    ]
+
+    return "\n".join(lines)
+
+
+def _interpret_rate_score(score: float | int) -> str:
+    """Interpret rate score as human-readable text."""
+    if score >= 80:
+        return "극도 완화"
+    elif score >= 70:
+        return "완화 사이클"
+    elif score >= 55:
+        return "중립"
+    elif score >= 40:
+        return "긴축 사이클"
+    else:
+        return "극도 긴축"
+
+
+def _one_line_macro_summary(macro: dict) -> str:
+    """Generate one-line macro summary for decision section."""
+    regime = macro.get("regime", "불명")
+    confidence = macro.get("confidence", 0)
+    transition = macro.get("transition", "")
+
+    if transition:
+        return f"거시 {transition} (신뢰도 {confidence:.0f}%)"
+    else:
+        return f"거시 {regime} 국면 유지 (신뢰도 {confidence:.0f}%)"
+
+
+def render_markdown(payload: dict) -> str:
+    """Render PEOS report using new 5-section user-centric structure.
+
+    Section 1: 거시 경제 대시보드 (macro indicators & regimes)
+    Section 2: SK Hynix 보유/매도 판단 (decision engine + triggers)
+    Section 3: 부동산 진입/대기 판단 (decision engine + event triggers)
+    Section 4: 통합 액션 플랜 (unified actions from both decisions)
+    Section 5: 의사결정 기저 (3-line summary + next focus)
+
+    Legacy sections kept for reference (append at end):
+    - Rate analysis, CCI analysis, real estate trends, personal analysis, calendar
+    """
+    header = f"# PEOS 일일 리포트 - {payload['report_month']}\n"
+
+    # NEW 5-SECTION STRUCTURE (Primary Report)
+    main_sections = [
+        _macro_dashboard_section(payload),
+        _sk_hynix_decision_section(payload),
+        _real_estate_decision_section(payload),
+        _unified_action_plan_section(payload),
+        _decision_rationale_summary(payload),
+    ]
+
+    # LEGACY SECTIONS (Appendix for detailed reference)
+    legacy_sections = [
+        _executive_summary(payload),
+        _monthly_key_changes(payload),
+        _rate_analysis(payload),
+        _cci_analysis(payload),
+        _indicator_deep_dive(payload),
+        _personal_analysis(payload),
+        _asset_impact(payload),
+        _scenario_analysis(payload),
+        _discussion_points(payload),
+        _calendar(payload),
+        _personal_brief(payload),
+        _appendix(payload),
+    ]
+
+    # Filter out empty legacy sections
+    legacy_sections = [s for s in legacy_sections if s]
+
+    # Combine sections
+    all_sections = main_sections + (
+        ["\n# Appendix — 상세 분석\n"] + legacy_sections if legacy_sections else []
+    )
+
+    return header + "\n\n" + "\n\n".join(all_sections) + "\n"
