@@ -174,6 +174,31 @@ Sachs Global Investment Research**, 데이터 소스 Quantiwise):
 제공). 상세 조사는
 [sources/kospi-forward-per-band-chart-2026-08-09.md](../../sources/kospi-forward-per-band-chart-2026-08-09.md) 참고.
 
+### 일일 근사 추적 방법론 (2026-08-09 추가)
+
+실제 Quantiwise forward PE는 자동 수집 불가하지만, "forward EPS(분모)가
+앵커 시점 이후 크게 변하지 않았다"는 가정 하에 **KOSPI 지수 변화율만으로
+근사치를 매일 역산**할 수 있다:
+
+```
+근사 forward PE(t) = 6.65 × KOSPI(t) / 7,769.16
+```
+
+- **앵커**: 2026-07-02 09:51 KST 장중 스냅샷 7,769.16 (웹검색으로 확인된
+  유일한 실측치 — 정확한 종가는 이 환경에서 확인 불가, 매도 사이드카
+  발동 시점 값). Forward PE 6.65배·-2.7표준편차는 원본 차트 기준.
+- **한계 (중요)**: ① 앵커가 종가가 아니라 장중 값이라 오차 있음.
+  ② SK하이닉스 등 주요 기업 2Q 실적 발표(7/29)가 앵커 이후에 있어
+  실제 컨센서스 EPS가 리비전됐을 수 있음 — 그 경우 이 근사치는 실제
+  Quantiwise 값과 갈수록 벌어짐. **정밀치가 아니라 방향성 참고용.**
+- 계산 스크립트: `scripts/kospi_valuation_tracker.py` (입력:
+  `sources/kr-index-quote.csv` KIS API 일일 실측 → 출력:
+  `sources/kospi-forward-pe-approx.csv`)
+- **일일 추적 현황**: [monitoring/kospi-valuation-tracker-status.md](../monitoring/kospi-valuation-tracker-status.md) —
+  2026-08-08 최신 근사치 5.36배, 앵커(6.65배) 대비 -19.44%, 20년 평균
+  대비 -46.43%. 즉 7/2 스냅샷 이후에도 지수가 추가로 더 빠지면서 근사
+  밸류에이션은 그 시점보다 더 저평가된 방향으로 이동.
+
 ## 다른 프레임워크와의 관계
 
 - [ROIC를 투자의 핵심 기준으로 보기](roic-as-investment-criterion.md): 이 페이지의
