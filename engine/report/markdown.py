@@ -933,6 +933,194 @@ def _one_line_macro_summary(macro: dict) -> str:
         return f"거시 {regime} 국면 유지 (신뢰도 {confidence:.0f}%)"
 
 
+def _monthly_rolling_window_section(payload: dict) -> str:
+    """Generate monthly rolling window section.
+
+    Shows month-over-month signal evolution, confidence trends, and comparisons.
+    """
+    rolling_windows = payload.get("rolling_windows", {})
+
+    if not rolling_windows or rolling_windows.get("status") in ("no_signals", "error"):
+        return ""
+
+    monthly_data = rolling_windows.get("monthly", {})
+    current = monthly_data.get("current")
+    previous = monthly_data.get("previous")
+    comparison = monthly_data.get("comparison", (None, None))
+
+    if not current:
+        return ""
+
+    # Build markdown for monthly rolling window
+    lines = [
+        "## 📅 월별 신호 추이 (월간 롤링 윈도우)",
+        "",
+        f"**기간**: {current.get('start_date', 'N/A')} ~ {current.get('end_date', 'N/A')} ({current.get('days_recorded', 0)}일 기록)",
+        "",
+    ]
+
+    # SK Hynix monthly analysis
+    lines.extend([
+        "### SK Hynix: 월간 추이",
+        "",
+        "| 지표 | 값 |",
+        "|------|--------|",
+        f"| 주요신호 | {current.get('sk_hynix_primary_signal', 'N/A')} |",
+        f"| 평균신뢰도 | {current.get('sk_hynix_avg_confidence', 0):.1f}% {current.get('sk_hynix_confidence_trend', '→')} |",
+        f"| HOLD | {current.get('sk_hynix_signal_counts', {}).get('HOLD', 0)}일 |",
+        f"| BUY | {current.get('sk_hynix_signal_counts', {}).get('BUY', 0)}일 |",
+        f"| SELL | {current.get('sk_hynix_signal_counts', {}).get('SELL', 0)}일 |",
+        "",
+    ])
+
+    # Real Estate monthly analysis
+    lines.extend([
+        "### 부동산: 월간 추이",
+        "",
+        "| 지표 | 값 |",
+        "|------|--------|",
+        f"| 주요신호 | {current.get('real_estate_primary_signal', 'N/A')} |",
+        f"| 평균신뢰도 | {current.get('real_estate_avg_confidence', 0):.1f}% {current.get('real_estate_confidence_trend', '→')} |",
+        f"| WAIT | {current.get('real_estate_signal_counts', {}).get('WAIT', 0)}일 |",
+        f"| ENTER | {current.get('real_estate_signal_counts', {}).get('ENTER', 0)}일 |",
+        "",
+    ])
+
+    # Month-over-month comparison
+    if previous and comparison[0] is not None:
+        sk_compare, re_compare = comparison
+        lines.extend([
+            "### 이전 달 대비 변화",
+            "",
+            f"- **SK Hynix**: {sk_compare.upper()} (이전 달: {previous.get('sk_hynix_primary_signal', 'N/A')} {previous.get('sk_hynix_avg_confidence', 0):.1f}%)",
+            f"- **부동산**: {re_compare.upper()} (이전 달: {previous.get('real_estate_primary_signal', 'N/A')} {previous.get('real_estate_avg_confidence', 0):.1f}%)",
+            "",
+        ])
+
+    return "\n".join(lines)
+
+
+def _quarterly_rolling_window_section(payload: dict) -> str:
+    """Generate quarterly rolling window section.
+
+    Shows quarter-over-quarter signal evolution and structural changes.
+    """
+    rolling_windows = payload.get("rolling_windows", {})
+
+    if not rolling_windows or rolling_windows.get("status") in ("no_signals", "error"):
+        return ""
+
+    quarterly_data = rolling_windows.get("quarterly", {})
+    current = quarterly_data.get("current")
+    previous = quarterly_data.get("previous")
+    comparison = quarterly_data.get("comparison", (None, None))
+
+    if not current:
+        return ""
+
+    # Build markdown for quarterly rolling window
+    lines = [
+        "## 📊 분기별 신호 추이 (분기 롤링 윈도우)",
+        "",
+        f"**기간**: {current.get('start_date', 'N/A')} ~ {current.get('end_date', 'N/A')} ({current.get('days_recorded', 0)}일 기록)",
+        "",
+    ]
+
+    # SK Hynix quarterly analysis
+    lines.extend([
+        "### SK Hynix: 분기 추이",
+        "",
+        "| 지표 | 값 |",
+        "|------|--------|",
+        f"| 주요신호 | {current.get('sk_hynix_primary_signal', 'N/A')} |",
+        f"| 평균신뢰도 | {current.get('sk_hynix_avg_confidence', 0):.1f}% {current.get('sk_hynix_confidence_trend', '→')} |",
+        f"| HOLD | {current.get('sk_hynix_signal_counts', {}).get('HOLD', 0)}일 |",
+        f"| BUY | {current.get('sk_hynix_signal_counts', {}).get('BUY', 0)}일 |",
+        f"| SELL | {current.get('sk_hynix_signal_counts', {}).get('SELL', 0)}일 |",
+        "",
+    ])
+
+    # Real Estate quarterly analysis
+    lines.extend([
+        "### 부동산: 분기 추이",
+        "",
+        "| 지표 | 값 |",
+        "|------|--------|",
+        f"| 주요신호 | {current.get('real_estate_primary_signal', 'N/A')} |",
+        f"| 평균신뢰도 | {current.get('real_estate_avg_confidence', 0):.1f}% {current.get('real_estate_confidence_trend', '→')} |",
+        f"| WAIT | {current.get('real_estate_signal_counts', {}).get('WAIT', 0)}일 |",
+        f"| ENTER | {current.get('real_estate_signal_counts', {}).get('ENTER', 0)}일 |",
+        "",
+    ])
+
+    # Quarter-over-quarter comparison
+    if previous and comparison[0] is not None:
+        sk_compare, re_compare = comparison
+        lines.extend([
+            "### 이전 분기 대비 변화",
+            "",
+            f"- **SK Hynix**: {sk_compare.upper()} (이전 분기: {previous.get('sk_hynix_primary_signal', 'N/A')} {previous.get('sk_hynix_avg_confidence', 0):.1f}%)",
+            f"- **부동산**: {re_compare.upper()} (이전 분기: {previous.get('real_estate_primary_signal', 'N/A')} {previous.get('real_estate_avg_confidence', 0):.1f}%)",
+            "",
+        ])
+
+    return "\n".join(lines)
+
+
+def _year_to_date_window_section(payload: dict) -> str:
+    """Generate year-to-date rolling window section.
+
+    Shows full-year trend from Q1 baseline.
+    """
+    rolling_windows = payload.get("rolling_windows", {})
+
+    if not rolling_windows or rolling_windows.get("status") in ("no_signals", "error"):
+        return ""
+
+    ytd_data = rolling_windows.get("ytd", {})
+    current = ytd_data.get("current")
+
+    if not current:
+        return ""
+
+    # Build markdown for YTD rolling window
+    lines = [
+        "## 📈 연간 신호 추이 (연초 이래 누적)",
+        "",
+        f"**기간**: {current.get('start_date', 'N/A')} ~ {current.get('end_date', 'N/A')} ({current.get('days_recorded', 0)}일 기록)",
+        "",
+    ]
+
+    # SK Hynix YTD analysis
+    lines.extend([
+        "### SK Hynix: 연간 누적 추이",
+        "",
+        "| 지표 | 값 |",
+        "|------|--------|",
+        f"| 주요신호 | {current.get('sk_hynix_primary_signal', 'N/A')} |",
+        f"| 평균신뢰도 | {current.get('sk_hynix_avg_confidence', 0):.1f}% {current.get('sk_hynix_confidence_trend', '→')} |",
+        f"| HOLD | {current.get('sk_hynix_signal_counts', {}).get('HOLD', 0)}일 |",
+        f"| BUY | {current.get('sk_hynix_signal_counts', {}).get('BUY', 0)}일 |",
+        f"| SELL | {current.get('sk_hynix_signal_counts', {}).get('SELL', 0)}일 |",
+        "",
+    ])
+
+    # Real Estate YTD analysis
+    lines.extend([
+        "### 부동산: 연간 누적 추이",
+        "",
+        "| 지표 | 값 |",
+        "|------|--------|",
+        f"| 주요신호 | {current.get('real_estate_primary_signal', 'N/A')} |",
+        f"| 평균신뢰도 | {current.get('real_estate_avg_confidence', 0):.1f}% {current.get('real_estate_confidence_trend', '→')} |",
+        f"| WAIT | {current.get('real_estate_signal_counts', {}).get('WAIT', 0)}일 |",
+        f"| ENTER | {current.get('real_estate_signal_counts', {}).get('ENTER', 0)}일 |",
+        "",
+    ])
+
+    return "\n".join(lines)
+
+
 def render_markdown(payload: dict) -> str:
     """Render PEOS report using new 5-section user-centric structure.
 
@@ -947,12 +1135,15 @@ def render_markdown(payload: dict) -> str:
     """
     header = f"# PEOS 일일 리포트 - {payload['report_month']}\n"
 
-    # NEW 5-SECTION STRUCTURE + ECONOMIC EVENTS (Primary Report)
+    # NEW 5-SECTION STRUCTURE + ECONOMIC EVENTS + ROLLING WINDOWS (Primary Report)
     main_sections = [
         _macro_dashboard_section(payload),
         _sk_hynix_decision_section(payload),
         _real_estate_decision_section(payload),
         generate_event_section(payload),  # 경제 달력 통합 (Section 3.5)
+        _monthly_rolling_window_section(payload),  # 월별 추이 (Section 4)
+        _quarterly_rolling_window_section(payload),  # 분기별 추이 (Section 5)
+        _year_to_date_window_section(payload),  # 연간 누적 (Section 6)
         _unified_action_plan_section(payload),
         _decision_rationale_summary(payload),
     ]

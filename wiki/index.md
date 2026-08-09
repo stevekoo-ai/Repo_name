@@ -58,9 +58,9 @@ Catalog of every page in the wiki. See `../CLAUDE.md` for conventions.
 
 #### Phase 3a+3b: Economic Events & Rolling Aggregation (Complete — 2026-08-09)
 
-- [PEOS Phase 3 Completion Summary](concepts/peos-phase-3-completion-summary.md) — 🆕 2026-08-09, Phase 3a(경제달력) + 3b(신호추이) 완료 종합 문서. 문제정의·구현상세·테스트결과·영향분석·아키텍처·Phase 3c 로드맵 포함.
+- [PEOS Phase 3 Completion Summary](concepts/peos-phase-3-completion-summary.md) — 🆕 2026-08-09, Phase 3a(경제달력) + 3b(신호추이) + 3c(보고서통합) ✅ COMPLETE. 문제정의·구현상세·테스트결과·영향분석·아키텍처 포함. 3c: payload.py 신호자동기록 + markdown.py 롤링윈도우섹션(Section 4-6) + GitHub Actions 신호저장 통합 완료.
 - [Economic Calendar Framework](concepts/economic-events-framework.md) — Phase 3a, CPI/PPI·기준금리·고용 이벤트의 SK/RE 신호 영향도 매핑, Downside/Base/Upside 시나리오 계획, 사후분석 체크리스트. engine/report/economic_events.py(290줄, 신호변환로직 포함) 모듈 + Section 3.5 보고서 통합 완료.
-- [Rolling Aggregation Framework](concepts/rolling-aggregation-framework.md) — Phase 3b, 일일 신호 기록 → 롤링윈도우(주/월/분기/연) 집계 → 추이 감지(↑/→/↓). engine/report/signal_recorder.py(CSV append-only 저장) + engine/report/rolling_aggregator.py(집계·비교·markdown) 모듈, 7/7 테스트 pass. Phase 3c: payload.py + markdown.py 통합 남음.
+- [Rolling Aggregation Framework](concepts/rolling-aggregation-framework.md) — Phase 3b + 3c ✅ COMPLETE, 일일 신호 기록 → 롤링윈도우(주/월/분기/연) 집계 → 추이 감지(↑/→/↓). engine/report/signal_recorder.py(CSV append-only 저장) + engine/report/rolling_aggregator.py(집계·비교·markdown) 모듈 + payload.py 신호자동기록 + markdown.py 월간/분기/연간 섹션(Section 4-6) 추가 완료.
 
 #### Architecture & Knowledge Model (4-Layer System Foundation — 2026-08-08)
 

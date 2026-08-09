@@ -296,6 +296,76 @@ def build_report_payload(month_key: str | None = None) -> dict:
         log_event("real_estate_decision.failed", error=str(exc), level="warning")
         payload["real_estate_decision"] = None
 
+    # Record daily signal (Phase 3c: Signal Persistence)
+    try:
+        from engine.report.signal_recorder import record_daily_signal
+
+        sk_signal = payload["sk_hynix_decision"].signal if payload.get("sk_hynix_decision") else "HOLD"
+        sk_confidence = payload["sk_hynix_decision"].confidence if payload.get("sk_hynix_decision") else 50.0
+        re_signal = payload["real_estate_decision"].signal if payload.get("real_estate_decision") else "WAIT"
+        re_confidence = payload["real_estate_decision"].confidence if payload.get("real_estate_decision") else 50.0
+
+        today = date.today().isoformat()
+        record_daily_signal(
+            date=today,
+            sk_hynix_signal=sk_signal,
+            sk_hynix_confidence=sk_confidence,
+            real_estate_signal=re_signal,
+            real_estate_confidence=re_confidence,
+            notes=f"Recorded from PEOS pipeline ({month_key})"
+        )
+        log_event("daily_signal.recorded", date=today, sk_signal=sk_signal, re_signal=re_signal)
+    except Exception as exc:
+        log_event("daily_signal.failed", error=str(exc), level="warning")
+
+    # Add rolling aggregation (Phase 3c: Signal Trending)
+    try:
+        from engine.report.signal_recorder import load_signals
+        from engine.report.rolling_aggregator import aggregate_signals_by_period, compare_periods
+
+        # Load signals from past 90 days
+        signals = load_signals()
+
+        # Aggregate into periods
+        if signals:
+            monthly_periods = aggregate_signals_by_period(signals, "month")
+            quarterly_periods = aggregate_signals_by_period(signals, "quarter")
+
+            # Build rolling windows dict
+            rolling_windows = {
+                "status": "ok",
+                "signals_count": len(signals),
+                "monthly": {
+                    "current": monthly_periods[-1].__dict__ if monthly_periods else None,
+                    "previous": monthly_periods[-2].__dict__ if len(monthly_periods) > 1 else None,
+                    "comparison": (
+                        compare_periods(monthly_periods[-1], monthly_periods[-2])
+                        if len(monthly_periods) > 1 else (None, None)
+                    ),
+                },
+                "quarterly": {
+                    "current": quarterly_periods[-1].__dict__ if quarterly_periods else None,
+                    "previous": quarterly_periods[-2].__dict__ if len(quarterly_periods) > 1 else None,
+                    "comparison": (
+                        compare_periods(quarterly_periods[-1], quarterly_periods[-2])
+                        if len(quarterly_periods) > 1 else (None, None)
+                    ),
+                },
+                "ytd": {
+                    "current": quarterly_periods[-1].__dict__ if quarterly_periods and len(quarterly_periods) >= 4 else None,
+                }
+            }
+            payload["rolling_windows"] = rolling_windows
+            log_event("rolling_windows.computed", signals_count=len(signals),
+                      monthly_count=len(monthly_periods), quarterly_count=len(quarterly_periods))
+        else:
+            payload["rolling_windows"] = {"status": "no_signals", "note": "신호 데이터 없음"}
+            log_event("rolling_windows.skipped", reason="no_signals")
+
+    except Exception as exc:
+        log_event("rolling_windows.failed", error=str(exc), level="warning")
+        payload["rolling_windows"] = {"status": "error", "error": str(exc)}
+
     log_event("report_payload.built", month=month_key, readiness=readiness, action_count=len(actions))
     return payload
 
