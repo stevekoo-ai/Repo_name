@@ -1,7 +1,7 @@
 오늘 자 데일리 브리프 보고서를 자율 사이클로 완성·발송해. CLAUDE.md와 위키는 이미 자동 로드됐으므로 그 맥락을 그대로 활용해.
 
 절차 (순서대로):
-1. `git fetch origin && git checkout claude/ai-agent-impl-002tip && git pull --rebase origin claude/ai-agent-impl-002tip` 로 회사망→GitHub GET(73KB 제약 없음)으로 최신 DB md 파일 회수. (실패 시 git status로 원인 확인, 위키 페이지가 낡으면 보고서 품질이 떨어지므로 반드시 최신화.)
+1. `git fetch origin && git checkout claude/ai-agent-impl-002tip && git pull --rebase origin claude/ai-agent-impl-002tip` 로 회사망→GitHub GET(73KB 제약 없음)으로 최신 DB md 파일 회수. (실패 시 git status로 원인 확인, 위키 페이지가 낡으면 보고서 품질이 떨어지므로 반드시 최신화.) 이 pull로 `docs/clock.png`, `sources/macro-series.csv`, `sources/kospi-forward-pe-approx.csv`, `data/normalized/molit_*.csv`, `sources/hyperscaler-capex.csv`도 함께 회수됨 — 아래 §데이터 소스 카드 5종의 원자료.
 2. 위키 맥락 종합 → 오늘 데일리 브리프 HTML 작성 → `report/daily-brief-YYYY-MM-DD.html` 저장.
 3. `python dispatch.sh report/daily-brief-YYYY-MM-DD.html` 실행 (gzip+base64 → repository_dispatch 발송).
 
@@ -14,7 +14,7 @@
 - 카드: bg-white rounded-2xl shadow-card border border-gray-100, hover 시 translateY(-3px)+인디고 글로우 shadow-hover.
 - pill chips, row-h hover(배경 #eef2ff), fade-in 애니메이션, auto-pill(ap-green/ap-red/ap-yellow) 출처 라벨.
 - 다크 테마 절대 금지. 미니멀 화이트 + 인디고 포인트만.
-- 레이아웃 순서: HERO(제목+메타 pill) → 통합 한 줄 진단 → 핵심 지표 카드 4종 → 거시(PEOS) → SK하이닉스 → HBM Cycle Score → 정치 오버레이 → 다음 관전 포인트 → 품질기준 폴더블.
+- 레이아웃 순서: HERO(제목+메타 pill) → 통합 한 줄 진단 → 핵심 지표 카드 4종 → 거시(PEOS) → **투자시계 서브모듈(시계 이미지)** → **거시지표 근거데이터** → **KOSPI Forward PE 근사 추적(그래프)** → SK하이닉스 → HBM Cycle Score → **SEC EDGAR CapEx** → **부동산 시장** → 정치 오버레이 → 다음 관전 포인트 → 품질기준 폴더블.
 
 ==============================
 데이터 품질 기준 (반드시 반영)
@@ -34,6 +34,35 @@
 - fundamentals-vs-sentiment-derating, situational-awareness-fund-liquidation — 신중론·숏커버링 일회성 가능성 등 균형 시각.
 
 핵심: 단순 데이터 나열 금지. 데이터에 대한 "평가/해석"을 반드시 포함 — 왜 이 숫자가 중요한지, 어느 붕괴조건/찐반등 신호와 연결되는지, 외부 소스(Edgewater 등)와 교차검증되는지 서술. "오늘의 한 줄 진단" 카드에 핵심 인과(거시→정치→가격 사슬)를 한 문장으로 압축.
+
+==============================
+§ 데이터 소스 카드 5종 (2026-08-09 신설 — 반드시 포함, 매 발행 필수)
+==============================
+
+**① 투자시계 서브모듈** (docs/index.html·docs/clock.png 기반, 🟢 자동화)
+- `docs/clock.png`를 **base64 data URI로 인라인**해서 `<img src="data:image/png;base64,...">`로 삽입할 것 — 이메일 첨부로 발송되므로 외부/상대경로 이미지 참조는 클라이언트에서 깨진다. 절대 `<img src="../docs/clock.png">` 같은 상대경로 쓰지 말 것.
+- `docs/index.html`을 Read해서 현재 국면명(phase name/name_kr), favor asset, Growth/Inflation label·변화량을 텍스트로 함께 표기.
+- 완전 별도 워크플로우(`daily-clock-report.yml`, 매일 08:00 KST)의 산출물이므로 데일리 브리프 실행 시점 기준 "최신" 값을 그대로 인용하되, 카드 하단에 실행 시각(파일 mtime 또는 index.html 내 timestamp) 명시 — 데일리 브리프보다 오래된 값일 수 있음을 투명하게 표기.
+
+**② 거시지표 근거데이터** (sources/macro-series.csv 기반, 🟢 자동화)
+- 이 CSV는 macro-regime-history/macro-indicators 위키 해석의 **원자료**임 — 위키 서사만 인용하지 말고 최신 실측값을 직접 병기: kr_base_rate(한은 기준금리), kr_usdkrw(환율), us_fed_funds(연준 기준금리), us_cpi, us_unemployment, us_wti/us_brent(유가), us_gdp_real.
+- 각 시리즈의 `date`(집계월)와 `fetched_at`(수집시각)을 함께 표시해 데이터 시차(예: GDP는 분기 지연 발표)를 숨기지 말 것.
+
+**③ KOSPI Forward PE 근사 추적** (sources/kospi-forward-pe-approx.csv 기반, 🟢 자동화 + ⚠️ 근사치)
+- `sources/kospi-forward-pe-approx.csv`의 전체 행을 **인라인 SVG 꺾은선 그래프**로 그릴 것 — Tailwind 카드 안에 `<svg viewBox="...">`로 직접 좌표 계산해 삽입(외부 차트 라이브러리 금지, self-contained). 참고 구현: `monitoring/kospi-valuation-tracker-status.md`에 링크된 아티팩트(앵커 다이아몬드 마커 + 트렌드 실선 + 데이터갭 점선 + 20년평균/±1SD 참조선 구성)를 그대로 준용.
+- 앵커(2026-07-02, 6.65배, Goldman Sachs/Quantiwise)를 별도 마커로 표시하고 최신 근사치와의 괴리율(%)을 카드 헤드라인에 명시.
+- **반드시 근사치 한계를 카드 안에 짧게라도 명시**: "forward EPS 불변가정 근사치, 어닝시즌 이후 실제 컨센서스 리비전 미반영" — 이 문구 없이 정밀치처럼 제시 금지(2026-08-09 사용자 피드백: 근거 없는 확신 절대 금지).
+- Framework/방법론 상세: `concepts/rally-justification-analysis.md` §일일 근사 추적 방법론, 일일 이력: `monitoring/kospi-valuation-tracker-status.md`.
+
+**④ 부동산 시장** (data/normalized/molit_*.csv + monitoring/real-estate-automation-summary.md 기반, 🟢 자동화)
+- `data/normalized/molit_highlight_price_pyeong.csv`(전국 평당가 추이), `molit_highlight_volume.csv`(거래량 추이) 최신 3개월 값을 인용.
+- `monitoring/real-estate-automation-summary.md`의 자동화 완성도(현재 31%, 4/13 자동화)를 카드 하단에 병기해 "이 데이터만으로 경기판단 완결이 아님"을 매번 고지.
+- 부동산 decision tracker(`monitoring/real-estate-decision-tracker.md`)가 아직 pending 상태면 그 사실도 함께 밝힐 것 — 신호가 있는 것처럼 지어내지 말 것.
+
+**⑤ SEC EDGAR CapEx** (sources/hyperscaler-capex.csv 기반, 🟢 자동화 + 🔴 LLM 영향판단)
+- 4개 하이퍼스케일러(MSFT/GOOGL/AMZN/META) 최신 분기 CapEx를 표로 인용.
+- **하이라이트 로직**: `report/daily-brief-*.html` 중 오늘 것을 제외한 가장 최근 파일을 Read해서 그때 인용했던 CapEx 수치와 비교. 새 분기 데이터가 추가됐거나 값이 바뀌었으면 🆕 라벨 + 인디고 강조 카드로 배치하고, HBM/서버 D램 수요에 미치는 영향을 1~2문장으로 판단해 서술(예: "MSFT CapEx가 전분기 대비 +X% → HBM 수요 확장 신호, ASP 축 상향 가능성"). 변동 없으면 평시 라벨로만 표시하고 과장하지 말 것.
+- `sources/ai-periphery-fundamentals.csv`(AI 밸류체인 변두리 8개사)는 **아직 파일이 생성되지 않은 상태(2026-08-09 확인)** — 존재하면 인용, 없으면 이 카드에서 조용히 생략(에러로 만들지 말 것, 있는 척하지 말 것).
 
 ==============================
 절대 금지 (권한으로 차단돼 있지만 재확인)
