@@ -54,7 +54,7 @@ Catalog of every page in the wiki. See `../CLAUDE.md` for conventions.
 
 #### Personal Investment Decisions (User-Centric Decision Engines — 2026-08-09)
 
-- [SK Hynix Investment Thesis](concepts/sk-hynix-investment-thesis.md) — 🆕 2026-08-09, SK하이닉스 1,200주(180M원, 포트폴리오 35%) 보유/매도 의사결정 프레임워크. 거시국면(상승/조정/약세/위기) → 반도체밴드(양호/정상/부진/극악) → 금리환경(완화/중립/긴축) → 외부신호(외국인수급·HBM ASP·CapEx) 4계층 의사결정 로직 + 조건부 트리거(가격·신호). 일일 추적은 monitoring/sk-hynix-decision-tracker.md
+- [SK Hynix Investment Thesis](concepts/sk-hynix-investment-thesis.md) — 🆕 2026-08-09, SK하이닉스 1,200주(180M원, 포트폴리오 35%) 보유/매도 의사결정 프레임워크. 거시국면(상승/조정/약세/위기) → 반도체밴드(양호/정상/부진/극악) → 금리환경(완화/중립/긴축) → 외부신호(외국인수급·HBM ASP·CapEx) 4계층 의사결정 로직 + 조건부 트리거(가격·신호). 일일 추적은 monitoring/sk-hynix-decision-tracker.md. **🆕 같은 날 Layer 0(밸류에이션 밴드) 추가**: 사용자가 업로드한 외부(Gemini) 퀀트 시스템 스펙을 별도 파이프라인 대신 기존 엔진에 통합 — P/E Z-score 근사(rally-justification-analysis.md 이격도 시계열 기반, 현재 Z≈1.06 중립) + ERP(us_10y 신규 등록, 다음 macro-data-sync부터 산출). `engine/valuation/hynix_band.py`.
 - [Real Estate Market Entry Framework](concepts/real-estate-market-framework.md) — 🆕 2026-08-09, 부동산 시장 진입/대기 의사결정 프레임워크. 금리환경(완화/중립/긴축) → 거시국면(상승/조정/약세/위기) → 전세가 트렌드(상승/보합/하강) → 이벤트 트리거(기준금리 25bp인하·플랫폼시티 청약공시·강남전세가+5%) 4계층 의사결정 로직. 플랫폼시티 공공분양 추적 포함. 일일 추적은 monitoring/real-estate-decision-tracker.md
 - [Economic Calendar Framework](concepts/economic-events-framework.md) — 🆕 2026-08-09, 거시경제 이벤트(CPI/PPI·기준금리·고용) 통합 프레임워크. 사건 중요도 분류(🔴Critical/🟡High/🟢Medium) + 신호 영향도 매핑(SK하이닉스 HOLD/BUY/SELL ↔ 실제 차이 > 0.5%p) + 시나리오 계획(Downside/Base/Upside 확률·신호변화) + 사후분석 체크리스트. Phase 3a 구현: engine/report/economic_events.py 모듈 신설, Section 3.5로 보고서 통합. 일일 추적은 monitoring/economic-events-status.md
 

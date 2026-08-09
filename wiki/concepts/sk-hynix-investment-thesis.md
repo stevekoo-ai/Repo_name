@@ -15,6 +15,40 @@ The thesis bridges macro economic signals, semiconductor industry cycles (HBM ma
 
 ## Decision Hierarchy
 
+### Layer 0: Valuation Band (근사치, 2026-08-09 추가)
+
+**출처**: 사용자가 외부(Gemini 생성) 프로젝트 스펙(`Project_SKH_Alpha_Prompt.md`)을
+업로드하며 별도의 yfinance/DART 기반 독립 퀀트 시스템 구축을 요청 — 검토 결과
+기존 4계층 엔진과 중복되는 시스템이 될 위험이 커서(이미 거시국면 판정이
+G/I/L·Investment Clock·PEOS 3개로 나뉘어 혼란스러운 전례 있음), 사용자
+승인 하에 **새 지표(P/E Z-score, ERP)만 추출해 기존 엔진에 통합**하는
+방식으로 진행. 첨부 스펙의 나머지 지표(수출모멘텀·외국인수급)는 이미
+`hbm-cycle-score.md`·`macro-indicators.md`가 자동 추적 중이라 재사용.
+
+- **P/E Z-score(근사)**: 실제 P/E가 아니라 [rally-justification-analysis.md](rally-justification-analysis.md)의
+  이격도(divergence = log₁₀(주가지수) - log₁₀(영업이익지수), 24Q1=100 기준)
+  시계열의 Z-score. 실제 PER 계산에 필요한 발행주식수 시계열이 미검증
+  (2025 자사주 소각 ~2.1%, 2026 ADR 신주발행·자사주 매입 ~40조 등으로
+  최근 2년간 변동)이라 대체 채택 — 방향은 동일(양수=고평가 방향,
+  음수=저평가 방향)하나 절대 PER 수치는 아님.
+  - Z ≤ -1.5: 저평가 극단(밸류에이션 관점 매수 매력)
+  - Z ≥ +1.5: 고평가 극단(밸류에이션 관점 수익실현 검토)
+  - **2026-08-09 현재값: Z ≈ 1.06(중립)**, 26Q2(6월 말) 이격도 -0.108 —
+    26Q1(-0.207)보다 고평가 방향으로 이동(6월 사상최고 2,987,000원까지
+    선반영 랠리와 일치).
+  - ⚠️ 샘플 10개 분기뿐(24Q1~26Q2) — 표준 밴드(5~10년, 20~40분기) 대비
+    부족, 방향성 참고용.
+- **ERP(Equity Risk Premium)**: Earnings Yield(선행PER 6.8~6.9배 앵커 기반
+  근사) - 미국 10년물 국채(FRED DGS10). **2026-08-09 기준 아직 미산출**
+  — `us_10y` 시리즈를 `scripts/macro_data.py`에 신규 등록, `macro-data-sync.yml`
+  다음 실행부터 자동 수집 시작. ⚠️ 원화자산에 달러 무위험금리를 쓰는
+  방법론적 한계 있음(사용자 원안 그대로 채택 — 글로벌 반도체 밸류에이션
+  비교 관행).
+- **동작 방식**: 이 계층은 다른 계층의 신호를 뒤집지 않음 — 극단치일 때만
+  `risk_flags`/`triggers`에 참고 정보로 추가되고, confidence는 자동
+  조정하지 않는다(기계적 매도 자동집행 위험 방지, 최종 판단은 사람이).
+- 구현: `engine/valuation/hynix_band.py`, 원자료: `sources/sk-hynix-quarterly-fundamentals.csv`
+
 ### Layer 1: Macro Regime (Primary Driver)
 - **상승 (Bullish)**: Base case HOLD, BUY on dips if HBM score ≥ 양호
 - **조정 (Adjustment)**: Cautious HOLD, BUY if Kr confidence ≥ 70% + rate score ≥ 55
@@ -138,4 +172,7 @@ Each trigger fires only when its precondition is met. Prices are reference level
 - [SK Hynix Analyst Thesis Checkpoints](../entities/sk-hynix.md) — current state snapshot
 - [SK Hynix Decision Tracker](../monitoring/sk-hynix-decision-tracker.md) — daily decision log
 - [Korea Macro Regime](../entities/korea-macro-regime.md) — macro framework
+- [SK하이닉스 주가 상승의 정당성 분석](rally-justification-analysis.md) — Layer 0 divergence 시계열 원본
 - `engine/exporters/sk_hynix_decision.py` — decision engine implementation
+- `engine/valuation/hynix_band.py` — Layer 0 (P/E Z-score 근사 + ERP) 구현
+- `sources/sk-hynix-quarterly-fundamentals.csv` — Layer 0 원자료 (분기별 영업이익·종가)

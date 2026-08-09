@@ -748,6 +748,22 @@ def _sk_hynix_decision_section(payload: dict) -> str:
         f"- 반도체 점수: {_fmt(personal.get('semiconductor_score'))} ({personal.get('semiconductor_band')})",
         f"- 금리 환경: {_fmt(rate_analysis.get('total_score'), '/100점')} ({_interpret_rate_score(rate_analysis.get('total_score', 50))})",
         "",
+    ]
+
+    vb = decision.valuation_band or {}
+    if vb.get("pe_zscore") is not None:
+        lines.extend([
+            "## 밸류에이션 밴드 (Layer 0, 근사치)",
+            f"- P/E Z-score(근사): {vb['pe_zscore']:.2f} — {vb['band_label']} "
+            f"(기준: {vb.get('latest_quarter', '')} 이격도 {vb.get('latest_divergence', 0):.3f})",
+            f"- ERP: {vb.get('erp_pct'):.2f}%p" if vb.get("erp_pct") is not None
+            else f"- ERP: 미산출 ({vb.get('erp_note', '')})",
+        ])
+        for c in vb.get("caveats", []):
+            lines.append(f"  - ⚠️ {c}")
+        lines.append("")
+
+    lines += [
         "## 거시-반도체 연결 분석",
         f"{decision.macro_linkage}",
         "",
