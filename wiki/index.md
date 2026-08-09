@@ -43,9 +43,25 @@ Catalog of every page in the wiki. See `../CLAUDE.md` for conventions.
 - [SK하이닉스 분석가 의견 체크포인트 — 일일 상태](monitoring/sk-hynix-analyst-thesis-checkpoints-status.md) — 🆕 2026-08-08, 4-layer 구조화에 따라 concepts/sk-hynix-analyst-thesis-checkpoints.md에서 분리된 일일 체크 이력(append-only). 2026-07-15~08-06 40+ 항목 종합 검증(①ASP/②HBM4공급/③CapEx/⑥ADR/⑦CXMT 등), 체크포인트별 최신상태 + 분석가 의견 변동 추적. Framework 정의는 concepts/sk-hynix-analyst-thesis-checkpoints.md 참고
 - [트럼프 2026 중간선거 — 일일 추적 상태](monitoring/trump-midterm-tracker-status.md) — 🆕 2026-08-08, 4-layer 구조화에 따라 concepts/trump-midterm-tracker.md에서 분리된 일일 추적 데이터(append-only). 5개 카테고리(정치·경제·전쟁외교·이민·경쟁구도) × 4개 체크(2026-08-01/02주말·8/2저녁·8/5저녁·8/6저녁) 타임라인 테이블. Framework 정의는 concepts/trump-midterm-tracker.md 참고
 - [Situational Awareness 헤지펀드 청산 — 사건 진행](monitoring/situational-awareness-fund-liquidation-status.md) — 🆕 2026-08-08, 4-layer 구조화에 따라 concepts/situational-awareness-fund-liquidation.md에서 분리된 이벤트 타임라인(append-only). 2026-09 설립부터 7/30 시타델 인수까지 5개 주요 사건 + 규모 재검증(SK하이닉스 시총 1% 미만) 기록. Framework 정의는 concepts/situational-awareness-fund-liquidation.md 참고
+- [SK Hynix Daily Decision Tracker](monitoring/sk-hynix-decision-tracker.md) — 🆕 2026-08-09, SK하이닉스 보유/매도 의사결정 일일 추적(append-only). HOLD/BUY/SELL 신호, 신뢰도, 주요 드라이버(거시·반도체·금리), 조건부 트리거 기록. Framework 정의는 concepts/sk-hynix-investment-thesis.md 참고
+- [Real Estate Daily Decision Tracker](monitoring/real-estate-decision-tracker.md) — 🆕 2026-08-09, 부동산 시장 진입/대기 의사결정 일일 추적(append-only). WAIT/ENTER 신호, 신뢰도, 금리·거시·전세가 트렌드, 이벤트 트리거(기준금리·플랫폼시티 공시) 기록. Framework 정의는 concepts/real-estate-market-framework.md 참고
+- [Economic Calendar Status & Tracking](monitoring/economic-events-status.md) — 🆕 2026-08-09, 거시경제 이벤트 추적(append-only). 다음 14일 Critical 이벤트 테이블(미국CPI·한국은행기준금리·미국PPI)·Downside/Base/Upside 시나리오 확률·역사적 패턴 분석·신호변경이력·일일 모니터링 체크리스트. Framework 정의는 concepts/economic-events-framework.md 참고
+- [부동산 자동화 파이프라인 — 수집 현황 & 경기판단 데이터 갭 분석](monitoring/real-estate-automation-summary.md) — 🆕 2026-08-09, MOLIT 부동산 데이터 자동 수집 파이프라인 구축 완료 리포트. 현재 자동화 4개 지표(거래가·금리·통화·신용) + 미자동화 22개 항목 상세 분류(심리지수·신규공급·정책변수 등) + Phase 1~3 개발 로드맵. 경기판단 완성도 현재 31% (거래가+금리만으로는 부족), 우선 개발 순서 3단계 정의.
 
 
 ### concepts
+
+#### Personal Investment Decisions (User-Centric Decision Engines — 2026-08-09)
+
+- [SK Hynix Investment Thesis](concepts/sk-hynix-investment-thesis.md) — 🆕 2026-08-09, SK하이닉스 1,200주(180M원, 포트폴리오 35%) 보유/매도 의사결정 프레임워크. 거시국면(상승/조정/약세/위기) → 반도체밴드(양호/정상/부진/극악) → 금리환경(완화/중립/긴축) → 외부신호(외국인수급·HBM ASP·CapEx) 4계층 의사결정 로직 + 조건부 트리거(가격·신호). 일일 추적은 monitoring/sk-hynix-decision-tracker.md
+- [Real Estate Market Entry Framework](concepts/real-estate-market-framework.md) — 🆕 2026-08-09, 부동산 시장 진입/대기 의사결정 프레임워크. 금리환경(완화/중립/긴축) → 거시국면(상승/조정/약세/위기) → 전세가 트렌드(상승/보합/하강) → 이벤트 트리거(기준금리 25bp인하·플랫폼시티 청약공시·강남전세가+5%) 4계층 의사결정 로직. 플랫폼시티 공공분양 추적 포함. 일일 추적은 monitoring/real-estate-decision-tracker.md
+- [Economic Calendar Framework](concepts/economic-events-framework.md) — 🆕 2026-08-09, 거시경제 이벤트(CPI/PPI·기준금리·고용) 통합 프레임워크. 사건 중요도 분류(🔴Critical/🟡High/🟢Medium) + 신호 영향도 매핑(SK하이닉스 HOLD/BUY/SELL ↔ 실제 차이 > 0.5%p) + 시나리오 계획(Downside/Base/Upside 확률·신호변화) + 사후분석 체크리스트. Phase 3a 구현: engine/report/economic_events.py 모듈 신설, Section 3.5로 보고서 통합. 일일 추적은 monitoring/economic-events-status.md
+
+#### Phase 3a+3b: Economic Events & Rolling Aggregation (Complete — 2026-08-09)
+
+- [PEOS Phase 3 Completion Summary](concepts/peos-phase-3-completion-summary.md) — 🆕 2026-08-09, Phase 3a(경제달력) + 3b(신호추이) + 3c(보고서통합) ✅ COMPLETE. 문제정의·구현상세·테스트결과·영향분석·아키텍처 포함. 3c: payload.py 신호자동기록 + markdown.py 롤링윈도우섹션(Section 4-6) + GitHub Actions 신호저장 통합 완료.
+- [Economic Calendar Framework](concepts/economic-events-framework.md) — Phase 3a, CPI/PPI·기준금리·고용 이벤트의 SK/RE 신호 영향도 매핑, Downside/Base/Upside 시나리오 계획, 사후분석 체크리스트. engine/report/economic_events.py(290줄, 신호변환로직 포함) 모듈 + Section 3.5 보고서 통합 완료.
+- [Rolling Aggregation Framework](concepts/rolling-aggregation-framework.md) — Phase 3b + 3c ✅ COMPLETE, 일일 신호 기록 → 롤링윈도우(주/월/분기/연) 집계 → 추이 감지(↑/→/↓). engine/report/signal_recorder.py(CSV append-only 저장) + engine/report/rolling_aggregator.py(집계·비교·markdown) 모듈 + payload.py 신호자동기록 + markdown.py 월간/분기/연간 섹션(Section 4-6) 추가 완료.
 
 #### Architecture & Knowledge Model (4-Layer System Foundation — 2026-08-08)
 
