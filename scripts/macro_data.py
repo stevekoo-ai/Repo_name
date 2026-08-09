@@ -67,6 +67,10 @@ PRESETS = {
     # 번도 동기화되지 않았던 게 뒤늦게 발견됨 — PR #34로 main에 반영.
     "us_brent": ("fred", "DCOILBRENTEU", "브렌트유 현물(일별, $/배럴)", "검증됨(FRED 표준 series_id)"),
     "us_wti": ("fred", "DCOILWTICO", "WTI 현물(일별, $/배럴)", "검증됨(FRED 표준 series_id)"),
+    # 2026-08-09 추가 — SK Hynix Investment Thesis "Layer 0: Valuation Band"의
+    # ERP(Equity Risk Premium) 계산에 필요한 무위험금리. Earnings Yield(1/PER
+    # 근사) - 이 시리즈 = ERP. concepts/sk-hynix-investment-thesis.md 참고.
+    "us_10y": ("fred", "DGS10", "미국 10년물 국채금리(일별)", "검증됨(FRED 표준 series_id)"),
 }
 
 DEFAULT_LOOKBACK_DAYS = 3652  # 최초 백필 시 과거 10년치

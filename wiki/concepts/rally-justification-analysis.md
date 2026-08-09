@@ -1,8 +1,8 @@
 ---
 title: SK하이닉스 주가 상승의 정당성 — 버블 vs 실적 선행 분석
 created: 2026-07-22
-updated: 2026-07-24
-tags: [sk-hynix, valuation, bubble-analysis, per, roic, cycle]
+updated: 2026-08-09
+tags: [sk-hynix, valuation, bubble-analysis, per, roic, cycle, kospi]
 ---
 
 23Q1(HBM 매출 본격화 직전) 대비 26Q1까지의 누적 상승(주가 약 13.5배)이 세 가지
@@ -146,6 +146,58 @@ ASP 인상(+15~20% 프리미엄)**이 확인돼, 이미 진행 중인 분기의 
 컨센서스를 상회할 가능성을 시사하는 선행지표가 나왔다 — "26Q2~Q3 실적이
 다음 검증대"라는 위 유보 사항에 대한 긍정적 조기 신호. 상세는
 [sources/sk-hynix-memory-demand-analysis-2026-07-23.md](../../sources/sk-hynix-memory-demand-analysis-2026-07-23.md).
+
+## 코스피 지수 전체 밸류에이션 맥락 (2026-08-09 추가)
+
+SK하이닉스 개별 종목의 선행 PER 6.8~6.9배 저평가가 개별 현상인지,
+시장 전체의 밸류에이션 붕괴와 같은 방향인지 교차검증하는 자료.
+
+사용자 제보 차트("Exhibit 1: KOSPI 12m forward P/E hit the lowest level
+since the G.F.C amid the recent market volatility", 출처: **Goldman
+Sachs Global Investment Research**, 데이터 소스 Quantiwise):
+**KOSPI 12개월 선행 PER이 2026-07-02 기준 6.65배(-2.7 표준편차)로,
+2008년 금융위기(GFC) 이후 최저 수준**. 20년(2006~2026) 평균 PER
+약 10.0배, ±1 표준편차 밴드 8.8~11.2배 — 지금은 이 밴드를 크게
+벗어난 극단적 저평가 구간.
+
+**해석**: SK하이닉스 개별 종목의 저평가(체크포인트 ⑧ 마이크론 대비
+할인, 이 페이지의 divergence 게이지 전 구간 음수)가 종목 특이적
+현상이 아니라 **코스피 지수 전체가 겪고 있는 밸류에이션 디레이팅과
+같은 방향**이라는 뜻 — [펀더멘털 불변 vs 심리·수급발
+디레이팅](fundamentals-vs-sentiment-derating.md) 프레임을 지수
+레벨에서도 뒷받침하는 근거. 다만 이 지수 차원의 저평가가 SK하이닉스
+때문인지(시총 비중이 커서 지수를 끌어내림), 시장 전반의 별개 요인
+때문인지는 이 자료만으로는 분리되지 않음 — 별도 검증 필요.
+
+**데이터 가용성**: 이 "선행 PER" 지표는 애널리스트 컨센서스 EPS
+추정치가 필요해 무료 공개 API로는 구할 수 없음(KRX는 trailing PER만
+제공). 상세 조사는
+[sources/kospi-forward-per-band-chart-2026-08-09.md](../../sources/kospi-forward-per-band-chart-2026-08-09.md) 참고.
+
+### 일일 근사 추적 방법론 (2026-08-09 추가)
+
+실제 Quantiwise forward PE는 자동 수집 불가하지만, "forward EPS(분모)가
+앵커 시점 이후 크게 변하지 않았다"는 가정 하에 **KOSPI 지수 변화율만으로
+근사치를 매일 역산**할 수 있다:
+
+```
+근사 forward PE(t) = 6.65 × KOSPI(t) / 7,769.16
+```
+
+- **앵커**: 2026-07-02 09:51 KST 장중 스냅샷 7,769.16 (웹검색으로 확인된
+  유일한 실측치 — 정확한 종가는 이 환경에서 확인 불가, 매도 사이드카
+  발동 시점 값). Forward PE 6.65배·-2.7표준편차는 원본 차트 기준.
+- **한계 (중요)**: ① 앵커가 종가가 아니라 장중 값이라 오차 있음.
+  ② SK하이닉스 등 주요 기업 2Q 실적 발표(7/29)가 앵커 이후에 있어
+  실제 컨센서스 EPS가 리비전됐을 수 있음 — 그 경우 이 근사치는 실제
+  Quantiwise 값과 갈수록 벌어짐. **정밀치가 아니라 방향성 참고용.**
+- 계산 스크립트: `scripts/kospi_valuation_tracker.py` (입력:
+  `sources/kr-index-quote.csv` KIS API 일일 실측 → 출력:
+  `sources/kospi-forward-pe-approx.csv`)
+- **일일 추적 현황**: [monitoring/kospi-valuation-tracker-status.md](../monitoring/kospi-valuation-tracker-status.md) —
+  2026-08-08 최신 근사치 5.36배, 앵커(6.65배) 대비 -19.44%, 20년 평균
+  대비 -46.43%. 즉 7/2 스냅샷 이후에도 지수가 추가로 더 빠지면서 근사
+  밸류에이션은 그 시점보다 더 저평가된 방향으로 이동.
 
 ## 다른 프레임워크와의 관계
 

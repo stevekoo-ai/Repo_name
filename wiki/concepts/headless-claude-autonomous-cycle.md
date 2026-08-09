@@ -205,6 +205,75 @@ claude -p --dangerously-skip-permissions \
 
 → `prompts/daily-brief-headless.txt` v2로 갱신. 헤드리스 다음 사이클부터 이 품질 reproduce.
 
+## 개명: 데일리 브리프 → POET Daily Intelligence (2026-08-09)
+
+사용자 지적: "'데일리 브리프' 이름을 더 이상 브리프라고 부를 수 없을 것 같다.
+아주 방대한 거시적, 미시적, 다채로운 평가 기법들이 담겨있는 새로운 daily
+보고서이다." — 아래 §데이터 소스 카드 5종 통합으로 위키 서사 요약을
+넘어 8개 독립 파이프라인(KIS API·FRED/ECOS·MOLIT·SEC EDGAR·투자시계·
+KOSPI 밸류에이션 근사 엔진·PEOS 거시엔진·정치 트래커)을 종합하는
+리포트가 됐으니 타당한 지적.
+
+**새 이름 "POET"의 출처**: 새로 지어낸 이름이 아니라, `run_daily.bat`에
+사용자가 이미 붙여둔 로컬 Task Scheduler 작업명 **"Steve_Daily_POET"**
+(2026-08-06 설정)를 그대로 리포트 브랜드로 승격. 정확한 원의미는
+불명이나(사용자가 로컬에서 지은 이름), 기존 결정을 존중해 재사용.
+
+**변경 범위**: 표시 브랜드명만 변경 — 파일 경로(`report/daily-brief-YYYY-MM-DD.html`)와
+이메일 발송 워크플로우(`daily-brief-report.yml`/`daily-brief-dispatch.yml`)의
+path 트리거는 그대로 유지(자동화 배관을 건드리면 이메일 발송이 끊길
+위험). `prompts/daily-brief-headless.txt`에 HTML `<title>`/HERO eyebrow에
+"POET DAILY INTELLIGENCE" 명시 지시 추가.
+
+**2026-08-09 첫 발행**: 위키 실제 근거자료로 오늘자 리포트를 직접 조립해
+Artifact로 발행 — https://claude.ai/code/artifact/94f21e7b-c717-4d56-80a2-713d6616ed33
+동일 내용을 `report/daily-brief-2026-08-09.html`(라이트 전용, 이메일
+호환)로도 저장해 다음 헤드리스 실행의 품질 기준본으로 삼음. 구성:
+HERO+한줄진단 → 헤드라인 4타일 → 거시(G/I/L·투자시계·거시지표·KOSPI PE
+그래프) → SK하이닉스(HBM Score·패닉회복·찐반등·체크포인트) → SEC
+EDGAR+변두리 → 부동산 → 정치오버레이 → 다음관전포인트 → 품질기준
+폴더블. dataviz 스킬 절차 준수(인라인 SVG 차트), headless Chromium으로
+라이트/다크 렌더링 검증 완료.
+
+## 데이터 소스 카드 5종 통합 (2026-08-09 추가)
+
+사용자 검토 요청("이미 구현된 건 회신, 안 된 건 추가") 결과, 다음 4개
+파이프라인이 각자 독립적으로는 잘 동작하지만 데일리 브리프에는 전혀
+반영되지 않고 있음을 확인 — 프롬프트 v3로 갱신해 5종 카드로 통합.
+
+| 항목 | 원본 파이프라인 | 이전 상태 |
+| --- | --- | --- |
+| 투자시계 | `daily-clock-report.yml` → `docs/clock.png`, `docs/index.html` | 완전 별도 워크플로우, 데일리 브리프 미언급 |
+| 거시지표 동기화 | `macro-data-sync.yml` → `sources/macro-series.csv` | 위키 서사만 언급, 원자료 CSV 직접 인용 지시 없음 |
+| KOSPI Forward PE 근사 추적 | `scripts/kospi_valuation_tracker.py` → `sources/kospi-forward-pe-approx.csv` | 2026-08-09 신설 직후라 애초에 통합 대상 아니었음 |
+| 부동산 데이터 | `real-estate-sync.yml` → `data/normalized/molit_*.csv` | 데일리 브리프 미언급 |
+| SEC EDGAR CapEx | `sec-edgar-capex.yml` → `sources/hyperscaler-capex.csv` | 데일리 브리프 미언급, 하이라이트/영향판단 로직 없음 |
+
+**부수 발견 → 해결 완료 (2026-08-09 같은 세션)**: `sources/ai-periphery-fundamentals.csv`가
+없어서 조사한 결과, 버그가 아니라 **다른 세션이 데이터 정합성 버그(매출
+YTD 오수집·백로그 개념오류) 수정 후 오염된 CSV를 의도적으로 삭제**했고,
+주 1회(월요일)만 도는 워크플로우라 재생성이 지연되고 있었던 것으로 확인.
+`sec-edgar-capex.yml` 수동 재실행(run 31318833237)으로 88건 정상
+재생성 완료, `git merge origin/main`으로 작업 브랜치에 반영. 상세 경위는
+[ai-value-chain-periphery-monitor.md §5-1](ai-value-chain-periphery-monitor.md) 참고.
+카드 ⑤를 "SEC EDGAR CapEx & AI 밸류체인 변두리"로 확장 — 8개사 매출·백로그
+(QoQ 변화 우선 해석)까지 daily brief에 통합.
+
+**반영 내용** (`prompts/daily-brief-headless.txt` §데이터 소스 카드 5종):
+1. **투자시계 서브모듈**: `docs/clock.png`를 base64 data URI로 인라인(이메일
+   첨부라 외부/상대경로 이미지는 깨짐) + `docs/index.html`에서 국면·자산
+   텍스트 파싱. 데일리 브리프보다 갱신 시점이 다를 수 있음을 카드에 명시.
+2. **거시지표 근거데이터**: `sources/macro-series.csv` 최신 실측값(기준금리·
+   환율·CPI·실업률·유가·GDP)을 date/fetched_at과 함께 직접 인용.
+3. **KOSPI Forward PE 근사 추적**: `sources/kospi-forward-pe-approx.csv`
+   전체를 인라인 SVG 꺾은선 그래프로(외부 라이브러리 금지), 앵커 마커 +
+   근사치 한계 문구 필수 병기.
+4. **부동산 시장**: `data/normalized/molit_highlight_*.csv` 최신 3개월 +
+   자동화 완성도(31%) 고지 + decision tracker pending 상태 투명 공개.
+5. **SEC EDGAR CapEx**: 4개사 최신 분기 CapEx 표 + 직전 daily-brief HTML과
+   비교해 변경분만 🆕 하이라이트·HBM 수요 영향 1~2문장 판단(변동 없으면
+   과장 금지).
+
 ## Sources
 
 - [73KB 초과 HTML 업로드 우회 — 아이디어 비교](large-file-upload-bypass-ideas.md) (안 1 gzip+dispatch)

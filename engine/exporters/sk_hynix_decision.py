@@ -14,6 +14,8 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
+from engine.valuation.hynix_band import compute_valuation_band
+
 
 @dataclass
 class SKHynixDecision:
@@ -25,6 +27,7 @@ class SKHynixDecision:
     macro_linkage: str  # how macro signals connect to this decision
     risk_flags: list[str]  # current risk indicators
     next_check: str  # when to re-evaluate
+    valuation_band: dict | None = None  # Layer 0 — P/E Z-score(근사) + ERP, see engine/valuation/hynix_band.py
 
 
 def compute_sk_hynix_decision(payload: dict) -> SKHynixDecision:
@@ -55,6 +58,38 @@ def compute_sk_hynix_decision(payload: dict) -> SKHynixDecision:
     confidence = 50
     triggers = []
     risk_flags = []
+
+    # --- LAYER 0: VALUATION BAND (added 2026-08-09) ---
+    # P/E Z-score(근사, divergence 기반) + ERP. 극단치일 때만 modifier로
+    # 작용 — 밸류에이션 신호가 다른 계층의 결론을 뒤집지는 않고, 확신도만
+    # 조정한다(Gemini 원안의 "score += ..." 직접가산 대신 완충 방식 채택 —
+    # 이미 4계층이 확립된 엔진에 다섯 번째 계층을 얹으면서 기존 로직의
+    # 우선순위를 존중). 상세: engine/valuation/hynix_band.py
+    valuation = compute_valuation_band()
+    valuation_band_dict = {
+        "pe_zscore": valuation.pe_zscore,
+        "band_label": valuation.band_label,
+        "latest_quarter": valuation.latest_quarter,
+        "latest_divergence": valuation.latest_divergence,
+        "erp_pct": valuation.erp_pct,
+        "erp_note": valuation.erp_note,
+        "caveats": valuation.caveats,
+    }
+    if valuation.pe_zscore is not None:
+        if valuation.pe_zscore <= -1.5:
+            risk_flags.append(f"밸류에이션 저평가 극단(P/E Z {valuation.pe_zscore:.2f})")
+            triggers.append({
+                "condition": f"P/E Z-score {valuation.pe_zscore:.2f} ≤ -1.5 (저평가 극단)",
+                "action": "밸류에이션 관점 매수 매력 — 다른 계층과 함께 재검토",
+                "price_level": None,
+            })
+        elif valuation.pe_zscore >= 1.5:
+            risk_flags.append(f"밸류에이션 고평가 극단(P/E Z {valuation.pe_zscore:.2f})")
+            triggers.append({
+                "condition": f"P/E Z-score {valuation.pe_zscore:.2f} ≥ 1.5 (고평가 극단)",
+                "action": "밸류에이션 관점 수익실현 검토 — 다른 계층과 함께 재검토",
+                "price_level": None,
+            })
 
     # --- MACRO-LEVEL REGIME CHECK ---
     # 약세/위기: default to SELL unless strong counterarguments
@@ -159,6 +194,7 @@ def compute_sk_hynix_decision(payload: dict) -> SKHynixDecision:
         macro_linkage=macro_linkage,
         risk_flags=risk_flags,
         next_check=next_check,
+        valuation_band=valuation_band_dict,
     )
 
 
