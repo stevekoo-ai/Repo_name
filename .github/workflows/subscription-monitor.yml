@@ -2,7 +2,7 @@ name: Subscription monitor (Seoul/Gyeonggi 국민주택)
 
 on:
   schedule:
-    - cron: "*/5 * * * *"   # every 5 minutes - API confirmed healthy, daily quota is 40,000 (plenty of headroom)
+    - cron: "7,37 * * * *"   # every 30 minutes (07/37 past hour) - 5min→30min per user request 2026-08-10. API quota 40,000/day, 48 runs/day plenty of headroom.
   workflow_dispatch:
     inputs:
       test_keyword:
