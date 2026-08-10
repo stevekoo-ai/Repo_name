@@ -1,0 +1,52 @@
+name: POET 08-10 Chunked Assemble
+
+on:
+  push:
+    branches: [chore/poet-0810-chunked]
+    paths: ['.chunks/**']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  assemble:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: chore/poet-0810-chunked
+          persist-credentials: true
+          fetch-depth: 0
+      - name: Assemble HTML from chunks
+        run: |
+          mkdir -p report
+          cat .chunks/chunk_0 .chunks/chunk_1 .chunks/chunk_2 > report/daily-brief-2026-08-10.html
+          echo "Assembled $(wc -c < report/daily-brief-2026-08-10.html) bytes"
+      - name: Clean scaffolding + commit assembled HTML
+        run: |
+          git config user.name "Claude"
+          git config user.email "noreply@anthropic.com"
+          git add report/daily-brief-2026-08-10.html
+          git rm -r --quiet .chunks || true
+          git rm --quiet .github/workflows/poet-0810-assemble.yml || true
+          git commit -m "report: POET Daily Intelligence 2026-08-10 (manual publish — auto routine git conflict)
+
+POET Daily Intelligence 2026-08-10 (Mon). 08-09 template base with date update
+(4 spots) + weekend (8/8~9) no-trade note. Auto publish routine hit a git
+conflict this morning (run_daily.bat unstaged + divergence); manual publish via
+chunked-blob route (129KB HTML exceeds corp-net single-POST limit, split into
+3 chunks <80KB each, assembled on CI).
+
+Co-Authored-By: Claude <noreply@anthropic.com>"
+          git push origin chore/poet-0810-chunked
+      - name: Open PR to main
+        run: |
+          gh pr create --base main --head chore/poet-0810-chunked \
+            --title "report: POET Daily Intelligence 2026-08-10" \
+            --body "POET Daily Intelligence 2026-08-10 (Mon). Uploaded via chunked-blob route (129KB > corp-net single-POST limit), assembled on CI from 3 chunks. The push to chore/poet-0810-chunked triggers daily-brief-report.yml (no branch filter) which sends the email.
+
+          🤖 Generated with [Claude Code](https://claude.com/claude-code)" || true
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
