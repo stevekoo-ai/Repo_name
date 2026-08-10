@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>[청약 Desktop] 2026-08-10 저녁 heartbeat</title>
+<style>
+  :root{
+    --bg:#f5f6f8; --surface:#ffffff; --surface-2:#eceff3; --ink:#161a20; --muted:#5c6470;
+    --line:#dde1e7; --accent:#0b5fb0; --accent-ink:#0a4a8a; --accent-soft:#e3edf9;
+    --live:#0e9a6c; --live-soft:#e1f5ec;
+    --warn:#b5551a; --warn-soft:#fbe9db; --warn-line:#eec7a0;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#0d1116; --surface:#151a21; --surface-2:#1b212a; --ink:#e7ebf1; --muted:#8b93a1;
+      --line:#2a323d; --accent:#5aa9ef; --accent-ink:#8ec4f5; --accent-soft:#122a41;
+      --live:#3fd39a; --live-soft:#0f2c22;
+      --warn:#ffab6b; --warn-soft:#3a2415; --warn-line:#5a381f;
+    }
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:"Pretendard Variable","Apple SD Gothic Neo","Malgun Gothic",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+    line-height:1.6;}
+  .page{max-width:860px;margin:0 auto;padding:44px 22px 90px;}
+  .topbar{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap;
+    padding-bottom:22px;border-bottom:1px solid var(--line);margin-bottom:28px;}
+  .brand .eyebrow{display:inline-flex;align-items:center;gap:7px;font-size:12px;font-weight:700;
+    letter-spacing:.07em;text-transform:uppercase;color:var(--accent-ink);}
+  .brand .eyebrow .dot{width:7px;height:7px;border-radius:50%;background:var(--live);box-shadow:0 0 0 3px var(--live-soft);}
+  .brand h1{font-size:clamp(22px,3.4vw,28px);font-weight:800;letter-spacing:-0.02em;margin:8px 0 4px;}
+  .brand p{margin:0;color:var(--muted);font-size:14px;max-width:56ch;}
+  .desktop-tag{display:inline-block;margin-left:10px;padding:2px 10px;border-radius:100px;
+    font-size:11px;font-weight:700;background:var(--accent-soft);color:var(--accent-ink);
+    letter-spacing:.03em;}
+  .clock{text-align:right;font-size:12.5px;color:var(--muted);font-variant-numeric:tabular-nums;}
+  .clock b{color:var(--ink);font-size:13.5px;}
+  section{margin-top:32px;}
+  h2{font-size:18px;font-weight:800;margin:0 0 12px;}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;}
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px 18px;}
+  .card .k{font-size:11.5px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);font-weight:700;}
+  .card .v{font-size:22px;font-weight:800;font-variant-numeric:tabular-nums;margin-top:4px;}
+  .card .sub{font-size:12.5px;color:var(--muted);margin-top:2px;}
+  .status.{color:var(--live);}
+  .status.warn{color:var(--warn);}
+  .tablewrap{overflow-x:auto;border:1px solid var(--line);border-radius:14px;background:var(--surface);}
+  table{border-collapse:collapse;width:100%;font-size:13.6px;}
+  th,td{text-align:left;padding:11px 14px;border-bottom:1px solid var(--line);}
+  th{background:var(--surface-2);font-size:11.5px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);font-weight:700;}
+  tr:last-child td{border-bottom:none;}
+  .muted{color:var(--muted);text-align:center;padding:24px;}
+  .note{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px 16px;font-size:13.4px;color:var(--muted);}
+  footer{margin-top:44px;padding-top:20px;border-top:1px solid var(--line);font-size:12px;color:var(--muted);}
+  a{color:var(--accent-ink);}
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="topbar">
+    <div class="brand">
+      <span class="eyebrow"><span class="dot"></span>청약 모니터 · 저녁 heartbeat<span class="desktop-tag">⌬ From. Desktop</span></span>
+      <h1>청약 시스템 정상 동작 확인 (2026-08-10)</h1>
+      <p>Desktop이 매일 저녁 보내는 heartbeat 보고서입니다. 실시간 매물 알림(NEW_MATCH/PRIORITY_UP)은 5분 간격 GitHub Actions 파이프라인이 별도 처리합니다. 이 메일은 "오늘도 시스템이 정상이었다"는 확인용 1회/일 발송입니다.</p>
+    </div>
+    <div class="clock">
+      발송 시각<br><b>2026-08-10 10:31 KST</b>
+    </div>
+  </div>
+
+  <section>
+    <h2>핵심 지표</h2>
+    <div class="grid">
+      <div class="card">
+        <div class="k">API 상태</div>
+        <div class="v status ok">정상</div>
+        <div class="sub">연속 실패 0회 · 장애 알림 없음</div>
+      </div>
+      <div class="card">
+        <div class="k">접수중 매물</div>
+        <div class="v">1건</div>
+        <div class="sub">서울·경기 국민주택 일반공급</div>
+      </div>
+      <div class="card">
+        <div class="k">오늘 heartbeat</div>
+        <div class="v">미발송</div>
+        <div class="sub">09시 이후 첫 정상 run (실시간 파이프라인)</div>
+      </div>
+      <div class="card">
+        <div class="k">추적 중 매물</div>
+        <div class="v">3건</div>
+        <div class="sub">이미 알림 보낸 플랫폼 매칭 공고</div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>대시보드 상태</h2>
+    <div class="note">
+      마지막 갱신: <b>2026-08-10 08:52 KST</b> · 다음 갱신 예정: <b>08-10 12:52 KST</b><br>
+      5분 간격 GitHub Actions 파이프라인이 data.go.kr을 fetch해 갱신합니다.
+      위 갱신 시각이 이 발송 시각(2026-08-10 10:31 KST)과 멀리 떨어져 있으면 파이프라인이 멈춘 것입니다.
+    </div>
+  </section>
+
+  <section>
+    <h2>현재 접수중 / 접수예정 공고 (1건)</h2>
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th style="width:40px">#</th><th>단지명</th></tr></thead>
+        <tbody>
+<tr><td>1</td><td>시흥거모 A-5블록 신혼희망타운(공공분양)(본청약)</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <h2>내 청약통장</h2>
+    <div class="note">
+      가입일 <b>2005-11-03</b> · <b>249회</b> 납입 · 저축총액 <b>2,805만원</b> · 최고액 납입 <b>25만원</b><br>
+      청약통장 점수 <b>40/40</b> (20년+ 15 · 240회+ 15 · 최고액납입 10) — 순차제(저축총액순)에서 최상위권.
+    </div>
+  </section>
+
+  <section>
+    <h2>다음 관전 포인트</h2>
+    <div class="note">
+      감지 키워드: <b>플랫폼시티 / 광교 / 원천동</b> — 이 이름이 단지명·주소에 포함된 공고가 뜨면 즉시 알림(NEW_MATCH)이 별도 발송됩니다.<br>
+      일반 서울·경기 국민주택은 이 heartbeat에 표시만 되고 즉시 알림 대상이 아닙니다 (점수 40/40로 순차제 유리하지만 키워드 매칭이 우선).<br>
+      전세계약 만료일 <b>2027-02-22</b> — 이 시점까지 입주 가능한 공고를 우선 관전.
+    </div>
+  </section>
+
+  <footer>
+    발송 주체: Desktop (Windows Task Scheduler → Python 스크립트 → Contents API PUT → GitHub Actions 발송 워크플로우).<br>
+    모바일 Claude Code 구독 만료와 무관 — 실시간 매물 알림은 GitHub Actions Python이 처리합니다.
+  </footer>
+</div>
+</body>
+</html>
