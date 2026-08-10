@@ -22,12 +22,25 @@ on:
     paths:
       - 'wiki/cxl-memory-product-planning-report-*.html'
       - 'wiki/cxl-daily-report-*.html'
+  # Manual trigger: lets us re-send the latest report without a re-push,
+  # e.g. after fixing the workflow itself. Checks out the narrative branch
+  # by default (workflow_dispatch ref = default branch, so set ref below).
+  workflow_dispatch:
 
 jobs:
   send-email:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          # CXL report HTML lives on the narrative branch, not main. On
+          # push events github.ref = claude/ai-agent-impl-002tip (correct).
+          # On workflow_dispatch github.ref = main (no HTML there) — fall
+          # back to the narrative branch explicitly so manual re-runs find
+          # the report. Without this, checkout defaults to main and the
+          # "Find latest CXL report" step finds no files, exits 2
+          # (2026-08-10 run 31359117007 failure).
+          ref: ${{ github.ref == 'refs/heads/main' && 'refs/heads/claude/ai-agent-impl-002tip' || github.ref }}
 
       - name: Find latest CXL report
         id: find
