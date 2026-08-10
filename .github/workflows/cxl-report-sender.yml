@@ -46,11 +46,27 @@ jobs:
         id: find
         shell: bash
         run: |
+          set +e
+          # Debug: show what the workspace actually contains after checkout
+          echo "DEBUG: pwd=$(pwd)"
+          echo "DEBUG: git rev-parse HEAD=$(git rev-parse HEAD)"
+          echo "DEBUG: wiki/ listing:"
+          ls -la wiki/ 2>&1 | head -30
+          echo "DEBUG: glob match for wiki/cxl-daily-report-*.html:"
+          ls -1 wiki/cxl-daily-report-*.html 2>&1
+          echo "DEBUG: glob match for wiki/cxl-memory-product-planning-report-*.html:"
+          ls -1 wiki/cxl-memory-product-planning-report-*.html 2>&1
+
           # 두 패턴 중 가장 최근 수정된 파일 1개 선택.
-          FILE=$(ls -t \
+          # NOTE: glob inside ls produces no match -> ls exits 2; with `set -e`
+          # the command substitution would abort before the `-z` check, so we
+          # run this block with `set +e` and test the result explicitly.
+          FILES=$(ls -t \
             wiki/cxl-memory-product-planning-report-*.html \
             wiki/cxl-daily-report-*.html \
-            2>/dev/null | head -1)
+            2>/dev/null || true)
+          FILE=$(echo "$FILES" | head -1)
+          echo "DEBUG: FILE resolved to: '$FILE'"
           if [ -z "$FILE" ]; then
             echo "No CXL report HTML found. Exiting."
             exit 1
