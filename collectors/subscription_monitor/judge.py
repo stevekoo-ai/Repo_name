@@ -20,8 +20,8 @@ KST = timezone(timedelta(hours=9))
 # --- My subscription-savings profile (single source of truth) ---------------
 # Mirrors wiki/entities/user-profile.md "청약통장 상세" table + config/portfolio.yaml.
 # fetch_and_render.py imports these instead of keeping its own copy.
-MY_SAVINGS_TOTAL = 28_050_000
-MY_SAVINGS_ROUNDS = 249
+MY_SAVINGS_TOTAL = 28_300_000
+MY_SAVINGS_ROUNDS = 250
 MY_JOIN_DATE = "2005-11-03"          # 2005-11-03 (confirmed vs PEOS portfolio.yaml)
 MY_MONTHLY_DEPOSIT = 250_000         # 최고액 납입 (납입인정 최고금액)
 MY_REGION = "경기"                    # 현재 거주: 용인 수지구 → 경기
