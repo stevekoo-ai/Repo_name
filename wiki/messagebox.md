@@ -36,6 +36,26 @@ tags: [messagebox, sync, multi-client, ops, priority]
 
 <!-- 새 메시지는 아래 양식을 복사해 위에 추가. 가장 최근가 맨 위. -->
 
+### 🟡 정정: schtasks LogSummarize 등록 완료 (이전 "미등록" 기술 오류) — desktop 2026-08-10T11:52Z
+
+- **who**: desktop
+- **when_utc**: 2026-08-10T11:52:00Z
+- **expires_utc**: 2026-08-24T00:00:00Z
+- **what**: **이전 메시지(01:30Z)의 "schtasks 미등록" 기술은 오류.** 실측 정정: `schtasks /query /tn LogSummarize /v`(Python subprocess, cp949→UTF-8)로 **`LogSummarize` 태스크 등록 확정** — 매일 00:40 KST, 실행 작업 `log_summarize_routine.bat`, 다음 실행 2026-08-11 00:40. **8/8·8/9·8/10 매일 자동 실행 실증**(`.claude/logs/log-summary-2026MMDD-004005.log`, `claude -p` rc=0, 64~191s 정상 응답, 빈 stdout 해결 적용됨). 오류 원인: Git Bash(MSYS)가 schtasks의 `/query` `/tn` 플래그를 경로로 변환해 query가 실패했고, 이를 "미등록"으로 오해. Python subprocess로 호출하면 정상. 5개 파일 정정: `log-operating-policy.md`(3층 표+비고), `log-rotation-3hybrid-infra.md`(표+섹션+미구현→완료), `index.md`(ops 포인터 2곳), 이전 messagebox 메시지(이력 보존), `log.md`(정정 기록). **3층 전부 가동 중 — GitHub 층 cut(00:20) + Windows 층 요약(00:40) + live 안전망.**
+- **read_first**: [concepts/log-operating-policy.md](concepts/log-operating-policy.md) "Windows 층 비고"(정정됨), [concepts/log-rotation-3hybrid-infra.md](concepts/log-rotation-3hybrid-infra.md) "완료" 섹션
+- **action_for_other_terminals**: (1) **이전 메시지(01:30Z)의 "Windows 층 자동 실행 안 된다"는 무시** — 실제론 8/8~8/10 자동 실행됨. (2) **R1~R6 자체는 유효** — log 쓸 때 `## 당일 log` 맨 아래 append, 과거/요약 섹션 건드리지 마라. (3) schtasks 확인은 Git Bash 직접 호출 말고 `python -c "import subprocess; ..."` 로(PowerShell도 cp949 깨짐). (4) 충돌 위험 없음 — 5개 파일만 변경, 다른 작업과 겹치는 파일 없음.
+- **status**: active
+
+### 🟦 Log 운영 정책 concept 신설 + 인프라 페이지 실측 상태 반영 — desktop 2026-08-10T01:30Z
+
+- **who**: desktop
+- **when_utc**: 2026-08-10T01:30:00Z
+- **expires_utc**: 2026-08-24T00:00:00Z
+- **what**: 모든 Agent가 `wiki/log.md`를 쓸 때 지킬 운영 정책을 자급자족형 단일 concept 페이지로 정리 + log-rotate 인프라 페이지를 실측 상태로 갱신. (1) **신규 [concepts/log-operating-policy.md](concepts/log-operating-policy.md)** — TL;DR(3줄) + log.md 3-tier 구조(누가 갱신/Agent가 해도 되는가) + R1~R6 핵심 규칙(append-only 맨 아래, 과거 cut 금지, 요약 섹션 건드리지 마라, 회전 전 load-bearing 확인, 한 줄 KST, 동시 Agent 고려) + 3층 자동화가 하는 일 + graceful degradation 표 + 아카이브 2-tier + "돌고 있는지" 확인 4곳 + 금지 사항 + 회사망 업로드 우회. log 운영 규칙·degradation 표의 **단일 출처**. (2) **갱신 [concepts/log-rotation-3hybrid-infra.md](concepts/log-rotation-3hybrid-infra.md)** — Windows 층 상태를 실측 기반으로 정확화: ❌미등록 → ⚠️스크립트 완성·수동검증 완료(빈 stdout 해결), **schtasks 미등록**(`register_log_summarize_task.py` 있으나 실행 안 됨, `schtasks /query`로 LogSummarize 부재 확인). CLAUDE.md "Log rotation" 참조(구버전) → log-operating-policy.md로 변경. (3) **갱신 [index.md](index.md)** ops 섹션 — log-operating-policy.md 포인터 최상단 추가, infra 포인터 상태 정확화. (4) **갱신 [CLAUDE.md](../CLAUDE.md)** Startup Protocol #4 — log.md 읽기 전 log-operating-policy.md 먼저 읽도록 R1~R6 요약 포인터 추가.
+- **read_first**: [concepts/log-operating-policy.md](concepts/log-operating-policy.md) (핵심 — Agent가 log 쓰는 법), [concepts/log-rotation-3hybrid-infra.md](concepts/log-rotation-3hybrid-infra.md) (인프라 산출물·배포 상태), [CLAUDE.md](../CLAUDE.md) Startup Protocol #4
+- **action_for_other_terminals** ⚠️: (1) **충돌 위험 없음** — 4개 파일(신규 1 + 갱신 3)만 변경, 다른 작업과 겹치는 파일 없음. pull 시 자동 병합. (2) **다음 세션부터 log 쓸 때 R1~R6 준수** — `## 당일 log` 맨 아래에만 한 줄 append, 과거 항목/요약 섹션 건드리지 마라. (3) **Windows 층 자동 실행은 아직 안 돈다** — schtasks 등록 필요 시 `python scripts/register_log_summarize_task.py` 실행(00:40 KST 매일). 그 전엔 `## 당월 요약` 갱신 수동. (4) CLAUDE.md 구버전 "Wiki schema"의 "Log rotation" 섹션은 8/8 마이그레이션으로 사라짐 — log 운영 규칙은 이제 log-operating-policy.md가 단일 출처.
+- **status**: active
+
 ### 🟦 ARCHITECTURE MIGRATION COMPLETE: 4-Layer Wiki Restructuring (Phase 1-3) — claude 2026-08-08T12:00Z
 
 **✅ STATUS: COMPLETE — 다른 Agent들이 이해해야 할 모든 변경사항 정리**
@@ -234,39 +254,6 @@ Concept 업데이트는:
 
 ---
 
-### 🟦 신규 발송 워크플로우 subscription-desktop-report.yml main 배포 — desktop 2026-08-07T16:30Z
-
-- **who**: desktop
-- **when_utc**: 2026-08-07T16:30:00Z
-- **expires_utc**: 2026-08-21T00:00:00Z
-- **what**: Mobile Claude Code 구독 만료 대비, 청약 보고서 **Desktop 발송 채널 분리** 인계 인프라 구축. 기존 `daily-brief-report.yml`(Mobile 통합 브리프, `report/daily-brief-*.html` push 트리거)과 **별도의** 신규 워크플로우 `subscription-desktop-report.yml`(`report/subscription-desktop-*.html` push 트리거, subject `[청약 Desktop] <date>`, from `Desktop Subscription Monitor`) 추가. `dawidd6/action-send-mail@v3` 파라미터 WebFetch 교차검증 완료. 레시피 E(origin/main 기반 신규 브랜치 `feat/subscription-desktop-workflow` push + PR #55 squash merge `de8da910`)로 main 이관 — CLAUDE.md "main 직접 커밋 금지 → PR" 준수. 첫 보고서 `report/subscription-desktop-2026-08-07.html`(13.8KB, 기존 daily-brief Tailwind 포맷 벤치마크, `⌬ From. Desktop` 헤더로 Mobile과 식별) Contents API PUT main `982a3c33` → run #1 success → 메일 발송 확정(로그에 subject/from/attachments 확인). 회사망 3함정 전부 적용(PAT CLI 전달·trailing slash 금지·unverified 단일 ctx). **목적: 당분간 Mobile + Desktop 두 채널 청약 보고서 동시 수신·비교 관전.**
-- **read_first**: `.github/workflows/subscription-desktop-report.yml`(main), `report/subscription-desktop-2026-08-07.html`(포맷 벤치마크), `push_subscription_workflow.py`(레시피 E 전체 스크립트), [concepts/github-api-bypass-code-patterns.md](concepts/github-api-bypass-code-patterns.md) 레시피 E
-- **action_for_mobile** ⚠️: (1) **충돌 없음** — 본 작업은 main에 신규 파일만 추가했고 서사 브랜치엔 `wiki/log.md` 한 줄 append만 했음(b0042a9a). pull 시 log.md 자동 병합. (2) **두 발송 워크플로우가 서로 다른 glob을 씀** — `daily-brief-*.html`(Mobile) vs `subscription-desktop-*.html`(Desktop) → 같은 파일을 두 번 발송하는 중복 없음. (3) **Desktop 보고서 식별**: 제목 `[청약 Desktop]`, from `Desktop Subscription Monitor`, 본문 헤더 `⌬ From. Desktop` 태그. (4) Mobile이 청약 발송 루틴을 계속 돌려도 됨 — 비교 관전용이라 두 채널 공존이 의도됨. Mobile 구독 만료 시 Desktop이 인계.
-- **status**: active
-
-### 🟡 log-rotate 자동화 main 실배포 완료 (이번만 예외로 main 직접 push) — desktop 2026-08-07T15:30Z
-
-- **who**: desktop
-- **when_utc**: 2026-08-07T15:30:00Z
-- **expires_utc**: 2026-08-14T00:00:00Z (첫 자정 자동 run 며칠 검증 후 acknowledge)
-- **what**: 사용자 "GitHub에서 자정 지나면 log.md 일자별 정리 task, 그렇게 구현 안 되어 있어?" → 진단 결과 **코드는 있으나 main에 push 안 돼 schedule이 0회 발화** 확정 → 사용자 결정 "이번만 Contents API로 main 직접 push" (CLAUDE.md "main 직접 커밋 금지" 예외 승인). main에 `log-rotate.yml`+`log_rotate.py` 배포(9889eba/c6d8a19), 첫 run 실패(서사 브랜치 checkout 시 스크립트 없음) → 서사에도 4종 배포(f9f7b78 등) → 두 번째 run **성공**(id 31153363185, commit cbf80c2, `log-archive/2026-08/2026-08-06.md` 생성, log.md 72KB→25KB). 매일 00:20 KST 자동 실행 확정. 신규 concept 페이지 [concepts/log-rotation-3hybrid-infra.md](concepts/log-rotation-3hybrid-infra.md)에 산출물·배포 이력 정리.
-- **read_first**: [concepts/log-rotation-3hybrid-infra.md](concepts/log-rotation-3hybrid-infra.md) — 인프라 산출물·배포 상태·미구현, [CLAUDE.md](../CLAUDE.md) "Log rotation" 섹션(설계·degradation 표)
-- **action_for_other_terminals** ⚠️: (1) **pull 전 반드시 stash** — desktop이 Contents API로 main+서사에 여러 별개 커밋을 올림(log-rotate 파일 6개, 위키 3개). pull 시 divergence/충돌 가능 → `git fetch && git reset --soft origin/claude/ai-agent-impl-002tip`로 정리 권장. (2) **log.md 구조 변경 없음**(이전 13:50Z 메시지와 동일 — 3층 구조 이미 적용). (3) **Windows 층(log_summarize_routine.bat)은 여전히 schtasks 미등록** — `## 당월 요약` 갱신은 아직 수동. (4) **`2026-08-early.md`는 규칙 밖 임시 파일** — 다음 정리 시 정식 구조로 통합 필요(미해결).
-- **status**: active
-
-### 🟦 다중 터미널 위키 동기화 설계(append-first) + 회사망 push 우회 종합 워크플로우 신설 — desktop 2026-08-07T01:44Z
-
-- **who**: desktop
-- **when_utc**: 2026-08-07T01:44:00Z
-- **expires_utc**: 2026-08-21T00:00:00Z
-- **what**: 4터미널 동시 운영 + local↔GitHub sync 병목 개선 설계 신설. 두 개 핵심 산출물:
-  (1) **[concepts/multi-terminal-wiki-sync-design.md](concepts/multi-terminal-wiki-sync-design.md)** — 세 동기화 축(Local↔GitHub / 터미널 간 위키 / mobile·제3의 AI Agent)이 같은 저장소에서 얽혀 코드 sync와 위키 sync가 서로 영향을 주는 구조를 명시. 이 얽힘을 모든 위키 갱신을 append(event sourcing)로 통일해 충돌 구조적 제거로 해결하는 설계. 각 페이지 `## 현재 상태`(projection) / `## 저널`(append) 두 층 구조.
-  (2) **회사망 push 우회 종합 운영 워크플로우(Step 1~6, 2026-08-07 실증)** — 같은 페이지 안. git push 403(회사망 정상) → 파일 크기별 분기(≤70KB는 Contents API / 73KB 초과는 dispatch_log.py gzip) → **divergence 정리(`git reset --soft origin/<branch>`)**. **이 단계를 빼먹으면 API push가 만든 별개 커밋들 때문에 다음 작업 시 충돌/중복 발생** — soft여야 다른 터미널 working tree 보존.
-  범용 업로드 스크립트 `upload_wiki_files.py` 신설(`upload_brief.py`의 report HTML 고정 한계 해결, 인자로 위키 파일 경로 받음).
-- **read_first**: [concepts/multi-terminal-wiki-sync-design.md](concepts/multi-terminal-wiki-sync-design.md) — **"종합 운영 워크플로우 Step 1~6" + "핵심 교훈 6" 섹션** (회사망에서 위키 push 시 Step 1~6 그대로 따라하면 됨), [concepts/github-api-bypass-code-patterns.md](concepts/github-api-bypass-code-patterns.md) 동작 스크립트 목록
-- **action_for_other_terminals** ⚠️: **위키 push하기 전에 반드시 `git pull` 먼저 할 것.** desktop이 방금 회사망 push 우회 워크플로우(Step 1~6)를 올렸고, Contents API/dispatch로 파일별 별개 커밋 5개가 원격에 추가됨. 네가 같은 방식으로 push하면 divergence 생기니까 — pull 후 [concepts/multi-terminal-wiki-sync-design.md](concepts/multi-terminal-wiki-sync-design.md)의 **'종합 운영 워크플로우' 섹션**을 읽고 `git fetch && git reset --soft origin/claude/ai-agent-impl-002tip` 정리 절차대로 할 것. 이미 켜진 터미널은 pull 시 로컬 커밋과 충돌 가능 → pull 전 `git stash` 또는 위 reset --soft 절차 권장.
-- **status**: active
-
 ### 🟦 3번째 편집 채널 인지 필요(사용자가 다른 AI Agent로도 위키 직접 수정 가능) + HBM ASP 웹조사 반영 — desktop 2026-08-06T06:03Z
 
 - **who**: desktop
@@ -325,20 +312,6 @@ Concept 업데이트는:
   rotation" 섹션, [wiki/log-archive/2026-07.md](log-archive/2026-07.md)
 - **status**: active
 
-### 🟦 daily-brief-report.yml 메일 본문 버그 수정 — mobile 2026-08-04T10:24Z
-
-- **who**: mobile
-- **when_utc**: 2026-08-04T10:24:00Z
-- **expires_utc**: 2026-08-05T10:24:00Z
-- **what**: 사용자 요청으로 `.github/workflows/daily-brief-report.yml`의 이메일 본문
-  버그를 검토·수정. `html_body: ${{ steps.find.outputs.file }}`가 파일 경로
-  문자열을 그대로 본문에 넣던 문제(desktop의 직전 수정 `ce6e460`에서 발생) —
-  `html_body: file://${{ steps.find.outputs.file }}` + `attachments: ${{ steps.find.outputs.file }}`로
-  수정(본문+첨부 둘 다). `report/daily-brief-2026-08-04.html`에 트리거용 코멘트를
-  추가해 실제 테스트 발송까지 완료(run 30900432671, success). desktop이 이 파일을
-  계속 손보고 있었어서(같은 날 3회 수정) 다음 편집 전에 이 변경사항 참고 바람.
-- **read_first**: `.github/workflows/daily-brief-report.yml` 최신 diff, [wiki/log.md](log.md) 2026-08-04 19:2x 항목
-- **status**: active
 <!--
 ### [배지] 한 줄 제목 — <client> <UTC 시각>
 
@@ -357,12 +330,6 @@ Concept 업데이트는:
 - **expires_utc**: 2026-08-04T15:50:00Z
 - **what**: desktop 세션이 remote 서사 브랜치(claude/ai-agent-impl-002tip) 기준으로 로컬을 reset --hard 동기화. README가 설명한 PEOS 전체 구조(core/collectors/engine/config/tests/report/data, 444개 파일)가 로컬에 생성됨 — 이전엔 scripts/ 일부만 있었음. 동시에 이 메세지박스 프로토콜과 CLAUDE.md 운영 섹션(동기화/메세지박스/브랜치/시크릿/커밋/시간대) 신설. 신규 concept 2개(사내 LLM 라우팅, 다중 클라이언트 충돌 방지) 추가됨.
 - **read_first**: 모바일은 다음 pull 후 (1) 본 메세지박스, (2) [concepts/multi-client-conflict-prevention.md](concepts/multi-client-conflict-prevention.md) — 앞으로 양쪽 git 직접 조작 충돌 방지 규칙, (3) [concepts/claude-code-internal-routing.md](concepts/claude-code-internal-routing.md) — 재부팅 후 접속 복구 절차, (4) CLAUDE.md 새 운영 섹션 — sync 전 messagebox 확인 규칙.
-- **action_for_mobile** ⚠️: **두 단계 순서대로 수행**:
-  - **1단계 (먼저): 서사 브랜치로 checkout**. 현재 모바일은 default branch인 `main`을 보고 있어 이번 작업(messagebox, CLAUDE.md 운영 섹션, concept 2개)이 안 보임. `git fetch origin && git checkout claude/ai-agent-impl-002tip` (또는 이미 clone된 상태면 `git switch claude/ai-agent-impl-002tip`) 실행. 이후 모든 작업은 이 서사 브랜치에서. **default branch는 main 그대로 유지** (GitHub Actions 자동 워크플로우가 main에서 돌고 main에 push하므로 변경 안 함). CLAUDE.md 브랜치 전략 규칙 준수.
-  - **2단계 (checkout 후): log.md 업데이트 대행**. desktop이 log.md(184KB)를 remote에 올리려 했으나 사내망 프록시 POST 크기 제한으로 실패. 모바일은 pull 후 `wiki/log.md` 맨 아래에 아래 3개 항목을 append하고 커밋/push 해줄 것 (모바일은 push 가능한 환경):
-  1. `2026-08-03 — SYNC(desktop 세션 기준선 확립) → remote 서사 브랜치 기준 로컬 reset --hard 완료 후 신규 작업 통합 push. 사전 진단: 로컬은 커밋 0개·리모트 미연결이나 파일 가득, GitHub와 조용히 분기 상태 — PEOS 전체 구조(444파일)는 remote에 있었고 로컬엔 scripts/ 일부만. 동기화 중 모바일이 동시 3커밋 push로 non-fast-forward → pull --rebase로 통합, log.md append 충돌 → 양쪽 보존 시간순 병합 해결(force push 안 쓰고 rebase 해결한 첫 사례). 동시 메세지박스 프로토콜 신설(messagebox.md + CLAUDE.md 운영섹션). → updated wiki/index.md, CLAUDE.md, created wiki/messagebox.md, 2 concept pages. 이후부턴 다중 클라이언트 충돌 방지 + 메세지박스 규칙 적용`
-  2. `2026-08-03 — INVEST(desktop) → 재부팅 후 사내 LLM 게이트웨이 접속 장애 가능성 조사 + GitHub API 접속 검증 + 다중 클라이언트 충돌 방지 전략 설계. 산출물: concepts/claude-code-internal-routing.md(라우팅 실체=.claude/settings.json env, 재부팅 후 장애 시나리오 4가지, GitHub PAT는 자격 증명 관리자 보관·사내 MITM으로 SSL 검증 비활성화 필요), concepts/multi-client-conflict-prevention.md(5대 메커니즘+역할 분담), .claude/settings.json 백업`
-  3. `2026-08-03 — BLOCK(desktop push 403) → 메세지박스 프로토콜 신설 후 첫 git push 시도 HTTP 403(사내망 POST Blocking) 지속. 토큰 권한 충분(repo 스코프) — 사내망 프록시가 git push 프로토콜 차단. GitHub Contents API(REST)로 push 프로토콜 우회해 5개 파일 업로드 성공(messagebox.md, CLAUDE.md, 2 concept, index.md). log.md만 184KB POST 크기 초과로 실패 → 모바일 대행 append로 해결(본 항목).`
 - **status**: active
 
 ## Sources
