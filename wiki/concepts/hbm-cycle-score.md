@@ -168,7 +168,7 @@ This page contains framework definition only — score definition, axes, methodo
 3회(07/10/19시 KST) 그대로 유지하기로 결정 — 매시간 실행은 웹검색
 소스(TrendForce·DigiTimes 등) 자체가 시간 단위로 갱신되지 않아 비용 대비
 정보 이득이 작다고 판단. Telegram/Slack/Discord 발송 제안은 채택하지
-않음 — 기존 이메일 발송 체계(run_once_at 자동발동)가 이미 안정적으로
+않음 — 기존 보고서 생성 체계(run_once_at 자동발동)가 이미 안정적으로
 작동 중이라 별도 채널 구축의 실익이 낮음.
 
 **2026-07-28 추가(PR #34)**: ①"공급확대" 축과 관련해 오래 방치돼 있던
