@@ -30,6 +30,11 @@ on:
 
 permissions:
   contents: write
+  # Needed only for the self-escalation step below (dispatching this same
+  # workflow again with retry_until_fresh=true) — that call goes through the
+  # REST API with GITHUB_TOKEN, which requires this scope to create a
+  # workflow_dispatch event.
+  actions: write
 
 concurrency:
   group: core10-collect
@@ -120,7 +125,8 @@ jobs:
             # series can look fine there while still carrying forward.
             if ! grep -qE '^(kosis|ecos):.*❌' /tmp/collect_out.txt; then
               echo "KOSIS/ECOS 전부 성공 — 재시도 루프 종료"
-              break
+              echo "still_failing=false" >> "$GITHUB_OUTPUT"
+              exit 0
             fi
 
             if [ "$i" -lt "$MAX_ATTEMPTS" ]; then
@@ -137,27 +143,69 @@ jobs:
             fi
           done
 
+          # Reached only when the loop ran out of attempts without a clean
+          # success table. Exit non-zero so the failure() steps below (the
+          # self-escalation dispatch and the email alert) actually fire —
+          # collect_core10.py itself always exits 0 (no --strict) and every
+          # git command above can succeed even while KOSIS/ECOS stay down, so
+          # without this the step reports green regardless of outcome.
+          echo "still_failing=true" >> "$GITHUB_OUTPUT"
+          exit 1
+
       - name: Report data freshness
         # A job exiting 0 is not evidence that data arrived — three ECOS series
         # sat at 2018-08-24 for 2,912 days while every run reported success.
         # This measures the outcome instead, and annotates dead series so a
-        # silent collector cannot pass as healthy.
+        # silent collector cannot pass as healthy. `if: always()` because this
+        # must show current state even when the collect step above exits
+        # non-zero — without it, a failed collection would skip straight past
+        # the one step that shows what's actually stale.
+        if: always()
         run: |
           python -m scripts.data_freshness_audit | tee /tmp/freshness.txt
           if grep -q "DEAD" /tmp/freshness.txt; then
             echo "::warning::일부 시리즈가 수집되지 않고 있습니다 — 위 DEAD 목록 확인"
           fi
 
+      - name: Auto-escalate to a retry campaign
+        # Self-sufficiency: once retry_until_fresh is proven out, a plain
+        # daily run should not need a human to notice a KOSIS/ECOS outage and
+        # manually re-dispatch with retry_until_fresh=true — it should do that
+        # itself. Scoped to schedule-triggered runs only (github.event_name),
+        # so a retry campaign that itself exhausts 30 attempts does NOT
+        # re-dispatch another one — workflow_dispatch runs never hit this
+        # condition, which is what breaks the chain.
+        if: failure() && github.event_name == 'schedule'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          curl -sS -X POST \
+            -H "Authorization: Bearer ${GH_TOKEN}" \
+            -H "Accept: application/vnd.github+json" \
+            "https://api.github.com/repos/${{ github.repository }}/actions/workflows/core10-collect.yml/dispatches" \
+            -d '{"ref":"${{ github.ref_name }}","inputs":{"retry_until_fresh":"true"}}'
+          echo "재시도 캠페인(retry_until_fresh=true) 자동 시작함"
+
       - name: Report that collection failed
         # A collector that stops collecting looks exactly like one that has
         # nothing new to collect. Three ECOS series sat at 2018-08-24 for 2,912
         # days while every run reported success — so a failure here is mailed
         # rather than left in a log nobody opens.
+        #
+        # The message differs by context so the inbox distinguishes "handled
+        # automatically, FYI" from "needs a human now": a schedule run that
+        # just auto-escalated is not yet an emergency (the retry campaign
+        # above is already running), but a retry campaign that itself
+        # exhausted every attempt (~5h of real failures) is.
         if: failure()
         env:
           GMAIL_ADDRESS: ${{ secrets.GMAIL_ADDRESS }}
           GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
           NOTIFY_EMAIL_TO: ${{ secrets.NOTIFY_EMAIL_TO }}
         run: |
-          python -m scripts.send_report_email \
-            --failure-alert "core10-collect 워크플로가 실패했습니다 — Core-10 지표가 이월됩니다"
+          if [ "${{ github.event_name }}" = "schedule" ]; then
+            REASON="core10-collect 일일 자동 수집에서 KOSIS/ECOS 일부가 실패해 재시도 캠페인(최대 5시간, retry_until_fresh)을 자동 시작했습니다. 이 메일은 참고용이며, 캠페인이 그마저 실패하면 별도 메일이 옵니다."
+          else
+            REASON="core10-collect 재시도 캠페인이 최대 시도(30회, 약 5시간)를 전부 소진하고도 KOSIS/ECOS 일부가 계속 실패했습니다 — 지금은 자동 복구가 아니라 확인이 필요합니다."
+          fi
+          python -m scripts.send_report_email --failure-alert "$REASON"
