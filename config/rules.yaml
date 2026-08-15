@@ -51,11 +51,18 @@ macro:
     negative: { lt: 0.0 }
 
   current_account:
-    label: "경상수지 (3개월 평균, 억달러)"
+    # 단위 정정 2026-08-10: 라벨이 "억달러"였으나 collectors/ecos.py의 시리즈 정의
+    # (stat_code 301Y013, unit "백만달러", 2026-07-14 실제 응답으로 검증)와 100배
+    # 어긋나 있었다. 임계값도 억달러 기준(50 = 50억달러)으로 쓰여 있어서
+    # neutral 구간이 0~50 백만달러($0~5천만)가 되어 사실상 도달 불가능했고,
+    # 이 지표는 사실상 항상 positive(+1)만 찍고 있었다.
+    # 값을 변환하지 않고 임계값을 같은 단위로 맞춘다 (50억달러 = 5,000백만달러).
+    # 현재 avg_3m ≈ 38,877 백만달러이므로 판정은 positive 그대로 — 회귀 없음.
+    label: "경상수지 (3개월 평균, 백만달러)"
     weight: 0.8
     field: avg_3m
-    positive: { gte: 50 }
-    neutral: { between: [0.0, 50] }
+    positive: { gte: 5000 }
+    neutral: { between: [0.0, 5000] }
     negative: { lt: 0.0 }
 
   cpi:

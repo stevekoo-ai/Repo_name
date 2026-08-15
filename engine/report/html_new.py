@@ -290,6 +290,120 @@ def _render_rent_section(re_data: dict) -> str:
         </div>"""
 
 
+def _rate_or_missing(rates: dict, key: str, suffix: str = "%") -> str:
+    """Render a rate, or say it is uncollected.
+
+    `.get(key, "N/A")` does not help here: the key exists with a None value once
+    the staleness guard drops an old series, so the page rendered "None%".
+    """
+    v = (rates or {}).get(key)
+    if v is None:
+        return '<span style="color:#94A3B8;font-size:0.85em">미수집</span>'
+    return f"{v}{suffix}"
+
+
+def _stale_series_note(rate: dict) -> str:
+    """Explain dropped series inline. Mirrors markdown.py — this renderer feeds
+    docs/report.html and the emailed report, so a fix applied only there would
+    never reach the page the user actually opens."""
+    stale = (rate or {}).get("stale_series") or []
+    if not stale:
+        return ""
+    rows = "".join(
+        f"<li><code>{d['series']}</code> — 최종 관측 {d['as_of']} ({d['age_days']:,}일 경과)</li>"
+        for d in stale
+    )
+    return f"""
+            <div style="margin-top:16px;padding:12px 14px;border-radius:8px;
+                        background:rgba(251,191,36,0.1);border:1px solid rgba(251,191,36,0.35)">
+                <div style="color:#FBBF24;font-weight:700;margin-bottom:6px">⚠️ 너무 낡아 제외된 시리즈</div>
+                <ul style="color:#94A3B8;margin:0;padding-left:18px">{rows}</ul>
+                <div style="color:#64748B;font-size:0.85em;margin-top:8px">
+                    2026-08-13까지 현재값처럼 표시되어 실재하지 않는 한-KR 금리차를 만들어냈습니다.
+                    신선도 기준(45일) 초과 시 값을 버리고 사유를 남깁니다.
+                </div>
+            </div>"""
+
+
+def _render_exposure_and_reconciliation(payload: dict) -> str:
+    """Sections 0 and 0.5 for the HTML renderer.
+
+    render_html() is a SEPARATE code path from markdown.py — anything wired only
+    into the markdown renderer never reaches docs/report.html (the public
+    dashboard) or the emailed report. Section 0/0.5 were added to markdown first
+    and this renderer kept publishing the old, unreconciled view, including the
+    CCI "적극 매수" instruction that reconciliation demotes under R4.
+    Keep the two renderers in step.
+    """
+    m = payload.get("exposure")
+    rec = payload.get("reconciliation")
+    out = []
+
+    if m is not None:
+        def eok(v):
+            return f"{v/100_000_000:.2f}억"
+        emp = next((h for h in m.holdings if h.ticker == "000660.KS"), None)
+        sellable = f"{emp.sellable_qty:,}주" if emp else "—"
+        locked = f"{emp.locked_qty:,}주 ({emp.lock_until})" if emp and emp.locked_qty else "없음"
+        out.append(f"""
+        <div class="card" style="margin-bottom: 30px; border-left: 4px solid #38BDF8;">
+            <h2>🧭 0. 포지션 &amp; 익스포저</h2>
+            <p style="color:#94A3B8; margin: 8px 0 18px;">
+                외부 API를 쓰지 않는 섹션 — 지표가 전부 이월된 날에도 이 숫자는 유효하다.
+            </p>
+            <div class="grid-2">
+                <div>
+                    <h3 style="color:#CBD5E1;">집중도</h3>
+                    <p style="font-size: 2rem; font-weight: 800; color:#F87171; margin:6px 0;">
+                        반도체 {m.semi_pct:.1f}%</p>
+                    <p style="color:#94A3B8;">주식+ETF {eok(m.total_valued)} 중 {eok(m.semi_valued)}<br>
+                    SK하이닉스 단독 {eok(m.employer_valued)} ({m.employer_pct:.1f}%)<br>
+                    급여·PS·퇴직연금이 같은 회사 → 실질 집중도는 이보다 높음</p>
+                </div>
+                <div>
+                    <h3 style="color:#CBD5E1;">동원 가능 자금</h3>
+                    <p style="font-size: 2rem; font-weight: 800; color:#38BDF8; margin:6px 0;">
+                        {eok(m.deployable_cash)}</p>
+                    <p style="color:#94A3B8;">현금 {eok(m.cash_krw)} + 매각가능 {eok(m.liquid_valued)}<br>
+                    즉시 조정 가능: <strong style="color:#E2E8F0;">{sellable}</strong><br>
+                    락업: {locked}</p>
+                </div>
+            </div>
+            <p style="color:#64748B; font-size:0.85rem; margin-top:14px;">
+                시세 검증 커버리지 {m.priced_coverage_pct:.0f}% — 나머지는 매수원가 기준 근사.
+            </p>
+        </div>""")
+
+    if rec is not None:
+        ok = rec.tradeable
+        color = "#10B981" if ok else "#EF4444"
+        badge = "실행 가능" if ok else "오늘 실행 보류"
+        blockers = "".join(f"<li>{b}</li>" for b in rec.blockers) or "<li>없음</li>"
+        conflicts = "".join(
+            f"""<div style="margin:14px 0; padding:12px; background:rgba(148,163,184,0.08); border-radius:8px;">
+                <div style="font-weight:700; color:#E2E8F0;">{i}. {c.topic}</div>
+                <div style="color:#94A3B8; margin-top:6px;">
+                    <div>격하: {c.claim_a}</div>
+                    <div>채택: {c.claim_b}</div>
+                    <div style="color:#64748B; margin-top:4px;">{c.rule} — {c.resolution}</div>
+                </div>
+            </div>"""
+            for i, c in enumerate(rec.conflicts, 1)
+        )
+        out.append(f"""
+        <div class="card" style="margin-bottom: 30px; border-left: 4px solid {color};">
+            <h2>⚖️ 0.5 엔진 정합성 점검</h2>
+            <p style="font-size:1.4rem; font-weight:800; color:{color}; margin:10px 0;">{badge}</p>
+            <p style="color:#94A3B8;">{rec.verdict}</p>
+            <h3 style="margin-top:18px; color:#CBD5E1;">보류 사유</h3>
+            <ul style="color:#94A3B8; padding-left:18px;">{blockers}</ul>
+            <h3 style="margin-top:18px; color:#CBD5E1;">검출된 충돌 {len(rec.conflicts)}건</h3>
+            {conflicts or '<p style="color:#94A3B8;">없음</p>'}
+        </div>""")
+
+    return "".join(out)
+
+
 def render_html(payload: dict) -> str:
     """Render comprehensive PEOS report as beautiful, responsive HTML."""
     month = payload["report_month"]
@@ -457,6 +571,8 @@ def render_html(payload: dict) -> str:
             <div class="date">{datetime.now().strftime('%Y년 %m월 %d일')} 생성</div>
         </div>
 
+        {_render_exposure_and_reconciliation(payload)}
+
         <div class="grid-2">
             <!-- CCI 카드 -->
             <div class="card">
@@ -515,12 +631,14 @@ def render_html(payload: dict) -> str:
                 </div>
                 <div class="metric">
                     <span class="metric-label">KR 10Y Bond</span>
-                    <span class="metric-value">{rate.get('current_rates', {}).get('kr_10y', 'N/A')}%</span>
+                    <span class="metric-value">{_rate_or_missing(rate.get('current_rates', {}), 'kr_10y')}</span>
                 </div>
                 <div class="metric">
                     <span class="metric-label">Spread</span>
-                    <span class="metric-value">{rate.get('current_rates', {}).get('spread_bp', 'N/A')} bp</span>
+                    <span class="metric-value">{_rate_or_missing(rate.get('current_rates', {}), 'spread_bp', ' bp')}</span>
                 </div>
+
+                {_stale_series_note(rate)}
 
                 <h3 style="margin-top: 25px; color: #CBD5E1;">금리 컴포넌트</h3>
                 <table>
@@ -550,7 +668,11 @@ def render_html(payload: dict) -> str:
 
         <!-- SK하이닉스 액션 플랜 -->
         <div class="card" style="margin-bottom: 30px;">
-            <h2>🎯 SK하이닉스 포지션 관리</h2>
+            <h2>🎯 위기지수 기반 위험환경 정보 <span style="font-size:0.8rem; color:#94A3B8;">(포지션 지시 아님)</span></h2>
+            <p style="color:#FBBF24; background:rgba(251,191,36,0.1); padding:10px 12px; border-radius:8px; margin-bottom:14px;">
+                R4 — 종목 매수/매도 지시는 SK하이닉스 의사결정 엔진만 낼 수 있습니다.
+                아래 문구는 위기 국면 서술이며, 0.5절의 판정을 우선하십시오.
+            </p>
             {_render_sk_hynix_action(cci.get('sk_hynix_action', {}))}
         </div>
 

@@ -14,7 +14,7 @@ from datetime import datetime, timedelta
 from typing import List, Optional
 
 # Import DailySignal dataclass
-from rolling_aggregator import DailySignal
+from .rolling_aggregator import DailySignal
 
 
 DATA_DIR = Path(__file__).parent.parent.parent / "data" / "daily_signals"
@@ -64,37 +64,44 @@ def record_daily_signal(
     Returns:
         True if successful, False otherwise
     """
+    fieldnames = [
+        "date",
+        "sk_hynix_signal",
+        "sk_hynix_confidence",
+        "real_estate_signal",
+        "real_estate_confidence",
+        "notes",
+    ]
+
     try:
         ensure_signal_directory()
 
         signal_file = get_signal_file_path(date)
-        file_exists = signal_file.exists()
 
-        with open(signal_file, "a", newline="") as f:
-            writer = csv.DictWriter(
-                f,
-                fieldnames=[
-                    "date",
-                    "sk_hynix_signal",
-                    "sk_hynix_confidence",
-                    "real_estate_signal",
-                    "real_estate_confidence",
-                    "notes",
-                ]
-            )
+        # One row per calendar day. The pipeline can legitimately run more
+        # than once a day (manual re-run, retry after a failed GitHub Actions
+        # job); a blind append put the same date in twice and the rolling
+        # aggregator then counted that day twice when averaging confidence.
+        # Re-recording a date overwrites that day's row instead.
+        existing: list[dict] = []
+        if signal_file.exists():
+            with open(signal_file, "r", newline="") as f:
+                existing = [r for r in csv.DictReader(f) if r.get("date") != date]
 
-            # Write header if file is new
-            if not file_exists:
-                writer.writeheader()
+        row = {
+            "date": date,
+            "sk_hynix_signal": sk_hynix_signal,
+            "sk_hynix_confidence": sk_hynix_confidence,
+            "real_estate_signal": real_estate_signal,
+            "real_estate_confidence": real_estate_confidence,
+            "notes": notes or "",
+        }
 
-            writer.writerow({
-                "date": date,
-                "sk_hynix_signal": sk_hynix_signal,
-                "sk_hynix_confidence": sk_hynix_confidence,
-                "real_estate_signal": real_estate_signal,
-                "real_estate_confidence": real_estate_confidence,
-                "notes": notes or "",
-            })
+        with open(signal_file, "w", newline="") as f:
+            writer = csv.DictWriter(f, fieldnames=fieldnames)
+            writer.writeheader()
+            for r in sorted(existing + [row], key=lambda r: r["date"]):
+                writer.writerow(r)
 
         return True
     except Exception as e:
@@ -125,9 +132,13 @@ def load_signals(
 
         signals: List[DailySignal] = []
 
-        # Determine which monthly files to read
-        start_dt = datetime.strptime(start_date, "%Y-%m-%d")
-        end_dt = datetime.strptime(end_date, "%Y-%m-%d")
+        # Determine which monthly files to read. The cursor walks month
+        # boundaries, so it must be normalized to day 1 — keeping the start
+        # day-of-month made the final step overshoot end_date whenever today
+        # was earlier in the month than start_date (e.g. 05-12 -> ... -> 08-12
+        # > 08-10), silently skipping the current month's signals entirely.
+        start_dt = datetime.strptime(start_date, "%Y-%m-%d").replace(day=1)
+        end_dt = datetime.strptime(end_date, "%Y-%m-%d").replace(day=1)
         current_dt = start_dt
 
         while current_dt <= end_dt:

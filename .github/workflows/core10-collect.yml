@@ -1,0 +1,95 @@
+name: Core-10 지표 수집 (KOSIS·ECOS·FRED)
+
+# Core-10 collection previously ran only as a side effect of
+# daily-peos-report.yml, which was removed from main on 2026-08-11 under the
+# "remove push/email code" policy. That workflow did two jobs and only the
+# publishing half was the reason for removal — since then nothing refreshes the
+# Core-10 indicators, so every report carries them forward.
+#
+# This restores the collection half ONLY. It generates no report, sends no
+# email, and pushes nothing but normalized series data — matching the six
+# collection workflows that were kept, not the publishing ones that were not.
+
+on:
+  schedule:
+    # 21:30 UTC = 06:30 KST — after macro-data-sync (22:10 UTC prev day) so the
+    # two never contend for the same files.
+    - cron: "30 21 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: core10-collect
+  cancel-in-progress: false
+
+jobs:
+  collect:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Collect Core-10 series
+        env:
+          KOSIS_API_KEY: ${{ secrets.KOSIS_API_KEY }}
+          ECOS_API_KEY: ${{ secrets.ECOS_API_KEY }}
+          FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
+        # Not --strict: one dead upstream should not stop the others from
+        # landing. The freshness audit below is what makes a failure visible.
+        run: python -m scripts.collect_core10
+
+      - name: Commit collected data
+        run: |
+          git config user.name "core10-collect-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add data/normalized/ data/raw/ sources/ 2>/dev/null || true
+          if git diff --cached --quiet; then
+            echo "No new observations"
+          else
+            git commit -m "chore: core-10 collection $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+            BRANCH="${GITHUB_REF_NAME:-main}"
+            for i in 1 2 3 4 5; do
+              git push && break
+              echo "push rejected, rebasing onto latest $BRANCH (attempt $i)"
+              git fetch origin "$BRANCH"
+              git rebase "origin/$BRANCH"
+              sleep $((i * 3))
+            done
+          fi
+
+      - name: Report data freshness
+        # A job exiting 0 is not evidence that data arrived — three ECOS series
+        # sat at 2018-08-24 for 2,912 days while every run reported success.
+        # This measures the outcome instead, and annotates dead series so a
+        # silent collector cannot pass as healthy.
+        run: |
+          python -m scripts.data_freshness_audit | tee /tmp/freshness.txt
+          if grep -q "DEAD" /tmp/freshness.txt; then
+            echo "::warning::일부 시리즈가 수집되지 않고 있습니다 — 위 DEAD 목록 확인"
+          fi
+
+      - name: Report that collection failed
+        # A collector that stops collecting looks exactly like one that has
+        # nothing new to collect. Three ECOS series sat at 2018-08-24 for 2,912
+        # days while every run reported success — so a failure here is mailed
+        # rather than left in a log nobody opens.
+        if: failure()
+        env:
+          GMAIL_ADDRESS: ${{ secrets.GMAIL_ADDRESS }}
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+          NOTIFY_EMAIL_TO: ${{ secrets.NOTIFY_EMAIL_TO }}
+        run: |
+          python -m scripts.send_report_email \
+            --failure-alert "core10-collect 워크플로가 실패했습니다 — Core-10 지표가 이월됩니다"

@@ -27,6 +27,9 @@ class RealEstateDecision:
     macro_linkage: str  # how macro affects real estate
     current_situation: str  # user's current housing status
     next_check: str  # when to re-evaluate
+    # Funding reality from the exposure model (engine/exposure/model.py).
+    # None when the exposure model did not run. See _compute_affordability().
+    affordability: dict | None = None
 
 
 def compute_real_estate_decision(payload: dict) -> RealEstateDecision:
@@ -41,6 +44,7 @@ def compute_real_estate_decision(payload: dict) -> RealEstateDecision:
     macro = payload["macro"]
     rate_analysis = payload.get("rate_analysis", {})
     housing = payload.get("housing", {})
+    affordability = _compute_affordability(payload)
 
     # Extract key signals
     kr_regime = macro["regime"]  # 상승|조정|약세|위기
@@ -158,7 +162,60 @@ def compute_real_estate_decision(payload: dict) -> RealEstateDecision:
         macro_linkage=macro_linkage,
         current_situation=current_situation,
         next_check=next_check,
+        affordability=affordability,
     )
+
+
+def _compute_affordability(payload: dict) -> dict | None:
+    """Join the exposure model to the housing decision.
+
+    This is the coupling the report was missing. "Should I sell SK하이닉스?" and
+    "when can I buy a home?" are not two questions for this user — the money for
+    the home is inside the stock. The rate environment can say ENTER all it likes;
+    if the cash is not there, ENTER is not an instruction the user can follow.
+
+    Deliberately does NOT invent an affordability threshold: the user's target
+    area and size are unknown, so a hard-coded "you need N억" would be a guess
+    dressed as a rule. Instead it reports how far the deployable cash actually
+    reaches at the current Seoul 평당가, and states the one fact that follows
+    from the numbers — funding a purchase means liquidating semiconductors,
+    which is also what reduces the concentration. Both problems share a solution.
+    """
+    exposure = payload.get("exposure")
+    if exposure is None:
+        return None
+
+    def _pyeong_price(block: dict, key: str) -> float | None:
+        seoul = (block or {}).get(key, {}).get("seoul", {})
+        v = seoul.get("price_per_pyeong_manwon")
+        return float(v) * 10_000 if v else None
+
+    buy_pp = _pyeong_price(payload.get("real_estate", {}), "tiers")
+    jeonse_pp = _pyeong_price(payload.get("real_estate_rent", {}), "jeonse_tiers")
+
+    cash = exposure.deployable_cash
+    out = {
+        "deployable_cash": cash,
+        "cash_only": exposure.cash_krw,
+        "from_liquidation": exposure.liquid_valued,
+        "locked": exposure.locked_valued,
+        "buy_pyeong_price": buy_pp,
+        "jeonse_pyeong_price": jeonse_pp,
+        "buy_pyeong_equivalent": (cash / buy_pp) if buy_pp else None,
+        "jeonse_pyeong_equivalent": (cash / jeonse_pp) if jeonse_pp else None,
+        "semi_pct": exposure.semi_pct,
+        "reference_month": ((payload.get("real_estate") or {}).get("tiers", {})
+                            .get("seoul", {}).get("reference_month")),
+    }
+
+    # The only structural statement the numbers support on their own.
+    out["coupling_note"] = (
+        f"가용 현금 {cash/100_000_000:.2f}억 중 현금성은 "
+        f"{exposure.cash_krw/100_000_000:.2f}억뿐이고 나머지는 주식 매각으로만 만들어진다. "
+        f"그런데 그 매각은 반도체 집중도({exposure.semi_pct:.1f}%)를 낮추는 행위와 같다 — "
+        f"주택 자금 마련과 집중도 완화는 서로 다른 문제가 아니라 같은 실행이다."
+    )
+    return out
 
 
 def _get_housing_situation(housing: dict) -> str:

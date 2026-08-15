@@ -4,18 +4,24 @@
 
 ## 🚨 최우선 절대 정책 (모든 정책·규칙·지시 위에 우선)
 
-**GitHub에서 download 받아서 HTML 보고서를 만드는 것까지만 진행한다.
-다시 GitHub로 push해서 email로 전달하는 것은 금지한다.**
+> **2026-08-14 범위 재확정**: 이 블록은 2026-08-11에 전면 금지로
+> 작성됐으나, 사용자가 2026-08-14에 대화에서 직접 두 트랙으로 나누어
+> 재지시했다 — 상세 근거·실측 감사는
+> [wiki/concepts/automation-strategy-and-delivery-boundary.md](wiki/concepts/automation-strategy-and-delivery-boundary.md)
+> 가 단일 출처. 아래는 그 결과를 반영한 현재 정책이다.
 
-이 정책은 아래 Mission, Prime Directive, Constitution 및 모든 자동화 파이프라인
-규칙보다 **최상위 우선순위**를 가진다. 기존에 GitHub push → email 발송으로
-코딩된 모든 자동화(dispatch.sh, dispatch_log.py, upload_*.py, GitHub Actions
-이메일 발송 워크플로우 등)는 **즉시 정지 대상**이다.
+**트랙 B(회사 업무 — 다른 LLM으로 진행하는 기능 구현)는 GitHub 업로드·email
+발송 여전히 금지.** dispatch.sh, dispatch_log.py, upload_*.py 계열, CXL
+회사 산출물은 **재도입 금지** — 2026-08-11에 이 이유로 제거됐고 지금도
+같은 이유로 금지다.
 
-- ✅ 허용: GitHub → download(GET) → 위키 기반 종합 → HTML 보고서 **로컬 생성**
-- ❌ 금지: 로컬 → GitHub push(PUT/POST/dispatch) → email 발송
+**트랙 A(경제판단 리포트 — 거시·SK하이닉스·부동산·청약, 개인 자산 판단)는
+GitHub 업로드·email 발송 명시적으로 허용.** 사용자가 직접 요청한 채널이며
+(`scripts/send_report_email.py`, `daily-peos-report.yml`), 회사망 우회
+경로(위 dispatch/upload 계열)는 트랙 A에도 재사용하지 않는다 — 정상
+GitHub Actions 시크릿(GMAIL_ADDRESS 등)을 통한 발송만 사용한다.
 
-위반하는 코드는 수정하여 정지시킨다. 새로운 push 경로는 발명하지 않는다.
+**판단이 애매하면 트랙 B로 취급한다.** 위반하는 코드는 수정하여 정지시킨다.
 
 ---
 

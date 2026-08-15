@@ -18,6 +18,7 @@ import requests
 
 from core import cache as cache_mod
 from core.config import api_config, get_api_key
+from core.logger import log_event
 from core.models import DataPoint, DataStatus, Frequency, Metadata
 from . import base
 
@@ -54,17 +55,60 @@ ECOS_SERIES: dict[str, dict] = {
 }
 
 
+# ECOS caps StatisticSearch at 1000 rows PER REQUEST and pages oldest-first
+# (/시작건수/종료건수/), so any series longer than one page must be walked page by
+# page or the recent end is simply missing. This module asked for /1/500/ in one
+# shot, which is why the three cycle:"D" series (kr_10y_yield, kr_3y_yield,
+# usdkrw) all froze at 2018-08-24 for 2,912 days: 10 years of business days is
+# ~2,520 rows, the API returned the oldest 500, and the collector rewrote that
+# same 2016-2018 slice on every run. Monthly (120 rows) and quarterly (40) fit
+# in one page, which is why only the daily ones looked broken.
+#
+# scripts/macro_data.py hit exactly this in a live-account test on 2026-07-25
+# (kr_usdkrw filled 2016-2020 and nothing after) and was fixed there; this
+# collector was never updated. Raising the number alone does NOT work — asking
+# for 10000 still returns 1000. list_total_count is what makes it correct.
+_PAGE_SIZE = 1000
+_MAX_PAGES = 20  # 20,000 rows — far beyond any Core-10 series, but bounded
+
+
 def _fetch_stat(stat_code: str, cycle: str, item_code1: str, api_key: str,
                  start: str, end: str, timeout: int = 20) -> list[dict] | None:
     base_url = api_config()["sources"]["ecos"]["base_url"]
-    url = f"{base_url}/StatisticSearch/{api_key}/json/kr/1/500/{stat_code}/{cycle}/{start}/{end}/{item_code1}"
-    resp = requests.get(url, timeout=timeout)
-    resp.raise_for_status()
-    payload = resp.json()
+
+    def _page(row_from: int, row_to: int) -> dict:
+        url = (f"{base_url}/StatisticSearch/{api_key}/json/kr/{row_from}/{row_to}"
+               f"/{stat_code}/{cycle}/{start}/{end}/{item_code1}")
+        resp = requests.get(url, timeout=timeout)
+        resp.raise_for_status()
+        return resp.json()
+
+    payload = _page(1, _PAGE_SIZE)
     if "StatisticSearch" not in payload:
         # ECOS returns {"RESULT": {"CODE": ..., "MESSAGE": ...}} on error
         raise RuntimeError(payload.get("RESULT", {}).get("MESSAGE", "ECOS error response"))
-    return payload["StatisticSearch"].get("row", [])
+
+    search = payload["StatisticSearch"]
+    rows = list(search.get("row", []))
+    total = int(search.get("list_total_count", len(rows)))
+
+    pages = 1
+    row_from = _PAGE_SIZE + 1
+    while row_from <= total and pages < _MAX_PAGES:
+        nxt = _page(row_from, min(row_from + _PAGE_SIZE - 1, total))
+        page_rows = nxt.get("StatisticSearch", {}).get("row")
+        if not page_rows:
+            break
+        rows.extend(page_rows)
+        row_from += _PAGE_SIZE
+        pages += 1
+
+    # Never let an incomplete walk pass as a complete series.
+    if len(rows) < total:
+        log_event("collector.ecos_pagination_incomplete", level="warning",
+                  stat_code=stat_code, cycle=cycle, fetched=len(rows), total=total,
+                  note="페이지 순회가 끝나기 전에 중단 — 최신 구간이 누락됐을 수 있음")
+    return rows
 
 
 _HISTORY_YEARS = 10
