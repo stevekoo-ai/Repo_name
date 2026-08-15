@@ -7,8 +7,12 @@ sentence structure required by 17.2 wherever a judgment is being stated.
 """
 from __future__ import annotations
 
+from core.config import portfolio_config
 from core.models import DataStatus
 from engine.report.economic_events import generate_event_section
+from engine.report.reconciliation import render_reconciliation_section
+
+SK_HYNIX_TICKER = "000660.KS"
 
 STATUS_KR = {
     DataStatus.OK.value: "OK",
@@ -33,10 +37,120 @@ def _fmt(value, suffix: str = "") -> str:
     return f"{value}{suffix}"
 
 
+def _exposure_section(payload: dict) -> str:
+    """Section 0 — the decision layer that does not depend on any collector.
+
+    Placed first on purpose. On a day when every macro source fails, this is
+    the only section still carrying valid information, and it happens to be
+    the one that speaks to the user's two real decisions.
+    """
+    m = payload.get("exposure")
+    if not m:
+        return "# 0. 포지션 & 익스포저\n\n- 산출 실패 (config/portfolio.yaml 확인 필요)"
+
+    def won(v: float) -> str:
+        return f"{v/100_000_000:.2f}억원" if abs(v) >= 100_000_000 else f"{v/10_000:,.0f}만원"
+
+    emp = next((h for h in m.holdings if h.ticker == "000660.KS"), None)
+
+    lines = [
+        "# 0. 포지션 & 익스포저 (데이터 수집과 무관하게 항상 유효)",
+        "",
+        "> 이 섹션은 외부 API를 쓰지 않는다. 거시 지표가 전부 이월된 날에도 이 숫자는 옳다.",
+        "> 사용자의 두 결정(하이닉스 보유/매도, 주택 진입 시점)은 거시 질문이 아니라 익스포저 질문이며,",
+        "> **현금이 주식 안에 잠겨 있으므로 두 결정은 하나의 문제다.**",
+        "",
+        "| 항목 | 금액 | 비중 |",
+        "|---|---|---|",
+        f"| 주식+ETF 평가액 | {won(m.total_valued)} | — |",
+        f"| 반도체 섹터 합계 | {won(m.semi_valued)} | **{m.semi_pct:.1f}%** |",
+        f"| SK하이닉스 단독 | {won(m.employer_valued)} | {m.employer_pct:.1f}% |",
+        f"| 현금 | {won(m.cash_krw)} | — |",
+        f"| 퇴직연금(인출제한) | {won(m.retirement_krw)} | — |",
+        "",
+    ]
+
+    if emp:
+        lines += [
+            "## 매도 가능 수량 (락업 반영)",
+            f"- 보유 {emp.quantity:,}주 · 평단 {emp.avg_price:,.0f}원",
+            f"- 락업 {emp.locked_qty:,}주 ({emp.lock_until}까지) → 평가 {won(m.locked_valued)}",
+            f"- **즉시 조정 가능 {emp.sellable_qty:,}주**",
+            "",
+        ]
+
+    lines += [
+        "## 주택 진입에 실제로 쓸 수 있는 돈",
+        f"- 현금 {won(m.cash_krw)} + 매각가능 자산 {won(m.liquid_valued)} = **{won(m.deployable_cash)}**",
+        "- [해석] 부동산 진입 여력은 기준금리가 아니라 **이 숫자**가 결정한다.",
+        "  3절(부동산)의 WAIT/ENTER 판단은 이 값과 함께 읽어야 의미가 있다.",
+        "",
+        "## 집중도 경고",
+        f"- 반도체 섹터가 주식·ETF의 **{m.semi_pct:.1f}%** — SK하이닉스 단독이 아니라 "
+        "삼성전자·제주반도체·반도체 ETF까지 같은 사이클에 묶여 있다.",
+        "- 여기에 급여·성과급(PS)과 퇴직연금이 같은 회사에 연동된다 → **실질 집중도는 위 수치보다 높다.**",
+        "- [행동] 총자산 대비 반도체 상한선을 %로 정해 두면, 이벤트 당일에 감정이 아니라 규칙으로 대응하게 된다.",
+        "",
+        "## 이 섹션의 한계",
+    ]
+    lines += [f"- {n}" for n in m.notes]
+    return "\n".join(lines)
+
+
+def _sk_hynix_position_line() -> str:
+    """Actual SK하이닉스 position from config/portfolio.yaml.
+
+    This used to be the literal string "1,200주". The real holding is the
+    merged multi-broker position, and part of it is locked up — in a
+    hold/sell report the sellable quantity is the number the decision
+    actually applies to, so both are stated.
+    """
+    stocks = portfolio_config().get("stocks") or []
+    pos = next((s for s in stocks if s.get("ticker") == SK_HYNIX_TICKER), None)
+    if not pos:
+        return "미확인 (config/portfolio.yaml에 000660.KS 포지션 없음)"
+
+    qty = pos.get("quantity")
+    avg = pos.get("avg_price")
+    locked = sum(l.get("quantity", 0) for l in (pos.get("lockups") or []))
+
+    line = f"{qty:,}주"
+    if avg:
+        line += f" (평단 {avg:,.0f}원)"
+    if locked:
+        until = ", ".join(str(l.get("lock_until")) for l in pos["lockups"] if l.get("lock_until"))
+        line += f" — 이 중 {locked:,}주 락업({until}) → **즉시 매도 가능 {qty - locked:,}주**"
+    return line
+
+
+# Physically-possible ranges for indicators whose displayed unit has been observed
+# to disagree with the underlying series. This does NOT correct the value — the
+# correct unit is unknown without the source's metadata, and guessing a conversion
+# factor would replace a visible error with an invisible one. It only stops an
+# impossible number from being presented as fact.
+#
+# 경상수지: unit resolved 2026-08-10 — collectors/ecos.py declares 백만달러 for
+# stat_code 301Y013, verified against a live ECOS response on 2026-07-14, and
+# config/rules.yaml was relabelled to match. Bounds below are the plausible range
+# in 백만달러 (Korea's current account is on the order of tens of billions USD),
+# so they still catch a 100x unit regression without flagging normal readings.
+SANITY_BOUNDS: dict[str, tuple[float, float, str]] = {
+    "current_account": (-30_000, 150_000, "경상수지가 백만달러 기준 통상 범위를 벗어남 — 시리즈/단위 회귀 의심"),
+}
+
+
 def _macro_dashboard_rows(rows_data: list[dict]) -> list[str]:
     lines = ["| 지표 | 현재 | 이전 | 추세 | 점수 | 출처 |", "|---|---|---|---|---|---|"]
+    flagged: list[str] = []
     for row in rows_data:
         current = _fmt(row["current"]) + (" ‡" if row.get("status") == "stale" else "")
+
+        bound = SANITY_BOUNDS.get(row.get("key"))
+        value = row.get("current")
+        if bound and isinstance(value, (int, float)) and not (bound[0] <= value <= bound[1]):
+            current += " ⚠"
+            flagged.append(f"⚠ {row['indicator']}: {bound[2]}. 이 값은 판단 근거로 쓰지 말 것.")
+
         lines.append(
             f"| {row['indicator']} | {current} | {_fmt(row['previous'])} | "
             f"{row['trend']} | {_fmt(row['score'])} | {row['source'] or STATUS_KR.get(row['status'], row['status'])} |"
@@ -44,6 +158,9 @@ def _macro_dashboard_rows(rows_data: list[dict]) -> list[str]:
     if any(r.get("status") == "stale" for r in rows_data):
         lines.append("")
         lines.append("‡ 오늘 실시간 조회에 실패한 지표 — 마지막으로 확인된 값을 그대로 유지해 표시 (추측/대체 데이터 아님).")
+    for note in flagged:
+        lines.append("")
+        lines.append(note)
     return lines
 
 
@@ -319,9 +436,31 @@ def _rate_analysis(payload: dict) -> str:
         "",
         "### 현재 금리 상황",
         f"- **미국 10Y Treasury**: {_fmt(rates.get('us_10y'), '%')}",
-        f"- **한국 10Y 국고채**: {_fmt(rates.get('kr_10y'), '%')}",
-        f"- **Spread (US-KR)**: {_fmt(rates.get('spread_bp'), 'bp')}",
-        f"  - 기준: 200~250bp | 현재: {('**정상 범위**' if rates.get('spread_bp') is not None and 150 <= rates['spread_bp'] <= 300 else '**주의 필요**')}",
+        f"- **한국 10Y 국고채**: {_fmt(rates.get('kr_10y'), '%')}"
+        + ("" if rates.get("kr_10y") is not None else " — 미수집"),
+        f"- **Spread (US-KR)**: {_fmt(rates.get('spread_bp'), 'bp')}"
+        + ("" if rates.get("spread_bp") is not None else " — 한국 금리 미수집으로 산출 불가"),
+    ]
+    # The spread verdict is only meaningful when a spread exists. It used to print
+    # "주의 필요" unconditionally, which read as a judgment even when the number
+    # behind it was missing (or, before the staleness guard, eight years old).
+    if rates.get("spread_bp") is not None:
+        lines.append(
+            f"  - 기준: 200~250bp | 현재: "
+            f"{'**정상 범위**' if 150 <= rates['spread_bp'] <= 300 else '**주의 필요**'}"
+        )
+
+    stale = ra.get("stale_series") or []
+    if stale:
+        lines.append("")
+        lines.append("> ⚠️ **너무 낡아 제외된 시리즈** — 마지막 관측이 오래되어 현재값으로 쓰지 않았습니다.")
+        for sd in stale:
+            lines.append(f">   - `{sd['series']}` — 최종 관측 {sd['as_of']} ({sd['age_days']:,}일 경과)")
+        lines.append(">")
+        lines.append("> 이 값들은 2026-08-13까지 현재값처럼 표시되어 실재하지 않는 한-미 금리차(약 312bp)를")
+        lines.append("> 만들어냈습니다. 이제 신선도 기준(45일)을 넘기면 값을 버리고 사유를 남깁니다.")
+
+    lines += [
         "",
         "### 추이 신호",
         f"- **미국 10Y 1개월 변화**: {_fmt(trends.get('us_10y_1m_change_bp'), 'bp')}",
@@ -464,20 +603,38 @@ def _cci_analysis(payload: dict) -> str:
     lines.append("")
 
     # Semiconductor Cycle
+    # CCI is a RISK index: every component reads "higher = more danger", and the
+    # sibling blocks above narrate 0 as ✅ 안전/정상. This block used to invert that
+    # — it printed "📉 침체: 공급 과잉" for a low score, so a 0 was rendered as the
+    # worst possible verdict instead of the best.
+    #
+    # Worse, score_semiconductor_cycle() returns 0 in two unrelated cases: a healthy
+    # cycle, AND no data at all (KOSIS missing + US fallback unavailable). Narrating a
+    # missing series as an industry downturn is how a collector outage turns into a
+    # false sell signal — which matters a lot here, since semis are ~96% of the
+    # user's stock/ETF exposure. semi_cycle_index is None exactly in the no-data case.
     semi_score = cci['score_components']['semiconductor']
+    semi_cycle = (cci.get('raw_values') or {}).get('semi_cycle_index')
     lines.append(f"**5. 반도체 산업사이클** — {semi_score}/10")
-    if semi_score >= 8:
-        lines.append("- 📈 **긍정 신호**: 출하/재고 비율 정상화, 가격 안정화. 업황 회복 단계")
-        lines.append("- **경제 의미**: AI/DC 인프라 투자 재개. 메모리 공급 부족 심화. 가격 인상 가능성")
-        lines.append("- **사용자 영향 (SK하이닉스 직원)**: 매출 개선 → 보너스 사이클 상향. ETF 수익률 개선")
+    if semi_cycle is None:
+        lines.append("- ⓘ **데이터 없음**: 반도체 출하/재고 지수 미수집 — 판정하지 않음")
+        lines.append("- **경제 의미**: 이 항목은 위기지수 총점에 0점으로만 반영됨 (악재 판정 아님)")
+        lines.append("- **사용자 영향**: 이 줄을 근거로 매매하지 말 것. "
+                     "업황은 별도 지표(반도체 수출 증가율, HBM Cycle Score)로 확인")
+    elif semi_score >= 8:
+        lines.append("- 🔴 **위험**: 재고 급증/출하 급감. 사이클 하강 신호가 뚜렷함")
+        lines.append("- **경제 의미**: 공급 과잉과 가격 하락 압력. 구조조정 국면 진입 가능성")
+        lines.append("- **사용자 영향 (SK하이닉스 직원)**: 투자·고용 이중 노출이 동시에 악화되는 구간")
     elif semi_score >= 4:
-        lines.append("- ⚡ **회복 중**: 약간의 과잉 공급 남아있으나 개선 추세")
-        lines.append("- **경제 의미**: 시장 정리 진행 중. 향후 2~3개월이 중요")
-        lines.append("- **사용자 영향**: SK하이닉스 지켜보기. 실적 발표 주의")
+        lines.append("- 🟡 **주의**: 사이클 지표가 약세로 기울어짐")
+        lines.append("- **경제 의미**: 재고 조정 진행 중. 향후 2~3개월이 중요")
+        lines.append("- **사용자 영향**: SK하이닉스 실적 발표 주시")
     else:
-        lines.append("- 📉 **침체**: 공급 과잉, 가격 하락. 구조조정 우려")
-        lines.append("- **경제 의미**: 산업 사이클 저점. 정부 지원 정책 추적")
-        lines.append("- **사용자 영향**: 현금 확충. 저점 매수 기회 포착 준비")
+        lines.append("- ✅ **정상**: 사이클 지표에서 위험 신호 없음")
+        lines.append("- **경제 의미**: 재고·출하 흐름이 하강 국면을 가리키지 않음")
+        lines.append("- **사용자 영향**: 현재 포지션 유지 검토 가능")
+    if semi_cycle is not None:
+        lines.append(f"- **사이클 지수**: {semi_cycle:+.4f}")
     lines.append("")
 
     action = cci["sk_hynix_action"]
@@ -744,7 +901,7 @@ def _sk_hynix_decision_section(payload: dict) -> str:
         f"**근거**: {decision.rationale}",
         "",
         "## 현재 상태",
-        f"- 보유 수량: 1,200주",
+        f"- 보유 수량: {_sk_hynix_position_line()}",
         f"- 반도체 점수: {_fmt(personal.get('semiconductor_score'))} ({personal.get('semiconductor_band')})",
         f"- 금리 환경: {_fmt(rate_analysis.get('total_score'), '/100점')} ({_interpret_rate_score(rate_analysis.get('total_score', 50))})",
         "",
@@ -829,6 +986,38 @@ def _real_estate_decision_section(payload: dict) -> str:
         "## 거시-부동산 연결 분석",
         f"{decision.macro_linkage}",
         "",
+    ]
+
+    # Funding reality, joined from the exposure model (Section 0). A rate-driven
+    # ENTER is not an instruction the user can follow if the cash is not there.
+    aff = getattr(decision, "affordability", None)
+    if aff:
+        def _eok(v):
+            return f"{v/100_000_000:.2f}억원"
+        ref = f" ({aff['reference_month']} 기준)" if aff.get("reference_month") else ""
+        lines += [
+            "## 자금 현실 (0절 연동)",
+            f"- 진입 가용 현금: **{_eok(aff['deployable_cash'])}** "
+            f"(현금성 {_eok(aff['cash_only'])} + 매각가능 주식 {_eok(aff['from_liquidation'])})",
+        ]
+        if aff.get("locked"):
+            lines.append(f"- 동원 불가(락업): {_eok(aff['locked'])}")
+        if aff.get("buy_pyeong_equivalent"):
+            lines.append(f"- 서울 아파트 매매 평당 {aff['buy_pyeong_price']/10_000:,.0f}만원{ref} "
+                         f"→ 대출 없이 **약 {aff['buy_pyeong_equivalent']:.1f}평**")
+        if aff.get("jeonse_pyeong_equivalent"):
+            lines.append(f"- 서울 전세 평당 {aff['jeonse_pyeong_price']/10_000:,.0f}만원{ref} "
+                         f"→ **약 {aff['jeonse_pyeong_equivalent']:.1f}평**")
+        lines += [
+            "",
+            f"> {aff['coupling_note']}",
+            "",
+            "- ⓘ 위 평수는 서울 평균 평당가 기준의 자금 도달 범위일 뿐이다. "
+            "목표 지역·평형이 정해지면 그 값으로 다시 계산해야 하며, 대출 한도는 반영되어 있지 않다.",
+            "",
+        ]
+
+    lines += [
         "## 주요 이벤트 트리거",
         "",
     ]
@@ -1137,6 +1326,80 @@ def _year_to_date_window_section(payload: dict) -> str:
     return "\n".join(lines)
 
 
+def _weekly_analysis_section(payload: dict) -> str:
+    """Section: 12주 거시 지표 분석 (1-2 min read).
+
+    Supporting evidence for Layer 0 valuation and macro regime.
+    Displays 12-week rolling window trends for key indicators.
+    """
+    weekly = payload.get("weekly_analysis", {})
+
+    if not weekly or weekly.get("status") == "error":
+        return ""
+
+    indicators = weekly.get("indicators", {})
+    if not indicators:
+        return ""
+
+    lines = [
+        "# 2.5 12주 거시 지표 분석 — Layer 0 근거",
+        "",
+        f"**분석 기간**: {weekly.get('period_start')} ~ {weekly.get('period_end')}",
+        "",
+        "## 지표별 12주 추세",
+        "",
+        "| 지표 | 현재값 | 12주 전 | 변화율 | 추세 |",
+        "|------|--------|---------|--------|------|",
+    ]
+
+    # Add indicator summary table
+    for series_name, analysis in indicators.items():
+        current = f"{analysis.get('current_value', 'N/A'):.2f}" if isinstance(analysis.get('current_value'), (int, float)) else "N/A"
+        prev = f"{analysis.get('value_12w_ago', 'N/A'):.2f}" if isinstance(analysis.get('value_12w_ago'), (int, float)) else "N/A"
+        pct = f"{analysis.get('pct_change', 0):+.1f}%" if analysis.get('pct_change') is not None else "N/A"
+        trend_emoji = {"상향": "📈", "보합": "→", "하향": "📉"}.get(analysis.get('trend'), "?")
+        trend = f"{trend_emoji} {analysis.get('trend', 'N/A')}"
+
+        lines.append(f"| {analysis.get('label', series_name)} | {current} {analysis.get('unit')} | {prev} | {pct} | {trend} |")
+
+    lines.extend([
+        "",
+        "## 핵심 신호",
+        "",
+    ])
+
+    # Analyze trends to generate insights
+    trends = {}
+    for name, analysis in indicators.items():
+        trends[name] = analysis.get("trend")
+
+    # Count uptrends/downtrends
+    uptrends = [name for name, trend in trends.items() if trend == "상향"]
+    downtrends = [name for name, trend in trends.items() if trend == "하향"]
+
+    if uptrends:
+        labels = [indicators[n].get("label") for n in uptrends if n in indicators]
+        lines.append(f"- 📈 **상향**: {', '.join(labels)}")
+
+    if downtrends:
+        labels = [indicators[n].get("label") for n in downtrends if n in indicators]
+        lines.append(f"- 📉 **하향**: {', '.join(labels)}")
+
+    lines.extend([
+        "",
+        "## Layer 0 연결",
+        "",
+        "이 12주 지표 분석은 SK Hynix 의사결정의 **Layer 0 밸류에이션 밴드**를 뒷받침합니다:",
+        "- **US 10Y 금리**: ERP(Earnings Risk Premium) 산출에 직결",
+        "- **원/달러 환율**: 배당금 환산 영향 및 기업 현금흐름 진단",
+        "- **브렌트유**: 글로벌 경기 회복 신호 ↔ 자본적 지출 수요",
+        "- **한국은행 기준금리 / 미국 연방기금금리**: 금융 완화/긴축 사이클 추적",
+        "",
+    ])
+
+    return "\n".join(lines)
+
+
 def render_markdown(payload: dict) -> str:
     """Render PEOS report using new 5-section user-centric structure.
 
@@ -1153,8 +1416,11 @@ def render_markdown(payload: dict) -> str:
 
     # NEW 5-SECTION STRUCTURE + ECONOMIC EVENTS + ROLLING WINDOWS (Primary Report)
     main_sections = [
+        _exposure_section(payload),
+        render_reconciliation_section(payload.get("reconciliation")),
         _macro_dashboard_section(payload),
         _sk_hynix_decision_section(payload),
+        _weekly_analysis_section(payload),  # Layer 0 supporting evidence
         _real_estate_decision_section(payload),
         generate_event_section(payload),  # 경제 달력 통합 (Section 3.5)
         _monthly_rolling_window_section(payload),  # 월별 추이 (Section 4)

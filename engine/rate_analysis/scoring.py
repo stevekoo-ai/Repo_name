@@ -15,9 +15,13 @@ Score interpretation:
 """
 from __future__ import annotations
 
-from datetime import timedelta
-from dataclasses import dataclass
+from datetime import date, timedelta
+from dataclasses import dataclass, field
 from typing import Optional
+
+import pandas as pd
+
+from core.logger import log_event
 
 from collectors import fred, ecos
 from core.models import DataPoint, DataStatus
@@ -39,15 +43,47 @@ class RateScoreDetail:
     trend_1m: Optional[float] = None  # 1-month rate change (in bp)
     trend_3m: Optional[float] = None  # 3-month trend
     us_10y_2y_spread: Optional[float] = None  # Yield curve (recession signal)
+    # Series that were dropped for being too old to be "current" — each entry is
+    # {"series", "as_of", "age_days"}. Kept so the report can say WHY a rate is
+    # missing instead of silently showing a blank (or, as before, a stale number).
+    stale_series: list = field(default_factory=list)
 
 
-def _get_latest_rate(series_key: str, window_days: int = 1) -> Optional[float]:
-    """Fetch latest rate from normalized data."""
-    df = collector_base.read_normalized(f"fred_{series_key}" if "us_" in series_key else f"ecos_{series_key}")
+# A market rate is only "current" for so long. Beyond this the series is treated as
+# uncollected rather than current — ecos_kr_10y_yield/kr_3y_yield stopped updating in
+# 2018 and this module kept publishing the 2018-08-24 value as today's Korean 10Y,
+# which produced a fabricated US-KR spread (reported as ~312bp on 2026-08-13).
+# Daily market quotes get a short leash; anything monthly is fetched elsewhere.
+MAX_RATE_AGE_DAYS = 45
+
+_STALE_SERIES: list[dict] = []
+
+
+def _get_latest_rate(series_key: str, max_age_days: int = MAX_RATE_AGE_DAYS) -> Optional[float]:
+    """Latest value of a rate series, or None if the newest observation is too old.
+
+    Returning the last row regardless of its date is how an 8-year-old quote gets
+    rendered as a live one. Staleness is recorded in _STALE_SERIES so the caller can
+    report the observation date instead of showing an unexplained blank.
+    """
+    series_id = f"fred_{series_key}" if "us_" in series_key else f"ecos_{series_key}"
+    df = collector_base.read_normalized(series_id)
     if df.empty:
         return None
+
     latest = df.sort_values("date").iloc[-1]
-    return float(latest["value"]) if latest["value"] is not None else None
+    if latest["value"] is None or latest["value"] != latest["value"]:  # None/NaN
+        return None
+
+    as_of = pd.to_datetime(latest["date"]).date()
+    age = (date.today() - as_of).days
+    if age > max_age_days:
+        log_event("rate_analysis.series_stale", series=series_id,
+                  as_of=str(as_of), age_days=age, level="warning")
+        _STALE_SERIES.append({"series": series_id, "as_of": str(as_of), "age_days": age})
+        return None
+
+    return float(latest["value"])
 
 
 def _calculate_rate_change(series_key: str, days: int = 30) -> Optional[float]:
@@ -263,6 +299,7 @@ def calculate_rate_score() -> RateScoreDetail:
     # kr_10y_yield never was, which is why the spread score always read as "unavailable"
     # regardless of network conditions. Fetch it directly here so this module doesn't rely on
     # an unrelated pipeline stage's side effect to populate the one series it actually needs.
+    _STALE_SERIES.clear()
     ecos.fetch_series("kr_10y_yield")
 
     # Fetch latest rates
@@ -313,6 +350,7 @@ def calculate_rate_score() -> RateScoreDetail:
         trend_1m=us_1m_change,
         trend_3m=us_3m_change,
         us_10y_2y_spread=us_10y_2y,
+        stale_series=list(_STALE_SERIES),
     )
 
 

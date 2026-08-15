@@ -257,6 +257,20 @@ def build_report_payload(month_key: str | None = None) -> dict:
         "appendix": _appendix(macro),
     }
 
+    # Position & exposure model (Section 0). Deliberately computed BEFORE and
+    # independently of every collector: it reads config/portfolio.yaml only, so
+    # it stays valid on days when the whole macro layer is carried forward.
+    # See engine/exposure/model.py for why this layer exists.
+    try:
+        from engine.exposure.model import build_exposure_model
+        payload["exposure"] = build_exposure_model()
+        log_event("exposure_model.computed",
+                  semi_pct=round(payload["exposure"].semi_pct, 1),
+                  deployable=payload["exposure"].deployable_cash)
+    except Exception as exc:
+        log_event("exposure_model.failed", error=str(exc), level="warning")
+        payload["exposure"] = None
+
     # Add interest rate analysis
     rate_analysis = _rate_analysis_section()
     payload["rate_analysis"] = rate_analysis
@@ -366,6 +380,50 @@ def build_report_payload(month_key: str | None = None) -> dict:
         log_event("rolling_windows.failed", error=str(exc), level="warning")
         payload["rolling_windows"] = {"status": "error", "error": str(exc)}
 
+    # Add 12-week macro indicator analysis (Layer 0 supporting evidence)
+    try:
+        from engine.report.weekly_analysis import generate_weekly_analysis
+
+        weekly_result = generate_weekly_analysis()
+        payload["weekly_analysis"] = {
+            "analysis_date": weekly_result.analysis_date,
+            "period_start": weekly_result.period_start,
+            "period_end": weekly_result.period_end,
+            "indicators": {
+                name: {
+                    "label": analysis.label,
+                    "unit": analysis.unit,
+                    "current_value": analysis.current_value,
+                    "value_12w_ago": analysis.value_12w_ago,
+                    "pct_change": analysis.pct_change,
+                    "abs_change": analysis.abs_change,
+                    "trend": analysis.trend,
+                    "latest_date": analysis.latest_date,
+                    "data_points": analysis.data_points,
+                }
+                for name, analysis in weekly_result.indicators.items()
+            }
+        }
+        log_event("weekly_analysis.computed", analysis_date=weekly_result.analysis_date,
+                  indicator_count=len(weekly_result.indicators))
+    except Exception as exc:
+        log_event("weekly_analysis.failed", error=str(exc), level="warning")
+        payload["weekly_analysis"] = {"status": "error", "error": str(exc)}
+
+    # Cross-engine reconciliation. Runs LAST so it can see every engine's output,
+    # and emits one stance instead of letting modules contradict each other in
+    # front of the reader. See engine/report/reconciliation.py for the rules.
+    try:
+        from engine.report.reconciliation import reconcile
+        payload["reconciliation"] = reconcile(payload)
+        log_event("reconciliation.computed",
+                  conflicts=len(payload["reconciliation"].conflicts),
+                  tradeable=payload["reconciliation"].tradeable)
+    except Exception as exc:
+        log_event("reconciliation.failed", error=str(exc), level="warning")
+        payload["reconciliation"] = None
+
+
     log_event("report_payload.built", month=month_key, readiness=readiness, action_count=len(actions))
     return payload
 
@@ -389,6 +447,9 @@ def _rate_analysis_section() -> dict:
             "kr_10y": round(rate_score_detail.kr_10y, 2) if rate_score_detail.kr_10y else None,
             "spread_bp": round(rate_score_detail.spread, 0) if rate_score_detail.spread else None,
         },
+        # Series dropped for age. Present so the report can distinguish "not collected"
+        # from "collected and happens to be blank" — see engine/rate_analysis/scoring.py.
+        "stale_series": getattr(rate_score_detail, "stale_series", []),
         "trends": {
             "us_10y_1m_change_bp": round(rate_score_detail.trend_1m, 1) if rate_score_detail.trend_1m else None,
             "us_10y_3m_trend": "up" if rate_score_detail.trend_3m and rate_score_detail.trend_3m > 0 else "down",
@@ -439,6 +500,11 @@ def _cci_section() -> dict:
             "spread_10y3m": round(cci_detail.spread_10y3m, 3) if cci_detail.spread_10y3m else None,
             "hy_oas": round(cci_detail.hy_oas, 2) if cci_detail.hy_oas else None,
             "k_emp_yoy": round(cci_detail.k_emp_yoy, 0) if cci_detail.k_emp_yoy else None,
+            # Needed to tell "no data" apart from a real reading: score_semiconductor_cycle()
+            # returns 0 both when the series is missing and when the cycle is healthy, so the
+            # score alone cannot be narrated honestly. None here means genuinely uncollected.
+            "semi_cycle_index": (round(cci_detail.semi_cycle_index, 4)
+                                 if cci_detail.semi_cycle_index is not None else None),
         },
         "sk_hynix_action": sk_hynix_action,
         "interpretation": {

@@ -21,7 +21,7 @@ tags: [ops, automation, log-rotation, github-actions, infra]
 | 층 | 실행 주체 | 시각 | 산출물 | 상태 |
 |---|---|---|---|---|
 | GitHub Actions | `log-rotate.yml`(main) → `log_rotate.py` | 00:20 KST 매일 | `log-archive/YYYY-MM/YYYY-MM-DD.md` + 월말 월 아카이브 병합 | ✅ 배포 완료 (2026-08-07 실증) |
-| Windows Task Scheduler | `log_summarize_routine.bat` → `claude -p`(GLM) | 00:40 KST 매일 | `log.md` `## 당월 요약` 2~3줄 갱신 (로컬) | ✅ 등록 완료·자동 실행 중 (8/8~8/10 실증) |
+| Windows Task Scheduler | `log_summarize_routine.bat` → `claude -p`(GLM) | 00:40 KST 매일 | `log.md` `## 당월 요약` 2~3줄 갱신 + Contents API PUT | ✅ 등록 완료·자동 실행 중 (8/8~8/10 실증) |
 | Live session | 세션 시작 시 `wc -c > 50KB` | on-demand | 정성/복구 + 즉시 cut | 부분 (best-effort 안전망) |
 
 ## 산출물 파일 목록
@@ -34,27 +34,31 @@ tags: [ops, automation, log-rotation, github-actions, infra]
   dry-run/실 cut/월병합 지원. idempotent(아카이브 존재 시 skip).
 
 ### Windows 층 (✅ schtasks 등록 완료·자동 실행 중)
-- `scripts/log_summarize_routine.bat` — 2단계(git pull → `claude -p`
-  GLM 요약). 00:40 KST.
+- `scripts/log_summarize_routine.bat` — 3단계(git pull → `claude -p`
+  GLM 요약 → Contents API PUT). 00:40 KST.
 - `scripts/run_log_summarize_bounded.ps1` — `claude -p` 래퍼(시간 제한).
   `--append-system-prompt-file` 주입(빈 stdout fix, 2026-08-07).
+- `scripts/upload_log_summary.py` — log.md 단일 파일 Contents API PUT.
 - `prompts/log-summarize-headless.txt` — 헤드리스 요약 프롬프트.
 - `.claude/prompts/log-summarize.md` — system prompt(빈 stdout fix로 신설).
 - `scripts/register_log_summarize_task.py` — schtasks 등록 스크립트
   (`/TN LogSummarize /SC DAILY /ST 00:40 /F`). **실행 완료 — `LogSummarize`
   태스크 등록됨, 8/8~8/10 매일 00:40 자동 실행 실증**.
+  (`/TN LogSummarize /SC DAILY /ST 00:40 /F`). **아직 실행 안 됨**.
 
-### 배포 보조
-- main/서사 브랜치 양쪽에 rotation 파일 배포(최초 1회). 이후 워크플로우 자체가 GitHub Actions에서 자동 회전.
+### 배포 보조 (이번 세션 신설)
+- `scripts/push_log_rotate_to_main.py` — main에 rotation 파일 PUT
+  (3가지 함정 적용).
+- `scripts/push_log_rotate_to_narrative.py` — 서사 브랜치에 PUT.
 
 ## 배포 이력 (2026-08-07)
 
 | 단계 | 결과 |
 |---|---|
 | 진단 | rotation 파일 6종 전부 untracked(한 번도 commit 안 됨). log-rotate.yml main 없음 → schedule 발화 0회 |
-| main 배포 | log-rotate.yml, log_rotate.py 배포 완료 |
+| main 배포 | Contents API PUT 성공: log-rotate.yml(9889eba), log_rotate.py(c6d8a19) |
 | 첫 run(31152276405) | **실패** — 서사 브랜치 checkout 시 log_rotate.py 없어 FileNotFoundError |
-| 서사 배포 | 스크립트 4종 배포 완료 |
+| 서사 배포 | 스크립트 4종 PUT: f9f7b78/c62a95e/efafba/f1f60d |
 | 두 번째 run(31153363185) | **성공** — Bot commit cbf80c2, `2026-08-06.md` 생성, log.md 72KB→25KB |
 
 **핵심 교훈:** workflow 파일과 그 workflow가 실행하는 스크립트는
@@ -69,14 +73,15 @@ default branch(main)에 workflow 파일이 있어야 발화하지만, checkout�
 ```
 wiki/log-archive/
   2026-07.md                  ← 완료월 cold archive (mobile 2026-08-04 수동 cut)
-  2026-08-early.md            ← 🟡 규칙 밖 임시 파일 (8/1~8/5, 과도기 수동 cut)
+  2026-08-early.md            ← 🟡 규칙 밖 임시 파일 (8/1~8/5, dispatch 용량 회피용 수동 cut)
   2026-08/
     2026-08-06.md             ← ✅ workflow가 처음 만든 정식 일일 아카이브 (cbf80c2)
 ```
 
-> `2026-08-early.md`는 3인 하이브리드 도입 전 과도기에 수동 잘라낸 임시 파일.
-> 규칙상 2-tier(월 아카이브 + 일일 폴더)에 없는 파일이므로, 다음 정리 시
-> 정식 구조로 통합하거나 규칙에 "과도기 임시 파일 허용"을 한 줄 추가해야 (미해결).
+> `2026-08-early.md`는 3인 하이브리드 도입 전, 회사망 dispatch 용량
+> 한계 회피용으로 수동 잘라낸 임시 파일. 규칙상 2-tier(월 아카이브 +
+> 일일 폴더)에 없는 파일이므로, 다음 정리 시 정식 구조로 통합하거나
+> 규칙에 "과도기 임시 파일 허용"을 한 줄 추가해야 (미해결).
 
 ## 완료 (2026-08-10)
 

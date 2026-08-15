@@ -1,0 +1,81 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Steve's Economic Calendar//Korea//KO
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+X-WR-CALNAME:8월 경제 이벤트 (SK하이닉스·부동산)
+X-WR-TIMEZONE:Asia/Seoul
+X-WR-CALDESC:검증된 값만 기재. 컨센서스는 조회 불가하여 '미확인'으로 남김.
+BEGIN:VEVENT
+UID:kr-baserate-20260814-v2@steveswiki.local
+DTSTAMP:20260810T000000Z
+DTSTART:20260814T150000+0900
+DTEND:20260814T160000+0900
+SUMMARY:🔴 한국은행 기준금리 결정 (현재 2.75%)
+LOCATION:한국은행
+DESCRIPTION:[검증된 사실]\n현재 기준금리 2.75% (출처 한국은행 ECOS, sources/macro-series.csv)\n직전 변경 2026-07에 2.50% → 2.75% 인상\n2025-12 ~ 2026-06 기간에는 2.50% 유지\n\n[컨센서스] 미확인 — 이 환경에서 시장 예상치를 조회할 수 없어 확률을 적지 않음\n\n[정책 경로 판단]\n지난달 인상 직후이므로 연속 회의에서 인하로 뒤집는 경우는 드묾\n현실적 경로: 동결 우세 > 추가 인상 > 인하(매우 낮음)\n\n[내 포지션 기준 의미]\nSK하이닉스 248주 중 락업 67주 제외 조정 가능 181주\n반도체 섹터가 주식·ETF의 96.1% — 금리 방향은 섹터 전체에 동시 작용\n부동산: 인상 방향이면 WAIT 강화 (진입 지연 요인)\n\n[주의] 2026-08-09 버전 캘린더에 있던 '3.50% 동결 / 인하 시 매수 전환'은\n사실이 아니었음. 실제 금리는 2.75%이고 직전 움직임은 인상.\n해당 안내는 폐기하고 이 항목으로 대체함.\n\n참고: wiki/concepts/position-exposure-model.md
+CATEGORIES:경제이벤트,금융정책,CRITICAL
+STATUS:CONFIRMED
+SEQUENCE:1
+END:VEVENT
+BEGIN:VEVENT
+UID:us-cpi-20260812-v2@steveswiki.local
+DTSTAMP:20260810T000000Z
+DTSTART:20260812T213000+0900
+DTEND:20260812T223000+0900
+SUMMARY:🔴 미국 CPI (7월) 발표
+LOCATION:미국 노동통계국 (BLS)
+DESCRIPTION:[검증된 사실]\n미국 CPI 지수 332.568 (2026-08-10 리포트 기준, FRED — 당일 갱신 실패로 이월된 값)\n\n[컨센서스] 미확인 — 예상치를 조회할 수 없어 시나리오 확률을 적지 않음\n\n[발표 후 확인할 것]\n1. 발표치 vs 컨센서스 차이 (뉴스로 확인)\n2. 차이가 0.5%p를 넘으면 신호 재평가 대상\n3. 물가 하락은 그 자체로 침체 신호가 아님 — 수익률곡선·고용과 함께 볼 것\n   (2026-08-10 리포트에서 거시엔진이 CPI/PPI 하락만으로 Recession 판정을\n    냈으나, 수익률곡선 +0.46%p 정상·Sahm 0/20·HY스프레드 0/15로\n    침체 전조는 전부 0점이었음 → 디스인플레이션에 가까움)\n\n[발표 시각] 미국 동부 오전 8:30 = 한국 21:30 (서머타임 기준)\n\n참고: report/peos-audit-2026-08-10.html
+CATEGORIES:경제이벤트,물가,CRITICAL
+STATUS:CONFIRMED
+SEQUENCE:1
+END:VEVENT
+BEGIN:VEVENT
+UID:us-ppi-20260820-v2@steveswiki.local
+DTSTAMP:20260810T000000Z
+DTSTART:20260820T213000+0900
+DTEND:20260820T223000+0900
+SUMMARY:🟡 미국 PPI (7월) 발표
+LOCATION:미국 노동통계국 (BLS)
+DESCRIPTION:[검증된 사실]\n미국 PPI 지수 286.827 (2026-08-10 리포트 기준, FRED — 이월된 값)\n\n[컨센서스] 미확인\n\n[의미] CPI(8/12)와 함께 물가 추세를 확인하는 후속 지표.\n기준금리 결정(8/14) 이후이므로 이번 달에는 정책 선행 지표가 아니라\n다음 회의를 향한 확인 데이터에 가까움.\n\n참고: wiki/concepts/economic-events-framework.md
+CATEGORIES:경제이벤트,물가,HIGH
+STATUS:CONFIRMED
+SEQUENCE:1
+END:VEVENT
+BEGIN:VEVENT
+UID:sk-position-review-20260814-v2@steveswiki.local
+DTSTAMP:20260810T000000Z
+DTSTART:20260814T160000+0900
+DTEND:20260814T170000+0900
+SUMMARY:📋 기준금리 발표 후 — 포지션 점검
+LOCATION:의사결정
+DESCRIPTION:[확인 순서]\n1. 결정 내용 확인 (동결 / 인상 / 인하)\n2. 반도체 섹터 96.1% 집중도가 여전히 감내 가능한 수준인가\n3. 조정한다면 대상은 락업 제외 181주 (67주는 2027-02-11까지 매도 불가,\n   만기 전 매도 시 마크업 8,791,650원 소멸)\n4. 부동산 진입 가용 현금은 현재 약 3.26억 — 주식을 줄이면 이 값이 늘어남\n   즉 '하이닉스를 파느냐'와 '집을 언제 사느냐'는 같은 결정\n\n[하지 말 것]\n신뢰도 50% 신호(=무판단)에 근거해 실행하지 말 것.\n엔진 간 지시가 엇갈리는 날은 거래하지 않는 것이 기본값.\n\n참고: wiki/concepts/position-exposure-model.md
+CATEGORIES:의사결정,포지션
+STATUS:CONFIRMED
+SEQUENCE:1
+END:VEVENT
+BEGIN:VEVENT
+UID:data-pipeline-fix-20260811@steveswiki.local
+DTSTAMP:20260810T000000Z
+DTSTART:20260811T200000+0900
+DTEND:20260811T203000+0900
+SUMMARY:🔧 데이터 파이프 복구 (DATA_GO_KR_KEY)
+LOCATION:시스템
+DESCRIPTION:[문제] MOLIT 수집기 4종(아파트 매매·전월세·연립다세대·오피스텔)이\nDATA_GO_KR_KEY 미설정으로 전부 skip 중.\n부동산 WAIT 판단이 실거래가를 한 건도 보지 않고 금리 점수만으로 나오고 있음.\n\n[조치] data.go.kr에서 무료 활용신청 후 키를 환경변수로 등록.\n분석 문제가 아니라 설정 문제이므로 해결 비용이 낮음.\n\n참고: MessageBox.md 미해결 항목 2번
+CATEGORIES:시스템,데이터
+STATUS:CONFIRMED
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+UID:month-review-20260831-v2@steveswiki.local
+DTSTAMP:20260810T000000Z
+DTSTART:20260831T180000+0900
+DTEND:20260831T190000+0900
+SUMMARY:📊 8월 마감 — 신호 이력 점검
+LOCATION:의사결정
+DESCRIPTION:[점검 항목]\n1. data/daily_signals/signal_2026-08.csv 신호 이력 확인\n2. 8월 중 신호가 실제로 바뀐 지점이 있었는가\n3. 반도체 집중도(월초 96.1%) 변화\n4. 9월 이벤트 준비 — FOMC, 한국은행 회의\n\n[기록] 8월에 확인된 시스템 결함: 보유수량 하드코딩(수정됨),\n당월 신호 누락(수정됨), 신호 중복기록(수정됨),\nCCI가 미수집 지표를 악재로 표기(미수정), 경상수지 단위 오류(미수정)\n\n참고: MessageBox.md
+CATEGORIES:월간리뷰
+STATUS:CONFIRMED
+SEQUENCE:1
+END:VEVENT
+END:VCALENDAR
