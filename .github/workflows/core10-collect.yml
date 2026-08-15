@@ -16,6 +16,17 @@ on:
     # two never contend for the same files.
     - cron: "30 21 * * *"
   workflow_dispatch:
+    inputs:
+      retry_until_fresh:
+        description: >-
+          true면 KOSIS·ECOS가 전부 성공할 때까지 10분 간격으로 재시도(최대
+          약 5시간). 2026-08-15 KOSIS/ECOS가 GitHub Actions 러너에서 전부
+          connect timeout(TCP 연결 자체가 안 열림 — 9시간 전 macro-data-sync는
+          5초 만에 성공했던 것과 대조)이 나 일시적 장애로 판단, 복구를
+          기다리는 수동 캠페인용. 매일 자동 실행(schedule)은 이 입력이 없어
+          기본값 false로 빠르게 끝난다 — 일상 수집을 5시간짜리로 만들지 않음.
+        type: boolean
+        default: false
 
 permissions:
   contents: write
@@ -27,6 +38,11 @@ concurrency:
 jobs:
   collect:
     runs-on: ubuntu-latest
+    # GitHub-hosted runners hard-cap a job at 360 minutes regardless of what's
+    # requested here — set below that so a retry_until_fresh run that somehow
+    # overruns gets killed by OUR limit with the freshness-audit/failure-alert
+    # steps still reachable, rather than by GitHub's with no cleanup at all.
+    timeout-minutes: 340
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -41,33 +57,85 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
-      - name: Collect Core-10 series
+      - name: Collect Core-10 series (retry until fresh, if requested)
+        id: collect
         env:
           KOSIS_API_KEY: ${{ secrets.KOSIS_API_KEY }}
           ECOS_API_KEY: ${{ secrets.ECOS_API_KEY }}
           FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
+          RETRY_UNTIL_FRESH: ${{ inputs.retry_until_fresh }}
         # Not --strict: one dead upstream should not stop the others from
-        # landing. The freshness audit below is what makes a failure visible.
-        run: python -m scripts.collect_core10
-
-      - name: Commit collected data
+        # landing. The freshness audit further down is what makes a failure
+        # visible.
+        #
+        # retry_until_fresh=true loops collect+commit together so a series
+        # that recovers on attempt N is saved immediately rather than waiting
+        # for every series to succeed in the same attempt — KOSIS and ECOS
+        # are independent outages and there is no reason a fix to one should
+        # wait on the other.
+        #
+        # "10분 간격" means attempts START ~10 minutes apart, not that a
+        # 10-minute sleep is added on top of however long the attempt itself
+        # took — a fully-failing attempt already takes ~9 minutes (11 series
+        # x up to 3 retries x connect timeout), observed directly in run
+        # 31871454377. A flat +600s sleep on top would make the true cadence
+        # ~19min and only fit ~17 attempts in the 6h job ceiling GitHub
+        # enforces on hosted runners; timing the sleep from attempt START
+        # keeps the cadence honest and fits a full 30 attempts (~5h) with an
+        # hour of buffer for setup/install/the final freshness audit.
         run: |
           git config user.name "core10-collect-bot"
           git config user.email "actions@users.noreply.github.com"
-          git add data/normalized/ data/raw/ sources/ 2>/dev/null || true
-          if git diff --cached --quiet; then
-            echo "No new observations"
-          else
-            git commit -m "chore: core-10 collection $(date -u +%Y-%m-%dT%H:%M:%SZ)"
-            BRANCH="${GITHUB_REF_NAME:-main}"
-            for i in 1 2 3 4 5; do
-              git push && break
-              echo "push rejected, rebasing onto latest $BRANCH (attempt $i)"
-              git fetch origin "$BRANCH"
-              git rebase "origin/$BRANCH"
-              sleep $((i * 3))
-            done
+
+          MAX_ATTEMPTS=1
+          INTERVAL_SECONDS=600
+          if [ "$RETRY_UNTIL_FRESH" = "true" ]; then
+            MAX_ATTEMPTS=30
           fi
+
+          for i in $(seq 1 "$MAX_ATTEMPTS"); do
+            attempt_start=$(date +%s)
+            echo "::group::attempt $i/$MAX_ATTEMPTS"
+            python -m scripts.collect_core10 | tee /tmp/collect_out.txt
+            echo "::endgroup::"
+
+            git add data/normalized/ data/raw/ sources/ 2>/dev/null || true
+            if git diff --cached --quiet; then
+              echo "No new observations this attempt"
+            else
+              git commit -m "chore: core-10 collection $(date -u +%Y-%m-%dT%H:%M:%SZ) (attempt $i/$MAX_ATTEMPTS)"
+              BRANCH="${GITHUB_REF_NAME:-main}"
+              for r in 1 2 3 4 5; do
+                git push && break
+                echo "push rejected, rebasing onto latest $BRANCH (attempt $r)"
+                git fetch origin "$BRANCH"
+                git rebase "origin/$BRANCH"
+                sleep $((r * 3))
+              done
+            fi
+
+            # Stop once every kosis:/ecos: line in this attempt's own success
+            # table reports OK — the freshness audit's day-based tolerances
+            # are the wrong tool for "did THIS attempt succeed", since a
+            # series can look fine there while still carrying forward.
+            if ! grep -qE '^(kosis|ecos):.*❌' /tmp/collect_out.txt; then
+              echo "KOSIS/ECOS 전부 성공 — 재시도 루프 종료"
+              break
+            fi
+
+            if [ "$i" -lt "$MAX_ATTEMPTS" ]; then
+              elapsed=$(( $(date +%s) - attempt_start ))
+              remaining=$(( INTERVAL_SECONDS - elapsed ))
+              if [ "$remaining" -gt 0 ]; then
+                echo "일부 소스 실패 — 이번 시도 ${elapsed}초 소요, ${remaining}초 더 대기 후 재시도 ($((i+1))/$MAX_ATTEMPTS, 목표 간격 10분)"
+                sleep "$remaining"
+              else
+                echo "일부 소스 실패 — 이번 시도가 이미 ${elapsed}초 걸려 목표 간격을 넘김, 대기 없이 바로 재시도 ($((i+1))/$MAX_ATTEMPTS)"
+              fi
+            else
+              echo "::warning::재시도 상한(${MAX_ATTEMPTS}회, 약 5시간) 도달 — 일부 소스가 계속 실패 중"
+            fi
+          done
 
       - name: Report data freshness
         # A job exiting 0 is not evidence that data arrived — three ECOS series
