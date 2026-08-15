@@ -1,16 +1,26 @@
-# EXAMPLE manual input for 산업통상자원부 수출입 동향 (Master Instruction 8.1, 7.3).
+# Manual input for 산업통상자원부 수출입 동향 (Master Instruction 8.1, 7.3).
 # MOTIE does not publish a stable public API for these figures; update this
 # file monthly from the official 산업통상자원부 보도자료 / K-stat 수치.
-# Replace the EXAMPLE rows below with real released values — the pipeline
-# treats every row here as an official, judgment-grade observation (grade 5).
+# The pipeline treats every row here as an official, judgment-grade
+# observation (grade 5) — do not put an estimate in this file, only a
+# released figure with a source.
+#
+# 2026-08-15: 2026-07-01 row is REAL, from the 2026-08-01 산업통상부
+# "2026년 7월 수출입동향" press release (source: WebSearch, 산업통상부 공식
+# 발표 인용 보도 다수 교차확인 — 파이낸셜뉴스/머니투데이/부산합스 등).
+# 2026-04-01 ~ 2026-06-01 rows are STILL EXAMPLE placeholders — nobody has
+# replaced them yet. Do not read them as real; backfill with the actual
+# 4/5/6월 수출입동향 releases before trusting any trend across those months.
 
-updated_at: "2026-07-14"
+updated_at: "2026-08-15"
 series:
   total_exports_yoy:               # 총수출 증가율 (%, YoY)
-    - { date: "2026-04-01", value: 6.8 }   # EXAMPLE
-    - { date: "2026-05-01", value: 8.2 }   # EXAMPLE
-    - { date: "2026-06-01", value: 9.1 }   # EXAMPLE
+    - { date: "2026-04-01", value: 6.8 }   # EXAMPLE — not yet backfilled
+    - { date: "2026-05-01", value: 8.2 }   # EXAMPLE — not yet backfilled
+    - { date: "2026-06-01", value: 9.1 }   # EXAMPLE — not yet backfilled
+    - { date: "2026-07-01", value: 62.8 }  # REAL — 988.9억 달러, 역대 2위. 산업통상부 2026-08-01 발표
   semiconductor_exports_yoy:       # 반도체 수출 증가율 (%, YoY)
-    - { date: "2026-04-01", value: 18.9 }  # EXAMPLE
-    - { date: "2026-05-01", value: 22.4 }  # EXAMPLE
-    - { date: "2026-06-01", value: 24.7 }  # EXAMPLE
+    - { date: "2026-04-01", value: 18.9 }  # EXAMPLE — not yet backfilled
+    - { date: "2026-05-01", value: 22.4 }  # EXAMPLE — not yet backfilled
+    - { date: "2026-06-01", value: 24.7 }  # EXAMPLE — not yet backfilled
+    - { date: "2026-07-01", value: 178.8 } # REAL — 410.1억 달러, 2개월 연속 400억 달러 상회. 산업통상부 2026-08-01 발표
