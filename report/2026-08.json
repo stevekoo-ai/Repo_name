@@ -1,21 +1,24 @@
 {
   "report_month": "2026-08",
-  "report_readiness": "draft",
+  "report_readiness": "final",
   "macro_us": {
     "regime": "Recession",
     "previous_regime": "Slowdown",
     "transition": "downgrade",
     "score": -1,
-    "weighted_score": -0.8,
+    "weighted_score": -0.9,
     "score_band": "slowdown",
     "score_band_label": "둔화",
-    "confidence": 41.9,
-    "warnings": [],
+    "confidence": 93.8,
+    "warnings": [
+      "미국 소매판매 감소 전환"
+    ],
     "changes": [
       {
-        "indicator": "all",
-        "message": "임계치를 넘는 뚜렷한 변화 없음 (관찰 지속)",
-        "direction": "flat"
+        "indicator": "ppi",
+        "message": "미국 PPI YoY -1.8%p 둔화 (완화)",
+        "direction": "improve",
+        "delta": -1.84
       }
     ]
   },
@@ -28,7 +31,7 @@
       "previous_source": "snapshot",
       "trend": "→",
       "score": 0,
-      "status": "stale",
+      "status": "ok",
       "source": "FRED",
       "history": [
         {
@@ -198,7 +201,7 @@
       "previous_source": "snapshot",
       "trend": "→",
       "score": 0,
-      "status": "stale",
+      "status": "ok",
       "source": "FRED",
       "history": [
         {
@@ -679,12 +682,12 @@
     {
       "key": "retail_sales",
       "indicator": "미국 소매판매",
-      "current": 768553.0,
+      "current": 763602.0,
       "previous": 768553.0,
       "previous_source": "snapshot",
-      "trend": "→",
-      "score": 0,
-      "status": "stale",
+      "trend": "▼",
+      "score": -1,
+      "status": "ok",
       "source": "FRED",
       "history": [
         {
@@ -1109,11 +1112,11 @@
         },
         {
           "date": "2025-06-01",
-          "value": 720164.0
+          "value": 719484.0
         },
         {
           "date": "2025-07-01",
-          "value": 727727.0
+          "value": 727176.0
         },
         {
           "date": "2025-08-01",
@@ -1153,11 +1156,15 @@
         },
         {
           "date": "2026-05-01",
-          "value": 766876.0
+          "value": 766192.0
         },
         {
           "date": "2026-06-01",
-          "value": 768553.0
+          "value": 768072.0
+        },
+        {
+          "date": "2026-07-01",
+          "value": 763602.0
         }
       ],
       "history_years": 10
@@ -1165,12 +1172,12 @@
     {
       "key": "cpi",
       "indicator": "미국 CPI",
-      "current": 332.568,
+      "current": 332.813,
       "previous": 332.568,
       "previous_source": "snapshot",
       "trend": "▼",
       "score": -1,
-      "status": "stale",
+      "status": "ok",
       "source": "FRED",
       "history": [
         {
@@ -1640,6 +1647,10 @@
         {
           "date": "2026-06-01",
           "value": 332.568
+        },
+        {
+          "date": "2026-07-01",
+          "value": 332.813
         }
       ],
       "history_years": 10
@@ -1647,12 +1658,12 @@
     {
       "key": "ppi",
       "indicator": "미국 PPI",
-      "current": 286.827,
+      "current": 284.057,
       "previous": 286.827,
       "previous_source": "snapshot",
       "trend": "▼",
       "score": -1,
-      "status": "stale",
+      "status": "ok",
       "source": "FRED",
       "history": [
         {
@@ -2113,19 +2124,23 @@
         },
         {
           "date": "2026-03-01",
-          "value": 276.046
+          "value": 276.109
         },
         {
           "date": "2026-04-01",
-          "value": 282.779
+          "value": 282.755
         },
         {
           "date": "2026-05-01",
-          "value": 290.489
+          "value": 290.515
         },
         {
           "date": "2026-06-01",
-          "value": 286.827
+          "value": 286.279
+        },
+        {
+          "date": "2026-07-01",
+          "value": 284.057
         }
       ],
       "history_years": 10
@@ -2138,7 +2153,7 @@
       "previous_source": "snapshot",
       "trend": "▲",
       "score": 1,
-      "status": "stale",
+      "status": "ok",
       "source": "FRED",
       "history": [
         {
@@ -2624,7 +2639,7 @@
       "previous_source": "snapshot",
       "trend": "→",
       "score": 0,
-      "status": "stale",
+      "status": "ok",
       "source": "FRED",
       "history": [
         {
@@ -3105,12 +3120,12 @@
     {
       "key": "yield_curve",
       "indicator": "미국 10년-2년 국채 금리차 (%p)",
-      "current": 0.48,
+      "current": 0.51,
       "previous": 0.45,
       "previous_source": "snapshot",
-      "trend": "→",
-      "score": 0,
-      "status": "stale",
+      "trend": "▲",
+      "score": 1,
+      "status": "ok",
       "source": "FRED",
       "history": [
         {
@@ -13092,17 +13107,37 @@
         {
           "date": "2026-08-07",
           "value": 0.46
+        },
+        {
+          "date": "2026-08-10",
+          "value": 0.47
+        },
+        {
+          "date": "2026-08-11",
+          "value": 0.48
+        },
+        {
+          "date": "2026-08-12",
+          "value": 0.48
+        },
+        {
+          "date": "2026-08-13",
+          "value": 0.48
+        },
+        {
+          "date": "2026-08-14",
+          "value": 0.51
         }
       ],
       "history_years": 10
     }
   ],
   "kr_us_comparison": {
-    "kr_regime": "Recovery",
+    "kr_regime": "Early Expansion",
     "us_regime": "Recession",
     "kr_score_band": "unbalanced_expansion",
     "us_score_band": "slowdown",
-    "cycle_gap": -5,
+    "cycle_gap": -4,
     "alignment": "kr_behind",
     "indicator_pairs": [
       {
@@ -13127,10 +13162,10 @@
         "key": "retail_sales",
         "label": "소매판매",
         "kr_score": 0,
-        "us_score": 0,
+        "us_score": -1,
         "kr_value": 0.096711798839455,
-        "us_value": 768553.0,
-        "relationship": "sync"
+        "us_value": 763602.0,
+        "relationship": "diverge"
       },
       {
         "key": "cpi",
@@ -13138,7 +13173,7 @@
         "kr_score": -1,
         "us_score": -1,
         "kr_value": 118.84768138617,
-        "us_value": 332.568,
+        "us_value": 332.813,
         "relationship": "sync"
       },
       {
@@ -13147,7 +13182,7 @@
         "kr_score": -1,
         "us_score": -1,
         "kr_value": 130.03,
-        "us_value": 286.827,
+        "us_value": 284.057,
         "relationship": "sync"
       },
       {
@@ -13169,20 +13204,20 @@
         "relationship": "diverge"
       }
     ],
-    "narrative": "미국은 현재 Recession 국면, 한국은 Recovery 국면입니다. 한국이 사이클상 미국보다 뒤처져 있어, 미국에서 먼저 나타난 흐름이 시차를 두고 한국에 파급될 가능성을 주시할 필요가 있습니다. 비교 가능한 6개 핵심 지표 중 83%가 미국과 같은 방향으로 움직이고 있습니다. 미국과 한국 모두 뚜렷한 경고 신호는 없는 상태입니다. 방향이 엇갈린 지표: 산업생산 — 이 부분이 한국이 미국과 다르게 가는 지점입니다."
+    "narrative": "미국은 현재 Recession 국면, 한국은 Early Expansion 국면입니다. 한국이 사이클상 미국보다 뒤처져 있어, 미국에서 먼저 나타난 흐름이 시차를 두고 한국에 파급될 가능성을 주시할 필요가 있습니다. 비교 가능한 6개 핵심 지표 중 67%가 미국과 같은 방향으로 움직이고 있습니다. 미국 쪽에 경고 신호가 있지만 한국은 아직 뚜렷한 경고 신호가 없어, 미국발 리스크가 한국에는 아직 본격적으로 옮겨오지 않은 것으로 보입니다 — 다만 선행 지표로 계속 관찰이 필요합니다. 방향이 엇갈린 지표: 산업생산, 소매판매 — 이 부분이 한국이 미국과 다르게 가는 지점입니다."
   },
   "macro": {
-    "regime": "Recovery",
+    "regime": "Early Expansion",
     "previous_regime": "Early Expansion",
-    "transition": "upgrade",
+    "transition": null,
     "score": 1,
     "weighted_score": 1.1,
     "score_band": "unbalanced_expansion",
     "score_band_label": "불균형 확장",
-    "confidence": 71.5,
+    "confidence": 90.5,
     "confidence_components": {
-      "data_freshness": 30.0,
-      "source_quality": 100.0,
+      "data_freshness": 100.0,
+      "source_quality": 92.0,
       "indicator_consistency": 70.0,
       "trend_stability": 100.0
     },
@@ -13202,8 +13237,8 @@
       "growth_signal": "rising",
       "inflation_signal": "rising",
       "as_of": "2026-06-01",
-      "source": "stale_history",
-      "note": "실시간 조회 불가 — 2026-08-12 실행분(마지막 저장값) 사용. GitHub Pages 활성화 시 https://<github계정>.github.io/<저장소명>/ 에서 매일 갱신되는 대시보드로 확인 가능"
+      "source": "live",
+      "note": "GitHub Pages 활성화 시 https://<github계정>.github.io/<저장소명>/ 에서 매일 갱신되는 대시보드로 확인 가능"
     }
   },
   "macro_dashboard": [
@@ -13215,7 +13250,7 @@
       "previous_source": "snapshot",
       "trend": "→",
       "score": 0,
-      "status": "stale",
+      "status": "ok",
       "source": "한국은행 ECOS",
       "history": [
         {
@@ -13385,7 +13420,7 @@
       "previous_source": "snapshot",
       "trend": "▼",
       "score": -1,
-      "status": "stale",
+      "status": "ok",
       "source": "OECD (FRED 경유) — KOSIS 대체",
       "history": [
         {
@@ -13763,7 +13798,7 @@
       "previous_source": "snapshot",
       "trend": "→",
       "score": 0,
-      "status": "stale",
+      "status": "ok",
       "source": "OECD (FRED 경유) — KOSIS 대체",
       "history": [
         {
@@ -14297,7 +14332,7 @@
       "previous_source": "snapshot",
       "trend": "▲",
       "score": 1,
-      "status": "stale",
+      "status": "ok",
       "source": "한국은행 ECOS",
       "history": [
         {
@@ -14783,7 +14818,7 @@
       "previous_source": "snapshot",
       "trend": "▼",
       "score": -1,
-      "status": "stale",
+      "status": "ok",
       "source": "OECD (FRED 경유) — KOSIS 대체",
       "history": [
         {
@@ -15145,7 +15180,7 @@
       "previous_source": "snapshot",
       "trend": "▼",
       "score": -1,
-      "status": "stale",
+      "status": "ok",
       "source": "한국은행 ECOS",
       "history": [
         {
@@ -15631,7 +15666,7 @@
       "previous_source": "snapshot",
       "trend": "▲",
       "score": 1,
-      "status": "stale",
+      "status": "ok",
       "source": "OECD (FRED 경유) — KOSIS 대체",
       "history": [
         {
@@ -16120,74 +16155,74 @@
     }
   ],
   "personal": {
-    "investment_environment_score": 70.2,
+    "investment_environment_score": 67.0,
     "investment_biases": {
-      "stock_bias": "확대",
-      "etf_bias": "확대",
+      "stock_bias": "소폭 확대",
+      "etf_bias": "소폭 확대",
       "bond_bias": "축소/방어",
       "cash_bias": "축소/방어"
     },
     "semiconductor_score": 79.6,
     "semiconductor_band": "긍정",
-    "bond_score": 45.1,
-    "fx_score": 37.0,
+    "bond_score": 36.7,
+    "fx_score": 53.9,
     "housing_readiness_score": null,
     "etf_fit": [
       {
         "ticker": "0183J0.KS",
         "name": "TIGER 미국우주테크",
         "bucket": "space_tech",
-        "fit_score": 62.3,
+        "fit_score": 58.1,
         "data_status": "ok"
       },
       {
         "ticker": "371460.KS",
         "name": "TIGER 차이나전기차SOLACTIVE",
         "bucket": "ev_china",
-        "fit_score": 62.3,
+        "fit_score": 58.1,
         "data_status": "ok"
       },
       {
         "ticker": "411060.KS",
         "name": "ACE KRX금현물",
         "bucket": "gold",
-        "fit_score": 62.3,
+        "fit_score": 58.1,
         "data_status": "ok"
       },
       {
         "ticker": "455850.KS",
         "name": "SOL AI반도체소부장",
         "bucket": "semiconductor",
-        "fit_score": 71.1,
+        "fit_score": 67.0,
         "data_status": "ok"
       },
       {
         "ticker": "469150.KS",
         "name": "ACE AI반도체TOP3+",
         "bucket": "semiconductor",
-        "fit_score": 71.1,
+        "fit_score": 67.0,
         "data_status": "ok"
       },
       {
         "ticker": "475380.KS",
         "name": "RISE 글로벌리얼티인컴",
         "bucket": "reit_income",
-        "fit_score": 62.3,
+        "fit_score": 58.1,
         "data_status": "ok"
       },
       {
         "ticker": "476070.KS",
         "name": "KODEX 글로벌비만치료제TOP2 Plus",
         "bucket": "healthcare_theme",
-        "fit_score": 62.3,
+        "fit_score": 58.1,
         "data_status": "ok"
       }
     ]
   },
   "assets": {
     "stocks": {
-      "score": 72.2,
-      "stars": "★★★★☆",
+      "score": 69.7,
+      "stars": "★★★☆☆",
       "data_status": "ok",
       "detail": [
         "SK하이닉스",
@@ -16200,7 +16235,7 @@
       ]
     },
     "etf": {
-      "score": 64.8,
+      "score": 60.6,
       "stars": "★★★☆☆",
       "data_status": "ok",
       "detail": [
@@ -16208,56 +16243,56 @@
           "ticker": "0183J0.KS",
           "name": "TIGER 미국우주테크",
           "bucket": "space_tech",
-          "fit_score": 62.3,
+          "fit_score": 58.1,
           "data_status": "ok"
         },
         {
           "ticker": "371460.KS",
           "name": "TIGER 차이나전기차SOLACTIVE",
           "bucket": "ev_china",
-          "fit_score": 62.3,
+          "fit_score": 58.1,
           "data_status": "ok"
         },
         {
           "ticker": "411060.KS",
           "name": "ACE KRX금현물",
           "bucket": "gold",
-          "fit_score": 62.3,
+          "fit_score": 58.1,
           "data_status": "ok"
         },
         {
           "ticker": "455850.KS",
           "name": "SOL AI반도체소부장",
           "bucket": "semiconductor",
-          "fit_score": 71.1,
+          "fit_score": 67.0,
           "data_status": "ok"
         },
         {
           "ticker": "469150.KS",
           "name": "ACE AI반도체TOP3+",
           "bucket": "semiconductor",
-          "fit_score": 71.1,
+          "fit_score": 67.0,
           "data_status": "ok"
         },
         {
           "ticker": "475380.KS",
           "name": "RISE 글로벌리얼티인컴",
           "bucket": "reit_income",
-          "fit_score": 62.3,
+          "fit_score": 58.1,
           "data_status": "ok"
         },
         {
           "ticker": "476070.KS",
           "name": "KODEX 글로벌비만치료제TOP2 Plus",
           "bucket": "healthcare_theme",
-          "fit_score": 62.3,
+          "fit_score": 58.1,
           "data_status": "ok"
         }
       ]
     },
     "bond": {
-      "score": 45.1,
-      "stars": "★★☆☆☆",
+      "score": 36.7,
+      "stars": "★☆☆☆☆",
       "data_status": "ok",
       "detail": [
         {
@@ -16285,12 +16320,12 @@
       "detail": []
     },
     "fx_exposure": {
-      "score": 37.0,
-      "stars": "★☆☆☆☆",
+      "score": 53.9,
+      "stars": "★★☆☆☆",
       "data_status": "ok",
       "detail": {
-        "usdkrw_change_pct_3m": 4.35,
-        "dollar_index_change_pct_3m": 0.87,
+        "usdkrw_change_pct_3m": -5.36,
+        "dollar_index_change_pct_3m": 0.89,
         "kr_us_rate_differential_pct": -0.88,
         "us_fed_funds_change_bp_3m": -1.0
       }
@@ -16309,9 +16344,9 @@
         "destination_country": "US",
         "departure_date": "2026-09-15",
         "score_kind": "trip_readiness",
-        "score": 45.8,
+        "score": 56.2,
         "factors": {
-          "fx_favorability": 37.0,
+          "fx_favorability": 53.9,
           "cost_risk_inverse": null,
           "lead_time_readiness": 60.0
         },
@@ -16323,9 +16358,9 @@
         "destination_country": "JP",
         "departure_date": "2026-10-03",
         "score_kind": "travel_timing",
-        "score": 49.4,
+        "score": 59.9,
         "factors": {
-          "fx_favorability": 37.0,
+          "fx_favorability": 53.9,
           "season_favorability": 70.0,
           "airfare_hotel_trend": null
         },
@@ -16336,14 +16371,14 @@
   },
   "scenarios": {
     "base": {
-      "probability": 40,
-      "premise": "현재 국면(Recovery)과 반도체 업황(긍정)의 추세가 유지된다.",
+      "probability": 45,
+      "premise": "현재 국면(Early Expansion)과 반도체 업황(긍정)의 추세가 유지된다.",
       "expected_change": "지표가 현재 범위 내에서 등락하며 국면 전환 신호는 제한적.",
-      "user_impact": "Investment Environment Score 70.2점 수준의 배분 유지가 합리적."
+      "user_impact": "Investment Environment Score 67.0점 수준의 배분 유지가 합리적."
     },
     "bull": {
-      "probability": 35,
-      "premise": "상향 신호(semiconductor_strong, rates_easing, us_employment_improving)가 강화된다.",
+      "probability": 30,
+      "premise": "상향 신호(semiconductor_strong, us_employment_improving)가 강화된다.",
       "expected_change": "수출/반도체 개선과 물가 안정이 동반되며 국면이 한 단계 상향될 가능성.",
       "user_impact": "주식/ETF 비중 확대, 반도체/AI 인프라 비중 우선순위 상향을 검토할 수 있다."
     },
@@ -16379,7 +16414,7 @@
       "priority_label": "★★★☆☆ 관찰 필요",
       "priority_score": 58.8,
       "title": "주식/ETF 비중 확대 검토",
-      "reason": "Investment Environment Score 70.2점 — 거시/반도체 환경이 우호적.",
+      "reason": "Investment Environment Score 67.0점 — 거시/반도체 환경이 우호적.",
       "invalid_condition": "Investment Environment Score가 20점 이상 하락하면 보류.",
       "recheck": "다음 정기 리포트.",
       "category": "investment_opportunity",
@@ -16390,7 +16425,7 @@
       "priority_label": "★★☆☆☆ 참고",
       "priority_score": 52.8,
       "title": "미국 출장 (EXAMPLE) 분할 환전 검토",
-      "reason": "미국 출장 (EXAMPLE): 환전 유리도 45.8점으로 낮지만 일정이 확정되어 있어 환전을 전면 보류하기보다 분할 환전으로 리스크를 분산하는 것이 합리적이다.",
+      "reason": "미국 출장 (EXAMPLE): 환전 유리도 56.2점으로 낮지만 일정이 확정되어 있어 환전을 전면 보류하기보다 분할 환전으로 리스크를 분산하는 것이 합리적이다.",
       "invalid_condition": "출국일 이전 환율이 추가로 5% 이상 불리하게 움직이면 재검토.",
       "recheck": "2026-09-15 2주 전.",
       "category": "liquidity_survival",
@@ -16401,10 +16436,21 @@
       "priority_label": "★★☆☆☆ 참고",
       "priority_score": 52.8,
       "title": "일본 여행 (EXAMPLE) 분할 환전 검토",
-      "reason": "일본 여행 (EXAMPLE): 환전 유리도 49.4점으로 낮지만 일정이 확정되어 있어 환전을 전면 보류하기보다 분할 환전으로 리스크를 분산하는 것이 합리적이다.",
+      "reason": "일본 여행 (EXAMPLE): 환전 유리도 59.9점으로 낮지만 일정이 확정되어 있어 환전을 전면 보류하기보다 분할 환전으로 리스크를 분산하는 것이 합리적이다.",
       "invalid_condition": "출국일 이전 환율이 추가로 5% 이상 불리하게 움직이면 재검토.",
       "recheck": "2026-10-03 2주 전.",
       "category": "travel_discretionary",
+      "conflict_note": null
+    },
+    {
+      "priority": 2,
+      "priority_label": "★★☆☆☆ 참고",
+      "priority_score": 44.8,
+      "title": "채권 신규 매수 보류 및 만기 재투자 방식 재검토",
+      "reason": "Bond Score 36.7점 — 금리/실질금리 매력도가 낮은 국면.",
+      "invalid_condition": "실질금리 매력도 회복 또는 성장 둔화 신호 확산 시 재검토.",
+      "recheck": "다음 금통위/FOMC 이후.",
+      "category": "investment_opportunity",
       "conflict_note": null
     }
   ],
@@ -16436,14 +16482,14 @@
   ],
   "calendar": [],
   "personal_executive_brief": {
-    "one_line_diagnosis": "Recovery 국면(총점 1, 신뢰도 71.5점) — 반도체 긍정",
+    "one_line_diagnosis": "Early Expansion 국면(총점 1, 신뢰도 90.5점) — 반도체 긍정",
     "asset_summary": {
-      "stocks": "★★★★☆",
+      "stocks": "★★★☆☆",
       "etf": "★★★☆☆",
-      "bond": "★★☆☆☆",
+      "bond": "★☆☆☆☆",
       "cash": "★★★★★",
       "subscription_fund": null,
-      "fx_exposure": "★☆☆☆☆"
+      "fx_exposure": "★★☆☆☆"
     },
     "top_events": [],
     "final_suggestion": "메모리/AI 인프라 비중 유지 또는 확대 검토"
@@ -16464,31 +16510,25 @@
   },
   "exposure": "ExposureModel(as_of='2026-08-15', holdings=[Holding(name='SK하이닉스', ticker='000660.KS', quantity=248, avg_price=477365.0, cost=118386520.0, market_value=356128000, price_as_of='2026-08-07', is_semi=True, locked_qty=67, lock_until='2027-02-11'), Holding(name='삼성전자', ticker='005930.KS', quantity=108, avg_price=187911.0, cost=20294388.0, market_value=None, price_as_of=None, is_semi=True, locked_qty=0, lock_until=None), Holding(name='제주반도체', ticker='080220.KQ', quantity=20, avg_price=91725.0, cost=1834500.0, market_value=None, price_as_of=None, is_semi=True, locked_qty=0, lock_until=None), Holding(name='롯데렌탈', ticker='089860.KS', quantity=4, avg_price=59000.0, cost=236000.0, market_value=None, price_as_of=None, is_semi=False, locked_qty=0, lock_until=None), Holding(name='우리금융지주', ticker='316140.KS', quantity=4, avg_price=26100.0, cost=104400.0, market_value=None, price_as_of=None, is_semi=False, locked_qty=0, lock_until=None), Holding(name='이노진', ticker='344860', quantity=615, avg_price=1613.0, cost=991995.0, market_value=None, price_as_of=None, is_semi=False, locked_qty=0, lock_until=None), Holding(name='나노팀', ticker='417010', quantity=166, avg_price=6820.0, cost=1132120.0, market_value=None, price_as_of=None, is_semi=False, locked_qty=0, lock_until=None), Holding(name='TIGER 미국우주테크', ticker='0183J0.KS', quantity=225, avg_price=14064.0, cost=3164400.0, market_value=None, price_as_of=None, is_semi=False, locked_qty=0, lock_until=None), Holding(name='TIGER 차이나전기차SOLACTIVE', ticker='371460.KS', quantity=202, avg_price=10443.0, cost=2109486.0, market_value=None, price_as_of=None, is_semi=False, locked_qty=0, lock_until=None), Holding(name='ACE KRX금현물', ticker='411060.KS', quantity=113, avg_price=28916.0, cost=3267508.0, market_value=None, price_as_of=None, is_semi=False, locked_qty=0, lock_until=None), Holding(name='SOL AI반도체소부장', ticker='455850.KS', quantity=100, avg_price=27321.0, cost=2732100.0, market_value=None, price_as_of=None, is_semi=True, locked_qty=0, lock_until=None), Holding(name='ACE AI반도체TOP3+', ticker='469150.KS', quantity=297, avg_price=17793.0, cost=5284521.0, market_value=None, price_as_of=None, is_semi=True, locked_qty=0, lock_until=None), Holding(name='RISE 글로벌리얼티인컴', ticker='475380.KS', quantity=70, avg_price=9978.0, cost=698460.0, market_value=None, price_as_of=None, is_semi=False, locked_qty=0, lock_until=None), Holding(name='KODEX 글로벌비만치료제TOP2 Plus', ticker='476070.KS', quantity=440, avg_price=9341.0, cost=4110040.0, market_value=None, price_as_of=None, is_semi=False, locked_qty=0, lock_until=None)], cash_krw=20000000.0, retirement_krw=19016852.0, total_cost=164346438.0, total_valued=402087918.0, priced_coverage_pct=88.5696844041954, semi_valued=386273509.0, semi_pct=96.06692758174346, employer_valued=356128000, employer_pct=88.5696844041954, locked_valued=96212000.0, liquid_valued=305875918.0, deployable_cash=325875918.0, notes=['검증된 시세가 있는 자산은 평가액의 89%뿐 — 나머지는 매수원가 기준입니다. 시세 연동(KIS API) 전까지 비중(%)은 근사치입니다.', 'SK하이닉스 기준가 1,436,000원은 2026-08-07 사용자 제보 장중 스냅샷 (종가 아님).', '급여·성과급(PS)과 퇴직연금이 같은 회사·같은 메모리 사이클에 연동됩니다. 실질 집중도는 아래 지분율보다 높습니다.'])",
   "rate_analysis": {
-    "total_score": 60,
+    "total_score": 68,
     "score_components": {
-      "absolute_rates": 30,
+      "absolute_rates": 25,
       "trend_analysis": 15,
-      "spread": 0,
+      "spread": 13,
       "market_signals": 15
     },
     "current_rates": {
-      "us_10y": 4.69,
-      "kr_10y": null,
-      "spread_bp": null
+      "us_10y": 4.63,
+      "kr_10y": 2.74,
+      "spread_bp": 189.0
     },
-    "stale_series": [
-      {
-        "series": "ecos_kr_10y_yield",
-        "as_of": "2018-08-20",
-        "age_days": 2917
-      }
-    ],
+    "stale_series": [],
     "trends": {
-      "us_10y_1m_change_bp": 14.0,
+      "us_10y_1m_change_bp": 5.0,
       "us_10y_3m_trend": "up"
     },
     "market_signal": {
-      "us_10y_2y_spread": 0.46,
+      "us_10y_2y_spread": 0.51,
       "yield_curve_status": "normal"
     },
     "portfolio_recommendation": {
@@ -16502,7 +16542,7 @@
       "3m_upside_probability": 60,
       "6m_upside_probability": 55,
       "12m_upside_probability": 60,
-      "rationale": "중립적 금리 환경이 AI 모멘텀을 유지. 금리차 데이터 없음."
+      "rationale": "중립적 금리 환경이 AI 모멘텀을 유지. 적당한 금리차가 수출 마진을 유지."
     }
   },
   "cci_analysis": {
@@ -16521,9 +16561,9 @@
     },
     "raw_values": {
       "ur_ma3": null,
-      "ur_min_12m": null,
-      "spread_10y2y": 0.44,
-      "spread_10y3m": 0.79,
+      "ur_min_12m": 4.1,
+      "spread_10y2y": 0.48,
+      "spread_10y3m": 0.76,
       "hy_oas": 2.71,
       "k_emp_yoy": 3.0,
       "semi_cycle_index": null
@@ -16542,9 +16582,9 @@
     }
   },
   "real_estate": {
-    "fetch_status": "pending",
-    "fetch_note": "DATA_GO_KR_KEY not set — register a free key at data.go.kr (아파트매매 실거래 상세자료)",
-    "regions_covered": null,
+    "fetch_status": "source_error",
+    "fetch_note": "MOLIT unreachable (probe call failed after retry): MOLIT returned non-JSON response (likely a service/auth error): <?xml version=\"1.0\" encoding=\"utf-8\" standalone=\"yes\"?><response><header><resultCode>000</resultCode><resultMsg>OK</resultMsg></header><body><items><item><aptDong> </aptDong><aptNm>창신이수</aptNm><aptSeq>11110-42</aptSeq><bonbun>0023</bonbun><bubun>0816</bubun><buildYear>2003</buildYear><buyerGbn>개인</b — skipped remaining regions to avoid a long CI stall",
+    "regions_covered": 0,
     "regions_total": 55,
     "tiers": {
       "seoul": {
@@ -16635,9 +16675,9 @@
     }
   },
   "real_estate_rent": {
-    "fetch_status": "pending",
-    "fetch_note": "DATA_GO_KR_KEY not set — register a free key at data.go.kr (아파트 전월세 실거래가 자료)",
-    "regions_covered": null,
+    "fetch_status": "source_error",
+    "fetch_note": "MOLIT rent (전월세) unreachable (probe call failed after retry): MOLIT rent (전월세) returned non-JSON response (likely a service/auth error): <?xml version=\"1.0\" encoding=\"utf-8\" standalone=\"yes\"?><response><header><resultCode>000</resultCode><resultMsg>OK</resultMsg></header><body><items><item><aptNm>경희궁자이(2단지)</aptNm><aptSeq>11110-2445</aptSeq><buildYear>2017</buildYear><contractTerm>26.10~28.09</contractTerm><contractType>신규</contractT — skipped remaining regions to avoid a long CI stall",
+    "regions_covered": 0,
     "regions_total": 55,
     "jeonse_tiers": {
       "seoul": {
@@ -16763,9 +16803,9 @@
     }
   },
   "real_estate_villa": {
-    "fetch_status": "pending",
-    "fetch_note": "DATA_GO_KR_KEY not set — register a free key at data.go.kr (연립다세대 매매 실거래가 자료)",
-    "regions_covered": null,
+    "fetch_status": "source_error",
+    "fetch_note": "MOLIT villa (연립다세대) unreachable (probe call failed after retry): MOLIT villa (연립다세대) returned non-JSON response (likely a service/auth error): <?xml version=\"1.0\" encoding=\"utf-8\" standalone=\"yes\"?><response><header><resultCode>000</resultCode><resultMsg>OK</resultMsg></header><body><items><item><buildYear>2025</buildYear><buyerGbn>개인</buyerGbn><cdealDay> </cdealDay><cdealType> </cdealType><dealAmount>77,500</dealAmount><dealDay>27</dealDa — skipped remaining regions to avoid a long CI stall",
+    "regions_covered": 0,
     "regions_total": 55,
     "tiers": {
       "seoul": {
@@ -16856,9 +16896,9 @@
     }
   },
   "real_estate_officetel": {
-    "fetch_status": "pending",
-    "fetch_note": "DATA_GO_KR_KEY not set — register a free key at data.go.kr (오피스텔 매매 실거래가 자료)",
-    "regions_covered": null,
+    "fetch_status": "source_error",
+    "fetch_note": "MOLIT officetel (오피스텔) unreachable (probe call failed after retry): MOLIT officetel (오피스텔) returned non-JSON response (likely a service/auth error): <?xml version=\"1.0\" encoding=\"utf-8\" standalone=\"yes\"?><response><header><resultCode>000</resultCode><resultMsg>OK</resultMsg></header><body><items><item><buildYear>2004</buildYear><buyerGbn>개인</buyerGbn><cdealDay> </cdealDay><cdealType> </cdealType><dealAmount>64,000</dealAmount><dealDay>30</dealDa — skipped remaining regions to avoid a long CI stall",
+    "regions_covered": 0,
     "regions_total": 55,
     "tiers": {
       "seoul": {
@@ -16953,18 +16993,6 @@
     "month": "2026-08",
     "daily_records": [
       {
-        "date": "2026-08-10",
-        "kr_regime": "Recovery",
-        "kr_score": 1.0,
-        "kr_confidence": 71.5,
-        "us_regime": "Recession",
-        "us_score": -1.0,
-        "us_confidence": 41.9,
-        "investment_env_score": 70.2,
-        "semiconductor_score": 79.6,
-        "bond_score": 45.1
-      },
-      {
         "date": "2026-08-11",
         "kr_regime": "Recovery",
         "kr_score": 1.0,
@@ -17011,18 +17039,30 @@
         "investment_env_score": 69.8,
         "semiconductor_score": 79.6,
         "bond_score": 44.1
+      },
+      {
+        "date": "2026-08-15",
+        "kr_regime": "Recovery",
+        "kr_score": 1.0,
+        "kr_confidence": 71.5,
+        "us_regime": "Recession",
+        "us_score": -1.0,
+        "us_confidence": 41.9,
+        "investment_env_score": 70.2,
+        "semiconductor_score": 79.6,
+        "bond_score": 45.1
       }
     ],
     "trend_summary": {
-      "kr_regime_stable": false,
+      "kr_regime_stable": true,
       "kr_confidence_change": 0.0,
       "us_regime_stable": true,
       "us_confidence_change": 0.0,
-      "investment_env_trend": -0.4000000000000057,
+      "investment_env_trend": 0.0,
       "semiconductor_trend": 0.0
     }
   },
-  "sk_hynix_decision": "SKHynixDecision(signal='HOLD', confidence=50, rationale='거시 Recovery + 신뢰도 72% → 현 포지션 유지, 매수기 대기', triggers=[], macro_linkage='거시-반도체 연결고리 미확인', risk_flags=[], next_check='1-2주 후 거시 신뢰도 변화; 금리 신호 상향/하향 이동 시', valuation_band={'pe_zscore': 1.059687739499737, 'band_label': '중립', 'latest_quarter': '26Q2', 'latest_divergence': -0.10807339902222202, 'erp_pct': 9.968540145985404, 'erp_note': 'Earnings Yield 14.60%(선행PER 6.85배 앵커) - 미국10Y 4.63% = ERP 9.97%p. ⚠ 원화자산에 달러 무위험금리를 쓰는 방법론적 한계 있음(사용자 스펙 원안 그대로 채택 — 글로벌 반도체 밸류에이션 비교 관행).', 'caveats': ['P/E Z-score는 실제 P/E가 아니라 이격도(divergence = log 주가지수 - log 영업이익지수) 기반 근사 — 발행주식수 시계열 미검증으로 EPS 직접 계산 안 함(자사주 소각·ADR 신주발행으로 최근 2년간 주식수 변동 있었음).', '샘플 10개 분기뿐 — 표준 밸류에이션 밴드(5~10년, 20~40분기) 대비 부족, 방향성 참고용.']})",
+  "sk_hynix_decision": "SKHynixDecision(signal='HOLD', confidence=50, rationale='거시 Early Expansion + 신뢰도 90% → 현 포지션 유지, 매수기 대기', triggers=[], macro_linkage='거시-반도체 연결고리 미확인', risk_flags=[], next_check='1-2주 후 거시 신뢰도 변화', valuation_band={'pe_zscore': 1.059687739499737, 'band_label': '중립', 'latest_quarter': '26Q2', 'latest_divergence': -0.10807339902222202, 'erp_pct': 9.968540145985404, 'erp_note': 'Earnings Yield 14.60%(선행PER 6.85배 앵커) - 미국10Y 4.63% = ERP 9.97%p. ⚠ 원화자산에 달러 무위험금리를 쓰는 방법론적 한계 있음(사용자 스펙 원안 그대로 채택 — 글로벌 반도체 밸류에이션 비교 관행).', 'caveats': ['P/E Z-score는 실제 P/E가 아니라 이격도(divergence = log 주가지수 - log 영업이익지수) 기반 근사 — 발행주식수 시계열 미검증으로 EPS 직접 계산 안 함(자사주 소각·ADR 신주발행으로 최근 2년간 주식수 변동 있었음).', '샘플 10개 분기뿐 — 표준 밸류에이션 밴드(5~10년, 20~40분기) 대비 부족, 방향성 참고용.']})",
   "real_estate_decision": "RealEstateDecision(signal='WAIT', confidence=60, rationale='금리 중립 → 진입 판단 유보', event_triggers=[{'event': '기준금리 추가 인하 신호', 'action': '진입 검토로 전환', 'urgency': '중간'}, {'event': '플랫폼시티 청약공시 (대기 중)', 'action': '공시 시 즉시 분석 후 진입 신호 재검토', 'urgency': '관심'}], macro_linkage='금리 중립 → 전세금 추이 모니터링 필요', current_situation='현재 거주 상황 미입력', next_check='기준금리 발표 후 (매월 초); 주간 전세가 체크; 플랫폼시티 공시 소식', affordability={'deployable_cash': 325875918.0, 'cash_only': 20000000.0, 'from_liquidation': 305875918.0, 'locked': 96212000.0, 'buy_pyeong_price': 44210000.0, 'jeonse_pyeong_price': 25930000.0, 'buy_pyeong_equivalent': 7.371090658222122, 'jeonse_pyeong_equivalent': 12.567524797531817, 'semi_pct': 96.06692758174346, 'reference_month': '2026-07', 'coupling_note': '가용 현금 3.26억 중 현금성은 0.20억뿐이고 나머지는 주식 매각으로만 만들어진다. 그런데 그 매각은 반도체 집중도(96.1%)를 낮추는 행위와 같다 — 주택 자금 마련과 집중도 완화는 서로 다른 문제가 아니라 같은 실행이다.'})",
   "rolling_windows": {
     "status": "ok",
@@ -17270,5 +17310,5 @@
       }
     }
   },
-  "reconciliation": "Reconciliation(conflicts=[Conflict(topic='SK하이닉스 포지션 지시', claim_a='위기지수(CCI): \"적극 매수 (Long)\", 최대 비중 25%', claim_b='의사결정 엔진: HOLD (신뢰도 50%)', rule='R4 포지션 지시는 단일 출처', resolution=\"의사결정 엔진의 신호만 유효. CCI의 매수/매도 문구는 위기 국면 서술일 뿐 종목 지시가 아니므로 '위험 환경 정보'로 격하해 읽을 것.\"), Conflict(topic='미국 경기 국면', claim_a='거시 엔진: Recession (신뢰도 41.9점, 지표 100% 이월)', claim_b='위기지수: GREEN 5/100 — 침체 전조 지표 대부분 0점', rule='R2 신선 > 이월', resolution='Recession 판정은 물가지수(CPI/PPI) 하락만으로 성립한 것이며 수익률곡선·고용·신용스프레드는 침체를 가리키지 않음. 물가 하락 + 정상 수익률곡선은 침체가 아니라 디스인플레이션에 가깝다. 위기지수 쪽을 채택하되, 이월 비중이 높으므로 어느 쪽도 확정으로 쓰지 말 것.')], tradeable=False, verdict='오늘 이 리포트를 근거로 한 신규 매매 실행은 권장하지 않는다. 구조적 조정(집중도 상한 설정 등 0절 항목)은 데이터와 무관하게 진행 가능하다.', blockers=['SK하이닉스 신호 신뢰도 50% < 하한 55% → 무판단', '지표 이월 비중 높음 (한국 70%, 미국 100%) → 오늘 갱신된 경제 정보 거의 없음', '엔진 간 미해소 충돌 2건'])"
+  "reconciliation": "Reconciliation(conflicts=[Conflict(topic='SK하이닉스 포지션 지시', claim_a='위기지수(CCI): \"적극 매수 (Long)\", 최대 비중 25%', claim_b='의사결정 엔진: HOLD (신뢰도 50%)', rule='R4 포지션 지시는 단일 출처', resolution=\"의사결정 엔진의 신호만 유효. CCI의 매수/매도 문구는 위기 국면 서술일 뿐 종목 지시가 아니므로 '위험 환경 정보'로 격하해 읽을 것.\"), Conflict(topic='미국 경기 국면', claim_a='거시 엔진: Recession (신뢰도 93.8점, 지표 0% 이월)', claim_b='위기지수: GREEN 5/100 — 침체 전조 지표 대부분 0점', rule='R2 신선 > 이월', resolution='Recession 판정은 물가지수(CPI/PPI) 하락만으로 성립한 것이며 수익률곡선·고용·신용스프레드는 침체를 가리키지 않음. 물가 하락 + 정상 수익률곡선은 침체가 아니라 디스인플레이션에 가깝다. 위기지수 쪽을 채택하되, 이월 비중이 높으므로 어느 쪽도 확정으로 쓰지 말 것.')], tradeable=False, verdict='오늘 이 리포트를 근거로 한 신규 매매 실행은 권장하지 않는다. 구조적 조정(집중도 상한 설정 등 0절 항목)은 데이터와 무관하게 진행 가능하다.', blockers=['SK하이닉스 신호 신뢰도 50% < 하한 55% → 무판단', '엔진 간 미해소 충돌 2건'])"
 }
