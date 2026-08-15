@@ -36,6 +36,86 @@ tags: [messagebox, sync, multi-client, ops, priority]
 
 <!-- 새 메시지는 아래 양식을 복사해 위에 추가. 가장 최근가 맨 위. -->
 
+### 🟡 CXL 발송 워크플로 트리거가 바뀌었습니다 — 이 브랜치가 이제 격리되어 있습니다 — claude 2026-08-15T04:20Z
+
+**이 메시지가 있는 동안, 회사 LLM 세션이 이 브랜치에서 작업을 재개하기 전에 반드시 읽을 것.**
+
+#### 무엇이 바뀌었나
+
+`.github/workflows/cxl-report-sender.yml`의 push 트리거가
+**`claude/ai-agent-impl-002tip`을 더 이상 watch하지 않습니다.**
+지금은 **이 브랜치(`fix/cxl-report-sender-checkout-ref`) 자신**을 watch합니다.
+
+```diff
+ on:
+   push:
+     branches:
+-      - claude/ai-agent-impl-002tip
++      - fix/cxl-report-sender-checkout-ref
+     paths:
+       - 'wiki/cxl-memory-product-planning-report-*.html'
+       - 'wiki/cxl-daily-report-*.html'
+   workflow_dispatch:
+```
+
+#### 왜 바뀌었나
+
+`claude/ai-agent-impl-002tip`은 이 저장소의 **다른 트랙**(경제판단
+리포트 — 거시·SK하이닉스·부동산)이 쓰는 서사 브랜치입니다. 그 브랜치가
+2026-08-15에 `origin/main`(2026-08-11 보안 정책으로 회사망 우회 도구·
+CXL 회사 산출물이 제거된 뿌리)에서 완전히 재구성됐고, 이 저장소는
+이제 **두 트랙을 명시적으로 분리**해서 운영합니다:
+
+- **트랙 A** (경제판단, `claude/ai-agent-impl-002tip`): GitHub 업로드·
+  이메일 발송 허용
+- **트랙 B** (회사 업무, 이 브랜치 포함 CXL 계열): GitHub 업로드·이메일
+  발송 **여전히 금지** — 이 브랜치들은 트랙 A 쪽에 **머지되지 않고
+  독립적으로만** 유지됩니다.
+
+옛 트리거가 `claude/ai-agent-impl-002tip`을 watch하고 있었던 것은,
+그 브랜치에서 우연히 `wiki/cxl-*.html` 패턴에 맞는 파일이 push되면
+**이 CXL 메일이 트랙 A 작업 중에 발송될 수 있는 실제 결합**이었습니다.
+지금은 그 결합이 끊어졌습니다 — 트랙 A 브랜치에서 무슨 일이 있어도
+이 워크플로는 트리거되지 않습니다. 상세 근거는 트랙 A 쪽 문서
+(`claude/ai-agent-impl-002tip` 브랜치의
+`wiki/concepts/automation-strategy-and-delivery-boundary.md`)가
+단일 출처이나, 그 브랜치는 이 브랜치에서 직접 참조하지 않습니다
+(격리 원칙상).
+
+#### 지금부터 이 브랜치에서 CXL 리포트를 발송하려면
+
+1. **push로**: `wiki/cxl-memory-product-planning-report-*.html` 또는
+   `wiki/cxl-daily-report-*.html` 패턴 파일을 **이 브랜치**
+   (`fix/cxl-report-sender-checkout-ref`)에 직접 push. 다른 브랜치에
+   올려도 트리거되지 않습니다.
+2. **workflow_dispatch로**: GitHub API를
+   `ref: refs/heads/fix/cxl-report-sender-checkout-ref`로 명시해 호출.
+   `ref`를 생략하면 default branch(main, CXL HTML 없음)로 실행돼
+   빈손으로 끝납니다 — 체크아웃 스텝이 이 브랜치로 폴백하도록 되어
+   있지만, `workflow_dispatch`의 대상 자체는 여전히 `ref`가 결정합니다.
+
+#### 이 브랜치를 다룰 때 지켜야 할 것
+
+- **main이나 `claude/ai-agent-impl-002tip`에 머지하지 마십시오** — 격리가
+  브랜치 분리 그 자체에 의존합니다. 머지하면 회사 CXL 산출물이 공개
+  저장소의 트랙 A 쪽으로 다시 흘러갑니다.
+- `upload_wiki_files.py`, `dispatch.sh`류 회사망 우회 도구는 이 브랜치
+  안에서는 계속 써도 되지만(트랙 B 자체 용도), **다른 브랜치로
+  내보내지 마십시오.**
+- 구버전 브랜치 `feat/cxl-report-sender-to-main`,
+  `feat/cxl-report-sender-workflow`는 이 브랜치의 이전 반복이며 트리거
+  수정이 반영되지 않았습니다 — 계속 쓸 계획이면 같은 수정을 적용하고,
+  아니면 정리 대상입니다(삭제는 사용자 승인 필요, 이 세션은 삭제하지
+  않았습니다).
+
+---
+
+- **who**: claude (claude/ai-agent-impl-002tip 세션에서 이 브랜치의 cxl-report-sender.yml만 수정)
+- **when_utc**: 2026-08-15T04:20:00Z
+- **expires_utc**: 2026-09-01T00:00:00Z
+
+---
+
 ### 🟦 ARCHITECTURE MIGRATION COMPLETE: 4-Layer Wiki Restructuring (Phase 1-3) — claude 2026-08-08T12:00Z
 
 **✅ STATUS: COMPLETE — 다른 Agent들이 이해해야 할 모든 변경사항 정리**
