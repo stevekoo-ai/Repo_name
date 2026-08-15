@@ -75,12 +75,14 @@ jobs:
         run: python -m engine.report.daily_dashboard
 
       - name: Publish latest monthly report to Pages
-        # report/ now holds both the <month>.html "latest" file and dated <YYYY-MM-DD>.html
-        # archive copies (same content, different name) — pick the month file specifically
-        # so docs/report.html always points at "today's report", not whichever file the
-        # filesystem happens to list first.
+        # report/ holds the <YYYY-MM>.html "latest" file, dated <YYYY-MM-DD>.html
+        # archive copies, AND unrelated report families (subscription-desktop-*.html
+        # etc.) that also live under report/. The old "not a dated-day file" filter
+        # let subscription-desktop-2026-08-14.html sort after 2026-08.html and win
+        # `tail -1` — docs/report.html would have published the wrong report. Match
+        # the <YYYY-MM>.html shape explicitly instead of excluding by a different shape.
         run: |
-          LATEST_MONTH_FILE=$(ls report/*.html | grep -vE '/[0-9]{4}-[0-9]{2}-[0-9]{2}\.html$' | sort | tail -1)
+          LATEST_MONTH_FILE=$(ls report/*.html | grep -E '/[0-9]{4}-[0-9]{2}\.html$' | sort | tail -1)
           cp "$LATEST_MONTH_FILE" docs/report.html
 
       - name: Commit updated report, history, and dashboard

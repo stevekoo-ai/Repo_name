@@ -1,8 +1,8 @@
 {
   "macro": {
-    "regime": "Early Expansion",
+    "regime": "Recovery",
     "previous_regime": "Early Expansion",
-    "transition": null,
+    "transition": "upgrade",
     "score_band": "unbalanced_expansion",
     "score_band_label": "불균형 확장",
     "scores": {
@@ -28,6 +28,7 @@
     ],
     "upgrade_signals": [
       "semiconductor_strong",
+      "rates_easing",
       "us_employment_improving"
     ],
     "changes": [
@@ -88,7 +89,7 @@
           "yoy": 9.1
         },
         "note": null,
-        "last_fresh_at": "2026-08-14T10:06:16.308943+00:00"
+        "last_fresh_at": "2026-08-15T02:45:07.118835+00:00"
       },
       "semiconductor_exports": {
         "value": 24.7,
@@ -101,7 +102,7 @@
           "yoy": 24.7
         },
         "note": null,
-        "last_fresh_at": "2026-08-14T10:06:16.308943+00:00"
+        "last_fresh_at": "2026-08-15T02:45:07.118835+00:00"
       },
       "current_account": {
         "value": 49730.4,
@@ -164,7 +165,7 @@
         "source": "FRED",
         "fields": {},
         "note": null,
-        "last_fresh_at": "2026-08-14T10:06:16.308943+00:00"
+        "last_fresh_at": "2026-08-15T02:45:07.118835+00:00"
       }
     },
     "us_investment_clock": {
@@ -209,8 +210,7 @@
     ],
     "upgrade_signals": [
       "ppi_easing",
-      "unemployment_improving",
-      "yield_curve_steepening"
+      "unemployment_improving"
     ],
     "changes": [
       {
@@ -327,11 +327,11 @@
     }
   },
   "kr_us_comparison": {
-    "kr_regime": "Early Expansion",
+    "kr_regime": "Recovery",
     "us_regime": "Recession",
     "kr_score_band": "unbalanced_expansion",
     "us_score_band": "slowdown",
-    "cycle_gap": -4,
+    "cycle_gap": -5,
     "alignment": "kr_behind",
     "indicator_pairs": [
       {
@@ -398,8 +398,8 @@
         "relationship": "diverge"
       }
     ],
-    "narrative": "미국은 현재 Recession 국면, 한국은 Early Expansion 국면입니다. 한국이 사이클상 미국보다 뒤처져 있어, 미국에서 먼저 나타난 흐름이 시차를 두고 한국에 파급될 가능성을 주시할 필요가 있습니다. 비교 가능한 6개 핵심 지표 중 83%가 미국과 같은 방향으로 움직이고 있습니다. 미국과 한국 모두 뚜렷한 경고 신호는 없는 상태입니다. 방향이 엇갈린 지표: 산업생산 — 이 부분이 한국이 미국과 다르게 가는 지점입니다."
+    "narrative": "미국은 현재 Recession 국면, 한국은 Recovery 국면입니다. 한국이 사이클상 미국보다 뒤처져 있어, 미국에서 먼저 나타난 흐름이 시차를 두고 한국에 파급될 가능성을 주시할 필요가 있습니다. 비교 가능한 6개 핵심 지표 중 83%가 미국과 같은 방향으로 움직이고 있습니다. 미국과 한국 모두 뚜렷한 경고 신호는 없는 상태입니다. 방향이 엇갈린 지표: 산업생산 — 이 부분이 한국이 미국과 다르게 가는 지점입니다."
   },
   "month": "2026-08",
-  "saved_at": "2026-08-14T10:06:28.772710+00:00"
+  "saved_at": "2026-08-15T02:45:17.375818+00:00"
 }
