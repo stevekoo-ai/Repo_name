@@ -5,22 +5,20 @@
 # observation (grade 5) — do not put an estimate in this file, only a
 # released figure with a source.
 #
-# 2026-08-15: 2026-07-01 row is REAL, from the 2026-08-01 산업통상부
-# "2026년 7월 수출입동향" press release (source: WebSearch, 산업통상부 공식
-# 발표 인용 보도 다수 교차확인 — 파이낸셜뉴스/머니투데이/부산합스 등).
-# 2026-04-01 ~ 2026-06-01 rows are STILL EXAMPLE placeholders — nobody has
-# replaced them yet. Do not read them as real; backfill with the actual
-# 4/5/6월 수출입동향 releases before trusting any trend across those months.
+# 2026-08-15: 2026-04-01 ~ 2026-07-01 rows are all REAL now, from the
+# monthly 산업통상부 "n월 수출입동향" press releases (source: WebSearch,
+# 산업통상부 공식 발표 인용 보도 교차확인 — 파이낸셜뉴스/머니투데이/한국세정신문/
+# 부산합스/정책브리핑 등). No EXAMPLE rows remain in this file.
 
 updated_at: "2026-08-15"
 series:
   total_exports_yoy:               # 총수출 증가율 (%, YoY)
-    - { date: "2026-04-01", value: 6.8 }   # EXAMPLE — not yet backfilled
-    - { date: "2026-05-01", value: 8.2 }   # EXAMPLE — not yet backfilled
-    - { date: "2026-06-01", value: 9.1 }   # EXAMPLE — not yet backfilled
+    - { date: "2026-04-01", value: 48.0 }  # REAL — 858.9억 달러, 4월 기준 역대 최대. 산업통상부 2026-05월초 발표
+    - { date: "2026-05-01", value: 53.2 }  # REAL — 877.5억 달러, 월 기준 역대 최대, 3개월 연속 800억+. 산업통상부 발표
+    - { date: "2026-06-01", value: 70.9 }  # REAL — 1,022.5억 달러, 사상 최초 월 1,000억 달러 돌파. 산업통상부 발표
     - { date: "2026-07-01", value: 62.8 }  # REAL — 988.9억 달러, 역대 2위. 산업통상부 2026-08-01 발표
   semiconductor_exports_yoy:       # 반도체 수출 증가율 (%, YoY)
-    - { date: "2026-04-01", value: 18.9 }  # EXAMPLE — not yet backfilled
-    - { date: "2026-05-01", value: 22.4 }  # EXAMPLE — not yet backfilled
-    - { date: "2026-06-01", value: 24.7 }  # EXAMPLE — not yet backfilled
+    - { date: "2026-04-01", value: 173.5 } # REAL — 319.0억 달러. 산업통상부 발표
+    - { date: "2026-05-01", value: 169.4 } # REAL — 371.6억 달러, 3개월 연속 300억+, 월간 최고 기록. 산업통상부 발표
+    - { date: "2026-06-01", value: 199.5 } # REAL — 448.2억 달러, AI서버 수요+고정가 상승. 산업통상부 발표
     - { date: "2026-07-01", value: 178.8 } # REAL — 410.1억 달러, 2개월 연속 400억 달러 상회. 산업통상부 2026-08-01 발표

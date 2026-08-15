@@ -429,6 +429,134 @@ def test_freshness_audit_flags_a_dead_series():
             assert r["age_days"] > 365
 
 
+# ── exports/price correlation ───────────────────────────────────────────────
+
+def test_price_yoy_requires_a_prior_year_observation():
+    """Converting a price level to %YoY needs a close ~12 months earlier.
+    With less than a year of history this must return nothing, not a guess —
+    an early-partial YoY would be indistinguishable from a real one once it
+    lands in the correlation table."""
+    import pandas as pd
+    from scripts.correlation_analysis import _load_price_yoy, MONTHLY_PRICE_CSV
+
+    import tempfile, os
+    from pathlib import Path
+    fd, path = tempfile.mkstemp(suffix=".csv")
+    os.close(fd)
+    try:
+        df = pd.DataFrame([
+            {"date": "2026-05-01", "code": "TEST", "label": "t", "close": 100.0,
+             "source": "test", "fetched_at": ""},
+            {"date": "2026-06-01", "code": "TEST", "label": "t", "close": 110.0,
+             "source": "test", "fetched_at": ""},
+        ])
+        df.to_csv(path, index=False)
+        import scripts.correlation_analysis as mod
+        real_path = mod.MONTHLY_PRICE_CSV
+        mod.MONTHLY_PRICE_CSV = Path(path)
+        try:
+            yoy = mod._load_price_yoy("TEST")
+        finally:
+            mod.MONTHLY_PRICE_CSV = real_path
+        assert yoy.empty, f"expected no YoY points with <12mo of history, got {yoy}"
+    finally:
+        os.remove(path)
+
+
+def test_price_yoy_computes_correctly_with_a_year_of_history():
+    """The one case that should actually produce a number."""
+    import pandas as pd, tempfile, os
+    from pathlib import Path
+    fd, path = tempfile.mkstemp(suffix=".csv")
+    os.close(fd)
+    try:
+        df = pd.DataFrame([
+            {"date": "2025-06-01", "code": "TEST", "label": "t", "close": 100.0,
+             "source": "test", "fetched_at": ""},
+            {"date": "2026-06-01", "code": "TEST", "label": "t", "close": 150.0,
+             "source": "test", "fetched_at": ""},
+        ])
+        df.to_csv(path, index=False)
+        import scripts.correlation_analysis as mod
+        real_path = mod.MONTHLY_PRICE_CSV
+        mod.MONTHLY_PRICE_CSV = Path(path)
+        try:
+            yoy = mod._load_price_yoy("TEST")
+        finally:
+            mod.MONTHLY_PRICE_CSV = real_path
+        assert len(yoy) == 1
+        assert abs(yoy.iloc[0] - 50.0) < 1e-9, f"expected +50% YoY, got {yoy.iloc[0]}"
+    finally:
+        os.remove(path)
+
+
+def test_pairwise_correlation_matches_known_synthetic_case():
+    """Pin the actual math, not just that it runs."""
+    import pandas as pd
+    from scripts.correlation_analysis import pairwise_correlations
+
+    df = pd.DataFrame({
+        "a": [1.0, 2.0, 3.0, 4.0],
+        "b": [2.0, 4.0, 6.0, 8.0],      # perfectly correlated with a
+        "c": [4.0, 3.0, 2.0, 1.0],      # perfectly anti-correlated with a
+    })
+    pairs = {(p["a"], p["b"]): p for p in pairwise_correlations(df)}
+    assert abs(pairs[("a", "b")]["r"] - 1.0) < 1e-9
+    assert abs(pairs[("a", "c")]["r"] + 1.0) < 1e-9
+    assert pairs[("a", "b")]["n"] == 4
+
+
+def test_low_sample_pairs_are_flagged_not_silently_trusted():
+    """A correlation table without n is not trustworthy — this repo has
+    already shipped one fabricated-confidence number (the 8-year-old rate
+    published as current); a bare r with no sample-size caveat is the same
+    failure shape applied to statistics instead of a single value."""
+    from scripts.correlation_analysis import render_markdown, MIN_TRUSTWORTHY_N
+    import pandas as pd
+
+    df = pd.DataFrame({"total_exports_yoy": [1.0, 2.0, 3.0, 4.0],
+                        "semi_exports_yoy": [2.0, 4.0, 6.0, 8.0]},
+                       index=pd.to_datetime(["2026-04-01", "2026-05-01", "2026-06-01", "2026-07-01"]))
+    df.index.name = "month"
+    pairs = [{"a": "total_exports_yoy", "b": "semi_exports_yoy", "r": 1.0, "n": 4}]
+    assert 4 < MIN_TRUSTWORTHY_N, "test assumes n=4 is below the trust floor"
+    md = render_markdown(df, pairs)
+    assert "신뢰 불가" in md, "a low-n pair must be visibly flagged, not presented as a plain number"
+
+
+def test_correlation_prefers_growth_rates_over_raw_levels():
+    """The whole point of converting price to %YoY before correlating is to
+    avoid crediting a shared upward trend as a real relationship — pin that
+    the loader is actually a rate transform, not a passthrough of levels."""
+    import pandas as pd, tempfile, os
+    from pathlib import Path
+    fd, path = tempfile.mkstemp(suffix=".csv")
+    os.close(fd)
+    try:
+        # Monotonically rising level, ~5%/mo compounding — %YoY should land
+        # near 12*5% territory, not equal the raw closing level itself.
+        rows = []
+        price = 100.0
+        for i in range(13):
+            rows.append({"date": f"2025-{(i % 12) + 1:02d}-01" if i < 12 else "2026-01-01",
+                         "code": "TEST", "label": "t", "close": price, "source": "t", "fetched_at": ""})
+            price *= 1.05
+        df = pd.DataFrame(rows)
+        df.to_csv(path, index=False)
+        import scripts.correlation_analysis as mod
+        real_path = mod.MONTHLY_PRICE_CSV
+        mod.MONTHLY_PRICE_CSV = Path(path)
+        try:
+            yoy = mod._load_price_yoy("TEST")
+        finally:
+            mod.MONTHLY_PRICE_CSV = real_path
+        assert not yoy.empty
+        assert all(v != rows[i]["close"] for i, v in enumerate(yoy.values)), \
+            "YoY output must not just be the raw close level"
+    finally:
+        os.remove(path)
+
+
 if __name__ == "__main__":
     import sys, traceback
     fns = [(n, f) for n, f in sorted(globals().items())
