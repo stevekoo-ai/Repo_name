@@ -10,21 +10,32 @@ name: CXL Report Sender
 #   - wiki/cxl-daily-report-*.html                     (Daily Update HTML)
 # 두 패턴 모두 wiki/ 아래 report 계열 HTML로 한정.
 #
-# 브랜치 (2026-08-10 추가): 서사 브랜치 claude/ai-agent-impl-002tip push 로
-# 발송 트리거. upload_cxl_daily.py 가 HTML 을 이 브랜치에 올리므로, branches 를
-# 명시해야 트리거가 걸린다 (미지정 시 default branch=main 만 트리거되어 발송
-# 안 됨 — 서사 브랜치 HTML 은 main 에 merge 되기 전엔 메일 안 감).
+# ⚠️ 격리 경계 (2026-08-15, wiki/concepts/automation-strategy-and-delivery-boundary.md
+# 트랙 B): 이 워크플로는 회사 CXL 업무 전용이며 이 저장소의 트랙 A(경제판단)
+# 서사 브랜치 `claude/ai-agent-impl-002tip`와 **완전히 분리**되어야 한다.
+# 예전 버전은 `branches: [claude/ai-agent-impl-002tip]`로 트랙 A 브랜치를
+# push 트리거로 watch했다 — 트랙 A 작업 중 실수로 이 패턴에 맞는 파일을
+# 건드리면 CXL 메일이 발송될 수 있는 결합이었다. 지금은 **이 브랜치 자신의
+# 이름**만 watch하므로 트랙 A 브랜치에서 무슨 일이 있어도 이 워크플로는
+# 절대 트리거되지 않는다. 이 브랜치를 main이나 claude/ai-agent-impl-002tip에
+# 머지하지 말 것 — 격리가 브랜치 분리에 의존한다.
+#
+# 실행 방법: (1) 이 브랜치에 위 패턴 파일을 push, 또는
+#            (2) workflow_dispatch를 ref=이 브랜치명으로 API 호출
+#                (회사 LLM이 자체 토큰으로 직접 호출 가능 — 이 세션이
+#                대신 호출하지 않는다).
 
 on:
   push:
     branches:
-      - claude/ai-agent-impl-002tip
+      - fix/cxl-report-sender-checkout-ref
     paths:
       - 'wiki/cxl-memory-product-planning-report-*.html'
       - 'wiki/cxl-daily-report-*.html'
-  # Manual trigger: lets us re-send the latest report without a re-push,
-  # e.g. after fixing the workflow itself. Checks out the narrative branch
-  # by default (workflow_dispatch ref = default branch, so set ref below).
+  # 재발송용 수동/API 트리거. workflow_dispatch의 기본 ref는 default
+  # branch(main)이므로, 회사 LLM이 API로 호출할 때
+  # `ref: refs/heads/fix/cxl-report-sender-checkout-ref`를 명시해야
+  # 이 브랜치의 워크플로 정의+콘텐츠로 실행된다.
   workflow_dispatch:
 
 jobs:
@@ -33,14 +44,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          # CXL report HTML lives on the narrative branch, not main. On
-          # push events github.ref = claude/ai-agent-impl-002tip (correct).
-          # On workflow_dispatch github.ref = main (no HTML there) — fall
-          # back to the narrative branch explicitly so manual re-runs find
-          # the report. Without this, checkout defaults to main and the
-          # "Find latest CXL report" step finds no files, exits 2
-          # (2026-08-10 run 31359117007 failure).
-          ref: ${{ github.ref == 'refs/heads/main' && 'refs/heads/claude/ai-agent-impl-002tip' || github.ref }}
+          # workflow_dispatch를 ref 지정 없이 호출하면 github.ref=main이 되어
+          # (main에는 CXL HTML이 없음) 아래 파일 탐색이 빈손이 된다. 이 브랜치
+          # 자신으로 폴백 — 트랙 A 브랜치를 더 이상 참조하지 않는다.
+          ref: ${{ github.ref == 'refs/heads/main' && 'refs/heads/fix/cxl-report-sender-checkout-ref' || github.ref }}
 
       - name: Find latest CXL report
         id: find
