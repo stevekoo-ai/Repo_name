@@ -161,12 +161,13 @@ main은 깨끗하지만 퍼지 이전 이력을 가진 브랜치들이 남아 �
 
 | 순위 | 조치 | 이유 | 주체 |
 |---|---|---|---|
-| **P0** | 저장소를 **private으로 전환** | 노출 ①②를 한 번에 닫는다. Actions·이메일 발송은 private에서도 그대로 동작한다 | 사용자 (설정 변경) |
-| **P0** | PR #67을 **경제 부분만 남겨 재구성** | 현재 상태로 머지하면 08-11 보안 퍼지가 통째로 되돌려진다 | 에이전트 |
-| **P1** | 잔여 CXL 브랜치 정리 | 노출 ①의 나머지 절반 | 사용자 승인 후 |
-| **P1** | 수집 워크플로를 main에 올려 실제로 발화시키기 | `core10-collect.yml`은 main에 없으면 영원히 안 돈다 | 에이전트 + 머지 |
-| **P2** | 발행 워크플로에 **전달 + 실패 알림** 추가 | ✅ 2026-08-14 구현 완료 (§5.1) — main 머지 후 발화 | 에이전트 |
-| **P2** | ECOS 페이지네이션 실 API 검증 | 코드는 고쳤으나 네트워크 차단 환경이라 미검증 | 머지 후 수동 dispatch |
+| **P0** | 저장소를 **private으로 전환** | 노출 ①②를 한 번에 닫는다. Actions·이메일 발송은 private에서도 그대로 동작한다 | 사용자 — 2026-08-15 "유료 서비스라 나중에 검토" 보류 |
+| **P0** | PR #67을 **경제 부분만 남겨 재구성** | ✅ 2026-08-15 완료 (§5.2) — main에서 재구성 후 push | 에이전트 |
+| **P1** | 잔여 CXL 브랜치 정리 | ✅ 2026-08-15 부분 완료 — 트리거 격리(§5.3). 구버전 브랜치 2개 삭제는 사용자 승인 대기 | 사용자 승인 후 |
+| **P1** | 수집 워크플로를 main에 올려 실제로 발화시키기 | ✅ 2026-08-15 §5.2 push로 완료 — 다음 스케줄부터 발화 | 완료 |
+| **P2** | 발행 워크플로에 **전달 + 실패 알림** 추가 | ✅ 2026-08-14 구현 완료 (§5.1) — main 머지로 발화 시작 | 완료 |
+| **P2** | ECOS 페이지네이션 실 API 검증 | 코드는 고쳤으나 네트워크 차단 환경이라 미검증 | main 반영 후 다음 macro-data-sync/core10-collect 실행에서 확인 |
+| **P2** | KIS 토큰 발급 로직 통합 + ECOS 클라이언트 이중화 해소 | 2026-08-15 검토에서 발견(§5.4) — `investor_flow.py`/`portfolio_holdings.py`가 토큰 발급을 각자 구현(07-28~30 403 충돌의 원인), `macro_data.py`가 `collectors/ecos.py`와 별도 ECOS 클라이언트를 가짐(페이지네이션 버그가 한쪽만 고쳐졌던 근본 원인) | 다음 세션 |
 | **P3** | 죽은 OECD 미러 2종 대체 | `fred_kr_cpi_oecd`(1,017일), `fred_kr_industrial_production_oecd`(896일) | 에이전트 |
 
 > **P0 두 건은 사용자 결정 또는 사용자 설정이 필요하다.** 에이전트가
@@ -229,6 +230,43 @@ HTML을 그대로 넣으면 차트까지 열린다(외부 CDN 없이 인라인�
 메일 본문에 HTML을 그대로 싣고 있으므로 주 채널은 영향을 받지 않는다.
 차트는 외부 CDN 없이 인라인 SVG로 구워야 메일 클라이언트에서 보인다
 (스크립트는 실행되지 않음).
+
+### 5.2 main 반영 완료 (2026-08-15)
+
+`claude/ai-agent-impl-002tip`을 `origin/main`에서 다시 만들고, 이전
+424커밋 이력의 파일을 하나씩 main과 대조해 트랙 A만 이식한 뒤 push
+완료. 상세 경위는 `wiki/log.md` 2026-08-15 RESTRUCTURE 항목,
+`MessageBox.md`가 다음 에이전트용 인계 요약. 이 시점부터
+`daily-peos-report`·`core10-collect`가 main의 파일이므로 스케줄대로
+자동 발화한다 — §7 성공 기준 재확인은 다음 세션에서.
+
+### 5.3 CXL 브랜치 격리 (2026-08-15)
+
+`cxl-report-sender.yml`이 `push: branches: [claude/ai-agent-impl-002tip]`로
+**이 저장소의 트랙 A 브랜치를 직접 watch**하고 있었다 — 트랙 A 작업 중
+우연히 `wiki/cxl-*.html` 패턴 파일을 건드리면 CXL 회사 메일이 발송될 수
+있는 실제 결합이었다. `fix/cxl-report-sender-checkout-ref`를 정본으로
+삼아 트리거를 자기 브랜치 이름으로 교체하고(`workflow_dispatch`는 회사
+LLM이 `ref` 지정 API 호출로 유지), 헤더에 격리 근거와 "main·트랙 A
+브랜치에 머지 금지" 경고를 남겼다. 구버전 브랜치
+`feat/cxl-report-sender-to-main` · `feat/cxl-report-sender-workflow`는
+남아 있음 — 삭제는 사용자 승인 필요.
+
+### 5.4 API 재사용성 검토 (2026-08-15)
+
+`collectors/*.py`(ECOS/FRED/KOSIS/MOLIT)는 이미 `fetch_series(key)` /
+`fetch_all()`로 통일된 좋은 패턴 — 새 코드는 바로
+`from collectors import ecos; ecos.fetch_series("usdkrw")`로 재사용
+가능하다. 반대 사례가 `scripts/`에 있다:
+
+- `investor_flow.py`와 `portfolio_holdings.py`가 KIS 토큰 발급
+  (`kis_get_token`)을 **각자 따로 구현** — 07-28~30 403 충돌(같은
+  appkey를 짧은 시간에 중복 재발급 요청해 거부됨)의 실제 원인이었다.
+- `macro_data.py`가 `collectors/ecos.py`와 **별도의 ECOS 클라이언트**를
+  가지고 있다 — 이번에 고친 페이지네이션 버그가 한쪽(`macro_data.py`)만
+  먼저 고쳐지고 다른 쪽은 몰랐던 이유가 정확히 이 이중 구현 때문이었다.
+
+두 통합 모두 다음 우선순위 표(P2)에 기록. 구현은 이번 세션에서 보류.
 
 ---
 
