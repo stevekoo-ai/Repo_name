@@ -557,6 +557,153 @@ def test_correlation_prefers_growth_rates_over_raw_levels():
         os.remove(path)
 
 
+# ── annual (long-run) exports/KOSPI correlation ─────────────────────────────
+
+def test_kospi_annual_yoy_computes_from_manual_yaml():
+    """The manual kospi_annual.yaml is the only source in a fresh sandbox
+    (no KIS credentials, no monthly-price-history.csv yet) — pin that the
+    loader turns consecutive year-end closes into %YoY correctly on its own,
+    with no live CSV present at all."""
+    import pandas as pd, tempfile, os
+    from pathlib import Path
+    fd, path = tempfile.mkstemp(suffix=".yaml")
+    os.close(fd)
+    try:
+        Path(path).write_text(
+            "series:\n"
+            "  close:\n"
+            "    - { date: \"2023-12-28\", value: 100.0 }\n"
+            "    - { date: \"2024-12-30\", value: 110.0 }\n"
+            "    - { date: \"2025-12-30\", value: 143.0 }\n",
+            encoding="utf-8",
+        )
+        import scripts.correlation_analysis as mod
+        real_kospi = mod.KOSPI_ANNUAL_YAML
+        real_csv = mod.MONTHLY_PRICE_CSV
+        mod.KOSPI_ANNUAL_YAML = Path(path)
+        mod.MONTHLY_PRICE_CSV = Path("/nonexistent/does-not-exist.csv")
+        try:
+            yoy = mod._load_kospi_annual_yoy()
+        finally:
+            mod.KOSPI_ANNUAL_YAML = real_kospi
+            mod.MONTHLY_PRICE_CSV = real_csv
+        assert len(yoy) == 2
+        assert abs(yoy.loc[pd.Timestamp("2024-01-01")] - 10.0) < 1e-9
+        assert abs(yoy.loc[pd.Timestamp("2025-01-01")] - 30.0) < 1e-9
+    finally:
+        os.remove(path)
+
+
+def test_kospi_annual_yoy_prefers_live_kis_close_over_manual_file():
+    """Once exports-price-correlation.yml has actually collected a December
+    close via KIS, that real value must win over the manually-sourced
+    (WebSearch-only, unverifiable-in-sandbox) kospi_annual.yaml for the same
+    year — otherwise the live pipeline would silently have zero effect on
+    this analysis, contradicting the loader's own priority comment."""
+    import pandas as pd, tempfile, os
+    from pathlib import Path
+    fd_yaml, yaml_path = tempfile.mkstemp(suffix=".yaml")
+    os.close(fd_yaml)
+    fd_csv, csv_path = tempfile.mkstemp(suffix=".csv")
+    os.close(fd_csv)
+    try:
+        Path(yaml_path).write_text(
+            "series:\n"
+            "  close:\n"
+            "    - { date: \"2023-12-28\", value: 100.0 }\n"
+            "    - { date: \"2024-12-30\", value: 999.0 }\n",  # deliberately wrong
+            encoding="utf-8",
+        )
+        pd.DataFrame([
+            {"date": "2024-12-30", "code": "0001", "label": "코스피", "close": 120.0,
+             "source": "kis", "fetched_at": ""},
+        ]).to_csv(csv_path, index=False)
+
+        import scripts.correlation_analysis as mod
+        real_kospi = mod.KOSPI_ANNUAL_YAML
+        real_csv = mod.MONTHLY_PRICE_CSV
+        mod.KOSPI_ANNUAL_YAML = Path(yaml_path)
+        mod.MONTHLY_PRICE_CSV = Path(csv_path)
+        try:
+            yoy = mod._load_kospi_annual_yoy()
+        finally:
+            mod.KOSPI_ANNUAL_YAML = real_kospi
+            mod.MONTHLY_PRICE_CSV = real_csv
+        # (120/100 - 1) * 100 = 20.0, NOT (999/100 - 1) * 100 = 899.0
+        assert abs(yoy.loc[pd.Timestamp("2024-01-01")] - 20.0) < 1e-9, \
+            f"live KIS close must override the manual file, got {yoy.loc[pd.Timestamp('2024-01-01')]}"
+    finally:
+        os.remove(yaml_path)
+        os.remove(csv_path)
+
+
+def test_build_annual_dataset_reads_both_manual_yaml_files():
+    """End-to-end sanity: build_annual_dataset must actually wire together
+    exports_annual.yaml (two series) and kospi_annual.yaml (via
+    _load_kospi_annual_yoy) into one DataFrame keyed by year."""
+    import pandas as pd, tempfile, os
+    from pathlib import Path
+    fd_exp, exp_path = tempfile.mkstemp(suffix=".yaml")
+    os.close(fd_exp)
+    fd_kospi, kospi_path = tempfile.mkstemp(suffix=".yaml")
+    os.close(fd_kospi)
+    try:
+        Path(exp_path).write_text(
+            "series:\n"
+            "  total_exports_yoy:\n"
+            "    - { date: \"2024-01-01\", value: 8.2 }\n"
+            "    - { date: \"2025-01-01\", value: 3.8 }\n"
+            "  semiconductor_exports_yoy:\n"
+            "    - { date: \"2024-01-01\", value: 43.9 }\n"
+            "    - { date: \"2025-01-01\", value: 22.1 }\n",
+            encoding="utf-8",
+        )
+        Path(kospi_path).write_text(
+            "series:\n"
+            "  close:\n"
+            "    - { date: \"2023-12-28\", value: 2655.28 }\n"
+            "    - { date: \"2024-12-30\", value: 2399.49 }\n"
+            "    - { date: \"2025-12-30\", value: 4214.17 }\n",
+            encoding="utf-8",
+        )
+        import scripts.correlation_analysis as mod
+        real_exp = mod.EXPORTS_ANNUAL_YAML
+        real_kospi = mod.KOSPI_ANNUAL_YAML
+        real_csv = mod.MONTHLY_PRICE_CSV
+        mod.EXPORTS_ANNUAL_YAML = Path(exp_path)
+        mod.KOSPI_ANNUAL_YAML = Path(kospi_path)
+        mod.MONTHLY_PRICE_CSV = Path("/nonexistent/does-not-exist.csv")
+        try:
+            df = mod.build_annual_dataset()
+        finally:
+            mod.EXPORTS_ANNUAL_YAML = real_exp
+            mod.KOSPI_ANNUAL_YAML = real_kospi
+            mod.MONTHLY_PRICE_CSV = real_csv
+        assert list(df.columns) == ["total_exports_yoy", "semi_exports_yoy", "kospi_yoy"]
+        assert df.loc[pd.Timestamp("2025-01-01"), "total_exports_yoy"] == 3.8
+        assert df.loc[pd.Timestamp("2025-01-01"), "semi_exports_yoy"] == 22.1
+        kospi_2025 = df.loc[pd.Timestamp("2025-01-01"), "kospi_yoy"]
+        assert abs(kospi_2025 - ((4214.17 / 2399.49 - 1) * 100)) < 1e-6
+    finally:
+        os.remove(exp_path)
+        os.remove(kospi_path)
+
+
+def test_render_annual_markdown_handles_missing_metric_without_crashing():
+    """Same robustness class as render_markdown's own reindex fix — a caller
+    passing a frame missing a column entirely must render '—', not KeyError."""
+    from scripts.correlation_analysis import render_annual_markdown
+    import pandas as pd
+
+    df = pd.DataFrame({"total_exports_yoy": [8.2, 3.8]},
+                       index=pd.to_datetime(["2024-01-01", "2025-01-01"]))
+    df.index.name = "year"
+    pairs = [{"a": "total_exports_yoy", "b": "kospi_yoy", "r": float("nan"), "n": 0}]
+    md = render_annual_markdown(df, pairs)
+    assert "—" in md
+    assert "2025" in md
+
+
 if __name__ == "__main__":
     import sys, traceback
     fns = [(n, f) for n, f in sorted(globals().items())
