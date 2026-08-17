@@ -7,11 +7,17 @@ name: 관세청 잠정치 페이지 구조 프로브 (임시)
 # 워크플로들이 이미 여러 외부 API를 문제없이 호출 중), 여기서 실제로
 # 접근되는지/구조가 어떤지 먼저 확인한다. 확인되면 이 파일은 삭제한다
 # (다른 probe workflow들과 동일 패턴).
+#
+# 2026-08-17: 이전 커밋에서 python3 -c의 멀티라인 문자열이 run: | 블록
+# 스칼라 최소 들여쓰기 규칙을 어겨 YAML 파싱 자체가 실패했다(job 0개로
+# 즉시 실패 — kis-monthly-depth-probe.yml에서 이미 한 번 겪은 것과 같은
+# 실수). 별도 .py 스크립트 파일로 분리해 재발 방지.
 
 on:
   push:
     paths:
       - ".github/workflows/customs-preliminary-probe.yml"
+      - "scripts/_probe_customs_page.py"
   workflow_dispatch:
 
 permissions:
@@ -29,32 +35,5 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: 목록 페이지 접근 확인
-        run: |
-          python3 -c "
-import requests
-try:
-    r = requests.get('https://www.customs.go.kr/kcs/na/ntt/selectNttList.do?bbsId=1362&mi=2891', timeout=15,
-                      headers={'User-Agent': 'Mozilla/5.0'})
-    print('status:', r.status_code)
-    print('length:', len(r.text))
-    print('--- first 3000 chars ---')
-    print(r.text[:3000])
-except Exception as e:
-    print('ERROR:', type(e).__name__, e)
-"
-
-      - name: 상세 페이지 접근 확인 (8월 1~10일 잠정치, 실제 URL)
-        run: |
-          python3 -c "
-import requests
-try:
-    r = requests.get('https://www.customs.go.kr/kcs/na/ntt/selectNttInfo.do?mi=2891&bbsId=1362&nttSn=10172763', timeout=15,
-                      headers={'User-Agent': 'Mozilla/5.0'})
-    print('status:', r.status_code)
-    print('length:', len(r.text))
-    print('--- first 5000 chars ---')
-    print(r.text[:5000])
-except Exception as e:
-    print('ERROR:', type(e).__name__, e)
-"
+      - name: 목록/상세 페이지 접근 확인
+        run: python3 scripts/_probe_customs_page.py
