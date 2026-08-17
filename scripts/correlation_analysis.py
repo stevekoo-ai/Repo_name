@@ -285,7 +285,13 @@ def load_exports_preliminary() -> dict | None:
     중요: total_exports_yoy(실측) 시계열에는 절대 섞지 않는다 — 호출부가
     이 dict를 받아 별도로(점선/빈 마커) 그려야 한다. 반환값이 이미 지난
     달(오늘 기준 진행 중인 달이 아님)이면 None — 최신치를 안 챙겨서 낡은
-    잠정치가 이번 달 자리에 잘못 찍히는 걸 막는다."""
+    잠정치가 이번 달 자리에 잘못 찍히는 걸 막는다.
+
+    semi_value: yaml의 semiconductor_exports_yoy(참고용으로만 기록해두고
+    그동안 아무도 안 읽던 필드) — 2026-08-17 사용자 요청("최근 급등과
+    급락 장세의 수출과의 관계를 확인해보자")으로 이제 semi_exports_yoy
+    차트의 잠정치 다음 점에 쓴다. 필드가 없으면 None(과거 저장된 yaml에는
+    없을 수 있음 — 없어도 total 쪽 잠정치는 그대로 동작해야 한다)."""
     if not EXPORTS_PRELIMINARY_YAML.exists():
         return None
     payload = yaml.safe_load(EXPORTS_PRELIMINARY_YAML.read_text(encoding="utf-8")) or {}
@@ -302,9 +308,11 @@ def load_exports_preliminary() -> dict | None:
     label_en = (f"{pd.Timestamp(period_start).strftime('%b %-d')}-"
                 f"{pd.Timestamp(period_end).strftime('%-d')} prelim."
                 if period_start and period_end else "prelim.")
+    semi_yoy = latest.get("semiconductor_exports_yoy")
     return {
         "date": target_month,
         "value": float(latest["total_exports_yoy"]),
+        "semi_value": float(semi_yoy) if semi_yoy is not None else None,
         "label": latest.get("period_label", ""),
         "label_en": label_en,
         "source": latest.get("source", ""),
@@ -823,7 +831,10 @@ def render_markdown(df: pd.DataFrame, pairs: list[dict], preliminary: dict | Non
             f"## 진행 중인 달 잠정치 (아직 확정 아님)",
             "",
             f"**{preliminary['date'].strftime('%Y-%m')}** 총수출 %YoY 추정: "
-            f"**{preliminary['value']:+.1f}%** — 관세청 {preliminary['label']} 잠정치를 그 달 "
+            f"**{preliminary['value']:+.1f}%**"
+            + (f", 반도체수출 %YoY 추정: **{preliminary['semi_value']:+.1f}%**"
+               if preliminary.get("semi_value") is not None else "")
+            + f" — 관세청 {preliminary['label']} 잠정치를 그 달 "
             "전체의 %YoY로 근사한 값이다(2026-08-17 사용자 요청). 실제 발표값(관세청, "
             "다음 달 1일 확정치)과 다를 수 있다 — 상반월/월 전체의 조업일수·통관 타이밍 "
             "차이 때문. 위 표·상관계수 계산에는 포함하지 않았고, 차트에서만 점선+빈 "
@@ -1049,10 +1060,16 @@ def _render_monthly_chart(df: pd.DataFrame, top_pair: dict | None, out_path: Pat
     같은 파란색이지만 선 스타일과 마커를 확실히 다르게 해서 "이건 확정치가
     아니다"가 범례만 봐도 드러나게 한다. z-score는 실측 total_exports_yoy
     시리즈의 평균/표준편차를 그대로 재사용한다(잠정치 자체를 평균/표준편차
-    계산에 넣지 않는다 — 아직 확정 안 된 값이 정규화 기준을 흔들면 안 된다)."""
+    계산에 넣지 않는다 — 아직 확정 안 된 값이 정규화 기준을 흔들면 안 된다).
+    semi_exports_yoy에도 같은 방식으로 잠정치 다음 점을 찍는다(preliminary
+    의 semi_value, 2026-08-17 사용자 요청 — "최근 급등과 급락 장세의
+    수출과의 관계를 확인해보자". semi_exports_yoy 자체도 이번에 처음으로
+    이 차트에 추가됐다 — 지금까지는 MONTHLY_CHART_COLORS에 색만 예약돼
+    있고 실제로는 한 번도 안 그려졌었다)."""
     if top_pair is None:
         return
-    cols = [c for c in ("total_exports_yoy", "hynix_price_yoy", "kospi_yoy") if c in df.columns]
+    cols = [c for c in ("total_exports_yoy", "semi_exports_yoy", "hynix_price_yoy", "kospi_yoy")
+            if c in df.columns]
     plot_df = df[cols].dropna(how="all")
     if start is not None:
         plot_df = plot_df[plot_df.index >= start]
@@ -1062,7 +1079,7 @@ def _render_monthly_chart(df: pd.DataFrame, top_pair: dict | None, out_path: Pat
     # 2026-08-17: 사용자 요청 — 점 마커를 없애고 선을 얇게 해서(1.8→1.1) 세
     # 곡선의 상승/하강이 점에 가려지지 않고 잘 보이도록.
     fig, ax = plt.subplots(figsize=(10, 5))
-    exports_stats = None  # (mean, std, last_date, last_z) — 잠정치 점을 실측과 같은 척도로 찍기 위해 기억해둔다
+    series_stats = {}  # col -> (mean, std, last_date, last_z) — 잠정치 점을 실측과 같은 척도로 찍기 위해 기억해둔다
     for c in cols:
         series = plot_df[c].dropna()
         if series.empty:
@@ -1073,20 +1090,25 @@ def _render_monthly_chart(df: pd.DataFrame, top_pair: dict | None, out_path: Pat
         ax.plot(z.index, z.values, linewidth=1.1,
                 color=MONTHLY_CHART_COLORS.get(c, "#888888"), label=SERIES_LABELS_CHART[c],
                 **marker_kwargs)
-        if c == "total_exports_yoy":
-            exports_stats = (mean, std, z.index[-1], z.values[-1])
+        series_stats[c] = (mean, std, z.index[-1], z.values[-1])
 
-    if preliminary is not None and exports_stats is not None:
-        mean, std, last_date, last_z = exports_stats
-        prelim_date, prelim_value = preliminary["date"], preliminary["value"]
-        if start is None or prelim_date >= start:
+    # col -> preliminary dict의 어느 키가 그 col의 잠정치인지
+    prelim_value_keys = {"total_exports_yoy": "value", "semi_exports_yoy": "semi_value"}
+    if preliminary is not None:
+        for col, key in prelim_value_keys.items():
+            if col not in series_stats or preliminary.get(key) is None:
+                continue
+            mean, std, last_date, last_z = series_stats[col]
+            prelim_date, prelim_value = preliminary["date"], preliminary[key]
+            if start is not None and prelim_date < start:
+                continue
             prelim_z = (prelim_value - mean) / std
-            color = MONTHLY_CHART_COLORS["total_exports_yoy"]
+            color = MONTHLY_CHART_COLORS[col]
             ax.plot([last_date, prelim_date], [last_z, prelim_z], linestyle="--", linewidth=1.1,
                     color=color, alpha=0.7)
             ax.plot([prelim_date], [prelim_z], marker="D", markersize=7, markerfacecolor="none",
                     markeredgecolor=color, markeredgewidth=1.5, linestyle="none",
-                    label=f"Total exports (%YoY, {preliminary['label_en']})")
+                    label=f"{SERIES_LABELS_CHART[col]} ({preliminary['label_en']})")
 
     ax.axhline(0, color="#999999", linewidth=0.8, linestyle="--")
     ax.set_title(

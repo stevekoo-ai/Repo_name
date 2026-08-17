@@ -1063,6 +1063,46 @@ def test_load_exports_preliminary_returns_the_current_months_estimate():
         assert result["date"] == current_month
         assert abs(result["value"] - 45.3) < 1e-9
         assert "label_en" in result and result["label_en"]  # ASCII chart label always derivable
+        assert result["semi_value"] is None  # field absent from this payload -> must not crash, not fabricate
+    finally:
+        os.remove(path)
+
+
+def test_load_exports_preliminary_also_surfaces_the_semiconductor_yoy():
+    """2026-08-17 user request: '최근 급등과 급락 장세의 수출과의 관계를
+    확인해보자' — the yaml already records semiconductor_exports_yoy
+    (참고용) but nothing read it until now. It must come through as
+    semi_value so the chart can draw a second preliminary point."""
+    import pandas as pd, tempfile, os, yaml
+    from pathlib import Path
+    import scripts.correlation_analysis as mod
+
+    now = pd.Timestamp.now(tz="UTC").tz_localize(None)
+    current_month = pd.Timestamp(year=now.year, month=now.month, day=1)
+
+    fd, path = tempfile.mkstemp(suffix=".yaml")
+    os.close(fd)
+    try:
+        payload = {
+            "latest": {
+                "target_month": current_month.strftime("%Y-%m-%d"),
+                "period_label": "1일~10일",
+                "period_start": current_month.strftime("%Y-%m-%d"),
+                "period_end": (current_month + pd.Timedelta(days=9)).strftime("%Y-%m-%d"),
+                "total_exports_yoy": 45.3,
+                "semiconductor_exports_yoy": 155.4,
+                "source": "관세청 보도자료",
+            }
+        }
+        Path(path).write_text(yaml.safe_dump(payload, allow_unicode=True), encoding="utf-8")
+        real_path = mod.EXPORTS_PRELIMINARY_YAML
+        mod.EXPORTS_PRELIMINARY_YAML = Path(path)
+        try:
+            result = mod.load_exports_preliminary()
+        finally:
+            mod.EXPORTS_PRELIMINARY_YAML = real_path
+        assert result is not None
+        assert abs(result["semi_value"] - 155.4) < 1e-9
     finally:
         os.remove(path)
 
