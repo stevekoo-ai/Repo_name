@@ -269,7 +269,8 @@ def render_markdown(df: pd.DataFrame, pairs: list[dict]) -> str:
         "# 수출입동향 × SK하이닉스 × 코스피 상관관계",
         "",
         f"자동 생성 — `python -m scripts.correlation_analysis` "
-        f"(source: data/normalized/motie_*.csv, sources/monthly-price-history.csv)",
+        f"(source: data/normalized/customs_export_dlr.csv, data/normalized/motie_*.csv, "
+        f"sources/monthly-price-history.csv)",
         "",
         "모든 값은 %YoY로 통일해 비교했다 — 성장률(수출)과 가격 수준(주가)을",
         "그대로 맞대면 둘 다 장기 우상향이라 원인 없이도 높은 상관계수가",
@@ -327,10 +328,30 @@ def render_markdown(df: pd.DataFrame, pairs: list[dict]) -> str:
             )
         else:
             lines.append("아직 두 지표를 겹쳐볼 수 있는 달이 없다 — 월봉 이력이 더 필요하다.")
+    # 2026-08-17 이전엔 총수출이 motie 수동 파일(2026-04~)뿐이라 "수출입동향은
+    # 4개월분"이 표본을 제한하는 진짜 이유였다. 관세청 실측(1990.01~)이 붙은
+    # 뒤로는 그 문장이 거짓이 됐다 — 지금 표본을 실제로 제한하는 건 보통 가격
+    # 계열(KIS 월봉 이력이 짧음) 쪽이다. 하드코딩 대신 실제 non-null 개수를
+    # 비교해서 매번 맞는 쪽을 지목한다.
+    counts = {c: int(df_full[c].notna().sum()) for c in SERIES_LABELS}
+    available = {c: n for c, n in counts.items() if n > 0}
+    if available:
+        shortest_col = min(available, key=available.get)
+        longest_col = max(available, key=available.get)
+        if shortest_col != longest_col and available[shortest_col] < available[longest_col]:
+            limit_note = (
+                f"현재 표본을 실제로 제한하는 지표는 **{SERIES_LABELS[shortest_col]}**"
+                f"({available[shortest_col]}개월치)다 — {SERIES_LABELS[longest_col]}은 "
+                f"{available[longest_col]}개월치까지 있지만, 상관계수는 두 지표가 "
+                f"겹치는 달만 쓸 수 있어 짧은 쪽에 맞춰진다."
+            )
+        else:
+            limit_note = f"모든 지표가 {available[shortest_col]}개월치로 표본 크기가 같다."
+    else:
+        limit_note = "아직 어떤 지표도 데이터가 없다."
     lines.append(
-        "\n**한계**: 수출입동향은 4개월분(2026-04~07)뿐이라 표본이 원천적으로 "
-        "작다 — 상관계수가 높게 나와도 우연일 가능성을 배제할 수 없다. n이 "
-        "10 미만이면 방향성 참고 이상으로 쓰지 말 것."
+        f"\n**한계**: {limit_note} 상관계수가 높게 나와도 n이 작으면 우연일 "
+        "가능성을 배제할 수 없다. n이 10 미만이면 방향성 참고 이상으로 쓰지 말 것."
     )
     return "\n".join(lines) + "\n"
 
