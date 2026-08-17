@@ -22,34 +22,25 @@ jobs:
   probe:
     runs-on: ubuntu-latest
     steps:
-      - name: getNewtradeList 최대 이력 범위 확인 (재시도 포함)
+      - name: 1년 이내 제약 확인됨 -> 오래된 연도 데이터 존재 여부 확인
         env:
           SERVICE_KEY: ${{ secrets.DATA_GO_KR_KEY }}
         run: |
           set +e
+          # resultCode=99 "조회기간은 1년이내만 가능" 확인됨 -> 연도별로 나눠 호출해야 함.
+          # 얼마나 오래전까지 실제 데이터가 있는지만 확인 (2000, 1990).
           url="https://apis.data.go.kr/1220000/Newtrade/getNewtradeList"
-          for attempt in 1 2 3 4 5; do
-            echo "=== attempt $attempt: 2000-01 ~ 2026-07, numOfRows=350 ==="
+          for yr in 2000 1990; do
+            echo "=== ${yr}-01 ~ ${yr}-12 ==="
             code=$(curl -sS -G "$url" \
               --data-urlencode "serviceKey=${SERVICE_KEY}" \
-              --data-urlencode "strtYymm=200001" \
-              --data-urlencode "endYymm=202607" \
-              --data-urlencode "numOfRows=350" \
+              --data-urlencode "strtYymm=${yr}01" \
+              --data-urlencode "endYymm=${yr}12" \
+              --data-urlencode "numOfRows=20" \
               --data-urlencode "pageNo=1" \
-              -o resp_full.xml -w "%{http_code}" --max-time 25 --connect-timeout 15)
+              -o "resp_${yr}.xml" -w "%{http_code}" --max-time 20 --connect-timeout 15)
             echo "HTTP status: $code"
-            if [ "$code" = "200" ]; then
-              break
-            fi
-            echo "retrying in 10s..."
-            sleep 10
+            head -c 1200 "resp_${yr}.xml" 2>/dev/null
+            echo ""
+            sleep 3
           done
-          echo "byte size: $(wc -c < resp_full.xml 2>/dev/null)"
-          echo "--- resultCode/resultMsg ---"
-          grep -o '<resultCode>[^<]*</resultCode>\|<resultMsg>[^<]*</resultMsg>\|<totalCount>[^<]*</totalCount>' resp_full.xml 2>/dev/null
-          echo "--- first 3 <year> values ---"
-          grep -o '<year>[^<]*</year>' resp_full.xml 2>/dev/null | head -3
-          echo "--- last 5 <year> values ---"
-          grep -o '<year>[^<]*</year>' resp_full.xml 2>/dev/null | tail -5
-          echo "--- total <year> count ---"
-          grep -o '<year>[^<]*</year>' resp_full.xml 2>/dev/null | wc -l
