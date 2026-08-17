@@ -16,9 +16,12 @@ name: 수출입동향 × 주가 상관관계 갱신
 #      sk-hynix-daily-report와 같은 KIS_APP_KEY 공유이므로 토큰 캐시
 #      패턴도 동일하게 재사용 — 동시 재발급 403 충돌 방지, 그 워크플로들의
 #      2026-07-31 주석 참고). 평소엔 --months 24(최근만 롤링 갱신) — KIS 월봉
-#      API는 1회 호출이 최근 ~50개월로 잘려서(2026-08-17 실측) 2019년부터
+#      API는 1회 호출이 최근 ~50개월로 잘려서(2026-08-17 실측) 옛날부터
 #      채우려면 --start로 구간을 나눠 여러 번 호출해야 한다(별도
 #      workflow_dispatch 입력 backfill_price_history=true로 1회성 실행).
+#      코스피(0001)는 실측으로 1983-01(지수 출범)까지 확인됨 — 종목은
+#      상장 이전 구간에서 자연히 멈춘다(kis_fetch_monthly_price_history_deep
+#      참고).
 #   3. scripts.correlation_analysis — 위 파일들 + data/normalized/motie_*.csv,
 #      data/manual_inputs/*.yaml을 읽어 monitoring/exports-*-correlation
 #      .{md,png}(월별+연간) 생성.
@@ -38,7 +41,7 @@ on:
         type: boolean
         default: false
       backfill_price_history:
-        description: "KIS 월봉을 2019-01부터 깊게 다시 받기(여러 번 구간 호출, 1회 호출 최근 ~50개월 절단 우회) — 최초 1회용, 평소엔 false"
+        description: "KIS 월봉을 1980-01부터 깊게 다시 받기(여러 번 구간 호출, 1회 호출 최근 ~50개월 절단 우회, 종목은 상장 이전에서 자연히 멈춤) — 최초 1회용, 평소엔 false"
         type: boolean
         default: false
 
@@ -97,13 +100,15 @@ jobs:
         # KIS TR/필드명이 문서 기억 기반이라 최초 실행에서 실패할 수 있다 —
         # || true로 코스피 수집과 상관관계 계산까지는 계속 진행되게 하되,
         # 실패 자체는 로그에 그대로 남긴다(조용히 삼키지 않음).
-        # backfill_price_history=true면 --start로 2019-01부터 깊게(여러 번
+        # backfill_price_history=true면 --start로 1980-01부터 깊게(여러 번
         # 구간 호출) 받는다 — 1회 호출이 최근 ~50개월로 잘리는 문제(2026-08-17
-        # 실측, kis-monthly-depth-probe.yml) 우회. 평소엔 --months 24(최근만).
+        # 실측, kis-monthly-depth-probe.yml) 우회. 상장 이전 구간은
+        # kis_fetch_monthly_price_history_deep이 자연히 멈춘다. 평소엔
+        # --months 24(최근만).
         run: |
           if [ "${{ github.event.inputs.backfill_price_history }}" = "true" ]; then
             python3 scripts/investor_flow.py monthly-history --code 000660 \
-              --label "SK하이닉스" --start 2019-01-01 || echo "::warning::SK하이닉스 월봉 backfill 실패 — 위 에러 로그 확인"
+              --label "SK하이닉스" --start 1980-01-01 || echo "::warning::SK하이닉스 월봉 backfill 실패 — 위 에러 로그 확인"
           else
             python3 scripts/investor_flow.py monthly-history --code 000660 \
               --label "SK하이닉스" --months 24 || echo "::warning::SK하이닉스 월봉 수집 실패 — 위 에러 로그 확인"
@@ -116,7 +121,7 @@ jobs:
         run: |
           if [ "${{ github.event.inputs.backfill_price_history }}" = "true" ]; then
             python3 scripts/investor_flow.py monthly-history --code 0001 --is-index \
-              --start 2019-01-01 || echo "::warning::코스피 월봉 backfill 실패 — 위 에러 로그 확인"
+              --start 1980-01-01 || echo "::warning::코스피 월봉 backfill 실패 — 위 에러 로그 확인"
           else
             python3 scripts/investor_flow.py monthly-history --code 0001 --is-index \
               --months 24 || echo "::warning::코스피 월봉 수집 실패 — 위 에러 로그 확인"

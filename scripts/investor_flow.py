@@ -56,7 +56,7 @@ FIELDS 딕셔너리만 고치면 된다. 지어낸 숫자를 반환하지 않기
   python3 scripts/investor_flow.py monthly-history --code 000660 --label SK하이닉스 --months 24
   python3 scripts/investor_flow.py monthly-history --code 0001 --is-index --months 24  # 코스피
   python3 scripts/investor_flow.py monthly-history --code 000660 --months 3 --raw  # 필드명 최초 검증용
-  python3 scripts/investor_flow.py monthly-history --code 0001 --is-index --start 2019-01-01  # 장기 backfill(1회성)
+  python3 scripts/investor_flow.py monthly-history --code 0001 --is-index --start 1980-01-01  # 장기 backfill(1회성)
 """
 import os
 import sys
@@ -928,19 +928,37 @@ def kis_fetch_monthly_price_history_deep(code, is_index=False, account_type="rea
                                           start_date=None, months_per_window=45):
     """kis_fetch_monthly_price_history를 여러 번(과거로 구간을 당겨가며) 호출해
     start_date까지의 월봉을 채운다 — 1회 호출은 최근 ~50개월로 잘리므로
-    (2026-08-17 실측, kis-monthly-depth-probe.yml) 장기 이력(예: 2019~)은
-    이 함수가 필요하다. 최초 1회성 backfill 용도 — 평소 매일 갱신은 여전히
+    (2026-08-17 실측, kis-monthly-depth-probe.yml) 장기 이력은 이 함수가
+    필요하다. 최초 1회성 backfill 용도 — 평소 매일 갱신은 여전히
     kis_fetch_monthly_price_history(months=24)만으로 충분하다."""
+    # 2026-08-17 실측(kis-old-history-probe.yml): 코스피(0001) 월봉은 실제로
+    # 1983-01(지수 출범 시점, 118.27)까지 실측이 나온다 — 2019-01은 KIS의
+    # 하드 제약이 아니라 이 저장소가 (사용자의 첫 요청 "2019년부터"를 따라)
+    # 임의로 고른 값이었을 뿐이다. 종목(예: 하이닉스)은 상장일 이전엔 당연히
+    # 데이터가 없으므로, 기본값을 넉넉히 옛날로 잡고 실제 상장/출범 이전
+    # 구간은 아래 빈 응답 처리로 자연히 멈추게 한다.
     if start_date is None:
-        start_date = date(2019, 1, 1)
+        start_date = date(1980, 1, 1)
     end_date = datetime.now(timezone.utc).date()
     windows = _backward_date_windows(end_date, start_date, months_per_window)
     merged = {}
     for win_start, win_end in windows:
-        rows = kis_fetch_monthly_price_history(
-            code, is_index=is_index, account_type=account_type,
-            start_date=win_start, end_date=win_end,
-        )
+        try:
+            rows = kis_fetch_monthly_price_history(
+                code, is_index=is_index, account_type=account_type,
+                start_date=win_start, end_date=win_end,
+            )
+        except SystemExit as e:
+            # kis_fetch_monthly_price_history는 output2가 비어 있으면
+            # sys.exit한다 — 상장/출범 이전 구간을 요청했을 때(정상적으로
+            # 데이터가 없는 경우)도 같은 방식으로 실패한다. 여기서는 그걸
+            # "더 과거로 갈 수 없는 경계에 도달했다"는 신호로 보고 조용히
+            # 멈춘다(에러를 삼키지는 않음 — stderr에 남긴다) — 나머지(더
+            # 과거) 구간을 계속 두드리는 건 낭비이고, 진짜 API 에러였어도
+            # 이미 모은 구간까지는 유효하다.
+            print(f"[stop] {code} {win_start}~{win_end}: {e} — 더 과거로는 데이터가 "
+                  "없거나 호출 실패로 보고 여기서 멈춘다", file=sys.stderr)
+            break
         for r in rows:
             merged[r["date"]] = r
     return sorted(merged.values(), key=lambda r: r["date"])
