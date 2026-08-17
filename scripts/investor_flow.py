@@ -57,6 +57,10 @@ FIELDS 딕셔너리만 고치면 된다. 지어낸 숫자를 반환하지 않기
   python3 scripts/investor_flow.py monthly-history --code 0001 --is-index --months 24  # 코스피
   python3 scripts/investor_flow.py monthly-history --code 000660 --months 3 --raw  # 필드명 최초 검증용
   python3 scripts/investor_flow.py monthly-history --code 0001 --is-index --start 1980-01-01  # 장기 backfill(1회성)
+
+  # 9) 종목/지수 일봉 이력(2026-08-17 추가, correlation_analysis.py 일봉 확대 차트용)
+  python3 scripts/investor_flow.py daily-history --code 000660 --label SK하이닉스 --days 60
+  python3 scripts/investor_flow.py daily-history --code 0001 --is-index --start 2023-01-01  # 장기 backfill(1회성)
 """
 import os
 import sys
@@ -203,6 +207,11 @@ INDEX_NAMES = {"0001": "KOSPI", "1001": "KOSDAQ", "2001": "KOSPI200"}
 # 월봉 이력 저장 — code별로 한 파일에 섞어 쓴다(종목·지수 구분은 code 컬럼).
 MONTHLY_PRICE_CSV_PATH = Path(__file__).resolve().parent.parent / "sources" / "monthly-price-history.csv"
 MONTHLY_PRICE_CSV_FIELDS = ["date", "code", "label", "close", "source", "fetched_at"]
+# 2026-08-17 사용자 요청 — 일봉은 별도 파일. monthly-price-history.csv에
+# 섞으면 "한 달에 한 행"을 가정하는 correlation_analysis.py의 월별 로직이
+# 깨진다(한 달에 20여 개의 일봉 행이 들어가버림).
+DAILY_PRICE_CSV_PATH = Path(__file__).resolve().parent.parent / "sources" / "daily-price-history.csv"
+DAILY_PRICE_CSV_FIELDS = ["date", "code", "label", "close", "source", "fetched_at"]
 INDEX_FIELDS = {
     "price": "bstp_nmix_prpr",          # 업종 지수 현재가
     "change": "bstp_nmix_prdy_vrss",    # 전일 대비
@@ -819,19 +828,22 @@ MONTHLY_INDEX_PRICE_FIELDS = {
 }
 
 
-def kis_fetch_monthly_price_history(code, is_index=False, months=24, account_type="real", raw=False,
-                                     start_date=None, end_date=None):
-    """종목/지수의 월봉(월말 종가) 이력을 조회한다 — correlation_analysis.py의
-    유일한 실측 입력 경로. months는 대략치(월 단위 근사, KIS는 일 단위 기간을
-    받으므로 30일*months로 환산) — start_date/end_date를 직접 주면 그쪽이
-    우선한다(kis_fetch_monthly_price_history_deep이 구간별로 반복 호출할 때
-    사용).
+_PERIOD_LABELS = {"D": "일봉", "M": "월봉"}
 
-    2026-08-17 실측(kis-monthly-depth-probe.yml): FID_INPUT_DATE_1~2로 넓은
-    기간(예: 90개월)을 요청해도 응답은 최근 ~50개월로 잘린다 — 기간의
-    앞부분이 아니라 뒷부분(최신 쪽)만 채워진다. 그보다 긴 이력이 필요하면
-    이 함수를 여러 번, end_date를 과거로 당겨가며 호출해야 한다
-    (kis_fetch_monthly_price_history_deep 참고)."""
+
+def kis_fetch_price_history(code, is_index=False, period="M", months=24, account_type="real", raw=False,
+                             start_date=None, end_date=None):
+    """종목/지수의 일봉/월봉 이력을 조회한다(FID_PERIOD_DIV_CODE=period) —
+    correlation_analysis.py의 실측 입력 경로. months는 대략치(월 단위 근사,
+    KIS는 일 단위 기간을 받으므로 30일*months로 환산) — start_date/end_date를
+    직접 주면 그쪽이 우선한다(kis_fetch_*_price_history_deep이 구간별로
+    반복 호출할 때 사용).
+
+    2026-08-17 실측(kis-monthly-depth-probe.yml, period="M"): FID_INPUT_DATE_1~2
+    로 넓은 기간(예: 90개월)을 요청해도 응답은 최근 ~50개월로 잘린다 — 기간의
+    앞부분이 아니라 뒷부분(최신 쪽)만 채워진다. period="D"도 같은 절단
+    증상일 가능성이 높다(미검증 — 실측해서 확인할 것). 그보다 긴 이력이
+    필요하면 이 함수를 여러 번, end_date를 과거로 당겨가며 호출해야 한다."""
     appkey = _get_env_or_die("KIS_APP_KEY")
     appsecret = _get_env_or_die("KIS_APP_SECRET")
     token = kis_get_token(account_type)
@@ -857,7 +869,7 @@ def kis_fetch_monthly_price_history(code, is_index=False, months=24, account_typ
     params = (
         f"FID_COND_MRKT_DIV_CODE={market_div}&FID_INPUT_ISCD={code}"
         f"&FID_INPUT_DATE_1={start.strftime('%Y%m%d')}&FID_INPUT_DATE_2={end.strftime('%Y%m%d')}"
-        f"&FID_PERIOD_DIV_CODE=M&FID_ORG_ADJ_PRC=0"
+        f"&FID_PERIOD_DIV_CODE={period}&FID_ORG_ADJ_PRC=0"
     )
     req = urllib.request.Request(
         f"{host}/uapi/domestic-stock/v1/quotations/{endpoint}?{params}",
@@ -873,7 +885,8 @@ def kis_fetch_monthly_price_history(code, is_index=False, months=24, account_typ
         with urllib.request.urlopen(req, timeout=KIS_HTTP_TIMEOUT_S) as resp:
             data = json.loads(resp.read())
     except urllib.error.HTTPError as e:
-        sys.exit(f"KIS 월봉 API 호출 실패({code}): {e.code} {e.read().decode(errors='replace')}")
+        sys.exit(f"KIS {_PERIOD_LABELS.get(period, period)} API 호출 실패({code}): "
+                  f"{e.code} {e.read().decode(errors='replace')}")
 
     if raw:
         print(json.dumps(data, ensure_ascii=False, indent=2))
@@ -882,7 +895,8 @@ def kis_fetch_monthly_price_history(code, is_index=False, months=24, account_typ
     rows = data.get("output2")
     if not rows:
         sys.exit(
-            f"API 응답에서 월봉 리스트(output2)를 찾지 못했습니다({code}, endpoint={endpoint}) — "
+            f"API 응답에서 {_PERIOD_LABELS.get(period, period)} 리스트(output2)를 찾지 못했습니다"
+            f"({code}, endpoint={endpoint}) — "
             f"rt_cd={data.get('rt_cd')} msg_cd={data.get('msg_cd')} msg1={data.get('msg1')!r}. "
             "--raw로 원본 JSON을 확인하고 이 함수의 endpoint/tr_id/추출 키를 응답 구조에 맞게 고치세요."
         )
@@ -905,16 +919,31 @@ def kis_fetch_monthly_price_history(code, is_index=False, months=24, account_typ
     return out
 
 
-def _backward_date_windows(end_date, target_start_date, months_per_window=45):
+def kis_fetch_monthly_price_history(code, is_index=False, months=24, account_type="real", raw=False,
+                                     start_date=None, end_date=None):
+    """kis_fetch_price_history(period="M")의 하위호환 진입점 — 기존 호출부
+    (cmd_monthly_history 등)를 그대로 둔 채 일봉 지원을 추가하기 위한 얇은
+    래퍼."""
+    return kis_fetch_price_history(code, is_index=is_index, period="M", months=months,
+                                    account_type=account_type, raw=raw,
+                                    start_date=start_date, end_date=end_date)
+
+
+def _backward_date_windows(end_date, target_start_date, months_per_window=45, days_per_window=None):
     """end_date에서 target_start_date까지, end를 과거로 당겨가며 겹치지 않는
-    (start, end) 날짜 구간 리스트를 만든다. kis_fetch_monthly_price_history가
-    1회 호출당 최근 ~50개월로 잘리는 문제(2026-08-17 실측)를 우회하기 위한
-    분할 — customs_trade.py의 _year_windows()와 같은 목적, 다른 제약(달력
-    연도가 아니라 대략적인 개월 수)."""
+    (start, end) 날짜 구간 리스트를 만든다. kis_fetch_price_history가 1회
+    호출당 최근 구간만(월봉은 ~50개월, 2026-08-17 실측) 잘려서 오는 문제를
+    우회하기 위한 분할 — customs_trade.py의 _year_windows()와 같은 목적,
+    다른 제약(달력 연도가 아니라 대략적인 기간).
+
+    days_per_window를 주면 그쪽이 우선한다(일봉 backfill처럼 "개월" 단위가
+    안 맞는 경우용) — 안 주면 기존처럼 months_per_window*31일로 환산."""
+    if days_per_window is None:
+        days_per_window = months_per_window * 31
     windows = []
     cur_end = end_date
     while cur_end >= target_start_date:
-        cur_start = cur_end - timedelta(days=months_per_window * 31)
+        cur_start = cur_end - timedelta(days=days_per_window)
         if cur_start < target_start_date:
             cur_start = target_start_date
         windows.append((cur_start, cur_end))
@@ -956,6 +985,39 @@ def kis_fetch_monthly_price_history_deep(code, is_index=False, account_type="rea
             # 멈춘다(에러를 삼키지는 않음 — stderr에 남긴다) — 나머지(더
             # 과거) 구간을 계속 두드리는 건 낭비이고, 진짜 API 에러였어도
             # 이미 모은 구간까지는 유효하다.
+            print(f"[stop] {code} {win_start}~{win_end}: {e} — 더 과거로는 데이터가 "
+                  "없거나 호출 실패로 보고 여기서 멈춘다", file=sys.stderr)
+            break
+        for r in rows:
+            merged[r["date"]] = r
+    return sorted(merged.values(), key=lambda r: r["date"])
+
+
+def kis_fetch_daily_price_history_deep(code, is_index=False, account_type="real",
+                                        start_date=None, days_per_window=90):
+    """kis_fetch_price_history(period="D")를 여러 번(과거로 구간을 당겨가며)
+    호출해 start_date까지의 일봉을 채운다 — 2026-08-17 사용자 요청: 수출입
+    지표는 월별이 원 주기지만 주가/지수는 매일 발표되므로, 그 주기 그대로
+    (일봉) 써야 "더 자주 발표되는 지표가 다른 지표를 선행해서 보인다"가
+    실제로 성립한다(월봉으로 뭉개면 그 정보가 사라진다).
+
+    kis_fetch_monthly_price_history_deep과 같은 구조 — 1회 호출이 최근
+    구간으로 잘리는 문제(월봉 ~50개월, 2026-08-17 실측)와 같은 절단이
+    일봉에도 있을 가능성이 높아(미검증) 기본 구간을 보수적으로 90일(약
+    3개월)로 잡았다. 상장/출범 이전 구간은 kis_fetch_monthly_price_history_deep
+    과 동일하게 빈 응답으로 자연히 멈춘다."""
+    if start_date is None:
+        start_date = date(2023, 1, 1)
+    end_date = datetime.now(timezone.utc).date()
+    windows = _backward_date_windows(end_date, start_date, days_per_window=days_per_window)
+    merged = {}
+    for win_start, win_end in windows:
+        try:
+            rows = kis_fetch_price_history(
+                code, is_index=is_index, period="D", account_type=account_type,
+                start_date=win_start, end_date=win_end,
+            )
+        except SystemExit as e:
             print(f"[stop] {code} {win_start}~{win_end}: {e} — 더 과거로는 데이터가 "
                   "없거나 호출 실패로 보고 여기서 멈춘다", file=sys.stderr)
             break
@@ -1466,6 +1528,39 @@ def cmd_monthly_history(args):
           f"(범위 {rows[0]['date']} ~ {rows[-1]['date']})")
 
 
+def cmd_daily_history(args):
+    """monthly-history와 같은 구조, 일봉(period="D")용. --start를 주면 깊게
+    (여러 구간 호출) backfill, 아니면 --days만큼 최근만."""
+    if args.start:
+        if args.raw:
+            sys.exit("--start와 --raw는 함께 쓸 수 없습니다(--raw는 단일 호출 원본 확인용).")
+        start_date = datetime.strptime(args.start, "%Y-%m-%d").date()
+        rows = kis_fetch_daily_price_history_deep(
+            args.code, is_index=args.is_index, account_type=args.account_type,
+            start_date=start_date,
+        )
+    else:
+        end = datetime.now(timezone.utc).date()
+        start = end - timedelta(days=args.days)
+        if args.raw:
+            kis_fetch_price_history(args.code, is_index=args.is_index, period="D",
+                                     account_type=args.account_type, raw=True,
+                                     start_date=start, end_date=end)
+            return
+        rows = kis_fetch_price_history(args.code, is_index=args.is_index, period="D",
+                                        account_type=args.account_type,
+                                        start_date=start, end_date=end)
+    if args.raw:
+        return
+    fetched_at = datetime.now(timezone.utc).isoformat(timespec="seconds")
+    label = INDEX_NAMES.get(args.code, args.code) if args.is_index else (args.label or args.code)
+    csv_rows = [{"date": r["date"], "code": args.code, "label": label, "close": r["close"]} for r in rows]
+    n = _generic_upsert(DAILY_PRICE_CSV_PATH, DAILY_PRICE_CSV_FIELDS, ("date", "code"), csv_rows,
+                         extra={"source": "kis_api", "fetched_at": fetched_at})
+    print(f"{label} ({args.code}): {n}개 일봉 → {DAILY_PRICE_CSV_PATH}에 기록 "
+          f"(범위 {rows[0]['date']} ~ {rows[-1]['date']})")
+
+
 def cmd_short_sale(args):
     rows = kis_fetch_short_sale(args.ticker, args.account_type, raw=args.raw)
     if args.raw:
@@ -1589,6 +1684,18 @@ def main():
     pmh.add_argument("--account-type", default=os.environ.get("KIS_ACCOUNT_TYPE", "real"), choices=["real", "vts"])
     pmh.add_argument("--raw", action="store_true")
     pmh.set_defaults(func=cmd_monthly_history)
+
+    pdh = sub.add_parser("daily-history", help="종목/지수 일봉 이력 조회, sources/daily-price-history.csv에 기록")
+    pdh.add_argument("--code", required=True, help="종목코드(예: 000660) 또는 지수코드(예: 0001=코스피)")
+    pdh.add_argument("--is-index", action="store_true", help="code가 지수코드면 지정")
+    pdh.add_argument("--label", default=None, help="종목일 때 표시용 이름(예: SK하이닉스). 지수는 INDEX_NAMES에서 자동")
+    pdh.add_argument("--days", type=int, default=60, help="조회할 최근 일수(--start 미지정시)")
+    pdh.add_argument("--start", default=None,
+                      help="YYYY-MM-DD — 지정하면 이 날짜까지 여러 번 호출해 깊게 채운다"
+                           "(최초 1회성 backfill용, --days 무시)")
+    pdh.add_argument("--account-type", default=os.environ.get("KIS_ACCOUNT_TYPE", "real"), choices=["real", "vts"])
+    pdh.add_argument("--raw", action="store_true")
+    pdh.set_defaults(func=cmd_daily_history)
 
     pss = sub.add_parser("short-sale", help="공매도 일별추이 조회, sources/sk-hynix-short-sale.csv에 기록")
     pss.add_argument("--ticker", default="000660")

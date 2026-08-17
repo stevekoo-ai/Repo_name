@@ -632,13 +632,18 @@ MONTHLY_CHART_COLORS = {
 
 
 def _render_monthly_chart(df: pd.DataFrame, top_pair: dict | None, out_path: Path,
-                           start: pd.Timestamp | None = None, title_note: str = "") -> None:
+                           start: pd.Timestamp | None = None, title_note: str = "",
+                           markersize: float | None = None) -> None:
     """render_chart의 실제 구현 — start를 주면 그 시점부터만 잘라서 그린다
     (2026-08-17 사용자 요청: "2023년부터 zoom in"). z-score는 잘린 구간
     안에서 다시 계산한다 — 전체 이력 기준 z-score를 그대로 쓰면 최근 구간이
     이미 전체 차트에서 보이는 것과 똑같은 모양으로 눌려 나온다(총수출처럼
     1990~ 표본이 긴 지표일수록 심함); 구간 안에서 재정규화해야 그 구간
-    자체의 등락폭이 자기 스케일로 드러난다 — "확대"의 실질적 의미."""
+    자체의 등락폭이 자기 스케일로 드러난다 — "확대"의 실질적 의미.
+
+    markersize: None이면 점 없이 선만(전체 이력 차트 — 500개월치를 점까지
+    찍으면 너무 빽빽하다). 확대 차트는 표본이 훨씬 적어(3년 안팎) 작은 점을
+    찍어도 안 빽빽하고, 사용자가 명시적으로 요청(2026-08-17)."""
     if top_pair is None:
         return
     cols = [c for c in ("total_exports_yoy", "hynix_price_yoy", "kospi_yoy") if c in df.columns]
@@ -656,8 +661,10 @@ def _render_monthly_chart(df: pd.DataFrame, top_pair: dict | None, out_path: Pat
         if series.empty:
             continue
         z = (series - series.mean()) / series.std(ddof=0)
+        marker_kwargs = {"marker": "o", "markersize": markersize} if markersize else {}
         ax.plot(z.index, z.values, linewidth=1.1,
-                color=MONTHLY_CHART_COLORS.get(c, "#888888"), label=SERIES_LABELS_CHART[c])
+                color=MONTHLY_CHART_COLORS.get(c, "#888888"), label=SERIES_LABELS_CHART[c],
+                **marker_kwargs)
     ax.axhline(0, color="#999999", linewidth=0.8, linestyle="--")
     ax.set_title(
         f"Exports vs SK Hynix vs KOSPI, monthly (%YoY, z-score normalized){title_note}\n"
@@ -687,9 +694,10 @@ def render_chart(df: pd.DataFrame, top_pair: dict | None) -> None:
 
 def render_chart_zoom(df: pd.DataFrame, top_pair: dict | None, start: pd.Timestamp) -> None:
     """render_chart의 확대판 — start 이후 구간만, 그 구간 안에서 재정규화해
-    그린다(위 _render_monthly_chart 참고)."""
+    그린다(위 _render_monthly_chart 참고). 작은 점 마커 포함(2026-08-17
+    사용자 요청)."""
     _render_monthly_chart(df, top_pair, OUT_PNG_ZOOM, start=start,
-                           title_note=f" — {start.strftime('%Y-%m')}~")
+                           title_note=f" — {start.strftime('%Y-%m')}~", markersize=3.5)
 
 
 def render_annual_chart(df: pd.DataFrame, top_pair: dict | None) -> None:
