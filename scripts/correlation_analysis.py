@@ -37,11 +37,15 @@ OUTPUTS
                                              stated sample size for every
                                              pair (a correlation without n is
                                              not trustworthy — see 한계 절)
-  monitoring/exports-price-correlation.png  the most-correlated pair,
+  monitoring/exports-price-correlation.png  all three series (총수출/
+                                             하이닉스/코스피, %YoY) overlaid,
                                              z-score normalized onto one
-                                             chart so different units (a
-                                             %YoY vs a %YoY) sit on a
-                                             comparable scale
+                                             chart so different scales sit
+                                             comparably and each series'
+                                             own variation stays visible
+                                             even though 총수출 covers a much
+                                             longer span (1990~) than the
+                                             KIS price history (2019~)
 
 Run:
   python -m scripts.correlation_analysis
@@ -414,20 +418,46 @@ def render_annual_markdown(df: pd.DataFrame, pairs: list[dict]) -> str:
     return "\n".join(lines) + "\n"
 
 
+# 월별 차트 색상 — annual 차트(render_annual_chart)와 지표별로 같은 색을
+# 재사용한다(파랑=총수출, 초록=코스피, 주황=하이닉스/반도체수출) — 필터·차트가
+# 바뀌어도 "이 색은 이 지표"가 유지돼야 식별이 색 자체가 아니라 범례에
+# 의존하지 않는다.
+MONTHLY_CHART_COLORS = {
+    "total_exports_yoy": "#2a78d6",
+    "hynix_price_yoy": "#eb6834",
+    "kospi_yoy": "#3fa34d",
+    "semi_exports_yoy": "#a35fd1",
+}
+
+
 def render_chart(df: pd.DataFrame, top_pair: dict | None) -> None:
+    """2026-08-17: 사용자가 총수출도 같이 그려달라고 요청 — 원래는 상관 가장
+    높은 쌍(하이닉스 vs 코스피) 2개 지표만 그렸는데, render_annual_chart와
+    같은 방식(전 지표를 z-score로 겹쳐 그리기)으로 통일했다. 총수출은
+    1990~이라 표본이 훨씬 길지만, z-score는 각 지표를 자기 자신의 평균/표준
+    편차로 정규화하므로 그 변동폭이 다른 지표에 묻히지 않고 그대로 보인다."""
     if top_pair is None:
         return
-    a, b = top_pair["a"], top_pair["b"]
-    pair = df[[a, b]].dropna()
-    if pair.empty:
+    cols = [c for c in ("total_exports_yoy", "hynix_price_yoy", "kospi_yoy") if c in df.columns]
+    plot_df = df[cols].dropna(how="all")
+    if plot_df.empty:
         return
-    z = (pair - pair.mean()) / pair.std(ddof=0)
 
-    fig, ax = plt.subplots(figsize=(8, 4.5))
-    ax.plot(z.index, z[a], marker="o", linewidth=2, color="#2a78d6", label=SERIES_LABELS_CHART[a])
-    ax.plot(z.index, z[b], marker="o", linewidth=2, color="#eb6834", label=SERIES_LABELS_CHART[b])
+    fig, ax = plt.subplots(figsize=(10, 5))
+    for c in cols:
+        series = plot_df[c].dropna()
+        if series.empty:
+            continue
+        z = (series - series.mean()) / series.std(ddof=0)
+        ax.plot(z.index, z.values, marker="o", markersize=4, linewidth=1.8,
+                color=MONTHLY_CHART_COLORS.get(c, "#888888"), label=SERIES_LABELS_CHART[c])
     ax.axhline(0, color="#999999", linewidth=0.8, linestyle="--")
-    ax.set_title(f"{SERIES_LABELS_CHART[a]} vs {SERIES_LABELS_CHART[b]}  (r={top_pair['r']:+.2f}, n={top_pair['n']})")
+    ax.set_title(
+        f"Exports vs SK Hynix vs KOSPI, monthly (%YoY, z-score normalized)\n"
+        f"strongest pair: {SERIES_LABELS_CHART[top_pair['a']]} vs "
+        f"{SERIES_LABELS_CHART[top_pair['b']]} (r={top_pair['r']:+.2f}, n={top_pair['n']})",
+        fontsize=11,
+    )
     ax.set_ylabel("z-score (mean 0, std 1)")
     ax.set_xlabel("month")
     ax.legend(loc="best")
@@ -440,10 +470,11 @@ def render_chart(df: pd.DataFrame, top_pair: dict | None) -> None:
 
 
 def render_annual_chart(df: pd.DataFrame, top_pair: dict | None) -> None:
-    """Unlike render_chart (top pair only, monthly), this overlays all three
-    annual series — with only 3 metrics total, showing all of them is more
-    informative than picking just the best-correlated two, and is closer to
-    what was actually asked for ("관계를 그래프를 그려보자")."""
+    """Same all-series-overlaid approach as render_chart (both were originally
+    top-pair-only; render_chart switched to this pattern 2026-08-17 per user
+    request to show total exports alongside price) — showing every metric is
+    more informative than picking just the best-correlated two, and is closer
+    to what was actually asked for ("관계를 그래프를 그려보자")."""
     cols = [c for c in ANNUAL_SERIES_LABELS if c in df.columns and df[c].notna().any()]
     plot_df = df[cols].dropna(how="all")
     if plot_df.empty:
