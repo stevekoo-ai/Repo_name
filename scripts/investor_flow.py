@@ -779,21 +779,32 @@ def kis_fetch_index_price(index_code, account_type="real", raw=False):
 # 대신 이미 이 저장소가 신뢰하는 실제 출처(KIS)에서 월봉을 직접 받는다 —
 # TR FHKST03010100(국내주식기간별시세일/주/월/년, inquire-daily-itemchartprice)
 # 는 개별 종목·ETF의 과거 캔들을 기간 지정해 반환하고 FID_PERIOD_DIV_CODE=M
-# 이 월봉이다. 지수(코스피)는 별도 TR이 필요할 가능성이 높아
-# FID_COND_MRKT_DIV_CODE로 분기해 두었다.
-# ⚠ 이 스크립트의 다른 TR들과 마찬가지로 필드명·지수용 분기는 문서 기억
-# 기반이고, 이 샌드박스는 아웃바운드 네트워크가 막혀 있어 실호출로
-# 검증하지 못했다 — 최초 실행 시 반드시 --raw로 원본을 확인하고, output2
-# 배열의 정렬 순서(과거→최신인지 최신→과거인지)와 필드명이 다르면 아래
-# MONTHLY_PRICE_FIELDS와 파싱 로직을 실제 응답에 맞게 고칠 것. 지어낸
-# 필드값을 반환하지 않기 위해 예상 필드가 없으면 조용히 넘어가지 않고
-# 즉시 에러를 낸다(이 파일의 다른 모든 kis_fetch_*와 동일한 원칙).
+# 이 월봉이다.
+#
+# 2026-08-17 실측으로 확인됨: 지수(코스피, code=0001)는 이 종목용 엔드포인트를
+# FID_COND_MRKT_DIV_CODE=U로 불러도 "ERROR INVALID FID_COND_MRKT_DIV_CODE"
+# (rt_cd=2, msg_cd=OPSQ2001)로 거부된다 — 애초 주석의 우려("별도 TR이 필요할
+# 가능성")가 맞았다. 지수는 완전히 다른 엔드포인트(국내주식업종기간별시세
+# 일/주/월/년, inquire-daily-indexchartprice / TR FHKUP03500100)가 필요하다.
+# 이 엔드포인트/TR/필드명은 KIS 공식 문서 기억 기반으로 아직 실호출
+# 미검증 — 다음 실행에서 --raw로 확인해 틀렸으면 고칠 것(막연히 "됐겠지"로
+# 넘기지 않는다, 이 파일의 다른 모든 kis_fetch_*와 동일 원칙).
 MONTHLY_PRICE_FIELDS = {
     "date": "stck_bsop_date",   # 영업일자(월봉이면 그 달의 마지막 거래일)
     "close": "stck_clpr",       # 종가
     "open": "stck_oprc",
     "high": "stck_hgpr",
     "low": "stck_lwpr",
+    "volume": "acml_vol",
+}
+# 지수용(업종지수) 필드명 — 종목과 접두어가 다를 가능성이 높음(문서 기억
+# 기반, 미검증). date는 종목과 동일한 키를 쓰는 경우가 많아 우선 재사용.
+MONTHLY_INDEX_PRICE_FIELDS = {
+    "date": "stck_bsop_date",
+    "close": "bstp_nmix_prpr",  # 업종지수 현재가(종가)
+    "open": "bstp_nmix_oprc",
+    "high": "bstp_nmix_hgpr",
+    "low": "bstp_nmix_lwpr",
     "volume": "acml_vol",
 }
 
@@ -809,17 +820,26 @@ def kis_fetch_monthly_price_history(code, is_index=False, months=24, account_typ
 
     end = datetime.now(timezone.utc).date()
     start = end - timedelta(days=months * 31)
-    market_div = "U" if is_index else "J"
+
+    # 2026-08-17 실측: 지수(0001)를 종목용 엔드포인트+market_div=U로 부르면
+    # rt_cd=2 "ERROR INVALID FID_COND_MRKT_DIV_CODE"로 거부됨 — 완전히 다른
+    # 엔드포인트/TR이 필요하다(아래 endpoint/tr_id/fields 분기). 이 지수용
+    # 분기 자체는 아직 실호출 미검증 — 틀리면 --raw로 확인 후 고칠 것.
+    if is_index:
+        endpoint = "inquire-daily-indexchartprice"
+        tr_id = "FHKUP03500100"
+        market_div = "U"
+        fields = MONTHLY_INDEX_PRICE_FIELDS
+    else:
+        endpoint = "inquire-daily-itemchartprice"
+        tr_id = "FHKST03010100"
+        market_div = "J"
+        fields = MONTHLY_PRICE_FIELDS
     params = (
         f"FID_COND_MRKT_DIV_CODE={market_div}&FID_INPUT_ISCD={code}"
         f"&FID_INPUT_DATE_1={start.strftime('%Y%m%d')}&FID_INPUT_DATE_2={end.strftime('%Y%m%d')}"
         f"&FID_PERIOD_DIV_CODE=M&FID_ORG_ADJ_PRC=0"
     )
-    # 지수는 별도 엔드포인트/TR일 가능성이 있음(문서 기억 불확실) — 종목과
-    # 동일 엔드포인트로 우선 시도하고, 404/필드누락 시 --raw로 확인해 아래
-    # endpoint/tr_id 분기를 실제 응답에 맞게 고칠 것.
-    endpoint = "inquire-daily-itemchartprice"
-    tr_id = "FHKST03010100"
     req = urllib.request.Request(
         f"{host}/uapi/domestic-stock/v1/quotations/{endpoint}?{params}",
         headers={
@@ -843,21 +863,24 @@ def kis_fetch_monthly_price_history(code, is_index=False, months=24, account_typ
     rows = data.get("output2")
     if not rows:
         sys.exit(
-            f"API 응답에서 월봉 리스트(output2)를 찾지 못했습니다({code}) — --raw로 "
-            "원본 JSON을 확인하고 이 함수의 endpoint/tr_id/추출 키를 응답 구조에 맞게 고치세요."
+            f"API 응답에서 월봉 리스트(output2)를 찾지 못했습니다({code}, endpoint={endpoint}) — "
+            f"rt_cd={data.get('rt_cd')} msg_cd={data.get('msg_cd')} msg1={data.get('msg1')!r}. "
+            "--raw로 원본 JSON을 확인하고 이 함수의 endpoint/tr_id/추출 키를 응답 구조에 맞게 고치세요."
         )
-    missing = [v for v in MONTHLY_PRICE_FIELDS.values() if v not in rows[0]]
+    missing = [v for v in fields.values() if v not in rows[0]]
     if missing:
         sys.exit(
             f"예상한 필드가 API 응답에 없습니다({code}): {missing}. 실제 응답 키: "
-            f"{sorted(rows[0].keys())}\nMONTHLY_PRICE_FIELDS를 위 실제 필드명으로 고치세요."
+            f"{sorted(rows[0].keys())}\n"
+            f"{'MONTHLY_INDEX_PRICE_FIELDS' if is_index else 'MONTHLY_PRICE_FIELDS'}를 "
+            "위 실제 필드명으로 고치세요."
         )
     out = []
     for r in rows:
-        d = r[MONTHLY_PRICE_FIELDS["date"]]
+        d = r[fields["date"]]
         out.append({
             "date": f"{d[0:4]}-{d[4:6]}-{d[6:8]}",
-            "close": float(r[MONTHLY_PRICE_FIELDS["close"]]),
+            "close": float(r[fields["close"]]),
         })
     out.sort(key=lambda row: row["date"])
     return out
