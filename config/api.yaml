@@ -88,6 +88,23 @@ sources:
     base_url: "https://apis.data.go.kr/1613000/RTMSDataSvcAptTradeDev/getRTMSDataSvcAptTradeDev"
     note: "공공데이터포털(data.go.kr)에서 무료 일반 인증키 발급. 원자료가 개별 거래 단위라 지역군별 월 중위가로 집계해 저장."
 
+  customs_trade:
+    label: "관세청 수출입총괄(GW) — 월별 총수출입 실적"
+    reliability_grade: 5
+    official: true
+    requires_key: true
+    env_key: DATA_GO_KR_KEY
+    base_url: "https://apis.data.go.kr/1220000/Newtrade/getNewtradeList"
+    note: >
+      2026-08-17 사용자가 Swagger 문서에서 직접 확인해준 base_url — 이 저장소가
+      추측한 5+10개 후보는 전부 틀렸었다(.github/workflows/customs-trade-api-probe.yml,
+      삭제됨). 응답은 XML(response>header>resultCode "00"=정상). 실측 확인된 제약:
+      strtYymm~endYymm 조회 기간이 1년(12개월) 초과면 resultCode 99
+      ("조회기간은 1년이내만 가능") — 여러 해를 가져오려면 연도별로 나눠 호출해야
+      한다. 1990.01까지는 실제 데이터 존재 확인됨(1990 이전은 미확인, 더 오래된
+      해는 시도 안 해봄). data.go.kr 활용신청은 상품 단위라 DATA_GO_KR_KEY가
+      있어도 이 상품에 별도 승인이 필요했다(사용자가 2026-08-17에 완료).
+
   molit_rent:
     label: "국토교통부 실거래가 공개시스템 (아파트 전월세 실거래가 자료)"
     reliability_grade: 5

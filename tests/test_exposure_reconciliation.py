@@ -557,6 +557,76 @@ def test_correlation_prefers_growth_rates_over_raw_levels():
         os.remove(path)
 
 
+# ── customs_trade collector (관세청 수출입총괄 GW) ──────────────────────────
+
+def test_customs_trade_year_windows_split_on_a_1_year_boundary():
+    """The API rejects any strtYymm~endYymm span over 12 months
+    (resultCode=99, confirmed live 2026-08-17) — pin that the splitter never
+    produces a window wider than that, including the partial first/last year."""
+    from collectors.customs_trade import _year_windows
+
+    assert _year_windows("202506", "202607") == [("202506", "202512"), ("202601", "202607")]
+    assert _year_windows("199001", "199012") == [("199001", "199012")]
+    assert _year_windows("202601", "202601") == [("202601", "202601")]
+
+
+def test_customs_trade_parses_real_response_shape_and_drops_the_total_row():
+    """getNewtradeList appends a trailing <year>총계</year> summary row to
+    every response — pin that it's filtered out (it would otherwise look
+    like a 13th "month" and corrupt any month-indexed series)."""
+    import collectors.customs_trade as ct
+    from unittest.mock import patch, MagicMock
+
+    sample_xml = (
+        '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
+        '<response><header><resultCode>00</resultCode>'
+        '<resultMsg>정상서비스.</resultMsg></header><body><items>'
+        '<item><balPayments>8700467993</balPayments><expCnt>1027989</expCnt>'
+        '<expDlr>65843936782</expDlr><impCnt>4936713</impCnt>'
+        '<impDlr>57143468789</impDlr><year>2026.01</year></item>'
+        '<item><balPayments>167759691097</balPayments><expCnt>7920384</expCnt>'
+        '<expDlr>595062835447</expDlr><impCnt>34460197</impCnt>'
+        '<impDlr>427303144350</impDlr><year>총계</year></item>'
+        '</items></body></response>'
+    )
+    mock_resp = MagicMock()
+    mock_resp.text = sample_xml
+    mock_resp.raise_for_status = MagicMock()
+
+    with patch("collectors.customs_trade.requests.get", return_value=mock_resp):
+        rows = ct._fetch_year_window("202601", "202601", "FAKEKEY")
+
+    assert len(rows) == 1, "the 총계 summary row must be dropped, not kept as a 13th month"
+    assert rows[0]["date"] == "2026-01-01"
+    assert rows[0]["exp_dlr"] == 65843936782.0
+    assert rows[0]["imp_dlr"] == 57143468789.0
+
+
+def test_customs_trade_raises_loudly_on_a_non_ok_result_code():
+    """A resultCode != 00 (e.g. 99 = query span too wide) must raise, not
+    silently return an empty/partial list that looks like 'no data that
+    month' — those are different failure modes and must not be conflated."""
+    import collectors.customs_trade as ct
+    from unittest.mock import patch, MagicMock
+
+    err_xml = (
+        '<?xml version="1.0" encoding="UTF-8"?><response><header>'
+        '<resultCode>99</resultCode>'
+        '<resultMsg>시작과 종료의 조회기간은 1년이내 기간만 가능합니다.</resultMsg>'
+        '</header></response>'
+    )
+    mock_resp = MagicMock()
+    mock_resp.text = err_xml
+    mock_resp.raise_for_status = MagicMock()
+
+    with patch("collectors.customs_trade.requests.get", return_value=mock_resp):
+        try:
+            ct._fetch_year_window("200001", "202607", "FAKEKEY")
+            assert False, "expected a RuntimeError for resultCode=99"
+        except RuntimeError as exc:
+            assert "99" in str(exc)
+
+
 # ── annual (long-run) exports/KOSPI correlation ─────────────────────────────
 
 def test_kospi_annual_yoy_computes_from_manual_yaml():
@@ -687,6 +757,79 @@ def test_build_annual_dataset_reads_both_manual_yaml_files():
     finally:
         os.remove(exp_path)
         os.remove(kospi_path)
+
+
+def test_customs_export_yoy_computes_from_real_data():
+    """collectors/customs_trade.py writes level ($ dollars) rows to
+    customs_export_dlr.csv — pin that the loader turns those into %YoY
+    correctly, same math as _load_price_yoy but a different source file."""
+    import pandas as pd, tempfile, os
+    from pathlib import Path
+    fd, path = tempfile.mkstemp(suffix=".csv")
+    os.close(fd)
+    try:
+        pd.DataFrame([
+            {"date": "2025-06-01", "value": 1000000.0},
+            {"date": "2026-06-01", "value": 1200000.0},
+        ]).to_csv(path, index=False)
+        import scripts.correlation_analysis as mod
+        real_path = mod.CUSTOMS_EXPORT_CSV
+        mod.CUSTOMS_EXPORT_CSV = Path(path)
+        try:
+            yoy = mod._load_customs_export_yoy()
+        finally:
+            mod.CUSTOMS_EXPORT_CSV = real_path
+        assert len(yoy) == 1
+        assert abs(yoy.iloc[0] - 20.0) < 1e-9, f"expected +20% YoY, got {yoy.iloc[0]}"
+    finally:
+        os.remove(path)
+
+
+def test_build_dataset_prefers_real_customs_data_over_manual_motie():
+    """Once collectors/customs_trade.py has real data for a month, that must
+    win over the manually-maintained motie_total_exports_yoy.csv for the same
+    month — same live-overrides-manual priority as the annual KOSPI loader.
+    Regression target: combine_first() called on the wrong operand order
+    would silently make the manual (weaker) source win instead."""
+    import pandas as pd, tempfile, os
+    from pathlib import Path
+    fd_customs, customs_path = tempfile.mkstemp(suffix=".csv")
+    os.close(fd_customs)
+    fd_motie, motie_path = tempfile.mkstemp(suffix=".csv")
+    os.close(fd_motie)
+    try:
+        # Two years of levels so 2026-04 gets a real %YoY.
+        pd.DataFrame([
+            {"date": "2025-04-01", "value": 1000000.0},
+            {"date": "2026-04-01", "value": 1100000.0},
+        ]).to_csv(customs_path, index=False)
+        # Manual file deliberately disagrees for the same month.
+        pd.DataFrame([
+            {"date": "2026-04-01", "value": 999.9},
+        ]).to_csv(motie_path, index=False)
+
+        import scripts.correlation_analysis as mod
+        real_customs = mod.CUSTOMS_EXPORT_CSV
+        real_normalized = mod.NORMALIZED
+        mod.CUSTOMS_EXPORT_CSV = Path(customs_path)
+        # _load_motie() reads NORMALIZED / f"{series_id}.csv" — point it at a
+        # temp dir containing a same-named file so build_dataset() reads our
+        # fixture instead of the repo's real motie_total_exports_yoy.csv.
+        tmp_dir = Path(tempfile.mkdtemp())
+        (tmp_dir / "motie_total_exports_yoy.csv").write_text(Path(motie_path).read_text())
+        (tmp_dir / "motie_semiconductor_exports_yoy.csv").write_text("date,value\n")
+        mod.NORMALIZED = tmp_dir
+        try:
+            df = mod.build_dataset()
+        finally:
+            mod.CUSTOMS_EXPORT_CSV = real_customs
+            mod.NORMALIZED = real_normalized
+        got = df.loc[pd.Timestamp("2026-04-01"), "total_exports_yoy"]
+        assert abs(got - 10.0) < 1e-9, \
+            f"real customs %YoY (+10.0) must win over manual (999.9), got {got}"
+    finally:
+        os.remove(customs_path)
+        os.remove(motie_path)
 
 
 def test_render_annual_markdown_handles_missing_metric_without_crashing():

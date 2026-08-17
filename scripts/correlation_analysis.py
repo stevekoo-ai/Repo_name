@@ -17,6 +17,10 @@ moved together, not just that both happened to rise.
 
 INPUTS (all real, no estimates)
 ────────────────────────────────
+  data/normalized/customs_export_dlr.csv                (date, value) $, from
+    collectors/customs_trade.py (관세청 수출입총괄 GW, 실측 1990.01~ 확인됨) —
+    이게 있으면 총수출 %YoY의 1차 출처. 이 파일이 커버 못 하는 달만
+    motie_total_exports_yoy.csv(수동, 2026-04~)로 보충한다.
   data/normalized/motie_total_exports_yoy.csv          (date, value) %YoY
   data/normalized/motie_semiconductor_exports_yoy.csv   (date, value) %YoY
   sources/monthly-price-history.csv                     (date, code, label,
@@ -98,6 +102,32 @@ def _load_motie(series_id: str) -> pd.Series:
     return df.set_index("date")["value"].sort_index()
 
 
+CUSTOMS_EXPORT_CSV = NORMALIZED / "customs_export_dlr.csv"
+
+
+def _load_customs_export_yoy() -> pd.Series:
+    """관세청 수출입총괄(GW) 실측 월별 총수출(달러) -> %YoY.
+
+    collectors/customs_trade.py가 채우는 data/normalized/customs_export_dlr.csv
+    기반 — data/manual_inputs/exports.yaml(수동, 2026-04~뿐)보다 이력이 훨씬
+    길고(실측 1990.01~ 확인됨, config/api.yaml customs_trade 참고) 자동
+    갱신된다. build_dataset()에서 이 실측값이 수동 값보다 항상 우선한다."""
+    if not CUSTOMS_EXPORT_CSV.exists():
+        return pd.Series(dtype=float)
+    df = pd.read_csv(CUSTOMS_EXPORT_CSV)
+    df["date"] = pd.to_datetime(df["date"])
+    close = df.set_index("date")["value"].sort_index()
+
+    yoy = {}
+    for month, val in close.items():
+        prior_month = month - pd.DateOffset(years=1)
+        if prior_month in close.index:
+            prior = close.loc[prior_month]
+            if prior:
+                yoy[month] = (val / prior - 1) * 100
+    return pd.Series(yoy, dtype=float).sort_index()
+
+
 def _load_price_yoy(code: str) -> pd.Series:
     """Monthly close -> %YoY. Requires a close roughly 12 months earlier to
     exist in the same file — with less than a year of KIS history this
@@ -133,8 +163,14 @@ def _load_price_yoy(code: str) -> pd.Series:
 
 
 def build_dataset() -> pd.DataFrame:
+    # 실측(관세청) 우선, 없는 달만 수동 파일(motie_total_exports_yoy)로 보충 —
+    # _load_kospi_annual_yoy()의 "실측이 수동을 덮어쓴다" 패턴과 동일.
+    manual_exports_yoy = _load_motie("motie_total_exports_yoy")
+    real_exports_yoy = _load_customs_export_yoy()
+    total_exports_yoy = (real_exports_yoy.combine_first(manual_exports_yoy)
+                          if not real_exports_yoy.empty else manual_exports_yoy)
     series = {
-        "total_exports_yoy": _load_motie("motie_total_exports_yoy"),
+        "total_exports_yoy": total_exports_yoy,
         "semi_exports_yoy": _load_motie("motie_semiconductor_exports_yoy"),
         "hynix_price_yoy": _load_price_yoy("000660"),
         "kospi_yoy": _load_price_yoy("0001"),
