@@ -37,12 +37,16 @@ jobs:
         run: |
           set +e
           declare -a CANDIDATES=(
-            "http://apis.data.go.kr/1220000/sumryTrd/getSumryTrdList"
-            "http://apis.data.go.kr/1220000/gnrlTrade/getGnrlTradeList"
-            "http://apis.data.go.kr/1220000/expImpTrend/getExpImpTrendList"
-            "http://apis.data.go.kr/1220000/trade/getTradeList"
-            "http://apis.data.go.kr/1220000/ExpImpTotal/getExpImpTotalList"
             "http://apis.data.go.kr/1220000/nitemtrade/getNitemtradeList"
+            "http://apis.data.go.kr/1220000/expImp/getExpImpList"
+            "http://apis.data.go.kr/1220000/expImpTot/getExpImpTotList"
+            "http://apis.data.go.kr/1220000/sumtrade/getSumtradeList"
+            "http://apis.data.go.kr/1220000/gwtrade/getGwtradeList"
+            "http://apis.data.go.kr/1220000/itemtrade/getItemtradeList"
+            "http://apis.data.go.kr/1220000/natntrade/getNatntradeList"
+            "http://apis.data.go.kr/1220000/cntrytrade/getCntrytradeList"
+            "http://apis.data.go.kr/1220000/tradeSumry/getTradeSumryList"
+            "http://apis.data.go.kr/1220000/expImpSumry/getExpImpSumryList"
           )
           for url in "${CANDIDATES[@]}"; do
             echo "=================================================="
