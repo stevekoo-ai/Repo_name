@@ -51,6 +51,11 @@ FIELDS 딕셔너리만 고치면 된다. 지어낸 숫자를 반환하지 않기
 
   # 7) ETF/ETN 현재가+NAV+괴리율(포트폴리오 보유 ETF 점검용)
   python3 scripts/investor_flow.py etf-nav --ticker 469150
+
+  # 8) 종목/지수 월봉 이력(scripts/correlation_analysis.py 입력용)
+  python3 scripts/investor_flow.py monthly-history --code 000660 --label SK하이닉스 --months 24
+  python3 scripts/investor_flow.py monthly-history --code 0001 --is-index --months 24  # 코스피
+  python3 scripts/investor_flow.py monthly-history --code 000660 --months 3 --raw  # 필드명 최초 검증용
 """
 import os
 import sys
@@ -184,6 +189,10 @@ INDEX_CSV_FIELDS = [
     "source", "fetched_at",
 ]
 INDEX_NAMES = {"0001": "KOSPI", "1001": "KOSDAQ", "2001": "KOSPI200"}
+
+# 월봉 이력 저장 — code별로 한 파일에 섞어 쓴다(종목·지수 구분은 code 컬럼).
+MONTHLY_PRICE_CSV_PATH = Path(__file__).resolve().parent.parent / "sources" / "monthly-price-history.csv"
+MONTHLY_PRICE_CSV_FIELDS = ["date", "code", "label", "close", "source", "fetched_at"]
 INDEX_FIELDS = {
     "price": "bstp_nmix_prpr",          # 업종 지수 현재가
     "change": "bstp_nmix_prdy_vrss",    # 전일 대비
@@ -757,6 +766,103 @@ def kis_fetch_index_price(index_code, account_type="real", raw=False):
     }
 
 
+# 2026-08-15 신설 — scripts/correlation_analysis.py가 수출입동향(월별 %YoY)과
+# 대조할 실측 월별 이력이 필요해서 추가. 기존 sk-hynix-price-snapshot.csv·
+# kr-index-quote.csv는 2026-07-28부터 매일 쌓이기 시작한 스냅샷이라 아직
+# 2주치뿐이고, 4~7월 상관관계는 그걸로 계산할 수 없다. 웹검색으로 월말
+# 종가를 찾으려 했으나 namu.wiki·investing.com이 이 환경의 egress
+# 프록시에서 차단돼 있고, 검색 스니펫은 "코스피 5월 7천선 돌파" 같은
+# 정성적 설명뿐이라 정확한 종가로 신뢰할 수 없었다 — 지어낸 숫자를
+# "실측"으로 커밋하지 않는다는 이 저장소의 원칙(8년 묵은 금리를 현재값으로
+# 발행했던 사고 이후 확립)에 따라 그 값을 쓰지 않았다.
+#
+# 대신 이미 이 저장소가 신뢰하는 실제 출처(KIS)에서 월봉을 직접 받는다 —
+# TR FHKST03010100(국내주식기간별시세일/주/월/년, inquire-daily-itemchartprice)
+# 는 개별 종목·ETF의 과거 캔들을 기간 지정해 반환하고 FID_PERIOD_DIV_CODE=M
+# 이 월봉이다. 지수(코스피)는 별도 TR이 필요할 가능성이 높아
+# FID_COND_MRKT_DIV_CODE로 분기해 두었다.
+# ⚠ 이 스크립트의 다른 TR들과 마찬가지로 필드명·지수용 분기는 문서 기억
+# 기반이고, 이 샌드박스는 아웃바운드 네트워크가 막혀 있어 실호출로
+# 검증하지 못했다 — 최초 실행 시 반드시 --raw로 원본을 확인하고, output2
+# 배열의 정렬 순서(과거→최신인지 최신→과거인지)와 필드명이 다르면 아래
+# MONTHLY_PRICE_FIELDS와 파싱 로직을 실제 응답에 맞게 고칠 것. 지어낸
+# 필드값을 반환하지 않기 위해 예상 필드가 없으면 조용히 넘어가지 않고
+# 즉시 에러를 낸다(이 파일의 다른 모든 kis_fetch_*와 동일한 원칙).
+MONTHLY_PRICE_FIELDS = {
+    "date": "stck_bsop_date",   # 영업일자(월봉이면 그 달의 마지막 거래일)
+    "close": "stck_clpr",       # 종가
+    "open": "stck_oprc",
+    "high": "stck_hgpr",
+    "low": "stck_lwpr",
+    "volume": "acml_vol",
+}
+
+
+def kis_fetch_monthly_price_history(code, is_index=False, months=24, account_type="real", raw=False):
+    """종목/지수의 월봉(월말 종가) 이력을 조회한다 — correlation_analysis.py의
+    유일한 실측 입력 경로. months는 대략치(월 단위 근사, KIS는 일 단위 기간을
+    받으므로 30일*months로 환산)."""
+    appkey = _get_env_or_die("KIS_APP_KEY")
+    appsecret = _get_env_or_die("KIS_APP_SECRET")
+    token = kis_get_token(account_type)
+    host = KIS_HOSTS[account_type]
+
+    end = datetime.now(timezone.utc).date()
+    start = end - timedelta(days=months * 31)
+    market_div = "U" if is_index else "J"
+    params = (
+        f"FID_COND_MRKT_DIV_CODE={market_div}&FID_INPUT_ISCD={code}"
+        f"&FID_INPUT_DATE_1={start.strftime('%Y%m%d')}&FID_INPUT_DATE_2={end.strftime('%Y%m%d')}"
+        f"&FID_PERIOD_DIV_CODE=M&FID_ORG_ADJ_PRC=0"
+    )
+    # 지수는 별도 엔드포인트/TR일 가능성이 있음(문서 기억 불확실) — 종목과
+    # 동일 엔드포인트로 우선 시도하고, 404/필드누락 시 --raw로 확인해 아래
+    # endpoint/tr_id 분기를 실제 응답에 맞게 고칠 것.
+    endpoint = "inquire-daily-itemchartprice"
+    tr_id = "FHKST03010100"
+    req = urllib.request.Request(
+        f"{host}/uapi/domestic-stock/v1/quotations/{endpoint}?{params}",
+        headers={
+            "content-type": "application/json; charset=utf-8",
+            "authorization": f"Bearer {token}",
+            "appkey": appkey,
+            "appsecret": appsecret,
+            "tr_id": tr_id,
+        },
+    )
+    try:
+        with urllib.request.urlopen(req) as resp:
+            data = json.loads(resp.read())
+    except urllib.error.HTTPError as e:
+        sys.exit(f"KIS 월봉 API 호출 실패({code}): {e.code} {e.read().decode(errors='replace')}")
+
+    if raw:
+        print(json.dumps(data, ensure_ascii=False, indent=2))
+        return None
+
+    rows = data.get("output2")
+    if not rows:
+        sys.exit(
+            f"API 응답에서 월봉 리스트(output2)를 찾지 못했습니다({code}) — --raw로 "
+            "원본 JSON을 확인하고 이 함수의 endpoint/tr_id/추출 키를 응답 구조에 맞게 고치세요."
+        )
+    missing = [v for v in MONTHLY_PRICE_FIELDS.values() if v not in rows[0]]
+    if missing:
+        sys.exit(
+            f"예상한 필드가 API 응답에 없습니다({code}): {missing}. 실제 응답 키: "
+            f"{sorted(rows[0].keys())}\nMONTHLY_PRICE_FIELDS를 위 실제 필드명으로 고치세요."
+        )
+    out = []
+    for r in rows:
+        d = r[MONTHLY_PRICE_FIELDS["date"]]
+        out.append({
+            "date": f"{d[0:4]}-{d[4:6]}-{d[6:8]}",
+            "close": float(r[MONTHLY_PRICE_FIELDS["close"]]),
+        })
+    out.sort(key=lambda row: row["date"])
+    return out
+
+
 def kis_fetch_short_sale(ticker, account_type="real", raw=False):
     """국내주식 공매도 일별추이 조회."""
     appkey = _get_env_or_die("KIS_APP_KEY")
@@ -1234,6 +1340,22 @@ def cmd_index_quote(args):
           f"상승{q['advancers']}/하락{q['decliners']}/보합{q['unchanged']}  상한{q['limit_up']}/하한{q['limit_down']}  → {INDEX_CSV_PATH}에 기록")
 
 
+def cmd_monthly_history(args):
+    rows = kis_fetch_monthly_price_history(
+        args.code, is_index=args.is_index, months=args.months,
+        account_type=args.account_type, raw=args.raw,
+    )
+    if args.raw:
+        return
+    fetched_at = datetime.now(timezone.utc).isoformat(timespec="seconds")
+    label = INDEX_NAMES.get(args.code, args.code) if args.is_index else (args.label or args.code)
+    csv_rows = [{"date": r["date"], "code": args.code, "label": label, "close": r["close"]} for r in rows]
+    n = _generic_upsert(MONTHLY_PRICE_CSV_PATH, MONTHLY_PRICE_CSV_FIELDS, ("date", "code"), csv_rows,
+                         extra={"source": "kis_api", "fetched_at": fetched_at})
+    print(f"{label} ({args.code}): {n}개 월봉 → {MONTHLY_PRICE_CSV_PATH}에 기록 "
+          f"(범위 {rows[0]['date']} ~ {rows[-1]['date']})")
+
+
 def cmd_short_sale(args):
     rows = kis_fetch_short_sale(args.ticker, args.account_type, raw=args.raw)
     if args.raw:
@@ -1345,6 +1467,15 @@ def main():
     pix.add_argument("--account-type", default=os.environ.get("KIS_ACCOUNT_TYPE", "real"), choices=["real", "vts"])
     pix.add_argument("--raw", action="store_true")
     pix.set_defaults(func=cmd_index_quote)
+
+    pmh = sub.add_parser("monthly-history", help="종목/지수 월봉 이력 조회, sources/monthly-price-history.csv에 기록")
+    pmh.add_argument("--code", required=True, help="종목코드(예: 000660) 또는 지수코드(예: 0001=코스피)")
+    pmh.add_argument("--is-index", action="store_true", help="code가 지수코드면 지정")
+    pmh.add_argument("--label", default=None, help="종목일 때 표시용 이름(예: SK하이닉스). 지수는 INDEX_NAMES에서 자동")
+    pmh.add_argument("--months", type=int, default=24, help="조회할 개월 수(근사)")
+    pmh.add_argument("--account-type", default=os.environ.get("KIS_ACCOUNT_TYPE", "real"), choices=["real", "vts"])
+    pmh.add_argument("--raw", action="store_true")
+    pmh.set_defaults(func=cmd_monthly_history)
 
     pss = sub.add_parser("short-sale", help="공매도 일별추이 조회, sources/sk-hynix-short-sale.csv에 기록")
     pss.add_argument("--ticker", default="000660")

@@ -1,0 +1,128 @@
+name: 수출입동향 × 주가 상관관계 갱신
+
+# 사용자 요청(2026-08-15): 수출입동향(총수출/반도체수출 %YoY)과 SK하이닉스
+# 주가·코스피 지수 간 상관관계를 표+그래프로 자동 생성.
+# 2026-08-17 확장: 관세청 수출입총괄(GW) 실측(1990.01~ 확인됨,
+# collectors/customs_trade.py)을 총수출 1차 출처로 추가 — 기존 수동
+# exports.yaml(2026-04~뿐)보다 훨씬 긴 실측 이력을 자동으로 채운다.
+#
+# 세 단계로 구성:
+#   1. collectors.customs_trade update-recent — 관세청 실측 월별 총수출/
+#      총수입(달러)을 data/normalized/customs_export_dlr.csv 등에 채운다
+#      (최근 14개월만 매번 갱신 — 전체 backfill은 별도 workflow_dispatch
+#      입력으로 1회성 실행, 아래 참고).
+#   2. scripts.investor_flow monthly-history — KIS 월봉을 sources/
+#      monthly-price-history.csv에 채운다(portfolio-holdings-sync·
+#      sk-hynix-daily-report와 같은 KIS_APP_KEY 공유이므로 토큰 캐시
+#      패턴도 동일하게 재사용 — 동시 재발급 403 충돌 방지, 그 워크플로들의
+#      2026-07-31 주석 참고).
+#   3. scripts.correlation_analysis — 위 파일들 + data/normalized/motie_*.csv,
+#      data/manual_inputs/*.yaml을 읽어 monitoring/exports-*-correlation
+#      .{md,png}(월별+연간) 생성.
+#
+# 반도체 수출 %YoY는 아직 관세청 API로 못 옮겼다(품목별 상품은 별도 활용신청
+# 필요) — data/manual_inputs/exports.yaml 수동 갱신에 계속 의존한다.
+
+on:
+  schedule:
+    # 10:30 UTC = 19:30 KST — portfolio-holdings-sync(19:10 KST) 직후,
+    # 같은 KIS 토큰 캐시를 그날 이미 발급된 것으로 재사용할 수 있는 시점.
+    - cron: "30 10 * * *"
+  workflow_dispatch:
+    inputs:
+      backfill_customs_trade:
+        description: "관세청 수출입총괄 전체 이력(1990~현재)을 처음부터 다시 받기 — 최초 1회용, 평소엔 false"
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+concurrency:
+  group: exports-price-correlation
+  cancel-in-progress: false
+
+jobs:
+  correlate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: KIS 토큰 캐시 날짜 계산
+        id: kisdate
+        run: echo "date=$(date -u +%Y-%m-%d)" >> "$GITHUB_OUTPUT"
+
+      - name: KIS 토큰 캐시 복원
+        uses: actions/cache@v4
+        with:
+          path: scripts/.kis_token_cache.json
+          key: kis-token-cache-${{ steps.kisdate.outputs.date }}
+          restore-keys: |
+            kis-token-cache-
+
+      - name: 관세청 수출입총괄 실측 수집
+        env:
+          DATA_GO_KR_KEY: ${{ secrets.DATA_GO_KR_KEY }}
+        # backfill은 1990년부터 다시 받는 무거운 1회성 작업이라 workflow_dispatch
+        # 입력으로만 켠다 — 매일 스케줄 실행은 항상 update-recent(최근 14개월).
+        run: |
+          if [ "${{ github.event.inputs.backfill_customs_trade }}" = "true" ]; then
+            python3 -m collectors.customs_trade backfill || echo "::warning::관세청 backfill 실패 — 위 에러 로그 확인"
+          else
+            python3 -m collectors.customs_trade update-recent || echo "::warning::관세청 실측 수집 실패 — 위 에러 로그 확인"
+          fi
+
+      - name: SK하이닉스 월봉 수집
+        env:
+          KIS_APP_KEY: ${{ secrets.KIS_APP_KEY }}
+          KIS_APP_SECRET: ${{ secrets.KIS_APP_SECRET }}
+        # KIS TR/필드명이 문서 기억 기반이라 최초 실행에서 실패할 수 있다 —
+        # || true로 코스피 수집과 상관관계 계산까지는 계속 진행되게 하되,
+        # 실패 자체는 로그에 그대로 남긴다(조용히 삼키지 않음).
+        run: |
+          python3 scripts/investor_flow.py monthly-history --code 000660 \
+            --label "SK하이닉스" --months 24 || echo "::warning::SK하이닉스 월봉 수집 실패 — 위 에러 로그 확인"
+
+      - name: 코스피 월봉 수집
+        env:
+          KIS_APP_KEY: ${{ secrets.KIS_APP_KEY }}
+          KIS_APP_SECRET: ${{ secrets.KIS_APP_SECRET }}
+        run: |
+          python3 scripts/investor_flow.py monthly-history --code 0001 --is-index \
+            --months 24 || echo "::warning::코스피 월봉 수집 실패 — 위 에러 로그 확인"
+
+      - name: 상관관계 재계산
+        run: python -m scripts.correlation_analysis
+
+      - name: 변경사항 커밋 & 푸시
+        run: |
+          git config user.name "exports-price-correlation-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add sources/monthly-price-history.csv data/raw/ data/normalized/customs_export_dlr.csv \
+            data/normalized/customs_import_dlr.csv monitoring/exports-price-correlation.md \
+            monitoring/exports-price-correlation.png monitoring/exports-kospi-correlation-annual.md \
+            monitoring/exports-kospi-correlation-annual.png 2>/dev/null || true
+          if git diff --cached --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "chore: 수출입동향-주가 상관관계 갱신 $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+            BRANCH="${GITHUB_REF_NAME:-main}"
+            for i in 1 2 3 4 5; do
+              git push && break
+              echo "push rejected, rebasing onto latest $BRANCH (attempt $i)"
+              git fetch origin "$BRANCH"
+              git rebase "origin/$BRANCH"
+              sleep $((i * 3))
+            done
+          fi
