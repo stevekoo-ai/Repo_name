@@ -443,13 +443,15 @@ def render_chart(df: pd.DataFrame, top_pair: dict | None) -> None:
     if plot_df.empty:
         return
 
+    # 2026-08-17: 사용자 요청 — 점 마커를 없애고 선을 얇게 해서(1.8→1.1) 세
+    # 곡선의 상승/하강이 점에 가려지지 않고 잘 보이도록.
     fig, ax = plt.subplots(figsize=(10, 5))
     for c in cols:
         series = plot_df[c].dropna()
         if series.empty:
             continue
         z = (series - series.mean()) / series.std(ddof=0)
-        ax.plot(z.index, z.values, marker="o", markersize=4, linewidth=1.8,
+        ax.plot(z.index, z.values, linewidth=1.1,
                 color=MONTHLY_CHART_COLORS.get(c, "#888888"), label=SERIES_LABELS_CHART[c])
     ax.axhline(0, color="#999999", linewidth=0.8, linestyle="--")
     ax.set_title(
