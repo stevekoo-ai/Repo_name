@@ -1027,6 +1027,74 @@ def test_filter_from_does_not_crash_on_an_empty_series():
     assert list(out2.index) == [pd.Timestamp("2025-01-01")]
 
 
+def test_load_exports_preliminary_returns_the_current_months_estimate():
+    """2026-08-17 user request: draw the next (not-yet-final) point from
+    관세청's 10-day preliminary release. Only surface it when it actually
+    targets the in-progress month — a stale preliminary from a month that's
+    already closed would misleadingly overwrite a real point."""
+    import pandas as pd, tempfile, os, yaml
+    from pathlib import Path
+    import scripts.correlation_analysis as mod
+
+    now = pd.Timestamp.now(tz="UTC").tz_localize(None)
+    current_month = pd.Timestamp(year=now.year, month=now.month, day=1)
+
+    fd, path = tempfile.mkstemp(suffix=".yaml")
+    os.close(fd)
+    try:
+        payload = {
+            "latest": {
+                "target_month": current_month.strftime("%Y-%m-%d"),
+                "period_label": "1일~10일",
+                "period_start": current_month.strftime("%Y-%m-%d"),
+                "period_end": (current_month + pd.Timedelta(days=9)).strftime("%Y-%m-%d"),
+                "total_exports_yoy": 45.3,
+                "source": "관세청 보도자료",
+            }
+        }
+        Path(path).write_text(yaml.safe_dump(payload, allow_unicode=True), encoding="utf-8")
+        real_path = mod.EXPORTS_PRELIMINARY_YAML
+        mod.EXPORTS_PRELIMINARY_YAML = Path(path)
+        try:
+            result = mod.load_exports_preliminary()
+        finally:
+            mod.EXPORTS_PRELIMINARY_YAML = real_path
+        assert result is not None
+        assert result["date"] == current_month
+        assert abs(result["value"] - 45.3) < 1e-9
+        assert "label_en" in result and result["label_en"]  # ASCII chart label always derivable
+    finally:
+        os.remove(path)
+
+
+def test_load_exports_preliminary_ignores_a_stale_target_month():
+    """A preliminary reading left over from a month that has already closed
+    (nobody updated the file after month-end) must not be drawn as if it
+    were still the in-progress estimate."""
+    import pandas as pd, tempfile, os, yaml
+    from pathlib import Path
+    import scripts.correlation_analysis as mod
+
+    fd, path = tempfile.mkstemp(suffix=".yaml")
+    os.close(fd)
+    try:
+        payload = {"latest": {
+            "target_month": "2019-01-01",  # safely in the past regardless of when this test runs
+            "period_label": "1일~10일", "period_start": "2019-01-01", "period_end": "2019-01-10",
+            "total_exports_yoy": 1.0, "source": "test",
+        }}
+        Path(path).write_text(yaml.safe_dump(payload, allow_unicode=True), encoding="utf-8")
+        real_path = mod.EXPORTS_PRELIMINARY_YAML
+        mod.EXPORTS_PRELIMINARY_YAML = Path(path)
+        try:
+            result = mod.load_exports_preliminary()
+        finally:
+            mod.EXPORTS_PRELIMINARY_YAML = real_path
+        assert result is None
+    finally:
+        os.remove(path)
+
+
 if __name__ == "__main__":
     import sys, traceback
     fns = [(n, f) for n, f in sorted(globals().items())

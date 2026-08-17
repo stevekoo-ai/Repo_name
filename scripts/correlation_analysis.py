@@ -36,6 +36,15 @@ INPUTS (all real, no estimates)
   Price/index YoY% is derived here (close_m / close_{m-12} - 1) * 100 — it is
   not itself a stored series, so a short price history simply yields fewer
   YoY points rather than an error.
+  data/manual_inputs/exports_preliminary.yaml   2026-08-17 added — 관세청
+    10일 단위 수출입 현황 [잠정치] (1~10일 released day 11, 1~20일 released
+    day 21, both ahead of the day-1-of-next-month final figure). Never
+    merged into total_exports_yoy — load_exports_preliminary() surfaces it
+    separately so callers can draw it as a distinctly-styled "next point"
+    (dashed line + hollow marker) rather than pretend it's a real
+    observation. Update the file's `latest` block by hand when a new
+    10-day/20-day release lands (no clean structured export-side API found
+    on data.go.kr as of this writing — only an import-side one).
 
 OUTPUTS
 ────────
@@ -118,6 +127,7 @@ MONTHLY_PRICE_CSV = REPO_ROOT / "sources" / "monthly-price-history.csv"
 DAILY_PRICE_CSV = REPO_ROOT / "sources" / "daily-price-history.csv"
 EXPORTS_ANNUAL_YAML = MANUAL_INPUTS / "exports_annual.yaml"
 KOSPI_ANNUAL_YAML = MANUAL_INPUTS / "kospi_annual.yaml"
+EXPORTS_PRELIMINARY_YAML = MANUAL_INPUTS / "exports_preliminary.yaml"
 OUT_DIR = REPO_ROOT / "monitoring"
 OUT_MD = OUT_DIR / "exports-price-correlation.md"
 OUT_PNG = OUT_DIR / "exports-price-correlation.png"
@@ -225,6 +235,40 @@ def _load_customs_export_yoy() -> pd.Series:
     """관세청 실측 월별 총수출(달러) -> %YoY. build_dataset()에서 이 실측값이
     수동 값(motie_total_exports_yoy)보다 항상 우선한다."""
     return _series_yoy(_load_customs_export_level())
+
+
+def load_exports_preliminary() -> dict | None:
+    """관세청 10일 단위 수출입 현황 [잠정치](data/manual_inputs/
+    exports_preliminary.yaml) — 진행 중인 달이 끝나기 전에 미리 나오는
+    부분기간 수치를 그 달의 %YoY '추정치'로 쓴다. 2026-08-17 사용자 요청.
+
+    중요: total_exports_yoy(실측) 시계열에는 절대 섞지 않는다 — 호출부가
+    이 dict를 받아 별도로(점선/빈 마커) 그려야 한다. 반환값이 이미 지난
+    달(오늘 기준 진행 중인 달이 아님)이면 None — 최신치를 안 챙겨서 낡은
+    잠정치가 이번 달 자리에 잘못 찍히는 걸 막는다."""
+    if not EXPORTS_PRELIMINARY_YAML.exists():
+        return None
+    payload = yaml.safe_load(EXPORTS_PRELIMINARY_YAML.read_text(encoding="utf-8")) or {}
+    latest = payload.get("latest")
+    if not latest:
+        return None
+    target_month = pd.Timestamp(latest["target_month"])
+    if target_month != _current_incomplete_month_start():
+        return None  # 낡은 잠정치 — 이번 달이 이미 지났으면 표시하지 않는다
+    period_start, period_end = latest.get("period_start"), latest.get("period_end")
+    # 차트 범례는 ASCII만(DejaVu Sans엔 한글 글리프가 없음, SERIES_LABELS_CHART와
+    # 같은 이유) — period_label(한글)은 markdown에서만 쓰고, 차트용은 날짜에서
+    # 직접 만든다.
+    label_en = (f"{pd.Timestamp(period_start).strftime('%b %-d')}-"
+                f"{pd.Timestamp(period_end).strftime('%-d')} prelim."
+                if period_start and period_end else "prelim.")
+    return {
+        "date": target_month,
+        "value": float(latest["total_exports_yoy"]),
+        "label": latest.get("period_label", ""),
+        "label_en": label_en,
+        "source": latest.get("source", ""),
+    }
 
 
 def _load_price_level(code: str) -> pd.Series:
@@ -529,7 +573,7 @@ def pairwise_correlations(df: pd.DataFrame) -> list[dict]:
     return out
 
 
-def render_markdown(df: pd.DataFrame, pairs: list[dict]) -> str:
+def render_markdown(df: pd.DataFrame, pairs: list[dict], preliminary: dict | None = None) -> str:
     lines = [
         "# 수출입동향 × SK하이닉스 × 코스피 상관관계",
         "",
@@ -554,6 +598,20 @@ def render_markdown(df: pd.DataFrame, pairs: list[dict]) -> str:
     for month, row in df_full.iterrows():
         cells = [f"{row[c]:.1f}" if pd.notna(row[c]) else "—" for c in SERIES_LABELS]
         lines.append(f"| {month.strftime('%Y-%m')} | " + " | ".join(cells) + " |")
+
+    if preliminary is not None:
+        lines += [
+            "",
+            f"## 진행 중인 달 잠정치 (아직 확정 아님)",
+            "",
+            f"**{preliminary['date'].strftime('%Y-%m')}** 총수출 %YoY 추정: "
+            f"**{preliminary['value']:+.1f}%** — 관세청 {preliminary['label']} 잠정치를 그 달 "
+            "전체의 %YoY로 근사한 값이다(2026-08-17 사용자 요청). 실제 발표값(관세청, "
+            "다음 달 1일 확정치)과 다를 수 있다 — 상반월/월 전체의 조업일수·통관 타이밍 "
+            "차이 때문. 위 표·상관계수 계산에는 포함하지 않았고, 차트에서만 점선+빈 "
+            "마름모로 별도 표시했다.",
+            f"\n출처: {preliminary['source']}" if preliminary.get("source") else "",
+        ]
 
     lines += ["", "## 쌍별 상관계수 (Pearson r, 표본 많은/상관 높은 순)", "",
               "| 지표 A | 지표 B | r | n | 비고 |", "|---|---|---|---|---|"]
@@ -753,7 +811,8 @@ MONTHLY_CHART_COLORS = {
 
 def _render_monthly_chart(df: pd.DataFrame, top_pair: dict | None, out_path: Path,
                            start: pd.Timestamp | None = None, title_note: str = "",
-                           markersize: float | None = None) -> None:
+                           markersize: float | None = None,
+                           preliminary: dict | None = None) -> None:
     """render_chart의 실제 구현 — start를 주면 그 시점부터만 잘라서 그린다
     (2026-08-17 사용자 요청: "2023년부터 zoom in"). z-score는 잘린 구간
     안에서 다시 계산한다 — 전체 이력 기준 z-score를 그대로 쓰면 최근 구간이
@@ -763,7 +822,16 @@ def _render_monthly_chart(df: pd.DataFrame, top_pair: dict | None, out_path: Pat
 
     markersize: None이면 점 없이 선만(전체 이력 차트 — 500개월치를 점까지
     찍으면 너무 빽빽하다). 확대 차트는 표본이 훨씬 적어(3년 안팎) 작은 점을
-    찍어도 안 빽빽하고, 사용자가 명시적으로 요청(2026-08-17)."""
+    찍어도 안 빽빽하고, 사용자가 명시적으로 요청(2026-08-17).
+
+    preliminary: load_exports_preliminary()의 반환값 — 진행 중인 달의
+    "다음 점"을 관세청 10일 단위 잠정치로 미리 찍어본다(2026-08-17 사용자
+    요청: "잠정치로 예측 가능한 다음 점을 찍어보자"). total_exports_yoy의
+    실측 마지막 점에서 점선으로 이어지는 속이 빈 마름모로 그린다 — 실측과
+    같은 파란색이지만 선 스타일과 마커를 확실히 다르게 해서 "이건 확정치가
+    아니다"가 범례만 봐도 드러나게 한다. z-score는 실측 total_exports_yoy
+    시리즈의 평균/표준편차를 그대로 재사용한다(잠정치 자체를 평균/표준편차
+    계산에 넣지 않는다 — 아직 확정 안 된 값이 정규화 기준을 흔들면 안 된다)."""
     if top_pair is None:
         return
     cols = [c for c in ("total_exports_yoy", "hynix_price_yoy", "kospi_yoy") if c in df.columns]
@@ -776,15 +844,32 @@ def _render_monthly_chart(df: pd.DataFrame, top_pair: dict | None, out_path: Pat
     # 2026-08-17: 사용자 요청 — 점 마커를 없애고 선을 얇게 해서(1.8→1.1) 세
     # 곡선의 상승/하강이 점에 가려지지 않고 잘 보이도록.
     fig, ax = plt.subplots(figsize=(10, 5))
+    exports_stats = None  # (mean, std, last_date, last_z) — 잠정치 점을 실측과 같은 척도로 찍기 위해 기억해둔다
     for c in cols:
         series = plot_df[c].dropna()
         if series.empty:
             continue
-        z = (series - series.mean()) / series.std(ddof=0)
+        mean, std = series.mean(), series.std(ddof=0)
+        z = (series - mean) / std
         marker_kwargs = {"marker": "o", "markersize": markersize} if markersize else {}
         ax.plot(z.index, z.values, linewidth=1.1,
                 color=MONTHLY_CHART_COLORS.get(c, "#888888"), label=SERIES_LABELS_CHART[c],
                 **marker_kwargs)
+        if c == "total_exports_yoy":
+            exports_stats = (mean, std, z.index[-1], z.values[-1])
+
+    if preliminary is not None and exports_stats is not None:
+        mean, std, last_date, last_z = exports_stats
+        prelim_date, prelim_value = preliminary["date"], preliminary["value"]
+        if start is None or prelim_date >= start:
+            prelim_z = (prelim_value - mean) / std
+            color = MONTHLY_CHART_COLORS["total_exports_yoy"]
+            ax.plot([last_date, prelim_date], [last_z, prelim_z], linestyle="--", linewidth=1.1,
+                    color=color, alpha=0.7)
+            ax.plot([prelim_date], [prelim_z], marker="D", markersize=7, markerfacecolor="none",
+                    markeredgecolor=color, markeredgewidth=1.5, linestyle="none",
+                    label=f"Total exports (%YoY, {preliminary['label_en']})")
+
     ax.axhline(0, color="#999999", linewidth=0.8, linestyle="--")
     ax.set_title(
         f"Exports vs SK Hynix vs KOSPI, monthly (%YoY, z-score normalized){title_note}\n"
@@ -803,21 +888,23 @@ def _render_monthly_chart(df: pd.DataFrame, top_pair: dict | None, out_path: Pat
     plt.close(fig)
 
 
-def render_chart(df: pd.DataFrame, top_pair: dict | None) -> None:
+def render_chart(df: pd.DataFrame, top_pair: dict | None, preliminary: dict | None = None) -> None:
     """2026-08-17: 사용자가 총수출도 같이 그려달라고 요청 — 원래는 상관 가장
     높은 쌍(하이닉스 vs 코스피) 2개 지표만 그렸는데, render_annual_chart와
     같은 방식(전 지표를 z-score로 겹쳐 그리기)으로 통일했다. 총수출은
     1990~이라 표본이 훨씬 길지만, z-score는 각 지표를 자기 자신의 평균/표준
     편차로 정규화하므로 그 변동폭이 다른 지표에 묻히지 않고 그대로 보인다."""
-    _render_monthly_chart(df, top_pair, OUT_PNG)
+    _render_monthly_chart(df, top_pair, OUT_PNG, preliminary=preliminary)
 
 
-def render_chart_zoom(df: pd.DataFrame, top_pair: dict | None, start: pd.Timestamp) -> None:
+def render_chart_zoom(df: pd.DataFrame, top_pair: dict | None, start: pd.Timestamp,
+                       preliminary: dict | None = None) -> None:
     """render_chart의 확대판 — start 이후 구간만, 그 구간 안에서 재정규화해
     그린다(위 _render_monthly_chart 참고). 작은 점 마커 포함(2026-08-17
     사용자 요청)."""
     _render_monthly_chart(df, top_pair, OUT_PNG_ZOOM, start=start,
-                           title_note=f" — {start.strftime('%Y-%m')}~", markersize=3.5)
+                           title_note=f" — {start.strftime('%Y-%m')}~", markersize=3.5,
+                           preliminary=preliminary)
 
 
 def render_annual_chart(df: pd.DataFrame, top_pair: dict | None) -> None:
@@ -1018,19 +1105,23 @@ def main() -> int:
         return 1
 
     pairs = pairwise_correlations(df)
+    preliminary = load_exports_preliminary()
     OUT_DIR.mkdir(parents=True, exist_ok=True)
-    OUT_MD.write_text(render_markdown(df, pairs), encoding="utf-8")
+    OUT_MD.write_text(render_markdown(df, pairs, preliminary=preliminary), encoding="utf-8")
 
     trustworthy = [p for p in pairs if pd.notna(p["r"]) and p["n"] >= MIN_TRUSTWORTHY_N]
     top_pair = trustworthy[0] if trustworthy else (pairs[0] if pairs and pd.notna(pairs[0]["r"]) else None)
-    render_chart(df, top_pair)
-    render_chart_zoom(df, top_pair, ZOOM_START)
+    render_chart(df, top_pair, preliminary=preliminary)
+    render_chart_zoom(df, top_pair, ZOOM_START, preliminary=preliminary)
 
     print(f"[월별] {len(pairs)}개 쌍 계산 완료 → {OUT_MD}")
     if OUT_PNG.exists():
         print(f"[월별] 차트 저장 → {OUT_PNG}")
     if OUT_PNG_ZOOM.exists():
         print(f"[월별 확대 {ZOOM_START.strftime('%Y-%m')}~] 차트 저장 → {OUT_PNG_ZOOM}")
+    if preliminary is not None:
+        print(f"  잠정치 다음 점: {preliminary['date'].strftime('%Y-%m')} "
+              f"{preliminary['value']:+.1f}% ({preliminary['label']})")
     for p in pairs:
         r_str = f"{p['r']:+.2f}" if pd.notna(p["r"]) else "N/A"
         print(f"  {p['a']:<18} x {p['b']:<18} r={r_str} n={p['n']}")
