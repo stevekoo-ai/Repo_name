@@ -873,6 +873,41 @@ def test_render_annual_markdown_handles_missing_metric_without_crashing():
     assert "2025" in md
 
 
+def test_backward_date_windows_walks_from_now_to_a_target_start():
+    """kis_fetch_monthly_price_history is confirmed (2026-08-17,
+    kis-monthly-depth-probe.yml) to truncate to the most recent ~50 months
+    regardless of how wide a date range is requested (months=90 → still only
+    50 rows back to 2022-07). _backward_date_windows is what lets
+    kis_fetch_monthly_price_history_deep walk further back by making several
+    narrower, non-overlapping calls with the end date pulled progressively
+    into the past."""
+    from datetime import date, timedelta
+    from scripts.investor_flow import _backward_date_windows
+
+    windows = _backward_date_windows(date(2026, 8, 17), date(2019, 1, 1), months_per_window=45)
+    assert windows[0][1] == date(2026, 8, 17)   # newest window ends "now"
+    assert windows[-1][0] == date(2019, 1, 1)   # oldest window starts exactly at target
+    for start, end in windows:
+        assert start <= end
+        assert start >= date(2019, 1, 1)
+    # non-overlapping: each next (older) window ends the day before the
+    # previous window started
+    for i in range(len(windows) - 1):
+        prev_start = windows[i][0]
+        next_end = windows[i + 1][1]
+        assert next_end == prev_start - timedelta(days=1)
+
+
+def test_backward_date_windows_single_window_when_range_is_short():
+    """A range that already fits inside one call's ~50-month reach must not
+    be split — that would just waste an extra KIS call."""
+    from datetime import date
+    from scripts.investor_flow import _backward_date_windows
+
+    windows = _backward_date_windows(date(2026, 8, 17), date(2026, 1, 1), months_per_window=45)
+    assert windows == [(date(2026, 1, 1), date(2026, 8, 17))]
+
+
 if __name__ == "__main__":
     import sys, traceback
     fns = [(n, f) for n, f in sorted(globals().items())
