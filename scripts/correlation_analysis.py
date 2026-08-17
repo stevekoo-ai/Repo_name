@@ -50,6 +50,15 @@ OUTPUTS
                                              three series, but %QoQ (vs prior
                                              quarter) instead of %YoY, on a
                                              quarterly grid instead of monthly.
+  monitoring/exports-price-correlation-2023-zoom.png   2026-08-17 added — same
+                                             three monthly %YoY series as the
+                                             main PNG, but sliced to
+                                             ZOOM_START~present and
+                                             re-z-scored within that slice
+                                             (not the full-history z-score)
+                                             so recent detail isn't flattened
+                                             by 35+ years of total_exports
+                                             history dominating the scale.
 
 CURRENT (IN-PROGRESS) MONTH IS ALWAYS EXCLUDED
 ────────────────────────────────────────────────
@@ -90,6 +99,8 @@ OUT_MD_ANNUAL = OUT_DIR / "exports-kospi-correlation-annual.md"
 OUT_PNG_ANNUAL = OUT_DIR / "exports-kospi-correlation-annual.png"
 OUT_MD_QOQ = OUT_DIR / "exports-price-correlation-qoq.md"
 OUT_PNG_QOQ = OUT_DIR / "exports-price-correlation-qoq.png"
+OUT_PNG_ZOOM = OUT_DIR / "exports-price-correlation-2023-zoom.png"
+ZOOM_START = pd.Timestamp("2023-01-01")
 
 # 표본이 이보다 적으면 상관계수를 표에는 싣되 "신뢰 불가"로 명시한다 —
 # 조용히 숫자만 보여주면 n=3짜리 상관계수도 확신처럼 읽힌다.
@@ -620,16 +631,20 @@ MONTHLY_CHART_COLORS = {
 }
 
 
-def render_chart(df: pd.DataFrame, top_pair: dict | None) -> None:
-    """2026-08-17: 사용자가 총수출도 같이 그려달라고 요청 — 원래는 상관 가장
-    높은 쌍(하이닉스 vs 코스피) 2개 지표만 그렸는데, render_annual_chart와
-    같은 방식(전 지표를 z-score로 겹쳐 그리기)으로 통일했다. 총수출은
-    1990~이라 표본이 훨씬 길지만, z-score는 각 지표를 자기 자신의 평균/표준
-    편차로 정규화하므로 그 변동폭이 다른 지표에 묻히지 않고 그대로 보인다."""
+def _render_monthly_chart(df: pd.DataFrame, top_pair: dict | None, out_path: Path,
+                           start: pd.Timestamp | None = None, title_note: str = "") -> None:
+    """render_chart의 실제 구현 — start를 주면 그 시점부터만 잘라서 그린다
+    (2026-08-17 사용자 요청: "2023년부터 zoom in"). z-score는 잘린 구간
+    안에서 다시 계산한다 — 전체 이력 기준 z-score를 그대로 쓰면 최근 구간이
+    이미 전체 차트에서 보이는 것과 똑같은 모양으로 눌려 나온다(총수출처럼
+    1990~ 표본이 긴 지표일수록 심함); 구간 안에서 재정규화해야 그 구간
+    자체의 등락폭이 자기 스케일로 드러난다 — "확대"의 실질적 의미."""
     if top_pair is None:
         return
     cols = [c for c in ("total_exports_yoy", "hynix_price_yoy", "kospi_yoy") if c in df.columns]
     plot_df = df[cols].dropna(how="all")
+    if start is not None:
+        plot_df = plot_df[plot_df.index >= start]
     if plot_df.empty:
         return
 
@@ -645,8 +660,8 @@ def render_chart(df: pd.DataFrame, top_pair: dict | None) -> None:
                 color=MONTHLY_CHART_COLORS.get(c, "#888888"), label=SERIES_LABELS_CHART[c])
     ax.axhline(0, color="#999999", linewidth=0.8, linestyle="--")
     ax.set_title(
-        f"Exports vs SK Hynix vs KOSPI, monthly (%YoY, z-score normalized)\n"
-        f"strongest pair: {SERIES_LABELS_CHART[top_pair['a']]} vs "
+        f"Exports vs SK Hynix vs KOSPI, monthly (%YoY, z-score normalized){title_note}\n"
+        f"strongest pair (full history): {SERIES_LABELS_CHART[top_pair['a']]} vs "
         f"{SERIES_LABELS_CHART[top_pair['b']]} (r={top_pair['r']:+.2f}, n={top_pair['n']})",
         fontsize=11,
     )
@@ -657,8 +672,24 @@ def render_chart(df: pd.DataFrame, top_pair: dict | None) -> None:
     fig.autofmt_xdate()
     fig.tight_layout()
     OUT_DIR.mkdir(parents=True, exist_ok=True)
-    fig.savefig(OUT_PNG, dpi=150)
+    fig.savefig(out_path, dpi=150)
     plt.close(fig)
+
+
+def render_chart(df: pd.DataFrame, top_pair: dict | None) -> None:
+    """2026-08-17: 사용자가 총수출도 같이 그려달라고 요청 — 원래는 상관 가장
+    높은 쌍(하이닉스 vs 코스피) 2개 지표만 그렸는데, render_annual_chart와
+    같은 방식(전 지표를 z-score로 겹쳐 그리기)으로 통일했다. 총수출은
+    1990~이라 표본이 훨씬 길지만, z-score는 각 지표를 자기 자신의 평균/표준
+    편차로 정규화하므로 그 변동폭이 다른 지표에 묻히지 않고 그대로 보인다."""
+    _render_monthly_chart(df, top_pair, OUT_PNG)
+
+
+def render_chart_zoom(df: pd.DataFrame, top_pair: dict | None, start: pd.Timestamp) -> None:
+    """render_chart의 확대판 — start 이후 구간만, 그 구간 안에서 재정규화해
+    그린다(위 _render_monthly_chart 참고)."""
+    _render_monthly_chart(df, top_pair, OUT_PNG_ZOOM, start=start,
+                           title_note=f" — {start.strftime('%Y-%m')}~")
 
 
 def render_annual_chart(df: pd.DataFrame, top_pair: dict | None) -> None:
@@ -666,7 +697,12 @@ def render_annual_chart(df: pd.DataFrame, top_pair: dict | None) -> None:
     top-pair-only; render_chart switched to this pattern 2026-08-17 per user
     request to show total exports alongside price) — showing every metric is
     more informative than picking just the best-correlated two, and is closer
-    to what was actually asked for ("관계를 그래프를 그려보자")."""
+    to what was actually asked for ("관계를 그래프를 그려보자").
+
+    2026-08-17: 점 마커 제거 + 선 얇게(2→1.1) — 월별/QoQ 차트에 적용한 것과
+    같은 스타일로 통일해달라는 사용자 요청. 연간은 표본이 7개뿐이라 마커
+    없이는 개별 관측치가 잘 안 보일 수 있지만, 세 차트가 같은 관례를
+    따르는 쪽을 우선한다."""
     cols = [c for c in ANNUAL_SERIES_LABELS if c in df.columns and df[c].notna().any()]
     plot_df = df[cols].dropna(how="all")
     if plot_df.empty:
@@ -677,7 +713,7 @@ def render_annual_chart(df: pd.DataFrame, top_pair: dict | None) -> None:
     fig, ax = plt.subplots(figsize=(9, 5))
     for c in cols:
         series = z[c].dropna()
-        ax.plot(series.index, series.values, marker="o", linewidth=2,
+        ax.plot(series.index, series.values, linewidth=1.1,
                 color=colors.get(c, "#888888"), label=ANNUAL_SERIES_LABELS_CHART[c])
     ax.axhline(0, color="#999999", linewidth=0.8, linestyle="--")
     title = "Exports vs KOSPI, annual (%YoY, z-score normalized)"
@@ -745,10 +781,13 @@ def main() -> int:
     trustworthy = [p for p in pairs if pd.notna(p["r"]) and p["n"] >= MIN_TRUSTWORTHY_N]
     top_pair = trustworthy[0] if trustworthy else (pairs[0] if pairs and pd.notna(pairs[0]["r"]) else None)
     render_chart(df, top_pair)
+    render_chart_zoom(df, top_pair, ZOOM_START)
 
     print(f"[월별] {len(pairs)}개 쌍 계산 완료 → {OUT_MD}")
     if OUT_PNG.exists():
         print(f"[월별] 차트 저장 → {OUT_PNG}")
+    if OUT_PNG_ZOOM.exists():
+        print(f"[월별 확대 {ZOOM_START.strftime('%Y-%m')}~] 차트 저장 → {OUT_PNG_ZOOM}")
     for p in pairs:
         r_str = f"{p['r']:+.2f}" if pd.notna(p["r"]) else "N/A"
         print(f"  {p['a']:<18} x {p['b']:<18} r={r_str} n={p['n']}")

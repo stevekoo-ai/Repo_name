@@ -152,7 +152,8 @@ jobs:
                    monitoring/exports-kospi-correlation-annual.md \
                    monitoring/exports-kospi-correlation-annual.png \
                    monitoring/exports-price-correlation-qoq.md \
-                   monitoring/exports-price-correlation-qoq.png; do
+                   monitoring/exports-price-correlation-qoq.png \
+                   monitoring/exports-price-correlation-2023-zoom.png; do
             [ -f "$f" ] && git add "$f"
           done
           [ -d data/raw ] && git add data/raw/ 2>/dev/null
