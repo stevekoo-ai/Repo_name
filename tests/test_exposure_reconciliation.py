@@ -602,6 +602,32 @@ def test_customs_trade_parses_real_response_shape_and_drops_the_total_row():
     assert rows[0]["imp_dlr"] == 57143468789.0
 
 
+def test_customs_trade_circuit_breaker_aborts_after_first_window_fails():
+    """Live 2026-08-17: this GitHub Actions runner pool intermittently can't
+    even open a TCP connection to apis.data.go.kr (same documented symptom
+    as collectors/molit.py's KOSIS/ECOS circuit breaker). fetch_range() must
+    give up after the first window fails its probe, not retry every
+    remaining window (up to 37 for a full 1990-2026 backfill) and burn
+    minutes on a connection that's already known to be down this run."""
+    import collectors.customs_trade as ct
+    from unittest.mock import patch
+
+    calls = []
+
+    def always_fails(strt, end, api_key, timeout=20):
+        calls.append((strt, end))
+        raise RuntimeError("Connection to apis.data.go.kr timed out.")
+
+    with patch("collectors.customs_trade.get_api_key", return_value="FAKEKEY"), \
+         patch("collectors.customs_trade._fetch_year_window", side_effect=always_fails):
+        rows = ct.fetch_range("202401", "202612")  # 3 windows: 2024, 2025, 2026
+
+    assert rows == []
+    assert len(calls) == 2, (
+        f"expected exactly 2 calls (the probe's 2 attempts on window 1 only), got {len(calls)}: {calls}"
+    )
+
+
 def test_customs_trade_raises_loudly_on_a_non_ok_result_code():
     """A resultCode != 00 (e.g. 99 = query span too wide) must raise, not
     silently return an empty/partial list that looks like 'no data that

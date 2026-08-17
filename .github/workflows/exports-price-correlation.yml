@@ -34,15 +34,6 @@ on:
         description: "관세청 수출입총괄 전체 이력(1990~현재)을 처음부터 다시 받기 — 최초 1회용, 평소엔 false"
         type: boolean
         default: false
-  # TEMP(2026-08-17): 이 워크플로가 아직 main에 머지 안 돼 있어 workflow_dispatch가
-  # API로 안 먹는다(default 브랜치에 없으면 dispatch 불가) — subscription-schema-
-  # probe.yml과 같은 방식으로 push 트리거를 잠깐 추가해 실측 최초 실행을 검증한다.
-  # 검증 끝나면 이 블록은 지운다.
-  push:
-    branches:
-      - claude/ai-agent-impl-002tip
-    paths:
-      - .github/workflows/exports-price-correlation.yml
 
 permissions:
   contents: write

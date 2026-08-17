@@ -90,21 +90,51 @@ def _year_windows(start_yyyymm: str, end_yyyymm: str) -> list[tuple[str, str]]:
     return windows
 
 
+def _probe(strt: str, end: str, api_key: str) -> tuple[list[dict] | None, str | None]:
+    """collectors/molit.py의 서킷브레이커와 동일한 패턴 — 실측(2026-08-17)으로 확인됨:
+    GitHub Actions 러너가 apis.data.go.kr에 간헐적으로(항상은 아님) connect timeout을
+    내는 게 KOSIS/ECOS와 같은 증상이다. 첫 창을 2회만 시도해보고 그마저 실패하면
+    나머지 모든 창(최대 37개, 1990~현재)을 똑같이 3번씩 재시도하며 몇 분을
+    날리는 대신 바로 포기한다."""
+    last_error: str | None = None
+    for attempt in range(1, 3):
+        try:
+            return _fetch_year_window(strt, end, api_key), None
+        except Exception as exc:
+            last_error = str(exc)
+            log_event("collector.fetch_failed", level="warning",
+                      label=f"customs_trade:probe:{strt}-{end}", attempt=attempt, error=last_error)
+    return None, last_error
+
+
 def fetch_range(start_yyyymm: str, end_yyyymm: str) -> list[dict]:
     """start_yyyymm~end_yyyymm(둘 다 "YYYYMM") 전체를 연도별로 나눠 호출해 합친다.
 
     각 연도 창은 base.retry()로 감싸 개별 실패가 전체를 죽이지 않게 한다 — 한
     해가 실패해도 나머지 해는 계속 채워진다(이 저장소의 "부분 실패는 조용히
-    삼키지 않되 전체를 막지도 않는다" 관례).
-    """
+    삼키지 않되 전체를 막지도 않는다" 관례). 다만 첫 창부터 서킷브레이커로
+    한 번 거른다 — molit.py 참고, 이 러너에서 실측된 동일 증상."""
     api_key = get_api_key("customs_trade")
     if not api_key:
         log_event("collector.customs_trade.no_key", level="warning",
                   note="DATA_GO_KR_KEY not set — skipping")
         return []
 
-    all_rows: list[dict] = []
-    for strt, end in _year_windows(start_yyyymm, end_yyyymm):
+    windows = _year_windows(start_yyyymm, end_yyyymm)
+    if not windows:
+        return []
+
+    first_strt, first_end = windows[0]
+    probe_rows, probe_error = _probe(first_strt, first_end, api_key)
+    if probe_rows is None:
+        note = (f"관세청 API 응답 없음(probe 재시도 후에도 실패): {probe_error} — "
+                f"나머지 {len(windows) - 1}개 구간은 건너뜀(GitHub Actions 러너에서 "
+                f"apis.data.go.kr로 간헐적 connect timeout, KOSIS/ECOS와 동일 증상)")
+        log_event("collector.customs_trade_circuit_breaker_tripped", level="warning", note=note)
+        return []
+
+    all_rows: list[dict] = list(probe_rows)
+    for strt, end in windows[1:]:
         rows = base.retry(
             lambda s=strt, e=end: _fetch_year_window(s, e, api_key),
             label=f"customs_trade:{strt}-{end}",
