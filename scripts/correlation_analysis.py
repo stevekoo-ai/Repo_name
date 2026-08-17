@@ -146,6 +146,7 @@ DAILY_PRICE_CSV = REPO_ROOT / "sources" / "daily-price-history.csv"
 EXPORTS_ANNUAL_YAML = MANUAL_INPUTS / "exports_annual.yaml"
 KOSPI_ANNUAL_YAML = MANUAL_INPUTS / "kospi_annual.yaml"
 EXPORTS_PRELIMINARY_YAML = MANUAL_INPUTS / "exports_preliminary.yaml"
+EXPORTS_YAML = MANUAL_INPUTS / "exports.yaml"
 OUT_DIR = REPO_ROOT / "monitoring"
 OUT_MD = OUT_DIR / "exports-price-correlation.md"
 OUT_PNG = OUT_DIR / "exports-price-correlation.png"
@@ -178,11 +179,13 @@ OUT_PNG_LEVELS_ZOOM = OUT_DIR / "exports-price-levels-trend-2023-zoom.png"
 # 정규화 — %YoY로 바꾸지 않은 채 그냥 스케일만 맞춘다.
 LEVELS_SERIES_LABELS = {
     "total_exports_usd": "총수출 (달러, 레벨)",
+    "semi_exports_usd": "반도체수출 (달러, 레벨)",
     "hynix_price_krw": "SK하이닉스 주가 (원, 레벨)",
     "kospi_index": "코스피 지수 (포인트, 레벨)",
 }
 LEVELS_SERIES_LABELS_CHART = {
     "total_exports_usd": "Total exports (USD level)",
+    "semi_exports_usd": "Semiconductor exports (USD level)",
     "hynix_price_krw": "SK Hynix price (KRW level)",
     "kospi_index": "KOSPI index (level)",
 }
@@ -568,9 +571,20 @@ def build_daily_focus_dataset(display_days: int = DAILY_FOCUS_DISPLAY_DAYS) -> p
 # %YoY가 아니라 원 단위(달러/원/포인트) 그대로 겹쳐서 추세의 '모양'만 본다.
 # 상관계수는 절대 안 낸다 — 모듈 docstring "WHY YoY, NOT LEVELS" 참고.
 
+def _load_semi_exports_level() -> pd.Series:
+    """반도체 수출 금액(달러, 레벨) — data/manual_inputs/exports.yaml의
+    semiconductor_exports_usd_100m(억 달러)을 그대로 옮긴 것, %YoY를 역산한
+    값이 아니다(2026-08-17 사용자 요청 배경은 exports.yaml 주석 참고).
+    총수출 레벨(_load_customs_export_level)과 달리 자동 수집 경로가 없어
+    2026-04~뿐이고(n=4), _drop_current_incomplete_month() 대상도 아니다 —
+    애초에 진행 중인 달(8월) 실측값 자체가 이 파일에 없다."""
+    return _load_manual_yaml_series(EXPORTS_YAML, "semiconductor_exports_usd_100m") * 1e8
+
+
 def build_levels_dataset() -> pd.DataFrame:
     series = {
         "total_exports_usd": _load_customs_export_level(),
+        "semi_exports_usd": _load_semi_exports_level(),
         "hynix_price_krw": _load_price_level("000660"),
         "kospi_index": _load_price_level("0001"),
     }
@@ -579,7 +593,12 @@ def build_levels_dataset() -> pd.DataFrame:
     return df
 
 
-LEVELS_CHART_COLORS = {"total_exports_usd": "#2a78d6", "hynix_price_krw": "#eb6834", "kospi_index": "#3fa34d"}
+LEVELS_CHART_COLORS = {
+    "total_exports_usd": "#2a78d6",
+    "semi_exports_usd": "#a35fd1",  # %YoY 차트의 semi_exports_yoy와 같은 색 — 지표 색 일관성 유지
+    "hynix_price_krw": "#eb6834",
+    "kospi_index": "#3fa34d",
+}
 
 
 def _render_levels_chart(df: pd.DataFrame, out_path: Path, start: pd.Timestamp | None = None,
@@ -596,7 +615,13 @@ def _render_levels_chart(df: pd.DataFrame, out_path: Path, start: pd.Timestamp |
     preliminary_level: _estimate_preliminary_export_level()의 반환값 —
     total_exports_usd 실측 마지막 점에서 점선으로 이어지는 속이 빈
     마름모로, %YoY 차트의 잠정치 표시와 같은 스타일(2026-08-17 사용자
-    요청: "10일 잠정치에 대한 예상치도 같이 추가해줘")."""
+    요청: "10일 잠정치에 대한 예상치도 같이 추가해줘").
+
+    표본이 작은 지표(n < MIN_TRUSTWORTHY_N, 지금은 semi_exports_usd가
+    n=4)는 각 점 위에 실제 금액(억 달러)을 숫자로 함께 적는다 —
+    exports-price-correlation.md의 semi_exports_yoy 차트에서 이미 겪은
+    같은 종류의 z-score 착시(사용자 지적, 2026-08-17: "왜 이렇게 뚝
+    떨어지지?")를 반도체수출 레벨 차트에서도 반복하지 않기 위해서다."""
     cols = [c for c in LEVELS_SERIES_LABELS if c in df.columns and df[c].notna().any()]
     plot_df = df[cols].dropna(how="all")
     if start is not None:
@@ -617,6 +642,13 @@ def _render_levels_chart(df: pd.DataFrame, out_path: Path, start: pd.Timestamp |
                 label=LEVELS_SERIES_LABELS_CHART[c], **marker_kwargs)
         if c == "total_exports_usd":
             exports_stats = (mean, std, z.index[-1], z.values[-1])
+        if len(series) < MIN_TRUSTWORTHY_N:
+            for date, raw_val, zval in zip(series.index, series.values, z.values):
+                # ASCII만 — DejaVu Sans엔 한글 글리프가 없다(모듈 전체 관례,
+                # SERIES_LABELS_CHART 등과 같은 이유). "억" 대신 "$X.XB".
+                ax.annotate(f"${raw_val / 1e9:,.1f}B", (date, zval), textcoords="offset points",
+                            xytext=(0, 7), fontsize=7, ha="center",
+                            color=LEVELS_CHART_COLORS.get(c, "#888888"))
 
     if preliminary_level is not None and exports_stats is not None:
         mean, std, last_date, last_z = exports_stats
@@ -693,11 +725,25 @@ def render_levels_markdown(df: pd.DataFrame, preliminary_level: dict | None = No
             v = row[c]
             if pd.isna(v):
                 cells.append("—")
-            elif c == "total_exports_usd":
+            elif c in ("total_exports_usd", "semi_exports_usd"):
                 cells.append(f"{v / 1e8:,.0f}억")
             else:
                 cells.append(f"{v:,.1f}")
         lines.append(f"| {month.strftime('%Y-%m')} | " + " | ".join(cells) + " |")
+
+    if "semi_exports_usd" in df.columns and df["semi_exports_usd"].notna().any():
+        lines += [
+            "",
+            "**반도체수출(달러) 출처 참고**: 자동 수집 경로가 없다(관세청 API는 "
+            "총계만 주고, 품목별 API는 아직 미신청) — data/manual_inputs/exports.yaml에 "
+            "산업통상부 월간 보도자료 실측 금액을 직접 옮겨뒀다(2026-04~뿐, n=4). "
+            "%YoY를 거꾸로 계산해 만든 근사치가 아니라 원래 발표된 금액 그대로다. "
+            "8월(진행 중인 달)은 이 파일에 실측 월간 금액이 아직 없어 레벨 추정치를 "
+            "찍지 않았다 — 총수출과 달리 전년 동월 반도체수출 레벨 이력이 없어 "
+            "같은 방식(전년 동월×(1+YoY%))으로 역산할 근거가 없고, 반도체는 대형 "
+            "계약 클리어런스가 월말에 몰리는 경우가 많아 상반월 비중만으로 "
+            "함부로 월 전체를 투영하면 특히 왜곡될 수 있다.",
+        ]
 
     if preliminary_level is not None:
         lines += [

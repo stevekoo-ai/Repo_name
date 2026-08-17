@@ -1139,16 +1139,35 @@ def test_build_levels_dataset_assembles_the_three_raw_level_columns():
     """2026-08-17 user request: '절대 수치(레벨)로 트렌드를 코스피와 비교'.
     build_levels_dataset() must reuse the already-tested level loaders
     (_load_customs_export_level / _load_price_level) unmodified and just
-    assemble them into one frame — no %YoY transform, no new fetching."""
+    assemble them into one frame — no %YoY transform, no new fetching.
+
+    semi_exports_usd was added later the same day ('YoY를 거꾸로 역산해서
+    RAW level로 그려줄 수 있어?' — turned out to be real published $ amounts
+    already sitting in exports.yaml comments, not an actual YoY reversal)."""
     import scripts.correlation_analysis as mod
 
     df = mod.build_levels_dataset()
     assert list(df.columns) == [
-        "total_exports_usd", "hynix_price_krw", "kospi_index",
+        "total_exports_usd", "semi_exports_usd", "hynix_price_krw", "kospi_index",
     ]
     # real collected data should give at least some non-null history in each column
     assert df["total_exports_usd"].notna().any()
     assert df["kospi_index"].notna().any()
+
+
+def test_load_semi_exports_level_converts_100m_usd_units_to_raw_usd():
+    """2026-08-17 user request: '반도체수출 raw level'. exports.yaml stores
+    semiconductor_exports_usd_100m in 억 달러 (hundred-million-dollar) units
+    — the loader must scale by 1e8 so it's directly comparable (same raw-USD
+    units) to total_exports_usd from _load_customs_export_level()."""
+    import pandas as pd
+    import scripts.correlation_analysis as mod
+
+    series = mod._load_semi_exports_level()
+    assert not series.empty
+    # 2026-04 real published figure is 319.0억 달러 = $31.9B
+    val = series.loc[pd.Timestamp("2026-04-01")]
+    assert abs(val - 319.0 * 1e8) < 1e-6
 
 
 def test_estimate_preliminary_export_level_scales_prior_year_by_the_prelim_yoy():
