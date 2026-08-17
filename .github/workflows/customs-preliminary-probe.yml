@@ -1,0 +1,60 @@
+name: 관세청 잠정치 페이지 구조 프로브 (임시)
+
+# 2026-08-17 사용자 요청 — 8/21에 나올 1~20일 잠정치가 자동으로 갱신되게
+# 만들어달라는 요청 진행 중. 이 인터랙티브 세션의 WebFetch는
+# customs.go.kr/korea.kr 등이 전부 EGRESS_BLOCKED라 실제 페이지 구조를
+# 직접 못 봤다 — GitHub Actions 러너는 인터넷 제약이 다를 수 있어(다른
+# 워크플로들이 이미 여러 외부 API를 문제없이 호출 중), 여기서 실제로
+# 접근되는지/구조가 어떤지 먼저 확인한다. 확인되면 이 파일은 삭제한다
+# (다른 probe workflow들과 동일 패턴).
+
+on:
+  push:
+    paths:
+      - ".github/workflows/customs-preliminary-probe.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: 목록 페이지 접근 확인
+        run: |
+          python3 -c "
+import requests
+try:
+    r = requests.get('https://www.customs.go.kr/kcs/na/ntt/selectNttList.do?bbsId=1362&mi=2891', timeout=15,
+                      headers={'User-Agent': 'Mozilla/5.0'})
+    print('status:', r.status_code)
+    print('length:', len(r.text))
+    print('--- first 3000 chars ---')
+    print(r.text[:3000])
+except Exception as e:
+    print('ERROR:', type(e).__name__, e)
+"
+
+      - name: 상세 페이지 접근 확인 (8월 1~10일 잠정치, 실제 URL)
+        run: |
+          python3 -c "
+import requests
+try:
+    r = requests.get('https://www.customs.go.kr/kcs/na/ntt/selectNttInfo.do?mi=2891&bbsId=1362&nttSn=10172763', timeout=15,
+                      headers={'User-Agent': 'Mozilla/5.0'})
+    print('status:', r.status_code)
+    print('length:', len(r.text))
+    print('--- first 5000 chars ---')
+    print(r.text[:5000])
+except Exception as e:
+    print('ERROR:', type(e).__name__, e)
+"
