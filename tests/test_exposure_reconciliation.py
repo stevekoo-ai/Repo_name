@@ -1202,6 +1202,67 @@ def test_estimate_preliminary_export_level_scales_prior_year_by_the_prelim_yoy()
     assert mod._estimate_preliminary_export_level(export_level, None) is None
 
 
+def test_series_peak_vs_latest_flags_a_pullback_from_the_recent_peak():
+    """2026-08-17 user request: '이 총수출이 어쨌든 피크를 찍고 떨어진
+    것이 다시 고지를 향해갈 수 있을지 보고서에 포인트로 기술해줘'.
+    _series_peak_vs_latest must find the peak within the recent window and
+    correctly report a pullback (negative gap, negative MoM) — this is the
+    exact June-peak/July-pullback shape seen in the real semiconductor
+    export data."""
+    import pandas as pd
+    import scripts.correlation_analysis as mod
+
+    series = pd.Series({
+        pd.Timestamp("2026-04-01"): 31.9e9,
+        pd.Timestamp("2026-05-01"): 37.2e9,
+        pd.Timestamp("2026-06-01"): 44.8e9,  # peak
+        pd.Timestamp("2026-07-01"): 41.0e9,  # pullback
+    })
+    stat = mod._series_peak_vs_latest(series)
+    assert stat is not None
+    assert stat["peak_date"] == pd.Timestamp("2026-06-01")
+    assert stat["latest_date"] == pd.Timestamp("2026-07-01")
+    assert stat["gap_from_peak_pct"] < 0  # still below the peak
+    assert stat["mom_pct"] < 0            # fell versus the prior month
+
+    # fewer than 2 real points -> nothing to compare, must not guess
+    assert mod._series_peak_vs_latest(pd.Series({pd.Timestamp("2026-07-01"): 41.0e9})) is None
+
+
+def test_yoy_deceleration_trend_distinguishes_widening_from_narrowing():
+    """The 2nd-derivative check must tell 'deceleration is accelerating'
+    apart from 'deceleration is easing' — both look like a falling YoY
+    line at a glance, but they imply opposite forward paths."""
+    import pandas as pd
+    import scripts.correlation_analysis as mod
+
+    # 199.5 -> 178.8 (delta -20.7) -> 155.4 (delta -23.4): gap widening
+    widening = pd.Series({pd.Timestamp("2026-06-01"): 199.5, pd.Timestamp("2026-07-01"): 178.8})
+    assert "커지고" in mod._yoy_deceleration_trend(widening, 155.4)
+
+    # 199.5 -> 178.8 (delta -20.7) -> 170.0 (delta -8.8): gap narrowing
+    narrowing = pd.Series({pd.Timestamp("2026-06-01"): 199.5, pd.Timestamp("2026-07-01"): 178.8})
+    assert "줄고" in mod._yoy_deceleration_trend(narrowing, 170.0)
+
+    # fewer than 3 total points (2 real + 0 prelim) -> can't compute a 2nd derivative
+    assert mod._yoy_deceleration_trend(pd.Series({pd.Timestamp("2026-07-01"): 178.8}), None) is None
+
+
+def test_render_export_recovery_watch_note_links_to_the_wiki_concept():
+    """2026-08-17 user request: 'wiki에 남기고 ... 보고서에 포인트로
+    기술해줘'. The note must be computed from real data (not a fixed
+    string) and must point back to the wiki concept doc that carries the
+    full hypothesis set, so the report and the wiki stay one source of
+    truth instead of two independent narratives drifting apart."""
+    import scripts.correlation_analysis as mod
+
+    levels_df = mod.build_levels_dataset()
+    yoy_df = mod.build_dataset()
+    note = mod.render_export_recovery_watch_note(levels_df, yoy_df, mod.load_exports_preliminary())
+    assert "semiconductor-export-peak-recovery-watch.md" in note
+    assert "반도체수출" in note or "총수출" in note
+
+
 if __name__ == "__main__":
     import sys, traceback
     fns = [(n, f) for n, f in sorted(globals().items())

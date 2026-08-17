@@ -698,7 +698,8 @@ def render_levels_chart_zoom(df: pd.DataFrame, start: pd.Timestamp,
                           preliminary_level=preliminary_level)
 
 
-def render_levels_markdown(df: pd.DataFrame, preliminary_level: dict | None = None) -> str:
+def render_levels_markdown(df: pd.DataFrame, preliminary_level: dict | None = None,
+                            recovery_note: str = "") -> str:
     lines = [
         "# 수출입동향 × SK하이닉스 × 코스피 — 실제 값(레벨) 추세 비교",
         "",
@@ -758,6 +759,119 @@ def render_levels_markdown(df: pd.DataFrame, preliminary_level: dict | None = No
             "포함하지 않았고, 차트에서만 점선+빈 마름모로 별도 표시했다.",
         ]
 
+    if recovery_note:
+        lines += ["", recovery_note.rstrip("\n")]
+
+    return "\n".join(lines) + "\n"
+
+
+# ── "정점 이후 다시 고지로?" 관찰 포인트 ────────────────────────────────────
+# 2026-08-17 사용자 요청 — "왜!!! 반도체 수출이 줄어들지?"에서 시작된 조사를
+# "위키에 남기고 이 총수출이 어쨌든 피크를 찍고 떨어진 것이 다시 고지를
+# 향해갈 수 있을지 보고서에 포인트로 기술해줘. 특히 10일간 데이터가 나오는
+# 날, 관련 코멘트가 될 수 있도록 하자"로 확장한 결과. 하드코딩된 서술이
+# 아니라 매번 실측 데이터에서 재계산한다 — 관세청 10일/20일 잠정치 자동
+# 갱신 Routine이 이 파이프라인을 재실행할 때마다 이 문단도 최신 데이터로
+# 다시 그려진다. 상세 가설(A: 조업일수·제품믹스 타이밍 노이즈 / B: 사용자
+# 제기 — 가격 급등이 엔드단 수요를 눌러 수출물량 자체가 줄었을 가능성,
+# 미검증)과 "전고점 재돌파" 판정 체크리스트는
+# wiki/concepts/semiconductor-export-peak-recovery-watch.md가 단일 출처 —
+# 여기선 그 문서로 안내하는 요약 문단만 계산해서 넣는다.
+_RECOVERY_WATCH_CONCEPT = "../wiki/concepts/semiconductor-export-peak-recovery-watch.md"
+_RECOVERY_WATCH_STATUS = "../wiki/monitoring/semiconductor-export-peak-recovery-status.md"
+
+
+def _series_peak_vs_latest(series: pd.Series, window: int = 12) -> dict | None:
+    """최근 window개 실측치 중 정점(peak) 대비 최신 실측치가 얼마나
+    떨어져 있는지, 전월 대비 방향은 반등인지 추가 하락인지. window=12는
+    "이번 확장 사이클"을 대략 최근 1년으로 잡은 것 — total_exports_usd처럼
+    1990~ 긴 이력을 가진 시리즈가 수십 년 전 무관한 고점을 "정점"으로
+    잡지 않도록."""
+    series = series.dropna()
+    if len(series) < 2:
+        return None
+    recent = series.tail(window)
+    peak_date = recent.idxmax()
+    peak_value = float(recent.loc[peak_date])
+    latest_date = series.index[-1]
+    latest_value = float(series.iloc[-1])
+    prev_value = float(series.iloc[-2])
+    return {
+        "peak_date": peak_date, "peak_value": peak_value,
+        "latest_date": latest_date, "latest_value": latest_value,
+        "gap_from_peak_pct": (latest_value / peak_value - 1) * 100 if peak_value else None,
+        "mom_pct": (latest_value / prev_value - 1) * 100 if prev_value else None,
+    }
+
+
+def _yoy_deceleration_trend(yoy_series: pd.Series, prelim_value: float | None) -> str | None:
+    """YoY 증가율의 2차 미분(둔화 '속도' 자체가 줄고 있는지 늘고 있는지) —
+    최근 실측 2개 + (있으면) 이번 달 잠정치까지 3개 점으로 델타 2개를
+    비교한다. 점이 3개 미만이면 판단 보류(None)."""
+    vals = list(yoy_series.dropna().tail(2).values)
+    if prelim_value is not None:
+        vals.append(prelim_value)
+    if len(vals) < 3:
+        return None
+    d1, d2 = vals[1] - vals[0], vals[2] - vals[1]
+    if d2 > d1:
+        return "둔화 폭이 줄고 있다(회복 조짐)"
+    if d2 < d1:
+        return "둔화 폭이 더 커지고 있다(추가 둔화)"
+    return "둔화 속도 변화 없음"
+
+
+def render_export_recovery_watch_note(levels_df: pd.DataFrame, yoy_df: pd.DataFrame,
+                                       preliminary: dict | None) -> str:
+    """반도체수출/총수출이 정점 이후 반등 중인지 추가 둔화 중인지를 실측
+    데이터에서 계산해 markdown 문단으로 만든다. render_markdown()과
+    render_levels_markdown() 양쪽에 그대로 삽입 — 둘 다 관세청 10일/20일
+    잠정치 Routine이 재생성하는 파일이라, 어느 쪽이 커밋되든 이 문단이
+    최신 상태로 노출된다."""
+    lines = [
+        "## 관찰 포인트 — 정점 이후, 다시 고지를 향해갈 수 있을까",
+        "",
+        "2026-08-17 신설 — 매 관세청 10일/20일 잠정치 발표마다 아래 수치를 "
+        "실측 데이터에서 다시 계산한다(고정된 서술이 아니다). 상세 가설과 "
+        f"전고점 재돌파 판정 체크리스트는 [semiconductor-export-peak-recovery-watch.md]"
+        f"({_RECOVERY_WATCH_CONCEPT})가 단일 출처, 발표일별 이력은 "
+        f"[일일 상태]({_RECOVERY_WATCH_STATUS})에 append된다.",
+        "",
+    ]
+    # level_col -> (yoy_col, preliminary dict의 해당 키, 한글 라벨)
+    series_map = {
+        "semi_exports_usd": ("semi_exports_yoy", "semi_value", "반도체수출"),
+        "total_exports_usd": ("total_exports_yoy", "value", "총수출"),
+    }
+    any_line = False
+    for level_col, (yoy_col, prelim_key, label) in series_map.items():
+        if level_col not in levels_df.columns:
+            continue
+        stat = _series_peak_vs_latest(levels_df[level_col])
+        if stat is None:
+            continue
+        any_line = True
+        direction = "반등" if (stat["mom_pct"] or 0) > 0 else "추가 하락"
+        line = (
+            f"- **{label}**: {stat['peak_date'].strftime('%Y-%m')} 정점 "
+            f"${stat['peak_value'] / 1e9:,.1f}B 대비 {stat['latest_date'].strftime('%Y-%m')} "
+            f"실측 ${stat['latest_value'] / 1e9:,.1f}B({stat['gap_from_peak_pct']:+.1f}%), "
+            f"전월대비 {stat['mom_pct']:+.1f}%({direction})"
+        )
+        if yoy_col in yoy_df.columns and preliminary is not None:
+            trend = _yoy_deceleration_trend(yoy_df[yoy_col], preliminary.get(prelim_key))
+            if trend:
+                line += f" — YoY {trend}"
+        lines.append(line)
+    if not any_line:
+        return ""
+    lines += [
+        "",
+        "**판정 원칙**: 위 신호 한두 개만으로 '회복' 또는 '추가 둔화'를 "
+        "확정하지 않는다 — concept 문서 §3의 6항목 체크리스트가 함께 "
+        "충족돼야 방향 판단을 바꾼다. 수요 자체가 줄었을 가능성(가격 급등이 "
+        "엔드단 수요를 눌렀을 수 있다는 가설)도 아직 배제되지 않았다.",
+    ]
     return "\n".join(lines) + "\n"
 
 
@@ -845,7 +959,8 @@ def pairwise_correlations(df: pd.DataFrame) -> list[dict]:
     return out
 
 
-def render_markdown(df: pd.DataFrame, pairs: list[dict], preliminary: dict | None = None) -> str:
+def render_markdown(df: pd.DataFrame, pairs: list[dict], preliminary: dict | None = None,
+                     recovery_note: str = "") -> str:
     lines = [
         "# 수출입동향 × SK하이닉스 × 코스피 상관관계",
         "",
@@ -962,6 +1077,10 @@ def render_markdown(df: pd.DataFrame, pairs: list[dict], preliminary: dict | Non
         f"\n**한계**: {limit_note} 상관계수가 높게 나와도 n이 작으면 우연일 "
         "가능성을 배제할 수 없다. n이 10 미만이면 방향성 참고 이상으로 쓰지 말 것."
     )
+
+    if recovery_note:
+        lines += ["", recovery_note.rstrip("\n")]
+
     return "\n".join(lines) + "\n"
 
 
@@ -1422,8 +1541,14 @@ def main() -> int:
 
     pairs = pairwise_correlations(df)
     preliminary = load_exports_preliminary()
+    # levels dataset도 먼저 계산해둔다 — render_export_recovery_watch_note가
+    # %YoY(df)와 레벨(ldf) 양쪽을 같이 봐야 "정점 대비 얼마나 떨어졌는지"를
+    # 계산할 수 있다. 아래 "레벨" 섹션에서 다시 만들지 않고 이 값을 재사용.
+    ldf = build_levels_dataset()
+    recovery_note = render_export_recovery_watch_note(ldf, df, preliminary)
     OUT_DIR.mkdir(parents=True, exist_ok=True)
-    OUT_MD.write_text(render_markdown(df, pairs, preliminary=preliminary), encoding="utf-8")
+    OUT_MD.write_text(render_markdown(df, pairs, preliminary=preliminary, recovery_note=recovery_note),
+                       encoding="utf-8")
 
     trustworthy = [p for p in pairs if pd.notna(p["r"]) and p["n"] >= MIN_TRUSTWORTHY_N]
     top_pair = trustworthy[0] if trustworthy else (pairs[0] if pairs and pd.notna(pairs[0]["r"]) else None)
@@ -1495,12 +1620,14 @@ def main() -> int:
               "(python -m scripts.investor_flow daily-history ...)", file=sys.stderr)
 
     # ── levels (레벨, %YoY 아님) ─────────────────────────────────────────
-    ldf = build_levels_dataset()
+    # ldf는 main() 상단에서 이미 계산됨(recovery_note용) — 여기서 재사용.
     if not ldf.dropna(how="all").empty:
         preliminary_level = _estimate_preliminary_export_level(ldf["total_exports_usd"], preliminary)
         render_levels_chart(ldf, preliminary_level=preliminary_level)
         render_levels_chart_zoom(ldf, ZOOM_START, preliminary_level=preliminary_level)
-        OUT_MD_LEVELS.write_text(render_levels_markdown(ldf, preliminary_level=preliminary_level), encoding="utf-8")
+        OUT_MD_LEVELS.write_text(
+            render_levels_markdown(ldf, preliminary_level=preliminary_level, recovery_note=recovery_note),
+            encoding="utf-8")
         print(f"\n[레벨] {OUT_MD_LEVELS}")
         if OUT_PNG_LEVELS.exists():
             print(f"[레벨] 차트 저장 → {OUT_PNG_LEVELS} (상관계수 없음 — 트렌드 비교 전용)")

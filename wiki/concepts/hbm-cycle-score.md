@@ -1,7 +1,7 @@
 ---
 title: HBM Cycle Score & 선행지표 조기경보 (HSEWS) — Framework Definition
 created: 2026-07-24
-updated: 2026-08-08
+updated: 2026-08-17
 tags: [hbm, cycle-score, concept, framework, early-warning]
 ---
 
@@ -128,6 +128,12 @@ Score의 다른 5축(외국인수급·보유율·ASP·엔비디아&CoWoS·공급
 때만 이 조건이 재판정됨. 기준선: **2026-07 +178.8% YoY**(410억
 달러, 14개월 연속 역대 최고) — 10% 문턱까지 크게 여유 있어 현재
 미충족.
+
+**🆕 2026-08-17**: 이 지표 자체가 6월 정점(+199.5%) 이후 계속 둔화 중
+(7월 +178.8%, 8월 1~10일 잠정 +155.4%)이라는 게 별도 관찰 대상이 됐다 —
+10% 문턱까지는 여전히 크게 여유 있어 이 붕괴조건은 미충족 유지지만,
+"왜 둔화하는가"(캘린더·믹스 노이즈 vs 실제 수요 위축) 자체를 별도
+프레임워크로 추적 중: [semiconductor-export-peak-recovery-watch.md](semiconductor-export-peak-recovery-watch.md).
 
 **2026-07-31 19:xx 저녁 체크(하루 최종 확정치) 기준 충족 개수: 🔴 1/5** —
 ④(외국인 20일 누적 순매도 전환)가 20일 누적 -5조 2,994억원으로 여전히
