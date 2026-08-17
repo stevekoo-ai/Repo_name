@@ -76,6 +76,15 @@ KIS_HOSTS = {
     "vts": "https://openapivts.koreainvestment.com:29443",
 }
 
+# 2026-08-17 실측: 이 파일의 모든 urlopen(req) 호출에 timeout이 전혀 없었다
+# (기본 socket timeout=None → 연결이 멎으면 무한 대기). kis-old-history-probe
+# 실행 중 monthly-history 구간 호출 하나가 3분+ 걸려 멈춰서 발견 —
+# customs_trade.py/molit.py가 이미 겪은 것과 같은 종류의 간헐적 연결 문제로
+# 보이지만, 이쪽엔 타임아웃이 없어서 job이 끝없이 매달릴 수 있었다. 모든
+# urlopen에 이 타임아웃을 적용한다(개별 함수의 retry/circuit-breaker 로직과
+# 별개로, 최소한 "멎지는 않는다"를 보장).
+KIS_HTTP_TIMEOUT_S = 20
+
 CSV_FIELDS = [
     "date", "ticker", "foreign_net_qty", "inst_net_qty", "retail_net_qty",
     "foreign_net_krw", "inst_net_krw", "retail_net_krw", "source", "note",
@@ -304,7 +313,7 @@ def kis_get_token(account_type="real"):
         f"{host}/oauth2/tokenP", data=body, method="POST",
         headers={"content-type": "application/json"},
     )
-    with urllib.request.urlopen(req) as resp:
+    with urllib.request.urlopen(req, timeout=KIS_HTTP_TIMEOUT_S) as resp:
         data = json.loads(resp.read())
 
     token = data["access_token"]
@@ -333,7 +342,7 @@ def kis_fetch_investor_trend(ticker, account_type="real", raw=False):
         },
     )
     try:
-        with urllib.request.urlopen(req) as resp:
+        with urllib.request.urlopen(req, timeout=KIS_HTTP_TIMEOUT_S) as resp:
             data = json.loads(resp.read())
     except urllib.error.HTTPError as e:
         sys.exit(f"KIS API 호출 실패: {e.code} {e.read().decode(errors='replace')}")
@@ -403,7 +412,7 @@ def kis_fetch_price(ticker, account_type="real", raw=False, with_snapshot_extra=
         },
     )
     try:
-        with urllib.request.urlopen(req) as resp:
+        with urllib.request.urlopen(req, timeout=KIS_HTTP_TIMEOUT_S) as resp:
             data = json.loads(resp.read())
     except urllib.error.HTTPError as e:
         sys.exit(f"KIS API 호출 실패: {e.code} {e.read().decode(errors='replace')}")
@@ -466,7 +475,7 @@ def kis_fetch_overseas_price(symbol, excd="NAS", account_type="real", raw=False)
         },
     )
     try:
-        with urllib.request.urlopen(req) as resp:
+        with urllib.request.urlopen(req, timeout=KIS_HTTP_TIMEOUT_S) as resp:
             data = json.loads(resp.read())
     except urllib.error.HTTPError as e:
         sys.exit(f"KIS 해외주식 API 호출 실패: {e.code} {e.read().decode(errors='replace')}")
@@ -541,7 +550,7 @@ def kis_fetch_overseas_daily_price(symbol, excd="NAS", account_type="real", raw=
         },
     )
     try:
-        with urllib.request.urlopen(req) as resp:
+        with urllib.request.urlopen(req, timeout=KIS_HTTP_TIMEOUT_S) as resp:
             data = json.loads(resp.read())
     except urllib.error.HTTPError as e:
         sys.exit(f"KIS 해외주식 일별시세 API 호출 실패: {e.code} {e.read().decode(errors='replace')}")
@@ -665,7 +674,7 @@ def kis_fetch_credit_balance(ticker, account_type="real", raw=False):
         },
     )
     try:
-        with urllib.request.urlopen(req) as resp:
+        with urllib.request.urlopen(req, timeout=KIS_HTTP_TIMEOUT_S) as resp:
             data = json.loads(resp.read())
     except urllib.error.HTTPError as e:
         sys.exit(f"KIS 신용잔고 API 호출 실패: {e.code} {e.read().decode(errors='replace')}")
@@ -730,7 +739,7 @@ def kis_fetch_index_price(index_code, account_type="real", raw=False):
         },
     )
     try:
-        with urllib.request.urlopen(req) as resp:
+        with urllib.request.urlopen(req, timeout=KIS_HTTP_TIMEOUT_S) as resp:
             data = json.loads(resp.read())
     except urllib.error.HTTPError as e:
         sys.exit(f"KIS 지수 API 호출 실패: {e.code} {e.read().decode(errors='replace')}")
@@ -861,7 +870,7 @@ def kis_fetch_monthly_price_history(code, is_index=False, months=24, account_typ
         },
     )
     try:
-        with urllib.request.urlopen(req) as resp:
+        with urllib.request.urlopen(req, timeout=KIS_HTTP_TIMEOUT_S) as resp:
             data = json.loads(resp.read())
     except urllib.error.HTTPError as e:
         sys.exit(f"KIS 월봉 API 호출 실패({code}): {e.code} {e.read().decode(errors='replace')}")
@@ -956,7 +965,7 @@ def kis_fetch_short_sale(ticker, account_type="real", raw=False):
         },
     )
     try:
-        with urllib.request.urlopen(req) as resp:
+        with urllib.request.urlopen(req, timeout=KIS_HTTP_TIMEOUT_S) as resp:
             data = json.loads(resp.read())
     except urllib.error.HTTPError as e:
         sys.exit(f"KIS 공매도 API 호출 실패: {e.code} {e.read().decode(errors='replace')}")
@@ -1015,7 +1024,7 @@ def kis_fetch_etf_nav(ticker, account_type="real", raw=False):
         },
     )
     try:
-        with urllib.request.urlopen(req) as resp:
+        with urllib.request.urlopen(req, timeout=KIS_HTTP_TIMEOUT_S) as resp:
             data = json.loads(resp.read())
     except urllib.error.HTTPError as e:
         sys.exit(f"KIS ETF API 호출 실패: {e.code} {e.read().decode(errors='replace')}")
