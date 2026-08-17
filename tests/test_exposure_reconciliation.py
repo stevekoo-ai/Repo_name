@@ -976,6 +976,57 @@ def test_qoq_computes_percent_change_from_the_prior_quarter():
     assert abs(out.iloc[0] - 10.0) < 1e-9
 
 
+def test_daily_yoy_finds_the_nearest_trading_day_within_tolerance():
+    """Exactly 365 days earlier is rarely a trading day (weekend/holiday) —
+    _daily_yoy must fall back to the closest available observation inside
+    the tolerance window, not require an exact calendar match."""
+    import pandas as pd
+    from scripts.correlation_analysis import _daily_yoy
+
+    # 2025-08-15 is a Friday; 2026-08-14 (Friday) is the "today" observation.
+    # The exact year-earlier date (2025-08-14, a Thursday) is missing —
+    # nearest available is 2025-08-15, 1 day off, well inside tolerance.
+    s = pd.Series({
+        pd.Timestamp("2025-08-15"): 100.0,
+        pd.Timestamp("2026-08-14"): 150.0,
+    })
+    out = _daily_yoy(s, tolerance_days=5)
+    assert len(out) == 1
+    assert abs(out.iloc[0] - 50.0) < 1e-9
+
+
+def test_daily_yoy_skips_a_day_with_no_prior_year_observation_nearby():
+    """If nothing falls inside the tolerance window (e.g. history doesn't
+    go back a full year yet, or there's a gap), that day is dropped rather
+    than paired with a far-off, misleading "closest" value."""
+    import pandas as pd
+    from scripts.correlation_analysis import _daily_yoy
+
+    s = pd.Series({
+        pd.Timestamp("2025-01-01"): 100.0,   # nothing ~1yr before this
+        pd.Timestamp("2026-08-14"): 150.0,   # nothing ~1yr before this either
+    })
+    out = _daily_yoy(s, tolerance_days=5)
+    assert out.empty
+
+
+def test_filter_from_does_not_crash_on_an_empty_series():
+    """Regression: an empty pd.Series(dtype=float) has a RangeIndex, not a
+    DatetimeIndex — comparing it to a Timestamp (series.index >= cutoff)
+    raises TypeError. build_daily_focus_dataset hit this the first time it
+    ran with no daily-price-history.csv yet (all three inputs can be empty)."""
+    import pandas as pd
+    from scripts.correlation_analysis import _filter_from
+
+    empty = pd.Series(dtype=float)
+    out = _filter_from(empty, pd.Timestamp("2024-01-01"))
+    assert out.empty
+
+    populated = pd.Series({pd.Timestamp("2023-01-01"): 1.0, pd.Timestamp("2025-01-01"): 2.0})
+    out2 = _filter_from(populated, pd.Timestamp("2024-01-01"))
+    assert list(out2.index) == [pd.Timestamp("2025-01-01")]
+
+
 if __name__ == "__main__":
     import sys, traceback
     fns = [(n, f) for n, f in sorted(globals().items())

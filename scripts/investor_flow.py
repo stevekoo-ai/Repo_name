@@ -994,17 +994,18 @@ def kis_fetch_monthly_price_history_deep(code, is_index=False, account_type="rea
 
 
 def kis_fetch_daily_price_history_deep(code, is_index=False, account_type="real",
-                                        start_date=None, days_per_window=90):
+                                        start_date=None, days_per_window=60):
     """kis_fetch_price_history(period="D")를 여러 번(과거로 구간을 당겨가며)
     호출해 start_date까지의 일봉을 채운다 — 2026-08-17 사용자 요청: 수출입
     지표는 월별이 원 주기지만 주가/지수는 매일 발표되므로, 그 주기 그대로
     (일봉) 써야 "더 자주 발표되는 지표가 다른 지표를 선행해서 보인다"가
     실제로 성립한다(월봉으로 뭉개면 그 정보가 사라진다).
 
-    kis_fetch_monthly_price_history_deep과 같은 구조 — 1회 호출이 최근
-    구간으로 잘리는 문제(월봉 ~50개월, 2026-08-17 실측)와 같은 절단이
-    일봉에도 있을 가능성이 높아(미검증) 기본 구간을 보수적으로 90일(약
-    3개월)로 잡았다. 상장/출범 이전 구간은 kis_fetch_monthly_price_history_deep
+    kis_fetch_monthly_price_history_deep과 같은 구조 — 1회 호출당 최근
+    구간으로 잘리는 문제(2026-08-17 kis-daily-period-probe.yml 실측:
+    200일 요청 시 종목은 최근 100행, 지수는 최근 50행까지만 옴 — 지수 쪽이
+    더 좁다). days_per_window=60(약 42거래일)은 두 쪽 모두의 캡보다
+    확실히 작게 잡은 값. 상장/출범 이전 구간은 kis_fetch_monthly_price_history_deep
     과 동일하게 빈 응답으로 자연히 멈춘다."""
     if start_date is None:
         start_date = date(2023, 1, 1)

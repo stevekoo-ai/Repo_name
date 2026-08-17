@@ -16,6 +16,13 @@ from core.models import DataStatus
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 CLOCK_IMAGE_PATH = REPO_ROOT / "docs" / "clock.png"
+# 2026-08-17 사용자 요청 — SK하이닉스 vs 코스피 vs 총수출 일별 확대 추적
+# 차트를 데일리 리포트에 계속 넣어달라고 함. 이 PNG는
+# exports-price-correlation.yml이 매일(19:30 KST) 갱신·커밋한다 — 이
+# 리포트(06:00 KST 다음날 실행)는 그 최신본을 그냥 읽어서 base64로
+# 심기만 한다(새로 그리지 않음 — KIS 인증 시크릿을 이 워크플로에 추가할
+# 필요가 없다).
+DAILY_FOCUS_CHART_PATH = REPO_ROOT / "monitoring" / "exports-price-correlation-daily-focus.png"
 
 STATUS_KR = {
     DataStatus.OK.value: "OK", DataStatus.PENDING.value: "Pending",
@@ -106,6 +113,13 @@ def _clock_image_data_uri() -> str | None:
     return f"data:image/png;base64,{data}"
 
 
+def _daily_focus_chart_data_uri() -> str | None:
+    if not DAILY_FOCUS_CHART_PATH.exists():
+        return None
+    data = base64.b64encode(DAILY_FOCUS_CHART_PATH.read_bytes()).decode("ascii")
+    return f"data:image/png;base64,{data}"
+
+
 def _section_stat_tiles(payload: dict) -> str:
     macro = payload["macro"]
     macro_us = payload["macro_us"]
@@ -172,6 +186,28 @@ def _section_investment_clock(payload: dict) -> str:
       PEOS의 미국/글로벌 참고 신호로 그대로 재사용합니다. 매일 자동 갱신되는 원본 대시보드는
       GitHub Pages가 활성화되어 있다면 별도로 계속 확인할 수 있습니다.</p>
       <div class="clock-row">{img_html}<div>{body}</div></div>
+    </section>"""
+
+
+def _section_daily_focus_chart(payload: dict) -> str:
+    """2026-08-17 사용자 요청 — "SK하이닉스 주가가 총수출을 급격히 따돌리고
+    올라간 뒤 급락하여 총수출 지표를 뚫고 내려간 것이 다시 말려서 올라올
+    것이 기대가 되네, 이 표를 계속 트레이스하자, 데일리 보고서에 추가해줘."
+    차트 원본은 scripts.correlation_analysis(exports-price-correlation.yml,
+    매일 19:30 KST)가 만든다 — 여기서는 이미 커밋된 PNG를 base64로 심기만
+    한다(_section_investment_clock과 같은 패턴). PNG가 아직 없으면(최초
+    실행 전) 섹션 자체를 비운다 — 빈 이미지나 깨진 링크를 보여주지 않는다."""
+    img_uri = _daily_focus_chart_data_uri()
+    if not img_uri:
+        return ""
+    return f"""
+    <section class="card">
+      <h2>SK하이닉스 vs 코스피 vs 총수출 — 일별 확대 추적</h2>
+      <p class="tile-sub">하이닉스 주가가 총수출을 급격히 따돌리고 올라간 뒤 급락해 총수출
+      추세선 아래로 뚫고 내려갔다가, 다시 말려 올라오는지를 계속 관찰한다. 총수출은
+      월별(원 주기) 그대로, 하이닉스·코스피는 일별(원 주기) 그대로 겹쳐 그린다 —
+      최근 2년만. 상세 표·상관계수는 monitoring/exports-price-correlation-daily-focus.md 참고.</p>
+      <img class="chart-img" src="{img_uri}" alt="SK하이닉스 vs 코스피 vs 총수출 일별 확대 추적">
     </section>"""
 
 
@@ -495,6 +531,8 @@ th { color: var(--text-muted); font-weight: 600; font-size: 0.78rem; text-transf
 .clock-row { display: flex; gap: 18px; align-items: center; flex-wrap: wrap; }
 .clock-img { width: 180px; height: 180px; border-radius: 10px; flex-shrink: 0;
   background: #ffffff; padding: 6px; border: 1px solid var(--border); }
+.chart-img { width: 100%; height: auto; border-radius: 10px;
+  background: #ffffff; padding: 6px; border: 1px solid var(--border); }
 .discuss-card { background: var(--surface-2); border-left: 3px solid var(--accent); border-radius: 8px;
   padding: 12px 16px; margin: 10px 0; }
 .discuss-topic { font-weight: 700; margin-bottom: 4px; }
@@ -645,6 +683,7 @@ def render_html(payload: dict) -> str:
         _section_executive_summary(payload),
         _section_monthly_changes(payload),
         _section_investment_clock(payload),
+        _section_daily_focus_chart(payload),
         _section_personal_analysis(payload),
         _section_asset_impact(payload),
         _section_scenarios(payload),

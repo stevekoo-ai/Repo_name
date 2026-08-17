@@ -22,13 +22,21 @@ name: 수출입동향 × 주가 상관관계 갱신
 #      코스피(0001)는 실측으로 1983-01(지수 출범)까지 확인됨 — 종목은
 #      상장 이전 구간에서 자연히 멈춘다(kis_fetch_monthly_price_history_deep
 #      참고).
-#   3. scripts.correlation_analysis — 위 파일들 + data/normalized/motie_*.csv,
+#   3. scripts.investor_flow daily-history — KIS 일봉을 sources/
+#      daily-price-history.csv에 채운다(2026-08-17 추가) — 일별 확대
+#      추적 차트(daily-focus)용. 평소엔 --days 10(최근 며칠만 upsert로
+#      추가), backfill_daily_price_history=true면 --start 2023-01부터
+#      깊게.
+#   4. scripts.correlation_analysis — 위 파일들 + data/normalized/motie_*.csv,
 #      data/manual_inputs/*.yaml을 읽어 monitoring/exports-*-correlation
-#      .{md,png}(월별 YoY + 연간 + 분기별 QoQ, 2026-08-17 추가) 생성. 진행
-#      중인(아직 안 끝난) 이번 달/분기는 항상 제외한다 —
-#      _drop_current_incomplete_month/_quarter 참고, 부분 기간을 완결
-#      기간과 비교하면 착시가 생긴다(실측: 2026-08 총수출 %YoY가 실제로는
-#      정상인데 부분월이라 -32.8%로 잘못 보였던 사례).
+#      .{md,png}(월별 YoY + 연간 + 분기별 QoQ + 일별 확대(daily-focus),
+#      2026-08-17 추가) 생성. 진행 중인(아직 안 끝난) 이번 달/분기는 항상
+#      제외한다 — _drop_current_incomplete_month/_quarter 참고, 부분 기간을
+#      완결 기간과 비교하면 착시가 생긴다(실측: 2026-08 총수출 %YoY가
+#      실제로는 정상인데 부분월이라 -32.8%로 잘못 보였던 사례). daily-focus
+#      차트는 사용자가 계속 트레이스해달라고 요청한 차트 — 하이닉스가
+#      총수출을 급격히 따돌리고 올라간 뒤 급락해 총수출 추세선 아래로
+#      뚫고 내려간 뒤 다시 반등하는지 관찰용.
 #
 # 반도체 수출 %YoY는 아직 관세청 API로 못 옮겼다(품목별 상품은 별도 활용신청
 # 필요) — data/manual_inputs/exports.yaml 수동 갱신에 계속 의존한다.
@@ -46,6 +54,10 @@ on:
         default: false
       backfill_price_history:
         description: "KIS 월봉을 1980-01부터 깊게 다시 받기(여러 번 구간 호출, 1회 호출 최근 ~50개월 절단 우회, 종목은 상장 이전에서 자연히 멈춤) — 최초 1회용, 평소엔 false"
+        type: boolean
+        default: false
+      backfill_daily_price_history:
+        description: "KIS 일봉을 2023-01부터 깊게 다시 받기(일별 확대 추적 차트용) — 최초 1회용, 평소엔 false"
         type: boolean
         default: false
 
@@ -131,6 +143,36 @@ jobs:
               --months 24 || echo "::warning::코스피 월봉 수집 실패 — 위 에러 로그 확인"
           fi
 
+      - name: SK하이닉스 일봉 수집
+        env:
+          KIS_APP_KEY: ${{ secrets.KIS_APP_KEY }}
+          KIS_APP_SECRET: ${{ secrets.KIS_APP_SECRET }}
+        # 2026-08-17 추가 — 일별 확대 추적 차트(exports-price-correlation-
+        # daily-focus.png)용. 평소엔 --days 10(최근 며칠치만 — upsert라
+        # 기존에 쌓인 이력은 그대로 두고 새 거래일만 더해진다). backfill=true면
+        # --start로 2023-01부터 깊게(여러 구간 호출) 받는다.
+        run: |
+          if [ "${{ github.event.inputs.backfill_daily_price_history }}" = "true" ]; then
+            python3 scripts/investor_flow.py daily-history --code 000660 \
+              --label "SK하이닉스" --start 2023-01-01 || echo "::warning::SK하이닉스 일봉 backfill 실패 — 위 에러 로그 확인"
+          else
+            python3 scripts/investor_flow.py daily-history --code 000660 \
+              --label "SK하이닉스" --days 10 || echo "::warning::SK하이닉스 일봉 수집 실패 — 위 에러 로그 확인"
+          fi
+
+      - name: 코스피 일봉 수집
+        env:
+          KIS_APP_KEY: ${{ secrets.KIS_APP_KEY }}
+          KIS_APP_SECRET: ${{ secrets.KIS_APP_SECRET }}
+        run: |
+          if [ "${{ github.event.inputs.backfill_daily_price_history }}" = "true" ]; then
+            python3 scripts/investor_flow.py daily-history --code 0001 --is-index \
+              --start 2023-01-01 || echo "::warning::코스피 일봉 backfill 실패 — 위 에러 로그 확인"
+          else
+            python3 scripts/investor_flow.py daily-history --code 0001 --is-index \
+              --days 10 || echo "::warning::코스피 일봉 수집 실패 — 위 에러 로그 확인"
+          fi
+
       - name: 상관관계 재계산
         run: python -m scripts.correlation_analysis
 
@@ -145,6 +187,7 @@ jobs:
           # 버그(SK하이닉스 실측 25개월치가 이 이유로 통째로 유실됨). 존재하는
           # 파일만 개별적으로 add하면 나머지 파일의 유무와 무관하게 안전하다.
           for f in sources/monthly-price-history.csv \
+                   sources/daily-price-history.csv \
                    data/normalized/customs_export_dlr.csv \
                    data/normalized/customs_import_dlr.csv \
                    monitoring/exports-price-correlation.md \
@@ -153,7 +196,9 @@ jobs:
                    monitoring/exports-kospi-correlation-annual.png \
                    monitoring/exports-price-correlation-qoq.md \
                    monitoring/exports-price-correlation-qoq.png \
-                   monitoring/exports-price-correlation-2023-zoom.png; do
+                   monitoring/exports-price-correlation-2023-zoom.png \
+                   monitoring/exports-price-correlation-daily-focus.md \
+                   monitoring/exports-price-correlation-daily-focus.png; do
             [ -f "$f" ] && git add "$f"
           done
           [ -d data/raw ] && git add data/raw/ 2>/dev/null
