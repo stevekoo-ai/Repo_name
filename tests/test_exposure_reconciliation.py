@@ -908,6 +908,74 @@ def test_backward_date_windows_single_window_when_range_is_short():
     assert windows == [(date(2026, 1, 1), date(2026, 8, 17))]
 
 
+def test_drop_current_incomplete_month_removes_the_in_progress_month():
+    """The customs/KIS collectors write a row for whatever calendar month a
+    run happens to land in, even though that month isn't over — comparing
+    that partial figure to a prior COMPLETE month produces a swing that
+    looks like a real move (found 2026-08-17: 총수출 %YoY showed -32.8% at
+    the last point, which was actually just a half-counted August, not a
+    real collapse). This must be dropped before any YoY/QoQ math runs."""
+    import pandas as pd
+    from scripts.correlation_analysis import _drop_current_incomplete_month
+
+    now = pd.Timestamp.now(tz="UTC").tz_localize(None)
+    current_month = pd.Timestamp(year=now.year, month=now.month, day=1)
+    prior_month = current_month - pd.DateOffset(months=1)
+    s = pd.Series({prior_month: 100.0, current_month: 40.0})
+    out = _drop_current_incomplete_month(s)
+    assert list(out.index) == [prior_month]
+    assert out.iloc[0] == 100.0
+
+
+def test_quarterly_sum_drops_a_quarter_with_fewer_than_3_months():
+    """A flow variable (export dollars) summed over a quarter that only has
+    1-2 monthly observations understates that quarter next to a real 3-month
+    quarter — same partial-period trap as the monthly case, one level up."""
+    import pandas as pd
+    from scripts.correlation_analysis import _quarterly_sum
+
+    s = pd.Series({
+        pd.Timestamp("2024-01-01"): 10.0,
+        pd.Timestamp("2024-02-01"): 10.0,
+        pd.Timestamp("2024-03-01"): 10.0,
+        pd.Timestamp("2024-04-01"): 5.0,   # only 1 month into Q2 2024
+    })
+    out = _quarterly_sum(s)
+    assert list(out.index) == [pd.Timestamp("2024-03-31")]
+    assert out.iloc[0] == 30.0
+
+
+def test_quarterly_last_drops_the_in_progress_quarter():
+    """A stock variable's (price) "last observation in the quarter" is only
+    meaningful once the quarter has actually ended — otherwise it's just
+    whatever the most recent trading day happens to be, and would silently
+    change value every time the pipeline reruns later in the same quarter."""
+    import pandas as pd
+    from scripts.correlation_analysis import _quarterly_last
+
+    now = pd.Timestamp.now(tz="UTC").tz_localize(None)
+    current_q_end = now.to_period("Q").end_time.normalize()
+    prior_q_end = current_q_end - pd.offsets.QuarterEnd(1)
+    s = pd.Series({
+        prior_q_end: 100.0,
+        current_q_end - pd.DateOffset(days=5): 999.0,  # a snapshot inside the still-open quarter
+    })
+    out = _quarterly_last(s)
+    assert list(out.index) == [prior_q_end]
+    assert out.iloc[0] == 100.0
+
+
+def test_qoq_computes_percent_change_from_the_prior_quarter():
+    """Pin the actual math, not just that it runs."""
+    import pandas as pd
+    from scripts.correlation_analysis import _qoq
+
+    s = pd.Series({pd.Timestamp("2024-03-31"): 100.0, pd.Timestamp("2024-06-30"): 110.0})
+    out = _qoq(s)
+    assert len(out) == 1
+    assert abs(out.iloc[0] - 10.0) < 1e-9
+
+
 if __name__ == "__main__":
     import sys, traceback
     fns = [(n, f) for n, f in sorted(globals().items())

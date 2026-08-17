@@ -24,7 +24,11 @@ name: 수출입동향 × 주가 상관관계 갱신
 #      참고).
 #   3. scripts.correlation_analysis — 위 파일들 + data/normalized/motie_*.csv,
 #      data/manual_inputs/*.yaml을 읽어 monitoring/exports-*-correlation
-#      .{md,png}(월별+연간) 생성.
+#      .{md,png}(월별 YoY + 연간 + 분기별 QoQ, 2026-08-17 추가) 생성. 진행
+#      중인(아직 안 끝난) 이번 달/분기는 항상 제외한다 —
+#      _drop_current_incomplete_month/_quarter 참고, 부분 기간을 완결
+#      기간과 비교하면 착시가 생긴다(실측: 2026-08 총수출 %YoY가 실제로는
+#      정상인데 부분월이라 -32.8%로 잘못 보였던 사례).
 #
 # 반도체 수출 %YoY는 아직 관세청 API로 못 옮겼다(품목별 상품은 별도 활용신청
 # 필요) — data/manual_inputs/exports.yaml 수동 갱신에 계속 의존한다.
@@ -146,7 +150,9 @@ jobs:
                    monitoring/exports-price-correlation.md \
                    monitoring/exports-price-correlation.png \
                    monitoring/exports-kospi-correlation-annual.md \
-                   monitoring/exports-kospi-correlation-annual.png; do
+                   monitoring/exports-kospi-correlation-annual.png \
+                   monitoring/exports-price-correlation-qoq.md \
+                   monitoring/exports-price-correlation-qoq.png; do
             [ -f "$f" ] && git add "$f"
           done
           [ -d data/raw ] && git add data/raw/ 2>/dev/null
