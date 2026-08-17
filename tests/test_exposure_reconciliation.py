@@ -1111,6 +1111,38 @@ def test_build_levels_dataset_assembles_the_three_raw_level_columns():
     assert df["kospi_index"].notna().any()
 
 
+def test_estimate_preliminary_export_level_scales_prior_year_by_the_prelim_yoy():
+    """2026-08-17 user request: '10일 잠정치에 대한 예상치도 [레벨 차트에]
+    같이 추가해줘'. load_exports_preliminary() only gives %YoY — converting
+    it to a level for the LEVELS chart means: prior-year-same-month level ×
+    (1 + prelim %YoY / 100). Must never touch the real level series."""
+    import pandas as pd
+    import scripts.correlation_analysis as mod
+
+    export_level = pd.Series(
+        {pd.Timestamp("2025-08-01"): 100.0, pd.Timestamp("2026-07-01"): 200.0},
+        dtype=float,
+    )
+    preliminary = {
+        "date": pd.Timestamp("2026-08-01"),
+        "value": 45.3,  # %YoY
+        "label_en": "Aug 1-10 prelim.",
+    }
+    result = mod._estimate_preliminary_export_level(export_level, preliminary)
+    assert result is not None
+    assert result["date"] == pd.Timestamp("2026-08-01")
+    assert abs(result["value"] - 145.3) < 1e-9  # 100 * (1 + 45.3/100)
+    assert result["label_en"] == "Aug 1-10 prelim."
+
+    # no prior-year same month in the series -> can't scale anything, must not guess
+    assert mod._estimate_preliminary_export_level(
+        pd.Series({pd.Timestamp("2026-07-01"): 200.0}, dtype=float), preliminary
+    ) is None
+
+    # no preliminary reading at all -> nothing to estimate
+    assert mod._estimate_preliminary_export_level(export_level, None) is None
+
+
 if __name__ == "__main__":
     import sys, traceback
     fns = [(n, f) for n, f in sorted(globals().items())

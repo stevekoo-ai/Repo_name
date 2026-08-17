@@ -102,6 +102,15 @@ OUTPUTS
                                              this view is for eyeballing the
                                              trend shape only, never cite an r
                                              from it.
+  monitoring/exports-price-levels-trend-2023-zoom.{png} 2026-08-17 added —
+                                             same LEVELS chart, cropped to
+                                             ZOOM_START~ and re-normalized
+                                             within that window (so the recent
+                                             spike/drop shows at its own scale
+                                             instead of being flattened by
+                                             the 1990~/1983~ full history).
+                                             Also carries the preliminary
+                                             "next point" (see below).
 
 CURRENT (IN-PROGRESS) MONTH IS ALWAYS EXCLUDED
 ────────────────────────────────────────────────
@@ -158,6 +167,7 @@ DAILY_FOCUS_DISPLAY_DAYS = 730
 
 OUT_MD_LEVELS = OUT_DIR / "exports-price-levels-trend.md"
 OUT_PNG_LEVELS = OUT_DIR / "exports-price-levels-trend.png"
+OUT_PNG_LEVELS_ZOOM = OUT_DIR / "exports-price-levels-trend-2023-zoom.png"
 # 2026-08-17 사용자 요청 — "YoY 말고, 총수출 실제 값(레벨)으로 트렌드를
 # 코스피와 비교해보면 어때?" %YoY 대신 원래 단위(총수출 달러, 하이닉스
 # 원화, 코스피 포인트) 그대로의 장기 추세 '모양'을 보여준다. 모듈
@@ -298,6 +308,32 @@ def load_exports_preliminary() -> dict | None:
         "label": latest.get("period_label", ""),
         "label_en": label_en,
         "source": latest.get("source", ""),
+    }
+
+
+def _estimate_preliminary_export_level(export_level: pd.Series, preliminary: dict | None) -> dict | None:
+    """load_exports_preliminary()는 %YoY만 준다 — 레벨(달러) 축 차트에 다음
+    점을 찍으려면 전년 동월 실측 레벨에 그 %YoY를 적용해 '추정 레벨'로
+    환산해야 한다: 전년 동월 레벨 × (1 + 잠정 %YoY/100). 2026-08-17 사용자
+    요청 — "10일 잠정치에 대한 예상치도 [레벨 차트에] 같이 추가해줘".
+
+    이 값은 관세청이 발표한 숫자가 아니라 이 파이프라인이 계산한 2차 추정치
+    (%YoY 자체도 이미 10일치를 한 달 전체로 근사한 값이었다는 걸 상기) —
+    export_level 실측 시리즈에는 절대 섞지 않고, 호출부가 점선/빈 마커로만
+    그린다."""
+    if preliminary is None:
+        return None
+    target_month = preliminary["date"]
+    prior_year_month = target_month - pd.DateOffset(years=1)
+    if prior_year_month not in export_level.index:
+        return None
+    prior_level = export_level.loc[prior_year_month]
+    if pd.isna(prior_level) or prior_level == 0:
+        return None
+    return {
+        "date": target_month,
+        "value": float(prior_level) * (1 + preliminary["value"] / 100),
+        "label_en": preliminary["label_en"],
     }
 
 
@@ -535,29 +571,60 @@ def build_levels_dataset() -> pd.DataFrame:
     return df
 
 
-def render_levels_chart(df: pd.DataFrame) -> None:
-    """레벨(원 단위) 그대로 z-score 정규화해서 겹쳐 그린다 — %YoY 차트와
-    똑같은 스타일(점 없는 얇은 선, 지표별 고정 색)이지만, 상관계수는 표시
-    하지 않는다(레벨끼리는 둘 다 장기 우상향이라 원인 없이도 높게 나오기
-    쉬움 — render_markdown 쪽 "WHY YoY" 설명과 같은 이유로 여기선 아예
-    계산도 안 한다, 잘못 인용될 여지를 만들지 않기 위해)."""
+LEVELS_CHART_COLORS = {"total_exports_usd": "#2a78d6", "hynix_price_krw": "#eb6834", "kospi_index": "#3fa34d"}
+
+
+def _render_levels_chart(df: pd.DataFrame, out_path: Path, start: pd.Timestamp | None = None,
+                          title_note: str = "", markersize: float | None = None,
+                          preliminary_level: dict | None = None) -> None:
+    """render_levels_chart의 실제 구현 — _render_monthly_chart와 완전히 같은
+    확대(zoom) 패턴이다: start를 주면 그 시점부터만 잘라서 그 구간 안에서
+    다시 정규화한다(2026-08-17 사용자 요청: "2023년부터 zoom in. 급격한
+    상승과 하강을 볼 수 있는 방법으로"). 전체 이력 기준 z-score를 그대로
+    쓰면 최근 급등락이 1990년대~ 긴 이력에 눌려 밋밋하게 보인다 — 구간 안
+    재정규화라야 그 구간 자체의 등락폭이 자기 스케일로 드러난다. 상관계수는
+    레벨 차트 공통 정책대로 여전히 계산하지 않는다.
+
+    preliminary_level: _estimate_preliminary_export_level()의 반환값 —
+    total_exports_usd 실측 마지막 점에서 점선으로 이어지는 속이 빈
+    마름모로, %YoY 차트의 잠정치 표시와 같은 스타일(2026-08-17 사용자
+    요청: "10일 잠정치에 대한 예상치도 같이 추가해줘")."""
     cols = [c for c in LEVELS_SERIES_LABELS if c in df.columns and df[c].notna().any()]
     plot_df = df[cols].dropna(how="all")
+    if start is not None:
+        plot_df = plot_df[plot_df.index >= start]
     if plot_df.empty:
         return
 
-    colors = {"total_exports_usd": "#2a78d6", "hynix_price_krw": "#eb6834", "kospi_index": "#3fa34d"}
     fig, ax = plt.subplots(figsize=(10, 5))
+    exports_stats = None  # (mean, std, last_date, last_z) — 잠정 추정 레벨을 실측과 같은 척도로 찍기 위해 기억해둔다
     for c in cols:
         series = plot_df[c].dropna()
         if series.empty:
             continue
-        z = (series - series.mean()) / series.std(ddof=0)
-        ax.plot(z.index, z.values, linewidth=1.1, color=colors.get(c, "#888888"),
-                label=LEVELS_SERIES_LABELS_CHART[c])
+        mean, std = series.mean(), series.std(ddof=0)
+        z = (series - mean) / std
+        marker_kwargs = {"marker": "o", "markersize": markersize} if markersize else {}
+        ax.plot(z.index, z.values, linewidth=1.1, color=LEVELS_CHART_COLORS.get(c, "#888888"),
+                label=LEVELS_SERIES_LABELS_CHART[c], **marker_kwargs)
+        if c == "total_exports_usd":
+            exports_stats = (mean, std, z.index[-1], z.values[-1])
+
+    if preliminary_level is not None and exports_stats is not None:
+        mean, std, last_date, last_z = exports_stats
+        prelim_date, prelim_value = preliminary_level["date"], preliminary_level["value"]
+        if start is None or prelim_date >= start:
+            prelim_z = (prelim_value - mean) / std
+            color = LEVELS_CHART_COLORS["total_exports_usd"]
+            ax.plot([last_date, prelim_date], [last_z, prelim_z], linestyle="--", linewidth=1.1,
+                    color=color, alpha=0.7)
+            ax.plot([prelim_date], [prelim_z], marker="D", markersize=7, markerfacecolor="none",
+                    markeredgecolor=color, markeredgewidth=1.5, linestyle="none",
+                    label=f"Total exports (level, est. from {preliminary_level['label_en']})")
+
     ax.axhline(0, color="#999999", linewidth=0.8, linestyle="--")
     ax.set_title(
-        "Exports vs SK Hynix vs KOSPI — raw LEVELS (not %YoY), z-score normalized\n"
+        f"Exports vs SK Hynix vs KOSPI — raw LEVELS (not %YoY), z-score normalized{title_note}\n"
         "trend shape only — no correlation computed (levels share a spurious uptrend, see caveat)",
         fontsize=11,
     )
@@ -568,11 +635,30 @@ def render_levels_chart(df: pd.DataFrame) -> None:
     fig.autofmt_xdate()
     fig.tight_layout()
     OUT_DIR.mkdir(parents=True, exist_ok=True)
-    fig.savefig(OUT_PNG_LEVELS, dpi=150)
+    fig.savefig(out_path, dpi=150)
     plt.close(fig)
 
 
-def render_levels_markdown(df: pd.DataFrame) -> str:
+def render_levels_chart(df: pd.DataFrame, preliminary_level: dict | None = None) -> None:
+    """레벨(원 단위) 그대로 z-score 정규화해서 겹쳐 그린다 — %YoY 차트와
+    똑같은 스타일(점 없는 얇은 선, 지표별 고정 색)이지만, 상관계수는 표시
+    하지 않는다(레벨끼리는 둘 다 장기 우상향이라 원인 없이도 높게 나오기
+    쉬움 — render_markdown 쪽 "WHY YoY" 설명과 같은 이유로 여기선 아예
+    계산도 안 한다, 잘못 인용될 여지를 만들지 않기 위해)."""
+    _render_levels_chart(df, OUT_PNG_LEVELS, preliminary_level=preliminary_level)
+
+
+def render_levels_chart_zoom(df: pd.DataFrame, start: pd.Timestamp,
+                              preliminary_level: dict | None = None) -> None:
+    """render_levels_chart의 확대판 — start 이후 구간만, 그 구간 안에서
+    재정규화해 그린다(2026-08-17 사용자 요청). render_chart_zoom과 같은
+    이유로 작은 점 마커 포함."""
+    _render_levels_chart(df, OUT_PNG_LEVELS_ZOOM, start=start,
+                          title_note=f" — {start.strftime('%Y-%m')}~", markersize=3.5,
+                          preliminary_level=preliminary_level)
+
+
+def render_levels_markdown(df: pd.DataFrame, preliminary_level: dict | None = None) -> str:
     lines = [
         "# 수출입동향 × SK하이닉스 × 코스피 — 실제 값(레벨) 추세 비교",
         "",
@@ -604,6 +690,20 @@ def render_levels_markdown(df: pd.DataFrame) -> str:
             else:
                 cells.append(f"{v:,.1f}")
         lines.append(f"| {month.strftime('%Y-%m')} | " + " | ".join(cells) + " |")
+
+    if preliminary_level is not None:
+        lines += [
+            "",
+            "## 진행 중인 달 잠정 추정 레벨 (아직 확정 아님)",
+            "",
+            f"**{preliminary_level['date'].strftime('%Y-%m')}** 총수출 레벨 추정: "
+            f"**약 {preliminary_level['value'] / 1e8:,.0f}억 달러** — 관세청 10일 잠정치 "
+            "%YoY를 전년 동월 실측 레벨에 적용해 환산한 2차 추정치다(전년 동월 레벨 × "
+            "(1 + 잠정 %YoY/100)). 관세청이 직접 발표한 레벨 숫자가 아니고, %YoY 자체도 "
+            "이미 10일치를 한 달 전체로 근사한 값이라는 점을 감안할 것 — 위 표에는 "
+            "포함하지 않았고, 차트에서만 점선+빈 마름모로 별도 표시했다.",
+        ]
+
     return "\n".join(lines) + "\n"
 
 
@@ -1299,11 +1399,18 @@ def main() -> int:
     # ── levels (레벨, %YoY 아님) ─────────────────────────────────────────
     ldf = build_levels_dataset()
     if not ldf.dropna(how="all").empty:
-        render_levels_chart(ldf)
-        OUT_MD_LEVELS.write_text(render_levels_markdown(ldf), encoding="utf-8")
+        preliminary_level = _estimate_preliminary_export_level(ldf["total_exports_usd"], preliminary)
+        render_levels_chart(ldf, preliminary_level=preliminary_level)
+        render_levels_chart_zoom(ldf, ZOOM_START, preliminary_level=preliminary_level)
+        OUT_MD_LEVELS.write_text(render_levels_markdown(ldf, preliminary_level=preliminary_level), encoding="utf-8")
         print(f"\n[레벨] {OUT_MD_LEVELS}")
         if OUT_PNG_LEVELS.exists():
             print(f"[레벨] 차트 저장 → {OUT_PNG_LEVELS} (상관계수 없음 — 트렌드 비교 전용)")
+        if OUT_PNG_LEVELS_ZOOM.exists():
+            print(f"[레벨 확대 {ZOOM_START.strftime('%Y-%m')}~] 차트 저장 → {OUT_PNG_LEVELS_ZOOM}")
+        if preliminary_level is not None:
+            print(f"  레벨 잠정 추정 다음 점: {preliminary_level['date'].strftime('%Y-%m')} "
+                  f"~{preliminary_level['value'] / 1e8:,.0f}억 달러 (전년동월×(1+10일 잠정 YoY))")
     else:
         print("\n[레벨] 입력 데이터 없음", file=sys.stderr)
 
