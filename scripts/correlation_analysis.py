@@ -840,6 +840,17 @@ def render_markdown(df: pd.DataFrame, pairs: list[dict], preliminary: dict | Non
             "차이 때문. 위 표·상관계수 계산에는 포함하지 않았고, 차트에서만 점선+빈 "
             "마름모로 별도 표시했다.",
             f"\n출처: {preliminary['source']}" if preliminary.get("source") else "",
+            (
+                "\n\n**반도체수출 z-score 착시 주의**: 차트에서 반도체수출 선이 8월 "
+                "잠정치에서 급락하는 것처럼 보이지만, 실제 값(+155.4%)은 여전히 "
+                "전년 대비 2.5배 이상 폭증이다 — 착시의 원인은 표본이 4개월(4~7월, "
+                "모두 170~200%대)뿐이라 평균 대비 표준편차가 11.6%p로 극히 좁다는 것: "
+                "그 좁은 평균 대비로는 여전히 압도적인 증가율도 몇 표준편차 밖으로 "
+                "튕겨 나가 보인다. 표본이 작은 지표는 차트에 원값(%)을 점 위에 같이 "
+                "적어뒀다 — z-score 모양만 보고 '반도체 실적이 무너졌다'고 오독하지 "
+                "말 것."
+                if preliminary.get("semi_value") is not None else ""
+            ),
         ]
 
     lines += ["", "## 쌍별 상관계수 (Pearson r, 표본 많은/상관 높은 순)", "",
@@ -1065,7 +1076,17 @@ def _render_monthly_chart(df: pd.DataFrame, top_pair: dict | None, out_path: Pat
     의 semi_value, 2026-08-17 사용자 요청 — "최근 급등과 급락 장세의
     수출과의 관계를 확인해보자". semi_exports_yoy 자체도 이번에 처음으로
     이 차트에 추가됐다 — 지금까지는 MONTHLY_CHART_COLORS에 색만 예약돼
-    있고 실제로는 한 번도 안 그려졌었다)."""
+    있고 실제로는 한 번도 안 그려졌었다).
+
+    표본이 작은 지표(n < MIN_TRUSTWORTHY_N, 지금은 semi_exports_yoy가
+    n=4)는 각 점 위에 실제 %YoY 원값을 숫자로 함께 적는다(2026-08-17
+    사용자 요청 — "왜 이렇게 뚝 떨어지지?": semi_exports_yoy가 199.5%→
+    155.4%(잠정)로 떨어지는 게 z-score로는 절벽처럼 보이지만, 4개 점이
+    전부 170~200%대에 몰려 있어 표준편차가 11.6%p로 극히 작다 — 그 결과
+    "여전히 압도적 증가(+155%)"인 값도 그 좁은 평균 대비로는 -2 표준편차
+    밖으로 튕겨 나가 보인다. z-score 모양만 보면 실제로는 여전히 폭증
+    중인 지표를 "급락"으로 오독하게 된다 — 원값을 같이 적어야 이 착시를
+    바로잡을 수 있다)."""
     if top_pair is None:
         return
     cols = [c for c in ("total_exports_yoy", "semi_exports_yoy", "hynix_price_yoy", "kospi_yoy")
@@ -1091,6 +1112,11 @@ def _render_monthly_chart(df: pd.DataFrame, top_pair: dict | None, out_path: Pat
                 color=MONTHLY_CHART_COLORS.get(c, "#888888"), label=SERIES_LABELS_CHART[c],
                 **marker_kwargs)
         series_stats[c] = (mean, std, z.index[-1], z.values[-1])
+        if len(series) < MIN_TRUSTWORTHY_N:
+            for date, raw_val, zval in zip(series.index, series.values, z.values):
+                ax.annotate(f"{raw_val:+.0f}%", (date, zval), textcoords="offset points",
+                            xytext=(0, 7), fontsize=7, ha="center",
+                            color=MONTHLY_CHART_COLORS.get(c, "#888888"))
 
     # col -> preliminary dict의 어느 키가 그 col의 잠정치인지
     prelim_value_keys = {"total_exports_yoy": "value", "semi_exports_yoy": "semi_value"}
@@ -1109,6 +1135,10 @@ def _render_monthly_chart(df: pd.DataFrame, top_pair: dict | None, out_path: Pat
             ax.plot([prelim_date], [prelim_z], marker="D", markersize=7, markerfacecolor="none",
                     markeredgecolor=color, markeredgewidth=1.5, linestyle="none",
                     label=f"{SERIES_LABELS_CHART[col]} ({preliminary['label_en']})")
+            underlying_n = len(plot_df[col].dropna())
+            if underlying_n < MIN_TRUSTWORTHY_N:
+                ax.annotate(f"{prelim_value:+.1f}%", (prelim_date, prelim_z), textcoords="offset points",
+                            xytext=(0, 7), fontsize=7, ha="center", color=color)
 
     ax.axhline(0, color="#999999", linewidth=0.8, linestyle="--")
     ax.set_title(
