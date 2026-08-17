@@ -1095,6 +1095,22 @@ def test_load_exports_preliminary_ignores_a_stale_target_month():
         os.remove(path)
 
 
+def test_build_levels_dataset_assembles_the_three_raw_level_columns():
+    """2026-08-17 user request: '절대 수치(레벨)로 트렌드를 코스피와 비교'.
+    build_levels_dataset() must reuse the already-tested level loaders
+    (_load_customs_export_level / _load_price_level) unmodified and just
+    assemble them into one frame — no %YoY transform, no new fetching."""
+    import scripts.correlation_analysis as mod
+
+    df = mod.build_levels_dataset()
+    assert list(df.columns) == [
+        "total_exports_usd", "hynix_price_krw", "kospi_index",
+    ]
+    # real collected data should give at least some non-null history in each column
+    assert df["total_exports_usd"].notna().any()
+    assert df["kospi_index"].notna().any()
+
+
 if __name__ == "__main__":
     import sys, traceback
     fns = [(n, f) for n, f in sorted(globals().items())

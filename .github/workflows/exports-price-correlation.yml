@@ -205,7 +205,9 @@ jobs:
                    monitoring/exports-price-correlation-qoq.png \
                    monitoring/exports-price-correlation-2023-zoom.png \
                    monitoring/exports-price-correlation-daily-focus.md \
-                   monitoring/exports-price-correlation-daily-focus.png; do
+                   monitoring/exports-price-correlation-daily-focus.png \
+                   monitoring/exports-price-levels-trend.md \
+                   monitoring/exports-price-levels-trend.png; do
             [ -f "$f" ] && git add "$f"
           done
           [ -d data/raw ] && git add data/raw/ 2>/dev/null

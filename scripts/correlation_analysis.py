@@ -93,6 +93,15 @@ OUTPUTS
                                              exports, then diving back below
                                              the exports trend — watching for
                                              whether it curls back up).
+  monitoring/exports-price-levels-trend.{md,png}   2026-08-17 added — same
+                                             three series, but their raw
+                                             LEVELS (USD / KRW / index points)
+                                             instead of %YoY. No correlation
+                                             is computed here on purpose —
+                                             see "WHY YoY, NOT LEVELS" above;
+                                             this view is for eyeballing the
+                                             trend shape only, never cite an r
+                                             from it.
 
 CURRENT (IN-PROGRESS) MONTH IS ALWAYS EXCLUDED
 ────────────────────────────────────────────────
@@ -146,6 +155,27 @@ OUT_PNG_DAILY_FOCUS = OUT_DIR / "exports-price-correlation-daily-focus.png"
 # 시점까지 그려지므로("선행"), 시간축을 인위적으로 밀지 않아도 그 자체로
 # "먼저 움직이는 걸 보여준다"는 요청을 만족한다.
 DAILY_FOCUS_DISPLAY_DAYS = 730
+
+OUT_MD_LEVELS = OUT_DIR / "exports-price-levels-trend.md"
+OUT_PNG_LEVELS = OUT_DIR / "exports-price-levels-trend.png"
+# 2026-08-17 사용자 요청 — "YoY 말고, 총수출 실제 값(레벨)으로 트렌드를
+# 코스피와 비교해보면 어때?" %YoY 대신 원래 단위(총수출 달러, 하이닉스
+# 원화, 코스피 포인트) 그대로의 장기 추세 '모양'을 보여준다. 모듈
+# 최상단 docstring의 "WHY YoY, NOT LEVELS"에 이미 적어뒀듯 레벨끼리
+# 비교하면(둘 다 장기 우상향) 상관계수가 원인 없이도 높게 나오기 쉽다 —
+# 그래서 이 차트는 상관계수를 아예 안 낸다(추세를 눈으로 보기용, 통계적
+# 근거로 쓰지 않는다). z-score는 각 지표 레벨 자체의 평균/표준편차로
+# 정규화 — %YoY로 바꾸지 않은 채 그냥 스케일만 맞춘다.
+LEVELS_SERIES_LABELS = {
+    "total_exports_usd": "총수출 (달러, 레벨)",
+    "hynix_price_krw": "SK하이닉스 주가 (원, 레벨)",
+    "kospi_index": "코스피 지수 (포인트, 레벨)",
+}
+LEVELS_SERIES_LABELS_CHART = {
+    "total_exports_usd": "Total exports (USD level)",
+    "hynix_price_krw": "SK Hynix price (KRW level)",
+    "kospi_index": "KOSPI index (level)",
+}
 
 # 표본이 이보다 적으면 상관계수를 표에는 싣되 "신뢰 불가"로 명시한다 —
 # 조용히 숫자만 보여주면 n=3짜리 상관계수도 확신처럼 읽힌다.
@@ -487,6 +517,94 @@ def build_daily_focus_dataset(display_days: int = DAILY_FOCUS_DISPLAY_DAYS) -> p
     df["kospi_yoy_daily"] = kospi_yoy
     df.index.name = "date"
     return df
+
+
+# ── levels (레벨) dataset — 2026-08-17 사용자 요청 ──────────────────────────
+# "YoY 말고, 총수출 실제 값(레벨)으로 트렌드를 코스피와 비교해보면 어때?"
+# %YoY가 아니라 원 단위(달러/원/포인트) 그대로 겹쳐서 추세의 '모양'만 본다.
+# 상관계수는 절대 안 낸다 — 모듈 docstring "WHY YoY, NOT LEVELS" 참고.
+
+def build_levels_dataset() -> pd.DataFrame:
+    series = {
+        "total_exports_usd": _load_customs_export_level(),
+        "hynix_price_krw": _load_price_level("000660"),
+        "kospi_index": _load_price_level("0001"),
+    }
+    df = pd.DataFrame(series)
+    df.index.name = "month"
+    return df
+
+
+def render_levels_chart(df: pd.DataFrame) -> None:
+    """레벨(원 단위) 그대로 z-score 정규화해서 겹쳐 그린다 — %YoY 차트와
+    똑같은 스타일(점 없는 얇은 선, 지표별 고정 색)이지만, 상관계수는 표시
+    하지 않는다(레벨끼리는 둘 다 장기 우상향이라 원인 없이도 높게 나오기
+    쉬움 — render_markdown 쪽 "WHY YoY" 설명과 같은 이유로 여기선 아예
+    계산도 안 한다, 잘못 인용될 여지를 만들지 않기 위해)."""
+    cols = [c for c in LEVELS_SERIES_LABELS if c in df.columns and df[c].notna().any()]
+    plot_df = df[cols].dropna(how="all")
+    if plot_df.empty:
+        return
+
+    colors = {"total_exports_usd": "#2a78d6", "hynix_price_krw": "#eb6834", "kospi_index": "#3fa34d"}
+    fig, ax = plt.subplots(figsize=(10, 5))
+    for c in cols:
+        series = plot_df[c].dropna()
+        if series.empty:
+            continue
+        z = (series - series.mean()) / series.std(ddof=0)
+        ax.plot(z.index, z.values, linewidth=1.1, color=colors.get(c, "#888888"),
+                label=LEVELS_SERIES_LABELS_CHART[c])
+    ax.axhline(0, color="#999999", linewidth=0.8, linestyle="--")
+    ax.set_title(
+        "Exports vs SK Hynix vs KOSPI — raw LEVELS (not %YoY), z-score normalized\n"
+        "trend shape only — no correlation computed (levels share a spurious uptrend, see caveat)",
+        fontsize=11,
+    )
+    ax.set_ylabel("z-score (mean 0, std 1)")
+    ax.set_xlabel("month")
+    ax.legend(loc="best")
+    ax.grid(True, alpha=0.3)
+    fig.autofmt_xdate()
+    fig.tight_layout()
+    OUT_DIR.mkdir(parents=True, exist_ok=True)
+    fig.savefig(OUT_PNG_LEVELS, dpi=150)
+    plt.close(fig)
+
+
+def render_levels_markdown(df: pd.DataFrame) -> str:
+    lines = [
+        "# 수출입동향 × SK하이닉스 × 코스피 — 실제 값(레벨) 추세 비교",
+        "",
+        "자동 생성 — `python -m scripts.correlation_analysis` "
+        "(source: data/normalized/customs_export_dlr.csv, sources/monthly-price-history.csv)",
+        "",
+        "%YoY(증가율)가 아니라 **원 단위 그대로**(총수출 달러, 하이닉스 원화, 코스피",
+        "포인트) 장기 추세의 '모양'만 겹쳐본다. **상관계수는 일부러 안 낸다** —",
+        "레벨은 둘 다 장기적으로 우상향하는 경향이 있어서, 서로 아무 인과 없이도",
+        "높은 상관계수가 나오기 쉽다(추세 공유로 인한 가짜 상관 — 이 저장소가",
+        "이미 한 번 겪은 실수, 8년 전 관측 하나로 만든 미-한 금리차 조작 사례와",
+        "같은 함정). 진짜 관계를 보려면 exports-price-correlation.md(월별 %YoY)를",
+        "참고할 것 — 이 페이지는 순전히 눈으로 보는 추세 비교용이다.",
+        "",
+        "## 표본 데이터 (최근 24개월)",
+        "",
+        "| 월 | " + " | ".join(LEVELS_SERIES_LABELS.values()) + " |",
+        "|---|" + "---|" * len(LEVELS_SERIES_LABELS),
+    ]
+    df_full = df.reindex(columns=list(LEVELS_SERIES_LABELS)).dropna(how="all").tail(24)
+    for month, row in df_full.iterrows():
+        cells = []
+        for c in LEVELS_SERIES_LABELS:
+            v = row[c]
+            if pd.isna(v):
+                cells.append("—")
+            elif c == "total_exports_usd":
+                cells.append(f"{v / 1e8:,.0f}억")
+            else:
+                cells.append(f"{v:,.1f}")
+        lines.append(f"| {month.strftime('%Y-%m')} | " + " | ".join(cells) + " |")
+    return "\n".join(lines) + "\n"
 
 
 # ── annual (long-run) dataset ───────────────────────────────────────────────
@@ -1177,6 +1295,17 @@ def main() -> int:
     else:
         print("\n[일별 확대] 입력 데이터 없음 — sources/daily-price-history.csv 확인 필요 "
               "(python -m scripts.investor_flow daily-history ...)", file=sys.stderr)
+
+    # ── levels (레벨, %YoY 아님) ─────────────────────────────────────────
+    ldf = build_levels_dataset()
+    if not ldf.dropna(how="all").empty:
+        render_levels_chart(ldf)
+        OUT_MD_LEVELS.write_text(render_levels_markdown(ldf), encoding="utf-8")
+        print(f"\n[레벨] {OUT_MD_LEVELS}")
+        if OUT_PNG_LEVELS.exists():
+            print(f"[레벨] 차트 저장 → {OUT_PNG_LEVELS} (상관계수 없음 — 트렌드 비교 전용)")
+    else:
+        print("\n[레벨] 입력 데이터 없음", file=sys.stderr)
 
     return 0
 
