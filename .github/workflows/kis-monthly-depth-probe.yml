@@ -37,13 +37,4 @@ jobs:
         run: |
           python3 scripts/investor_flow.py monthly-history --code 0001 --is-index \
             --months 90 --raw > /tmp/raw.json
-          python3 -c "
-import json
-d = json.load(open('/tmp/raw.json'))
-rows = d.get('output2') or []
-print('row count:', len(rows))
-if rows:
-    dates = sorted(r['stck_bsop_date'] for r in rows if r.get('stck_bsop_date'))
-    print('earliest:', dates[0] if dates else None)
-    print('latest:', dates[-1] if dates else None)
-"
+          python3 -c "import json; d = json.load(open('/tmp/raw.json')); rows = d.get('output2') or []; dates = sorted(r['stck_bsop_date'] for r in rows if r.get('stck_bsop_date')); print('row count:', len(rows)); print('earliest:', dates[0] if dates else None); print('latest:', dates[-1] if dates else None)"
