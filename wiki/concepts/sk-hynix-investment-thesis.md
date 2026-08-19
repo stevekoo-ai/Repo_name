@@ -1,7 +1,7 @@
 ---
 title: SK Hynix Investment Thesis
 created: 2026-08-09
-updated: 2026-08-09
+updated: 2026-08-19
 tags: [investment, sk-hynix, decision-framework, semiconductor, portfolio]
 ---
 
@@ -28,9 +28,13 @@ G/I/L·Investment Clock·PEOS 3개로 나뉘어 혼란스러운 전례 있음), 
 - **P/E Z-score(근사)**: 실제 P/E가 아니라 [rally-justification-analysis.md](rally-justification-analysis.md)의
   이격도(divergence = log₁₀(주가지수) - log₁₀(영업이익지수), 24Q1=100 기준)
   시계열의 Z-score. 실제 PER 계산에 필요한 발행주식수 시계열이 미검증
-  (2025 자사주 소각 ~2.1%, 2026 ADR 신주발행·자사주 매입 ~40조 등으로
-  최근 2년간 변동)이라 대체 채택 — 방향은 동일(양수=고평가 방향,
-  음수=저평가 방향)하나 절대 PER 수치는 아님.
+  (2025 자사주 소각 ~2.1%, 2026 ADR 신주발행 + **2026-08-19 확정: 2,407만주
+  (발행주식 3.3%) 40조원 자사주 매입·소각, 8/20부터 약 3개월 매입 후 전량
+  소각** — [checkpoints.md §5-1](sk-hynix-analyst-thesis-checkpoints.md#5-1-40조원-자사주-매입소각-2026-08-19--사실관계와-해석-분리)
+  참고 — 등으로 최근 2년간 변동)이라 대체 채택 — 방향은 동일(양수=고평가
+  방향, 음수=저평가 방향)하나 절대 PER 수치는 아님. 소각이 완료되면
+  발행주식수가 실제로 줄어드므로, 이 표본 부족 한계는 오히려 커진다 —
+  소각 진행 중(8/20~) 구간의 P/E Z-score는 특히 방향성 참고용으로만 볼 것.
   - Z ≤ -1.5: 저평가 극단(밸류에이션 관점 매수 매력)
   - Z ≥ +1.5: 고평가 극단(밸류에이션 관점 수익실현 검토)
   - **2026-08-09 현재값: Z ≈ 1.06(중립)**, 26Q2(6월 말) 이격도 -0.108 —
