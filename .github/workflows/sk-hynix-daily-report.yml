@@ -16,6 +16,15 @@ on:
 permissions:
   contents: write
 
+# 2026-08-21 추가 — 재시도 창(최대 6시간, 10분 간격)이 다음 스케줄 실행과
+# 겹칠 수 있어(07:00→10:00 KST는 3시간 간격) 최신 실행이 오래된 재시도
+# 실행을 대체하도록 직렬화. 같은 KIS_APP_KEY를 쓰는 portfolio-holdings-sync
+# 와의 토큰 충돌(2026-07-28~30 사례)과는 별개 문제라 이 워크플로 내부에서만
+# 막으면 됨.
+concurrency:
+  group: sk-hynix-daily-report
+  cancel-in-progress: true
+
 jobs:
   report:
     runs-on: ubuntu-latest
@@ -71,12 +80,28 @@ jobs:
           python3 scripts/investor_flow.py etf-nav --ticker 469150 --raw || true
           echo "::endgroup::"
 
+      # 2026-08-21 추가 — 실패하면 성공할 때까지(최대 6시간, 10분 간격 36회)
+      # 재시도. 사용자 지시: "요청이 실패하면 성공할 때까지 iteration,
+      # 10분 단위로 재시도해서 성공하면 완료". 상한 도달 시에만 실패로
+      # 넘어가 맨 아래 실패 알림 스텝이 발동 — 무한 재시도는 아님(실제
+      # 코드 버그면 36번을 재시도해도 매번 같은 이유로 실패하다가 결국
+      # 알림이 감).
       - name: 종목별 투자자매매동향 fetch
         if: ${{ github.event.inputs.debug_raw != 'true' }}
         env:
           KIS_APP_KEY: ${{ secrets.KIS_APP_KEY }}
           KIS_APP_SECRET: ${{ secrets.KIS_APP_SECRET }}
-        run: python3 scripts/investor_flow.py fetch --ticker 000660 --days 30
+        run: |
+          attempt=1; max_attempts=36
+          until python3 scripts/investor_flow.py fetch --ticker 000660 --days 30; do
+            if [ "$attempt" -ge "$max_attempts" ]; then
+              echo "::error::${max_attempts}회(6시간) 재시도했지만 투자자매매동향 fetch 실패"
+              exit 1
+            fi
+            echo "[재시도 $attempt/$max_attempts] 투자자매매동향 fetch 실패 — 10분 후 재시도"
+            attempt=$((attempt + 1))
+            sleep 600
+          done
 
       - name: ADR(SKHY, 나스닥) 시세 fetch
         if: ${{ github.event.inputs.debug_raw != 'true' }}
@@ -91,7 +116,17 @@ jobs:
         env:
           KIS_APP_KEY: ${{ secrets.KIS_APP_KEY }}
           KIS_APP_SECRET: ${{ secrets.KIS_APP_SECRET }}
-        run: python3 scripts/investor_flow.py snapshot --ticker 000660
+        run: |
+          attempt=1; max_attempts=36
+          until python3 scripts/investor_flow.py snapshot --ticker 000660; do
+            if [ "$attempt" -ge "$max_attempts" ]; then
+              echo "::error::${max_attempts}회(6시간) 재시도했지만 snapshot 실패"
+              exit 1
+            fi
+            echo "[재시도 $attempt/$max_attempts] snapshot 실패 — 10분 후 재시도"
+            attempt=$((attempt + 1))
+            sleep 600
+          done
 
       # 2026-07-31 추가 — stevekoo-ai/open-trading-api(KIS 공식 예제) 조사로
       # 발견한 4개 TR. 신용잔고는 찐반등 신호①(빚의 청산)의 데이터소스,
@@ -137,7 +172,16 @@ jobs:
           KIS_APP_SECRET: ${{ secrets.KIS_APP_SECRET }}
         run: |
           cd scripts
-          python3 daily_report.py --ticker 000660 | tee /tmp/report.md
+          attempt=1; max_attempts=36
+          until python3 daily_report.py --ticker 000660 | tee /tmp/report.md; do
+            if [ "$attempt" -ge "$max_attempts" ]; then
+              echo "::error::${max_attempts}회(6시간) 재시도했지만 리포트 생성 실패"
+              exit 1
+            fi
+            echo "[재시도 $attempt/$max_attempts] 리포트 생성 실패 — 10분 후 재시도"
+            attempt=$((attempt + 1))
+            sleep 600
+          done
           echo "report_path=$(ls -t ../sources/sk-hynix-auto-report-*.md | head -1)" >> "$GITHUB_OUTPUT"
 
       - name: 변경사항 커밋 & 푸시

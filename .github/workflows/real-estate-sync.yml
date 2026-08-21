@@ -15,6 +15,10 @@ on:
 permissions:
   contents: write
 
+concurrency:
+  group: real-estate-sync
+  cancel-in-progress: true
+
 jobs:
   sync-real-estate:
     runs-on: ubuntu-latest
@@ -28,44 +32,94 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
+      # 2026-08-21 추가 — 4개 수집기 각각 실패하면 성공할 때까지(최대
+      # 6시간, 10분 간격) 재시도. 기존 설계(하나 실패해도 나머지는 계속
+      # 진행)는 그대로 유지 — 6시간 다 소진해도 실패하면 그 항목만
+      # /tmp/real_estate_failures.txt에 기록하고 다음 수집기로 넘어감.
+      # 잡 자체를 실패시키지 않되, 맨 아래 최종 알림 스텝에서 그 기록을
+      # 읽어 실패한 항목만 콕 집어 이메일로 알림.
       - name: 아파트 매매 실거래가 수집
         env:
           DATA_GO_KR_KEY: ${{ secrets.DATA_GO_KR_KEY }}
-        run: python3 -c "
-from collectors import molit
-result = molit.fetch_and_store()
-print(f'✓ 아파트 매매: {result}')
-" || echo "⚠️ 아파트 매매 수집 실패 (네트워크/API 문제)"
+        run: |
+          attempt=1; max_attempts=36
+          until python3 -c "
+          from collectors import molit
+          result = molit.fetch_and_store()
+          print(f'✓ 아파트 매매: {result}')
+          "; do
+            if [ "$attempt" -ge "$max_attempts" ]; then
+              echo "::warning::아파트 매매 수집 6시간 재시도 소진 — 실패로 넘어감"
+              echo "아파트 매매" >> /tmp/real_estate_failures.txt
+              break
+            fi
+            echo "[재시도 $attempt/$max_attempts] 아파트 매매 수집 실패 — 10분 후 재시도"
+            attempt=$((attempt + 1))
+            sleep 600
+          done
 
       - name: 아파트 전월세(전세/월세) 실거래가 수집
         env:
           DATA_GO_KR_KEY: ${{ secrets.DATA_GO_KR_KEY }}
         if: ${{ github.event.inputs.only_apartment != 'true' }}
-        run: python3 -c "
-from collectors import molit_rent
-result = molit_rent.fetch_and_store()
-print(f'✓ 아파트 전월세: {result}')
-" || echo "⚠️ 아파트 전월세 수집 실패 (네트워크/API 문제)"
+        run: |
+          attempt=1; max_attempts=36
+          until python3 -c "
+          from collectors import molit_rent
+          result = molit_rent.fetch_and_store()
+          print(f'✓ 아파트 전월세: {result}')
+          "; do
+            if [ "$attempt" -ge "$max_attempts" ]; then
+              echo "::warning::아파트 전월세 수집 6시간 재시도 소진 — 실패로 넘어감"
+              echo "아파트 전월세" >> /tmp/real_estate_failures.txt
+              break
+            fi
+            echo "[재시도 $attempt/$max_attempts] 아파트 전월세 수집 실패 — 10분 후 재시도"
+            attempt=$((attempt + 1))
+            sleep 600
+          done
 
       - name: 연립다세대(빌라) 매매 실거래가 수집
         env:
           DATA_GO_KR_KEY: ${{ secrets.DATA_GO_KR_KEY }}
         if: ${{ github.event.inputs.only_apartment != 'true' }}
-        run: python3 -c "
-from collectors import molit_villa
-result = molit_villa.fetch_and_store()
-print(f'✓ 빌라 매매: {result}')
-" || echo "⚠️ 빌라 매매 수집 실패 (네트워크/API 문제)"
+        run: |
+          attempt=1; max_attempts=36
+          until python3 -c "
+          from collectors import molit_villa
+          result = molit_villa.fetch_and_store()
+          print(f'✓ 빌라 매매: {result}')
+          "; do
+            if [ "$attempt" -ge "$max_attempts" ]; then
+              echo "::warning::빌라 매매 수집 6시간 재시도 소진 — 실패로 넘어감"
+              echo "빌라 매매" >> /tmp/real_estate_failures.txt
+              break
+            fi
+            echo "[재시도 $attempt/$max_attempts] 빌라 매매 수집 실패 — 10분 후 재시도"
+            attempt=$((attempt + 1))
+            sleep 600
+          done
 
       - name: 오피스텔 매매 실거래가 수집
         env:
           DATA_GO_KR_KEY: ${{ secrets.DATA_GO_KR_KEY }}
         if: ${{ github.event.inputs.only_apartment != 'true' }}
-        run: python3 -c "
-from collectors import molit_officetel
-result = molit_officetel.fetch_and_store()
-print(f'✓ 오피스텔 매매: {result}')
-" || echo "⚠️ 오피스텔 매매 수집 실패 (네트워크/API 문제)"
+        run: |
+          attempt=1; max_attempts=36
+          until python3 -c "
+          from collectors import molit_officetel
+          result = molit_officetel.fetch_and_store()
+          print(f'✓ 오피스텔 매매: {result}')
+          "; do
+            if [ "$attempt" -ge "$max_attempts" ]; then
+              echo "::warning::오피스텔 매매 수집 6시간 재시도 소진 — 실패로 넘어감"
+              echo "오피스텔 매매" >> /tmp/real_estate_failures.txt
+              break
+            fi
+            echo "[재시도 $attempt/$max_attempts] 오피스텔 매매 수집 실패 — 10분 후 재시도"
+            attempt=$((attempt + 1))
+            sleep 600
+          done
 
       - name: 수집된 데이터 검증
         run: |
@@ -91,4 +145,20 @@ print(f'✓ 오피스텔 매매: {result}')
               git rebase origin/main
               sleep $((i * 3))
             done
+          fi
+
+      # 2026-08-21 추가 — 잡 자체는 실패하지 않는 설계(하나 실패해도 나머지
+      # 진행)라 failure()가 아니라 always()로 검사 — 6시간 재시도를 다
+      # 소진한 항목이 하나라도 있으면(위 4개 수집기 스텝에서 기록) 알림.
+      - name: 실패 시 알림 (조용한 실패 방지)
+        if: always()
+        env:
+          GMAIL_ADDRESS: ${{ secrets.GMAIL_ADDRESS }}
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+          NOTIFY_EMAIL_TO: ${{ secrets.NOTIFY_EMAIL_TO }}
+        run: |
+          if [ -f /tmp/real_estate_failures.txt ]; then
+            failed=$(paste -sd', ' /tmp/real_estate_failures.txt)
+            python3 -m scripts.send_report_email \
+              --failure-alert "real-estate-sync 워크플로 일부 항목이 실패했습니다 (6시간 재시도 소진): ${failed} — 오늘 이 항목들의 실거래가 데이터는 갱신되지 않았습니다."
           fi

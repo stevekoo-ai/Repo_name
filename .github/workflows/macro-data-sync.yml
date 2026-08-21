@@ -8,6 +8,10 @@ on:
 permissions:
   contents: write
 
+concurrency:
+  group: macro-data-sync
+  cancel-in-progress: true
+
 jobs:
   sync:
     runs-on: ubuntu-latest
@@ -18,11 +22,22 @@ jobs:
         with:
           python-version: "3.12"
 
+      # 2026-08-21 추가 — 실패하면 성공할 때까지(최대 6시간, 10분 간격) 재시도.
       - name: 프리셋 전체 동기화
         env:
           FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
           ECOS_API_KEY: ${{ secrets.ECOS_API_KEY }}
-        run: python3 scripts/macro_data.py sync
+        run: |
+          attempt=1; max_attempts=36
+          until python3 scripts/macro_data.py sync; do
+            if [ "$attempt" -ge "$max_attempts" ]; then
+              echo "::error::${max_attempts}회(6시간) 재시도했지만 거시지표 동기화 실패"
+              exit 1
+            fi
+            echo "[재시도 $attempt/$max_attempts] 거시지표 동기화 실패 — 10분 후 재시도"
+            attempt=$((attempt + 1))
+            sleep 600
+          done
 
       - name: 변경사항 커밋 & 푸시
         run: |
@@ -37,3 +52,15 @@ jobs:
             git rebase origin/main
             sleep $((i * 3))
           done
+
+      # 2026-08-21 추가 — 위 재시도(최대 6시간)까지 다 소진하고도 실패한
+      # 경우에만 도달. 트랙 A(거시지표, 경제판단 리포트 재료) 채널.
+      - name: 실패 시 알림 (조용한 실패 방지)
+        if: failure()
+        env:
+          GMAIL_ADDRESS: ${{ secrets.GMAIL_ADDRESS }}
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+          NOTIFY_EMAIL_TO: ${{ secrets.NOTIFY_EMAIL_TO }}
+        run: |
+          python3 -m scripts.send_report_email \
+            --failure-alert "macro-data-sync 워크플로가 실패했습니다 (6시간 재시도 소진) — 오늘의 거시지표(금리·GDP·환율)는 갱신되지 않았습니다."

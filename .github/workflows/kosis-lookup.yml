@@ -23,7 +23,19 @@ jobs:
       - name: Install dependencies
         run: pip install requests
 
+      # 2026-08-21 추가 — 수동 실행·즉시 확인용 진단 도구라 가벼운 재시도만
+      # (3회, 20초 간격) — 6시간 재시도는 사람을 기다리게 하므로 부적절.
       - name: Look up KOSIS candidate tables
         env:
           KOSIS_API_KEY: ${{ secrets.KOSIS_API_KEY }}
-        run: python -m scripts.kosis_lookup ${{ github.event.inputs.series }}
+        run: |
+          attempt=1; max_attempts=3
+          until python -m scripts.kosis_lookup ${{ github.event.inputs.series }}; do
+            if [ "$attempt" -ge "$max_attempts" ]; then
+              echo "::error::${max_attempts}회 재시도했지만 실패"
+              exit 1
+            fi
+            echo "[재시도 $attempt/$max_attempts] 실패 — 20초 후 재시도"
+            attempt=$((attempt + 1))
+            sleep 20
+          done
