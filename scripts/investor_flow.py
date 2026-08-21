@@ -382,21 +382,45 @@ def kis_fetch_investor_trend(ticker, account_type="real", raw=False):
     # 백만원 단위가 맞다고 판단). 위키 관례(원 단위 표기)에 맞춰 정규화.
     KRW_UNIT_MULTIPLIER = 1_000_000
 
+    # ⚠ 2026-08-21 발견 — 장중(특히 개장 직후) 조회 시 당일 행의 *_tr_pbmn
+    # 필드가 KIS 쪽에서 아직 정산 전이라 빈 문자열('')로 내려오는 경우가
+    # 있음(int('') → ValueError로 스크립트 전체가 죽어 07:00/10:00 KST
+    # 자동 리포트가 여러 날 연속 실패한 원인 — GitHub Actions 로그로 확인).
+    # 값을 지어내지 않되, 그 행 하나 때문에 나머지 29일치까지 버리지 않도록
+    # 해당 행만 건너뛴다(끊긴 하루보다 "말없이 전체 실패"가 더 나쁘다는
+    # 판단 — Prime Directive: 창작 금지가 곧 조용한 전체 실패를 정당화하진
+    # 않음).
     parsed = []
+    skipped_dates = []
     for r in rows:
         d = r[FIELDS["date"]]
+        date_str = f"{d[0:4]}-{d[4:6]}-{d[6:8]}"
+        try:
+            foreign_net_krw = int(r[FIELDS["foreign_net_krw"]]) * KRW_UNIT_MULTIPLIER
+            inst_net_krw = int(r[FIELDS["inst_net_krw"]]) * KRW_UNIT_MULTIPLIER
+            retail_net_krw = int(r[FIELDS["retail_net_krw"]]) * KRW_UNIT_MULTIPLIER
+        except ValueError:
+            skipped_dates.append(date_str)
+            continue
         parsed.append({
-            "date": f"{d[0:4]}-{d[4:6]}-{d[6:8]}",
+            "date": date_str,
             "ticker": ticker,
             "foreign_net_qty": r[FIELDS["foreign_net_qty"]],
             "inst_net_qty": r[FIELDS["inst_net_qty"]],
             "retail_net_qty": r[FIELDS["retail_net_qty"]],
-            "foreign_net_krw": int(r[FIELDS["foreign_net_krw"]]) * KRW_UNIT_MULTIPLIER,
-            "inst_net_krw": int(r[FIELDS["inst_net_krw"]]) * KRW_UNIT_MULTIPLIER,
-            "retail_net_krw": int(r[FIELDS["retail_net_krw"]]) * KRW_UNIT_MULTIPLIER,
+            "foreign_net_krw": foreign_net_krw,
+            "inst_net_krw": inst_net_krw,
+            "retail_net_krw": retail_net_krw,
             "source": "kis_api",
             "note": "",
         })
+    if skipped_dates:
+        print(
+            f"[경고] {len(skipped_dates)}개 행(날짜: {', '.join(skipped_dates)})은 "
+            "순매수대금 필드가 KIS에서 아직 미정산(빈 문자열)이라 건너뜀 — "
+            "보통 조회 당일 장중(정산 전) 조회 시 발생, 장마감 후 재조회하면 채워짐.",
+            file=sys.stderr,
+        )
     return parsed
 
 
