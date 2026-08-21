@@ -173,3 +173,21 @@ jobs:
           to: ${{ secrets.GMAIL_ADDRESS }}
           from: SK하이닉스 자동 리포트 봇
           body: file:///tmp/report.md
+
+      # 2026-08-21 추가 — 이 워크플로는 위 어느 단계에서 실패하든(예:
+      # investor_flow.py가 KIS API 미정산 필드에 죽는 버그, 8/16~8/20
+      # 여러 날 07:00·10:00 KST 실행이 이렇게 조용히 실패했었음) 재시도
+      # 없이 그냥 다음 크론까지 기다렸다 — 실패해도 아무 알림이 없어
+      # 나흘간 아무도 몰랐다. core10-collect.yml·daily-peos-report.yml과
+      # 같은 패턴(scripts/send_report_email.py --failure-alert)을 그대로
+      # 재사용 — 트랙 A(SK하이닉스 개인 판단 리포트) 채널이라 GitHub
+      # Actions 시크릿을 통한 이메일 발송은 CLAUDE.md 정책상 허용됨.
+      - name: 실패 시 알림 (조용한 실패 방지)
+        if: failure()
+        env:
+          GMAIL_ADDRESS: ${{ secrets.GMAIL_ADDRESS }}
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+          NOTIFY_EMAIL_TO: ${{ secrets.NOTIFY_EMAIL_TO }}
+        run: |
+          python3 -m scripts.send_report_email \
+            --failure-alert "sk-hynix-daily-report 워크플로가 실패했습니다 (KIS 시세·수급 수집~리포트 생성 중 한 단계) — 이 실행 시간대(07:00/10:00/19:00 KST)의 SK하이닉스 자동 데이터는 없는 것으로 취급하세요."
