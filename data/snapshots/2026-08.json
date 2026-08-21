@@ -13,10 +13,10 @@
       "coverage_pct": 100.0
     },
     "confidence": {
-      "confidence": 80.6,
+      "confidence": 90.5,
       "components": {
-        "data_freshness": 70.0,
-        "source_quality": 88.6,
+        "data_freshness": 100.0,
+        "source_quality": 92.0,
         "indicator_consistency": 70.0,
         "trend_stability": 100.0
       }
@@ -30,6 +30,7 @@
     "upgrade_signals": [
       "exports_strong",
       "semiconductor_strong",
+      "ppi_easing",
       "us_employment_improving"
     ],
     "changes": [
@@ -38,6 +39,12 @@
         "message": "수출 증가율 +53.7%p 개선 (강화)",
         "direction": "improve",
         "delta": 53.7
+      },
+      {
+        "indicator": "ppi",
+        "message": "PPI YoY -0.9%p 둔화 (완화)",
+        "direction": "improve",
+        "delta": -0.91
       }
     ],
     "readings": {
@@ -45,14 +52,14 @@
         "value": 0.622,
         "score": 0,
         "weight": 1.0,
-        "status": "stale",
+        "status": "ok",
         "label": "실질 GDP 성장률",
         "source": "한국은행 ECOS",
         "fields": {
           "qoq": 0.622
         },
-        "note": "ECOS unreachable and no cache available",
-        "last_fresh_at": "2026-08-19T21:22:20.647966+00:00"
+        "note": null,
+        "last_fresh_at": "2026-08-21T21:21:18.499501+00:00"
       },
       "industrial_production": {
         "value": 114.912,
@@ -65,7 +72,7 @@
           "mom": -3.2258064516129012
         },
         "note": "KOSIS 접속 불가로 OECD 대체 데이터 사용 (FRED 경유, kr_industrial_production_oecd)",
-        "last_fresh_at": "2026-08-20T21:24:41.032853+00:00"
+        "last_fresh_at": "2026-08-21T21:21:18.499501+00:00"
       },
       "retail_sales": {
         "value": 0.096711798839455,
@@ -78,7 +85,7 @@
           "mom": 0.096711798839455
         },
         "note": "KOSIS 접속 불가로 OECD 대체 데이터 사용 (FRED 경유, kr_retail_sales_mom_oecd — 이미 계산된 전월비 값)",
-        "last_fresh_at": "2026-08-20T21:24:41.032853+00:00"
+        "last_fresh_at": "2026-08-21T21:21:18.499501+00:00"
       },
       "exports": {
         "value": 62.8,
@@ -91,7 +98,7 @@
           "yoy": 62.8
         },
         "note": null,
-        "last_fresh_at": "2026-08-20T21:24:41.032853+00:00"
+        "last_fresh_at": "2026-08-21T21:21:18.499501+00:00"
       },
       "semiconductor_exports": {
         "value": 178.8,
@@ -104,20 +111,20 @@
           "yoy": 178.8
         },
         "note": null,
-        "last_fresh_at": "2026-08-20T21:24:41.032853+00:00"
+        "last_fresh_at": "2026-08-21T21:21:18.499501+00:00"
       },
       "current_account": {
         "value": 49730.4,
         "score": 1,
         "weight": 0.8,
-        "status": "stale",
+        "status": "ok",
         "label": "경상수지 (3개월 평균, 백만달러)",
         "source": "한국은행 ECOS",
         "fields": {
           "avg_3m": 38876.700000000004
         },
-        "note": "ECOS unreachable and no cache available",
-        "last_fresh_at": "2026-08-19T21:22:20.647966+00:00"
+        "note": null,
+        "last_fresh_at": "2026-08-21T21:21:18.499501+00:00"
       },
       "cpi": {
         "value": 118.84768138617,
@@ -130,20 +137,20 @@
           "yoy": 3.336388634281018
         },
         "note": "KOSIS 접속 불가로 OECD 대체 데이터 사용 (FRED 경유, kr_cpi_oecd)",
-        "last_fresh_at": "2026-08-20T21:24:41.032853+00:00"
+        "last_fresh_at": "2026-08-21T21:21:18.499501+00:00"
       },
       "ppi": {
-        "value": 130.03,
+        "value": 129.39,
         "score": -1,
         "weight": 1.0,
-        "status": "stale",
+        "status": "ok",
         "label": "PPI",
         "source": "한국은행 ECOS",
         "fields": {
-          "yoy": 8.566418969691913
+          "yoy": 7.654546967301763
         },
-        "note": "ECOS unreachable and no cache available",
-        "last_fresh_at": "2026-08-19T21:22:20.647966+00:00"
+        "note": null,
+        "last_fresh_at": "2026-08-21T21:21:18.499501+00:00"
       },
       "unemployment": {
         "value": 2.8,
@@ -156,7 +163,7 @@
           "avg_3m_change": -0.033333333333333215
         },
         "note": "KOSIS 접속 불가로 OECD 대체 데이터 사용 (FRED 경유, kr_unemployment_oecd)",
-        "last_fresh_at": "2026-08-20T21:24:41.032853+00:00"
+        "last_fresh_at": "2026-08-21T21:21:18.499501+00:00"
       },
       "us_global": {
         "value": 1.0,
@@ -167,7 +174,7 @@
         "source": "FRED",
         "fields": {},
         "note": null,
-        "last_fresh_at": "2026-08-20T21:24:41.032853+00:00"
+        "last_fresh_at": "2026-08-21T21:21:18.499501+00:00"
       }
     },
     "us_investment_clock": {
@@ -214,7 +221,8 @@
     ],
     "upgrade_signals": [
       "ppi_easing",
-      "unemployment_improving"
+      "unemployment_improving",
+      "yield_curve_steepening"
     ],
     "changes": [
       {
@@ -236,7 +244,7 @@
           "qoq": 1.5
         },
         "note": null,
-        "last_fresh_at": "2026-08-20T21:24:41.032853+00:00"
+        "last_fresh_at": "2026-08-21T21:21:18.499501+00:00"
       },
       "industrial_production": {
         "value": 102.9939,
@@ -249,7 +257,7 @@
           "mom": 0.2014850155856559
         },
         "note": null,
-        "last_fresh_at": "2026-08-20T21:24:41.032853+00:00"
+        "last_fresh_at": "2026-08-21T21:21:18.499501+00:00"
       },
       "retail_sales": {
         "value": 763602.0,
@@ -262,7 +270,7 @@
           "mom": -0.581976689685342
         },
         "note": null,
-        "last_fresh_at": "2026-08-20T21:24:41.032853+00:00"
+        "last_fresh_at": "2026-08-21T21:21:18.499501+00:00"
       },
       "cpi": {
         "value": 332.813,
@@ -275,7 +283,7 @@
           "yoy": 3.539751427193674
         },
         "note": null,
-        "last_fresh_at": "2026-08-20T21:24:41.032853+00:00"
+        "last_fresh_at": "2026-08-21T21:21:18.499501+00:00"
       },
       "ppi": {
         "value": 284.057,
@@ -288,7 +296,7 @@
           "yoy": 8.270759801492622
         },
         "note": null,
-        "last_fresh_at": "2026-08-20T21:24:41.032853+00:00"
+        "last_fresh_at": "2026-08-21T21:21:18.499501+00:00"
       },
       "unemployment": {
         "value": 4.1,
@@ -301,7 +309,7 @@
           "avg_3m_change": -0.13333333333333286
         },
         "note": null,
-        "last_fresh_at": "2026-08-20T21:24:41.032853+00:00"
+        "last_fresh_at": "2026-08-21T21:21:18.499501+00:00"
       },
       "trade_balance": {
         "value": -73261.0,
@@ -314,7 +322,7 @@
           "avg_3m": -68492.66666666667
         },
         "note": null,
-        "last_fresh_at": "2026-08-20T21:24:41.032853+00:00"
+        "last_fresh_at": "2026-08-21T21:21:18.499501+00:00"
       },
       "yield_curve": {
         "value": 0.5,
@@ -327,7 +335,7 @@
           "spread": 0.5
         },
         "note": null,
-        "last_fresh_at": "2026-08-20T21:24:41.032853+00:00"
+        "last_fresh_at": "2026-08-21T21:21:18.499501+00:00"
       }
     }
   },
@@ -380,7 +388,7 @@
         "label": "PPI",
         "kr_score": -1,
         "us_score": -1,
-        "kr_value": 130.03,
+        "kr_value": 129.39,
         "us_value": 284.057,
         "relationship": "sync"
       },
@@ -406,5 +414,5 @@
     "narrative": "미국은 현재 Recession 국면, 한국은 Expansion 국면입니다. 한국이 사이클상 미국보다 뒤처져 있어, 미국에서 먼저 나타난 흐름이 시차를 두고 한국에 파급될 가능성을 주시할 필요가 있습니다. 비교 가능한 6개 핵심 지표 중 60%가 미국과 같은 방향으로 움직이고 있습니다. 미국 쪽에 경고 신호가 있지만 한국은 아직 뚜렷한 경고 신호가 없어, 미국발 리스크가 한국에는 아직 본격적으로 옮겨오지 않은 것으로 보입니다 — 다만 선행 지표로 계속 관찰이 필요합니다. 방향이 엇갈린 지표: 소매판매, 고용(실업률) — 이 부분이 한국이 미국과 다르게 가는 지점입니다."
   },
   "month": "2026-08",
-  "saved_at": "2026-08-20T21:32:48.168195+00:00"
+  "saved_at": "2026-08-21T21:21:53.658158+00:00"
 }
