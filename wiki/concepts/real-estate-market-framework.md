@@ -1,7 +1,7 @@
 ---
 title: Real Estate Market Entry Framework
 created: 2026-08-09
-updated: 2026-08-21
+updated: 2026-08-22
 tags: [housing, real-estate, decision-framework, personal, platform-city]
 ---
 
@@ -83,14 +83,16 @@ Unlike stock trading, real estate decisions are event-driven. These events are d
 
 ## 플랫폼시티 Tracking Strategy
 
-### Current Status (2026-08-21 갱신)
-- **규모·방식**: 8조 2,680억원 투입, 기흥구 보정동·마북동·신갈동 + 수지구 상현동·풍덕천동 일원 275만㎡, 경기도·용인시 공동 공영개발. **완공 목표 2030년**. [FACT, 다수 매체 교차확인]
-- **역삼지구 기반공사**: 2025-08-18 착공(~2028-12-18 예정) — "착공 1년" 시점(2026-04 기사)을 지나 개발이 본격화 국면. [FACT]
-- **3공구(신갈동 일원, 용인도시공사 담당)**: 2024-12-30 착공. 반도체 R&D 기업 유치용 도시첨단산업단지 부지 27만㎡ 포함 — SK하이닉스 등 반도체 밸류체인과의 지리적 연결점. [FACT]
+### Current Status (2026-08-21 갱신, 08-22 정정)
+- **규모·방식**: 8조 2,680억원 투입, 기흥구 보정동·마북동·신갈동 + 수지구 상현동·풍덕천동 일원 275만㎡, 경기도·용인시 공동 공영개발. **완공 목표 2030년(일부 보도는 2030-12 특정)**. [FACT, 다수 매체 교차확인]
+- **⚠️ 착공 시점 정정(08-22)**: 전체 프로젝트 공식 착공식은 **2025-03-11**(이언주 의원 등 참석, 총선 1호공약 연계 — [경기도 공식 보도자료](https://gnews.gg.go.kr/briefing/brief_gongbo_view.do?BS_CODE=s017&number=65088)). "착공 1년" 기사(2026-04 보도)들이 이 시점과 일치. **직전 갱신에서 이 날짜를 아래 역삼지구 개별 착공일(2025-08-18)과 혼동해 전체 착공일처럼 잘못 기재했었음 — 정정.** [FACT]
+- **역삼지구 기반공사**: 2025-08-18 착공(~2028-12-18 예정) — 전체 착공식과는 별개인 하위 지구 단위 공사. [FACT]
+- **3공구(신갈동 일원, 용인도시공사 담당)**: 2024-12-30 착공(전체 착공식보다 이른 시점 — 선행 공구로 추정, 확인 필요). 반도체 R&D 기업 유치용 도시첨단산업단지 부지 27만㎡ 포함 — SK하이닉스 등 반도체 밸류체인과의 지리적 연결점. [FACT]
+- **실시설계**: 2026년 하반기(지금부터) 시작 예정. [FACT, 08-22 신규 확인]
 - **주거 분양 파이프라인(전부 민간/일반분양 — 사용자가 기다리는 공공분양과는 별도)**:
   - 라온프라이빗아르디에 238세대 — **청약 이미 진행(2026-03-23)**, 2028-04 입주 예정. [FACT]
   - 용인역삼 힐스테이트(828세대), 용인 한라비발디 센트럴시티(아파트 1,042세대+오피스텔 138실) — 분양 준비 중(시점 미확정). [FACT]
-- **공공분양 (사용자 최우선 추적 대상)**: 여전히 미정 — 위 민간분양 파이프라인이 움직이기 시작했다는 게 공공분양 시점이 임박했다는 뜻은 아님, 별개 트랙으로 계속 모니터링 필요. [OPINION — 사업 진행 속도로부터의 추정, 공식 공시 아님]
+- **공공분양 (사용자 최우선 추적 대상)**: 여전히 미정 — 8/22 재검색에서도 8월 공공분양 청약 관련 공식 일정은 전혀 확인 안 됨(검색 자체가 "구체적 일정 확인 불가"라고 명시) — 공고 자체가 아직 안 나온 상태로 판단. 위 민간분양 파이프라인이 움직이기 시작했다는 게 공공분양 시점이 임박했다는 뜻은 아님, 별개 트랙으로 계속 모니터링 필요. [OPINION — 사업 진행 속도로부터의 추정, 공식 공시 아님]
 - **GTX 용인역(구성역) 복합환승센터**: 플랫폼시티 서부권에 GTX·지하철·버스 연계 환승센터 추진 중, 환승 수요 분석 진행 단계. [FACT]
 - **GTX-A 접근성**: 구성역→수서역 약 14분(현재). 삼성역 무정차 통과 방식으로 파주운정~동탄 전 구간 연결 시 구성역→서울역 20분대 예상(2026-06 기준 보도). [FACT, 단 무정차 통과 시행 시점 자체는 이 검색에서 확정 못 함]
 
@@ -183,3 +185,4 @@ Unlike stock trading, real estate decisions are event-driven. These events are d
 - `engine/exporters/real_estate_decision.py` — decision engine implementation
 - 2026-08-21 도시철도 3노선 사전타당성조사: [아시아투데이](https://www.asiatoday.co.kr/kn/view.php?key=20260820010006420), [인천일보](https://www.incheonilbo.com/news/articleView.html?idxno=1329992)
 - 2026-08-21 플랫폼시티 진행현황: [스마트투데이 — 착공 1년](https://www.smarttoday.co.kr/ko-kr/articles/106016), [한국경제 — 착공 1년 개발 본격화](https://www.hankyung.com/article/202604023390i), [경기신문 — GTX·플랫폼시티·반도체 클러스터 대중교통 새판](https://www.kyeonggi.com/article/20260607580284), [시사저널e — 구성역 일대 첫삽](https://www.sisajournal-e.com/news/articleView.html?idxno=410143) — WebSearch 스니펫 기반, 원문 직접 대조는 안 함(EGRESS_BLOCKED 환경)
+- 2026-08-22 착공식 날짜 정정 + 실시설계 시점 확인: [경기도뉴스포털 공식 보도자료](https://gnews.gg.go.kr/briefing/brief_gongbo_view.do?BS_CODE=s017&number=65088), [중부일보 — 8조2천억 투입 착공](https://www.joongboo.com/news/articleView.html?idxno=363686771), [중부일보 — 이언주 1호공약 착공](https://www.joongboo.com/news/articleView.html?idxno=363686749)
