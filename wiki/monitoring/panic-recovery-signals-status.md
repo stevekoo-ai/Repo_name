@@ -1,7 +1,7 @@
 ---
 title: 패닉 회복 신호 — 일일 체크 이력 및 현황
 created: 2026-08-08
-updated: 2026-08-06
+updated: 2026-08-24
 tags: [monitoring, panic-recovery, daily-tracking, sk-hynix]
 ---
 
@@ -9,12 +9,13 @@ tags: [monitoring, panic-recovery, daily-tracking, sk-hynix]
 
 ## Latest Status
 
-**Judgment (as of 2026-08-06 19:xx KST):** 바닥 다지기 진행중
+**⚠️ 갱신 공백 고지(2026-08-24)**: 8/19 트리거 재설계 이후 자동 저녁 스캔이 이 파일에 한 번도 못 썼음이 확인됨(원인: 실행환경 문제 추정, 수정 완료 — wiki/log.md 2026-08-24 CRITICAL 참고). 8/6→8/24 18일 공백을 전부 소급 판정하지 않고, **가격 축만 갱신** — Tier1/Tier2 재검증은 다음 정식 체크로 이월.
 
-**Tier1 Signal Count:** 6 항목 유지, 신규 반박 없음  
-**Current Price:** SK하이닉스 1,495,000원 (-10.37% from 2026-08-05 close)  
-**Foreign Investor Flow (1일 기준):** -1.67조원 순매도  
-**Composite Judgment Rationale:** Tier1 펀더멘털 신호(CapEx 유지·CXMT 반박·HBM4 견조)는 오늘도 반박되지 않았으나, 가격이 신호를 따라붙지 못하고 -10.37% 급락 + 사이드카 발동 — "펀더멘털 붕괴"가 아니라 "신호 대기 중 단기 수급(미국發 AI 반도체 섹터 약세, 외국인 대량매도)의 우위" 국면. Tier1이 안 깨진 점을 감안해 완전한 "패닉 지속"으로의 재역행은 미보류, 한 단계만 유지.
+**Judgment (as of 2026-08-24, 잠정 — Tier1 재검증 전)**: 가격만 보면 "바닥 다지기"를 지나 **회복이 상당히 진행됨**으로 보이나, 이 판정 프레임 자체의 Tier1/Tier2 항목을 18일치 재검증하지 않은 상태라 격상은 보류.
+
+**Current Price**: SK하이닉스 1,717,000원(2026-08-24, -0.75%) — **8/6 패닉 저점(1,495,000원) 대비 +14.8% 회복**. 이 사이 40조원 자사주 매입·소각 확정(8/19, [checkpoints.md §5-1](../concepts/sk-hynix-analyst-thesis-checkpoints.md#5-1-40조원-자사주-매입소각-2026-08-19--사실관계와-해석-분리)), 54.3조원 신규 팹 투자 확정(8/7) 등 굵직한 호재가 이미 checkpoints 트래커 쪽에는 반영돼 있음 — 이 파일(패닉회복 프레임)만 갱신이 밀려 있었던 것.
+**Foreign Investor Flow (20일 누적)**: -4조 3,112억원 순매도, 여전히 미해소([HBM Cycle Score 붕괴조건④](hbm-cycle-score-status.md) 참고)
+**Composite Judgment Rationale (잠정)**: 가격은 패닉 국면을 명확히 벗어났으나, 외국인 수급이라는 이 프레임의 핵심 축 하나가 여전히 미해소라 "완전한 회복 확정"은 다음 Tier1 재검증 후 판단.
 
 ---
 
