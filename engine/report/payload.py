@@ -476,6 +476,21 @@ def build_report_payload(month_key: str | None = None) -> dict:
         log_event("data_center_construction.failed", error=str(exc), level="warning")
         payload["data_center_construction"] = None
 
+    # 위키 판단형 지식 브리지 (Phase 4, 2026-08-27) — HBM Cycle Score 정성축,
+    # 9체크포인트, 찐반등 4대 신호, 트럼프 트래커 등은 WebSearch·애널리스트
+    # 리포트 해석이 필요해 이 LLM-미사용 cron 파이프라인이 재현할 수 없다.
+    # data/wiki_digest/*.yaml(위키가 유일한 원천, 이 파일들은 그 압축 요약을
+    # 미러링할 뿐)을 읽어 리포트에 노출 — 원문은 위키로 링크.
+    try:
+        from engine.report.wiki_digest import load_wiki_digests
+
+        payload["wiki_digests"] = load_wiki_digests()
+        log_event("wiki_digests.loaded", count=len(payload["wiki_digests"]),
+                  stale_count=sum(1 for d in payload["wiki_digests"] if d["is_stale"]))
+    except Exception as exc:
+        log_event("wiki_digests.failed", error=str(exc), level="warning")
+        payload["wiki_digests"] = []
+
     # Cross-engine reconciliation. Runs LAST so it can see every engine's output,
     # and emits one stance instead of letting modules contradict each other in
     # front of the reader. See engine/report/reconciliation.py for the rules.

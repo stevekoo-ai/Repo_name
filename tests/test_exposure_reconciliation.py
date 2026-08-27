@@ -1436,6 +1436,81 @@ def test_sk_hynix_section_shows_live_data_and_capex_as_context_not_a_directive()
         assert verb not in evidence_text
 
 
+def test_wiki_digests_load_from_the_real_repo_and_none_are_stale():
+    """2026-08-27 Phase 4: data/wiki_digest/*.yaml must load cleanly against the
+    real wiki/monitoring/*.md files and, since both were written/updated in the
+    same session, none should show drift yet."""
+    from engine.report.wiki_digest import load_wiki_digests
+
+    digests = load_wiki_digests()
+    slugs = {d["slug"] for d in digests}
+    assert {"hbm-cycle-score", "sk-hynix-analyst-thesis-checkpoints",
+            "market-cycles-leverage-risk", "trump-midterm-tracker",
+            "data-center-construction-vs-opposition",
+            "semiconductor-export-peak-recovery"} <= slugs
+    for d in digests:
+        assert d["one_line_summary"], f"{d['slug']} digest has no summary"
+        assert not d["is_stale"], f"{d['slug']} digest is stale relative to its wiki page"
+
+
+def test_wiki_digest_drift_is_detected_not_silently_ignored():
+    """The whole point of this bridge is that a wiki update without a matching
+    digest update must be visible (data/wiki_digest/README.md's drift rule) —
+    this pins that detection with a synthetic monitoring page dated after the
+    digest's as_of. read_frontmatter() resolves monitoring_page as
+    REPO_ROOT / monitoring_page, so the fake page has to live under REPO_ROOT
+    for this round-trip to work — a tempdir outside the repo can't be used."""
+    import os
+    import shutil
+    import tempfile
+    import yaml as yaml_mod
+    from engine.report import wiki_digest as wd
+
+    tmp_name = f"_test_wiki_digest_drift_{next(tempfile._get_candidate_names())}"
+    monitoring_dir = wd.REPO_ROOT / tmp_name
+    monitoring_dir.mkdir()
+    monitoring = monitoring_dir / "fake-status.md"
+    monitoring.write_text("---\nupdated: 2026-09-01\n---\n\n# Latest Status\nfoo\n", encoding="utf-8")
+
+    digest_dir = monitoring_dir / "digests"
+    digest_dir.mkdir()
+    rel_monitoring_path = os.path.relpath(str(monitoring), str(wd.REPO_ROOT))
+    (digest_dir / "fake.yaml").write_text(
+        yaml_mod.safe_dump({
+            "monitoring_page": rel_monitoring_path,
+            "as_of": "2026-08-20",
+            "status_label": "test",
+            "one_line_summary": "test",
+        }),
+        encoding="utf-8",
+    )
+
+    saved_dir = wd.DIGEST_DIR
+    wd.DIGEST_DIR = digest_dir
+    try:
+        digests = wd.load_wiki_digests()
+    finally:
+        wd.DIGEST_DIR = saved_dir
+        shutil.rmtree(monitoring_dir)
+
+    assert len(digests) == 1
+    assert digests[0]["is_stale"] is True
+    assert digests[0]["page_updated"] == "2026-09-01"
+
+
+def test_wiki_digest_section_never_contains_directive_language():
+    """R4 guard for Phase 4 — the wiki digest section is context, never a second
+    position instruction alongside the decision engine."""
+    from engine.report.markdown import _wiki_digest_section
+    from engine.report.wiki_digest import load_wiki_digests
+
+    out = _wiki_digest_section({"wiki_digests": load_wiki_digests()})
+    assert "2.7 위키 추적 신호 요약" in out
+    for verb in ("매수하세요", "매도하세요", "지금 사", "지금 팔"):
+        assert verb not in out
+    assert "R4" in out  # explicit "not a directive" disclaimer present
+
+
 def test_automation_run_log_creates_header_then_appends():
     """2026-08-27: CI 단계 자동 상태로그 신설 — 첫 호출은 헤더+1행, 두 번째
     호출은 헤더 없이 1행만 추가해야 append-only 원칙을 지킨다."""

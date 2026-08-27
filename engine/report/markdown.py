@@ -1520,6 +1520,57 @@ def _data_center_construction_section(payload: dict) -> str:
     return "\n".join(lines)
 
 
+def _wiki_digest_section(payload: dict) -> str:
+    """Section: 위키 추적 신호 요약 (1 min read, Phase 4 2026-08-27).
+
+    HBM Cycle Score 정성축·9체크포인트·찐반등 4대 신호·트럼프 트래커 등은
+    WebSearch·애널리스트 리포트 해석이 필요한 판단형 지식이라 이
+    LLM-미사용 cron 파이프라인이 재현할 수 없다 — 위키(data/wiki_digest/*.yaml
+    이 미러링하는 wiki/monitoring/*.md)가 유일한 원천이고, 이 섹션은 그
+    압축 요약만 그대로 인용한다(다시 풀어쓰지 않음). 각 줄이 위키 페이지로
+    링크돼 리포트와 위키가 서로 다른 이야기를 할 수 없게 한다.
+    """
+    digests = payload.get("wiki_digests") or []
+    if not digests:
+        return ""
+
+    lines = [
+        "# 2.7 위키 추적 신호 요약 — 판단형 지식 (참고자료, 매매 지시 아님)",
+        "",
+        "이 저장소가 계속 추적·갱신해온 판단형 신호의 최신 상태 — 원문은 각 위키 "
+        "페이지가 유일한 원천이며 여기선 그 요약만 인용한다.",
+        "",
+    ]
+    for d in digests:
+        stale_note = f" ⚠️ 위키가 {d['page_updated']}에 갱신됐는데 이 요약은 {d['as_of']} 기준 — 드리프트, 다음 갱신 필요" if d["is_stale"] else ""
+        lines.append(f"### {d['status_label']}{stale_note}")
+        lines.append(f"- {d['one_line_summary']}")
+        links = []
+        if d.get("concept_page"):
+            links.append(f"[Framework]({_wiki_relative_link(d['concept_page'])})")
+        if d.get("monitoring_page"):
+            links.append(f"[Daily Status]({_wiki_relative_link(d['monitoring_page'])})")
+        if links:
+            lines.append(f"- {' · '.join(links)} (as of {d['as_of']})")
+        lines.append("")
+
+    lines.append(
+        "⚠️ 위 요약은 SK Hynix/부동산 판단(HOLD/BUY/SELL, WAIT/ENTER) 지시가 아니다 — "
+        "매매 신호는 이 리포트 최상단의 '최종 의사결정'만 유효(R4)."
+    )
+    lines.append("")
+
+    return "\n".join(lines)
+
+
+def _wiki_relative_link(repo_relative_path: str) -> str:
+    """payload가 'wiki/concepts/foo.md' 같은 저장소 루트 기준 경로를 주므로,
+    report/YYYY-MM-DD.md가 서 있는 위치(저장소 루트 report/ 아래) 기준
+    상대경로('../wiki/concepts/foo.md')로 변환 — 이 파일의 다른 위키 링크들과
+    동일한 규칙."""
+    return f"../{repo_relative_path}"
+
+
 def render_markdown(payload: dict) -> str:
     """Render PEOS report using new 5-section user-centric structure.
 
@@ -1542,6 +1593,7 @@ def render_markdown(payload: dict) -> str:
         _sk_hynix_decision_section(payload),
         _weekly_analysis_section(payload),  # Layer 0 supporting evidence
         _data_center_construction_section(payload),  # 고객재고 축 보조 참고자료 (2.6)
+        _wiki_digest_section(payload),  # 위키 판단형 지식 브리지 (2.7)
         _real_estate_decision_section(payload),
         _real_estate_trend(payload),  # 3절 보조 근거 — 아파트 매매 실거래 트렌드
         _rent_trend(payload),  # 3절 보조 근거 — 아파트 전월세 실거래 트렌드
