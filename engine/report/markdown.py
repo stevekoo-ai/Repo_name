@@ -920,6 +920,27 @@ def _sk_hynix_decision_section(payload: dict) -> str:
             lines.append(f"  - ⚠️ {c}")
         lines.append("")
 
+    hbm = payload.get("hbm_cycle_score")
+    if hbm:
+        flow, holding = hbm["foreign_flow"], hbm["foreign_holding"]
+        auto_total = flow["score"] + holding["score"]
+        lines += [
+            "## HBM Cycle Score — 외국인수급·보유율 자동채점 (참고자료, 매매 지시 아님)",
+            f"- 자동채점 소계: **{auto_total:.1f}/30점** (외국인수급 {flow['score']}/15 + "
+            f"외국인보유율 {holding['score']}/15) — 전체 100점 중 나머지 70점(ASP·엔비디아&CoWoS·"
+            "공급확대·고객재고)은 정성 판단이라 이 파이프라인에서 계산하지 않음, "
+            "[hbm-cycle-score.md](../wiki/concepts/hbm-cycle-score.md)에서 사람이 갱신.",
+        ]
+        for label, val in flow["detail"].items():
+            lines.append(f"  - 외국인수급·{label}: {val}")
+        for label, val in holding["detail"].items():
+            lines.append(f"  - 외국인보유율·{label}: {val}")
+        lines.append(
+            "- ⚠️ 위 소계는 SK Hynix 판단(HOLD/BUY/SELL) 지시가 아니라 근거 자료다 — "
+            "매매 신호는 이 리포트 최상단의 '최종 의사결정'만 유효(R4)."
+        )
+        lines.append("")
+
     lines += [
         "## 거시-반도체 연결 분석",
         f"{decision.macro_linkage}",

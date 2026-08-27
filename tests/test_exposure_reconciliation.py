@@ -1302,6 +1302,44 @@ def test_render_export_recovery_watch_note_links_to_the_wiki_concept():
     assert "반도체수출" in note or "총수출" in note
 
 
+def test_hbm_cycle_score_module_is_shared_not_duplicated():
+    """2026-08-27: score_foreign_flow_axis/score_foreign_holding_axis used to be
+    defined twice inline inside scripts/daily_report.py with no other caller —
+    now both live once in scripts/hbm_cycle_score.py, importable package-style
+    (PYTHONPATH=., what engine/report/payload.py uses) with the expected shape."""
+    from scripts.hbm_cycle_score import score_foreign_flow_axis, score_foreign_holding_axis
+
+    flow = score_foreign_flow_axis("000660")
+    assert flow["max"] == 15.0
+    assert 0.0 <= flow["score"] <= 15.0
+    assert set(flow["detail"].keys()) == {"당일", "20일_누적", "모멘텀(5일vs20일)"}
+
+    holding = score_foreign_holding_axis("000660")
+    assert holding["max"] == 15.0
+    assert 0.0 <= holding["score"] <= 15.0
+
+
+def test_daily_report_delegates_to_the_shared_hbm_module_not_a_private_copy():
+    """daily_report.py is only ever run sibling-style (`cd scripts && python3
+    daily_report.py`, exactly how sk-hynix-daily-report.yml invokes it), so this
+    spawns it that way rather than importing scripts.daily_report from repo
+    root (which can't work — daily_report.py's own investor_flow import is
+    sibling-style too, a pre-existing property this test isn't re-litigating).
+    Confirms the two callers are the literal same function object, not two
+    definitions that could silently drift apart."""
+    import subprocess
+
+    result = subprocess.run(
+        ["python3", "-c",
+         "import daily_report, hbm_cycle_score as hbm; "
+         "print(daily_report.score_foreign_flow_axis is hbm.score_foreign_flow_axis); "
+         "print(daily_report.score_foreign_holding_axis is hbm.score_foreign_holding_axis)"],
+        cwd="scripts", capture_output=True, text=True, timeout=30,
+    )
+    assert result.returncode == 0, f"daily_report.py failed to import: {result.stderr}"
+    assert result.stdout.strip().splitlines() == ["True", "True"]
+
+
 def test_automation_run_log_creates_header_then_appends():
     """2026-08-27: CI 단계 자동 상태로그 신설 — 첫 호출은 헤더+1행, 두 번째
     호출은 헤더 없이 1행만 추가해야 append-only 원칙을 지킨다."""

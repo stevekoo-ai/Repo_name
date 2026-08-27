@@ -302,6 +302,27 @@ def build_report_payload(month_key: str | None = None) -> dict:
         log_event("sk_hynix_decision.failed", error=str(exc), level="warning")
         payload["sk_hynix_decision"] = None
 
+    # HBM Cycle Score — 외국인수급·보유율 2축 자동채점 (hbm-cycle-score.md "1.").
+    # Context/evidence only, never a second buy/sell instruction (R4 in
+    # reconciliation.py: 포지션 지시는 단일 출처) — sk_hynix_decision above
+    # remains the only module allowed to say HOLD/BUY/SELL. The other 4 axes
+    # (ASP·엔비디아&CoWoS·공급확대·고객재고) are qualitative judgment calls
+    # this cron pipeline can't reproduce; they stay in the wiki (Phase 4).
+    try:
+        from scripts.hbm_cycle_score import score_foreign_flow_axis, score_foreign_holding_axis
+
+        payload["hbm_cycle_score"] = {
+            "ticker": "000660",
+            "foreign_flow": score_foreign_flow_axis("000660"),
+            "foreign_holding": score_foreign_holding_axis("000660"),
+        }
+        log_event("hbm_cycle_score.computed",
+                  flow=payload["hbm_cycle_score"]["foreign_flow"]["score"],
+                  holding=payload["hbm_cycle_score"]["foreign_holding"]["score"])
+    except Exception as exc:
+        log_event("hbm_cycle_score.failed", error=str(exc), level="warning")
+        payload["hbm_cycle_score"] = None
+
     try:
         payload["real_estate_decision"] = compute_real_estate_decision(payload)
         log_event("real_estate_decision.computed", signal=payload["real_estate_decision"].signal,
