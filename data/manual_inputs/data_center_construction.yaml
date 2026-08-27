@@ -1,0 +1,46 @@
+# Manual input for 미국 데이터센터 건설 반대 vs 실제 착공(ConstructConnect) 지표
+# (Master Instruction 7.3 예외 정책 — ConstructConnect·Data Center Watch 모두
+# 무료 공개 API가 없어 매달 보도자료/WebSearch로 수동 갱신한다).
+#
+# 이 지표는 HBM Cycle Score의 "고객재고"(수요 지속성) 축을 보조하는 참고
+# 신호다 — SEC EDGAR CapEx 실측(하이퍼스케일러 지출)과 마찬가지로 "AI 인프라
+# 수요가 실제로 land 위에서 지어지고 있는가"를 보여주지만, 이 파일의 데이터는
+# **점수화하지 않는다** — 건설 반대(정치/규제 리스크)와 착공 실적(경제적
+# 수요)이 같은 시점에 정반대 방향으로 움직이는 긴장 관계이고, 이를 하나의
+# 숫자로 합성할 신뢰할 만한 방법론이 아직 없기 때문(Concept Before
+# Conclusion — 새 스코어링 방법론을 임의로 만들지 않는다). 리포트에는 원자료만
+# 그대로 노출하고, 해석은 wiki/concepts/data-center-construction-vs-opposition.md
+# 에서 사람이 갱신한다.
+#
+# 2026-08-27: 최초 생성 — 세션 내 WebSearch 조사 결과(오늘 대화)를 반영.
+
+updated_at: "2026-08-27"
+reliability_grade: 3  # 7.3 예외 — 공식 API 없음, 언론/업계 리포트 교차확인 기반
+
+construction_starts_usd_b:  # ConstructConnect "Data Center Report" 월간 착공액(달러, 십억)
+  # 방법론: Dodge Data & Analytics와 비교 가능하도록 2020-01부터 추적 시작.
+  - { date: "2026-01-01", value: 25.5, note: "역대 최고 단월 기록" }
+  - { date: "2026-02-01", value: 11.5, note: "역대 6위" }
+  # 2026-06 vs 2026-08 중 어느 달의 수치인지 소스 간 불일치 — [미검증], FACT 승격 보류
+  - { date: null, value: 22.3, note: "[미검증] 6월 또는 8월로 추정 — 소스 표기 불일치, 다음 갱신 시 재확인" }
+h1_2026_cumulative_usd_b: 81.5   # 2026년 상반기 누적 — 이미 2025년 전체(72.5) 초과
+full_year_2025_usd_b: 72.5       # 2025년 전체 착공액(2024년 전체 대비 3배 이상)
+
+opposition_severity:
+  # Data Center Watch(10a Labs 자금 지원 — 경미한 이해상충 가능성, [OPINION]
+  # 소스 성격에 유의) 집계 + 언론 교차확인.
+  blocked_or_delayed_usd_b_2025_baseline: 64    # ~2025-03 기준 누적
+  blocked_q1_2026_usd_b: 130                    # 2026년 1분기 단독으로 2025년 전체와 맞먹음
+  protest_events_single_day: 142                # 2026-07-18, 42개 주
+  activist_groups: 142
+  activist_states: 24
+  public_disapproval_pct: 75
+  public_approval_pct: 15
+  texas_action: "Abbott 주지사, ERCOT/PUCT 전체 신규 데이터센터 계통연계 감사·일시중단 지시 (474GW 대기열, ~248개 프로젝트)"
+  maryland_moratorium_counties: "24개 카운티 중 13개 모라토리엄 채택"
+
+sources:
+  - "ConstructConnect 'Data Center Report' (월간, 공개 API 없음 — 보도자료/업계 인용)"
+  - "Data Center Watch (10a Labs) — 반대/차단 집계"
+  - "Brookings — 2026 중간선거 핵심 이슈로 데이터센터 반대 지목"
+  - "세션 내 WebSearch 조사 (2026-08-27), 교차확인 매체 다수"

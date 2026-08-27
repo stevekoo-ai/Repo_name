@@ -106,3 +106,17 @@ def fetch_subscription_notices() -> list[dict]:
         return []
     base.write_raw("subscription", "notices", payload)
     return payload.get("notices", [])
+
+
+def fetch_data_center_construction() -> dict | None:
+    """미국 데이터센터 건설 반대 vs 착공(ConstructConnect) 원자료 (7.3 예외).
+
+    HBM Cycle Score의 "고객재고" 축 보조 참고자료 — 의도적으로 점수화하지
+    않는다 (data_center_construction.yaml 상단 주석 참고). None이면 아직
+    수동 입력 파일이 없다는 뜻이고, 리포트 쪽에서 조용히 섹션을 생략한다.
+    """
+    payload = _load("data_center_construction")
+    if not payload:
+        return None
+    base.write_raw("data_center", "construction_vs_opposition", payload)
+    return payload

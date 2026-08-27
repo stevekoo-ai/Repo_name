@@ -410,6 +410,20 @@ def build_report_payload(month_key: str | None = None) -> dict:
         log_event("weekly_analysis.failed", error=str(exc), level="warning")
         payload["weekly_analysis"] = {"status": "error", "error": str(exc)}
 
+    # Add data center construction vs opposition raw data (HBM Cycle Score
+    # "고객재고" axis supporting reference — intentionally NOT scored, see
+    # data/manual_inputs/data_center_construction.yaml header for why).
+    try:
+        from collectors import manual as manual_collectors
+
+        dc_payload = manual_collectors.fetch_data_center_construction()
+        payload["data_center_construction"] = dc_payload  # None -> markdown section self-skips
+        if dc_payload:
+            log_event("data_center_construction.loaded", updated_at=dc_payload.get("updated_at"))
+    except Exception as exc:
+        log_event("data_center_construction.failed", error=str(exc), level="warning")
+        payload["data_center_construction"] = None
+
     # Cross-engine reconciliation. Runs LAST so it can see every engine's output,
     # and emits one stance instead of letting modules contradict each other in
     # front of the reader. See engine/report/reconciliation.py for the rules.

@@ -1400,6 +1400,57 @@ def _weekly_analysis_section(payload: dict) -> str:
     return "\n".join(lines)
 
 
+def _data_center_construction_section(payload: dict) -> str:
+    """Section: 미국 데이터센터 건설 반대 vs 착공 실적 (1 min read).
+
+    HBM Cycle Score "고객재고" 축 보조 참고자료. 반대(정치·규제 리스크)와
+    착공 실적(경제적 수요)이 같은 시기에 정반대로 움직이는 긴장 관계를
+    원자료 그대로 보여준다 — 점수화하지 않는다(왜 그런지는
+    data/manual_inputs/data_center_construction.yaml 헤더 참고).
+    """
+    dc = payload.get("data_center_construction")
+    if not dc:
+        return ""
+
+    starts = dc.get("construction_starts_usd_b", [])
+    opp = dc.get("opposition_severity", {})
+
+    lines = [
+        "# 2.6 미국 데이터센터 건설 반대 vs 착공 실적 — 참고자료",
+        "",
+        f"**갱신일**: {dc.get('updated_at')} (수동 입력, 신뢰도 {dc.get('reliability_grade')}/5 — "
+        "ConstructConnect·Data Center Watch 모두 공개 API 없음)",
+        "",
+        "## 착공 실적 (ConstructConnect, 월간 $)",
+        "",
+    ]
+    for row in starts:
+        date_label = row.get("date") or "(날짜 미확인)"
+        note = f" — {row['note']}" if row.get("note") else ""
+        lines.append(f"- {date_label}: **${row.get('value')}B**{note}")
+
+    lines.extend([
+        f"- 2026 상반기 누적: **${dc.get('h1_2026_cumulative_usd_b')}B** "
+        f"(2025년 전체 ${dc.get('full_year_2025_usd_b')}B 이미 초과)",
+        "",
+        "## 건설 반대 심각도",
+        "",
+        f"- 2026년 1분기 차단/지연 규모: **${opp.get('blocked_q1_2026_usd_b')}B** "
+        f"(2025년 전체 누적 ${opp.get('blocked_or_delayed_usd_b_2025_baseline')}B와 맞먹음, [OPINION] 소스=Data Center Watch)",
+        f"- 여론: 반대 {opp.get('public_disapproval_pct')}% / 찬성 {opp.get('public_approval_pct')}%",
+        f"- 텍사스: {opp.get('texas_action')}",
+        f"- 메릴랜드: {opp.get('maryland_moratorium_counties')}",
+        "",
+        "**해석**: 착공 실적은 사상 최고 수준인데 반대 여론·규제 리스크도 동시에 급증 중 — "
+        "두 신호가 상충하는 이유(주별 편차 vs. 이미 승인된 프로젝트의 관성적 진행)는 아직 미해소. "
+        "상세: [wiki/concepts/data-center-construction-vs-opposition.md]"
+        "(../wiki/concepts/data-center-construction-vs-opposition.md)",
+        "",
+    ])
+
+    return "\n".join(lines)
+
+
 def render_markdown(payload: dict) -> str:
     """Render PEOS report using new 5-section user-centric structure.
 
@@ -1421,6 +1472,7 @@ def render_markdown(payload: dict) -> str:
         _macro_dashboard_section(payload),
         _sk_hynix_decision_section(payload),
         _weekly_analysis_section(payload),  # Layer 0 supporting evidence
+        _data_center_construction_section(payload),  # 고객재고 축 보조 참고자료 (2.6)
         _real_estate_decision_section(payload),
         generate_event_section(payload),  # 경제 달력 통합 (Section 3.5)
         _monthly_rolling_window_section(payload),  # 월별 추이 (Section 4)
