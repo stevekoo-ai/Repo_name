@@ -1263,6 +1263,42 @@ def test_render_export_recovery_watch_note_links_to_the_wiki_concept():
     assert "반도체수출" in note or "총수출" in note
 
 
+def test_automation_run_log_creates_header_then_appends():
+    """2026-08-27: CI 단계 자동 상태로그 신설 — 첫 호출은 헤더+1행, 두 번째
+    호출은 헤더 없이 1행만 추가해야 append-only 원칙을 지킨다."""
+    import csv, pathlib, tempfile
+    from scripts.log_automation_run import append_row
+
+    tmp = pathlib.Path(tempfile.mkdtemp()) / "automation-run-log.csv"
+    append_row("sk-hynix-daily-report", "investor_flow_fetch", "1", "36", "success", path=tmp)
+    append_row("macro-data-sync", "macro_sync", "5", "36", "exhausted", path=tmp)
+
+    rows = list(csv.DictReader(open(tmp, encoding="utf-8")))
+    assert len(rows) == 2, f"expected 2 data rows, got {len(rows)}"
+    assert rows[0]["workflow"] == "sk-hynix-daily-report"
+    assert rows[0]["result"] == "success"
+    assert rows[1]["workflow"] == "macro-data-sync"
+    assert rows[1]["attempts_used"] == "5"
+    assert rows[1]["result"] == "exhausted"
+
+
+def test_automation_run_log_rejects_unknown_result():
+    """success/exhausted 둘 중 하나가 아니면 조용히 넘어가지 않고 즉시 실패
+    — CI 스텝에서 오타가 나면 로그가 아니라 워크플로 자체가 눈에 띄게 죽어야
+    한다(silent corruption 방지)."""
+    import pathlib, tempfile
+    from scripts.log_automation_run import append_row
+
+    tmp = pathlib.Path(tempfile.mkdtemp()) / "automation-run-log.csv"
+    try:
+        append_row("sk-hynix-daily-report", "investor_flow_fetch", "1", "36", "partial", path=tmp)
+        raised = False
+    except ValueError:
+        raised = True
+    assert raised, "an invalid result value must raise, not be written"
+    assert not tmp.exists(), "no file should be created on a rejected write"
+
+
 if __name__ == "__main__":
     import sys, traceback
     fns = [(n, f) for n, f in sorted(globals().items())

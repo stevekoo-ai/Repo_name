@@ -32,18 +32,21 @@ jobs:
           until python3 scripts/macro_data.py sync; do
             if [ "$attempt" -ge "$max_attempts" ]; then
               echo "::error::${max_attempts}회(6시간) 재시도했지만 거시지표 동기화 실패"
+              python3 scripts/log_automation_run.py macro-data-sync macro_sync "$attempt" "$max_attempts" exhausted
               exit 1
             fi
             echo "[재시도 $attempt/$max_attempts] 거시지표 동기화 실패 — 10분 후 재시도"
             attempt=$((attempt + 1))
             sleep 600
           done
+          python3 scripts/log_automation_run.py macro-data-sync macro_sync "$attempt" "$max_attempts" success
 
       - name: 변경사항 커밋 & 푸시
         run: |
           git config user.name "macro-data-sync-bot"
           git config user.email "actions@users.noreply.github.com"
           git add sources/macro-series.csv
+          [ -f sources/automation-run-log.csv ] && git add sources/automation-run-log.csv
           git diff --cached --quiet || git commit -m "거시지표 자동 동기화: $(date -u +%Y-%m-%dT%H:%M:%SZ)"
           for i in 1 2 3 4 5; do
             git push && break
@@ -52,6 +55,31 @@ jobs:
             git rebase origin/main
             sleep $((i * 3))
           done
+
+      # 2026-08-27 추가 — 재시도 소진으로 잡이 실패하면 위 커밋 스텝 자체가
+      # 실행되지 않아 "exhausted" 로그 행이 영영 안 남는다 — 항상 실행되는
+      # 별도 스텝으로 로그 파일만 커밋(성공 경로에선 위에서 이미 커밋돼
+      # no-op).
+      - name: 자동화 상태로그 커밋 (항상 실행)
+        if: always()
+        run: |
+          git config user.name "macro-data-sync-bot"
+          git config user.email "actions@users.noreply.github.com"
+          if [ -f sources/automation-run-log.csv ]; then
+            git add sources/automation-run-log.csv
+            if git diff --cached --quiet; then
+              echo "automation-run-log.csv: 새로 커밋할 행 없음"
+            else
+              git commit -m "chore: automation run log $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+              for i in 1 2 3 4 5; do
+                git push && break
+                echo "push rejected, rebasing onto latest main (attempt $i)"
+                git fetch origin main
+                git rebase origin/main
+                sleep $((i * 3))
+              done
+            fi
+          fi
 
       # 2026-08-21 추가 — 위 재시도(최대 6시간)까지 다 소진하고도 실패한
       # 경우에만 도달. 트랙 A(거시지표, 경제판단 리포트 재료) 채널.

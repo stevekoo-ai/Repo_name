@@ -96,12 +96,14 @@ jobs:
           until python3 scripts/investor_flow.py fetch --ticker 000660 --days 30; do
             if [ "$attempt" -ge "$max_attempts" ]; then
               echo "::error::${max_attempts}회(6시간) 재시도했지만 투자자매매동향 fetch 실패"
+              python3 scripts/log_automation_run.py sk-hynix-daily-report investor_flow_fetch "$attempt" "$max_attempts" exhausted
               exit 1
             fi
             echo "[재시도 $attempt/$max_attempts] 투자자매매동향 fetch 실패 — 10분 후 재시도"
             attempt=$((attempt + 1))
             sleep 600
           done
+          python3 scripts/log_automation_run.py sk-hynix-daily-report investor_flow_fetch "$attempt" "$max_attempts" success
 
       - name: ADR(SKHY, 나스닥) 시세 fetch
         if: ${{ github.event.inputs.debug_raw != 'true' }}
@@ -121,12 +123,14 @@ jobs:
           until python3 scripts/investor_flow.py snapshot --ticker 000660; do
             if [ "$attempt" -ge "$max_attempts" ]; then
               echo "::error::${max_attempts}회(6시간) 재시도했지만 snapshot 실패"
+              python3 scripts/log_automation_run.py sk-hynix-daily-report price_snapshot "$attempt" "$max_attempts" exhausted
               exit 1
             fi
             echo "[재시도 $attempt/$max_attempts] snapshot 실패 — 10분 후 재시도"
             attempt=$((attempt + 1))
             sleep 600
           done
+          python3 scripts/log_automation_run.py sk-hynix-daily-report price_snapshot "$attempt" "$max_attempts" success
 
       # 2026-07-31 추가 — stevekoo-ai/open-trading-api(KIS 공식 예제) 조사로
       # 발견한 4개 TR. 신용잔고는 찐반등 신호①(빚의 청산)의 데이터소스,
@@ -176,12 +180,14 @@ jobs:
           until python3 daily_report.py --ticker 000660 | tee /tmp/report.md; do
             if [ "$attempt" -ge "$max_attempts" ]; then
               echo "::error::${max_attempts}회(6시간) 재시도했지만 리포트 생성 실패"
+              python3 log_automation_run.py sk-hynix-daily-report report_generation "$attempt" "$max_attempts" exhausted
               exit 1
             fi
             echo "[재시도 $attempt/$max_attempts] 리포트 생성 실패 — 10분 후 재시도"
             attempt=$((attempt + 1))
             sleep 600
           done
+          python3 log_automation_run.py sk-hynix-daily-report report_generation "$attempt" "$max_attempts" success
           echo "report_path=$(ls -t ../sources/sk-hynix-auto-report-*.md | head -1)" >> "$GITHUB_OUTPUT"
 
       - name: 변경사항 커밋 & 푸시
@@ -196,6 +202,7 @@ jobs:
           [ -f sources/kr-index-quote.csv ] && git add sources/kr-index-quote.csv
           [ -f sources/sk-hynix-short-sale.csv ] && git add sources/sk-hynix-short-sale.csv
           [ -f sources/portfolio-etf-nav.csv ] && git add sources/portfolio-etf-nav.csv
+          [ -f sources/automation-run-log.csv ] && git add sources/automation-run-log.csv
           git diff --cached --quiet || git commit -m "자동 리포트: $(date -u +%Y-%m-%dT%H:%M:%SZ)"
           for i in 1 2 3 4 5; do
             git push && break
@@ -217,6 +224,34 @@ jobs:
           to: ${{ secrets.GMAIL_ADDRESS }}
           from: SK하이닉스 자동 리포트 봇
           body: file:///tmp/report.md
+
+      # 2026-08-27 추가 — 위 "변경사항 커밋 & 푸시"는 재시도 소진으로 잡이
+      # 실패하면 아예 실행되지 않아 automation-run-log.csv의 "exhausted"
+      # 행이 영영 커밋되지 못한다(CI 헬스체크가 다시 GitHub API 수동
+      # 고고학으로 돌아가는 걸 막으려는 게 이 로그의 목적인데, 정작 실패
+      # 사례가 안 남으면 무의미) — 성공/실패 무관하게 항상 이 로그 파일만
+      # 별도로 커밋. 성공 경로에서는 위 스텝이 이미 커밋해놔서 git diff
+      # --cached가 비어있는 게 정상(no-op).
+      - name: 자동화 상태로그 커밋 (항상 실행)
+        if: always()
+        run: |
+          git config user.name "sk-hynix-auto-report-bot"
+          git config user.email "actions@users.noreply.github.com"
+          if [ -f sources/automation-run-log.csv ]; then
+            git add sources/automation-run-log.csv
+            if git diff --cached --quiet; then
+              echo "automation-run-log.csv: 새로 커밋할 행 없음"
+            else
+              git commit -m "chore: automation run log $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+              for i in 1 2 3 4 5; do
+                git push && break
+                echo "push rejected, rebasing onto latest main (attempt $i)"
+                git fetch origin main
+                git rebase origin/main
+                sleep $((i * 3))
+              done
+            fi
+          fi
 
       # 2026-08-21 추가 — 이 워크플로는 위 어느 단계에서 실패하든(예:
       # investor_flow.py가 KIS API 미정산 필드에 죽는 버그, 8/16~8/20
