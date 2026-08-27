@@ -1474,6 +1474,10 @@ def render_markdown(payload: dict) -> str:
         _weekly_analysis_section(payload),  # Layer 0 supporting evidence
         _data_center_construction_section(payload),  # 고객재고 축 보조 참고자료 (2.6)
         _real_estate_decision_section(payload),
+        _real_estate_trend(payload),  # 3절 보조 근거 — 아파트 매매 실거래 트렌드
+        _rent_trend(payload),  # 3절 보조 근거 — 아파트 전월세 실거래 트렌드
+        _villa_trend(payload),  # 3절 보조 근거 — 빌라 매매 실거래 트렌드
+        _officetel_trend(payload),  # 3절 보조 근거 — 오피스텔 매매 실거래 트렌드
         generate_event_section(payload),  # 경제 달력 통합 (Section 3.5)
         _monthly_rolling_window_section(payload),  # 월별 추이 (Section 4)
         _quarterly_rolling_window_section(payload),  # 분기별 추이 (Section 5)
