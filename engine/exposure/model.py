@@ -39,13 +39,26 @@ see wiki/concepts/kis-api-reference.md) and market values become live.
 Until then cost-basis numbers are correct and clearly labelled, which is
 the right failure mode. Do NOT paper over it by defaulting price to
 avg_price silently.
+
+2026-08-27 update — that quote source now exists and is wired in:
+sk-hynix-daily-report.yml has been fetching a live KIS price into
+sources/sk-hynix-price-snapshot.csv 3x/day since 2026-07-28, but this
+module kept reading the one-time hardcoded KNOWN_PRICES value (stuck at the
+2026-08-07 snapshot) instead. `_load_live_price()` below reads that CSV's
+latest row — still no network call (it's a file this repo already commits
+daily), so the "always valid with zero collectors running" property is
+unchanged. KNOWN_PRICES stays as the fallback for tickers with no such CSV.
 """
 from __future__ import annotations
 
+import csv
 from dataclasses import dataclass, field
 from datetime import date
+from pathlib import Path
 
 from core.config import portfolio_config
+
+REPO_ROOT = Path(__file__).resolve().parents[2]
 
 # Last verified market prices. Each entry MUST carry its observation date and
 # source — an undated price is how stale numbers turn into fake precision.
@@ -63,6 +76,41 @@ SEMI_SECTORS = {"semiconductor_memory", "semiconductor"}
 SEMI_ETF_BUCKETS = {"semiconductor"}
 
 EMPLOYER_TICKER = "000660.KS"
+
+# Tickers with a locally-collected live-price CSV (KIS API via
+# sk-hynix-daily-report.yml, 3x/day) — maps to (csv_path, plain ticker value
+# used in that CSV's "ticker" column, since the CSV doesn't carry the
+# ".KS" suffix config/portfolio.yaml uses). Add an entry here whenever a new
+# holding gets a real collector; anything absent falls back to KNOWN_PRICES.
+LIVE_PRICE_CSV: dict[str, tuple[Path, str]] = {
+    "000660.KS": (REPO_ROOT / "sources" / "sk-hynix-price-snapshot.csv", "000660"),
+}
+
+
+def _load_live_price(ticker: str) -> dict | None:
+    """Latest row from the daily-collected KIS snapshot CSV for `ticker`, or
+    None. Never raises and never guesses — a missing file, an empty file, or
+    a malformed row all just fall through to KNOWN_PRICES (or cost basis),
+    same as the "never invent a price" rule above."""
+    entry = LIVE_PRICE_CSV.get(ticker)
+    if not entry:
+        return None
+    path, plain_ticker = entry
+    if not path.exists():
+        return None
+    try:
+        with path.open(newline="", encoding="utf-8") as f:
+            rows = [r for r in csv.DictReader(f) if r.get("ticker") == plain_ticker]
+        if not rows:
+            return None
+        latest = rows[-1]  # collector upserts one row per date, in date order
+        return {
+            "price": int(float(latest["price"])),
+            "as_of": latest["date"],
+            "source": "KIS API 실시간 스냅샷 (sk-hynix-daily-report.yml)",
+        }
+    except (KeyError, ValueError, OSError):
+        return None
 
 
 @dataclass
@@ -125,7 +173,7 @@ def build_exposure_model() -> ExposureModel:
         avg = float(row.get("avg_price") or 0)
         cost = qty * avg
 
-        quote = KNOWN_PRICES.get(ticker)
+        quote = _load_live_price(ticker) or KNOWN_PRICES.get(ticker)
         mv = qty * quote["price"] if quote else None
 
         lockups = row.get("lockups") or []
@@ -187,10 +235,11 @@ def build_exposure_model() -> ExposureModel:
             f"나머지는 매수원가 기준입니다. 시세 연동(KIS API) 전까지 비중(%)은 근사치입니다."
         )
     if emp and emp.price_as_of:
-        m.notes.append(
-            f"{emp.name} 기준가 {KNOWN_PRICES[EMPLOYER_TICKER]['price']:,}원은 "
-            f"{emp.price_as_of} {KNOWN_PRICES[EMPLOYER_TICKER]['source']}."
-        )
+        quote = _load_live_price(EMPLOYER_TICKER) or KNOWN_PRICES.get(EMPLOYER_TICKER)
+        if quote:
+            m.notes.append(
+                f"{emp.name} 기준가 {quote['price']:,}원은 {emp.price_as_of} {quote['source']}."
+            )
     m.notes.append(
         "급여·성과급(PS)과 퇴직연금이 같은 회사·같은 메모리 사이클에 연동됩니다. "
         "실질 집중도는 아래 지분율보다 높습니다."

@@ -45,6 +45,45 @@ def test_unpriced_holdings_fall_back_to_cost_never_to_a_fake_market_value():
     assert 0 < m.priced_coverage_pct < 100
 
 
+def test_exposure_model_prefers_live_kis_snapshot_over_the_hardcoded_price():
+    """2026-08-27: KNOWN_PRICES was stuck at a 2026-08-07 snapshot even though
+    sk-hynix-daily-report.yml has written a fresher price to
+    sources/sk-hynix-price-snapshot.csv every day since. The live CSV must win
+    once it exists for a ticker, and its as_of date must be reported honestly
+    (not silently overwritten with the stale hardcoded date)."""
+    from engine.exposure import model as m
+
+    assert m.KNOWN_PRICES["000660.KS"]["as_of"] == "2026-08-07", (
+        "this test's premise is that KNOWN_PRICES is the older/fallback source — "
+        "if this fails, the file itself may have been refreshed, which is fine, "
+        "just update this assertion's expected date"
+    )
+    live = m._load_live_price("000660.KS")
+    assert live is not None, "fixture expects sources/sk-hynix-price-snapshot.csv to have a 000660 row"
+    assert live["as_of"] > "2026-08-07", "the live snapshot should be newer than the hardcoded fallback"
+
+    model = m.build_exposure_model()
+    sk = next(h for h in model.holdings if h.ticker == "000660.KS")
+    assert sk.market_value == sk.quantity * live["price"]
+    assert sk.price_as_of == live["as_of"]
+
+
+def test_load_live_price_falls_back_gracefully_when_csv_is_missing():
+    """A ticker with no collector-backed CSV (or a CSV that vanished) must return
+    None, not raise — build_exposure_model() then falls through to KNOWN_PRICES
+    or cost basis, never crashes Section 0."""
+    from engine.exposure import model as m
+    import pathlib
+
+    saved = m.LIVE_PRICE_CSV
+    m.LIVE_PRICE_CSV = {"000660.KS": (pathlib.Path("/nonexistent/does-not-exist.csv"), "000660")}
+    try:
+        assert m._load_live_price("000660.KS") is None
+        assert m._load_live_price("999999.KS") is None  # not in the map at all
+    finally:
+        m.LIVE_PRICE_CSV = saved
+
+
 def test_concentration_is_sector_wide_not_single_ticker():
     """The risk is not 'SK하이닉스 한 종목' — 삼성전자/제주반도체/반도체 ETF ride the
     same memory cycle, so semi exposure must exceed the employer position alone."""
