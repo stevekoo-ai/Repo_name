@@ -944,7 +944,55 @@ def _sk_hynix_decision_section(payload: dict) -> str:
     lines += [
         "## 거시-반도체 연결 분석",
         f"{decision.macro_linkage}",
-        "",
+    ]
+    capex = payload.get("hyperscaler_capex")
+    if capex:
+        capex_bits = []
+        for tk in ("GOOGL", "MSFT", "AMZN", "META"):
+            c = capex.get(tk)
+            if not c or c["qoq_pct"] is None:
+                continue
+            stale_note = " ⚠스테일" if c["is_stale"] else ""
+            conflict_note = " ⚠데이터충돌" if c.get("note") else ""
+            capex_bits.append(f"{tk} {c['qoq_pct']:+.1f}%({c['end_date']}){stale_note}{conflict_note}")
+        if capex_bits:
+            lines.append(
+                f"- [실측] 하이퍼스케일러 CapEx QoQ(SEC EDGAR): " + ", ".join(capex_bits) +
+                " — HBM Cycle Score 고객재고 축 보조 근거, 어닝콜 논조 판단은 별도(사람/Claude 몫)"
+            )
+    lines.append("")
+
+    live = payload.get("sk_hynix_live")
+    if live:
+        lines += ["## 오늘의 실측 데이터 (KIS API, sk-hynix-daily-report.yml 3x/일)", ""]
+        snap = live.get("price_snapshot")
+        if snap:
+            lines.append(
+                f"- {snap['date']} 시세: **{int(float(snap['price'])):,}원** "
+                f"({float(snap['change']):+,.0f}, {float(snap['change_pct']):+.2f}%), "
+                f"외국인보유율 {float(snap['foreign_hold_pct']):.2f}%"
+            )
+        fs = live.get("flow_summary")
+        if fs and fs.get(20) and fs[20].get("foreign") is not None:
+            w20 = fs[20]
+            collapse = " (HBM Cycle Score 붕괴조건④ 충족)" if w20["foreign"] < 0 else ""
+            lines.append(f"- {live['flow_latest_date']} 기준 외국인 20일 누적 순매수: {w20['foreign']:+,}원{collapse}")
+        cb = live.get("credit_balance")
+        if cb and cb.get("latest"):
+            streak_note = f" ({cb['direction']} {cb['streak_days']}거래일 연속)" if cb.get("direction") else ""
+            lines.append(f"- 신용융자잔고: {int(cb['latest']['loan_balance_qty']):,}주{streak_note}")
+        ss = live.get("short_sale")
+        if ss:
+            lines.append(f"- {ss['date']} 공매도 거래량 비중: {float(ss['short_vol_pct']):.2f}%")
+        adr = live.get("adr")
+        if adr:
+            if adr.get("crosscheck") == "MISMATCH":
+                lines.append(f"- ADR(SKHY) {adr.get('date', '?')}: ${float(adr['price']):,.2f} — ⚠️ 등락률 크로스체크 불일치, 미확정")
+            else:
+                lines.append(f"- ADR(SKHY) {adr.get('date', '?')}: ${float(adr['price']):,.2f}")
+        lines.append("")
+
+    lines += [
         "## 위험 신호",
         "",
     ]

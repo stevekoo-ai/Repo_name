@@ -1340,6 +1340,102 @@ def test_daily_report_delegates_to_the_shared_hbm_module_not_a_private_copy():
     assert result.stdout.strip().splitlines() == ["True", "True"]
 
 
+def test_capex_periphery_module_is_shared_not_duplicated():
+    """2026-08-27: read_hyperscaler_capex/read_ai_periphery moved out of
+    scripts/daily_report.py the same way the HBM axes did — package-style
+    import must work (what engine/report/payload.py uses) and return the
+    expected per-ticker shape."""
+    from scripts.capex_periphery import read_hyperscaler_capex, read_ai_periphery
+
+    capex = read_hyperscaler_capex()
+    assert capex, "fixture expects sources/hyperscaler-capex.csv to have rows"
+    for ticker in ("GOOGL", "MSFT", "AMZN", "META"):
+        assert ticker in capex, f"expected {ticker} in hyperscaler capex data"
+        assert "value_usd" in capex[ticker] and "end_date" in capex[ticker]
+
+    periphery = read_ai_periphery()
+    assert periphery, "fixture expects sources/ai-periphery-fundamentals.csv to have rows"
+
+
+def test_daily_report_delegates_to_the_shared_capex_module_not_a_private_copy():
+    """Same guarantee as test_daily_report_delegates_to_the_shared_hbm_module —
+    spawned sibling-style (cwd=scripts), matching the real CI invocation."""
+    import subprocess
+
+    result = subprocess.run(
+        ["python3", "-c",
+         "import daily_report, capex_periphery as cp; "
+         "print(daily_report.read_hyperscaler_capex is cp.read_hyperscaler_capex); "
+         "print(daily_report.read_ai_periphery is cp.read_ai_periphery)"],
+        cwd="scripts", capture_output=True, text=True, timeout=30,
+    )
+    assert result.returncode == 0, f"daily_report.py failed to import: {result.stderr}"
+    assert result.stdout.strip().splitlines() == ["True", "True"]
+
+
+def test_sk_hynix_section_shows_live_data_and_capex_as_context_not_a_directive():
+    """2026-08-27 Phase 3: the '오늘의 실측 데이터'/CapEx lines must render from
+    real payload data, and must never contain BUY/SELL/HOLD language of their
+    own — R4 (포지션 지시는 단일 출처) says only the decision engine may
+    instruct a position; supplementary evidence sections must read as context."""
+    from dataclasses import dataclass
+    from engine.report.markdown import _sk_hynix_decision_section
+    from scripts.capex_periphery import read_hyperscaler_capex, read_ai_periphery
+    from scripts.investor_flow import read_latest_price_snapshot, read_ticker_rows, summarize_flows, \
+        credit_balance_streak, read_latest_short_sale, read_latest_adr
+    from scripts.hbm_cycle_score import score_foreign_flow_axis, score_foreign_holding_axis
+
+    flow_rows = read_ticker_rows("000660")
+    fake_payload = {
+        "personal": {"semiconductor_score": 83.8, "semiconductor_band": "강한 긍정"},
+        "rate_analysis": {"total_score": 65.0},
+        "hbm_cycle_score": {
+            "ticker": "000660",
+            "foreign_flow": score_foreign_flow_axis("000660"),
+            "foreign_holding": score_foreign_holding_axis("000660"),
+        },
+        "hyperscaler_capex": read_hyperscaler_capex(),
+        "ai_periphery": read_ai_periphery(),
+        "sk_hynix_live": {
+            "price_snapshot": read_latest_price_snapshot("000660"),
+            "flow_summary": summarize_flows(flow_rows) if flow_rows else None,
+            "flow_latest_date": flow_rows[-1]["date"] if flow_rows else None,
+            "credit_balance": credit_balance_streak("000660"),
+            "short_sale": read_latest_short_sale("000660"),
+            "adr": read_latest_adr("SKHY"),
+        },
+    }
+
+    @dataclass
+    class FakeDecision:
+        signal: str = "HOLD"
+        confidence: float = 50.0
+        rationale: str = "test"
+        macro_linkage: str = "test linkage"
+        risk_flags: list = None
+        triggers: list = None
+        next_check: str = "soon"
+        valuation_band: dict = None
+
+    import engine.exporters.sk_hynix_decision as skmod
+    orig = skmod.compute_sk_hynix_decision
+    skmod.compute_sk_hynix_decision = lambda p: FakeDecision(risk_flags=[], triggers=[])
+    try:
+        out = _sk_hynix_decision_section(fake_payload)
+    finally:
+        skmod.compute_sk_hynix_decision = orig
+
+    assert "오늘의 실측 데이터" in out
+    assert "하이퍼스케일러 CapEx QoQ" in out
+    assert "GOOGL" in out  # real ticker from the CSV, not a placeholder
+    # R4 guard: no directive language inside the evidence sections
+    evidence_start = out.find("## HBM Cycle Score")
+    evidence_end = out.find("## 위험 신호")
+    evidence_text = out[evidence_start:evidence_end]
+    for verb in ("매수하세요", "매도하세요", "지금 사", "지금 팔"):
+        assert verb not in evidence_text
+
+
 def test_automation_run_log_creates_header_then_appends():
     """2026-08-27: CI 단계 자동 상태로그 신설 — 첫 호출은 헤더+1행, 두 번째
     호출은 헤더 없이 1행만 추가해야 append-only 원칙을 지킨다."""

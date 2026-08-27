@@ -323,6 +323,37 @@ def build_report_payload(month_key: str | None = None) -> dict:
         log_event("hbm_cycle_score.failed", error=str(exc), level="warning")
         payload["hbm_cycle_score"] = None
 
+    # 하이퍼스케일러 CapEx 실측 + SK Hynix 오늘의 실측 데이터 (SEC EDGAR + KIS,
+    # 이미 매일/주간 수집되던 CSV를 처음으로 PEOS 쪽에서도 읽는다). 전부
+    # 정보/근거용 — 어느 것도 새 매매 지시를 만들지 않는다(R4).
+    try:
+        from scripts.capex_periphery import read_hyperscaler_capex, read_ai_periphery
+        from scripts.investor_flow import (
+            read_latest_price_snapshot, read_ticker_rows, summarize_flows,
+            credit_balance_streak, read_latest_short_sale, read_latest_adr,
+        )
+
+        payload["hyperscaler_capex"] = read_hyperscaler_capex()
+        payload["ai_periphery"] = read_ai_periphery()
+
+        flow_rows = read_ticker_rows("000660")
+        payload["sk_hynix_live"] = {
+            "price_snapshot": read_latest_price_snapshot("000660"),
+            "flow_summary": summarize_flows(flow_rows) if flow_rows else None,
+            "flow_latest_date": flow_rows[-1]["date"] if flow_rows else None,
+            "credit_balance": credit_balance_streak("000660"),
+            "short_sale": read_latest_short_sale("000660"),
+            "adr": read_latest_adr("SKHY"),
+        }
+        log_event("sk_hynix_live_data.loaded",
+                  capex_tickers=list(payload["hyperscaler_capex"].keys()) if payload["hyperscaler_capex"] else [],
+                  has_price_snapshot=payload["sk_hynix_live"]["price_snapshot"] is not None)
+    except Exception as exc:
+        log_event("sk_hynix_live_data.failed", error=str(exc), level="warning")
+        payload["hyperscaler_capex"] = None
+        payload["ai_periphery"] = None
+        payload["sk_hynix_live"] = None
+
     try:
         payload["real_estate_decision"] = compute_real_estate_decision(payload)
         log_event("real_estate_decision.computed", signal=payload["real_estate_decision"].signal,
