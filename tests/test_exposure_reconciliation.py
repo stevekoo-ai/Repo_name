@@ -1511,6 +1511,37 @@ def test_wiki_digest_section_never_contains_directive_language():
     assert "R4" in out  # explicit "not a directive" disclaimer present
 
 
+def test_calendar_section_and_economic_events_no_longer_contradict_each_other():
+    """2026-08-27 Phase 5: Section 14 used to read data/manual_inputs/calendar.yaml
+    (all-EXAMPLE, past-dated -> always '확정된 일정 없음') while Section 3.5 read a
+    separate hardcoded event list -- the same report simultaneously claimed 'no
+    events' and listed three specific ones. Both must now agree on the same
+    events."""
+    from engine.report.markdown import _calendar
+    from engine.report.economic_events import get_upcoming_events
+
+    out = _calendar({})
+    events = get_upcoming_events()
+    for e in events:
+        assert e.date in out and e.name in out
+    assert "확정된 일정 없음" not in out or not events
+
+
+def test_stale_hardcoded_events_are_flagged_loudly_not_shown_as_current():
+    """get_upcoming_events() is still Phase-3a placeholder data (its own docstring
+    says so) — if every event date has already passed, generate_event_section()
+    must say so loudly rather than silently presenting stale sample dates as
+    this week's real calendar."""
+    from engine.report.economic_events import generate_event_section, get_upcoming_events
+    from datetime import datetime
+
+    events = get_upcoming_events()
+    all_past = all((datetime.strptime(e.date, "%Y-%m-%d") - datetime.now()).days < 0 for e in events)
+    out = generate_event_section({})
+    if all_past:
+        assert "이미 지난 날짜" in out
+
+
 def test_automation_run_log_creates_header_then_appends():
     """2026-08-27: CI 단계 자동 상태로그 신설 — 첫 호출은 헤더+1행, 두 번째
     호출은 헤더 없이 1행만 추가해야 append-only 원칙을 지킨다."""

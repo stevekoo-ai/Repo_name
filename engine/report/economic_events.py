@@ -172,6 +172,22 @@ def generate_event_section(payload: dict) -> str:
     md = "\n# 3.5 경제 일정 & 의사결정 트리거\n\n"
     md += "**다음 14일간 SK Hynix/부동산 신호에 영향을 미칠 주요 이벤트 추적**\n\n"
 
+    # 2026-08-27 발견 — get_upcoming_events()는 module docstring이 스스로 인정하듯
+    # "Phase 3a 검증용 하드코딩, Phase 3b에서 API로 교체 예정"이었으나 교체가
+    # 안 됐다. 무료 공개 경제캘린더 API가 없어(아래 get_upcoming_events 참고)
+    # 이 표의 날짜가 전부 오늘보다 과거로 밀리면(교체 전까지 계속 발생) 마치
+    # 최신 데이터인 것처럼 조용히 보여주지 않고 여기서 loud하게 경고한다 —
+    # "값을 지어내지 않는다"는 이 저장소 전반의 원칙과 동일선상.
+    if events and all(
+        (datetime.strptime(e.date, "%Y-%m-%d") - datetime.now()).days < 0 for e in events
+    ):
+        md += (
+            "**🚨 [사실] 아래 이벤트는 전부 오늘(현재 실행 시각) 기준으로 이미 지난 날짜입니다** — "
+            "이 표는 Phase 3a 검증용 예시 데이터가 그대로 남아있는 것이며(무료 공개 경제캘린더 API가 "
+            "없어 아직 실데이터로 교체되지 못함), 실제 다음 14일 일정이 아닙니다. "
+            "실제 경제 일정은 별도로 확인하세요.\n\n"
+        )
+
     # Upcoming events table
     md += "## 📍 Upcoming Critical Events (Next 14 Days)\n\n"
     md += "| 날짜 | 이벤트 | 중요도 | 컨센서스 | 직전값 | D-Days | SK 신호 영향 | RE 신호 영향 |\n"

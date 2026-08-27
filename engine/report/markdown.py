@@ -376,11 +376,23 @@ def _action_plan(payload: dict) -> str:
 
 
 def _calendar(payload: dict) -> str:
-    lines = ["## 14. 경제 캘린더", "", "| 날짜 | 이벤트 | 중요도 | 사용자 영향 |", "|---|---|---|---|"]
-    for ev in payload["calendar"]:
-        lines.append(f"| {ev['date']} | {ev['name']} | {ev['importance_label']} | {ev['priority_score']}점 |")
-    if not payload["calendar"]:
-        lines.append("| - | 확정된 일정 없음 (data/manual_inputs/calendar.yaml 갱신 필요) | - | - |")
+    # 2026-08-27 Phase 5 — 이전엔 이 14절이 data/manual_inputs/calendar.yaml
+    # (예시 데이터만 있고 전부 과거 날짜라 늘 "확정된 일정 없음"으로만 표시됨)을
+    # 읽고, 바로 위 3.5절(generate_event_section)은 별도의 하드코딩 이벤트
+    # 리스트를 읽어서 — 같은 리포트 안에서 "일정 없음"과 "구체적 이벤트 3건"이
+    # 동시에 나오는 내부 모순이 있었다. get_upcoming_events()로 소스를 통일 —
+    # 그쪽도 아직 Phase 3a 검증용 예시 데이터라는 게 3.5절 상단 경고로 이미
+    # 드러나므로, 이 절도 같은 사실을 반복하지 않고 3.5절을 참고하라고만 안내.
+    from engine.report.economic_events import get_upcoming_events
+
+    events = get_upcoming_events()
+    lines = ["## 14. 경제 캘린더", "", "| 날짜 | 이벤트 | 중요도 |", "|---|---|---|"]
+    for ev in events:
+        lines.append(f"| {ev.date} | {ev.name} | {ev.importance} |")
+    if not events:
+        lines.append("| - | 확정된 일정 없음 | - |")
+    lines.append("")
+    lines.append("- 이 표의 데이터 최신성·상세(컨센서스/D-Day/신호 영향)는 3.5절(경제 일정 & 의사결정 트리거) 참고 — 같은 소스.")
     return "\n".join(lines)
 
 
