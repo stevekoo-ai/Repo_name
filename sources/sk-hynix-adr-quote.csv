@@ -19,4 +19,4 @@ date,symbol,price,change,change_pct,prev_close,crosscheck,crosscheck_detail,sour
 2026-08-25,SKHY,159.53,4.16,2.6774795649095706,155.37,OK,rate:+2.68|calc:+2.68|hist:+2.68,kis_api,2026-08-26T02:19:26+00:00
 2026-08-26,SKHY,158.02,1.51,,156.51000000000002,MISMATCH,rate:-0.95|calc:+0.96|hist:-0.95,kis_api,2026-08-27T02:50:05+00:00
 2026-08-27,SKHY,161.61,3.59,2.271864320972029,158.02,OK,rate:+2.27|calc:+2.27|hist:+2.27,kis_api,2026-08-28T05:55:19+00:00
-2026-08-28,SKHY,161.04,0.57,,160.47,MISMATCH,rate:-0.35|calc:+0.36|hist:-0.35,kis_api,2026-08-29T14:57:02+00:00
+2026-08-28,SKHY,161.04,0.57,,160.47,MISMATCH,rate:-0.35|calc:+0.36|hist:-0.35,kis_api,2026-08-29T23:51:20+00:00
