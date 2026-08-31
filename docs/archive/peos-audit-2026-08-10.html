@@ -1,0 +1,797 @@
+<title>PEOS 감사 리포트 — 2026-08-10</title>
+<style>
+/* ─────────────────────────────────────────────────────────────
+   PEOS Audit — 2026-08-10
+   Palette validated with dataviz/scripts/validate_palette.js
+     light categorical: #0093A8 #C25A18 #8B45B8  (all checks PASS)
+     dark  categorical: #1FA5BA #D4762F #A67AD0  (all checks PASS)
+   Neutrals biased toward the cyan accent, not pure grey.
+   ───────────────────────────────────────────────────────────── */
+
+:root {
+  --ground:      #F2F5F6;
+  --surface:     #FFFFFF;
+  --surface-2:   #E9EEF0;
+  --ink:         #0E1719;
+  --sub:         #4E6166;
+  --muted:       #7C9198;
+  --rule:        #D3DDE0;
+  --rule-strong: #B4C4C9;
+
+  --accent:      #056C7C;
+  --accent-ink:  #045763;
+  --accent-wash: #E2F0F2;
+
+  --s1: #0093A8;   /* series 1 — 한국 */
+  --s2: #C25A18;   /* series 2 — 미국 */
+  --s3: #8B45B8;   /* series 3 */
+
+  --good:      #14714F;
+  --good-wash: #E0EFE8;
+  --warn:      #8A5A0C;
+  --warn-wash: #F6ECDB;
+  --crit:      #A32229;
+  --crit-wash: #F7E4E5;
+
+  --shadow: 0 1px 2px rgba(14,23,25,.05), 0 10px 28px -14px rgba(14,23,25,.20);
+
+  --mono: ui-monospace, "SF Mono", SFMono-Regular, "Cascadia Mono", "Roboto Mono",
+          Menlo, Consolas, "D2Coding", monospace;
+  --sans: -apple-system, BlinkMacSystemFont, "Pretendard", "Apple SD Gothic Neo",
+          "Malgun Gothic", "Noto Sans KR", "Segoe UI", system-ui, sans-serif;
+
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ground:      #0A1013;
+    --surface:     #121B1E;
+    --surface-2:   #1B262A;
+    --ink:         #E6EEEF;
+    --sub:         #A0B4B9;
+    --muted:       #718589;
+    --rule:        #263438;
+    --rule-strong: #3A4C51;
+
+    --accent:      #3FB6C7;
+    --accent-ink:  #6ACedb;
+    --accent-wash: #102A2F;
+
+    --s1: #1FA5BA;
+    --s2: #D4762F;
+    --s3: #A67AD0;
+
+    --good:      #4CB98C;
+    --good-wash: #10241C;
+    --warn:      #D3A04A;
+    --warn-wash: #2A2110;
+    --crit:      #E8757E;
+    --crit-wash: #2C1518;
+
+    --shadow: 0 1px 2px rgba(0,0,0,.4), 0 10px 28px -14px rgba(0,0,0,.6);
+    color-scheme: dark;
+  }
+}
+
+:root[data-theme="dark"] {
+  --ground:      #0A1013;
+  --surface:     #121B1E;
+  --surface-2:   #1B262A;
+  --ink:         #E6EEEF;
+  --sub:         #A0B4B9;
+  --muted:       #718589;
+  --rule:        #263438;
+  --rule-strong: #3A4C51;
+
+  --accent:      #3FB6C7;
+  --accent-ink:  #6ACEDB;
+  --accent-wash: #102A2F;
+
+  --s1: #1FA5BA;
+  --s2: #D4762F;
+  --s3: #A67AD0;
+
+  --good:      #4CB98C;
+  --good-wash: #10241C;
+  --warn:      #D3A04A;
+  --warn-wash: #2A2110;
+  --crit:      #E8757E;
+  --crit-wash: #2C1518;
+
+  --shadow: 0 1px 2px rgba(0,0,0,.4), 0 10px 28px -14px rgba(0,0,0,.6);
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--ground);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: 16.5px;
+  line-height: 1.68;
+  -webkit-font-smoothing: antialiased;
+  /* Korean breaks at 어절, never mid-word — without this the browser
+     splits 경제 across two lines. */
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+
+.page { max-width: 940px; margin: 0 auto; padding: clamp(1.6rem, 4vw, 3.4rem) clamp(1.1rem, 4vw, 2rem) 6rem; }
+
+/* ── numerals ─────────────────────────────────────────────── */
+.n, td.n, th.n, .stat-v, .big, code, .stamp, .tick {
+  font-family: var(--mono);
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
+}
+
+/* ── masthead ─────────────────────────────────────────────── */
+.masthead { border-bottom: 2px solid var(--ink); padding-bottom: 1.1rem; margin-bottom: 2.3rem; }
+.masthead .row { display: flex; justify-content: space-between; align-items: baseline; gap: 1rem; flex-wrap: wrap; }
+.wordmark {
+  font-family: var(--mono); font-size: .74rem; font-weight: 600;
+  letter-spacing: .18em; text-transform: uppercase; color: var(--accent-ink);
+}
+.issued { font-family: var(--mono); font-size: .74rem; color: var(--muted); letter-spacing: .04em; }
+
+h1 {
+  font-size: clamp(1.85rem, 4.4vw, 2.75rem);
+  line-height: 1.16; letter-spacing: -.023em; font-weight: 760;
+  text-wrap: balance; margin: 1.5rem 0 .85rem;
+}
+.standfirst { font-size: 1.09rem; color: var(--sub); max-width: 63ch; margin: 0; }
+.standfirst strong { color: var(--ink); font-weight: 640; }
+
+/* ── freshness stamp — the report's structural device ─────── */
+.stamp {
+  display: inline-flex; align-items: center; gap: .38rem;
+  font-size: .67rem; font-weight: 600; letter-spacing: .06em;
+  padding: .17rem .48rem; border-radius: 3px; white-space: nowrap;
+  text-transform: uppercase;
+}
+.stamp::before { content: ""; width: 5px; height: 5px; border-radius: 50%; background: currentColor; flex: none; }
+.stamp.fresh   { color: var(--good); background: var(--good-wash); }
+.stamp.days    { color: var(--warn); background: var(--warn-wash); }
+.stamp.month   { color: var(--sub);  background: var(--surface-2); }
+.stamp.never   { color: var(--crit); background: var(--crit-wash); }
+
+/* ── sections ─────────────────────────────────────────────── */
+section { margin-top: 3.3rem; }
+h2 {
+  font-size: 1.32rem; font-weight: 700; letter-spacing: -.014em;
+  margin: 0 0 .3rem; text-wrap: balance;
+  padding-bottom: .5rem; border-bottom: 1px solid var(--rule-strong);
+  display: flex; align-items: center; justify-content: space-between; gap: .8rem; flex-wrap: wrap;
+}
+h2 .kicker {
+  font-family: var(--mono); font-size: .67rem; font-weight: 600;
+  letter-spacing: .13em; text-transform: uppercase; color: var(--muted);
+}
+.lede { color: var(--sub); margin: .9rem 0 1.3rem; max-width: 65ch; }
+p { margin: 0 0 1rem; max-width: 65ch; }
+h3 { font-size: 1rem; font-weight: 680; margin: 1.8rem 0 .5rem; letter-spacing: -.008em; }
+
+/* ── panels ───────────────────────────────────────────────── */
+.panel {
+  background: var(--surface); border: 1px solid var(--rule);
+  border-radius: 10px; padding: 1.3rem 1.4rem; box-shadow: var(--shadow);
+  margin: 1.4rem 0;
+}
+.panel > :last-child { margin-bottom: 0; }
+.panel-head {
+  display: flex; align-items: baseline; justify-content: space-between;
+  gap: .8rem; flex-wrap: wrap; margin-bottom: 1rem;
+}
+.panel-title { font-size: .93rem; font-weight: 680; letter-spacing: -.005em; }
+.panel-sub { font-size: .8rem; color: var(--muted); }
+
+/* ── hero position figure ─────────────────────────────────── */
+.headline-fig {
+  background: var(--surface); border: 1px solid var(--rule);
+  border-top: 3px solid var(--accent);
+  border-radius: 10px; padding: 1.5rem 1.5rem 1.35rem; box-shadow: var(--shadow); margin: 1.5rem 0;
+}
+.big { font-size: clamp(2.3rem, 7vw, 3.5rem); font-weight: 700; letter-spacing: -.035em; line-height: 1; }
+.big .unit { font-size: .42em; font-weight: 600; color: var(--sub); letter-spacing: -.01em; margin-left: .12em; }
+.big-cap { font-size: .81rem; color: var(--muted); margin-top: .5rem; }
+
+.stat-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(132px, 1fr)); gap: 1px; background: var(--rule); border: 1px solid var(--rule); border-radius: 8px; overflow: hidden; margin: 1.3rem 0; }
+.stat { background: var(--surface); padding: .85rem .95rem; }
+.stat-k { font-size: .72rem; color: var(--muted); margin-bottom: .3rem; letter-spacing: .01em; }
+.stat-v { font-size: 1.18rem; font-weight: 680; letter-spacing: -.018em; }
+.stat-v.pos { color: var(--good); }
+.stat-v.neg { color: var(--crit); }
+.stat-n { font-size: .71rem; color: var(--muted); margin-top: .22rem; }
+
+/* ── tables ───────────────────────────────────────────────── */
+.tw { overflow-x: auto; margin: 1.2rem 0; border: 1px solid var(--rule); border-radius: 8px; background: var(--surface); }
+table { border-collapse: collapse; width: 100%; font-size: .875rem; min-width: 460px; }
+th, td { text-align: left; padding: .6rem .8rem; border-bottom: 1px solid var(--rule); vertical-align: top; }
+thead th {
+  font-family: var(--mono); font-size: .68rem; font-weight: 600;
+  letter-spacing: .07em; text-transform: uppercase; color: var(--muted);
+  background: var(--surface-2); border-bottom: 1px solid var(--rule-strong); white-space: nowrap;
+}
+tbody tr:last-child td { border-bottom: none; }
+td.n, th.n { text-align: right; white-space: nowrap; }
+.rowlab { font-weight: 600; }
+
+/* ── verdict / claim-vs-fact ──────────────────────────────── */
+.clash { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--rule); border: 1px solid var(--rule); border-radius: 8px; overflow: hidden; margin: .9rem 0 1.1rem; }
+@media (max-width: 640px) { .clash { grid-template-columns: 1fr; } }
+.clash > div { background: var(--surface); padding: .85rem 1rem; }
+.clash .lab { font-family: var(--mono); font-size: .66rem; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin-bottom: .4rem; }
+.clash .a { border-left: 2px solid var(--s2); }
+.clash .b { border-left: 2px solid var(--s1); }
+.clash p { margin: 0; font-size: .89rem; }
+
+.resolve {
+  background: var(--accent-wash); border-radius: 7px; padding: .8rem 1rem;
+  font-size: .89rem; margin: .9rem 0 0;
+}
+.resolve strong { color: var(--accent-ink); }
+.resolve p { margin: 0; max-width: none; }
+
+/* ── callout ──────────────────────────────────────────────── */
+.callout { border-radius: 8px; padding: 1rem 1.15rem; margin: 1.3rem 0; font-size: .93rem; border: 1px solid; }
+.callout > :last-child { margin-bottom: 0; }
+.callout p { max-width: none; }
+.callout .ct { font-weight: 680; margin-bottom: .35rem; display: block; }
+.callout.err  { background: var(--crit-wash); border-color: color-mix(in srgb, var(--crit) 32%, transparent); }
+.callout.err .ct { color: var(--crit); }
+.callout.warn { background: var(--warn-wash); border-color: color-mix(in srgb, var(--warn) 32%, transparent); }
+.callout.warn .ct { color: var(--warn); }
+.callout.ok   { background: var(--good-wash); border-color: color-mix(in srgb, var(--good) 32%, transparent); }
+.callout.ok .ct { color: var(--good); }
+
+/* ── charts ───────────────────────────────────────────────── */
+figure { margin: 1.4rem 0; }
+figcaption { font-size: .8rem; color: var(--muted); margin-top: .55rem; }
+svg { display: block; width: 100%; height: auto; overflow: visible; }
+.grid-l { stroke: var(--rule); stroke-width: 1; }
+.axis-t { fill: var(--muted); font-family: var(--mono); font-size: 10px; }
+.dlabel { fill: var(--ink); font-family: var(--mono); font-size: 11.5px; font-weight: 600; }
+.legend { display: flex; gap: 1.1rem; flex-wrap: wrap; font-size: .82rem; color: var(--sub); margin-bottom: .3rem; }
+.legend span { display: inline-flex; align-items: center; gap: .38rem; }
+.swatch { width: 11px; height: 3px; border-radius: 2px; flex: none; }
+.mini { width: 100%; min-width: 0; font-size: .8rem; margin-top: 1rem; }
+.mini th, .mini td { padding: .38rem .55rem; }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+.sm-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 1.15rem; margin: 1.3rem 0; }
+.sm { background: var(--surface); border: 1px solid var(--rule); border-radius: 9px; padding: .95rem 1rem 1.05rem; }
+.sm-t { font-size: .8rem; font-weight: 640; margin-bottom: .1rem; }
+.sm-v { font-size: 1.28rem; font-weight: 700; letter-spacing: -.02em; margin: .18rem 0 .05rem; }
+.sm-d { font-size: .76rem; color: var(--sub); margin-bottom: .55rem; }
+
+ul, ol { padding-left: 1.15rem; max-width: 65ch; }
+li { margin-bottom: .42rem; }
+li::marker { color: var(--muted); }
+code {
+  background: var(--surface-2); padding: .09em .34em; border-radius: 3px;
+  font-size: .855em; border: 1px solid var(--rule);
+}
+strong { font-weight: 660; }
+a { color: var(--accent-ink); }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 2px; }
+hr { border: none; border-top: 1px solid var(--rule); margin: 2.6rem 0; }
+
+/* ── action list ──────────────────────────────────────────── */
+.acts { display: flex; flex-direction: column; gap: .9rem; margin: 1.3rem 0; }
+.act { display: grid; grid-template-columns: auto 1fr; gap: .9rem; background: var(--surface); border: 1px solid var(--rule); border-radius: 9px; padding: .95rem 1.1rem; }
+.act-w { font-family: var(--mono); font-size: .68rem; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; padding: .2rem .45rem; border-radius: 3px; height: fit-content; white-space: nowrap; }
+.act-w.now  { color: var(--crit); background: var(--crit-wash); }
+.act-w.wk   { color: var(--warn); background: var(--warn-wash); }
+.act-w.hold { color: var(--sub);  background: var(--surface-2); }
+.act h4 { margin: 0 0 .28rem; font-size: .93rem; font-weight: 660; }
+.act p { margin: 0; font-size: .875rem; color: var(--sub); max-width: none; }
+
+footer { margin-top: 4rem; padding-top: 1.3rem; border-top: 1px solid var(--rule); font-size: .8rem; color: var(--muted); }
+footer p { max-width: none; }
+</style>
+
+<div class="page">
+
+<header class="masthead">
+  <div class="row">
+    <span class="wordmark">PEOS · 감사 리포트</span>
+    <span class="issued">2026-08-10 (월)</span>
+  </div>
+  <h1>오늘 이 시스템은 새로운 경제 데이터를 한 건도 받지 못했다</h1>
+  <p class="standfirst">
+    파이프라인은 정상적으로 돌았고 8개 섹션을 만들어냈다. 그런데 그 안의 경제 수치는
+    <strong>8월 6일자와 바이트 단위로 동일</strong>하다. 오늘 바뀐 것은 단 하나 —
+    시스템이 자기 판단에 대해 가진 신뢰도가 무너졌다는 것. 그래서 오늘 리포트의 결론은
+    "HOLD"가 아니라 <strong>"오늘은 이 리포트로 매매 판단을 하지 마라"</strong>이다.
+  </p>
+</header>
+
+<!-- ══════════════════════════════════════════════════════ -->
+<section>
+  <h2>신뢰도 붕괴 <span class="kicker">오늘 유일하게 변한 값</span></h2>
+  <p class="lede">
+    거시 엔진은 데이터가 오래될수록 스스로 신뢰도를 깎는다. 그 설계가 정확히 작동했다 —
+    그리고 그 결과가 오늘의 유일한 뉴스다.
+  </p>
+
+  <figure class="panel">
+    <div class="panel-head">
+      <span class="panel-title">경기 판정 신뢰도 (0–100)</span>
+      <span class="stamp fresh">오늘 산출</span>
+    </div>
+    <div class="legend">
+      <span><i class="swatch" style="background:var(--s1)"></i>한국</span>
+      <span><i class="swatch" style="background:var(--s2)"></i>미국</span>
+    </div>
+    <svg viewBox="0 0 640 250" role="img" aria-label="한국 신뢰도는 90.5에서 71.5로, 미국은 96.9에서 41.9로 하락">
+      <g class="grid-l">
+        <line x1="52" y1="24"  x2="614" y2="24"/>
+        <line x1="52" y1="70"  x2="614" y2="70"/>
+        <line x1="52" y1="116" x2="614" y2="116"/>
+        <line x1="52" y1="162" x2="614" y2="162"/>
+        <line x1="52" y1="208" x2="614" y2="208"/>
+      </g>
+      <g class="axis-t" text-anchor="end">
+        <text x="44" y="28">100</text><text x="44" y="74">75</text>
+        <text x="44" y="120">50</text><text x="44" y="166">25</text><text x="44" y="212">0</text>
+      </g>
+      <g class="axis-t" text-anchor="middle">
+        <text x="90"  y="232">08-05</text><text x="264" y="232">08-06</text>
+        <text x="438" y="232">08-07</text><text x="592" y="232">08-10</text>
+      </g>
+
+      <!-- 미국: 96.9 96.9 96.9 41.9  → y = 208 - v*1.84 -->
+      <polyline fill="none" stroke="var(--s2)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"
+                points="90,29.7 264,29.7 438,29.7 592,130.9"/>
+      <!-- 한국: 90.5 90.5 90.5 71.5 -->
+      <polyline fill="none" stroke="var(--s1)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"
+                points="90,41.5 264,41.5 438,41.5 592,76.4"/>
+
+      <g>
+        <circle cx="592" cy="130.9" r="4.5" fill="var(--s2)" stroke="var(--surface)" stroke-width="2"/>
+        <circle cx="592" cy="76.4"  r="4.5" fill="var(--s1)" stroke="var(--surface)" stroke-width="2"/>
+        <circle cx="90" cy="29.7" r="3.4" fill="var(--s2)" stroke="var(--surface)" stroke-width="2"/>
+        <circle cx="90" cy="41.5" r="3.4" fill="var(--s1)" stroke="var(--surface)" stroke-width="2"/>
+      </g>
+      <g class="dlabel" text-anchor="start">
+        <text x="604" y="134">41.9</text>
+        <text x="604" y="80">71.5</text>
+      </g>
+      <g class="dlabel" text-anchor="end" fill="var(--muted)">
+        <text x="78" y="33">96.9</text>
+        <text x="78" y="45">90.5</text>
+      </g>
+    </svg>
+    <figcaption>
+      출처: <code>data/peos_daily_history.csv</code> — 8/05·8/06·8/07 3일간 값이 완전히 동일하다가
+      8/10에만 하락. 한국 −19.0%p, 미국 −55.0%p.
+    </figcaption>
+  </figure>
+
+  <div class="callout warn">
+    <span class="ct">이 하락은 경제가 나빠졌다는 뜻이 아니다</span>
+    <p>지표값 자체는 하나도 안 움직였다(아래 표 참조). 떨어진 건 <em>데이터 신선도 점수</em>다.
+    즉 "경기가 악화됐다"가 아니라 <strong>"오늘은 판단할 재료가 없다"</strong>는 신호다.
+    미국 Recession 판정이 신뢰도 <span class="n">41.9</span>점 — 동전 던지기보다 낮다.</p>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════ -->
+<section>
+  <h2>오늘 실제로 수집된 데이터 <span class="kicker">10개 중 1개</span></h2>
+  <p class="lede">
+    리포트 본문은 10개 한국 지표를 모두 표로 보여준다. 그중 오늘 기계가 실제로 가져온 건 하나다.
+    나머지는 마지막으로 성공한 값을 그대로 표시한 것이고, 두 개는 사람이 직접 입력한 값이다.
+  </p>
+
+  <div class="tw">
+    <table>
+      <thead>
+        <tr><th>한국 Core-10 지표</th><th class="n">표시된 값</th><th>실제 관측</th><th>출처</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="rowlab">반도체 수출 증가율</td><td class="n">24.70%</td><td><span class="stamp days">수동입력</span></td><td>산업통상자원부</td></tr>
+        <tr><td class="rowlab">총수출 증가율</td><td class="n">9.10%</td><td><span class="stamp days">수동입력</span></td><td>산업통상자원부</td></tr>
+        <tr><td class="rowlab">미국 고용+글로벌 합성</td><td class="n">1.00</td><td><span class="stamp fresh">오늘 산출</span></td><td>저장된 FRED 시리즈로 계산</td></tr>
+        <tr><td class="rowlab">실질 GDP 성장률</td><td class="n">0.62%</td><td><span class="stamp month">이월</span></td><td>한국은행 ECOS</td></tr>
+        <tr><td class="rowlab">전산업생산지수</td><td class="n">114.91</td><td><span class="stamp month">이월</span></td><td>OECD 대체(KOSIS 불가)</td></tr>
+        <tr><td class="rowlab">소매판매</td><td class="n">0.10</td><td><span class="stamp month">이월</span></td><td>OECD 대체</td></tr>
+        <tr><td class="rowlab">CPI</td><td class="n">118.85</td><td><span class="stamp month">이월</span></td><td>OECD 대체</td></tr>
+        <tr><td class="rowlab">PPI</td><td class="n">130.03</td><td><span class="stamp month">이월</span></td><td>한국은행 ECOS</td></tr>
+        <tr><td class="rowlab">실업률</td><td class="n">2.80%</td><td><span class="stamp month">이월</span></td><td>OECD 대체</td></tr>
+        <tr><td class="rowlab">경상수지</td><td class="n">49,730.40</td><td><span class="stamp never">단위 오류 의심</span></td><td>한국은행 ECOS</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p>미국 지표는 <strong>8개 전부 이월</strong>이다. FRED가 이 실행 환경의 프록시에서 차단돼
+  (<code>403 Forbidden</code>) 단 한 건도 갱신되지 않았다.</p>
+
+  <div class="callout err">
+    <span class="ct">덤으로 발견한 데이터 오류: 경상수지</span>
+    <p>표시값 <span class="n">49,730.40</span> <strong>억달러</strong> = 약 <span class="n">4.97조 달러</span>.
+    한국 연간 경상수지는 <span class="n">700~900억 달러</span> 수준이므로 자릿수가 맞지 않는다.
+    게다가 8/05 <span class="n">38,607.4</span> → 8/06 <span class="n">49,730.4</span>로
+    하루 만에 <span class="n">+28.8%</span> 점프했다. 3개월 평균 시리즈에서 물리적으로 나올 수 없는 변화다.
+    단위 라벨(억달러 vs 백만달러) 또는 시리즈 매핑 오류로 보인다 — 이 값은 신뢰하지 말 것.</p>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════ -->
+<section>
+  <h2>리포트가 끝까지 안 알려준 숫자 <span class="kicker">당신의 실제 포지션</span></h2>
+  <p class="lede">
+    기존 리포트는 "보유 수량: 1,200주"라고 적어 왔다. 그건 코드에 박힌 문자열이었다.
+    <code>config/portfolio.yaml</code>의 실제 보유는 다음과 같다.
+  </p>
+
+  <div class="headline-fig">
+    <div class="big">3<span class="unit">억</span>5,613<span class="unit">만원</span></div>
+    <div class="big-cap">
+      SK하이닉스 248주 × 1,436,000원 · 매수원가 118,386,456원 대비
+      <strong style="color:var(--good)">+237,741,544원 (+200.8%)</strong>
+    </div>
+  </div>
+
+  <div class="stat-row">
+    <div class="stat"><div class="stat-k">보유</div><div class="stat-v">248주</div><div class="stat-n">한투 138 + 하나 110</div></div>
+    <div class="stat"><div class="stat-k">즉시 매도 가능</div><div class="stat-v">181주</div><div class="stat-n">2억 5,992만원</div></div>
+    <div class="stat"><div class="stat-k">락업</div><div class="stat-v">67주</div><div class="stat-n">2027-02-11까지</div></div>
+    <div class="stat"><div class="stat-k">평단 대비</div><div class="stat-v pos">3.01배</div><div class="stat-n">평단 477,365원</div></div>
+    <div class="stat"><div class="stat-k">8/6 하루 손익</div><div class="stat-v neg">−4,290만원</div><div class="stat-n">−10.37% 하루</div></div>
+  </div>
+
+  <p>이 숫자들이 왜 중요한가. 8월 6일 하루에 이 포지션은 <strong>4,290만원</strong>이 움직였다.
+  같은 날 리포트가 내놓은 신호는 "HOLD, 신뢰도 50%"였다. 신뢰도 50%는 판단이 아니라
+  <strong>동전 던지기</strong>다. 4,290만원짜리 변동성 앞에서 동전을 던지고 있었다는 뜻이다.</p>
+
+  <div class="callout warn">
+    <span class="ct">삼중 집중 리스크</span>
+    <p>당신은 SK하이닉스에 <strong>세 겹으로</strong> 노출돼 있다 — ① 주식 3.56억,
+    ② 급여·PS(회사 실적 연동), ③ IRP/DC 퇴직연금. 메모리 사이클이 꺾이면 세 개가 <em>동시에</em> 나빠진다.
+    이건 CPI 발표나 기준금리와 무관하게 지금 이 순간 사실인 구조적 리스크이고,
+    <strong>데이터가 없는 오늘도 판단할 수 있는 유일한 항목</strong>이다.</p>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════ -->
+<section>
+  <h2>엔진끼리 서로 반대말을 하고 있다 <span class="kicker">모순 4건</span></h2>
+  <p class="lede">
+    같은 리포트 안에서 모듈들이 정면으로 충돌한다. 이걸 정리하지 않으면 어떤 결론도 근거가 없다.
+  </p>
+
+  <h3>① 미국은 침체인가, 확장인가</h3>
+  <div class="clash">
+    <div class="a"><div class="lab">거시 엔진</div><p><strong>Recession</strong> (총점 −1, 신뢰도 <span class="n">41.9</span>)</p></div>
+    <div class="b"><div class="lab">위기지수 CCI</div><p><strong>GREEN <span class="n">5/100</span></strong> — "Systemic expansion. Aggressive growth positioning optimal."</p></div>
+  </div>
+  <div class="resolve"><p><strong>판정: CCI 쪽이 맞다.</strong>
+  Recession 판정은 CPI·PPI가 각각 −1점을 받아서 나온 결과인데, 이건 <em>물가지수가 내려갔다</em>는 뜻이다.
+  같은 리포트에서 수익률곡선 <span class="n">+0.46%p</span>(정상), Sahm Rule <span class="n">0/20</span>,
+  HY 신용스프레드 <span class="n">0/15</span> — 침체의 실제 전조는 <strong>전부 0점</strong>이다.
+  물가 하락 + 정상 수익률곡선 + 안정적 고용 = 침체가 아니라 <strong>디스인플레이션</strong>이다.</p></div>
+
+  <h3>② 반도체는 긍정인가, 침체인가</h3>
+  <div class="clash">
+    <div class="a"><div class="lab">CCI 반도체 사이클</div><p>"<strong>침체</strong>: 공급 과잉, 가격 하락. 구조조정 우려"</p></div>
+    <div class="b"><div class="lab">거시 지표 + 반도체 점수</div><p>반도체 수출 <strong>+24.7% YoY</strong> ▲ / 종합 <strong><span class="n">79.6</span>점 (긍정)</strong></p></div>
+  </div>
+  <div class="resolve"><p><strong>판정: 수출 데이터 쪽이 맞다.</strong>
+  <span class="n">+24.7%</span>는 산업통상자원부 실측 수치다. CCI의 "침체" 라인은 해당 하위지표가
+  <span class="n">0/10</span>점 — 즉 <em>데이터가 없어서 0점</em>인 것을 "침체"라는 라벨로 출력한 것이다.
+  미수집을 악재로 표시하는 표기 버그에 가깝다.</p></div>
+
+  <h3>③ 같은 종목에 대해 정반대 지시</h3>
+  <div class="clash">
+    <div class="a"><div class="lab">CCI 포지션 관리</div><p>"<strong>적극 매수 (Long)</strong>, 최대 비중 25%, 분할매수 실행"</p></div>
+    <div class="b"><div class="lab">SK하이닉스 의사결정 엔진</div><p>"<strong>HOLD</strong>, 신뢰도 <span class="n">50%</span>"</p></div>
+  </div>
+  <div class="resolve"><p><strong>판정: 오늘은 둘 다 따르지 말 것.</strong>
+  CCI의 "적극 매수"는 위기지수가 낮다는 것만 보고 나온 기계적 문구이고, SK 엔진의 50%는 무판단이다.
+  두 엔진이 같은 티커에 반대 지시를 내리는데 어느 쪽도 근거를 못 대고 있다면,
+  그날의 정답은 <strong>거래하지 않는 것</strong>이다.</p></div>
+
+  <h3>④ 달러 강세인가, 원화 강세인가</h3>
+  <div class="clash">
+    <div class="a"><div class="lab">금리 분석 모듈</div><p>"미–한 금리차 확대(<strong>달러 강세</strong>)가 수출 경쟁력을 뒷받침"</p></div>
+    <div class="b"><div class="lab">실제 환율 12주</div><p>1,503.5원 → <strong>1,418.8원</strong> (<span class="n">−5.6%</span>, 원화 <em>강세</em>)</p></div>
+  </div>
+  <div class="resolve"><p><strong>판정: 실제 환율이 맞다.</strong>
+  금리차(<span class="n">312bp</span>)로부터 "달러 강세"를 <em>추론</em>했지만 실제 데이터는 반대로 갔다.
+  같은 리포트의 FX 점수가 <span class="n">37/100</span> ★☆☆☆☆로 전 자산 중 최하위인 것이
+  실제 상황과 일치한다 — 원화 강세는 수출기업에 <strong>역풍</strong>이다.</p></div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════ -->
+<section>
+  <h2>정정: 어제 드린 캘린더가 틀렸습니다 <span class="kicker">기준금리</span></h2>
+
+  <div class="callout err">
+    <span class="ct">제가 어제 만든 8월 캘린더(.ics)의 기준금리 정보는 사실과 다릅니다</span>
+    <p>캘린더에는 "예상 3.50% 동결 / 직전값 3.50% / <strong>인하 시 HOLD→BUY 전환</strong>"이라고 적혀 있습니다.
+    한국은행 ECOS 실제 데이터는 다릅니다.</p>
+  </div>
+
+  <div class="tw">
+    <table>
+      <thead><tr><th>항목</th><th>어제 드린 캘린더</th><th>ECOS 실제 데이터</th></tr></thead>
+      <tbody>
+        <tr><td class="rowlab">현재 기준금리</td><td class="n">3.50%</td><td class="n" style="color:var(--good);font-weight:600">2.75%</td></tr>
+        <tr><td class="rowlab">직전 움직임</td><td>동결 유지</td><td style="color:var(--good);font-weight:600">2026-07 · 2.50% → 2.75% <strong>인상</strong></td></tr>
+        <tr><td class="rowlab">8/14 시나리오</td><td>"인하 30% → 매수 전환"</td><td style="color:var(--crit);font-weight:600">인상 직후 → 인하는 매우 낮음</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p>숫자만 틀린 게 아니라 <strong>정책 방향이 반대</strong>였습니다. 한국은행은 지난달 25bp를 <em>올렸습니다</em>.
+  연속 회의에서 인상 직후 인하로 뒤집는 경우는 드물기 때문에, 8/14의 현실적 경로는
+  <strong>동결 우세, 추가 인상 가능, 인하 매우 낮음</strong>입니다.
+  "인하를 기다렸다가 매수" 프레임은 폐기하시는 게 맞습니다.</p>
+
+  <div class="callout warn">
+    <span class="ct">확률은 적지 않겠습니다</span>
+    <p>어제 저는 "인하 30% / 동결 60% / 인상 10%"라고 썼는데, 그 숫자에는 <strong>아무 근거가 없었습니다</strong>.
+    지금 이 실행 환경은 외부 네트워크가 막혀 있어 시장 컨센서스를 조회할 수 없습니다.
+    없는 데이터를 숫자로 지어내는 대신, 확인 가능한 사실(2.75%, 7월 인상)만 적고
+    컨센서스는 <strong>미확인</strong>으로 남겨둡니다.</p>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════ -->
+<section>
+  <h2>12주 거시 지표 <span class="kicker">실측 주간 데이터</span></h2>
+
+  <div class="sm-grid">
+    <div class="sm">
+      <div class="sm-t">미국 10년물 국채금리</div>
+      <div class="sm-v n">4.69%</div>
+      <div class="sm-d">12주 전 4.56% · <span style="color:var(--s2)">▲ +2.9%</span></div>
+      <svg viewBox="0 0 200 56" role="img" aria-label="미국 10년물 금리 6월 4.51에서 8월 4.69로 상승">
+        <polyline fill="none" stroke="var(--s1)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"
+          points="6,32.1 32,50.0 58,36.2 84,17.0 110,19.8 136,12.9 162,6.0 188,7.4"/>
+        <circle cx="188" cy="7.4" r="3.6" fill="var(--s1)" stroke="var(--surface)" stroke-width="2"/>
+      </svg>
+      <div class="sm-d" style="margin:.45rem 0 0">06-22 → 08-06 · ERP 산출에 직결</div>
+    </div>
+
+    <div class="sm">
+      <div class="sm-t">원/달러 환율</div>
+      <div class="sm-v n">1,418.8원</div>
+      <div class="sm-d">12주 전 1,503.5원 · <span style="color:var(--s1)">▼ −5.6%</span></div>
+      <svg viewBox="0 0 200 56" role="img" aria-label="원달러 환율 1535원에서 1418.8원으로 지속 하락">
+        <polyline fill="none" stroke="var(--s1)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"
+          points="6,9.2 32,6.0 58,7.6 84,19.0 110,27.0 136,33.3 162,44.8 188,50.0"/>
+        <circle cx="188" cy="50.0" r="3.6" fill="var(--s1)" stroke="var(--surface)" stroke-width="2"/>
+      </svg>
+      <div class="sm-d" style="margin:.45rem 0 0">06-22 → 08-07 · 원화 강세 = 수출 역풍</div>
+    </div>
+
+    <div class="sm">
+      <div class="sm-t">브렌트유</div>
+      <div class="sm-v n">$88.90</div>
+      <div class="sm-d">12주 전 $106.90 · <span style="color:var(--s1)">▼ −16.8%</span></div>
+      <svg viewBox="0 0 200 56" role="img" aria-label="브렌트유 84달러에서 69달러까지 하락 후 91달러로 반등, 현재 88.9달러">
+        <polyline fill="none" stroke="var(--s1)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"
+          points="6,20.7 32,36.3 58,46.0 84,50.0 110,26.2 136,15.5 162,6.0 188,11.8"/>
+        <circle cx="188" cy="11.8" r="3.6" fill="var(--s1)" stroke="var(--surface)" stroke-width="2"/>
+      </svg>
+      <div class="sm-d" style="margin:.45rem 0 0">06-15 → 08-03 · 저점 $69.6 후 반등</div>
+    </div>
+  </div>
+
+  <div class="callout warn">
+    <span class="ct">이 표의 "추세" 칼럼은 월간 지표에서 작동하지 않는다</span>
+    <p>리포트 본문 표는 기준금리를 <strong>"+10.0% 변화 / 추세: 보합"</strong>이라고 표시한다.
+    <span class="n">+10%</span>는 <span class="n">2.50 → 2.75</span>, 즉 <strong>25bp 인상</strong>인데 "보합"이라고 적힌 것이다.</p>
+    <p style="margin-top:.6rem">원인: 추세 판정이 <em>최근 4주 평균 vs 12주 평균</em>을 비교하는데,
+    기준금리·연방기금금리는 <strong>월간</strong> 시리즈라 12주 안에 데이터가 2개뿐이다
+    (<span class="n">06-01: 2.50</span>, <span class="n">07-01: 2.75</span>).
+    두 평균이 같은 2개 점에서 계산되니 <strong>항상 동일 → 항상 "보합"</strong>이 나온다.
+    금리를 아무리 올려도 이 칼럼은 영원히 보합이다.</p>
+    <p style="margin-top:.6rem">브렌트유의 "−16.8%인데 보합"도 같은 계산 구조 탓이다(중간에 저점을 찍고 반등해 두 평균이 비슷해짐).
+    <code>CLAUDE.md</code>가 <code>weekly_analysis.py</code>를 수정 금지로 지정해 두었으므로 <strong>코드는 건드리지 않았고</strong>,
+    대신 여기 기록해 둡니다. 월간 시리즈에서는 <strong>추세 칼럼을 무시하고 변화율만 보십시오.</strong></p>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════ -->
+<section>
+  <h2>부동산: 판단 근거가 사실상 비어 있다 <span class="kicker">WAIT 60%</span></h2>
+
+  <div class="callout err">
+    <span class="ct">부동산 데이터 수집기 4개가 전부 멈춰 있다</span>
+    <p><code>DATA_GO_KR_KEY</code>가 설정되지 않아 아파트 매매·전월세·연립다세대·오피스텔
+    <strong>4개 수집기 전부 skip</strong>되었다. 즉 "WAIT 신뢰도 60%"는 실거래가를 한 건도 안 보고
+    <strong>금리 점수(65/100) 하나</strong>로만 나온 숫자다.</p>
+  </div>
+
+  <p>다만 디스크에 <strong>7월까지의 실거래 데이터</strong>는 남아 있다. 엔진이 쓰지 않은 그 데이터로
+  실제 그림을 그리면 이렇다.</p>
+
+  <figure class="panel">
+    <div class="panel-head">
+      <span class="panel-title">서울 아파트 평당가 — 매매 vs 전세</span>
+      <span class="stamp month">2026-07 (한 달 전)</span>
+    </div>
+    <div class="legend">
+      <span><i class="swatch" style="background:var(--s1)"></i>매매</span>
+      <span><i class="swatch" style="background:var(--s2)"></i>전세</span>
+    </div>
+    <svg viewBox="0 0 640 230" role="img" aria-label="서울 아파트 평당 매매가는 4300만원대 횡보, 전세가는 7월에 하락">
+      <g class="grid-l">
+        <line x1="66" y1="20"  x2="614" y2="20"/>
+        <line x1="66" y1="65"  x2="614" y2="65"/>
+        <line x1="66" y1="110" x2="614" y2="110"/>
+        <line x1="66" y1="155" x2="614" y2="155"/>
+        <line x1="66" y1="190" x2="614" y2="190"/>
+      </g>
+      <g class="axis-t" text-anchor="end">
+        <text x="58" y="24">5,000만</text><text x="58" y="69">4,250만</text>
+        <text x="58" y="114">3,500만</text><text x="58" y="159">2,750만</text><text x="58" y="194">2,167만</text>
+      </g>
+      <g class="axis-t" text-anchor="middle">
+        <text x="100" y="214">4월</text><text x="271" y="214">5월</text>
+        <text x="442" y="214">6월</text><text x="600" y="214">7월</text>
+      </g>
+      <!-- y = 20 + (50,000,000 - v)/1,000,000 * 6 -->
+      <polyline fill="none" stroke="var(--s1)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"
+                points="100,61.2 271,44.5 442,61.8 600,54.7"/>
+      <polyline fill="none" stroke="var(--s2)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"
+                points="100,166.7 271,160.8 442,160.8 600,164.4"/>
+      <g>
+        <circle cx="600" cy="54.7"  r="4.2" fill="var(--s1)" stroke="var(--surface)" stroke-width="2"/>
+        <circle cx="600" cy="164.4" r="4.2" fill="var(--s2)" stroke="var(--surface)" stroke-width="2"/>
+      </g>
+      <g class="dlabel" text-anchor="middle">
+        <text x="600" y="42">4,421만</text>
+        <text x="600" y="184">2,593만</text>
+      </g>
+    </svg>
+    <table class="mini">
+      <thead><tr><th>원/평</th><th class="n">4월</th><th class="n">5월</th><th class="n">6월</th><th class="n">7월</th></tr></thead>
+      <tbody>
+        <tr><td class="rowlab">매매</td><td class="n">4,313만</td><td class="n">4,592만</td><td class="n">4,303만</td><td class="n">4,421만</td></tr>
+        <tr><td class="rowlab">전세</td><td class="n">2,556만</td><td class="n">2,653만</td><td class="n">2,654만</td><td class="n">2,593만</td></tr>
+        <tr><td class="rowlab">전세가율</td><td class="n">59.3%</td><td class="n">57.8%</td><td class="n">61.7%</td><td class="n">58.6%</td></tr>
+      </tbody>
+    </table>
+    <figcaption>출처: <code>data/normalized/molit_seoul_price_pyeong.csv</code>,
+    <code>molit_rent_jeonse_seoul_price_pyeong.csv</code> · 원/평, 월별</figcaption>
+  </figure>
+
+  <div class="stat-row">
+    <div class="stat"><div class="stat-k">전세가율</div><div class="stat-v">58.6%</div><div class="stat-n">2,593만 / 4,421만</div></div>
+    <div class="stat"><div class="stat-k">전세 전월 대비</div><div class="stat-v neg">−2.3%</div><div class="stat-n">6월 → 7월</div></div>
+    <div class="stat"><div class="stat-k">매매 3개월</div><div class="stat-v">−3.7%</div><div class="stat-n">5월 고점 대비</div></div>
+    <div class="stat"><div class="stat-k">청약통장</div><div class="stat-v">40/40</div><div class="stat-n">2,830만원·250회</div></div>
+  </div>
+
+  <p><strong>이 데이터가 말하는 것:</strong> 전세가는 4→6월 완만히 올랐다가 <strong>7월에 −2.3% 꺾였다</strong>
+  (한 달치라 아직 추세로 부르긴 이르다). 매매는 5월 고점 이후 <span class="n">−3.7%</span> 횡보·조정.
+  전세가 꺾이면 진입을 서두를 이유가 줄어들므로 <strong>WAIT 자체는 방향이 맞다</strong>.
+  다만 그 근거는 엔진이 말한 "금리 중립"이 아니라 <em>7월 전세 반락 + 매매 횡보</em>다.
+  그리고 기준금리가 <strong>인상</strong> 방향이라는 앞의 정정을 반영하면,
+  WAIT는 <strong>더 강화</strong>된다 — 어제 캘린더가 암시한 "인하 → 진입 검토"의 정반대다.</p>
+</section>
+
+<!-- ══════════════════════════════════════════════════════ -->
+<section>
+  <h2>그래서 오늘 뭘 하는가 <span class="kicker">데이터 없이도 가능한 것</span></h2>
+  <p class="lede">
+    오늘은 새 정보가 없으므로 <em>시장 판단</em>은 미룬다. 대신 새 정보가 없어도 결정할 수 있는
+    <em>구조</em> 항목이 남는다. 아래는 그 구분이다.
+  </p>
+
+  <div class="acts">
+    <div class="act">
+      <span class="act-w now">지금</span>
+      <div>
+        <h4>집중도 상한선을 숫자로 정해 둘 것</h4>
+        <p>3.56억 · 삼중 노출은 CPI 결과와 무관하게 이미 사실이다. "총자산의 몇 %까지 SK하이닉스로 두겠다"는
+        상한을 정해두면, 8/12·8/14에 시장이 급변할 때 감정이 아니라 규칙으로 대응하게 된다.
+        락업 67주는 2027-02-11까지 못 파므로 <strong>조정 가능한 건 181주뿐</strong>이라는 제약도 함께 반영해야 한다.</p>
+      </div>
+    </div>
+    <div class="act">
+      <span class="act-w now">지금</span>
+      <div>
+        <h4>어제 캘린더의 기준금리 항목을 교체</h4>
+        <p>일정 앱에 들어간 "인하 시 매수 전환" 알림은 방향이 반대다. 8/14 항목을
+        <strong>"2.75%에서 동결/추가인상 여부 확인"</strong>으로 바꿔야 잘못된 기대를 안 만든다.</p>
+      </div>
+    </div>
+    <div class="act">
+      <span class="act-w wk">이번 주</span>
+      <div>
+        <h4>데이터 파이프 두 곳을 복구</h4>
+        <p><code>DATA_GO_KR_KEY</code>(부동산 4종 전체가 여기에 걸림)와 FRED 접근 경로.
+        이 둘이 막힌 채로는 부동산 판단과 미국 거시 판단이 계속 빈 채로 굴러간다.
+        <strong>둘 다 분석 문제가 아니라 설정 문제</strong>라 해결 비용이 낮다.</p>
+      </div>
+    </div>
+    <div class="act">
+      <span class="act-w wk">이번 주</span>
+      <div>
+        <h4>8/12 CPI는 "발표 확인"까지만</h4>
+        <p>컨센서스를 조회할 수 없으므로 시나리오 확률은 만들지 않는다.
+        발표 후 실제 수치를 넣고 그때 판단하는 것이 맞다. 미리 만든 확률표는 어제처럼 틀린다.</p>
+      </div>
+    </div>
+    <div class="act">
+      <span class="act-w hold">보류</span>
+      <div>
+        <h4>매수·매도 실행</h4>
+        <p>오늘 신호는 HOLD 50%(무판단)이고, 근거 데이터는 8/06자이며, 두 엔진이 서로 반대를 말한다.
+        <strong>이 세 조건에서 실행은 근거가 없다.</strong> 8/14 이후 데이터가 갱신되면 재평가.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════ -->
+<section>
+  <h2>이번에 고친 것 <span class="kicker">코드 3건</span></h2>
+  <p class="lede">
+    이 리포트를 만들면서 발견한 실제 버그들. 셋 다 조용히 틀린 값을 내던 종류다.
+  </p>
+
+  <div class="tw">
+    <table>
+      <thead><tr><th>버그</th><th>증상</th><th>조치</th></tr></thead>
+      <tbody>
+        <tr>
+          <td class="rowlab">보유 수량 하드코딩</td>
+          <td>SK 섹션이 항상 <span class="n">"1,200주"</span> 출력 (실제 <span class="n">248주</span>)</td>
+          <td><code>markdown.py</code> → <code>portfolio.yaml</code>에서 읽도록 변경, 락업분까지 표기</td>
+        </tr>
+        <tr>
+          <td class="rowlab">당월 신호 누락</td>
+          <td>롤링 집계(4–6절)가 <span class="n">no_signals</span>로 계속 비어 있었음</td>
+          <td><code>load_signals</code> 커서가 일자를 유지해 <span class="n">08-12 &gt; 08-10</span>으로 당월을 건너뜀 → 월초 기준으로 정규화</td>
+        </tr>
+        <tr>
+          <td class="rowlab">신호 중복 기록</td>
+          <td>하루에 두 번 실행하면 같은 날짜가 2행 → 신뢰도 평균 왜곡</td>
+          <td>날짜 기준 upsert로 변경 (1일 1행 보장)</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="callout ok">
+    <span class="ct">파이프라인 실행 시간: 12.3초</span>
+    <p>어제 "FRED 차단 때문에 파이프라인을 못 돌린다"고 말씀드린 건 정확하지 않았습니다.
+    막힌 건 맞지만, 코드에는 이미 <em>이월(carry-forward)</em> 경로가 있어서 그대로 완주합니다.
+    실제 원인은 죽은 호스트마다 <strong>3회 재시도 × 백오프</strong>를 도느라 시간이 터진 것이었고,
+    재시도를 1회로 낮추자 <strong>12.3초</strong>에 끝났습니다. 스코어링·판정 로직은 손대지 않았습니다.</p>
+  </div>
+</section>
+
+<hr>
+
+<section>
+  <h2>세 줄 요약</h2>
+  <ol style="font-size:1.02rem">
+    <li><strong>오늘 리포트에는 새 경제 정보가 없다.</strong> 수치는 8/06과 동일하고, 바뀐 건 신뢰도뿐(한국 −19%p, 미국 −55%p). 오늘 매매 판단의 근거로 쓰지 말 것.</li>
+    <li><strong>당신의 실제 노출은 3.56억(248주, +201%)이고 하루 ±4,000만원대로 움직인다.</strong> 리포트는 이 숫자를 <span class="n">1,200주</span>로 잘못 적고 있었다. 신호가 무판단(50%)인 상태에서 이 규모를 방치하는 것 자체가 결정이다.</li>
+    <li><strong>어제 드린 기준금리 정보는 방향이 반대였다.</strong> 실제는 2.75%이고 7월에 <em>인상</em>했다. "인하 기다렸다 매수" 프레임은 폐기하고, 부동산 WAIT는 오히려 강화된다.</li>
+  </ol>
+</section>
+
+<footer>
+  <p><strong>생성</strong> — <code>python -m engine.report.run --month 2026-08</code> 실제 실행 (12.3초).
+  출처: <code>report/2026-08.{md,json}</code>, <code>data/peos_daily_history.csv</code>,
+  <code>config/portfolio.yaml</code>, <code>sources/macro-series.csv</code>,
+  <code>data/normalized/molit_*.csv</code>.</p>
+  <p style="margin-top:.7rem"><strong>주가 기준</strong> — 1,436,000원은 2026-08-07 장중 사용자 제보 스냅샷이며 종가·실시간 시세가 아닙니다.
+  이 환경에서는 시세 API에 접근할 수 없어 8/10 현재가는 미확인입니다. 평가액은 이 값 기준의 참고치입니다.</p>
+  <p style="margin-top:.7rem"><strong>미확인 항목</strong> — 8/12 CPI·8/14 기준금리 시장 컨센서스(네트워크 차단),
+  8/10 종가, MOLIT 8월 실거래(<code>DATA_GO_KR_KEY</code> 미설정), 미국 거시 8개 지표 전량.</p>
+  <p style="margin-top:.7rem">투자 판단의 참고 자료이며 투자 권유가 아닙니다.</p>
+</footer>
+
+</div>

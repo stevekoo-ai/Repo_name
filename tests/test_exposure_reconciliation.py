@@ -1542,6 +1542,52 @@ def test_stale_hardcoded_events_are_flagged_loudly_not_shown_as_current():
         assert "이미 지난 날짜" in out
 
 
+def test_reports_index_covers_every_report_file_and_links_are_well_formed():
+    """2026-08-31: 'every generated report must be reachable via a link here'
+    (user request) — build_index() must find every dated/monthly report/*.md
+    and sources/sk-hynix-auto-report-*.md that actually exists on disk, and
+    every .html file must get mirrored into docs/archive/ so its link
+    actually resolves (GitHub's blob view doesn't render .html, only Pages
+    serving docs/ does)."""
+    import glob
+    from scripts.build_reports_index import build_index, ARCHIVE_DIR, INDEX_PATH
+
+    build_index()
+    out = INDEX_PATH.read_text(encoding="utf-8")
+
+    real_daily_md = glob.glob("report/[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9].md")
+    assert real_daily_md, "fixture expects at least one dated report/*.md on disk"
+    for path in real_daily_md:
+        assert path.split("/")[-1].replace(".md", "") in out
+
+    real_html = glob.glob("report/*.html")
+    for path in real_html:
+        name = path.split("/")[-1]
+        mirrored = ARCHIVE_DIR / name
+        assert mirrored.exists(), f"{name} should have been mirrored into docs/archive/"
+        assert name in out
+
+    sk_hynix_md = glob.glob("sources/sk-hynix-auto-report-*.md")
+    if sk_hynix_md:
+        sample = sk_hynix_md[0].split("/")[-1]
+        assert sample in out
+
+
+def test_reports_index_mirroring_is_idempotent():
+    """Re-running the index builder with no new report files must not touch
+    files it already mirrored (CI commits only real diffs, not a full
+    re-copy every run)."""
+    from scripts.build_reports_index import build_index, ARCHIVE_DIR
+
+    build_index()
+    sample = next(ARCHIVE_DIR.glob("*.html"), None)
+    assert sample is not None, "fixture expects at least one mirrored .html file"
+    mtime_before = sample.stat().st_mtime_ns
+
+    build_index()
+    assert sample.stat().st_mtime_ns == mtime_before, "unchanged file must not be rewritten"
+
+
 def test_automation_run_log_creates_header_then_appends():
     """2026-08-27: CI 단계 자동 상태로그 신설 — 첫 호출은 헤더+1행, 두 번째
     호출은 헤더 없이 1행만 추가해야 append-only 원칙을 지킨다."""

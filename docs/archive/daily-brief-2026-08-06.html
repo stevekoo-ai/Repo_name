@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Daily Brief — 2026-08-06 (목) 종합</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      colors: {
+        canvas: '#f5f5f7',
+        ink: '#1d1d1f',
+        sub: '#6e6e73',
+        indigo: { DEFAULT:'#4f46e5', 600:'#4f46e5', 700:'#4338ca', 50:'#eef2ff', 100:'#e0e7ff' },
+        star: '#f59e0b',
+        warn: '#b45309',
+        warnbg: '#fffbeb',
+        ok: '#047857',
+        okbg: '#ecfdf5',
+        bad: '#be123c',
+        badbg: '#fff1f2',
+        mute: '#9ca3af',
+      },
+      fontFamily: {
+        sans: ['-apple-system','BlinkMacSystemFont','SF Pro Display','Segoe UI','Malgun Gothic','Helvetica Neue','Arial','sans-serif'],
+      },
+      boxShadow: {
+        card: '0 1px 3px rgba(0,0,0,0.04), 0 10px 30px rgba(0,0,0,0.06)',
+        hover:'0 4px 12px rgba(79,70,229,0.18), 0 20px 50px rgba(0,0,0,0.10)',
+      },
+      borderRadius: { '2xl':'1.25rem' },
+    }
+  }
+}
+</script>
+<style>
+  html{scroll-behavior:smooth}
+  body{background:
+    radial-gradient(1200px 600px at 50% -10%, #ffffff 0%, #f5f5f7 60%) fixed;
+    -webkit-font-smoothing:antialiased}
+  .card{transition:transform .35s cubic-bezier(.22,1,.36,1), box-shadow .35s cubic-bezier(.22,1,.36,1)}
+  .card:hover{transform:translateY(-3px);box-shadow:0 4px 12px rgba(79,70,229,0.18),0 20px 50px rgba(0,0,0,0.10)}
+  .pill{transition:all .25s ease}
+  .pill:hover{transform:scale(1.06);background:#4f46e5;color:#fff}
+  .lnk{transition:color .2s ease, opacity .2s ease}
+  .lnk:hover{color:#4338ca;opacity:.85}
+  .row-h{transition:background .2s ease}
+  .row-h:hover{background:#eef2ff}
+  .fade-in{animation:fadeIn .6s ease both}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+  .auto-pill{display:inline-block;padding:1px 7px;border-radius:8px;font-size:10px;font-weight:700;letter-spacing:.3px}
+  .ap-green{background:rgba(4,120,87,.12);color:#047857;border:1px solid rgba(4,120,87,.3)}
+  .ap-red{background:rgba(190,18,60,.12);color:#be123c;border:1px solid rgba(190,18,60,.3)}
+  .ap-yellow{background:rgba(180,83,9,.12);color:#b45309;border:1px solid rgba(180,83,9,.3)}
+  .ap-mut{background:rgba(156,163,175,.15);color:#6e6e73;border:1px solid rgba(156,163,175,.35)}
+</style>
+</head>
+<body class="text-ink font-sans">
+
+<div class="max-w-3xl mx-auto px-5 py-10">
+
+  <!-- ============ HERO ============ -->
+  <header class="text-center mb-10 fade-in">
+    <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-indigo-50 text-indigo-700 text-xs font-medium tracking-wide mb-5">
+      <span class="w-1.5 h-1.5 rounded-full bg-indigo-600"></span>
+      SK하이닉스 · Daily Brief
+    </div>
+    <h1 class="text-4xl sm:text-5xl font-semibold tracking-tight text-ink leading-tight">
+      Daily Brief
+    </h1>
+    <p class="text-lg text-sub mt-2 font-light">2026-08-06 (목) · 저녁 종합</p>
+    <div class="flex flex-wrap justify-center gap-2 mt-6 text-xs text-sub">
+      <span class="px-3 py-1 rounded-full bg-white border border-gray-200">저녁 19:00 KST</span>
+      <span class="px-3 py-1 rounded-full bg-white border border-gray-200">가격 기준 8/6 종가</span>
+      <span class="px-3 py-1 rounded-full bg-white border border-gray-200">자율 사이클 v3</span>
+    </div>
+  </header>
+
+  <!-- ============ 통합 한 줄 진단 ============ -->
+  <section class="mb-10 fade-in">
+    <div class="card bg-white rounded-2xl p-8 shadow-card border border-gray-100">
+      <div class="text-xs font-semibold tracking-widest text-indigo-600 uppercase mb-3">오늘의 한 줄</div>
+      <p class="text-xl text-ink leading-relaxed">
+        간밤 <span class="text-bad font-medium">미국 반도체 4거래일 연속 약세</span>("AI 인프라 지출 정점론" 재부상) →
+        외국인 대량매도 <span class="text-bad font-medium">−1조 6,771억</span> →
+        <span class="text-bad font-medium">매도 사이드카</span> → 본주 <span class="text-bad font-medium">−10.37%</span>.
+        HBM Cycle Score <span class="text-warn font-semibold">75.3</span>(z-score 신방식 첫 적용), 붕괴조건 1/5(④ 심화), 찐반등 0/4.
+        <span class="text-sub text-base block mt-2">핵심 구분: <b>펀더멘털(ASP·CapEx·HBM4)은 오늘 훼손된 게 없다</b> — 거시심리·수급發 하루. 외교(호르무즈)는 오히려 개선 중이어 시장과 괴리.</span>
+      </p>
+    </div>
+  </section>
+
+  <!-- ============ 핵심 지표 카드 ============ -->
+  <section class="mb-10 fade-in">
+    <h2 class="text-sm font-semibold tracking-widest text-sub uppercase mb-4 text-center">핵심 지표</h2>
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+      <div class="card bg-white rounded-2xl p-5 shadow-card border border-gray-100 text-center">
+        <div class="text-xs text-sub mb-1">종가 (8/6)</div>
+        <div class="text-2xl font-bold text-ink">149.5만</div>
+        <div class="text-sm text-bad font-medium mt-1">−10.37% 🔴</div>
+      </div>
+      <div class="card bg-white rounded-2xl p-5 shadow-card border border-gray-100 text-center">
+        <div class="text-xs text-sub mb-1">HBM Cycle</div>
+        <div class="text-2xl font-bold text-warn">75.3<span class="text-base text-sub">/100</span></div>
+        <div class="text-sm text-sub font-medium mt-1">신방식 (경계)</div>
+      </div>
+      <div class="card bg-white rounded-2xl p-5 shadow-card border border-gray-100 text-center">
+        <div class="text-xs text-sub mb-1">패닉회복</div>
+        <div class="text-2xl font-bold text-warn">바닥다지기</div>
+        <div class="text-sm text-bad font-medium mt-1">재하향 ↓</div>
+      </div>
+      <div class="card bg-white rounded-2xl p-5 shadow-card border border-gray-100 text-center">
+        <div class="text-xs text-sub mb-1">찐반등 4대</div>
+        <div class="text-2xl font-bold text-bad">0<span class="text-base text-sub">/4</span></div>
+        <div class="text-sm text-bad font-medium mt-1">전면 재악화</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 1. 거시 ============ -->
+  <section class="mb-8 fade-in">
+    <div class="flex items-center gap-3 mb-4">
+      <h2 class="text-2xl font-semibold text-ink">📊 거시 · PEOS</h2>
+      <span class="auto-pill ap-green">🟢 자동화</span>
+    </div>
+
+    <div class="card bg-white rounded-2xl p-6 shadow-card border border-gray-100 mb-4">
+      <h3 class="text-sm font-semibold text-indigo-600 mb-3">국면 · 위기지수</h3>
+      <div class="overflow-x-auto">
+      <table class="w-full text-sm">
+        <thead><tr class="text-sub text-xs border-b border-gray-200">
+          <th class="text-left py-2 font-medium">국가</th><th class="text-left py-2 font-medium">국면</th><th class="text-right py-2 font-medium">총점</th><th class="text-right py-2 font-medium">신뢰도</th>
+        </tr></thead>
+        <tbody>
+          <tr class="row-h"><td class="py-2">🇺🇸 미국</td><td class="py-2 font-medium">Slowdown</td><td class="text-right py-2">−0.8</td><td class="text-right py-2 text-sub">96.9</td></tr>
+          <tr class="row-h"><td class="py-2">🇰🇷 한국</td><td class="py-2 font-medium text-ok">Early Expansion</td><td class="text-right py-2">+1.1</td><td class="text-right py-2 text-sub">90.5</td></tr>
+        </tbody>
+      </table>
+      </div>
+      <div class="mt-4 space-y-2 text-sm text-sub">
+        <div><span class="text-ink font-medium">위기지수 CCI</span> — <span class="auto-pill ap-green">🟢 5/100</span> Sahm·수익률곡선·신용 전부 정상 (단 반도체사이클 0/10)</div>
+        <div><span class="text-ink font-medium">금리</span> — 미10Y 4.68% / 한10Y 1.57% / 스프레드 311bp (주의 200~250bp) / 10Y-2Y 0.47% 정상</div>
+      </div>
+      <p class="text-xs text-sub mt-3">거시 배경은 건강(Early Expansion·위기지수 5)인데 한국 반도체가 -10% 급락 — 거시-개별 괴리 다시 확대. 멀티플(할인율) 압박은 HBM Cycle Score 바깥에서 별도 작용.</p>
+    </div>
+
+    <div class="card bg-white rounded-2xl p-6 shadow-card border border-gray-100">
+      <h3 class="text-sm font-semibold text-indigo-600 mb-3">반도체 수출 (실물 지표)</h3>
+      <table class="w-full text-sm">
+        <thead><tr class="text-sub text-xs border-b border-gray-200">
+          <th class="text-left py-2 font-medium">발표월</th><th class="text-right py-2 font-medium">수출 YoY</th><th class="text-right py-2 font-medium">수출액</th><th class="text-left py-2 font-medium">비고</th>
+        </tr></thead>
+        <tbody>
+          <tr class="row-h"><td class="py-2">2026-07</td><td class="text-right py-2 text-ok font-bold">+178.8%</td><td class="text-right py-2">$41.0B</td><td class="py-2 text-sub">14개월 연속 역대 최고</td></tr>
+        </tbody>
+      </table>
+      <p class="text-xs text-sub mt-3">HBM Cycle Score 붕괴조건 ⑤ (수출 10% 미만) — 10% 문턱 대비 대폭 여유, <span class="text-ok font-medium">미충족</span>. 실물 수요는 오늘 주가 급락과 무관하게 견조.</p>
+    </div>
+  </section>
+
+  <!-- ============ 2. SK하이닉스 ============ -->
+  <section class="mb-8 fade-in">
+    <div class="flex items-center gap-3 mb-4">
+      <h2 class="text-2xl font-semibold text-ink">💼 SK하이닉스 (000660)</h2>
+      <span class="auto-pill ap-green">🟢 자동화</span>
+    </div>
+
+    <div class="card bg-white rounded-2xl p-6 shadow-card border border-gray-100 mb-4">
+      <h3 class="text-sm font-semibold text-indigo-600 mb-3">가격 · 수급 (8/6 종가)</h3>
+      <div class="grid sm:grid-cols-2 gap-x-6 gap-y-2 text-sm">
+        <div><span class="text-sub">종가</span> <span class="text-ink font-bold text-lg">1,495,000원</span> <span class="text-bad">−173,000 (−10.37%)</span></div>
+        <div><span class="text-sub">거래량</span> <span class="text-ink">5.30M주</span> <span class="text-sub">(8/5 3.95M→급증)</span></div>
+        <div><span class="text-sub">외국인 보유율</span> <span class="text-ink">51.03%</span> <span class="text-sub">유지 (−536주)</span></div>
+        <div><span class="text-sub">250일 고가대비</span> <span class="text-bad">−49.95%</span> <span class="text-sub">(낙폭 재확대)</span></div>
+        <div class="sm:col-span-2"><span class="text-sub">ADR</span> <span class="text-ink">$151.03</span> <span class="auto-pill ap-green">OK 보합</span> <span class="text-sub">CSV 0.0% (3필드 합의) — 본주 -10.37%와 괴리, ADR 프리미엄 확대</span></div>
+      </div>
+      <p class="text-xs text-sub mt-3">거래량 급증(3.95M→5.30M)은 패닉매도 소진 정황(보조지표, 선행성 약함). 보유율은 사실상 변동없어 외국인 매도가 체결기준(당일)이지 보유 이탈로 이어지진 않음 — 결제시차(T+2) 검증은 다음 체크.</p>
+    </div>
+
+    <div class="card bg-white rounded-2xl p-6 shadow-card border border-gray-100 mb-4">
+      <h3 class="text-sm font-semibold text-indigo-600 mb-3">투자자별 순매수</h3>
+      <div class="overflow-x-auto">
+      <table class="w-full text-sm">
+        <thead><tr class="text-sub text-xs border-b border-gray-200">
+          <th class="text-left py-2 font-medium">누적</th><th class="text-right py-2 font-medium">외국인</th><th class="text-right py-2 font-medium">기관</th><th class="text-right py-2 font-medium">개인</th>
+        </tr></thead>
+        <tbody>
+          <tr class="row-h"><td class="py-2 font-medium">1일 (8/6)</td><td class="text-right py-2 text-bad font-bold">−1조 6,771억</td><td class="text-right py-2 text-bad">−422억</td><td class="text-right py-2 text-ok">+2조 389억</td></tr>
+          <tr class="row-h"><td class="py-2">5일 (7/31~)</td><td class="text-right py-2 text-ok">+232억</td><td class="text-right py-2 text-bad">−386억</td><td class="text-right py-2 text-ok">+45억</td></tr>
+          <tr class="row-h"><td class="py-2 font-medium">20일</td><td class="text-right py-2 text-bad font-bold">−5조 8,900억</td><td class="text-right py-2 text-bad">−347억</td><td class="text-right py-2 text-ok">+4,035억</td></tr>
+        </tbody>
+      </table>
+      </div>
+      <p class="text-xs text-sub mt-3">코스피 전체 외국인 순매도 1.7조 중 본주가 1조 6,771억(99%) — 오늘 매도 압력의 거의 전부가 SK하이닉스 한 종목에 집중. 20일 누적 −4.03조→<b>−5.89조로 재악화</b>(붕괴조건 ④ 심화). 개인 +2조 389억 저가매수는 "항복"이 아니라 역행 매수(찐반등 ② 미충족).</p>
+    </div>
+
+    <div class="card bg-white rounded-2xl p-6 shadow-card border border-gray-100">
+      <h3 class="text-sm font-semibold text-indigo-600 mb-3">시장 지표</h3>
+      <div class="grid sm:grid-cols-2 gap-x-6 gap-y-2 text-sm">
+        <div><span class="text-sub">코스피</span> <span class="text-ink">6,296.38</span> <span class="text-bad">−4.58%</span> <span class="auto-pill ap-red">매도사이드카 10:18</span></div>
+        <div><span class="text-sub">코스닥</span> <span class="text-ink">801.67</span> <span class="text-ok">+0.26%</span></div>
+        <div><span class="text-sub">신용융자잔고</span> <span class="text-ink">3.08M주</span> <span class="auto-pill ap-red">반전 1일차 ↑</span> <span class="text-sub">(8/4 2.78M→+10.5%)</span></div>
+        <div><span class="text-sub">공매도 비중</span> <span class="text-ink">3.49%</span> <span class="text-sub">완화 추세 유지</span></div>
+      </div>
+      <p class="text-xs text-sub mt-3">⚠️ 자동화 버그 정정: daily_report.py의 "N거래일 연속" 표시에 +1 과대표기 버그 발견·수정 — 실제 신용잔고는 3일 연속 감소 후 <b>오늘 1일차 반전(증가)</b>(z=+3.55σ 역대급 상승). 8/6 마감분은 아직 미수집.</p>
+    </div>
+  </section>
+
+  <!-- ============ 3. HBM Cycle Score ============ -->
+  <section class="mb-8 fade-in">
+    <div class="flex items-center gap-3 mb-4">
+      <h2 class="text-2xl font-semibold text-ink">🧠 HBM Cycle Score</h2>
+      <span class="auto-pill ap-red">🔴 LLM 종합</span>
+    </div>
+
+    <div class="card bg-white rounded-2xl p-6 shadow-card border border-gray-100 mb-4">
+      <div class="flex items-baseline justify-between mb-4">
+        <div>
+          <span class="text-4xl font-bold text-warn">75.3</span>
+          <span class="text-xl text-sub">/100</span>
+          <span class="ml-2 auto-pill ap-yellow">경계 (60~80)</span>
+        </div>
+        <div class="text-right">
+          <div class="text-sm text-sub font-medium">z-score 신방식 첫 적용</div>
+          <div class="text-sm text-bad">붕괴조건 1/5 (④ 심화)</div>
+        </div>
+      </div>
+      <p class="text-xs text-warn bg-warnbg rounded-lg p-3 mb-4 border border-amber-200">⚠️ <b>방법론 전환 안내</b>: 외국인수급·보유율 2축(30점)이 고정 점수구간에서 z-score 로지스틱 연속 스케일로 변경. 오늘 75.3 = 16.3(자동2축) + 22(ASP) + 20(CoWoS) + 7(공급확대) + 10(고객재고). 아침 특별조사의 "72점"은 구 방식 이월치라 직접 비교 불가.</p>
+      <div class="overflow-x-auto">
+      <table class="w-full text-sm">
+        <thead><tr class="text-sub text-xs border-b border-gray-200">
+          <th class="text-left py-2 font-medium">축</th><th class="text-right py-2 font-medium">배점</th><th class="text-right py-2 font-medium">점수</th><th class="text-left py-2 font-medium">방향</th><th class="text-center py-2 font-medium">유형</th>
+        </tr></thead>
+        <tbody>
+          <tr class="row-h"><td class="py-2">외국인 수급</td><td class="text-right py-2 text-sub">15</td><td class="text-right py-2 text-bad">10.8</td><td class="py-2 text-bad">당일 z=−0.75σ / 20일 z=+1.34σ</td><td class="text-center"><span class="auto-pill ap-green">🟢</span></td></tr>
+          <tr class="row-h"><td class="py-2">외국인 보유율</td><td class="text-right py-2 text-sub">15</td><td class="text-right py-2 text-sub">5.5</td><td class="py-2 text-sub">전일대비 0.00%p / 추세 하락</td><td class="text-center"><span class="auto-pill ap-green">🟢</span></td></tr>
+          <tr class="row-h"><td class="py-2">HBM ASP</td><td class="text-right py-2 text-sub">25</td><td class="text-right py-2 text-ok">22</td><td class="py-2 text-ok">사상 최대폭 (+30%QoQ D램)</td><td class="text-center"><span class="auto-pill ap-red">🔴</span></td></tr>
+          <tr class="row-h"><td class="py-2">엔비디아&CoWoS</td><td class="text-right py-2 text-sub">25</td><td class="text-right py-2">20</td><td class="py-2 text-sub">유지 (CoWoS 완전매진, 부정신호 無)</td><td class="text-center"><span class="auto-pill ap-red">🔴</span></td></tr>
+          <tr class="row-h"><td class="py-2">공급확대 위험</td><td class="text-right py-2 text-sub">10</td><td class="text-right py-2 text-ok">7</td><td class="py-2 text-ok">CXMT HBM3 양산 재지연</td><td class="text-center"><span class="auto-pill ap-red">🔴</span></td></tr>
+          <tr class="row-h"><td class="py-2">고객 재고 센티</td><td class="text-right py-2 text-sub">10</td><td class="text-right py-2">10</td><td class="py-2 text-sub">만점 유지 (CapEx $1조+)</td><td class="text-center"><span class="auto-pill ap-red">🔴</span></td></tr>
+        </tbody>
+      </table>
+      </div>
+      <p class="text-xs text-sub mt-3">외국인 2축(30점)만 CSV 자동화. ASP·엔비디아·공급확대·고객재고(70점)는 뉴스해석 본질 → 완전 LLM-free화 구조적 불가. <b>오늘 급락으로 6축 중 하향은 외국인수급(자동)뿐</b> — 나머지 4개 정성축은 부정신호 없어 그대로.</p>
+    </div>
+
+    <!-- 🆕 Edgewater ASP 보강 -->
+    <div class="card bg-indigo-50 rounded-2xl p-6 shadow-card border border-indigo-100 mb-4">
+      <h3 class="text-sm font-semibold text-indigo-700 mb-3">🆕 ASP 외부 교차검증 (Edgewater 8/6 INGEST)</h3>
+      <div class="overflow-x-auto">
+      <table class="w-full text-sm">
+        <thead><tr class="text-indigo-700 text-xs border-b border-indigo-200">
+          <th class="text-left py-2 font-medium">제품군</th><th class="text-right py-2 font-medium">C3Q26 ASP</th><th class="text-left py-2 font-medium">전망</th>
+        </tr></thead>
+        <tbody>
+          <tr class="row-h"><td class="py-2">서버 DRAM (RDIMM)</td><td class="text-right py-2">~$2.4/Gb</td><td class="py-2 text-sub">상승, 단일자리% 둔화</td></tr>
+          <tr class="row-h"><td class="py-2 font-medium">HBM3E/HBM4</td><td class="text-right py-2 font-medium">비공개</td><td class="py-2 text-ok font-medium">$30~40/GB (CY27, 2배↑)</td></tr>
+          <tr class="row-h"><td class="py-2">DC/eSSD</td><td class="text-right py-2">~$0.30/GB</td><td class="py-2 text-sub">+25~30%</td></tr>
+        </tbody>
+      </table>
+      </div>
+      <p class="text-xs text-indigo-700 mt-3"><span class="font-medium">해석:</span> CY27 HBM $30~40/GB(최소 2배↑)는 ASP축 22점(사상 최대폭)의 외부 근거. 오늘 -10.37% 급락에도 ASP축은 흔들리지 않음 — Edgewater 3사 분기 종합분석이 SK하이닉스 HBM4 양산 Q2·HBM4E 샘플 완료와 교차 검증 성공. 마이크론 DOI&lt;120일·삼성 CapEx 16.8T로 3사 전원 공급경직 지속 = 가격 결정력 방어.</p>
+    </div>
+
+    <!-- 패닉회복 + 찐반등 -->
+    <div class="card bg-white rounded-2xl p-6 shadow-card border border-gray-100 mb-4">
+      <h3 class="text-sm font-semibold text-indigo-600 mb-3">패닉회복 종합판정 · 찐반등 4대 신호</h3>
+      <div class="flex items-center gap-3 mb-3">
+        <span class="text-lg font-bold text-warn">🟠 바닥 다지기 진행중</span>
+        <span class="text-sm text-bad">(회복 초입 → 재하향, 8/5→8/6)</span>
+      </div>
+      <div class="grid grid-cols-2 gap-2 text-sm">
+        <div class="bg-badbg rounded-lg p-3 border border-rose-200"><span class="font-medium text-bad">① 빚청산</span> <span class="text-sub">반전 1일차(증가)</span></div>
+        <div class="bg-gray-50 rounded-lg p-3 border border-gray-200"><span class="font-medium text-sub">② 개미항복</span> <span class="text-sub">미충족 (역행매수)</span></div>
+        <div class="bg-badbg rounded-lg p-3 border border-rose-200"><span class="font-medium text-bad">③ 외국인귀환</span> <span class="text-bad">후퇴 (20일 −5.89조)</span></div>
+        <div class="bg-badbg rounded-lg p-3 border border-rose-200"><span class="font-medium text-bad">④ 미국동반</span> <span class="text-bad">미충족 (SOX 4일 약세)</span></div>
+      </div>
+      <p class="text-xs text-sub mt-3">4대 신호 0/4 — 5거래일 만에 전면 재악화(도입 7/23 이래 처음). 단 <b>Tier1 펀더멘털 반박신호 자체는 오늘 반박되지 않았다</b>(CapEx·CoWoS·HBM4·ASP 전부 유효) — "가격이 신호를 안 따라가는 소화 지연·단기 수급 우위" 국면, 8/3과 동일 구조. 신중론(SA overhang·숏커버링 일회성, 독립소스 2곳)이 8/5보다 다시 우위.</p>
+    </div>
+
+    <!-- HBF 신규 -->
+    <div class="card bg-white rounded-2xl p-6 shadow-card border border-gray-100">
+      <h3 class="text-sm font-semibold text-indigo-600 mb-3">🆕 신규 재료 — HBF (HBM 이후)</h3>
+      <p class="text-sm text-ink leading-relaxed">8/4~6 <b>FMS 2026</b>(산타클라라): SK하이닉스·샌디스크가 <b>HBF(High Bandwidth Flash)</b> 세계 최초 표준 규격 발표 — 최대 512GB·0.4~3.0TB/s·UCIe. <b>SK하이닉스 단독 주도</b> "HBM 이후" 후보 등장(삼성·마이크론 관망). HBM Cycle Score엔 미편입(별개 로드맵)이나 중기 성장엔진 다변화 차원 긍정적 — 오늘 주가 급락과 무관한 중기 호재.</p>
+    </div>
+  </section>
+
+  <!-- ============ 4. 정치 오버레이 ============ -->
+  <section class="mb-8 fade-in">
+    <div class="flex items-center gap-3 mb-4">
+      <h2 class="text-2xl font-semibold text-ink">🏛️ 정치 오버레이</h2>
+      <span class="auto-pill ap-red">🔴 LLM 종합</span>
+    </div>
+
+    <div class="card bg-white rounded-2xl p-6 shadow-card border border-gray-100">
+      <div class="overflow-x-auto">
+      <table class="w-full text-sm">
+        <thead><tr class="text-sub text-xs border-b border-gray-200">
+          <th class="text-left py-2 font-medium">카테고리</th><th class="text-left py-2 font-medium">8/6 판정</th><th class="text-left py-2 font-medium">핵심</th>
+        </tr></thead>
+        <tbody>
+          <tr class="row-h"><td class="py-2">🏛️ 정치</td><td class="py-2 text-bad">🔴↘</td><td class="py-2 text-sub">지지율 32~39%, 신규 여론조사 미확인</td></tr>
+          <tr class="row-h"><td class="py-2">💰 경제</td><td class="py-2 text-bad">🔴↘</td><td class="py-2 text-sub">관세 발효 유지, 신규 지표 無</td></tr>
+          <tr class="row-h"><td class="py-2">⚔️ 전쟁/외교</td><td class="py-2 text-warn">🔴🟡 혼재 유지(세부 진전)</td><td class="py-2"><span class="text-warn font-medium">호르무즈 항로 좌표 합의</span> — 통제권·통행료는 미해결</td></tr>
+          <tr class="row-h"><td class="py-2">🛂 이민</td><td class="py-2 text-bad">🔴↘</td><td class="py-2 text-sub">신규 사건 無, 기존 범위 유지</td></tr>
+          <tr class="row-h"><td class="py-2">🥊 경쟁</td><td class="py-2 text-bad">🔴⏳</td><td class="py-2 text-sub">8/4 예비선거 결과 미확인</td></tr>
+        </tbody>
+      </table>
+      </div>
+      <p class="text-sm text-ink mt-4 leading-relaxed"><b>⚠️ 시장-외교 괴리 확인</b>: 전쟁/외교 축은 8/5에 이어 8/6도 완만히 개선(이란-오만 호르무즈 항로 <b>지리적 좌표 합의</b>, 임시 운항체계 공동성명 최종 조율 단계). 그런데도 SK하이닉스 -10.37% 급락 — <b>오늘 급락 원인이 중동 재료가 아니라 미국 반도체 섹터 자체(AI 지출 정점론)</b>임을 다른 각도에서 재확인. 최종 타결 전까지 "혼재" 유지(통제권·통행료 미해결, 이란 "해상봉쇄 유지 시 안전통항 보장 못함" 명시).</p>
+    </div>
+  </section>
+
+  <!-- ============ 다음 관전 포인트 ============ -->
+  <section class="mb-8 fade-in">
+    <h2 class="text-2xl font-semibold text-ink mb-4">🔭 다음 관전 포인트</h2>
+    <div class="card bg-indigo-50 rounded-2xl p-6 shadow-card border border-indigo-100">
+      <ul class="space-y-3 text-sm text-ink">
+        <li class="flex gap-3"><span class="text-indigo-600 font-bold">①</span> <span><b>펀더멘털 vs 가격 괴리 지속 여부</b> — 오늘 Tier1(ASP·CapEx·CoWoS)은 미훼손, 가격만 -10.37%. 내일도 신호 안 깨지면 "소화 지연" 판정 유지, 깨지면 본격 경고</span></li>
+        <li class="flex gap-3"><span class="text-indigo-600 font-bold">②</span> <span><b>외국인 20일 누적 −5.89조</b> — 8/5 +657억 귀환 조짐이 하루 만에 뒤집힘. 며칠 더 순매수 시 붕괴조건④ 해소 + 찐반등 ③ 후보</span></li>
+        <li class="flex gap-3"><span class="text-indigo-600 font-bold">③</span> <span><b>신용융자 3.08M주 반전 1일차</b> — 증가가 강제청산(담보가치 급락)인지 자발적 신규융자인지 분리 필요. 추세 재확립 여부가 ① 판정 관건</span></li>
+        <li class="flex gap-3"><span class="text-indigo-600 font-bold">④</span> <span><b>미국 반도체 4거래일 약세</b> — "AI 인프라 지출 정점론" 재부상. SOX 방향 전환 시 찐반등 ④ 재충족 / 지속 시 멀티플 압박</span></li>
+        <li class="flex gap-3"><span class="text-indigo-600 font-bold">⑤</span> <span><b>호르무즈 최종 타결</b> — 항로 좌표 합의 후 통제권·통행료가 남았음. 타결 시 유가·리스크온 지속(오늘과 괴리 해소)</span></li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============ 품질 기준 안내 ============ -->
+  <section class="fade-in">
+    <div class="card bg-white rounded-2xl p-6 shadow-card border border-gray-100">
+      <details>
+        <summary class="text-xs font-semibold tracking-widest text-sub uppercase cursor-pointer flex items-center gap-2">
+          <span class="chev transition-transform duration-300">▾</span> 품질 기준 · 생성 정보
+        </summary>
+        <div class="mt-4 space-y-2 text-xs text-sub leading-relaxed">
+          <p><span class="auto-pill ap-green">🟢 자동화(사실층)</span> KIS API CSV 6종(price-snapshot·investor-flow·credit-balance·kr-index·short-sale·adr-quote) · portfolio-holdings · PEOS 거시 · 반도체수출 통계. 8/6 종가 기준.</p>
+          <p><span class="auto-pill ap-red">🔴 LLM 종합(해석층)</span> wiki/ 서사 — hbm-cycle-score(8/6 75.3점 z-score 신방식) · panic-recovery(8/6 바닥다지기로 재하향) · market-cycles(8/6 0/4 전면재악화) · trump-tracker(8/6 호르무즈 항로좌표 합의) · cxl-next-gen-memory(HBF) · macro-regime-history · fundamentals-vs-sentiment-derating · situational-awareness-fund-liquidation · <b>edgewater-memory-market-analysis(8/6 INGEST, ASP 교차검증)</b>.</p>
+          <p>하이브리드 원칙: automation-vs-ai-narrative-roadmap. 헤드리스 자율 사이클(git pull → 위키 종합 → HTML → dispatch). 로컬 작업 파일만 생성, 위키/원격 수정 없음.</p>
+          <p>디자인: CXL Daily Update 3호(0600.html) Apple-style 템플릿 준용 — 미니멀 화이트·인디고 포인트·카드 hover.</p>
+        </div>
+      </details>
+    </div>
+  </section>
+
+</div>
+</body>
+</html>
