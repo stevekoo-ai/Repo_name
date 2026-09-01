@@ -74,3 +74,4 @@ timestamp_utc,workflow,step,attempts_used,max_attempts,result
 2026-08-31T22:09:19Z,real-estate-sync,apartment_rent,1,36,success
 2026-08-31T22:09:38Z,real-estate-sync,villa_sale,1,36,success
 2026-08-31T22:09:56Z,real-estate-sync,officetel_sale,1,36,success
+2026-09-01T00:23:31Z,sec-edgar-capex,capex_fetch,1,36,success
