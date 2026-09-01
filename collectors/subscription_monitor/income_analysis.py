@@ -3,20 +3,32 @@ Automated income-requirement (소득요건) analysis for a matched listing's
 모집공고문 PDF.
 
 Runs only for NEW_MATCH listings (keyword-matched: 플랫폼시티/광교/원천동) —
-not for every listing fetched every run — because it downloads and parses a
-PDF, which is too expensive to do for the hundreds of unrelated 국민주택
-listings nationwide.
+not for every listing fetched every run — because it drives a headless
+browser to search+download a PDF, which is too expensive to do for the
+hundreds of unrelated 국민주택 listings nationwide.
 
-Pipeline: PBLANC_URL(청약Home 상세페이지) -> scrape PDF link -> download ->
-extract text (pdftotext) -> classify against the rules documented in
-wiki/concepts/public-housing-income-requirement-framework.md.
+Pipeline (discovered empirically 2026-09-01, see wiki/log.md for the trace):
+  1. 청약Home API's PBLANC_URL only points to a SUMMARY page — it explicitly
+     says "기타 자세한 모집공고문 내용은 사업주체 홈페이지... 참고" (no PDF
+     lives there at all).
+  2. The 시행사(사업주체) for 국민주택 is almost always LH — so the actual
+     PDF lives on LH청약플러스(apply.lh.or.kr), which is a JS SPA (urllib
+     gets only an 87-byte redirect shell). Playwright (headless Chromium) is
+     required to render it.
+  3. On apply.lh.or.kr: 메인 페이지 통합검색(#mainSrch) 검색 -> 결과의
+     a[href*="selectWrtancInfo.do"] 상세페이지 링크 -> 그 페이지의
+     "...모집공고...pdf" 텍스트를 가진 a[href^="javascript:fileDownLoad"]
+     클릭 -> Playwright download event로 실제 PDF 파일 캡처.
 
-Every stage degrades gracefully: if PDF discovery/download/parsing fails, we
-return a status="failed" dict with a reason instead of raising, so a bad PDF
-link never breaks the alert pipeline (compose.py just omits the section or
-notes "자동분석 실패").
+Only LH is supported for now (GH/SH/기타 지방공사는 이번 4건 표본에 없었음—
+확장 필요시 이 파일에 사업주체별 검색 함수를 추가).
 
-📚 Framework reference (single source of truth for the rules below):
+Every stage degrades gracefully: if search/discovery/download fails, we
+return a status="failed" dict with a reason instead of raising, so a bad
+listing never breaks the alert pipeline (compose.py just notes "자동분석
+실패, 수동확인 필요").
+
+📚 Framework reference (single source of truth for the classification rules):
    wiki/concepts/public-housing-income-requirement-framework.md
    - Axis 1: 사업유형 (신혼희망타운=전 평형 검증 vs 국민주택=특별공급+60㎡이하만)
    - Axis 2: 국민주택형끼리는 배율표(%)가 「공공주택 특별법 시행규칙」
@@ -26,14 +38,15 @@ notes "자동분석 실패").
 
 from __future__ import annotations
 
+import os
 import re
 import subprocess
 import tempfile
-import urllib.request
 from dataclasses import dataclass, field
 
-REQUEST_TIMEOUT = 25
-USER_AGENT = "Mozilla/5.0 (compatible; subscription-monitor-income-analysis/1.0)"
+LH_MAIN_URL = "https://apply.lh.or.kr/"
+LH_NAV_TIMEOUT_MS = 30000
+LH_DOWNLOAD_TIMEOUT_MS = 30000
 
 # Standard income-multiplier percentages seen across the 3 reference 국민주택형
 # announcements (성남복정2 A1 / 인천계양 A6 / 양주회천 A-26), incl. the
@@ -54,7 +67,7 @@ class IncomeAnalysis:
     status: str  # "ok" | "failed"
     stage: str | None = None       # where it failed, if status=="failed"
     reason: str | None = None
-    pdf_url: str | None = None
+    pdf_url: str | None = None     # detail page URL (source), not a raw file URL — LH's download is a JS action, not a stable link
     business_type: str | None = None      # "국민주택형" | "신혼희망타운형" | "미분류"
     income_scope: str | None = None       # "전체검증" | "60㎡이하만검증" | "미분류"
     applicable_target_line: str | None = None
@@ -67,61 +80,110 @@ class IncomeAnalysis:
 
 
 # ---------------------------------------------------------------------------
-# Stage 1: find the PDF link from the 청약Home listing detail page
+# Stage 1+2: search apply.lh.or.kr, find the detail page, download the PDF
 # ---------------------------------------------------------------------------
 
-def find_pdf_link(pblanc_url: str) -> str | None:
-    """청약Home 상세페이지(PBLANC_URL)를 열어 첫 .pdf 링크를 찾는다.
-    페이지 구조가 시행사/시점마다 달라질 수 있어 완전한 파서가 아니라
-    "본문 어디든 .pdf로 끝나는 href가 있으면 그것" 수준의 관대한 스크래핑이다."""
-    if not pblanc_url or not pblanc_url.startswith("http"):
-        return None
-    req = urllib.request.Request(pblanc_url, headers={"User-Agent": USER_AGENT})
-    with urllib.request.urlopen(req, timeout=REQUEST_TIMEOUT) as resp:
-        html = resp.read().decode("utf-8", errors="ignore")
+def _search_keyword(house_name: str) -> str:
+    """HOUSE_NM's leading token is what LH청약플러스 통합검색 matches on
+    reliably (e.g. '성남복정2 A1블록 신혼희망타운(공공분양)(본청약)' -> '성남복정2') —
+    the full name (with 블록/괄호 suffixes) does not reliably match.
 
-    # Prefer an <a href="....pdf"> style match; fall back to any bare URL ending in .pdf.
-    m = re.search(r'href=["\']([^"\']+\.pdf[^"\']*)["\']', html, re.IGNORECASE)
-    if not m:
-        m = re.search(r'(https?://[^\s"\'<>]+\.pdf)', html, re.IGNORECASE)
-    if not m:
-        return None
-    link = m.group(1)
-    if link.startswith("//"):
-        link = "https:" + link
-    elif link.startswith("/"):
-        origin = re.match(r"(https?://[^/]+)", pblanc_url)
-        link = (origin.group(1) if origin else "") + link
-    return link
+    A trailing '지구' also breaks the match — LH청약플러스 lists projects
+    under their short form (e.g. '남양주진접2지구 A-4블록...' -> HOUSE_NM's
+    leading token '남양주진접2지구' finds 0 results, but '남양주진접2' finds
+    the listing; confirmed empirically for both '남양주진접2지구' and
+    '양주회천지구' — '성남복정2'/'의정부우정', which have no '지구' suffix,
+    matched fine as-is)."""
+    first = (house_name or "").split()[0] if (house_name or "").strip() else ""
+    if first.endswith("지구"):
+        first = first[:-len("지구")]
+    return first
+
+
+def search_and_download_lh_pdf(house_name: str, download_dir: str) -> tuple[str, str]:
+    """Search LH청약플러스 for house_name, open the listing detail page, and
+    download its 모집공고문 PDF (not the .hwpx or 팸플릿 attachments).
+
+    Returns (local_pdf_path, detail_page_url). Raises RuntimeError/LookupError
+    with a specific message on any failure — analyze_listing() catches and
+    wraps these.
+    """
+    from playwright.sync_api import sync_playwright  # imported lazily: only NEW_MATCH pays this cost
+
+    keyword = _search_keyword(house_name)
+    if not keyword:
+        raise ValueError(f"검색어를 추출할 수 없음 (house_name={house_name!r})")
+
+    with sync_playwright() as p:
+        browser = p.chromium.launch()
+        try:
+            page = browser.new_page()
+            page.goto(LH_MAIN_URL, wait_until="networkidle", timeout=LH_NAV_TIMEOUT_MS)
+            # A promotional popup (#gnrlPop) covers the page and intercepts
+            # clicks on load — remove outright rather than hunting its close
+            # button (banner content rotates unpredictably).
+            page.evaluate("""() => { const el = document.querySelector('#gnrlPop'); if (el) el.remove(); }""")
+
+            # #mainSrch is the visible main-page search box — a second hidden
+            # input shares name="totalSearch" with it, so select by id.
+            search_box = page.locator("#mainSrch")
+            search_box.click()
+            search_box.fill(keyword)
+            search_box.press("Enter")
+            page.wait_for_load_state("networkidle", timeout=LH_NAV_TIMEOUT_MS)
+
+            detail_link = page.locator('a[href*="selectWrtancInfo.do"]').first
+            if detail_link.count() == 0:
+                raise LookupError(
+                    f"LH청약플러스에서 '{keyword}' 검색결과에 공고 상세 링크 없음 "
+                    "(아직 미등록이거나 검색어가 실제 공고명과 다를 수 있음)"
+                )
+            # NOTE: get_attribute("href") returns the raw (often relative)
+            # DOM attribute, which page.goto() cannot navigate to directly —
+            # .href via evaluate() returns the browser-resolved absolute URL.
+            detail_url = detail_link.evaluate("el => el.href")
+
+            page.goto(detail_url, wait_until="networkidle", timeout=LH_NAV_TIMEOUT_MS)
+
+            # The detail page lists several attachments (.hwpx forms, 팸플릿,
+            # 위임장 etc.) as javascript:fileDownLoad('id') links — the main
+            # notice is the one whose text contains both "모집공고" and ".pdf".
+            pdf_link = page.locator("a").filter(has_text=re.compile(r"모집공고.*\.pdf$"))
+            if pdf_link.count() == 0:
+                raise LookupError(
+                    "상세페이지에서 '...모집공고...pdf' 링크를 찾지 못함 "
+                    "(첨부파일 구성이 기존 사례와 다를 수 있음)"
+                )
+
+            with page.expect_download(timeout=LH_DOWNLOAD_TIMEOUT_MS) as download_info:
+                pdf_link.first.click()
+            download = download_info.value
+            local_path = os.path.join(download_dir, "notice.pdf")
+            download.save_as(local_path)
+
+            return local_path, page.url
+        finally:
+            browser.close()
 
 
 # ---------------------------------------------------------------------------
-# Stage 2: download + extract text
+# Stage 3: extract text
 # ---------------------------------------------------------------------------
 
-def download_pdf(pdf_url: str) -> bytes:
-    req = urllib.request.Request(pdf_url, headers={"User-Agent": USER_AGENT})
-    with urllib.request.urlopen(req, timeout=REQUEST_TIMEOUT) as resp:
-        return resp.read()
-
-
-def extract_text(pdf_bytes: bytes) -> str:
+def extract_text_from_file(pdf_path: str) -> str:
     """pdftotext(poppler-utils) -layout 으로 텍스트 추출. CI(workflow)에서
-    apt-get install poppler-utils 필요 — .github/workflows/subscription-monitor.yml 참고."""
-    with tempfile.NamedTemporaryFile(suffix=".pdf") as f:
-        f.write(pdf_bytes)
-        f.flush()
-        result = subprocess.run(
-            ["pdftotext", "-layout", f.name, "-"],
-            capture_output=True,
-            timeout=30,
-            check=True,
-        )
+    apt-get install poppler-utils 필요 — .github/workflows/*.yml 참고."""
+    result = subprocess.run(
+        ["pdftotext", "-layout", pdf_path, "-"],
+        capture_output=True,
+        timeout=30,
+        check=True,
+    )
     return result.stdout.decode("utf-8", errors="ignore")
 
 
 # ---------------------------------------------------------------------------
-# Stage 3: classify against the framework rules
+# Stage 4: classify against the framework rules
 # ---------------------------------------------------------------------------
 
 def _extract_income_section(text: str) -> str | None:
@@ -217,27 +279,26 @@ def analyze_listing(row: dict) -> dict:
     """row is a raw 청약Home API row (same shape judge.py/compose.py use).
     Never raises — every failure mode returns a status="failed" dict so the
     calling alert pipeline can proceed regardless."""
-    pblanc_url = row.get("PBLANC_URL")
-    if not pblanc_url:
-        return IncomeAnalysis(status="failed", stage="discover", reason="PBLANC_URL 없음").to_dict()
+    house_name = row.get("HOUSE_NM")
+    if not house_name:
+        return IncomeAnalysis(status="failed", stage="discover", reason="HOUSE_NM 없음").to_dict()
 
     try:
-        pdf_url = find_pdf_link(pblanc_url)
-    except Exception as e:
-        return IncomeAnalysis(status="failed", stage="discover", reason=f"상세페이지 접근 실패: {e}").to_dict()
-    if not pdf_url:
-        return IncomeAnalysis(status="failed", stage="discover", reason="상세페이지에서 PDF 링크를 찾지 못함").to_dict()
+        with tempfile.TemporaryDirectory() as tmpdir:
+            try:
+                pdf_path, detail_url = search_and_download_lh_pdf(house_name, tmpdir)
+            except Exception as e:
+                return IncomeAnalysis(status="failed", stage="discover", reason=f"LH청약플러스 검색/다운로드 실패: {e}").to_dict()
 
-    try:
-        pdf_bytes = download_pdf(pdf_url)
+            try:
+                text = extract_text_from_file(pdf_path)
+            except Exception as e:
+                return IncomeAnalysis(status="failed", stage="extract", pdf_url=detail_url, reason=f"PDF 텍스트 추출 실패: {e}").to_dict()
     except Exception as e:
-        return IncomeAnalysis(status="failed", stage="download", pdf_url=pdf_url, reason=f"PDF 다운로드 실패: {e}").to_dict()
-
-    try:
-        text = extract_text(pdf_bytes)
-    except Exception as e:
-        return IncomeAnalysis(status="failed", stage="extract", pdf_url=pdf_url, reason=f"PDF 텍스트 추출 실패: {e}").to_dict()
+        # Catches anything from Playwright/browser setup itself (e.g. missing
+        # chromium install) that isn't already one of the two stages above.
+        return IncomeAnalysis(status="failed", stage="discover", reason=f"예기치 않은 오류: {e}").to_dict()
 
     analysis = analyze_text(text)
-    analysis.pdf_url = pdf_url
+    analysis.pdf_url = detail_url
     return analysis.to_dict()

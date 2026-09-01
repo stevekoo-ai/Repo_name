@@ -100,10 +100,10 @@ def _income_analysis_lines(income: dict | None) -> list[str]:
     PRIORITY_UP re-notify), and a dict with status="failed"|"ok" when it was."""
     if income is None:
         return []
-    lines = ["", "── 소득요건 자동분석 (모집공고문 PDF) ──"]
+    lines = ["", "── 소득요건 자동분석 (LH청약플러스 모집공고문 PDF) ──"]
     if income.get("status") != "ok":
         lines.append(f"⚠️ 자동분석 실패 ({income.get('stage', '?')} 단계) — {income.get('reason', '사유 미상')}")
-        lines.append("청약홈 링크에서 직접 공고문을 확인해 주세요.")
+        lines.append("LH청약플러스(apply.lh.or.kr)에서 단지명으로 직접 검색해 공고문을 확인해 주세요.")
         return lines
 
     lines.append(f"사업유형: {income['business_type']}")
@@ -122,7 +122,7 @@ def _income_analysis_lines(income: dict | None) -> list[str]:
     else:
         lines.append("✅ 기존 3건(성남복정·인천계양·양주회천) 패턴과 일치, 예외 없음")
     if income.get("pdf_url"):
-        lines.append(f"공고문 PDF: {income['pdf_url']}")
+        lines.append(f"공고문 상세페이지: {income['pdf_url']}")
     lines.append(
         "판별 근거: wiki/concepts/public-housing-income-requirement-framework.md "
         "(새 예외는 그 페이지의 '예외 사례' 절에 수동 확인 후 기록할 것)"
