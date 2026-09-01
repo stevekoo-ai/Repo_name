@@ -28,6 +28,9 @@ jobs:
         with:
           python-version: "3.12"
 
+      - name: Install poppler-utils (pdftotext, for income_analysis.py PDF parsing)
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends poppler-utils
+
       - name: Fetch listings, check 플랫폼시티 alerts, render page
         env:
           DATA_GO_KR_KEY: ${{ secrets.DATA_GO_KR_KEY }}

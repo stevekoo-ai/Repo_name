@@ -28,6 +28,7 @@ import os
 from datetime import datetime
 
 import alerts
+import income_analysis
 from judge import judge_listings, summarize, ALERT_KEYWORDS, MY_ACCOUNT_SCORE
 
 FAILURE_THRESHOLD = 6  # 6 consecutive 5-min failures ≈ 30 min of no data (matches alerts.py)
@@ -93,11 +94,47 @@ def _listing_detail_lines(v: dict) -> list[str]:
     ]
 
 
-def compose_new_match(v: dict, is_test: bool) -> tuple[str, str]:
+def _income_analysis_lines(income: dict | None) -> list[str]:
+    """Render collectors/subscription_monitor/income_analysis.py's result for
+    the alert email body. income is None when analysis wasn't attempted (e.g.
+    PRIORITY_UP re-notify), and a dict with status="failed"|"ok" when it was."""
+    if income is None:
+        return []
+    lines = ["", "── 소득요건 자동분석 (모집공고문 PDF) ──"]
+    if income.get("status") != "ok":
+        lines.append(f"⚠️ 자동분석 실패 ({income.get('stage', '?')} 단계) — {income.get('reason', '사유 미상')}")
+        lines.append("청약홈 링크에서 직접 공고문을 확인해 주세요.")
+        return lines
+
+    lines.append(f"사업유형: {income['business_type']}")
+    scope_note = {
+        "전체검증": "전용면적 무관, 전원 소득검증 대상",
+        "60㎡이하만검증": "특별공급 전원 + 일반공급은 60㎡ 이하만 소득검증 (60㎡ 초과 일반공급은 소득 무관)",
+    }.get(income["income_scope"], "판별 실패 — 원문 직접 확인 필요")
+    lines.append(f"소득검증 범위: {income['income_scope']} ({scope_note})")
+    if income.get("percentages_found"):
+        pct = "~".join([str(min(income["percentages_found"])), str(max(income["percentages_found"]))])
+        lines.append(f"소득배율 범위: {pct}% (도시근로자 가구당 월평균소득 기준)")
+    if income.get("exceptions"):
+        lines.append("⚠️ 예외 발견 (프레임워크 규칙과 다름, 원문 확인 권장):")
+        for exc in income["exceptions"]:
+            lines.append(f"  - {exc}")
+    else:
+        lines.append("✅ 기존 3건(성남복정·인천계양·양주회천) 패턴과 일치, 예외 없음")
+    if income.get("pdf_url"):
+        lines.append(f"공고문 PDF: {income['pdf_url']}")
+    lines.append(
+        "판별 근거: wiki/concepts/public-housing-income-requirement-framework.md "
+        "(새 예외는 그 페이지의 '예외 사례' 절에 수동 확인 후 기록할 것)"
+    )
+    return lines
+
+
+def compose_new_match(v: dict, is_test: bool, income: dict | None = None) -> tuple[str, str]:
     prefix = "[테스트] " if is_test else ""
     title = f"{prefix}[청약 알림 · {v['match_keyword']}] {v['name']}"
     head = "테스트 알림입니다 (실제 매물이 아닙니다).\n" if is_test else ""
-    lines = [head, *_listing_detail_lines(v)]
+    lines = [head, *_listing_detail_lines(v), *_income_analysis_lines(income)]
     return title, "\n".join(l for l in lines if l != "" or True)
 
 
@@ -229,7 +266,15 @@ def run_pipeline(verdicts: list[dict], healthy: bool, now_kst: datetime, seoul_g
         prev = state.get(lid)
         # NEW_MATCH: keyword-matched listing we've never notified.
         if v["match_keyword"] and (prev is None or not prev.get("notified")):
-            title, body = compose_new_match(v, is_test)
+            # Only NEW_MATCH pays the PDF-download-and-parse cost (not every
+            # listing every run) — see income_analysis.py module docstring.
+            # Never let a bad PDF/site break the alert: analyze_listing()
+            # itself is exception-safe, but guard here too.
+            try:
+                income = income_analysis.analyze_listing(v["row"])
+            except Exception as e:
+                income = {"status": "failed", "stage": "unexpected", "reason": str(e)}
+            title, body = compose_new_match(v, is_test, income)
             _send(title, body, also_issue=True)
             state[lid] = {"priority": v["priority"], "keyword": v["match_keyword"], "notified": True}
             fired["new_match"] += 1
