@@ -1,0 +1,30 @@
+name: Income requirement pattern trace (서울/경기 국민주택, manual)
+
+# Exploratory/manual only — NOT scheduled. Downloads+parses one PDF per
+# currently-open 서울/경기 국민주택 listing to re-validate the pattern in
+# wiki/concepts/public-housing-income-requirement-framework.md against the
+# live population. Trigger via workflow_dispatch whenever a re-check is
+# wanted; results go to this run's job log (no state file, no commit).
+on:
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+jobs:
+  trace:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install poppler-utils (pdftotext)
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends poppler-utils
+
+      - name: Trace income requirement pattern across 서울/경기 국민주택
+        env:
+          DATA_GO_KR_KEY: ${{ secrets.DATA_GO_KR_KEY }}
+        run: python3 collectors/subscription_monitor/income_pattern_trace.py
