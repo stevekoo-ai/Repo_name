@@ -1,7 +1,5 @@
-"""Temporary: use Playwright to see how apply.lh.or.kr actually renders and
-where the 공고문 PDF download is triggered from, since it's a JS SPA that
-urllib can't handle. Investigates one known listing (성남복정2 A1,
-houseManageNo=2026820008) via the site's own search."""
+"""Temporary: use Playwright to trace apply.lh.or.kr's search -> detail -> PDF
+download flow for a known listing (성남복정2 A1)."""
 from playwright.sync_api import sync_playwright
 
 TARGET_NAME = "성남복정2"
@@ -10,23 +8,43 @@ with sync_playwright() as p:
     browser = p.chromium.launch()
     page = browser.new_page()
 
-    print("=== 1) LH청약플러스 메인 접속 ===")
+    print("=== 1) 메인 접속 + 통합검색 ===")
     page.goto("https://apply.lh.or.kr/", wait_until="networkidle", timeout=30000)
-    print("최종 URL:", page.url)
-    print("타이틀:", page.title())
+    search_box = page.locator('input[name="totalSearch"]').first
+    search_box.click()
+    search_box.fill(TARGET_NAME)
+    search_box.press("Enter")
+    page.wait_for_load_state("networkidle", timeout=30000)
+    print("검색 후 URL:", page.url)
 
-    # Dump visible links/buttons that look like search/notice-list entry points
-    print("\n=== 2) 메인 페이지 링크 후보 ===")
+    print("\n=== 2) 검색결과 페이지 링크 덤프 ===")
     hrefs = page.eval_on_selector_all("a[href]", "els => els.map(e => [e.href, e.textContent.trim()])")
     for href, text in hrefs:
-        if any(k in (href + text) for k in ["공고", "청약", "검색", "notice", "sbd", "board", "list", "gongo"]):
+        if text or "pdf" in href.lower():
             print(f"  {text!r} -> {href}")
 
-    print("\n=== 3) 페이지 내 검색창 탐색 ===")
-    inputs = page.eval_on_selector_all(
-        "input", "els => els.map(e => [e.type, e.id, e.name, e.placeholder])"
-    )
-    for t in inputs[:30]:
-        print(" input:", t)
+    print("\n=== 3) 검색결과 페이지 본문 텍스트(첫 3000자) ===")
+    body_text = page.locator("body").inner_text()
+    print(body_text[:3000])
+
+    print("\n=== 4) '모집공고문' 목록 페이지 직접 접속 시도 ===")
+    page2 = browser.new_page()
+    try:
+        page2.goto(
+            "https://apply.lh.or.kr/lhapply/apply/bfh/slpa/list.do?mi=1349",
+            wait_until="networkidle",
+            timeout=30000,
+        )
+        print("URL:", page2.url)
+        hrefs2 = page2.eval_on_selector_all("a[href]", "els => els.map(e => [e.href, e.textContent.trim()])")
+        pdf_like = [h for h in hrefs2 if TARGET_NAME in h[1] or "성남" in h[1]]
+        print(f"'{TARGET_NAME}' 또는 '성남' 포함 링크 {len(pdf_like)}개:")
+        for href, text in pdf_like[:10]:
+            print(f"  {text!r} -> {href}")
+        if not pdf_like:
+            print("본문 첫 2000자:")
+            print(page2.locator("body").inner_text()[:2000])
+    except Exception as e:
+        print("실패:", e)
 
     browser.close()
