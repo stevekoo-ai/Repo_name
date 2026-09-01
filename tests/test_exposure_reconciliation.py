@@ -1588,6 +1588,33 @@ def test_reports_index_mirroring_is_idempotent():
     assert sample.stat().st_mtime_ns == mtime_before, "unchanged file must not be rewritten"
 
 
+def test_archive_date_uses_kst_not_the_runners_utc_clock():
+    """2026-09-01: report/2026-08-31.md never got created because run.py used
+    date.today() (the GitHub Actions runner's UTC clock) to name the daily
+    archive, but the cron targets 06:00 KST. A run that fires late — e.g.
+    23:08 UTC on 2026-08-30, a real delay observed on this workflow — is
+    already 08:08 KST on 2026-08-31 (KST = UTC+9 crosses midnight at 15:00
+    UTC), so it should archive as 2026-08-31, not the UTC calendar date
+    2026-08-30 the old code would have produced. This pins the fix
+    (engine/report/run.py's KST-based `today_kst`) against that exact
+    real-world instant."""
+    from engine.report.run import KST
+    from datetime import datetime, timezone
+
+    # The literal instant run #64 actually started (created_at from the
+    # GitHub Actions API) — this is real observed data, not a hypothetical.
+    delayed_utc_instant = datetime(2026, 8, 30, 23, 8, 23, tzinfo=timezone.utc)
+
+    old_buggy_result = delayed_utc_instant.date().isoformat()  # what date.today() equivalent gave
+    fixed_result = delayed_utc_instant.astimezone(KST).date().isoformat()
+
+    assert old_buggy_result == "2026-08-30", "sanity check on the fixture itself"
+    assert fixed_result == "2026-08-31", (
+        "a run landing at 23:08 UTC is already the next KST day — the archive "
+        "must be dated 2026-08-31, matching the 06:00 KST slot this cron targets"
+    )
+
+
 def test_automation_run_log_creates_header_then_appends():
     """2026-08-27: CI 단계 자동 상태로그 신설 — 첫 호출은 헤더+1행, 두 번째
     호출은 헤더 없이 1행만 추가해야 append-only 원칙을 지킨다."""

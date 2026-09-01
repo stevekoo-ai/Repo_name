@@ -22,8 +22,10 @@ from __future__ import annotations
 
 import argparse
 import os
-from datetime import date
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
+
+KST = timezone(timedelta(hours=9))
 
 from core import notify
 from core.config import report_config
@@ -87,6 +89,17 @@ def run(month_key: str | None = None, archive: bool = True, archive_date: str | 
     out_dir = REPO_ROOT / report_config().get("output_dir", "report")
     out_dir.mkdir(parents=True, exist_ok=True)
 
+    # 2026-09-01 발견 — GitHub Actions ubuntu 러너는 로컬 시간이 UTC라
+    # date.today()가 이 크론의 실제 타겟(06:00 KST)이 아니라 UTC 날짜를
+    # 반환한다. 스케줄 실행 지연(플랫폼 부하 시 흔함, 이번엔 3시간+)이
+    # UTC 자정을 넘기면 그 UTC 날짜용 아카이브가 통째로 안 만들어지고
+    # 다음 UTC 날짜로 건너뛴다 — 실제로 2026-08-31 아카이브·daily_history
+    # 행이 둘 다 한 번도 안 만들어지고 09-01로 건너뛴 사례로 발견됨.
+    # 06:00 KST 실행이 지연돼도 KST 자정까지 ~18시간 여유가 있어 이 값이
+    # KST 자정을 넘길 가능성은 사실상 없다 — archive_date와 daily_history의
+    # run_date 둘 다 이 값 하나로 통일해서 항상 같은 날짜를 가리키게 한다.
+    today_kst = datetime.now(KST).date().isoformat()
+
     html_content = render_html(payload)
     md_content = render_markdown(payload)
 
@@ -101,7 +114,7 @@ def run(month_key: str | None = None, archive: bool = True, archive_date: str | 
     result = {"html": html_path, "markdown": md_path, "json": json_path}
 
     if archive:
-        archive_date = archive_date or date.today().isoformat()
+        archive_date = archive_date or today_kst
         daily_html_path = out_dir / f"{archive_date}.html"
         daily_html_path.write_text(html_content, encoding="utf-8")
         daily_md_path = out_dir / f"{archive_date}.md"
@@ -111,7 +124,7 @@ def run(month_key: str | None = None, archive: bool = True, archive_date: str | 
             "daily_html": daily_html_path, "daily_markdown": daily_md_path, "daily_json": daily_json_path,
         })
 
-    result["daily_history"] = daily_history.append_daily_history(payload)
+    result["daily_history"] = daily_history.append_daily_history(payload, run_date=today_kst)
 
     log_event("pipeline.report_generated", month=payload["report_month"],
               readiness=payload["report_readiness"], html=str(html_path),
