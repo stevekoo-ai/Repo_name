@@ -10,6 +10,15 @@ with sync_playwright() as p:
 
     print("=== 1) 메인 접속 + 통합검색 ===")
     page.goto("https://apply.lh.or.kr/", wait_until="networkidle", timeout=30000)
+    # A promotional popup (#gnrlPop, notice banners) covers the page on load
+    # and intercepts clicks — remove it outright rather than hunting for its
+    # close button (banner content is unpredictable/rotating).
+    removed = page.evaluate("""() => {
+        const el = document.querySelector('#gnrlPop');
+        if (el) { el.remove(); return true; }
+        return false;
+    }""")
+    print(f"gnrlPop 팝업 제거: {removed}")
     # There are two inputs sharing name="totalSearch" (a hidden header-popup one
     # and the visible main-page one, id="mainSrch") — id disambiguates.
     search_box = page.locator('#mainSrch')
