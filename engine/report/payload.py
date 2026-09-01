@@ -580,6 +580,8 @@ def _cci_section() -> dict:
             "spread_10y2y": round(cci_detail.spread_10y2y, 3) if cci_detail.spread_10y2y else None,
             "spread_10y3m": round(cci_detail.spread_10y3m, 3) if cci_detail.spread_10y3m else None,
             "hy_oas": round(cci_detail.hy_oas, 2) if cci_detail.hy_oas else None,
+            "copper_gold_ratio": (round(cci_detail.copper_gold_ratio, 4)
+                                  if cci_detail.copper_gold_ratio is not None else None),
             "k_emp_yoy": round(cci_detail.k_emp_yoy, 0) if cci_detail.k_emp_yoy else None,
             # Needed to tell "no data" apart from a real reading: score_semiconductor_cycle()
             # returns 0 both when the series is missing and when the cycle is healthy, so the
@@ -587,6 +589,10 @@ def _cci_section() -> dict:
             "semi_cycle_index": (round(cci_detail.semi_cycle_index, 4)
                                  if cci_detail.semi_cycle_index is not None else None),
         },
+        # 2026-09-01 신설 — 사용자 지적: "데이터 신선도가 표시가 없네! 특히
+        # 몇점이고 판단만 하는 항목은 믿을 수가 없네!". 모듈별 PRIMARY/FALLBACK/
+        # NO_DATA + 참조 시리즈 + 며칠 지난 데이터인지 그대로 통과시킨다.
+        "data_quality": cci_detail.data_quality,
         "sk_hynix_action": sk_hynix_action,
         "interpretation": {
             "GREEN": "Systemic expansion. Capital injection favored. Aggressive growth positioning optimal.",

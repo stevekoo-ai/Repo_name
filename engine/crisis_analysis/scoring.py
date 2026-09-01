@@ -10,7 +10,7 @@ Fallback strategy:
 """
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import datetime, timedelta
 from typing import Optional
 
@@ -45,6 +45,13 @@ class CCIDetail:
     rule20_value: Optional[float] = None
     k_emp_yoy: Optional[float] = None
     semi_cycle_index: Optional[float] = None
+
+    # 2026-09-01 신설 — 사용자 지적: "데이터 신선도가 표시가 없네! 특히 몇점이고
+    # 판단만 하는 항목은 믿을 수가 없네!". 모듈명 -> {quality, series, as_of,
+    # days_stale}. PRIMARY(1순위 시리즈 실측) / FALLBACK(대체 시리즈로 계산) /
+    # NO_DATA(둘 다 없음) 3단계 — 리포트가 "이 점수, 오늘 데이터야 아니면 몇 달
+    # 전 값이야?"를 항상 답할 수 있게 한다. _module_data_quality() 참고.
+    data_quality: dict = field(default_factory=dict)
 
     @property
     def state(self) -> str:
@@ -100,6 +107,68 @@ def _min_window(series_id: str, months: int = 12) -> Optional[float]:
     """Minimum value over N months."""
     values = _get_series_window(series_id, months * 30)
     return min(values) if values else None
+
+
+def _series_as_of(series_id: str) -> tuple[Optional[float], Optional[str], Optional[int]]:
+    """최신 데이터 포인트의 값·날짜·오늘 기준 며칠 지났는지를 그대로 반환 —
+    _get_series_window()와 달리 신선도 컷오프를 걸지 않는다.
+
+    2026-09-01 이 불일치 자체가 실제 버그의 원인이었다: _get_series_window(id, 60)은
+    60일 넘은 값을 조용히 빈 리스트로 걸러내는데, _get_latest()는 그 값이 아무리
+    오래됐어도 아무 경고 없이 "최신값"으로 반환해왔다. fred_us_industrial_production이
+    (월간 시리즈, ~2개월 지연) 62일 지연 상태였던 게 이 불일치를 실측으로 드러냈고,
+    그 결과 반도체 산업사이클 폴백이 "값은 있는데 window()만 텅 비어" 조용히
+    데이터없음으로 떨어졌다. 이 함수는 오직 "지금 시점 데이터 상태"를 있는 그대로
+    보고하기 위한 것 — 판정 로직(_get_series_window 기반)은 그대로 둔다."""
+    df = collector_base.read_normalized(series_id)
+    if df.empty:
+        return None, None, None
+    latest = df.sort_values("date").iloc[-1]
+    value = latest["value"]
+    if value is None:
+        return None, None, None
+    as_of = latest["date"]
+    as_of_str = as_of.isoformat() if hasattr(as_of, "isoformat") else str(as_of)
+    try:
+        days_stale = (datetime.now().date() - as_of).days
+    except TypeError:
+        days_stale = None
+    return float(value), as_of_str, days_stale
+
+
+# 모듈명 -> 그 모듈이 실제로 참조하는 시리즈들(우선순위 순, score_*() 내부
+# 폴백 순서와 일치해야 함). calculate_cci()가 각 score_*() 호출과 별개로 이
+# 표를 참고해 "이 점수가 실측 최신 데이터에서 나왔는지, 지연된 대체 시리즈에서
+# 나왔는지, 아예 데이터가 없는지"를 리포트에 노출한다 — score_*()의 반환
+# 시그니처는 바꾸지 않는다(tests/test_cci_fallback.py가 위치 기반으로 언패킹
+# 하므로). rule20/buffett은 2026-09-01부로 아래에서 영구 비활성화됐으니
+# 참조 시리즈를 남겨두지 않는다(값을 지어내지 않는다는 원칙과 동일선상 —
+# "신선도는 있는데 계산은 가짜"인 상태를 만들지 않기 위함).
+_MODULE_SERIES = {
+    "sahm": ["fred_us_unemployment"],
+    "yield_curve": ["fred_us_10y_treasury"],
+    "harvey": ["fred_us_yield_curve_10y2y"],
+    "copper_gold": ["fred_us_industrial_production"],
+    "credit_oas": ["fred_hy_oas"],
+    "buffett": [],
+    "rule_of_20": [],
+    "k_sahm": ["kosis_k_employed_yoy", "fred_kr_unemployment_oecd"],
+    "semiconductor": ["kosis_semiconductor_shipment_index", "fred_us_industrial_production"],
+}
+
+
+def _module_data_quality(module: str) -> dict:
+    """모듈이 실제로 쓴(또는 못 쓴) 시리즈의 신선도 — PRIMARY(1순위 시리즈 사용)/
+    FALLBACK(대체 시리즈 사용)/NO_DATA(참조 시리즈가 없거나 전부 비어 있음) 3단계."""
+    series_list = _MODULE_SERIES.get(module, [])
+    for i, series_id in enumerate(series_list):
+        value, as_of, days_stale = _series_as_of(series_id)
+        if value is not None:
+            return {
+                "quality": "PRIMARY" if i == 0 else "FALLBACK",
+                "series": series_id, "as_of": as_of, "days_stale": days_stale,
+            }
+    return {"quality": "NO_DATA", "series": None, "as_of": None, "days_stale": None}
 
 
 def score_sahm() -> tuple[int, Optional[float], Optional[float]]:
@@ -252,73 +321,84 @@ def score_credit_oas() -> tuple[int, Optional[float]]:
 
 
 def score_buffett() -> tuple[int, Optional[float]]:
-    """Module F: Buffett Indicator (macro valuation).
+    """Module F: Buffett Indicator — 정의상 미국 전체 상장 시가총액 / GDP 비율
+    (통상 100~200% 레인지, 180%↑면 고평가 경고)이다.
 
-    Uses US total market cap / GDP ratio as valuation proxy.
+    2026-09-01 영구 비활성화(사용자 지적: "위기지수 분석의 기타항목에 5는 뭐야?
+    왜 계속 같은 값이야?" 조사 중 발견) — 이 저장소엔 시가총액 데이터 소스가
+    전혀 없다(grep 확인: market_cap/시가총액 계열 시리즈 0건). 실제로 돌아가던
+    코드는 us_gdp_qoq(분기 GDP 성장률, 통상 -5%~+5%)를 2배 해 150/180과
+    비교하고 있었는데, 분기 성장률은 정의상 150을 절대 넘을 수 없다(그러려면
+    분기 GDP가 전분기 대비 75배로 뛰어야 함) — 즉 이 조건은 항상 거짓,
+    score_buffett()은 데이터가 있든 없든 구조적으로 영원히 0점이었다(반대
+    극단이지만 Rule of 20과 같은 버그 클래스 — 성장률 스케일 값을 레벨 스케일
+    임계값과 비교). 진짜 Buffett Indicator에 필요한 시가총액/GDP 데이터가
+    이 저장소에 추가되기 전까지, 값을 지어내지 않고 판정하지 않는다(R3).
 
-    Returns: (score, buffett_ratio)
+    Returns: (score, buffett_ratio) — 항상 (0, None).
     """
-    us_gdp = _get_latest("fred_us_gdp_qoq")
-    if us_gdp is None:
-        log_event("cci.buffett.fallback", source="none_available")
-        return 0, None
-
-    buffett = us_gdp * 2.0
-    if buffett > 180:
-        score = 10
-    elif buffett > 150:
-        score = 5
-    else:
-        score = 0
-
-    return score, buffett
+    log_event("cci.buffett.disabled", reason="no market-cap/GDP ratio data source in this repo — wiki/log.md 2026-09-01")
+    return 0, None
 
 
 def score_rule_of_20() -> tuple[int, Optional[float]]:
-    """Module G: Rule of 20 (PER + CPI inflation adjustment).
+    """Module G: Rule of 20 — 정의상 S&P500 PER + CPI YoY 인플레이션율의 합이
+    20을 넘으면 고평가 경고다.
 
-    Falls back to CPI-only calculation when PER data unavailable.
+    2026-09-01 영구 비활성화(사용자 지적: "위기지수 분석의 기타항목에 5는 뭐야?
+    왜 계속 같은 값이야?") — 이 저장소엔 PER 데이터 소스가 전혀 없다(grep 확인:
+    PER/Shiller 계열 시리즈 0건). "PER 데이터 없으면 CPI만으로 대체"라던 이
+    docstring도 사실과 달랐다 — PER을 시도하는 코드 자체가 없어 폴백이 아니라
+    유일한 경로였다. 게다가 그 유일한 경로가 fred_us_cpi(CPI **지수 레벨**,
+    기준연도=100 스케일이라 늘 300 안팎)를 그대로 20과 비교하고 있어서, 이
+    조건은 데이터가 있는 한 항상 참 — 매일 5/5 만점이 구조적으로 고정된
+    상태였다(CPI가 20 밑으로 가려면 기준연도 대비 94% 디플레이션이 나야 함).
+    실제 인플레이션율(YoY %)도, PER도 아닌 값을 판정에 쓰고 있었던 것 — 진짜
+    Rule of 20에 필요한 PER 데이터가 이 저장소에 추가되기 전까지, 값을 지어내지
+    않고 판정하지 않는다(R3).
 
-    Returns: (score, rule20_value)
+    Returns: (score, rule20_value) — 항상 (0, None).
     """
-    cpi = _get_latest("fred_us_cpi")
-    if cpi is None:
-        log_event("cci.rule_of_20.fallback", source="none_available")
-        return 0, None
-
-    rule20 = cpi
-    score = 5 if rule20 > 20 else 0
-    return score, rule20
+    log_event("cci.rule_of_20.disabled", reason="no PER data source in this repo — wiki/log.md 2026-09-01")
+    return 0, None
 
 
 def score_k_sahm() -> tuple[int, Optional[float]]:
-    """Module H: K-Sahm Rule (domestic South Korea employment crisis).
+    """Module H: K-Sahm Rule — KOSIS 고용 YoY(%) 시계열이 3개월 연속 마이너스면
+    약세로 판정한다.
 
-    Primary: KOSIS K employment → Fallback: FRED OECD-via-FRED Korean unemployment
+    Primary: KOSIS K employment YoY → Fallback: FRED OECD 한국 실업률(정보용만)
 
-    Returns: (score, k_emp_yoy)
+    2026-09-01 버그 수정(사용자 지적: "데이터 신선도가 표시가 없네! 특히 몇점이고
+    판단만 하는 항목은 믿을 수가 없네!" 조사 중 발견) — 예전 코드는 KOSIS 시리즈가
+    없으면 FRED 실업률(단위: %, 통상 2~4)로 대체하고, 그 값을
+    `weak_months = v < 100000` 같은 KOSIS 고용증가율(YoY %) 전용 임계값과 그대로
+    비교했다. 실업률이든 고용증가율이든 현실적인 값은 전부 100000보다 작아서,
+    폴백 히스토리가 3개 이상 쌓이는 순간 이 조건은 사실상 항상 참 — 지금까지는
+    폴백 히스토리가 우연히 1개뿐이라 0점으로 안전했을 뿐인, 데이터가 쌓이면
+    언제든 터질 수 있던 잠복 버그였다. 서로 다른 지표(고용증가율 vs 실업률)를
+    같은 임계값으로 섞지 않는다 — KOSIS 원 시리즈가 없으면 점수는 계산하지 않고
+    FRED 값은 참고용 원자료로만 반환한다(R3).
+
+    Returns: (score, k_emp_yoy_or_unemployment_rate_for_reference_only)
     """
     k_emp_data = kosis.fetch_series("k_employed_yoy")
     k_emp = k_emp_data.value
-
-    if k_emp is None:
-        k_emp = _get_latest("fred_kr_unemployment_oecd")
-        log_event("cci.k_sahm.fallback", source="fred_oecd_unemployment")
-
-    if k_emp is None:
-        return 0, None
-
     history = _get_series_window("kosis_k_employed_yoy", 90)
-    if not history:
-        history = _get_series_window("fred_kr_unemployment_oecd", 90)
 
-    if not history:
-        return 0, k_emp
+    if k_emp is not None and history:
+        weak_months = sum(1 for v in history[:3] if v < 0)  # YoY 고용증가율 마이너스(감소) 3개월
+        score = 5 if weak_months >= 3 else 0
+        return score, k_emp
 
-    weak_months = sum(1 for v in history[:3] if v < 100000)
+    # KOSIS 시리즈가 없다 — FRED 실업률은 다른 지표라 이 점수를 계산하는 데
+    # 쓰지 않는다(창작 금지). 원시값은 참고용으로만 반환.
+    fallback = _get_latest("fred_kr_unemployment_oecd")
+    if fallback is not None:
+        log_event("cci.k_sahm.fallback_info_only", source="fred_oecd_unemployment", value=fallback)
+        return 0, fallback
 
-    score = 5 if weak_months >= 3 else 0
-    return score, k_emp
+    return 0, None
 
 
 def score_semiconductor_cycle() -> tuple[int, Optional[float]]:
@@ -389,6 +469,8 @@ def calculate_cci() -> CCIDetail:
     log_event("cci.calculated", total_score=total, sahm=sahm_score, yield_curve=yield_score,
               state="GREEN" if total <= 30 else ("YELLOW" if total <= 55 else "RED"))
 
+    data_quality = {module: _module_data_quality(module) for module in _MODULE_SERIES}
+
     return CCIDetail(
         sahm_score=sahm_score,
         yield_curve_score=yield_score,
@@ -410,6 +492,7 @@ def calculate_cci() -> CCIDetail:
         rule20_value=rule20,
         k_emp_yoy=k_emp,
         semi_cycle_index=semi_cycle,
+        data_quality=data_quality,
     )
 
 

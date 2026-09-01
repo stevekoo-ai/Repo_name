@@ -517,21 +517,44 @@ def _cci_analysis(payload: dict) -> str:
     state = cci["state"]
     score = cci["total_score"]
 
+    # 2026-09-01 신설 — 사용자 지적: "데이터 신선도가 표시가 없네! 특히 몇점이고
+    # 판단만 하는 항목은 믿을 수가 없네!". 9개 모듈 전부 이 표에서 신선도를 바로
+    # 보여준다 — PRIMARY(1순위 시리즈 실측)/FALLBACK(대체 시리즈)/NO_DATA(둘 다
+    # 없음, 값을 지어내지 않고 판정 자체를 안 함) 3단계 + 그 시리즈가 며칠 전
+    # 데이터인지. dq가 비어있으면(구버전 payload 등) 신선도 없이 점수만 표시.
+    dq = cci.get("data_quality", {})
+
+    def _quality_cell(module: str) -> str:
+        q = dq.get(module)
+        if not q:
+            return "—"
+        quality = q.get("quality")
+        if quality == "NO_DATA":
+            return "⛔ 데이터없음(판정 안 함)"
+        days = q.get("days_stale")
+        days_note = f" · {days}일 전" if days is not None else ""
+        badge = "🟢실측" if quality == "PRIMARY" else "🟡대체"
+        return f"{badge}{days_note}"
+
     lines = [
         f"## 위기지수 분석 (Comprehensive Crisis Index)",
         f"**상태: {state_emoji.get(state, '?')} {state}** | **점수: {score}/100**",
         "",
-        "| 지표 | 점수 | 해석 |",
-        "|------|------|------|",
-        f"| Sahm Rule (고용 모멘텀) | {cci['score_components']['sahm']}/20 | US 실업률 3개월 MA 추이 |",
-        f"| Yield Curve (수익률곡선) | {cci['score_components']['yield_curve']}/15 | 10Y-2Y, 10Y-3M 스프레드 |",
-        f"| Harvey Filter (3개월 검증) | {cci['score_components']['harvey']}/15 | 장기 수익률곡선 역전 신호 |",
-        f"| Copper-Gold Ratio | {cci['score_components']['copper_gold']}/10 | 산업 수요 vs 안전자산 선호 |",
-        f"| HY Credit OAS | {cci['score_components']['credit_oas']}/15 | 신용 긴축 및 유동성 지수 |",
-        f"| Buffett Indicator | {cci['score_components']['buffett']}/5 | 거시 가치평가 지표 |",
-        f"| Rule of 20 | {cci['score_components']['rule_of_20']}/5 | PER + 인플레이션 조정 |",
-        f"| K-Sahm Rule (한국 고용) | {cci['score_components']['k_sahm']}/5 | 국내 일자리 악화 신호 |",
-        f"| 반도체 산업사이클 | {cci['score_components']['semiconductor']}/10 | 출하-재고 사이클 추이 |",
+        "> 🟢실측=이 지표 1순위 시리즈를 그대로 씀 · 🟡대체=1순위가 없어 대체 시리즈로 계산 "
+        "· ⛔데이터없음=값을 지어내지 않고 점수 계산 자체를 하지 않음(0점은 '안전'이 아니라 '판정 보류'). "
+        "N일 전=그 시리즈의 최신 데이터 시점(월간 지표는 발표 지연으로 정상적으로 30~60일 전일 수 있음).",
+        "",
+        "| 지표 | 점수 | 데이터 신선도 | 해석 |",
+        "|------|------|------|------|",
+        f"| Sahm Rule (고용 모멘텀) | {cci['score_components']['sahm']}/20 | {_quality_cell('sahm')} | US 실업률 3개월 MA 추이 |",
+        f"| Yield Curve (수익률곡선) | {cci['score_components']['yield_curve']}/15 | {_quality_cell('yield_curve')} | 10Y-2Y, 10Y-3M 스프레드 |",
+        f"| Harvey Filter (3개월 검증) | {cci['score_components']['harvey']}/15 | {_quality_cell('harvey')} | 장기 수익률곡선 역전 신호 |",
+        f"| Copper-Gold Ratio | {cci['score_components']['copper_gold']}/10 | {_quality_cell('copper_gold')} | 산업 수요 vs 안전자산 선호(프록시) |",
+        f"| HY Credit OAS | {cci['score_components']['credit_oas']}/15 | {_quality_cell('credit_oas')} | 신용 긴축 및 유동성 지수 |",
+        f"| Buffett Indicator | {cci['score_components']['buffett']}/5 | {_quality_cell('buffett')} | 시가총액/GDP — 2026-09-01부로 비활성화(하단 참고) |",
+        f"| Rule of 20 | {cci['score_components']['rule_of_20']}/5 | {_quality_cell('rule_of_20')} | PER+인플레이션 — 2026-09-01부로 비활성화(하단 참고) |",
+        f"| K-Sahm Rule (한국 고용) | {cci['score_components']['k_sahm']}/5 | {_quality_cell('k_sahm')} | 국내 일자리 악화 신호 |",
+        f"| 반도체 산업사이클 | {cci['score_components']['semiconductor']}/10 | {_quality_cell('semiconductor')} | 출하-재고 사이클 추이 |",
         "",
     ]
 
@@ -614,6 +637,61 @@ def _cci_analysis(payload: dict) -> str:
         lines.append("- **사용자 영향**: 신용 자산 비중 유지 가능")
     lines.append("")
 
+    # Copper-Gold / Buffett / Rule of 20 / K-Sahm — 2026-09-01 신설.
+    # 이전엔 이 4개 모듈이 점수 표에만 숫자로 찍히고 개별 해설이 없어서, HTML
+    # 리포트에서는 넷을 그냥 합산한 "기타 지표"라는 불투명한 숫자 하나로만
+    # 보였다(사용자 질문: "위기지수 분석의 기타항목에 5는 뭐야? 왜 계속 같은
+    # 값이야?" — 그 5는 사실 Rule of 20 혼자 늘 5/5를 찍던 것이었다). 9개 모듈
+    # 전부 표에서 바로 아래로 이어지는 번호 있는 해설을 갖도록 통일한다.
+    cg_score = cci['score_components']['copper_gold']
+    cg_ratio = (cci.get('raw_values') or {}).get('copper_gold_ratio')
+    lines.append(f"**5. Copper-Gold Ratio** — {cg_score}/10")
+    lines.append(f"- **데이터**: {_quality_cell('copper_gold')} — 미국 산업생산·달러지수로 구성한 프록시(실제 구리/금 가격비 아님)")
+    if cg_score >= 8:
+        lines.append("- 🔴 **경고**: 산업 수요 위축 대비 안전자산 선호가 뚜렷 — 경기 방어 심리 강함")
+    elif cg_score >= 3:
+        lines.append("- 🟡 **주의**: 산업 수요가 소폭 위축되는 신호")
+    else:
+        lines.append("- ✅ **정상**: 산업 수요 위축 신호 없음")
+    lines.append("- **사용자 영향**: 이 지표는 프록시라 단독으로 매매 근거 삼지 말 것 — 반도체 수출 증가율 등 직접 지표와 함께 볼 것")
+    if cg_ratio is not None:
+        lines.append(f"- **지수값**: {cg_ratio:+.4f}")
+    lines.append("")
+
+    buffett_score = cci['score_components']['buffett']
+    lines.append(f"**6. Buffett Indicator** — {buffett_score}/5")
+    lines.append(f"- **데이터**: {_quality_cell('buffett')}")
+    lines.append("- ⛔ **2026-09-01부로 영구 비활성화**: 정의상 미국 전체 시가총액/GDP 비율이 필요한데 "
+                 "이 저장소엔 시가총액 데이터 소스가 없다. 예전 코드는 GDP 분기성장률(통상 -5%~+5%)을 "
+                 "2배 해 150/180 임계값과 비교하고 있었는데, 분기성장률은 정의상 그 값을 절대 넘을 수 없어 "
+                 "항상 0점으로 고정된 가짜 판정이었다 — 시가총액 데이터가 추가되기 전까지 값을 지어내지 않는다.")
+    lines.append("")
+
+    rule20_score = cci['score_components']['rule_of_20']
+    lines.append(f"**7. Rule of 20** — {rule20_score}/5")
+    lines.append(f"- **데이터**: {_quality_cell('rule_of_20')}")
+    lines.append("- ⛔ **2026-09-01부로 영구 비활성화**: 정의상 S&P500 PER + CPI 인플레이션율이 필요한데 "
+                 "이 저장소엔 PER 데이터 소스가 없다. 예전 코드는 CPI **지수 레벨**(기준연도=100 스케일, "
+                 "항상 300 안팎)을 그대로 20과 비교하고 있었는데, 이 조건은 데이터가 있는 한 구조적으로 "
+                 "항상 참이라 매일 5/5 만점이 고정돼 있었다(사용자 질문 \"기타항목에 5는 뭐야?\"의 정체) — "
+                 "PER 데이터가 추가되기 전까지 값을 지어내지 않는다.")
+    lines.append("")
+
+    ksahm_score = cci['score_components']['k_sahm']
+    k_emp = (cci.get('raw_values') or {}).get('k_emp_yoy')
+    lines.append(f"**8. K-Sahm Rule (한국 고용)** — {ksahm_score}/5")
+    lines.append(f"- **데이터**: {_quality_cell('k_sahm')}")
+    if dq.get('k_sahm', {}).get('quality') == 'FALLBACK':
+        lines.append(f"- ⚠️ **대체 시리즈 참고용 원자료만 표시**: KOSIS 고용 YoY 시계열이 없어 "
+                     f"FRED 한국 실업률({k_emp}%, 다른 지표)로 대체 — 2026-09-01 이전엔 이 대체값을 "
+                     "KOSIS 전용 임계값과 그대로 비교해 데이터가 쌓이면 항상 5점이 될 수 있던 잠복 버그가 "
+                     "있었다. 지금은 KOSIS 원 시리즈가 없으면 점수를 계산하지 않는다(0점=판정 보류).")
+    elif ksahm_score >= 5:
+        lines.append("- 🔴 **경고**: KOSIS 고용 YoY가 3개월 연속 감소 — 국내 고용 시장 약세")
+    elif k_emp is not None:
+        lines.append("- ✅ **정상**: KOSIS 고용 YoY 기준 뚜렷한 약세 없음")
+    lines.append("")
+
     # Semiconductor Cycle
     # CCI is a RISK index: every component reads "higher = more danger", and the
     # sibling blocks above narrate 0 as ✅ 안전/정상. This block used to invert that
@@ -627,7 +705,8 @@ def _cci_analysis(payload: dict) -> str:
     # user's stock/ETF exposure. semi_cycle_index is None exactly in the no-data case.
     semi_score = cci['score_components']['semiconductor']
     semi_cycle = (cci.get('raw_values') or {}).get('semi_cycle_index')
-    lines.append(f"**5. 반도체 산업사이클** — {semi_score}/10")
+    lines.append(f"**9. 반도체 산업사이클** — {semi_score}/10")
+    lines.append(f"- **데이터**: {_quality_cell('semiconductor')}")
     if semi_cycle is None:
         lines.append("- ⓘ **데이터 없음**: 반도체 출하/재고 지수 미수집 — 판정하지 않음")
         lines.append("- **경제 의미**: 이 항목은 위기지수 총점에 0점으로만 반영됨 (악재 판정 아님)")

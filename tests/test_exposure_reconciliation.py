@@ -1813,6 +1813,94 @@ def test_automation_run_log_rejects_unknown_result():
     assert not tmp.exists(), "no file should be created on a rejected write"
 
 
+def _fake_cci_payload(**overrides):
+    """Minimal but structurally real cci_analysis payload — same shape
+    engine/report/payload.py's _cci_section() produces, so the markdown/HTML
+    renderers exercise their real key-lookup paths."""
+    base = {
+        "total_score": 5, "state": "GREEN",
+        "score_components": {
+            "sahm": 0, "yield_curve": 0, "harvey": 0, "copper_gold": 3,
+            "credit_oas": 0, "buffett": 0, "rule_of_20": 0, "k_sahm": 0, "semiconductor": 5,
+        },
+        "raw_values": {
+            "ur_ma3": None, "ur_min_12m": None, "spread_10y2y": None, "spread_10y3m": None,
+            "hy_oas": None, "copper_gold_ratio": -0.02, "k_emp_yoy": None, "semi_cycle_index": -0.01,
+        },
+        "data_quality": {
+            "sahm": {"quality": "NO_DATA", "series": None, "as_of": None, "days_stale": None},
+            "yield_curve": {"quality": "PRIMARY", "series": "fred_us_10y_treasury", "as_of": "2026-08-28", "days_stale": 4},
+            "harvey": {"quality": "PRIMARY", "series": "fred_us_yield_curve_10y2y", "as_of": "2026-08-31", "days_stale": 1},
+            "copper_gold": {"quality": "PRIMARY", "series": "fred_us_industrial_production", "as_of": "2026-07-01", "days_stale": 62},
+            "credit_oas": {"quality": "NO_DATA", "series": None, "as_of": None, "days_stale": None},
+            "buffett": {"quality": "NO_DATA", "series": None, "as_of": None, "days_stale": None},
+            "rule_of_20": {"quality": "NO_DATA", "series": None, "as_of": None, "days_stale": None},
+            "k_sahm": {"quality": "NO_DATA", "series": None, "as_of": None, "days_stale": None},
+            "semiconductor": {"quality": "FALLBACK", "series": "fred_us_industrial_production", "as_of": "2026-07-01", "days_stale": 62},
+        },
+        "sk_hynix_action": {"action": "적극 매수 (Long)", "max_weight": 25,
+                            "description": "d", "signal": "s"},
+        "interpretation": {"GREEN": "g", "YELLOW": "y", "RED": "r"},
+    }
+    base.update(overrides)
+    return base
+
+
+def test_cci_report_shows_freshness_for_every_module_not_just_a_score():
+    """2026-09-01: user said '데이터 신선도가 표시가 없네! 특히 몇점이고 판단만
+    하는 항목은 믿을 수가 없네!' — the markdown CCI section must show, for
+    every one of the 9 modules, whether the score came from a fresh primary
+    series, a fallback, or no data at all (not just a bare number)."""
+    from engine.report.markdown import _cci_analysis
+
+    out = _cci_analysis({"cci_analysis": _fake_cci_payload()})
+
+    # The score table must carry a freshness column with real badges, not
+    # just the score numbers.
+    assert "데이터 신선도" in out
+    assert "🟢실측 · 4일 전" in out  # yield_curve
+    assert "🟡대체 · 62일 전" in out  # semiconductor
+    assert "⛔ 데이터없음(판정 안 함)" in out  # e.g. sahm/credit_oas/buffett/rule_of_20/k_sahm
+
+    # All 9 modules must have their own numbered narrative — before this fix,
+    # Copper-Gold/Buffett/Rule of 20/K-Sahm had no individual write-up at all
+    # (only Sahm/Yield Curve/Harvey/Credit OAS/Semiconductor did).
+    for n in range(1, 10):
+        assert f"**{n}." in out, f"module #{n} is missing its narrative section"
+    assert "Copper-Gold Ratio**" in out
+    assert "Buffett Indicator**" in out
+    assert "Rule of 20**" in out
+    assert "K-Sahm Rule" in out
+
+
+def test_cci_report_explains_why_buffett_and_rule20_are_disabled():
+    """The disabled modules must say *why* in the report itself (no real PER /
+    market-cap data source exists), not just show a silent 0 that reads as
+    'measured and safe' — that silent-0 pattern is exactly what let Rule of
+    20 masquerade as a real signal for as long as it did."""
+    from engine.report.markdown import _cci_analysis
+
+    out = _cci_analysis({"cci_analysis": _fake_cci_payload()})
+    assert "영구 비활성화" in out
+    assert "시가총액" in out  # Buffett's missing data source, named explicitly
+    assert "PER" in out       # Rule of 20's missing data source, named explicitly
+
+
+def test_html_cci_table_lists_all_nine_modules_not_a_summed_other_row():
+    """Before this fix, HTML rendered Copper-Gold/Buffett/Rule of 20/K-Sahm as
+    one opaque summed '기타 지표' number — exactly what made the user unable
+    to tell what the constant '5' was. Each module must now be its own row."""
+    from engine.report.html_new import _cci_module_rows
+
+    rows_html = _cci_module_rows(_fake_cci_payload())
+    assert "기타 지표" not in rows_html
+    for label in ("Copper-Gold Ratio", "Buffett Indicator", "Rule of 20", "K-Sahm Rule"):
+        assert label in rows_html
+    assert "🟢실측 · 4일 전" in rows_html   # yield_curve
+    assert "🟡대체 · 62일 전" in rows_html  # semiconductor
+    assert "⛔ 없음" in rows_html           # buffett/rule_of_20
+
+
 if __name__ == "__main__":
     import sys, traceback
     fns = [(n, f) for n, f in sorted(globals().items())

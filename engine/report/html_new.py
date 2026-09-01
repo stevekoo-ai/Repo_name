@@ -20,6 +20,56 @@ def _state_label(state: str) -> str:
     return labels.get(state, "? Unknown")
 
 
+def _cci_quality_label(dq: dict, module: str) -> str:
+    """PRIMARY/FALLBACK/NO_DATA + 며칠 전 데이터인지 한 줄로 — markdown.py의
+    _quality_cell()과 같은 정보를 HTML용으로 렌더. 2026-09-01 신설(사용자
+    지적: "데이터 신선도가 표시가 없네!")."""
+    q = (dq or {}).get(module)
+    if not q:
+        return "—"
+    quality = q.get("quality")
+    if quality == "NO_DATA":
+        return "⛔ 없음"
+    days = q.get("days_stale")
+    days_note = f" · {days}일 전" if days is not None else ""
+    badge = "🟢실측" if quality == "PRIMARY" else "🟡대체"
+    return f"{badge}{days_note}"
+
+
+def _cci_module_rows(cci: dict) -> str:
+    """CCI 9개 모듈 전부를 표 행으로 렌더 — 2026-09-01 이전엔 4개(Copper-Gold/
+    Buffett/Rule of 20/K-Sahm)가 "기타 지표"라는 합산 숫자 하나로 뭉개져
+    있었다(사용자 질문 "기타항목에 5는 뭐야?"의 원인 — 그 5는 Rule of 20 혼자
+    늘 5/5를 찍던, 실제로는 PER 데이터가 없어 구조적으로 항상 만점이던 버그
+    였다). 이제 9개 모두 각자 점수 + 신선도를 보여준다."""
+    sc = cci.get("score_components", {})
+    dq = cci.get("data_quality", {})
+    rows = [
+        ("Sahm Rule (고용)", "sahm", 20),
+        ("Yield Curve", "yield_curve", 15),
+        ("Harvey Filter", "harvey", 15),
+        ("Copper-Gold Ratio", "copper_gold", 10),
+        ("Credit OAS", "credit_oas", 15),
+        ("Buffett Indicator*", "buffett", 5),
+        ("Rule of 20*", "rule_of_20", 5),
+        ("K-Sahm Rule (한국 고용)", "k_sahm", 5),
+        ("Semiconductor Cycle", "semiconductor", 10),
+    ]
+    lines = []
+    for label, key, max_score in rows:
+        lines.append(
+            f"<tr><td>{label}</td>"
+            f"<td><strong>{sc.get(key, 0)}/{max_score}</strong></td>"
+            f"<td>{_cci_quality_label(dq, key)}</td></tr>"
+        )
+    lines.append(
+        '<tr><td colspan="3" style="font-size:0.85em;color:#94A3B8;">'
+        "*2026-09-01부로 영구 비활성화 — 필요한 실데이터(시가총액, PER)가 "
+        "이 저장소에 없어 값을 지어내지 않고 0점 고정</td></tr>"
+    )
+    return "\n                    ".join(lines)
+
+
 def _rate_state_label(score: int) -> str:
     """Get rate analysis state label."""
     if score >= 85:
@@ -588,31 +638,9 @@ def render_html(payload: dict) -> str:
                     <tr>
                         <th>지표</th>
                         <th>점수</th>
+                        <th>신선도</th>
                     </tr>
-                    <tr>
-                        <td>Sahm Rule (고용)</td>
-                        <td><strong>{cci.get('score_components', {}).get('sahm', 0)}/20</strong></td>
-                    </tr>
-                    <tr>
-                        <td>Yield Curve</td>
-                        <td><strong>{cci.get('score_components', {}).get('yield_curve', 0)}/15</strong></td>
-                    </tr>
-                    <tr>
-                        <td>Harvey Filter</td>
-                        <td><strong>{cci.get('score_components', {}).get('harvey', 0)}/15</strong></td>
-                    </tr>
-                    <tr>
-                        <td>Credit OAS</td>
-                        <td><strong>{cci.get('score_components', {}).get('credit_oas', 0)}/15</strong></td>
-                    </tr>
-                    <tr>
-                        <td>Semiconductor Cycle</td>
-                        <td><strong>{cci.get('score_components', {}).get('semiconductor', 0)}/10</strong></td>
-                    </tr>
-                    <tr>
-                        <td>기타 지표</td>
-                        <td><strong>{cci.get('score_components', {}).get('copper_gold', 0) + cci.get('score_components', {}).get('buffett', 0) + cci.get('score_components', {}).get('rule_of_20', 0) + cci.get('score_components', {}).get('k_sahm', 0)}</strong></td>
-                    </tr>
+                    {_cci_module_rows(cci)}
                 </table>
             </div>
 
