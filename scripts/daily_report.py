@@ -193,7 +193,13 @@ def build_report(ticker: str) -> str:
     else:
         pct = float(adr["change_pct"])
         flag = " 🚨 급변동(±5% 이상)" if abs(pct) >= 5 else ""
-        lines.append(f"- {adr['date']} 기준: **${float(adr['price']):,.2f}** ({float(adr['change']):+,.2f}, {pct:+.2f}%){flag}, 전일종가 ${float(adr['prev_close']):,.2f}")
+        # 2026-09-01 — crosscheck=RESOLVED_2OF3(3방법 중 rate·hist 두 독립
+        # 방법만 일치, calc/diff필드는 배제)은 값을 조용히 섞어 넣지 않고
+        # 어떤 근거로 확정됐는지 그대로 노출 — MISMATCH는 아니지만 완전한
+        # 3/3 합치도 아니라는 걸 숨기지 않는다.
+        resolved_note = (f" [ℹ️ 자동확정: rate·hist 일치, calc 배제 — {adr.get('crosscheck_detail', '')}]"
+                          if adr.get("crosscheck") == "RESOLVED_2OF3" else "")
+        lines.append(f"- {adr['date']} 기준: **${float(adr['price']):,.2f}** ({float(adr['change']):+,.2f}, {pct:+.2f}%){flag}, 전일종가 ${float(adr['prev_close']):,.2f}{resolved_note}")
 
     # --- 수급 ---
     lines.append("\n## 투자자별 순매수")
