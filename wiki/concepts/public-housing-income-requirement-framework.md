@@ -101,6 +101,26 @@ tags: [housing, real-estate, public-housing, income-requirement, decision-framew
 5. 위 1~4 중 하나라도 이 페이지 규칙과 다르면 → 아래 "예외 사례"에 기록
 ```
 
+## 자동화 (2026-09-01)
+
+위 판별 규칙은 `collectors/subscription_monitor/income_analysis.py`로
+코드화됐다. NEW_MATCH(플랫폼시티/광교/원천동 키워드 매칭 신규 매물)가
+잡히면 청약Home 상세페이지(PBLANC_URL)에서 모집공고문 PDF를 자동으로
+찾아 다운로드 → `pdftotext`로 텍스트 추출 → 이 페이지의 두 축(사업유형,
+표준 배율표)에 따라 분류 → 알림 이메일 본문에 사업유형/소득검증범위/
+소득배율/예외여부를 자동 첨부한다. 코드가 판별한 `exceptions`가 비어
+있지 않으면 알림에 "⚠️ 예외 발견"으로 표시되므로, **그 이메일을 받으면
+원문을 직접 확인하고 아래 "예외 사례" 절에 사람이 기록**할 것 — 자동
+판정 자체가 이 표에 자동으로 append되지는 않는다(오탐 가능성이 있어
+사람 확인을 거치게 설계).
+
+전 범위(모든 국민주택 일반공급)가 아니라 **키워드 매칭 신규 매물에만**
+적용된다 — 5~30분마다 전국 수백 건에 PDF 파싱을 돌리는 건 과도하고
+관심사(플랫폼시티/광교신도시)와도 무관하기 때문. 관련 코드:
+`collectors/subscription_monitor/compose.py`(NEW_MATCH 분기),
+`tests/test_subscription_income_analysis.py`(6개 케이스, 실제 3개 PDF
+텍스트로 검증).
+
 ## 예외 사례 (append-only — 새 공고 검토 시 여기에 추가)
 
 *(2026-09-01 최초 작성 시점: 예외 없음. 3건 모두 규칙에 정확히 부합)*
