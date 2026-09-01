@@ -31,6 +31,14 @@ import income_analysis  # noqa: E402
 KST = timezone(timedelta(hours=9))
 PER_LISTING_DELAY_SEC = 1.5  # be polite to 청약Home / LH / GH servers — sequential, not parallel
 
+# SCOPE=national broadens beyond 서울/경기 to every open 국민주택 nationwide —
+# useful when the 서울/경기 pool is exhausted (already traced) and more PDF
+# samples are wanted to keep validating the framework. Non-LH listings
+# (GH/SH/기타 지방공사) will fail at the discover stage since
+# search_and_download_lh_pdf() only supports LH청약플러스 — that failure mode
+# itself is useful signal for whether LH-only support needs expanding.
+SCOPE = os.environ.get("SCOPE", "seoul_gyeonggi")
+
 
 def main() -> None:
     service_key = os.environ["DATA_GO_KR_KEY"]
@@ -38,10 +46,15 @@ def main() -> None:
     today = now_kst.strftime("%Y-%m-%d")
 
     all_rows = fetch_all(service_key, today)
-    rows = [r for r in all_rows if r.get("SUBSCRPT_AREA_CODE_NM") in TARGET_REGIONS]
+    if SCOPE == "national":
+        rows = all_rows
+        scope_label = "전국"
+    else:
+        rows = [r for r in all_rows if r.get("SUBSCRPT_AREA_CODE_NM") in TARGET_REGIONS]
+        scope_label = "서울/경기"
 
-    print(f"=== 서울/경기 국민주택 소득요건 패턴 트레이스 ({now_kst.strftime('%Y-%m-%d %H:%M KST')}) ===")
-    print(f"전국 국민주택(접수마감 전) {len(all_rows)}건 중 서울/경기 {len(rows)}건 대상\n")
+    print(f"=== {scope_label} 국민주택 소득요건 패턴 트레이스 ({now_kst.strftime('%Y-%m-%d %H:%M KST')}) ===")
+    print(f"전국 국민주택(접수마감 전) {len(all_rows)}건 중 {scope_label} {len(rows)}건 대상\n")
 
     results = []
     for i, r in enumerate(rows, 1):

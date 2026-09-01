@@ -6,7 +6,12 @@ name: Income requirement pattern trace (서울/경기 국민주택, manual)
 # live population. Trigger via workflow_dispatch whenever a re-check is
 # wanted; results go to this run's job log (no state file, no commit).
 on:
-  workflow_dispatch: {}
+  workflow_dispatch:
+    inputs:
+      scope:
+        description: "서울/경기(seoul_gyeonggi, 기본) 또는 전국(national) — national은 더 많은 PDF 샘플 확보용, LH 외 시행사 건은 discover 단계에서 실패할 수 있음(현재 LH만 지원)"
+        required: false
+        default: "seoul_gyeonggi"
 
 permissions:
   contents: read
@@ -29,7 +34,8 @@ jobs:
           pip install playwright
           playwright install --with-deps chromium
 
-      - name: Trace income requirement pattern across 서울/경기 국민주택
+      - name: Trace income requirement pattern
         env:
           DATA_GO_KR_KEY: ${{ secrets.DATA_GO_KR_KEY }}
+          SCOPE: ${{ github.event.inputs.scope }}
         run: python3 collectors/subscription_monitor/income_pattern_trace.py
