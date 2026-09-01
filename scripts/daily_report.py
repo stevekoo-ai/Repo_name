@@ -20,6 +20,7 @@ from pathlib import Path
 from investor_flow import (
     kis_fetch_price, read_ticker_rows, summarize_flows, read_latest_adr, read_latest_price_snapshot,
     credit_balance_streak, read_latest_short_sale, read_latest_index, read_credit_balance_rows,
+    read_price_snapshot_rows, read_short_sale_rows, read_index_rows,
 )
 from stats_utils import zscore, anomaly_label
 from hbm_cycle_score import score_foreign_flow_axis, score_foreign_holding_axis
@@ -33,6 +34,57 @@ PORTFOLIO_CSV_PATH = Path(__file__).resolve().parent.parent / "sources" / "portf
 # 2축 자동 채점은 2026-08-27부로 hbm_cycle_score.py로 옮겼다(전문/이력은
 # 그 파일 docstring 참고) — engine/report/payload.py도 같은 모듈을 import해
 # 두 리포트가 서로 다른 채점 로직을 쓰는 드리프트를 막는다.
+
+
+def _month_trend(rows, date_key, value_key, days=30):
+    """rows(날짜순 정렬됨)의 최신 값과, 최신 시점 기준 최근 `days` 캘린더일 전
+    값을 비교. 2026-09-01 신설 — 사용자 지적("보고서에 트렌드가 안 보여"): 이전엔
+    모든 섹션이 그날 하루치 값만 보여줬다. 실측 축적 CSV(sk-hynix-price-snapshot 등)
+    는 이미 최소 1개월치가 쌓여 있어 새 수집 없이 여기서 계산만 하면 된다.
+
+    창(30일)을 채울 만큼 데이터가 없으면 있는 것 중 가장 오래된 값으로 대체하고
+    `actual_days`로 실제 며칠치인지 명시한다 — 30일 트렌드인 척 지어내지 않는다.
+    행이 2건 미만이면 None(섹션에서 "데이터 부족"으로 표시).
+    """
+    if len(rows) < 2:
+        return None
+    latest = rows[-1]
+    latest_date = datetime.strptime(latest[date_key], "%Y-%m-%d").date()
+    cutoff = latest_date - timedelta(days=days)
+    window = [r for r in rows if datetime.strptime(r[date_key], "%Y-%m-%d").date() >= cutoff]
+    if len(window) < 2:
+        window = rows  # 창 안에 데이터가 모자라면 있는 전체로 대체(그만큼 짧게 표기)
+    start = window[0]
+    start_val = float(start[value_key])
+    latest_val = float(latest[value_key])
+    vals = [float(r[value_key]) for r in window]
+    actual_days = (latest_date - datetime.strptime(start[date_key], "%Y-%m-%d").date()).days
+    return {
+        "start_date": start[date_key], "start_val": start_val,
+        "latest_date": latest[date_key], "latest_val": latest_val,
+        "delta": latest_val - start_val,
+        "pct": ((latest_val - start_val) / start_val * 100) if start_val else None,
+        "min": min(vals), "max": max(vals),
+        "actual_days": actual_days, "n": len(window), "window_days": days,
+    }
+
+
+def _fmt_trend_line(label, trend, unit="", decimals=0, hint_cmd=None):
+    """_month_trend() 결과 하나를 리포트 한 줄로 렌더. trend가 None이면(데이터
+    2건 미만) 값을 지어내지 않고 부족하다고만 표시 — hint_cmd가 있으면 어떤
+    명령을 먼저 실행해야 채워지는지 안내(다른 섹션의 기존 관례와 동일)."""
+    if trend is None:
+        hint = f" — {hint_cmd}를 먼저 실행하세요." if hint_cmd else " — 자동 축적 중, 데이터가 쌓이면 채워집니다."
+        return f"- {label}: 데이터 부족(최소 2일치 필요){hint}"
+    fmt = "{:,.%df}" % decimals
+    start_str, latest_str, delta_str = (fmt.format(trend["start_val"]), fmt.format(trend["latest_val"]),
+                                         fmt.format(trend["delta"]))
+    sign = "+" if trend["delta"] >= 0 else ""
+    pct_str = f", {trend['pct']:+.1f}%" if trend["pct"] is not None else ""
+    short_window = trend["actual_days"] < trend["window_days"] - 3
+    span_note = f"{trend['actual_days']}일간" + ("(30일 미만 — 데이터 축적 중)" if short_window else "")
+    return (f"- {label}: {trend['start_date']} {start_str}{unit} → {trend['latest_date']} {latest_str}{unit} "
+            f"({sign}{delta_str}{unit}{pct_str}, {span_note}, 구간 {fmt.format(trend['min'])}~{fmt.format(trend['max'])}{unit})")
 
 
 def read_latest_portfolio_summary():
@@ -90,6 +142,24 @@ def build_report(ticker: str) -> str:
         lines.append(f"- 거래량: {q['volume']:,}주")
     except SystemExit as e:
         lines.append(f"- 시세 조회 실패: {e}")
+
+    # --- 최근 1개월 트렌드 (2026-09-01 신설) ---
+    # 사용자 지적: "보고서에 트렌드가 안 보여" — 그동안 모든 섹션이 그날 하루치
+    # 값만 보여주고, 오르는 중인지 내리는 중인지 알 수 없었다. 이미 매일
+    # investor_flow.py snapshot/fetch/credit-balance/short-sale/index-quote가
+    # sources/*.csv에 축적해온 실측 데이터를 새로 수집하지 않고 여기서 비교만
+    # 한다 — 창작 없음, 데이터가 30일 미만이면 그만큼 짧다고 명시.
+    lines.append("\n## 최근 1개월 트렌드 (실측 축적 데이터 기반)")
+    lines.append(_fmt_trend_line("주가", _month_trend(read_price_snapshot_rows(ticker), "date", "price"),
+                                  unit="원", decimals=0, hint_cmd="investor_flow.py snapshot"))
+    lines.append(_fmt_trend_line("외국인 보유율", _month_trend(read_price_snapshot_rows(ticker), "date", "foreign_hold_pct"),
+                                  unit="%", decimals=2, hint_cmd="investor_flow.py snapshot"))
+    lines.append(_fmt_trend_line("신용융자잔고", _month_trend(read_credit_balance_rows(ticker), "date", "loan_balance_qty"),
+                                  unit="주", decimals=0, hint_cmd="investor_flow.py credit-balance"))
+    lines.append(_fmt_trend_line("공매도 비중", _month_trend(read_short_sale_rows(ticker), "date", "short_vol_pct"),
+                                  unit="%", decimals=2, hint_cmd="investor_flow.py short-sale"))
+    lines.append(_fmt_trend_line("코스피지수", _month_trend(read_index_rows("0001"), "date", "price"),
+                                  unit="", decimals=2, hint_cmd="investor_flow.py index-quote"))
 
     # --- 외국인 보유율 & 250일 최고가 대비 드로다운 ---
     # 2026-07-28 추가: 그동안 "KSD 보유율 미확인"·"정확한 종가 미확인"으로

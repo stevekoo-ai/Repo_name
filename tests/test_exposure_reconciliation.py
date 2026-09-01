@@ -1431,6 +1431,60 @@ def test_daily_report_delegates_to_the_shared_capex_module_not_a_private_copy():
     assert result.stdout.strip().splitlines() == ["True", "True"]
 
 
+def test_month_trend_compares_start_vs_latest_without_fabricating_a_full_window():
+    """2026-09-01: user complaint — '보고서에 트렌드가 안 보여' (the report shows
+    no trend, every section was a single day's snapshot). _month_trend() must
+    compare the latest row to the oldest row within the last N days, and when
+    fewer than N days of history exist it must say so via actual_days rather
+    than silently presenting a shorter span as a full 30-day trend."""
+    import subprocess
+
+    script = (
+        "import daily_report as dr\n"
+        "rows = [\n"
+        "    {'date': '2026-08-01', 'price': '100'},\n"
+        "    {'date': '2026-08-15', 'price': '110'},\n"
+        "    {'date': '2026-08-31', 'price': '120'},\n"
+        "]\n"
+        "t = dr._month_trend(rows, 'date', 'price', days=30)\n"
+        "assert t['start_val'] == 100.0 and t['latest_val'] == 120.0, t\n"
+        "assert t['delta'] == 20.0 and abs(t['pct'] - 20.0) < 1e-9, t\n"
+        "assert t['min'] == 100.0 and t['max'] == 120.0, t\n"
+        "assert t['actual_days'] == 30, t\n"
+        "# fewer than 2 rows -> None, not a fabricated single-point trend\n"
+        "assert dr._month_trend([rows[0]], 'date', 'price') is None\n"
+        "# a window shorter than the requested days must say so honestly\n"
+        "short_rows = [{'date': '2026-08-28', 'price': '50'}, {'date': '2026-08-31', 'price': '55'}]\n"
+        "t2 = dr._month_trend(short_rows, 'date', 'price', days=30)\n"
+        "assert t2['actual_days'] == 3, t2\n"
+        "line = dr._fmt_trend_line('테스트', t2, unit='원', decimals=0)\n"
+        "assert '30일 미만' in line, line\n"
+        "print('OK')\n"
+    )
+    result = subprocess.run(["python3", "-c", script], cwd="scripts",
+                             capture_output=True, text=True, timeout=30)
+    assert result.returncode == 0, f"stderr: {result.stderr}"
+    assert result.stdout.strip() == "OK"
+
+
+def test_daily_report_trend_section_renders_from_real_accumulated_csvs():
+    """The new '최근 1개월 트렌드' section must actually appear in build_report()'s
+    output and reflect the real sources/*.csv history (no fabrication) — this
+    guards against the section being wired but never called, or silently
+    raising and getting swallowed."""
+    import subprocess
+
+    result = subprocess.run(
+        ["python3", "-c", "import daily_report as dr; print(dr.build_report('000660'))"],
+        cwd="scripts", capture_output=True, text=True, timeout=30,
+    )
+    assert result.returncode == 0, f"stderr: {result.stderr}"
+    out = result.stdout
+    assert "## 최근 1개월 트렌드" in out
+    assert "- 주가:" in out and "- 외국인 보유율:" in out
+    assert "- 신용융자잔고:" in out and "- 공매도 비중:" in out and "- 코스피지수:" in out
+
+
 def test_sk_hynix_section_shows_live_data_and_capex_as_context_not_a_directive():
     """2026-08-27 Phase 3: the '오늘의 실측 데이터'/CapEx lines must render from
     real payload data, and must never contain BUY/SELL/HOLD language of their
