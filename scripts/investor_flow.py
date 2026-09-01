@@ -549,6 +549,52 @@ def kis_fetch_overseas_price(symbol, excd="NAS", account_type="real", raw=False)
     }
 
 
+def _adr_crosscheck(rate_pct, calc_pct, hist_pct, tolerance=ADR_CROSSCHECK_TOLERANCE_PCT):
+    """3방법(rate/calc/hist) 크로스체크 판정 로직 — 2026-09-01에
+    kis_fetch_overseas_daily_price()에서 순수 함수로 분리(네트워크 호출 없이
+    단위테스트하기 위함, 로직 자체는 그대로).
+
+    Returns (crosscheck, change_pct, detail) — detail은 항상 사용 가능한
+    모든 방법의 값을 "method:+x.xx" 형식으로 남겨(창작 없음), crosscheck가
+    무엇이든 원 데이터를 그대로 추적할 수 있게 한다.
+    """
+    methods = {"rate": rate_pct, "calc": calc_pct, "hist": hist_pct}
+    available = {k: v for k, v in methods.items() if v is not None}
+    detail = "|".join(f"{k}:{v:+.2f}" for k, v in methods.items() if v is not None)
+
+    if len(available) >= 2:
+        spread = max(available.values()) - min(available.values())
+        if spread <= tolerance:
+            crosscheck = "OK" if len(available) == 3 else "OK_PARTIAL(2/3)"
+            # 합치하면 diff 기반(calc)을 확정치로 채택 — 세 방법 모두 오차
+            # 범위 안이므로 어느 걸 골라도 사실상 같지만, diff는 이 응답
+            # 자체가 준 값이라 반올림이 가장 덜 누적된 값으로 우선한다.
+            change_pct = calc_pct if calc_pct is not None else next(iter(available.values()))
+        elif rate_pct is not None and hist_pct is not None and abs(rate_pct - hist_pct) <= tolerance:
+            # 2026-09-01 신설 — 사용자와 함께 CSV 히스토리(10건의 과거 MISMATCH)를
+            # 실측 분석한 결과, 매번 rate·hist(서로 독립된 두 방법)는 일치하고
+            # calc 하나만 어긋났다 — calc가 쓰는 이 행의 diff 필드가 그 날짜에만
+            # 부호오류로 온 것으로 추정(wiki/log.md 2026-09-01 참고). 그동안은
+            # 이런 2:1 불일치도 전부 MISMATCH로 뭉뚱그려 change_pct를 비워왔는데,
+            # rate·hist가 서로 맞아떨어지는 경우만 그 값(평균)으로 확정한다 —
+            # 3방법 다 어긋나거나 rate/hist 중 하나가 없는 진짜 불확실한 경우는
+            # 여전히 아래 MISMATCH로 빠져 change_pct를 비워둔다. detail에는 3개
+            # 값을 전부 남겨 calc(=diff 필드)가 배제됐다는 사실이 항상 추적된다.
+            crosscheck = "RESOLVED_2OF3"
+            change_pct = (rate_pct + hist_pct) / 2
+        else:
+            crosscheck = "MISMATCH"
+            change_pct = None
+    elif len(available) == 1:
+        crosscheck = "PARTIAL_SINGLE(1/3)"
+        change_pct = next(iter(available.values()))
+    else:
+        crosscheck = "NO_METHOD"
+        change_pct = None
+
+    return crosscheck, change_pct, detail
+
+
 def kis_fetch_overseas_daily_price(symbol, excd="NAS", account_type="real", raw=False):
     """해외상장 종목(ADR 등)의 **일별 확정 시세**를 조회한다 — 이 저장소의
     자동체크 3회(07:00/10:00/19:00 KST)가 전부 나스닥 정규장(22:30~05:00
@@ -641,34 +687,15 @@ def kis_fetch_overseas_daily_price(symbol, excd="NAS", account_type="real", raw=
         except (KeyError, TypeError, ValueError):
             hist_pct = None
 
-    methods = {"rate": rate_pct, "calc": calc_pct, "hist": hist_pct}
-    available = {k: v for k, v in methods.items() if v is not None}
-    detail = "|".join(f"{k}:{v:+.2f}" for k, v in methods.items() if v is not None)
-
-    if len(available) >= 2:
-        spread = max(available.values()) - min(available.values())
-        if spread <= ADR_CROSSCHECK_TOLERANCE_PCT:
-            crosscheck = "OK" if len(available) == 3 else "OK_PARTIAL(2/3)"
-            # 합치하면 diff 기반(calc)을 확정치로 채택 — 세 방법 모두 오차
-            # 범위 안이므로 어느 걸 골라도 사실상 같지만, diff는 이 응답
-            # 자체가 준 값이라 반올림이 가장 덜 누적된 값으로 우선한다.
-            change_pct = calc_pct if calc_pct is not None else next(iter(available.values()))
-        else:
-            crosscheck = "MISMATCH"
-            change_pct = None
-            print(
-                f"⚠️ ADR change_pct 크로스체크 불일치 감지 ({symbol}, {trade_date}): "
-                f"{detail} — 자동으로 숫자를 확정하지 않고 change_pct를 비워둡니다. "
-                f"{ADR_CSV_PATH.name}의 crosscheck=MISMATCH 행을 확인해 사용자에게 "
-                "보고하고 어느 값을 쓸지 결정을 받으세요.",
-                file=sys.stderr,
-            )
-    elif len(available) == 1:
-        crosscheck = "PARTIAL_SINGLE(1/3)"
-        change_pct = next(iter(available.values()))
-    else:
-        crosscheck = "NO_METHOD"
-        change_pct = None
+    crosscheck, change_pct, detail = _adr_crosscheck(rate_pct, calc_pct, hist_pct)
+    if crosscheck == "MISMATCH":
+        print(
+            f"⚠️ ADR change_pct 크로스체크 불일치 감지 ({symbol}, {trade_date}): "
+            f"{detail} — 자동으로 숫자를 확정하지 않고 change_pct를 비워둡니다. "
+            f"{ADR_CSV_PATH.name}의 crosscheck=MISMATCH 행을 확인해 사용자에게 "
+            "보고하고 어느 값을 쓸지 결정을 받으세요.",
+            file=sys.stderr,
+        )
 
     return {
         "symbol": symbol,

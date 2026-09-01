@@ -1415,6 +1415,56 @@ def test_capex_periphery_module_is_shared_not_duplicated():
     assert periphery, "fixture expects sources/ai-periphery-fundamentals.csv to have rows"
 
 
+def test_adr_crosscheck_resolves_when_two_independent_methods_agree():
+    """2026-09-01: user asked '하이닉스 ADR 주가에 대해서 아직 혼돈이 있어?' —
+    investigating sources/sk-hynix-adr-quote.csv's MISMATCH history (10
+    occurrences) showed a consistent pattern: rate and hist (two independent
+    methods) agreed with each other every time, while calc (which trusts the
+    same row's `diff` field) was the lone outlier — e.g. the 2026-08-24 row
+    was exactly rate:-4.92|calc:+5.46|hist:-4.92. This pins the fix: when
+    rate and hist agree within tolerance, resolve using their average and
+    tag RESOLVED_2OF3 (not silently blended into OK, not left as a MISMATCH
+    blank) — calc/diff is excluded, and detail keeps all three values."""
+    from scripts.investor_flow import _adr_crosscheck, ADR_CROSSCHECK_TOLERANCE_PCT
+
+    # The real 2026-08-24 case.
+    crosscheck, change_pct, detail = _adr_crosscheck(rate_pct=-4.92, calc_pct=5.46, hist_pct=-4.92)
+    assert crosscheck == "RESOLVED_2OF3"
+    assert abs(change_pct - (-4.92)) < 1e-6, change_pct
+    assert "calc:+5.46" in detail, "excluded method's value must still be traceable in detail"
+
+    # All three agree -> still OK, unaffected by the new branch.
+    crosscheck, change_pct, detail = _adr_crosscheck(2.20, 2.20, 2.20)
+    assert crosscheck == "OK"
+    assert abs(change_pct - 2.20) < 1e-6, change_pct
+
+    # A genuine 3-way conflict (rate/hist don't agree either) must still
+    # fall back to MISMATCH with change_pct withheld — RESOLVED_2OF3 must
+    # not swallow every disagreement.
+    crosscheck, change_pct, detail = _adr_crosscheck(rate_pct=-4.92, calc_pct=5.46, hist_pct=1.0)
+    assert crosscheck == "MISMATCH"
+    assert change_pct is None
+
+    # rate missing entirely -> can't apply the 2-of-3 rule, stays MISMATCH.
+    crosscheck, change_pct, detail = _adr_crosscheck(rate_pct=None, calc_pct=5.46, hist_pct=-4.92)
+    assert crosscheck == "MISMATCH"
+    assert change_pct is None
+
+
+def test_daily_report_shows_resolved_2of3_note_not_silent_blend():
+    """The ADR report line must say when a value was RESOLVED_2OF3 rather than
+    rendering it identically to a clean 3/3 OK — silently blending an
+    auto-resolved anomaly into a normal-looking line would hide exactly the
+    kind of drift this fix exists to catch."""
+    from scripts.investor_flow import _adr_crosscheck
+
+    crosscheck, change_pct, detail = _adr_crosscheck(-4.92, 5.46, -4.92)
+    assert crosscheck == "RESOLVED_2OF3"
+    # daily_report.py's ADR section renders this note only for RESOLVED_2OF3;
+    # this test locks the crosscheck value it keys off of.
+    assert crosscheck != "OK" and crosscheck != "MISMATCH"
+
+
 def test_daily_report_delegates_to_the_shared_capex_module_not_a_private_copy():
     """Same guarantee as test_daily_report_delegates_to_the_shared_hbm_module —
     spawned sibling-style (cwd=scripts), matching the real CI invocation."""
