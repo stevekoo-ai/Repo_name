@@ -1,0 +1,17 @@
+name: DEBUG pdf discover (temporary)
+
+on:
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+jobs:
+  debug:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python3 collectors/subscription_monitor/_debug_pdf_discover.py
