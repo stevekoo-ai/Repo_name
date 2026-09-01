@@ -60,6 +60,34 @@ def main() -> None:
         if analysis["status"] == "ok":
             tag = "⚠️예외" if analysis.get("exceptions") else "✅일치"
             print(f"{tag} {analysis['business_type']}/{analysis['income_scope']}")
+        elif analysis.get("stage") == "discover" and r.get("PBLANC_URL"):
+            # DIAGNOSTIC (temporary, for this trace only): find_pdf_link()
+            # failed — dump enough of the raw detail page to figure out why
+            # (SPA/JS-rendered? different attachment mechanism?) without a
+            # second workflow run.
+            import re
+            import urllib.request
+            print(f"❌실패({analysis.get('stage')}): {analysis.get('reason')} [진단 덤프 시도]")
+            try:
+                req = urllib.request.Request(
+                    r["PBLANC_URL"], headers={"User-Agent": "Mozilla/5.0 (compatible; debug/1.0)"}
+                )
+                with urllib.request.urlopen(req, timeout=25) as resp:
+                    page_html = resp.read().decode("utf-8", errors="ignore")
+                print(f"    [진단] 페이지 길이: {len(page_html)} chars")
+                pdf_hits = [m.start() for m in re.finditer(r"\.pdf", page_html, re.IGNORECASE)]
+                print(f"    [진단] '.pdf' 문자열 등장 횟수: {len(pdf_hits)}")
+                for pos in pdf_hits[:5]:
+                    snippet = page_html[max(0, pos - 100):pos + 30].replace("\n", " ")
+                    print(f"    [진단]   ...{snippet}...")
+                for kw in ["공고문", "첨부", "다운로드", "fileDown", "javascript:", "<iframe", "React", "vue", "id=\"app\""]:
+                    c = page_html.count(kw)
+                    if c:
+                        print(f"    [진단] 키워드 {kw!r}: {c}회")
+                print(f"    [진단] 앞부분 800자: {page_html[:800]!r}")
+            except Exception as diag_e:
+                print(f"    [진단] 페이지 재요청도 실패: {diag_e}")
+            continue
         else:
             print(f"❌실패({analysis.get('stage')}): {analysis.get('reason')}")
 
