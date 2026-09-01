@@ -1200,6 +1200,46 @@ def _real_estate_decision_section(payload: dict) -> str:
     return "\n".join(lines)
 
 
+def _subscription_concerns_section(payload: dict) -> str:
+    """Section 3.5: 청약 우려사항 daily 추적.
+
+    사용자 요청 원문: "정보를 취득하면 항상 나를 바라봐야해. 내가 현재 우려하는
+    것들에 대해서 그 정보들이 진행되고 있는 방향을 분석해서 긴급하게 처리해야
+    하는지 전략을 수정해야하는지를 알려주는 daily보고서가 되어야하는거야."
+
+    5개 우려사항(소득제한/플랫폼시티 민영분류/전세만료/통학거리/자금갭)을 매일
+    재평가해 🔴긴급 / 🟡전략재검토 / 🟢관망 3단계로 판정한다. 새 정보가 들어와도
+    urgency가 바뀌지 않으면 조용히 관망 — 매일 똑같은 경보를 반복하지 않는다.
+    """
+    from engine.exporters.subscription_concern_tracker import compute_subscription_concerns
+
+    report = compute_subscription_concerns(payload)
+
+    urgency_emoji_line = {
+        "🔴 긴급": "🔴",
+        "🟡 전략재검토": "🟡",
+        "🟢 관망": "🟢",
+    }
+
+    lines = [
+        "# 3.5. 청약 우려사항 daily 추적",
+        "",
+        f"**{report.headline}**",
+        "",
+    ]
+
+    for c in report.concerns:
+        emoji = urgency_emoji_line.get(c.urgency, "❔")
+        lines.append(f"## {emoji} {c.name} — {c.urgency}")
+        lines.append(f"- 현황: {c.status}")
+        lines.append(f"- 권고: {c.recommendation}")
+        for d in c.detail:
+            lines.append(f"  - {d}")
+        lines.append("")
+
+    return "\n".join(lines)
+
+
 def _unified_action_plan_section(payload: dict) -> str:
     """Section 4: 통합 액션 플랜 (2 min read).
 
@@ -1686,6 +1726,7 @@ def render_markdown(payload: dict) -> str:
         _data_center_construction_section(payload),  # 고객재고 축 보조 참고자료 (2.6)
         _wiki_digest_section(payload),  # 위키 판단형 지식 브리지 (2.7)
         _real_estate_decision_section(payload),
+        _subscription_concerns_section(payload),
         _real_estate_trend(payload),  # 3절 보조 근거 — 아파트 매매 실거래 트렌드
         _rent_trend(payload),  # 3절 보조 근거 — 아파트 전월세 실거래 트렌드
         _villa_trend(payload),  # 3절 보조 근거 — 빌라 매매 실거래 트렌드

@@ -6,7 +6,44 @@
 # 참고)이지만, 그동안 이 파일에는 세종 5-1생활권을 가리키는 EXAMPLE 플레이스홀더
 # 공고만 있었다 — 실제 공고가 아니었으므로 제거함(7.9: 데이터 없으면 Pending,
 # 추측/대체 데이터로 채우지 않음). 용인 플랫폼시티 실제 공고가 나오면 아래
-# notices 목록에 위 EXAMPLE과 같은 형식으로 추가한다.
+# notices 목록에 아래 원천동 항목과 같은 형식으로 추가한다.
 
-updated_at: "2026-07-15"
-notices: []
+updated_at: "2026-09-01"
+notices:
+  - name: "수원 원천동(광교) 공공분양 (PENDING - 청약홈 미등록)"
+    agency: null   # TODO: GH(경기주택도시공사) 또는 LH — 정식 공고 시 확인
+    region: "경기도 수원시 영통구 원천동 80번지 일원"
+    is_platform_city: false
+    housing_type: "국민주택"
+    supply_type: "일반공급"
+    size: null                    # TODO: 정식 공고 전까지 평형 미확정
+    household_count: 600
+    announce_date: null           # TODO: 2026-10 분양 예정 — 통상 입주자모집공고는 접수 시작 1개월 전 공개
+    application_start: null
+    application_end: null
+    expected_price_krw: null
+    expected_competition_ratio: null
+    source: "사용자 제보 (2026-07-23) — 청약홈 API 조회 결과 아직 미등록 확인 (adhoc-subscription-query.yml 실행 기록 참조)"
+    note: >
+      2026-07-23 기준 scripts 및 adhoc 워크플로우로 HOUSE_NM/HSSPLY_ADRES(원천동, 영통구)
+      전체 검색했으나 매칭 없음. 통상 입주자모집공고는 접수 시작 약 1개월 전 공개되며,
+      2026-07-23 시점 기준 2026년 9월경 청약홈 등록이 예상되었음. subscription-monitor.yml이
+      "광교"/"원천동" 키워드로 5~30분마다 자동 감시 중 (2026-09-01 기준 alerted_state.json에
+      해당 키워드 매칭 이력 없음 — 아직 등록 전으로 판단).
+
+  # 플랫폼시티가 발표될 경우, 아래 예시처럼 민영 주택으로 입력할 것
+  # (역사적으로 라온프라이빗 아르디에·e편한세상 용인역 플랫폼시티 모두 민영 분류).
+  # - name: "용인 플랫폼시티 (EXAMPLE - 민영)"
+  #   agency: "플랫폼시티 운영사"
+  #   region: "용인 기흥구"
+  #   is_platform_city: true
+  #   housing_type: "민영"
+  #   supply_type: "일반공급"
+  #   size: "84㎡ 이상"
+  #   household_count: 1500        # EXAMPLE
+  #   announce_date: "2026-09-01"  # EXAMPLE
+  #   application_start: "2026-09-15"
+  #   application_end: "2026-09-20"
+  #   expected_price_krw: 850000000  # EXAMPLE
+  #   expected_competition_ratio: null
+  #   source: "청약홈 (수동 입력)"

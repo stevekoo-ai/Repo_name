@@ -362,6 +362,20 @@ def build_report_payload(month_key: str | None = None) -> dict:
         log_event("real_estate_decision.failed", error=str(exc), level="warning")
         payload["real_estate_decision"] = None
 
+    # 청약 우려사항 daily 추적 — 사용자 요청: "정보를 취득하면 항상 나를 바라봐야
+    # 해...긴급하게 처리해야하는지 전략을 수정해야하는지를 알려주는 daily보고서".
+    # exposure 모델(위)이 이미 payload에 있어야 자금조달 갭 체크가 동작하므로
+    # real_estate_decision 다음 자리에 둔다.
+    try:
+        from engine.exporters.subscription_concern_tracker import compute_subscription_concerns
+
+        payload["subscription_concerns"] = compute_subscription_concerns(payload)
+        log_event("subscription_concerns.computed",
+                  overall_urgency=payload["subscription_concerns"].overall_urgency)
+    except Exception as exc:
+        log_event("subscription_concerns.failed", error=str(exc), level="warning")
+        payload["subscription_concerns"] = None
+
     # Record daily signal (Phase 3c: Signal Persistence)
     try:
         from engine.report.signal_recorder import record_daily_signal
