@@ -10,7 +10,9 @@ with sync_playwright() as p:
 
     print("=== 1) 메인 접속 + 통합검색 ===")
     page.goto("https://apply.lh.or.kr/", wait_until="networkidle", timeout=30000)
-    search_box = page.locator('input[name="totalSearch"]').first
+    # There are two inputs sharing name="totalSearch" (a hidden header-popup one
+    # and the visible main-page one, id="mainSrch") — id disambiguates.
+    search_box = page.locator('#mainSrch')
     search_box.click()
     search_box.fill(TARGET_NAME)
     search_box.press("Enter")
