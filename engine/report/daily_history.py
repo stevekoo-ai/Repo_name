@@ -8,13 +8,14 @@ regime/scores day over day, which isn't captured anywhere else.
 """
 from __future__ import annotations
 
-from datetime import date
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 import pandas as pd
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 DAILY_HISTORY_PATH = REPO_ROOT / "data" / "peos_daily_history.csv"
+KST = timezone(timedelta(hours=9))
 
 
 def _indicator_values(dashboard_rows: list[dict], prefix: str) -> dict[str, float | None]:
@@ -22,7 +23,11 @@ def _indicator_values(dashboard_rows: list[dict], prefix: str) -> dict[str, floa
 
 
 def build_daily_row(payload: dict, run_date: str | None = None) -> dict:
-    run_date = run_date or date.today().isoformat()
+    # run.py always passes run_date explicitly (KST-computed, see its own
+    # 2026-09-01 comment) — this default exists only for other/direct callers
+    # and uses the same KST basis so it can't reintroduce the UTC-midnight
+    # skip bug that lost the 2026-08-31 row.
+    run_date = run_date or datetime.now(KST).date().isoformat()
     macro, macro_us, p = payload["macro"], payload["macro_us"], payload["personal"]
 
     row = {

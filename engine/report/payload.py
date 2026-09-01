@@ -302,6 +302,58 @@ def build_report_payload(month_key: str | None = None) -> dict:
         log_event("sk_hynix_decision.failed", error=str(exc), level="warning")
         payload["sk_hynix_decision"] = None
 
+    # HBM Cycle Score — 외국인수급·보유율 2축 자동채점 (hbm-cycle-score.md "1.").
+    # Context/evidence only, never a second buy/sell instruction (R4 in
+    # reconciliation.py: 포지션 지시는 단일 출처) — sk_hynix_decision above
+    # remains the only module allowed to say HOLD/BUY/SELL. The other 4 axes
+    # (ASP·엔비디아&CoWoS·공급확대·고객재고) are qualitative judgment calls
+    # this cron pipeline can't reproduce; they stay in the wiki (Phase 4).
+    try:
+        from scripts.hbm_cycle_score import score_foreign_flow_axis, score_foreign_holding_axis
+
+        payload["hbm_cycle_score"] = {
+            "ticker": "000660",
+            "foreign_flow": score_foreign_flow_axis("000660"),
+            "foreign_holding": score_foreign_holding_axis("000660"),
+        }
+        log_event("hbm_cycle_score.computed",
+                  flow=payload["hbm_cycle_score"]["foreign_flow"]["score"],
+                  holding=payload["hbm_cycle_score"]["foreign_holding"]["score"])
+    except Exception as exc:
+        log_event("hbm_cycle_score.failed", error=str(exc), level="warning")
+        payload["hbm_cycle_score"] = None
+
+    # 하이퍼스케일러 CapEx 실측 + SK Hynix 오늘의 실측 데이터 (SEC EDGAR + KIS,
+    # 이미 매일/주간 수집되던 CSV를 처음으로 PEOS 쪽에서도 읽는다). 전부
+    # 정보/근거용 — 어느 것도 새 매매 지시를 만들지 않는다(R4).
+    try:
+        from scripts.capex_periphery import read_hyperscaler_capex, read_ai_periphery
+        from scripts.investor_flow import (
+            read_latest_price_snapshot, read_ticker_rows, summarize_flows,
+            credit_balance_streak, read_latest_short_sale, read_latest_adr,
+        )
+
+        payload["hyperscaler_capex"] = read_hyperscaler_capex()
+        payload["ai_periphery"] = read_ai_periphery()
+
+        flow_rows = read_ticker_rows("000660")
+        payload["sk_hynix_live"] = {
+            "price_snapshot": read_latest_price_snapshot("000660"),
+            "flow_summary": summarize_flows(flow_rows) if flow_rows else None,
+            "flow_latest_date": flow_rows[-1]["date"] if flow_rows else None,
+            "credit_balance": credit_balance_streak("000660"),
+            "short_sale": read_latest_short_sale("000660"),
+            "adr": read_latest_adr("SKHY"),
+        }
+        log_event("sk_hynix_live_data.loaded",
+                  capex_tickers=list(payload["hyperscaler_capex"].keys()) if payload["hyperscaler_capex"] else [],
+                  has_price_snapshot=payload["sk_hynix_live"]["price_snapshot"] is not None)
+    except Exception as exc:
+        log_event("sk_hynix_live_data.failed", error=str(exc), level="warning")
+        payload["hyperscaler_capex"] = None
+        payload["ai_periphery"] = None
+        payload["sk_hynix_live"] = None
+
     try:
         payload["real_estate_decision"] = compute_real_estate_decision(payload)
         log_event("real_estate_decision.computed", signal=payload["real_estate_decision"].signal,
@@ -409,6 +461,35 @@ def build_report_payload(month_key: str | None = None) -> dict:
     except Exception as exc:
         log_event("weekly_analysis.failed", error=str(exc), level="warning")
         payload["weekly_analysis"] = {"status": "error", "error": str(exc)}
+
+    # Add data center construction vs opposition raw data (HBM Cycle Score
+    # "고객재고" axis supporting reference — intentionally NOT scored, see
+    # data/manual_inputs/data_center_construction.yaml header for why).
+    try:
+        from collectors import manual as manual_collectors
+
+        dc_payload = manual_collectors.fetch_data_center_construction()
+        payload["data_center_construction"] = dc_payload  # None -> markdown section self-skips
+        if dc_payload:
+            log_event("data_center_construction.loaded", updated_at=dc_payload.get("updated_at"))
+    except Exception as exc:
+        log_event("data_center_construction.failed", error=str(exc), level="warning")
+        payload["data_center_construction"] = None
+
+    # 위키 판단형 지식 브리지 (Phase 4, 2026-08-27) — HBM Cycle Score 정성축,
+    # 9체크포인트, 찐반등 4대 신호, 트럼프 트래커 등은 WebSearch·애널리스트
+    # 리포트 해석이 필요해 이 LLM-미사용 cron 파이프라인이 재현할 수 없다.
+    # data/wiki_digest/*.yaml(위키가 유일한 원천, 이 파일들은 그 압축 요약을
+    # 미러링할 뿐)을 읽어 리포트에 노출 — 원문은 위키로 링크.
+    try:
+        from engine.report.wiki_digest import load_wiki_digests
+
+        payload["wiki_digests"] = load_wiki_digests()
+        log_event("wiki_digests.loaded", count=len(payload["wiki_digests"]),
+                  stale_count=sum(1 for d in payload["wiki_digests"] if d["is_stale"]))
+    except Exception as exc:
+        log_event("wiki_digests.failed", error=str(exc), level="warning")
+        payload["wiki_digests"] = []
 
     # Cross-engine reconciliation. Runs LAST so it can see every engine's output,
     # and emits one stance instead of letting modules contradict each other in

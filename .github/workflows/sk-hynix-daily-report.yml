@@ -16,6 +16,15 @@ on:
 permissions:
   contents: write
 
+# 2026-08-21 추가 — 재시도 창(최대 6시간, 10분 간격)이 다음 스케줄 실행과
+# 겹칠 수 있어(07:00→10:00 KST는 3시간 간격) 최신 실행이 오래된 재시도
+# 실행을 대체하도록 직렬화. 같은 KIS_APP_KEY를 쓰는 portfolio-holdings-sync
+# 와의 토큰 충돌(2026-07-28~30 사례)과는 별개 문제라 이 워크플로 내부에서만
+# 막으면 됨.
+concurrency:
+  group: sk-hynix-daily-report
+  cancel-in-progress: true
+
 jobs:
   report:
     runs-on: ubuntu-latest
@@ -71,12 +80,30 @@ jobs:
           python3 scripts/investor_flow.py etf-nav --ticker 469150 --raw || true
           echo "::endgroup::"
 
+      # 2026-08-21 추가 — 실패하면 성공할 때까지(최대 6시간, 10분 간격 36회)
+      # 재시도. 사용자 지시: "요청이 실패하면 성공할 때까지 iteration,
+      # 10분 단위로 재시도해서 성공하면 완료". 상한 도달 시에만 실패로
+      # 넘어가 맨 아래 실패 알림 스텝이 발동 — 무한 재시도는 아님(실제
+      # 코드 버그면 36번을 재시도해도 매번 같은 이유로 실패하다가 결국
+      # 알림이 감).
       - name: 종목별 투자자매매동향 fetch
         if: ${{ github.event.inputs.debug_raw != 'true' }}
         env:
           KIS_APP_KEY: ${{ secrets.KIS_APP_KEY }}
           KIS_APP_SECRET: ${{ secrets.KIS_APP_SECRET }}
-        run: python3 scripts/investor_flow.py fetch --ticker 000660 --days 30
+        run: |
+          attempt=1; max_attempts=36
+          until python3 scripts/investor_flow.py fetch --ticker 000660 --days 30; do
+            if [ "$attempt" -ge "$max_attempts" ]; then
+              echo "::error::${max_attempts}회(6시간) 재시도했지만 투자자매매동향 fetch 실패"
+              python3 scripts/log_automation_run.py sk-hynix-daily-report investor_flow_fetch "$attempt" "$max_attempts" exhausted
+              exit 1
+            fi
+            echo "[재시도 $attempt/$max_attempts] 투자자매매동향 fetch 실패 — 10분 후 재시도"
+            attempt=$((attempt + 1))
+            sleep 600
+          done
+          python3 scripts/log_automation_run.py sk-hynix-daily-report investor_flow_fetch "$attempt" "$max_attempts" success
 
       - name: ADR(SKHY, 나스닥) 시세 fetch
         if: ${{ github.event.inputs.debug_raw != 'true' }}
@@ -91,7 +118,19 @@ jobs:
         env:
           KIS_APP_KEY: ${{ secrets.KIS_APP_KEY }}
           KIS_APP_SECRET: ${{ secrets.KIS_APP_SECRET }}
-        run: python3 scripts/investor_flow.py snapshot --ticker 000660
+        run: |
+          attempt=1; max_attempts=36
+          until python3 scripts/investor_flow.py snapshot --ticker 000660; do
+            if [ "$attempt" -ge "$max_attempts" ]; then
+              echo "::error::${max_attempts}회(6시간) 재시도했지만 snapshot 실패"
+              python3 scripts/log_automation_run.py sk-hynix-daily-report price_snapshot "$attempt" "$max_attempts" exhausted
+              exit 1
+            fi
+            echo "[재시도 $attempt/$max_attempts] snapshot 실패 — 10분 후 재시도"
+            attempt=$((attempt + 1))
+            sleep 600
+          done
+          python3 scripts/log_automation_run.py sk-hynix-daily-report price_snapshot "$attempt" "$max_attempts" success
 
       # 2026-07-31 추가 — stevekoo-ai/open-trading-api(KIS 공식 예제) 조사로
       # 발견한 4개 TR. 신용잔고는 찐반등 신호①(빚의 청산)의 데이터소스,
@@ -137,8 +176,26 @@ jobs:
           KIS_APP_SECRET: ${{ secrets.KIS_APP_SECRET }}
         run: |
           cd scripts
-          python3 daily_report.py --ticker 000660 | tee /tmp/report.md
+          attempt=1; max_attempts=36
+          until python3 daily_report.py --ticker 000660 | tee /tmp/report.md; do
+            if [ "$attempt" -ge "$max_attempts" ]; then
+              echo "::error::${max_attempts}회(6시간) 재시도했지만 리포트 생성 실패"
+              python3 log_automation_run.py sk-hynix-daily-report report_generation "$attempt" "$max_attempts" exhausted
+              exit 1
+            fi
+            echo "[재시도 $attempt/$max_attempts] 리포트 생성 실패 — 10분 후 재시도"
+            attempt=$((attempt + 1))
+            sleep 600
+          done
+          python3 log_automation_run.py sk-hynix-daily-report report_generation "$attempt" "$max_attempts" success
           echo "report_path=$(ls -t ../sources/sk-hynix-auto-report-*.md | head -1)" >> "$GITHUB_OUTPUT"
+
+      # 2026-08-31 추가 — 이 스텝이 새 sources/sk-hynix-auto-report-*.md를
+      # 만들 때마다 docs/reports-index.html의 "SK하이닉스 자동 리포트" 목록도
+      # 같이 갱신(사용자 요청 — 모든 생성된 리포트를 링크로 확인 가능하게).
+      - name: 리포트 링크 인덱스 갱신
+        if: ${{ github.event.inputs.debug_raw != 'true' }}
+        run: python3 scripts/build_reports_index.py
 
       - name: 변경사항 커밋 & 푸시
         if: ${{ github.event.inputs.debug_raw != 'true' }}
@@ -146,12 +203,14 @@ jobs:
           git config user.name "sk-hynix-auto-report-bot"
           git config user.email "actions@users.noreply.github.com"
           git add sources/sk-hynix-investor-flow.csv sources/sk-hynix-auto-report-*.md
+          git add docs/reports-index.html
           [ -f sources/sk-hynix-adr-quote.csv ] && git add sources/sk-hynix-adr-quote.csv
           [ -f sources/sk-hynix-price-snapshot.csv ] && git add sources/sk-hynix-price-snapshot.csv
           [ -f sources/sk-hynix-credit-balance.csv ] && git add sources/sk-hynix-credit-balance.csv
           [ -f sources/kr-index-quote.csv ] && git add sources/kr-index-quote.csv
           [ -f sources/sk-hynix-short-sale.csv ] && git add sources/sk-hynix-short-sale.csv
           [ -f sources/portfolio-etf-nav.csv ] && git add sources/portfolio-etf-nav.csv
+          [ -f sources/automation-run-log.csv ] && git add sources/automation-run-log.csv
           git diff --cached --quiet || git commit -m "자동 리포트: $(date -u +%Y-%m-%dT%H:%M:%SZ)"
           for i in 1 2 3 4 5; do
             git push && break
@@ -173,3 +232,49 @@ jobs:
           to: ${{ secrets.GMAIL_ADDRESS }}
           from: SK하이닉스 자동 리포트 봇
           body: file:///tmp/report.md
+
+      # 2026-08-27 추가 — 위 "변경사항 커밋 & 푸시"는 재시도 소진으로 잡이
+      # 실패하면 아예 실행되지 않아 automation-run-log.csv의 "exhausted"
+      # 행이 영영 커밋되지 못한다(CI 헬스체크가 다시 GitHub API 수동
+      # 고고학으로 돌아가는 걸 막으려는 게 이 로그의 목적인데, 정작 실패
+      # 사례가 안 남으면 무의미) — 성공/실패 무관하게 항상 이 로그 파일만
+      # 별도로 커밋. 성공 경로에서는 위 스텝이 이미 커밋해놔서 git diff
+      # --cached가 비어있는 게 정상(no-op).
+      - name: 자동화 상태로그 커밋 (항상 실행)
+        if: always()
+        run: |
+          git config user.name "sk-hynix-auto-report-bot"
+          git config user.email "actions@users.noreply.github.com"
+          if [ -f sources/automation-run-log.csv ]; then
+            git add sources/automation-run-log.csv
+            if git diff --cached --quiet; then
+              echo "automation-run-log.csv: 새로 커밋할 행 없음"
+            else
+              git commit -m "chore: automation run log $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+              for i in 1 2 3 4 5; do
+                git push && break
+                echo "push rejected, rebasing onto latest main (attempt $i)"
+                git fetch origin main
+                git rebase origin/main
+                sleep $((i * 3))
+              done
+            fi
+          fi
+
+      # 2026-08-21 추가 — 이 워크플로는 위 어느 단계에서 실패하든(예:
+      # investor_flow.py가 KIS API 미정산 필드에 죽는 버그, 8/16~8/20
+      # 여러 날 07:00·10:00 KST 실행이 이렇게 조용히 실패했었음) 재시도
+      # 없이 그냥 다음 크론까지 기다렸다 — 실패해도 아무 알림이 없어
+      # 나흘간 아무도 몰랐다. core10-collect.yml·daily-peos-report.yml과
+      # 같은 패턴(scripts/send_report_email.py --failure-alert)을 그대로
+      # 재사용 — 트랙 A(SK하이닉스 개인 판단 리포트) 채널이라 GitHub
+      # Actions 시크릿을 통한 이메일 발송은 CLAUDE.md 정책상 허용됨.
+      - name: 실패 시 알림 (조용한 실패 방지)
+        if: failure()
+        env:
+          GMAIL_ADDRESS: ${{ secrets.GMAIL_ADDRESS }}
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+          NOTIFY_EMAIL_TO: ${{ secrets.NOTIFY_EMAIL_TO }}
+        run: |
+          python3 -m scripts.send_report_email \
+            --failure-alert "sk-hynix-daily-report 워크플로가 실패했습니다 (KIS 시세·수급 수집~리포트 생성 중 한 단계) — 이 실행 시간대(07:00/10:00/19:00 KST)의 SK하이닉스 자동 데이터는 없는 것으로 취급하세요."

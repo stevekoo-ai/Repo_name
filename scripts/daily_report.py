@@ -19,133 +19,20 @@ from pathlib import Path
 
 from investor_flow import (
     kis_fetch_price, read_ticker_rows, summarize_flows, read_latest_adr, read_latest_price_snapshot,
-    foreign_hold_pct_trend, credit_balance_streak, read_latest_short_sale, read_latest_index,
-    read_price_snapshot_rows, read_credit_balance_rows,
+    credit_balance_streak, read_latest_short_sale, read_latest_index, read_credit_balance_rows,
 )
-from stats_utils import zscore, anomaly_label, logistic_scale
+from stats_utils import zscore, anomaly_label
+from hbm_cycle_score import score_foreign_flow_axis, score_foreign_holding_axis
+from capex_periphery import read_hyperscaler_capex, read_ai_periphery
 
 KST = timezone(timedelta(hours=9))
 REPORT_DIR = Path(__file__).resolve().parent.parent / "sources"
 PORTFOLIO_CSV_PATH = Path(__file__).resolve().parent.parent / "sources" / "portfolio-holdings.csv"
-HYPERSCALER_CAPEX_CSV_PATH = Path(__file__).resolve().parent.parent / "sources" / "hyperscaler-capex.csv"
-HYPERSCALER_CAPEX_STALE_DAYS = 150  # 분기 실적은 보통 분기말+30~45일 내 공시 — 5개월 이상 지나면 스테일로 취급
-AI_PERIPHERY_CSV_PATH = Path(__file__).resolve().parent.parent / "sources" / "ai-periphery-fundamentals.csv"
-AI_PERIPHERY_STALE_DAYS = 150  # 위와 동일 기준(분기 공시 주기)
 
-# 2026-08-05 신설, 2026-08-06 개정(B) — HBM Cycle Score(hbm-cycle-score.md "1.")
-# 6축 중 외국인수급(15점)·보유율(15점) 두 축을 매일 사람이 CSV를 보고 손으로
-# 채점하던 것을 대체하는 초안 규칙. ⚠ 이 배점 세부 구간은 hbm-cycle-score.md에
-# 공식 문서화된 적이 없다 — 이 페이지에 명시된 건 "외국인수급 15점/보유율 15점"
-# 이라는 축 자체의 배점뿐, 그 안의 세부 채점 규칙은 없었다(그동안 Claude가
-# 매일 정성적으로 판단). 아래는 그 정성판단을 재현 가능한 규칙으로 코드화한
-# "초안"이며, hbm-cycle-score.md에 공식 반영되기 전까지는 참고용 보조 신호로만
-# 쓸 것 — 최종 확정 점수는 계속 사람(또는 Claude)이 검토.
-#
-# 2026-08-06: 웹 조사(wiki/concepts/automation-vs-ai-narrative-roadmap.md "B")에서
-# 확인한 CNN Fear&Greed Index 방법론 — "고정 임계값 이분법"(8/4/3점 식) 대신
-# "과거 분포 대비 얼마나 벗어났는지"(z-score)를 0~점수만점 연속 스케일로 압축.
-# 국면이 바뀌어도 임계값을 손으로 재조정할 필요가 없다는 게 이점(과거 분포
-# 자체가 매일 갱신되며 자동 보정). stats_utils.zscore/logistic_scale이 표본
-# 부족(5건 미만) 시 자동으로 중립값을 반환하므로, 데이터 축적 초기에는
-# 기존 "미확인 → 중립 부여" 분기와 동일하게 동작한다.
-def _rolling_sum_history(rows, key, window):
-    """rows(날짜순 정렬)에서 window일 누적합의 시계열. 반환 리스트의 마지막
-    값이 rows 전체 기준 최신 window일 누적합, 그 앞은 하루씩 이전 시점 기준
-    누적합(=z-score history로 사용). 2026-08-06 신설(B). 청크 안에 빈 값이
-    섞이면 그 지점은 None — 지어내지 않는다."""
-    vals = [int(r[key]) if r.get(key) not in ("", None) else None for r in rows]
-    out = []
-    for i in range(window, len(vals) + 1):
-        chunk = vals[i - window:i]
-        out.append(None if any(v is None for v in chunk) else sum(chunk))
-    return out
-
-
-def score_foreign_flow_axis(ticker):
-    """외국인수급 축(15점 만점) 채점: 당일(3점)·20일 누적(8점)은 z-score 연속
-    스케일(B), 5일vs20일 모멘텀(4점)은 방향 이분법 유지 — 스프레드 시계열
-    z-score에는 최소 25영업일치 원자료가 필요해(20일 누적을 하루씩 밀어야
-    함) 아직 표본이 부족할 가능성이 높다. 데이터가 쌓이면 동일 방식으로
-    전환 예정."""
-    rows = read_ticker_rows(ticker)
-    summary = summarize_flows(rows)
-    w20, w5, w1 = summary.get(20), summary.get(5), summary.get(1)
-    detail = {}
-    score = 0.0
-
-    daily_vals = [int(r["foreign_net_krw"]) for r in rows if r["foreign_net_krw"] not in ("", None)]
-    if w1 is None or w1["foreign"] is None or len(daily_vals) < 2:
-        detail["당일"] = "미확인 — 3점 중 1.5점(중립) 부여"
-        score += 1.5
-    else:
-        z1 = zscore(daily_vals[-1], daily_vals[:-1])
-        pts = logistic_scale(z1, max_score=3.0)
-        score += pts
-        detail["당일"] = f"순매수 {w1['foreign']:+,}원, {anomaly_label(z1)} → {pts}/3.0점"
-
-    sum20_hist = _rolling_sum_history(rows, "foreign_net_krw", 20)
-    if w20 is None or w20["foreign"] is None or len(sum20_hist) < 2:
-        detail["20일_누적"] = "미확인(데이터 부족) — 8점 중 4점(중립) 부여"
-        score += 4.0
-    else:
-        z20 = zscore(sum20_hist[-1], sum20_hist[:-1])
-        pts = logistic_scale(z20, max_score=8.0)
-        score += pts
-        collapse_note = "(붕괴조건④ 충족)" if w20["foreign"] < 0 else ""
-        detail["20일_누적"] = (
-            f"순{'매수' if w20['foreign'] >= 0 else '매도'} 우위 {w20['foreign']:+,}원{collapse_note}, "
-            f"{anomaly_label(z20)} → {pts}/8.0점"
-        )
-
-    if w5 is None or w20 is None or w5["foreign"] is None or w20["foreign"] is None:
-        detail["모멘텀(5일vs20일)"] = "미확인 — 4점 중 2점(중립) 부여"
-        score += 2.0
-    else:
-        w5_daily_avg = w5["foreign"] / 5
-        w20_daily_avg = w20["foreign"] / 20
-        if w5_daily_avg > w20_daily_avg:
-            detail["모멘텀(5일vs20일)"] = f"최근 5일 일평균({w5_daily_avg:+,.0f}원) > 20일 일평균({w20_daily_avg:+,.0f}원) → 4/4점"
-            score += 4.0
-        else:
-            detail["모멘텀(5일vs20일)"] = f"최근 5일 일평균({w5_daily_avg:+,.0f}원) ≤ 20일 일평균({w20_daily_avg:+,.0f}원) → 0/4점"
-
-    return {"score": round(score, 1), "max": 15.0, "detail": detail}
-
-
-def score_foreign_holding_axis(ticker):
-    """외국인 보유율 축(15점 만점) 채점: 전일 대비 %p 변화(10점)는 z-score
-    연속 스케일(B), 5일평균추세(5점)는 방향 이분법 유지 — 표본 자체가
-    스냅샷 5개뿐이라 그 안에서 또 z-score를 낼 과거 분포가 없다(순환참조)."""
-    rows = read_price_snapshot_rows(ticker)
-    trend = foreign_hold_pct_trend(ticker, days=5)
-    detail = {}
-    score = 0.0
-
-    change = trend["latest_change_pp"]
-    pct_vals = [float(r["foreign_hold_pct"]) for r in rows if r.get("foreign_hold_pct") not in ("", None)]
-    daily_diffs = [pct_vals[i] - pct_vals[i - 1] for i in range(1, len(pct_vals))]
-    if change is None or len(daily_diffs) < 2:
-        detail["전일대비"] = "미확인(스냅샷 2건 미만) — 10점 중 5점(중립) 부여"
-        score += 5.0
-    else:
-        z = zscore(daily_diffs[-1], daily_diffs[:-1])
-        pts = logistic_scale(z, max_score=10.0)
-        score += pts
-        detail["전일대비"] = f"{change:+.2f}%p, {anomaly_label(z)} → {pts}/10.0점"
-
-    pts_trend = trend["trend"]
-    if len(pts_trend) < 2:
-        detail["5일평균추세"] = "미확인(스냅샷 부족) — 5점 중 2.5점(중립) 부여"
-        score += 2.5
-    else:
-        avg_change = (pts_trend[-1][1] - pts_trend[0][1]) / (len(pts_trend) - 1)
-        if avg_change > 0:
-            detail["5일평균추세"] = f"일평균 {avg_change:+.3f}%p/일(상승) → 5/5점"
-            score += 5.0
-        else:
-            detail["5일평균추세"] = f"일평균 {avg_change:+.3f}%p/일(하락/보합) → 0/5점"
-
-    return {"score": round(score, 1), "max": 15.0, "detail": detail}
+# HBM Cycle Score(hbm-cycle-score.md "1.") 외국인수급(15점)·보유율(15점)
+# 2축 자동 채점은 2026-08-27부로 hbm_cycle_score.py로 옮겼다(전문/이력은
+# 그 파일 docstring 참고) — engine/report/payload.py도 같은 모듈을 import해
+# 두 리포트가 서로 다른 채점 로직을 쓰는 드리프트를 막는다.
 
 
 def read_latest_portfolio_summary():
@@ -182,97 +69,9 @@ def read_latest_portfolio_summary():
     }
 
 
-def read_hyperscaler_capex():
-    """sources/hyperscaler-capex.csv(scripts/sec_edgar_capex.py, SEC EDGAR XBRL)에서
-    회사별 최신 분기 CapEx + 직전 분기 대비 QoQ%를 계산. 2026-08-06 신설 —
-    HBM Cycle Score "고객재고" 축(10점, 지금까지 전적으로 어닝콜 논조 해석)에
-    실측 CapEx 숫자를 보조 근거로 붙인다(축 자체를 자동채점하진 않음 — 논조
-    판단은 여전히 사람/Claude 몫, 여기선 "숫자가 실제로 얼마였나"만 제공).
-
-    ⚠ 2026-08-06 데이터 정합성 버그 발견·수정: SEC companyconcept API가 같은
-    분기(end_date)를 서로 다른 fiscal_year/fiscal_period로 중복 보고하는
-    경우가 있어(나중 필링의 "전년동기 비교치"로 재수록될 때) 예전 코드가
-    이를 별개 분기처럼 저장했었다 — end_date 기준으로 재정리하도록 고쳤다
-    (scripts/sec_edgar_capex.py 참고). 값 자체가 충돌하는 경우(MSFT 사례
-    확인됨)는 CSV `note` 컬럼에 남겨두고 여기서도 그대로 노출한다 — 조용히
-    하나를 버리지 않는다.
-    스테일 판정: 최신 end_date가 오늘로부터 HYPERSCALER_CAPEX_STALE_DAYS일
-    이상 지났으면 "확인됐지만 오래된 값"으로 명시 표기(최신인 것처럼 꾸미지
-    않는다) — 이 세션은 SEC 라이브 접속이 막혀 있어 재조회로 최신성을 직접
-    검증하지 못했다, GitHub Actions 재실행 필요."""
-    if not HYPERSCALER_CAPEX_CSV_PATH.exists():
-        return None
-    with HYPERSCALER_CAPEX_CSV_PATH.open(newline="", encoding="utf-8") as f:
-        rows = list(csv.DictReader(f))
-    if not rows:
-        return None
-
-    by_ticker = {}
-    for r in rows:
-        by_ticker.setdefault(r["ticker"], []).append(r)
-
-    today = datetime.now(KST).date()
-    out = {}
-    for ticker, company_rows in by_ticker.items():
-        company_rows.sort(key=lambda r: r["end_date"])
-        latest = company_rows[-1]
-        end_date = datetime.strptime(latest["end_date"], "%Y-%m-%d").date()
-        days_stale = (today - end_date).days
-        qoq_pct = None
-        if len(company_rows) >= 2:
-            prev_val = float(company_rows[-2]["value_usd"])
-            if prev_val:
-                qoq_pct = (float(latest["value_usd"]) - prev_val) / prev_val * 100
-        out[ticker] = {
-            "company": latest["company"], "end_date": latest["end_date"],
-            "value_usd": float(latest["value_usd"]), "qoq_pct": qoq_pct,
-            "days_stale": days_stale, "is_stale": days_stale >= HYPERSCALER_CAPEX_STALE_DAYS,
-            "note": latest.get("note", ""),
-        }
-    return out
-
-
-def read_ai_periphery():
-    """sources/ai-periphery-fundamentals.csv(scripts/sec_edgar_periphery.py 수집)에서
-    변두리 기업별 최신 분기 매출·백로그와 직전분기 대비 증감을 계산.
-    2026-08-07 신설 — wiki/concepts/ai-value-chain-periphery-monitor.md 운영지침 ⓐ.
-
-    **이 섹션의 존재 이유**: HBM Cycle Score 6축은 전부 주도주(SK하이닉스)
-    자신의 지표라 "주도주가 이미 흔들린 뒤"에야 신호가 뜬다. 백로그(이미
-    계약된 미래 매출)는 주문이 끊길 때 **가장 먼저** 꺾이는 자리라 조기경보로
-    쓴다 — 그래서 아래 판정에서 backlog 감소를 revenue 감소보다 무겁게 본다.
-
-    데이터가 없으면 None(섹션 자체 생략) — 억지로 만들지 않는다."""
-    if not AI_PERIPHERY_CSV_PATH.exists():
-        return None
-    with AI_PERIPHERY_CSV_PATH.open(newline="", encoding="utf-8") as f:
-        rows = list(csv.DictReader(f))
-    if not rows:
-        return None
-
-    series = {}
-    for r in rows:
-        series.setdefault((r["ticker"], r["metric"]), []).append(r)
-
-    today = datetime.now(KST).date()
-    out = {}
-    for (tk, metric), rs in series.items():
-        rs.sort(key=lambda r: r["end_date"])
-        latest = rs[-1]
-        qoq = None
-        if len(rs) >= 2:
-            prev = float(rs[-2]["value_usd"])
-            if prev:
-                qoq = (float(latest["value_usd"]) - prev) / prev * 100
-        end_date = datetime.strptime(latest["end_date"], "%Y-%m-%d").date()
-        days_stale = (today - end_date).days
-        out.setdefault(tk, {"company": latest["company"], "layer": latest["layer"], "metrics": {}})
-        out[tk]["metrics"][metric] = {
-            "end_date": latest["end_date"], "value_usd": float(latest["value_usd"]),
-            "qoq_pct": qoq, "days_stale": days_stale,
-            "is_stale": days_stale >= AI_PERIPHERY_STALE_DAYS, "note": latest.get("note", ""),
-        }
-    return out
+# read_hyperscaler_capex()/read_ai_periphery()는 2026-08-27부로 capex_periphery.py로
+# 옮겼다(전문/이력은 그 파일 docstring 참고) — engine/report/payload.py도 같은
+# 모듈을 import해 두 리포트가 서로 다른 CapEx 실측 숫자를 보여주는 드리프트를 막는다.
 
 
 def build_report(ticker: str) -> str:

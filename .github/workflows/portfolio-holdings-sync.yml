@@ -8,6 +8,13 @@ on:
 permissions:
   contents: write
 
+# 2026-08-21 추가 — 재시도 창(최대 6시간)이 다음날 같은 시각 실행과 겹칠
+# 일은 없지만(1일 1회), sk-hynix-daily-report.yml과 KIS_APP_KEY 토큰을
+# 공유하므로 이 워크플로 자신과의 중복 실행만 직렬화.
+concurrency:
+  group: portfolio-holdings-sync
+  cancel-in-progress: true
+
 jobs:
   sync:
     runs-on: ubuntu-latest
@@ -38,6 +45,7 @@ jobs:
           restore-keys: |
             kis-token-cache-
 
+      # 2026-08-21 추가 — 실패하면 성공할 때까지(최대 6시간, 10분 간격) 재시도.
       - name: 계좌별 보유종목 동기화
         env:
           KIS_APP_KEY: ${{ secrets.KIS_APP_KEY }}
@@ -50,13 +58,26 @@ jobs:
           KIS_ACCOUNT_ISP: ${{ secrets.KIS_ACCOUNT_ISP }}
           KIS_ACCOUNT_DC: ${{ secrets.KIS_ACCOUNT_DC }}
           KIS_ACCOUNT_IRP: ${{ secrets.KIS_ACCOUNT_IRP }}
-        run: python3 scripts/portfolio_holdings.py sync
+        run: |
+          attempt=1; max_attempts=36
+          until python3 scripts/portfolio_holdings.py sync; do
+            if [ "$attempt" -ge "$max_attempts" ]; then
+              echo "::error::${max_attempts}회(6시간) 재시도했지만 보유종목 동기화 실패"
+              python3 scripts/log_automation_run.py portfolio-holdings-sync holdings_sync "$attempt" "$max_attempts" exhausted
+              exit 1
+            fi
+            echo "[재시도 $attempt/$max_attempts] 보유종목 동기화 실패 — 10분 후 재시도"
+            attempt=$((attempt + 1))
+            sleep 600
+          done
+          python3 scripts/log_automation_run.py portfolio-holdings-sync holdings_sync "$attempt" "$max_attempts" success
 
       - name: 변경사항 커밋 & 푸시
         run: |
           git config user.name "portfolio-holdings-sync-bot"
           git config user.email "actions@users.noreply.github.com"
           git add sources/portfolio-holdings.csv
+          [ -f sources/automation-run-log.csv ] && git add sources/automation-run-log.csv
           git diff --cached --quiet || git commit -m "포트폴리오 보유종목 자동 동기화: $(date -u +%Y-%m-%dT%H:%M:%SZ)"
           for i in 1 2 3 4 5; do
             git push && break
@@ -65,3 +86,40 @@ jobs:
             git rebase origin/main
             sleep $((i * 3))
           done
+
+      # 2026-08-27 추가 — 재시도 소진으로 잡이 실패하면 위 커밋 스텝 자체가
+      # 실행되지 않아 "exhausted" 로그 행이 영영 안 남는다 — 항상 실행되는
+      # 별도 스텝으로 로그 파일만 커밋(성공 경로에선 위에서 이미 커밋돼
+      # no-op).
+      - name: 자동화 상태로그 커밋 (항상 실행)
+        if: always()
+        run: |
+          git config user.name "portfolio-holdings-sync-bot"
+          git config user.email "actions@users.noreply.github.com"
+          if [ -f sources/automation-run-log.csv ]; then
+            git add sources/automation-run-log.csv
+            if git diff --cached --quiet; then
+              echo "automation-run-log.csv: 새로 커밋할 행 없음"
+            else
+              git commit -m "chore: automation run log $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+              for i in 1 2 3 4 5; do
+                git push && break
+                echo "push rejected, rebasing onto latest main (attempt $i)"
+                git fetch origin main
+                git rebase origin/main
+                sleep $((i * 3))
+              done
+            fi
+          fi
+
+      # 2026-08-21 추가 — 위 재시도(최대 6시간)까지 다 소진하고도 실패한
+      # 경우에만 도달. 트랙 A(개인 포트폴리오) 채널이라 이메일 발송 허용.
+      - name: 실패 시 알림 (조용한 실패 방지)
+        if: failure()
+        env:
+          GMAIL_ADDRESS: ${{ secrets.GMAIL_ADDRESS }}
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+          NOTIFY_EMAIL_TO: ${{ secrets.NOTIFY_EMAIL_TO }}
+        run: |
+          python3 -m scripts.send_report_email \
+            --failure-alert "portfolio-holdings-sync 워크플로가 실패했습니다 (6시간 재시도 소진) — 오늘의 보유종목 데이터는 갱신되지 않았습니다."

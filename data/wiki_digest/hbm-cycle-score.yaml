@@ -1,0 +1,9 @@
+concept_page: "wiki/concepts/hbm-cycle-score.md"
+monitoring_page: "wiki/monitoring/hbm-cycle-score-status.md"
+as_of: "2026-08-24"
+status_label: "🔴 붕괴조건 1/5 충족 (④ 외국인 20일 누적 순매도)"
+one_line_summary: >-
+  ①ASP·②엔비디아주문·③CoWoS는 이번 갱신에서 미확인(다음 체크 필요).
+  ④외국인 20일 누적 순매도 -4조3,112억원으로 3주 가까이 미해소, 여전히
+  충족. ⑤반도체수출 YoY +155.4%로 미충족(안전). 가격은 8/6 저점 대비
+  +14.8% 회복했으나 ①②③ 미확인 상태라 100점 재계산은 보류.

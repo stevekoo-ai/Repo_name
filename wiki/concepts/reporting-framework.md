@@ -1,7 +1,7 @@
 ---
 title: Reporting Framework — Wiki Data to Reports
 created: 2026-08-08
-updated: 2026-08-08
+updated: 2026-08-21
 tags: [reporting, framework, architecture, analytics]
 ---
 
@@ -198,6 +198,12 @@ This document explains how data from the 4-layer wiki structure is synthesized i
 ```
 ## [Entity] — Daily Status
 
+### 지난밤 미국장 & 오늘 한국 증시 영향 (필수, 매일 고정 섹션)
+[미국장 총평: 다우/나스닥/SOX 등락 + 핵심 동인]
+[미국발 호재]
+[미국발 악재]
+[오늘 한국 증시(코스피·SK하이닉스) 영향 전망 — 확정 예측이 아니라 "~가능성" 수준]
+
 ### Current State (Entity L1)
 [Entity current-state summary + key metrics]
 
@@ -212,10 +218,13 @@ This document explains how data from the 4-layer wiki structure is synthesized i
 [Rationale for today's signal]
 ```
 
+**2026-08-21 사용자 지시 — 고정 요구사항**: "이후로 아침보고서에는 미국장에 대한 총평과 미국발 호재/악재, 그리고 오늘 한국 증시에 미칠 영향이 정리되어 포함되어야 한다." 모든 아침 리포트(자동 트리거·수동 발행 불문)는 이 섹션을 최상단에 포함해야 한다. 근거: 2026-08-20 사례에서 한국 반도체가 +12.73% 급등한 다음날 미국장은 오히려 국채금리 재상승으로 하락(다우 -1.32%, SK하이닉스 ADR -4.5%)했음이 확인됨 — 한국 시황이 좋았다고 미국도 좋을 것이라 단정하면 안 되므로, 매번 실제로 조회해서 방향이 같은지 반대인지 그대로 서술할 것(창작·낙관적 추정 금지). 이 요구사항은 `trig_01Bda27Tv6i4CPJBuzmG7Ppd`("SK하이닉스 아침 체크포인트 점검", 07:00 KST 자동 트리거) 프롬프트에 3-1단계로 반영 완료.
+
 **Queries**:
 - Read: `entities/sk-hynix.md` (L1)
 - Read: `monitoring/hbm-cycle-score-status.md` (L4, latest status only)
 - Reference: `concepts/hbm-cycle-score.md` (L3)
+- WebSearch: 지난밤 미국 증시 마감(다우/나스닥/SOX/국채금리/SKHY ADR) — 위키에 저장된 데이터가 아니라 매번 실시간 조회
 
 ---
 

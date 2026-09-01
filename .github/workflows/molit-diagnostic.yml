@@ -27,7 +27,19 @@ jobs:
       - name: Install dependencies
         run: pip install requests
 
+      # 2026-08-21 추가 — 수동 실행·즉시 확인용 진단 도구라 가벼운 재시도만
+      # (3회, 20초 간격) — 6시간 재시도는 사람을 기다리게 하므로 부적절.
       - name: Hit each MOLIT endpoint directly
         env:
           DATA_GO_KR_KEY: ${{ secrets.DATA_GO_KR_KEY }}
-        run: python -m scripts.molit_diagnostic "${{ github.event.inputs.lawd_cd }}" "${{ github.event.inputs.deal_ymd }}"
+        run: |
+          attempt=1; max_attempts=3
+          until python -m scripts.molit_diagnostic "${{ github.event.inputs.lawd_cd }}" "${{ github.event.inputs.deal_ymd }}"; do
+            if [ "$attempt" -ge "$max_attempts" ]; then
+              echo "::error::${max_attempts}회 재시도했지만 실패"
+              exit 1
+            fi
+            echo "[재시도 $attempt/$max_attempts] 실패 — 20초 후 재시도"
+            attempt=$((attempt + 1))
+            sleep 20
+          done

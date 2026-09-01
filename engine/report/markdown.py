@@ -376,11 +376,23 @@ def _action_plan(payload: dict) -> str:
 
 
 def _calendar(payload: dict) -> str:
-    lines = ["## 14. 경제 캘린더", "", "| 날짜 | 이벤트 | 중요도 | 사용자 영향 |", "|---|---|---|---|"]
-    for ev in payload["calendar"]:
-        lines.append(f"| {ev['date']} | {ev['name']} | {ev['importance_label']} | {ev['priority_score']}점 |")
-    if not payload["calendar"]:
-        lines.append("| - | 확정된 일정 없음 (data/manual_inputs/calendar.yaml 갱신 필요) | - | - |")
+    # 2026-08-27 Phase 5 — 이전엔 이 14절이 data/manual_inputs/calendar.yaml
+    # (예시 데이터만 있고 전부 과거 날짜라 늘 "확정된 일정 없음"으로만 표시됨)을
+    # 읽고, 바로 위 3.5절(generate_event_section)은 별도의 하드코딩 이벤트
+    # 리스트를 읽어서 — 같은 리포트 안에서 "일정 없음"과 "구체적 이벤트 3건"이
+    # 동시에 나오는 내부 모순이 있었다. get_upcoming_events()로 소스를 통일 —
+    # 그쪽도 아직 Phase 3a 검증용 예시 데이터라는 게 3.5절 상단 경고로 이미
+    # 드러나므로, 이 절도 같은 사실을 반복하지 않고 3.5절을 참고하라고만 안내.
+    from engine.report.economic_events import get_upcoming_events
+
+    events = get_upcoming_events()
+    lines = ["## 14. 경제 캘린더", "", "| 날짜 | 이벤트 | 중요도 |", "|---|---|---|"]
+    for ev in events:
+        lines.append(f"| {ev.date} | {ev.name} | {ev.importance} |")
+    if not events:
+        lines.append("| - | 확정된 일정 없음 | - |")
+    lines.append("")
+    lines.append("- 이 표의 데이터 최신성·상세(컨센서스/D-Day/신호 영향)는 3.5절(경제 일정 & 의사결정 트리거) 참고 — 같은 소스.")
     return "\n".join(lines)
 
 
@@ -920,10 +932,79 @@ def _sk_hynix_decision_section(payload: dict) -> str:
             lines.append(f"  - ⚠️ {c}")
         lines.append("")
 
+    hbm = payload.get("hbm_cycle_score")
+    if hbm:
+        flow, holding = hbm["foreign_flow"], hbm["foreign_holding"]
+        auto_total = flow["score"] + holding["score"]
+        lines += [
+            "## HBM Cycle Score — 외국인수급·보유율 자동채점 (참고자료, 매매 지시 아님)",
+            f"- 자동채점 소계: **{auto_total:.1f}/30점** (외국인수급 {flow['score']}/15 + "
+            f"외국인보유율 {holding['score']}/15) — 전체 100점 중 나머지 70점(ASP·엔비디아&CoWoS·"
+            "공급확대·고객재고)은 정성 판단이라 이 파이프라인에서 계산하지 않음, "
+            "[hbm-cycle-score.md](../wiki/concepts/hbm-cycle-score.md)에서 사람이 갱신.",
+        ]
+        for label, val in flow["detail"].items():
+            lines.append(f"  - 외국인수급·{label}: {val}")
+        for label, val in holding["detail"].items():
+            lines.append(f"  - 외국인보유율·{label}: {val}")
+        lines.append(
+            "- ⚠️ 위 소계는 SK Hynix 판단(HOLD/BUY/SELL) 지시가 아니라 근거 자료다 — "
+            "매매 신호는 이 리포트 최상단의 '최종 의사결정'만 유효(R4)."
+        )
+        lines.append("")
+
     lines += [
         "## 거시-반도체 연결 분석",
         f"{decision.macro_linkage}",
-        "",
+    ]
+    capex = payload.get("hyperscaler_capex")
+    if capex:
+        capex_bits = []
+        for tk in ("GOOGL", "MSFT", "AMZN", "META"):
+            c = capex.get(tk)
+            if not c or c["qoq_pct"] is None:
+                continue
+            stale_note = " ⚠스테일" if c["is_stale"] else ""
+            conflict_note = " ⚠데이터충돌" if c.get("note") else ""
+            capex_bits.append(f"{tk} {c['qoq_pct']:+.1f}%({c['end_date']}){stale_note}{conflict_note}")
+        if capex_bits:
+            lines.append(
+                f"- [실측] 하이퍼스케일러 CapEx QoQ(SEC EDGAR): " + ", ".join(capex_bits) +
+                " — HBM Cycle Score 고객재고 축 보조 근거, 어닝콜 논조 판단은 별도(사람/Claude 몫)"
+            )
+    lines.append("")
+
+    live = payload.get("sk_hynix_live")
+    if live:
+        lines += ["## 오늘의 실측 데이터 (KIS API, sk-hynix-daily-report.yml 3x/일)", ""]
+        snap = live.get("price_snapshot")
+        if snap:
+            lines.append(
+                f"- {snap['date']} 시세: **{int(float(snap['price'])):,}원** "
+                f"({float(snap['change']):+,.0f}, {float(snap['change_pct']):+.2f}%), "
+                f"외국인보유율 {float(snap['foreign_hold_pct']):.2f}%"
+            )
+        fs = live.get("flow_summary")
+        if fs and fs.get(20) and fs[20].get("foreign") is not None:
+            w20 = fs[20]
+            collapse = " (HBM Cycle Score 붕괴조건④ 충족)" if w20["foreign"] < 0 else ""
+            lines.append(f"- {live['flow_latest_date']} 기준 외국인 20일 누적 순매수: {w20['foreign']:+,}원{collapse}")
+        cb = live.get("credit_balance")
+        if cb and cb.get("latest"):
+            streak_note = f" ({cb['direction']} {cb['streak_days']}거래일 연속)" if cb.get("direction") else ""
+            lines.append(f"- 신용융자잔고: {int(cb['latest']['loan_balance_qty']):,}주{streak_note}")
+        ss = live.get("short_sale")
+        if ss:
+            lines.append(f"- {ss['date']} 공매도 거래량 비중: {float(ss['short_vol_pct']):.2f}%")
+        adr = live.get("adr")
+        if adr:
+            if adr.get("crosscheck") == "MISMATCH":
+                lines.append(f"- ADR(SKHY) {adr.get('date', '?')}: ${float(adr['price']):,.2f} — ⚠️ 등락률 크로스체크 불일치, 미확정")
+            else:
+                lines.append(f"- ADR(SKHY) {adr.get('date', '?')}: ${float(adr['price']):,.2f}")
+        lines.append("")
+
+    lines += [
         "## 위험 신호",
         "",
     ]
@@ -1400,6 +1481,108 @@ def _weekly_analysis_section(payload: dict) -> str:
     return "\n".join(lines)
 
 
+def _data_center_construction_section(payload: dict) -> str:
+    """Section: 미국 데이터센터 건설 반대 vs 착공 실적 (1 min read).
+
+    HBM Cycle Score "고객재고" 축 보조 참고자료. 반대(정치·규제 리스크)와
+    착공 실적(경제적 수요)이 같은 시기에 정반대로 움직이는 긴장 관계를
+    원자료 그대로 보여준다 — 점수화하지 않는다(왜 그런지는
+    data/manual_inputs/data_center_construction.yaml 헤더 참고).
+    """
+    dc = payload.get("data_center_construction")
+    if not dc:
+        return ""
+
+    starts = dc.get("construction_starts_usd_b", [])
+    opp = dc.get("opposition_severity", {})
+
+    lines = [
+        "# 2.6 미국 데이터센터 건설 반대 vs 착공 실적 — 참고자료",
+        "",
+        f"**갱신일**: {dc.get('updated_at')} (수동 입력, 신뢰도 {dc.get('reliability_grade')}/5 — "
+        "ConstructConnect·Data Center Watch 모두 공개 API 없음)",
+        "",
+        "## 착공 실적 (ConstructConnect, 월간 $)",
+        "",
+    ]
+    for row in starts:
+        date_label = row.get("date") or "(날짜 미확인)"
+        note = f" — {row['note']}" if row.get("note") else ""
+        lines.append(f"- {date_label}: **${row.get('value')}B**{note}")
+
+    lines.extend([
+        f"- 2026 상반기 누적: **${dc.get('h1_2026_cumulative_usd_b')}B** "
+        f"(2025년 전체 ${dc.get('full_year_2025_usd_b')}B 이미 초과)",
+        "",
+        "## 건설 반대 심각도",
+        "",
+        f"- 2026년 1분기 차단/지연 규모: **${opp.get('blocked_q1_2026_usd_b')}B** "
+        f"(2025년 전체 누적 ${opp.get('blocked_or_delayed_usd_b_2025_baseline')}B와 맞먹음, [OPINION] 소스=Data Center Watch)",
+        f"- 여론: 반대 {opp.get('public_disapproval_pct')}% / 찬성 {opp.get('public_approval_pct')}%",
+        f"- 텍사스: {opp.get('texas_action')}",
+        f"- 메릴랜드: {opp.get('maryland_moratorium_counties')}",
+        "",
+        "**해석**: 착공 실적은 사상 최고 수준인데 반대 여론·규제 리스크도 동시에 급증 중 — "
+        "두 신호가 상충하는 이유(주별 편차 vs. 이미 승인된 프로젝트의 관성적 진행)는 아직 미해소. "
+        "상세: [wiki/concepts/data-center-construction-vs-opposition.md]"
+        "(../wiki/concepts/data-center-construction-vs-opposition.md)",
+        "",
+    ])
+
+    return "\n".join(lines)
+
+
+def _wiki_digest_section(payload: dict) -> str:
+    """Section: 위키 추적 신호 요약 (1 min read, Phase 4 2026-08-27).
+
+    HBM Cycle Score 정성축·9체크포인트·찐반등 4대 신호·트럼프 트래커 등은
+    WebSearch·애널리스트 리포트 해석이 필요한 판단형 지식이라 이
+    LLM-미사용 cron 파이프라인이 재현할 수 없다 — 위키(data/wiki_digest/*.yaml
+    이 미러링하는 wiki/monitoring/*.md)가 유일한 원천이고, 이 섹션은 그
+    압축 요약만 그대로 인용한다(다시 풀어쓰지 않음). 각 줄이 위키 페이지로
+    링크돼 리포트와 위키가 서로 다른 이야기를 할 수 없게 한다.
+    """
+    digests = payload.get("wiki_digests") or []
+    if not digests:
+        return ""
+
+    lines = [
+        "# 2.7 위키 추적 신호 요약 — 판단형 지식 (참고자료, 매매 지시 아님)",
+        "",
+        "이 저장소가 계속 추적·갱신해온 판단형 신호의 최신 상태 — 원문은 각 위키 "
+        "페이지가 유일한 원천이며 여기선 그 요약만 인용한다.",
+        "",
+    ]
+    for d in digests:
+        stale_note = f" ⚠️ 위키가 {d['page_updated']}에 갱신됐는데 이 요약은 {d['as_of']} 기준 — 드리프트, 다음 갱신 필요" if d["is_stale"] else ""
+        lines.append(f"### {d['status_label']}{stale_note}")
+        lines.append(f"- {d['one_line_summary']}")
+        links = []
+        if d.get("concept_page"):
+            links.append(f"[Framework]({_wiki_relative_link(d['concept_page'])})")
+        if d.get("monitoring_page"):
+            links.append(f"[Daily Status]({_wiki_relative_link(d['monitoring_page'])})")
+        if links:
+            lines.append(f"- {' · '.join(links)} (as of {d['as_of']})")
+        lines.append("")
+
+    lines.append(
+        "⚠️ 위 요약은 SK Hynix/부동산 판단(HOLD/BUY/SELL, WAIT/ENTER) 지시가 아니다 — "
+        "매매 신호는 이 리포트 최상단의 '최종 의사결정'만 유효(R4)."
+    )
+    lines.append("")
+
+    return "\n".join(lines)
+
+
+def _wiki_relative_link(repo_relative_path: str) -> str:
+    """payload가 'wiki/concepts/foo.md' 같은 저장소 루트 기준 경로를 주므로,
+    report/YYYY-MM-DD.md가 서 있는 위치(저장소 루트 report/ 아래) 기준
+    상대경로('../wiki/concepts/foo.md')로 변환 — 이 파일의 다른 위키 링크들과
+    동일한 규칙."""
+    return f"../{repo_relative_path}"
+
+
 def render_markdown(payload: dict) -> str:
     """Render PEOS report using new 5-section user-centric structure.
 
@@ -1421,7 +1604,13 @@ def render_markdown(payload: dict) -> str:
         _macro_dashboard_section(payload),
         _sk_hynix_decision_section(payload),
         _weekly_analysis_section(payload),  # Layer 0 supporting evidence
+        _data_center_construction_section(payload),  # 고객재고 축 보조 참고자료 (2.6)
+        _wiki_digest_section(payload),  # 위키 판단형 지식 브리지 (2.7)
         _real_estate_decision_section(payload),
+        _real_estate_trend(payload),  # 3절 보조 근거 — 아파트 매매 실거래 트렌드
+        _rent_trend(payload),  # 3절 보조 근거 — 아파트 전월세 실거래 트렌드
+        _villa_trend(payload),  # 3절 보조 근거 — 빌라 매매 실거래 트렌드
+        _officetel_trend(payload),  # 3절 보조 근거 — 오피스텔 매매 실거래 트렌드
         generate_event_section(payload),  # 경제 달력 통합 (Section 3.5)
         _monthly_rolling_window_section(payload),  # 월별 추이 (Section 4)
         _quarterly_rolling_window_section(payload),  # 분기별 추이 (Section 5)

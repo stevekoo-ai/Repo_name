@@ -34,6 +34,10 @@ on:
 permissions:
   contents: write
 
+concurrency:
+  group: sec-edgar-capex
+  cancel-in-progress: true
+
 jobs:
   fetch-capex:
     runs-on: ubuntu-latest
@@ -59,16 +63,29 @@ jobs:
             python3 scripts/sec_edgar_capex.py fetch --raw
           fi
 
+      # 2026-08-21 추가 — 실패하면 성공할 때까지(최대 6시간, 10분 간격) 재시도.
       - name: Fetch (normal mode, upsert CSV)
         if: ${{ github.event.inputs.raw != 'true' }}
         env:
           SEC_EDGAR_CONTACT: "PEOS-research ${{ secrets.GMAIL_ADDRESS }}"
         run: |
           if [ -n "${{ github.event.inputs.company }}" ]; then
-            python3 scripts/sec_edgar_capex.py fetch --company "${{ github.event.inputs.company }}"
+            fetch_cmd="python3 scripts/sec_edgar_capex.py fetch --company ${{ github.event.inputs.company }}"
           else
-            python3 scripts/sec_edgar_capex.py fetch
+            fetch_cmd="python3 scripts/sec_edgar_capex.py fetch"
           fi
+          attempt=1; max_attempts=36
+          until $fetch_cmd; do
+            if [ "$attempt" -ge "$max_attempts" ]; then
+              echo "::error::${max_attempts}회(6시간) 재시도했지만 CapEx fetch 실패"
+              python3 scripts/log_automation_run.py sec-edgar-capex capex_fetch "$attempt" "$max_attempts" exhausted
+              exit 1
+            fi
+            echo "[재시도 $attempt/$max_attempts] CapEx fetch 실패 — 10분 후 재시도"
+            attempt=$((attempt + 1))
+            sleep 600
+          done
+          python3 scripts/log_automation_run.py sec-edgar-capex capex_fetch "$attempt" "$max_attempts" success
           python3 scripts/sec_edgar_capex.py show
 
       # --- AI 밸류체인 변두리 (2026-08-07 신설) ---
@@ -99,9 +116,48 @@ jobs:
           git config user.email "actions@users.noreply.github.com"
           git add sources/hyperscaler-capex.csv
           [ -f sources/ai-periphery-fundamentals.csv ] && git add sources/ai-periphery-fundamentals.csv
+          [ -f sources/automation-run-log.csv ] && git add sources/automation-run-log.csv
           if git diff --cached --quiet; then
             echo "No changes to commit"
           else
             git commit -m "chore: SEC EDGAR capex + AI periphery update $(date -u +%Y-%m-%d)"
             git push
           fi
+
+      # 2026-08-27 추가 — 재시도 소진으로 잡이 실패하면 위 커밋 스텝 자체가
+      # 실행되지 않아 "exhausted" 로그 행이 영영 안 남는다 — 항상 실행되는
+      # 별도 스텝으로 로그 파일만 커밋(성공 경로에선 위에서 이미 커밋돼
+      # no-op).
+      - name: 자동화 상태로그 커밋 (항상 실행)
+        if: always()
+        run: |
+          git config user.name "peos-bot"
+          git config user.email "actions@users.noreply.github.com"
+          if [ -f sources/automation-run-log.csv ]; then
+            git add sources/automation-run-log.csv
+            if git diff --cached --quiet; then
+              echo "automation-run-log.csv: 새로 커밋할 행 없음"
+            else
+              git commit -m "chore: automation run log $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+              for i in 1 2 3 4 5; do
+                git push && break
+                echo "push rejected, rebasing onto latest main (attempt $i)"
+                git fetch origin main
+                git rebase origin/main
+                sleep $((i * 3))
+              done
+            fi
+          fi
+
+      # 2026-08-21 추가 — 위 재시도(최대 6시간)까지 다 소진하고도 CapEx
+      # fetch가 실패한 경우에만 도달(AI periphery는 continue-on-error라
+      # 이 알림을 트리거하지 않음, 의도된 설계). 트랙 A 채널.
+      - name: 실패 시 알림 (조용한 실패 방지)
+        if: failure()
+        env:
+          GMAIL_ADDRESS: ${{ secrets.GMAIL_ADDRESS }}
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+          NOTIFY_EMAIL_TO: ${{ secrets.NOTIFY_EMAIL_TO }}
+        run: |
+          python3 -m scripts.send_report_email \
+            --failure-alert "sec-edgar-capex 워크플로가 실패했습니다 (6시간 재시도 소진) — 이번 주 하이퍼스케일러 CapEx 데이터는 갱신되지 않았습니다."

@@ -45,6 +45,45 @@ def test_unpriced_holdings_fall_back_to_cost_never_to_a_fake_market_value():
     assert 0 < m.priced_coverage_pct < 100
 
 
+def test_exposure_model_prefers_live_kis_snapshot_over_the_hardcoded_price():
+    """2026-08-27: KNOWN_PRICES was stuck at a 2026-08-07 snapshot even though
+    sk-hynix-daily-report.yml has written a fresher price to
+    sources/sk-hynix-price-snapshot.csv every day since. The live CSV must win
+    once it exists for a ticker, and its as_of date must be reported honestly
+    (not silently overwritten with the stale hardcoded date)."""
+    from engine.exposure import model as m
+
+    assert m.KNOWN_PRICES["000660.KS"]["as_of"] == "2026-08-07", (
+        "this test's premise is that KNOWN_PRICES is the older/fallback source — "
+        "if this fails, the file itself may have been refreshed, which is fine, "
+        "just update this assertion's expected date"
+    )
+    live = m._load_live_price("000660.KS")
+    assert live is not None, "fixture expects sources/sk-hynix-price-snapshot.csv to have a 000660 row"
+    assert live["as_of"] > "2026-08-07", "the live snapshot should be newer than the hardcoded fallback"
+
+    model = m.build_exposure_model()
+    sk = next(h for h in model.holdings if h.ticker == "000660.KS")
+    assert sk.market_value == sk.quantity * live["price"]
+    assert sk.price_as_of == live["as_of"]
+
+
+def test_load_live_price_falls_back_gracefully_when_csv_is_missing():
+    """A ticker with no collector-backed CSV (or a CSV that vanished) must return
+    None, not raise — build_exposure_model() then falls through to KNOWN_PRICES
+    or cost basis, never crashes Section 0."""
+    from engine.exposure import model as m
+    import pathlib
+
+    saved = m.LIVE_PRICE_CSV
+    m.LIVE_PRICE_CSV = {"000660.KS": (pathlib.Path("/nonexistent/does-not-exist.csv"), "000660")}
+    try:
+        assert m._load_live_price("000660.KS") is None
+        assert m._load_live_price("999999.KS") is None  # not in the map at all
+    finally:
+        m.LIVE_PRICE_CSV = saved
+
+
 def test_concentration_is_sector_wide_not_single_ticker():
     """The risk is not 'SK하이닉스 한 종목' — 삼성전자/제주반도체/반도체 ETF ride the
     same memory cycle, so semi exposure must exceed the employer position alone."""
@@ -871,6 +910,745 @@ def test_render_annual_markdown_handles_missing_metric_without_crashing():
     md = render_annual_markdown(df, pairs)
     assert "—" in md
     assert "2025" in md
+
+
+def test_backward_date_windows_walks_from_now_to_a_target_start():
+    """kis_fetch_monthly_price_history is confirmed (2026-08-17,
+    kis-monthly-depth-probe.yml) to truncate to the most recent ~50 months
+    regardless of how wide a date range is requested (months=90 → still only
+    50 rows back to 2022-07). _backward_date_windows is what lets
+    kis_fetch_monthly_price_history_deep walk further back by making several
+    narrower, non-overlapping calls with the end date pulled progressively
+    into the past."""
+    from datetime import date, timedelta
+    from scripts.investor_flow import _backward_date_windows
+
+    windows = _backward_date_windows(date(2026, 8, 17), date(2019, 1, 1), months_per_window=45)
+    assert windows[0][1] == date(2026, 8, 17)   # newest window ends "now"
+    assert windows[-1][0] == date(2019, 1, 1)   # oldest window starts exactly at target
+    for start, end in windows:
+        assert start <= end
+        assert start >= date(2019, 1, 1)
+    # non-overlapping: each next (older) window ends the day before the
+    # previous window started
+    for i in range(len(windows) - 1):
+        prev_start = windows[i][0]
+        next_end = windows[i + 1][1]
+        assert next_end == prev_start - timedelta(days=1)
+
+
+def test_backward_date_windows_single_window_when_range_is_short():
+    """A range that already fits inside one call's ~50-month reach must not
+    be split — that would just waste an extra KIS call."""
+    from datetime import date
+    from scripts.investor_flow import _backward_date_windows
+
+    windows = _backward_date_windows(date(2026, 8, 17), date(2026, 1, 1), months_per_window=45)
+    assert windows == [(date(2026, 1, 1), date(2026, 8, 17))]
+
+
+def test_drop_current_incomplete_month_removes_the_in_progress_month():
+    """The customs/KIS collectors write a row for whatever calendar month a
+    run happens to land in, even though that month isn't over — comparing
+    that partial figure to a prior COMPLETE month produces a swing that
+    looks like a real move (found 2026-08-17: 총수출 %YoY showed -32.8% at
+    the last point, which was actually just a half-counted August, not a
+    real collapse). This must be dropped before any YoY/QoQ math runs."""
+    import pandas as pd
+    from scripts.correlation_analysis import _drop_current_incomplete_month
+
+    now = pd.Timestamp.now(tz="UTC").tz_localize(None)
+    current_month = pd.Timestamp(year=now.year, month=now.month, day=1)
+    prior_month = current_month - pd.DateOffset(months=1)
+    s = pd.Series({prior_month: 100.0, current_month: 40.0})
+    out = _drop_current_incomplete_month(s)
+    assert list(out.index) == [prior_month]
+    assert out.iloc[0] == 100.0
+
+
+def test_quarterly_sum_drops_a_quarter_with_fewer_than_3_months():
+    """A flow variable (export dollars) summed over a quarter that only has
+    1-2 monthly observations understates that quarter next to a real 3-month
+    quarter — same partial-period trap as the monthly case, one level up."""
+    import pandas as pd
+    from scripts.correlation_analysis import _quarterly_sum
+
+    s = pd.Series({
+        pd.Timestamp("2024-01-01"): 10.0,
+        pd.Timestamp("2024-02-01"): 10.0,
+        pd.Timestamp("2024-03-01"): 10.0,
+        pd.Timestamp("2024-04-01"): 5.0,   # only 1 month into Q2 2024
+    })
+    out = _quarterly_sum(s)
+    assert list(out.index) == [pd.Timestamp("2024-03-31")]
+    assert out.iloc[0] == 30.0
+
+
+def test_quarterly_last_drops_the_in_progress_quarter():
+    """A stock variable's (price) "last observation in the quarter" is only
+    meaningful once the quarter has actually ended — otherwise it's just
+    whatever the most recent trading day happens to be, and would silently
+    change value every time the pipeline reruns later in the same quarter."""
+    import pandas as pd
+    from scripts.correlation_analysis import _quarterly_last
+
+    now = pd.Timestamp.now(tz="UTC").tz_localize(None)
+    current_q_end = now.to_period("Q").end_time.normalize()
+    prior_q_end = current_q_end - pd.offsets.QuarterEnd(1)
+    s = pd.Series({
+        prior_q_end: 100.0,
+        current_q_end - pd.DateOffset(days=5): 999.0,  # a snapshot inside the still-open quarter
+    })
+    out = _quarterly_last(s)
+    assert list(out.index) == [prior_q_end]
+    assert out.iloc[0] == 100.0
+
+
+def test_qoq_computes_percent_change_from_the_prior_quarter():
+    """Pin the actual math, not just that it runs."""
+    import pandas as pd
+    from scripts.correlation_analysis import _qoq
+
+    s = pd.Series({pd.Timestamp("2024-03-31"): 100.0, pd.Timestamp("2024-06-30"): 110.0})
+    out = _qoq(s)
+    assert len(out) == 1
+    assert abs(out.iloc[0] - 10.0) < 1e-9
+
+
+def test_daily_yoy_finds_the_nearest_trading_day_within_tolerance():
+    """Exactly 365 days earlier is rarely a trading day (weekend/holiday) —
+    _daily_yoy must fall back to the closest available observation inside
+    the tolerance window, not require an exact calendar match."""
+    import pandas as pd
+    from scripts.correlation_analysis import _daily_yoy
+
+    # 2025-08-15 is a Friday; 2026-08-14 (Friday) is the "today" observation.
+    # The exact year-earlier date (2025-08-14, a Thursday) is missing —
+    # nearest available is 2025-08-15, 1 day off, well inside tolerance.
+    s = pd.Series({
+        pd.Timestamp("2025-08-15"): 100.0,
+        pd.Timestamp("2026-08-14"): 150.0,
+    })
+    out = _daily_yoy(s, tolerance_days=5)
+    assert len(out) == 1
+    assert abs(out.iloc[0] - 50.0) < 1e-9
+
+
+def test_daily_yoy_skips_a_day_with_no_prior_year_observation_nearby():
+    """If nothing falls inside the tolerance window (e.g. history doesn't
+    go back a full year yet, or there's a gap), that day is dropped rather
+    than paired with a far-off, misleading "closest" value."""
+    import pandas as pd
+    from scripts.correlation_analysis import _daily_yoy
+
+    s = pd.Series({
+        pd.Timestamp("2025-01-01"): 100.0,   # nothing ~1yr before this
+        pd.Timestamp("2026-08-14"): 150.0,   # nothing ~1yr before this either
+    })
+    out = _daily_yoy(s, tolerance_days=5)
+    assert out.empty
+
+
+def test_filter_from_does_not_crash_on_an_empty_series():
+    """Regression: an empty pd.Series(dtype=float) has a RangeIndex, not a
+    DatetimeIndex — comparing it to a Timestamp (series.index >= cutoff)
+    raises TypeError. build_daily_focus_dataset hit this the first time it
+    ran with no daily-price-history.csv yet (all three inputs can be empty)."""
+    import pandas as pd
+    from scripts.correlation_analysis import _filter_from
+
+    empty = pd.Series(dtype=float)
+    out = _filter_from(empty, pd.Timestamp("2024-01-01"))
+    assert out.empty
+
+    populated = pd.Series({pd.Timestamp("2023-01-01"): 1.0, pd.Timestamp("2025-01-01"): 2.0})
+    out2 = _filter_from(populated, pd.Timestamp("2024-01-01"))
+    assert list(out2.index) == [pd.Timestamp("2025-01-01")]
+
+
+def test_load_exports_preliminary_returns_the_current_months_estimate():
+    """2026-08-17 user request: draw the next (not-yet-final) point from
+    관세청's 10-day preliminary release. Only surface it when it actually
+    targets the in-progress month — a stale preliminary from a month that's
+    already closed would misleadingly overwrite a real point."""
+    import pandas as pd, tempfile, os, yaml
+    from pathlib import Path
+    import scripts.correlation_analysis as mod
+
+    now = pd.Timestamp.now(tz="UTC").tz_localize(None)
+    current_month = pd.Timestamp(year=now.year, month=now.month, day=1)
+
+    fd, path = tempfile.mkstemp(suffix=".yaml")
+    os.close(fd)
+    try:
+        payload = {
+            "latest": {
+                "target_month": current_month.strftime("%Y-%m-%d"),
+                "period_label": "1일~10일",
+                "period_start": current_month.strftime("%Y-%m-%d"),
+                "period_end": (current_month + pd.Timedelta(days=9)).strftime("%Y-%m-%d"),
+                "total_exports_yoy": 45.3,
+                "source": "관세청 보도자료",
+            }
+        }
+        Path(path).write_text(yaml.safe_dump(payload, allow_unicode=True), encoding="utf-8")
+        real_path = mod.EXPORTS_PRELIMINARY_YAML
+        mod.EXPORTS_PRELIMINARY_YAML = Path(path)
+        try:
+            result = mod.load_exports_preliminary()
+        finally:
+            mod.EXPORTS_PRELIMINARY_YAML = real_path
+        assert result is not None
+        assert result["date"] == current_month
+        assert abs(result["value"] - 45.3) < 1e-9
+        assert "label_en" in result and result["label_en"]  # ASCII chart label always derivable
+        assert result["semi_value"] is None  # field absent from this payload -> must not crash, not fabricate
+    finally:
+        os.remove(path)
+
+
+def test_load_exports_preliminary_also_surfaces_the_semiconductor_yoy():
+    """2026-08-17 user request: '최근 급등과 급락 장세의 수출과의 관계를
+    확인해보자' — the yaml already records semiconductor_exports_yoy
+    (참고용) but nothing read it until now. It must come through as
+    semi_value so the chart can draw a second preliminary point."""
+    import pandas as pd, tempfile, os, yaml
+    from pathlib import Path
+    import scripts.correlation_analysis as mod
+
+    now = pd.Timestamp.now(tz="UTC").tz_localize(None)
+    current_month = pd.Timestamp(year=now.year, month=now.month, day=1)
+
+    fd, path = tempfile.mkstemp(suffix=".yaml")
+    os.close(fd)
+    try:
+        payload = {
+            "latest": {
+                "target_month": current_month.strftime("%Y-%m-%d"),
+                "period_label": "1일~10일",
+                "period_start": current_month.strftime("%Y-%m-%d"),
+                "period_end": (current_month + pd.Timedelta(days=9)).strftime("%Y-%m-%d"),
+                "total_exports_yoy": 45.3,
+                "semiconductor_exports_yoy": 155.4,
+                "source": "관세청 보도자료",
+            }
+        }
+        Path(path).write_text(yaml.safe_dump(payload, allow_unicode=True), encoding="utf-8")
+        real_path = mod.EXPORTS_PRELIMINARY_YAML
+        mod.EXPORTS_PRELIMINARY_YAML = Path(path)
+        try:
+            result = mod.load_exports_preliminary()
+        finally:
+            mod.EXPORTS_PRELIMINARY_YAML = real_path
+        assert result is not None
+        assert abs(result["semi_value"] - 155.4) < 1e-9
+    finally:
+        os.remove(path)
+
+
+def test_load_exports_preliminary_ignores_a_stale_target_month():
+    """A preliminary reading left over from a month that has already closed
+    (nobody updated the file after month-end) must not be drawn as if it
+    were still the in-progress estimate."""
+    import pandas as pd, tempfile, os, yaml
+    from pathlib import Path
+    import scripts.correlation_analysis as mod
+
+    fd, path = tempfile.mkstemp(suffix=".yaml")
+    os.close(fd)
+    try:
+        payload = {"latest": {
+            "target_month": "2019-01-01",  # safely in the past regardless of when this test runs
+            "period_label": "1일~10일", "period_start": "2019-01-01", "period_end": "2019-01-10",
+            "total_exports_yoy": 1.0, "source": "test",
+        }}
+        Path(path).write_text(yaml.safe_dump(payload, allow_unicode=True), encoding="utf-8")
+        real_path = mod.EXPORTS_PRELIMINARY_YAML
+        mod.EXPORTS_PRELIMINARY_YAML = Path(path)
+        try:
+            result = mod.load_exports_preliminary()
+        finally:
+            mod.EXPORTS_PRELIMINARY_YAML = real_path
+        assert result is None
+    finally:
+        os.remove(path)
+
+
+def test_build_levels_dataset_assembles_the_three_raw_level_columns():
+    """2026-08-17 user request: '절대 수치(레벨)로 트렌드를 코스피와 비교'.
+    build_levels_dataset() must reuse the already-tested level loaders
+    (_load_customs_export_level / _load_price_level) unmodified and just
+    assemble them into one frame — no %YoY transform, no new fetching.
+
+    semi_exports_usd was added later the same day ('YoY를 거꾸로 역산해서
+    RAW level로 그려줄 수 있어?' — turned out to be real published $ amounts
+    already sitting in exports.yaml comments, not an actual YoY reversal)."""
+    import scripts.correlation_analysis as mod
+
+    df = mod.build_levels_dataset()
+    assert list(df.columns) == [
+        "total_exports_usd", "semi_exports_usd", "hynix_price_krw", "kospi_index",
+    ]
+    # real collected data should give at least some non-null history in each column
+    assert df["total_exports_usd"].notna().any()
+    assert df["kospi_index"].notna().any()
+
+
+def test_load_semi_exports_level_converts_100m_usd_units_to_raw_usd():
+    """2026-08-17 user request: '반도체수출 raw level'. exports.yaml stores
+    semiconductor_exports_usd_100m in 억 달러 (hundred-million-dollar) units
+    — the loader must scale by 1e8 so it's directly comparable (same raw-USD
+    units) to total_exports_usd from _load_customs_export_level()."""
+    import pandas as pd
+    import scripts.correlation_analysis as mod
+
+    series = mod._load_semi_exports_level()
+    assert not series.empty
+    # 2026-04 real published figure is 319.0억 달러 = $31.9B
+    val = series.loc[pd.Timestamp("2026-04-01")]
+    assert abs(val - 319.0 * 1e8) < 1e-6
+
+
+def test_estimate_preliminary_export_level_scales_prior_year_by_the_prelim_yoy():
+    """2026-08-17 user request: '10일 잠정치에 대한 예상치도 [레벨 차트에]
+    같이 추가해줘'. load_exports_preliminary() only gives %YoY — converting
+    it to a level for the LEVELS chart means: prior-year-same-month level ×
+    (1 + prelim %YoY / 100). Must never touch the real level series."""
+    import pandas as pd
+    import scripts.correlation_analysis as mod
+
+    export_level = pd.Series(
+        {pd.Timestamp("2025-08-01"): 100.0, pd.Timestamp("2026-07-01"): 200.0},
+        dtype=float,
+    )
+    preliminary = {
+        "date": pd.Timestamp("2026-08-01"),
+        "value": 45.3,  # %YoY
+        "label_en": "Aug 1-10 prelim.",
+    }
+    result = mod._estimate_preliminary_export_level(export_level, preliminary)
+    assert result is not None
+    assert result["date"] == pd.Timestamp("2026-08-01")
+    assert abs(result["value"] - 145.3) < 1e-9  # 100 * (1 + 45.3/100)
+    assert result["label_en"] == "Aug 1-10 prelim."
+
+    # no prior-year same month in the series -> can't scale anything, must not guess
+    assert mod._estimate_preliminary_export_level(
+        pd.Series({pd.Timestamp("2026-07-01"): 200.0}, dtype=float), preliminary
+    ) is None
+
+    # no preliminary reading at all -> nothing to estimate
+    assert mod._estimate_preliminary_export_level(export_level, None) is None
+
+
+def test_series_peak_vs_latest_flags_a_pullback_from_the_recent_peak():
+    """2026-08-17 user request: '이 총수출이 어쨌든 피크를 찍고 떨어진
+    것이 다시 고지를 향해갈 수 있을지 보고서에 포인트로 기술해줘'.
+    _series_peak_vs_latest must find the peak within the recent window and
+    correctly report a pullback (negative gap, negative MoM) — this is the
+    exact June-peak/July-pullback shape seen in the real semiconductor
+    export data."""
+    import pandas as pd
+    import scripts.correlation_analysis as mod
+
+    series = pd.Series({
+        pd.Timestamp("2026-04-01"): 31.9e9,
+        pd.Timestamp("2026-05-01"): 37.2e9,
+        pd.Timestamp("2026-06-01"): 44.8e9,  # peak
+        pd.Timestamp("2026-07-01"): 41.0e9,  # pullback
+    })
+    stat = mod._series_peak_vs_latest(series)
+    assert stat is not None
+    assert stat["peak_date"] == pd.Timestamp("2026-06-01")
+    assert stat["latest_date"] == pd.Timestamp("2026-07-01")
+    assert stat["gap_from_peak_pct"] < 0  # still below the peak
+    assert stat["mom_pct"] < 0            # fell versus the prior month
+
+    # fewer than 2 real points -> nothing to compare, must not guess
+    assert mod._series_peak_vs_latest(pd.Series({pd.Timestamp("2026-07-01"): 41.0e9})) is None
+
+
+def test_yoy_deceleration_trend_distinguishes_widening_from_narrowing():
+    """The 2nd-derivative check must tell 'deceleration is accelerating'
+    apart from 'deceleration is easing' — both look like a falling YoY
+    line at a glance, but they imply opposite forward paths."""
+    import pandas as pd
+    import scripts.correlation_analysis as mod
+
+    # 199.5 -> 178.8 (delta -20.7) -> 155.4 (delta -23.4): gap widening
+    widening = pd.Series({pd.Timestamp("2026-06-01"): 199.5, pd.Timestamp("2026-07-01"): 178.8})
+    assert "커지고" in mod._yoy_deceleration_trend(widening, 155.4)
+
+    # 199.5 -> 178.8 (delta -20.7) -> 170.0 (delta -8.8): gap narrowing
+    narrowing = pd.Series({pd.Timestamp("2026-06-01"): 199.5, pd.Timestamp("2026-07-01"): 178.8})
+    assert "줄고" in mod._yoy_deceleration_trend(narrowing, 170.0)
+
+    # fewer than 3 total points (2 real + 0 prelim) -> can't compute a 2nd derivative
+    assert mod._yoy_deceleration_trend(pd.Series({pd.Timestamp("2026-07-01"): 178.8}), None) is None
+
+
+def test_render_export_recovery_watch_note_links_to_the_wiki_concept():
+    """2026-08-17 user request: 'wiki에 남기고 ... 보고서에 포인트로
+    기술해줘'. The note must be computed from real data (not a fixed
+    string) and must point back to the wiki concept doc that carries the
+    full hypothesis set, so the report and the wiki stay one source of
+    truth instead of two independent narratives drifting apart."""
+    import scripts.correlation_analysis as mod
+
+    levels_df = mod.build_levels_dataset()
+    yoy_df = mod.build_dataset()
+    note = mod.render_export_recovery_watch_note(levels_df, yoy_df, mod.load_exports_preliminary())
+    assert "semiconductor-export-peak-recovery-watch.md" in note
+    assert "반도체수출" in note or "총수출" in note
+
+
+def test_hbm_cycle_score_module_is_shared_not_duplicated():
+    """2026-08-27: score_foreign_flow_axis/score_foreign_holding_axis used to be
+    defined twice inline inside scripts/daily_report.py with no other caller —
+    now both live once in scripts/hbm_cycle_score.py, importable package-style
+    (PYTHONPATH=., what engine/report/payload.py uses) with the expected shape."""
+    from scripts.hbm_cycle_score import score_foreign_flow_axis, score_foreign_holding_axis
+
+    flow = score_foreign_flow_axis("000660")
+    assert flow["max"] == 15.0
+    assert 0.0 <= flow["score"] <= 15.0
+    assert set(flow["detail"].keys()) == {"당일", "20일_누적", "모멘텀(5일vs20일)"}
+
+    holding = score_foreign_holding_axis("000660")
+    assert holding["max"] == 15.0
+    assert 0.0 <= holding["score"] <= 15.0
+
+
+def test_daily_report_delegates_to_the_shared_hbm_module_not_a_private_copy():
+    """daily_report.py is only ever run sibling-style (`cd scripts && python3
+    daily_report.py`, exactly how sk-hynix-daily-report.yml invokes it), so this
+    spawns it that way rather than importing scripts.daily_report from repo
+    root (which can't work — daily_report.py's own investor_flow import is
+    sibling-style too, a pre-existing property this test isn't re-litigating).
+    Confirms the two callers are the literal same function object, not two
+    definitions that could silently drift apart."""
+    import subprocess
+
+    result = subprocess.run(
+        ["python3", "-c",
+         "import daily_report, hbm_cycle_score as hbm; "
+         "print(daily_report.score_foreign_flow_axis is hbm.score_foreign_flow_axis); "
+         "print(daily_report.score_foreign_holding_axis is hbm.score_foreign_holding_axis)"],
+        cwd="scripts", capture_output=True, text=True, timeout=30,
+    )
+    assert result.returncode == 0, f"daily_report.py failed to import: {result.stderr}"
+    assert result.stdout.strip().splitlines() == ["True", "True"]
+
+
+def test_capex_periphery_module_is_shared_not_duplicated():
+    """2026-08-27: read_hyperscaler_capex/read_ai_periphery moved out of
+    scripts/daily_report.py the same way the HBM axes did — package-style
+    import must work (what engine/report/payload.py uses) and return the
+    expected per-ticker shape."""
+    from scripts.capex_periphery import read_hyperscaler_capex, read_ai_periphery
+
+    capex = read_hyperscaler_capex()
+    assert capex, "fixture expects sources/hyperscaler-capex.csv to have rows"
+    for ticker in ("GOOGL", "MSFT", "AMZN", "META"):
+        assert ticker in capex, f"expected {ticker} in hyperscaler capex data"
+        assert "value_usd" in capex[ticker] and "end_date" in capex[ticker]
+
+    periphery = read_ai_periphery()
+    assert periphery, "fixture expects sources/ai-periphery-fundamentals.csv to have rows"
+
+
+def test_daily_report_delegates_to_the_shared_capex_module_not_a_private_copy():
+    """Same guarantee as test_daily_report_delegates_to_the_shared_hbm_module —
+    spawned sibling-style (cwd=scripts), matching the real CI invocation."""
+    import subprocess
+
+    result = subprocess.run(
+        ["python3", "-c",
+         "import daily_report, capex_periphery as cp; "
+         "print(daily_report.read_hyperscaler_capex is cp.read_hyperscaler_capex); "
+         "print(daily_report.read_ai_periphery is cp.read_ai_periphery)"],
+        cwd="scripts", capture_output=True, text=True, timeout=30,
+    )
+    assert result.returncode == 0, f"daily_report.py failed to import: {result.stderr}"
+    assert result.stdout.strip().splitlines() == ["True", "True"]
+
+
+def test_sk_hynix_section_shows_live_data_and_capex_as_context_not_a_directive():
+    """2026-08-27 Phase 3: the '오늘의 실측 데이터'/CapEx lines must render from
+    real payload data, and must never contain BUY/SELL/HOLD language of their
+    own — R4 (포지션 지시는 단일 출처) says only the decision engine may
+    instruct a position; supplementary evidence sections must read as context."""
+    from dataclasses import dataclass
+    from engine.report.markdown import _sk_hynix_decision_section
+    from scripts.capex_periphery import read_hyperscaler_capex, read_ai_periphery
+    from scripts.investor_flow import read_latest_price_snapshot, read_ticker_rows, summarize_flows, \
+        credit_balance_streak, read_latest_short_sale, read_latest_adr
+    from scripts.hbm_cycle_score import score_foreign_flow_axis, score_foreign_holding_axis
+
+    flow_rows = read_ticker_rows("000660")
+    fake_payload = {
+        "personal": {"semiconductor_score": 83.8, "semiconductor_band": "강한 긍정"},
+        "rate_analysis": {"total_score": 65.0},
+        "hbm_cycle_score": {
+            "ticker": "000660",
+            "foreign_flow": score_foreign_flow_axis("000660"),
+            "foreign_holding": score_foreign_holding_axis("000660"),
+        },
+        "hyperscaler_capex": read_hyperscaler_capex(),
+        "ai_periphery": read_ai_periphery(),
+        "sk_hynix_live": {
+            "price_snapshot": read_latest_price_snapshot("000660"),
+            "flow_summary": summarize_flows(flow_rows) if flow_rows else None,
+            "flow_latest_date": flow_rows[-1]["date"] if flow_rows else None,
+            "credit_balance": credit_balance_streak("000660"),
+            "short_sale": read_latest_short_sale("000660"),
+            "adr": read_latest_adr("SKHY"),
+        },
+    }
+
+    @dataclass
+    class FakeDecision:
+        signal: str = "HOLD"
+        confidence: float = 50.0
+        rationale: str = "test"
+        macro_linkage: str = "test linkage"
+        risk_flags: list = None
+        triggers: list = None
+        next_check: str = "soon"
+        valuation_band: dict = None
+
+    import engine.exporters.sk_hynix_decision as skmod
+    orig = skmod.compute_sk_hynix_decision
+    skmod.compute_sk_hynix_decision = lambda p: FakeDecision(risk_flags=[], triggers=[])
+    try:
+        out = _sk_hynix_decision_section(fake_payload)
+    finally:
+        skmod.compute_sk_hynix_decision = orig
+
+    assert "오늘의 실측 데이터" in out
+    assert "하이퍼스케일러 CapEx QoQ" in out
+    assert "GOOGL" in out  # real ticker from the CSV, not a placeholder
+    # R4 guard: no directive language inside the evidence sections
+    evidence_start = out.find("## HBM Cycle Score")
+    evidence_end = out.find("## 위험 신호")
+    evidence_text = out[evidence_start:evidence_end]
+    for verb in ("매수하세요", "매도하세요", "지금 사", "지금 팔"):
+        assert verb not in evidence_text
+
+
+def test_wiki_digests_load_from_the_real_repo_and_none_are_stale():
+    """2026-08-27 Phase 4: data/wiki_digest/*.yaml must load cleanly against the
+    real wiki/monitoring/*.md files and, since both were written/updated in the
+    same session, none should show drift yet."""
+    from engine.report.wiki_digest import load_wiki_digests
+
+    digests = load_wiki_digests()
+    slugs = {d["slug"] for d in digests}
+    assert {"hbm-cycle-score", "sk-hynix-analyst-thesis-checkpoints",
+            "market-cycles-leverage-risk", "trump-midterm-tracker",
+            "data-center-construction-vs-opposition",
+            "semiconductor-export-peak-recovery"} <= slugs
+    for d in digests:
+        assert d["one_line_summary"], f"{d['slug']} digest has no summary"
+        assert not d["is_stale"], f"{d['slug']} digest is stale relative to its wiki page"
+
+
+def test_wiki_digest_drift_is_detected_not_silently_ignored():
+    """The whole point of this bridge is that a wiki update without a matching
+    digest update must be visible (data/wiki_digest/README.md's drift rule) —
+    this pins that detection with a synthetic monitoring page dated after the
+    digest's as_of. read_frontmatter() resolves monitoring_page as
+    REPO_ROOT / monitoring_page, so the fake page has to live under REPO_ROOT
+    for this round-trip to work — a tempdir outside the repo can't be used."""
+    import os
+    import shutil
+    import tempfile
+    import yaml as yaml_mod
+    from engine.report import wiki_digest as wd
+
+    tmp_name = f"_test_wiki_digest_drift_{next(tempfile._get_candidate_names())}"
+    monitoring_dir = wd.REPO_ROOT / tmp_name
+    monitoring_dir.mkdir()
+    monitoring = monitoring_dir / "fake-status.md"
+    monitoring.write_text("---\nupdated: 2026-09-01\n---\n\n# Latest Status\nfoo\n", encoding="utf-8")
+
+    digest_dir = monitoring_dir / "digests"
+    digest_dir.mkdir()
+    rel_monitoring_path = os.path.relpath(str(monitoring), str(wd.REPO_ROOT))
+    (digest_dir / "fake.yaml").write_text(
+        yaml_mod.safe_dump({
+            "monitoring_page": rel_monitoring_path,
+            "as_of": "2026-08-20",
+            "status_label": "test",
+            "one_line_summary": "test",
+        }),
+        encoding="utf-8",
+    )
+
+    saved_dir = wd.DIGEST_DIR
+    wd.DIGEST_DIR = digest_dir
+    try:
+        digests = wd.load_wiki_digests()
+    finally:
+        wd.DIGEST_DIR = saved_dir
+        shutil.rmtree(monitoring_dir)
+
+    assert len(digests) == 1
+    assert digests[0]["is_stale"] is True
+    assert digests[0]["page_updated"] == "2026-09-01"
+
+
+def test_wiki_digest_section_never_contains_directive_language():
+    """R4 guard for Phase 4 — the wiki digest section is context, never a second
+    position instruction alongside the decision engine."""
+    from engine.report.markdown import _wiki_digest_section
+    from engine.report.wiki_digest import load_wiki_digests
+
+    out = _wiki_digest_section({"wiki_digests": load_wiki_digests()})
+    assert "2.7 위키 추적 신호 요약" in out
+    for verb in ("매수하세요", "매도하세요", "지금 사", "지금 팔"):
+        assert verb not in out
+    assert "R4" in out  # explicit "not a directive" disclaimer present
+
+
+def test_calendar_section_and_economic_events_no_longer_contradict_each_other():
+    """2026-08-27 Phase 5: Section 14 used to read data/manual_inputs/calendar.yaml
+    (all-EXAMPLE, past-dated -> always '확정된 일정 없음') while Section 3.5 read a
+    separate hardcoded event list -- the same report simultaneously claimed 'no
+    events' and listed three specific ones. Both must now agree on the same
+    events."""
+    from engine.report.markdown import _calendar
+    from engine.report.economic_events import get_upcoming_events
+
+    out = _calendar({})
+    events = get_upcoming_events()
+    for e in events:
+        assert e.date in out and e.name in out
+    assert "확정된 일정 없음" not in out or not events
+
+
+def test_stale_hardcoded_events_are_flagged_loudly_not_shown_as_current():
+    """get_upcoming_events() is still Phase-3a placeholder data (its own docstring
+    says so) — if every event date has already passed, generate_event_section()
+    must say so loudly rather than silently presenting stale sample dates as
+    this week's real calendar."""
+    from engine.report.economic_events import generate_event_section, get_upcoming_events
+    from datetime import datetime
+
+    events = get_upcoming_events()
+    all_past = all((datetime.strptime(e.date, "%Y-%m-%d") - datetime.now()).days < 0 for e in events)
+    out = generate_event_section({})
+    if all_past:
+        assert "이미 지난 날짜" in out
+
+
+def test_reports_index_covers_every_report_file_and_links_are_well_formed():
+    """2026-08-31: 'every generated report must be reachable via a link here'
+    (user request) — build_index() must find every dated/monthly report/*.md
+    and sources/sk-hynix-auto-report-*.md that actually exists on disk, and
+    every .html file must get mirrored into docs/archive/ so its link
+    actually resolves (GitHub's blob view doesn't render .html, only Pages
+    serving docs/ does)."""
+    import glob
+    from scripts.build_reports_index import build_index, ARCHIVE_DIR, INDEX_PATH
+
+    build_index()
+    out = INDEX_PATH.read_text(encoding="utf-8")
+
+    real_daily_md = glob.glob("report/[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9].md")
+    assert real_daily_md, "fixture expects at least one dated report/*.md on disk"
+    for path in real_daily_md:
+        assert path.split("/")[-1].replace(".md", "") in out
+
+    real_html = glob.glob("report/*.html")
+    for path in real_html:
+        name = path.split("/")[-1]
+        mirrored = ARCHIVE_DIR / name
+        assert mirrored.exists(), f"{name} should have been mirrored into docs/archive/"
+        assert name in out
+
+    sk_hynix_md = glob.glob("sources/sk-hynix-auto-report-*.md")
+    if sk_hynix_md:
+        sample = sk_hynix_md[0].split("/")[-1]
+        assert sample in out
+
+
+def test_reports_index_mirroring_is_idempotent():
+    """Re-running the index builder with no new report files must not touch
+    files it already mirrored (CI commits only real diffs, not a full
+    re-copy every run)."""
+    from scripts.build_reports_index import build_index, ARCHIVE_DIR
+
+    build_index()
+    sample = next(ARCHIVE_DIR.glob("*.html"), None)
+    assert sample is not None, "fixture expects at least one mirrored .html file"
+    mtime_before = sample.stat().st_mtime_ns
+
+    build_index()
+    assert sample.stat().st_mtime_ns == mtime_before, "unchanged file must not be rewritten"
+
+
+def test_archive_date_uses_kst_not_the_runners_utc_clock():
+    """2026-09-01: report/2026-08-31.md never got created because run.py used
+    date.today() (the GitHub Actions runner's UTC clock) to name the daily
+    archive, but the cron targets 06:00 KST. A run that fires late — e.g.
+    23:08 UTC on 2026-08-30, a real delay observed on this workflow — is
+    already 08:08 KST on 2026-08-31 (KST = UTC+9 crosses midnight at 15:00
+    UTC), so it should archive as 2026-08-31, not the UTC calendar date
+    2026-08-30 the old code would have produced. This pins the fix
+    (engine/report/run.py's KST-based `today_kst`) against that exact
+    real-world instant."""
+    from engine.report.run import KST
+    from datetime import datetime, timezone
+
+    # The literal instant run #64 actually started (created_at from the
+    # GitHub Actions API) — this is real observed data, not a hypothetical.
+    delayed_utc_instant = datetime(2026, 8, 30, 23, 8, 23, tzinfo=timezone.utc)
+
+    old_buggy_result = delayed_utc_instant.date().isoformat()  # what date.today() equivalent gave
+    fixed_result = delayed_utc_instant.astimezone(KST).date().isoformat()
+
+    assert old_buggy_result == "2026-08-30", "sanity check on the fixture itself"
+    assert fixed_result == "2026-08-31", (
+        "a run landing at 23:08 UTC is already the next KST day — the archive "
+        "must be dated 2026-08-31, matching the 06:00 KST slot this cron targets"
+    )
+
+
+def test_automation_run_log_creates_header_then_appends():
+    """2026-08-27: CI 단계 자동 상태로그 신설 — 첫 호출은 헤더+1행, 두 번째
+    호출은 헤더 없이 1행만 추가해야 append-only 원칙을 지킨다."""
+    import csv, pathlib, tempfile
+    from scripts.log_automation_run import append_row
+
+    tmp = pathlib.Path(tempfile.mkdtemp()) / "automation-run-log.csv"
+    append_row("sk-hynix-daily-report", "investor_flow_fetch", "1", "36", "success", path=tmp)
+    append_row("macro-data-sync", "macro_sync", "5", "36", "exhausted", path=tmp)
+
+    rows = list(csv.DictReader(open(tmp, encoding="utf-8")))
+    assert len(rows) == 2, f"expected 2 data rows, got {len(rows)}"
+    assert rows[0]["workflow"] == "sk-hynix-daily-report"
+    assert rows[0]["result"] == "success"
+    assert rows[1]["workflow"] == "macro-data-sync"
+    assert rows[1]["attempts_used"] == "5"
+    assert rows[1]["result"] == "exhausted"
+
+
+def test_automation_run_log_rejects_unknown_result():
+    """success/exhausted 둘 중 하나가 아니면 조용히 넘어가지 않고 즉시 실패
+    — CI 스텝에서 오타가 나면 로그가 아니라 워크플로 자체가 눈에 띄게 죽어야
+    한다(silent corruption 방지)."""
+    import pathlib, tempfile
+    from scripts.log_automation_run import append_row
+
+    tmp = pathlib.Path(tempfile.mkdtemp()) / "automation-run-log.csv"
+    try:
+        append_row("sk-hynix-daily-report", "investor_flow_fetch", "1", "36", "partial", path=tmp)
+        raised = False
+    except ValueError:
+        raised = True
+    assert raised, "an invalid result value must raise, not be written"
+    assert not tmp.exists(), "no file should be created on a rejected write"
 
 
 if __name__ == "__main__":

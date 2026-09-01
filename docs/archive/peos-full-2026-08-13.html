@@ -1,0 +1,578 @@
+<title>PEOS 종합 리포트 8-13</title>
+<style>
+/* Palette validated via dataviz/scripts/validate_palette.js —
+   light #0093A8/#C25A18/#8B45B8, dark #1FA5BA/#D4762F/#A67AD0: all six checks PASS. */
+:root{
+  --ground:#F3F6F7;--surface:#FFF;--surface-2:#E8EEF0;--ink:#0E1719;--sub:#4E6166;
+  --muted:#7C9198;--rule:#D3DDE0;--rule-2:#B4C4C9;
+  --accent:#056C7C;--accent-ink:#045763;--accent-wash:#E2F0F2;
+  --s1:#0093A8;--s2:#C25A18;--s3:#8B45B8;
+  --good:#14714F;--good-wash:#E0EFE8;--warn:#8A5A0C;--warn-wash:#F6ECDB;
+  --crit:#A32229;--crit-wash:#F7E4E5;
+  --shadow:0 1px 2px rgba(14,23,25,.05),0 10px 28px -14px rgba(14,23,25,.2);
+  --mono:ui-monospace,"SF Mono",SFMono-Regular,"Cascadia Mono",Menlo,Consolas,monospace;
+  --sans:-apple-system,BlinkMacSystemFont,"Pretendard","Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR","Segoe UI",system-ui,sans-serif;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --ground:#0A1013;--surface:#121B1E;--surface-2:#1B262A;--ink:#E6EEEF;--sub:#A0B4B9;
+  --muted:#718589;--rule:#263438;--rule-2:#3A4C51;
+  --accent:#3FB6C7;--accent-ink:#6ACEDB;--accent-wash:#102A2F;
+  --s1:#1FA5BA;--s2:#D4762F;--s3:#A67AD0;
+  --good:#4CB98C;--good-wash:#10241C;--warn:#D3A04A;--warn-wash:#2A2110;
+  --crit:#E8757E;--crit-wash:#2C1518;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 28px -14px rgba(0,0,0,.6);color-scheme:dark;
+}}
+:root[data-theme="dark"]{
+  --ground:#0A1013;--surface:#121B1E;--surface-2:#1B262A;--ink:#E6EEEF;--sub:#A0B4B9;
+  --muted:#718589;--rule:#263438;--rule-2:#3A4C51;
+  --accent:#3FB6C7;--accent-ink:#6ACEDB;--accent-wash:#102A2F;
+  --s1:#1FA5BA;--s2:#D4762F;--s3:#A67AD0;
+  --good:#4CB98C;--good-wash:#10241C;--warn:#D3A04A;--warn-wash:#2A2110;
+  --crit:#E8757E;--crit-wash:#2C1518;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 28px -14px rgba(0,0,0,.6);color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--ground);color:var(--ink);font-family:var(--sans);
+  font-size:16.5px;line-height:1.68;-webkit-font-smoothing:antialiased;
+  word-break:keep-all;overflow-wrap:break-word}
+.page{max-width:950px;margin:0 auto;padding:clamp(1.6rem,4vw,3.2rem) clamp(1.1rem,4vw,2rem) 6rem}
+.n,td.n,th.n,.stat-v,.big,code,.chip{font-family:var(--mono);font-variant-numeric:tabular-nums;font-feature-settings:"tnum" 1}
+
+header.mast{border-bottom:2px solid var(--ink);padding-bottom:1.1rem;margin-bottom:2.2rem}
+.mast .row{display:flex;justify-content:space-between;align-items:baseline;gap:1rem;flex-wrap:wrap}
+.wordmark{font-family:var(--mono);font-size:.74rem;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--accent-ink)}
+.issued{font-family:var(--mono);font-size:.74rem;color:var(--muted)}
+h1{font-size:clamp(1.75rem,4.2vw,2.5rem);line-height:1.18;letter-spacing:-.023em;font-weight:760;text-wrap:balance;margin:1.4rem 0 .8rem}
+.stand{font-size:1.06rem;color:var(--sub);max-width:64ch;margin:0}
+.stand strong{color:var(--ink);font-weight:640}
+
+section{margin-top:3.1rem}
+h2{font-size:1.28rem;font-weight:700;letter-spacing:-.014em;margin:0 0 .3rem;text-wrap:balance;
+  padding-bottom:.5rem;border-bottom:1px solid var(--rule-2);
+  display:flex;align-items:center;justify-content:space-between;gap:.8rem;flex-wrap:wrap}
+h2 .kick{font-family:var(--mono);font-size:.66rem;font-weight:600;letter-spacing:.13em;text-transform:uppercase;color:var(--muted)}
+h3{font-size:1rem;font-weight:680;margin:1.6rem 0 .5rem}
+.lede{color:var(--sub);margin:.9rem 0 1.2rem;max-width:65ch}
+p{margin:0 0 1rem;max-width:65ch}
+
+/* causal chain — the report's spine */
+.chain{display:flex;align-items:stretch;gap:0;margin:1.4rem 0;overflow-x:auto;padding-bottom:.4rem}
+.ch{flex:1;min-width:118px;background:var(--surface);border:1px solid var(--rule);padding:.75rem .6rem;text-align:center;position:relative}
+.ch:first-child{border-radius:8px 0 0 8px}.ch:last-child{border-radius:0 8px 8px 0}
+.ch+.ch{border-left:none}
+.ch-k{font-family:var(--mono);font-size:.62rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.ch-v{font-size:.92rem;font-weight:680;margin-top:.25rem;line-height:1.35}
+.ch-n{font-size:.72rem;color:var(--sub);margin-top:.2rem}
+.ch.hot{background:var(--warn-wash)}.ch.hot .ch-v{color:var(--warn)}
+.ch.end{background:var(--crit-wash)}.ch.end .ch-v{color:var(--crit)}
+
+.hero-fig{background:var(--surface);border:1px solid var(--rule);border-top:3px solid var(--s2);
+  border-radius:10px;padding:1.4rem;box-shadow:var(--shadow);margin:1.4rem 0}
+.big{font-size:clamp(2rem,6vw,3rem);font-weight:700;letter-spacing:-.035em;line-height:1}
+.big .u{font-size:.42em;font-weight:600;color:var(--sub);margin-left:.12em}
+.big-cap{font-size:.82rem;color:var(--muted);margin-top:.5rem}
+
+.stat-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(128px,1fr));gap:1px;background:var(--rule);
+  border:1px solid var(--rule);border-radius:8px;overflow:hidden;margin:1.2rem 0}
+.stat{background:var(--surface);padding:.8rem .9rem}
+.stat-k{font-size:.71rem;color:var(--muted);margin-bottom:.3rem}
+.stat-v{font-size:1.12rem;font-weight:680;letter-spacing:-.018em}
+.stat-v.pos{color:var(--good)}.stat-v.neg{color:var(--crit)}.stat-v.wrn{color:var(--warn)}
+.stat-n{font-size:.7rem;color:var(--muted);margin-top:.22rem}
+
+.sm-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(255px,1fr));gap:1.1rem;margin:1.3rem 0}
+.sm{background:var(--surface);border:1px solid var(--rule);border-radius:9px;padding:1rem 1.1rem 1.1rem;box-shadow:var(--shadow)}
+.sm-t{font-size:.8rem;font-weight:640}
+.sm-v{font-size:1.35rem;font-weight:700;letter-spacing:-.02em;margin:.2rem 0 .05rem}
+.sm-d{font-size:.76rem;color:var(--sub);margin-bottom:.6rem}
+svg{display:block;width:100%;height:auto;overflow:visible}
+.grid-l{stroke:var(--rule);stroke-width:1}
+.axis-t{fill:var(--muted);font-family:var(--mono);font-size:9px}
+.ev-l{stroke:var(--crit);stroke-width:1.5;stroke-dasharray:3 3}
+.ev-t{fill:var(--crit);font-family:var(--mono);font-size:9px;font-weight:600}
+
+.tw{overflow-x:auto;margin:1.2rem 0;border:1px solid var(--rule);border-radius:8px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;font-size:.87rem;min-width:460px}
+th,td{text-align:left;padding:.58rem .8rem;border-bottom:1px solid var(--rule);vertical-align:top}
+thead th{font-family:var(--mono);font-size:.67rem;font-weight:600;letter-spacing:.07em;text-transform:uppercase;
+  color:var(--muted);background:var(--surface-2);border-bottom:1px solid var(--rule-2);white-space:nowrap}
+tbody tr:last-child td{border-bottom:none}
+td.n,th.n{text-align:right;white-space:nowrap}
+.rowlab{font-weight:600}
+.tag{font-family:var(--mono);font-size:.65rem;padding:.12rem .4rem;border-radius:3px;white-space:nowrap}
+.tag.p{color:var(--good);background:var(--good-wash)}
+.tag.m{color:var(--crit);background:var(--crit-wash)}
+.tag.n{color:var(--sub);background:var(--surface-2)}
+
+.callout{border-radius:8px;padding:1rem 1.15rem;margin:1.3rem 0;font-size:.92rem;border:1px solid}
+.callout>:last-child{margin-bottom:0}.callout p{max-width:none}
+.callout .ct{font-weight:680;margin-bottom:.35rem;display:block}
+.callout.err{background:var(--crit-wash);border-color:color-mix(in srgb,var(--crit) 32%,transparent)}
+.callout.err .ct{color:var(--crit)}
+.callout.warn{background:var(--warn-wash);border-color:color-mix(in srgb,var(--warn) 32%,transparent)}
+.callout.warn .ct{color:var(--warn)}
+.callout.ok{background:var(--good-wash);border-color:color-mix(in srgb,var(--good) 32%,transparent)}
+.callout.ok .ct{color:var(--good)}
+.callout.info{background:var(--accent-wash);border-color:color-mix(in srgb,var(--accent) 30%,transparent)}
+.callout.info .ct{color:var(--accent-ink)}
+
+.verdict{background:var(--surface);border:1px solid var(--rule);border-left:4px solid var(--crit);
+  border-radius:10px;padding:1.3rem 1.4rem;margin:1.4rem 0;box-shadow:var(--shadow)}
+.verdict .vt{font-size:1.28rem;font-weight:760;color:var(--crit);margin-bottom:.4rem}
+
+/* price position bar */
+.pbar{position:relative;height:44px;margin:1.2rem 0 .3rem}
+.pbar-t{position:absolute;left:0;right:0;top:16px;height:10px;border-radius:5px;
+  background:linear-gradient(90deg,var(--good-wash),var(--surface-2),var(--crit-wash));border:1px solid var(--rule)}
+.pbar-m{position:absolute;top:8px;width:3px;height:26px;background:var(--s1);border-radius:2px}
+.pbar-lab{position:absolute;top:-4px;font-family:var(--mono);font-size:.72rem;font-weight:680;transform:translateX(-50%);white-space:nowrap}
+.pbar-e{position:absolute;top:32px;font-family:var(--mono);font-size:.68rem;color:var(--muted)}
+
+.acts{display:flex;flex-direction:column;gap:.85rem;margin:1.3rem 0}
+.act{display:grid;grid-template-columns:auto 1fr;gap:.9rem;background:var(--surface);border:1px solid var(--rule);border-radius:9px;padding:.95rem 1.1rem}
+.act-w{font-family:var(--mono);font-size:.67rem;font-weight:600;letter-spacing:.07em;text-transform:uppercase;
+  padding:.2rem .45rem;border-radius:3px;height:fit-content;white-space:nowrap}
+.act-w.now{color:var(--crit);background:var(--crit-wash)}
+.act-w.d1{color:var(--warn);background:var(--warn-wash)}
+.act-w.wk{color:var(--accent-ink);background:var(--accent-wash)}
+.act-w.hold{color:var(--sub);background:var(--surface-2)}
+.act h4{margin:0 0 .28rem;font-size:.92rem;font-weight:660}
+.act p{margin:0;font-size:.87rem;color:var(--sub);max-width:none}
+
+ul,ol{padding-left:1.15rem;max-width:65ch}
+li{margin-bottom:.42rem}li::marker{color:var(--muted)}
+code{background:var(--surface-2);padding:.09em .34em;border-radius:3px;font-size:.85em;border:1px solid var(--rule)}
+strong{font-weight:660}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+hr{border:none;border-top:1px solid var(--rule);margin:2.5rem 0}
+footer{margin-top:3.6rem;padding-top:1.3rem;border-top:1px solid var(--rule);font-size:.79rem;color:var(--muted)}
+footer p{max-width:none}
+</style>
+
+<div class="page">
+
+<header class="mast">
+  <div class="row">
+    <span class="wordmark">PEOS · 종합 리포트</span>
+    <span class="issued">2026-08-13 (목) · 기준금리 D-1</span>
+  </div>
+  <h1>홍해에서 시작된 사슬이 내일 금통위를 지나 내 포지션에 닿는다</h1>
+  <p class="stand">
+    7월 20일 후티 반군의 홍해 항행금지 이후 <strong>브렌트유가 한 주 만에 13.3% 뛰었고</strong>,
+    저점 대비로는 <strong>6주간 34.7%</strong> 올랐습니다. 유가는 물가로, 물가는
+    <strong>내일 한국은행 결정</strong>으로, 금리는 <strong>자산의 96.1%가 반도체인 포지션</strong>으로
+    이어집니다. 오늘 리포트는 그 사슬을 따라가고, 마지막에 내 상황 기준의 실행 가이드로 끝냅니다.
+  </p>
+</header>
+
+<!-- ═════ 사슬 ═════ -->
+<section>
+  <h2>오늘의 인과 사슬 <span class="kick">지정학 → 포지션</span></h2>
+  <div class="chain">
+    <div class="ch hot"><div class="ch-k">지정학</div><div class="ch-v">홍해 봉쇄</div><div class="ch-n">7/20 후티 항행금지<br>이란 휴전 종료</div></div>
+    <div class="ch hot"><div class="ch-k">원자재</div><div class="ch-v">브렌트 +13.3%</div><div class="ch-n">1주 만에<br>$83.08 → $94.12</div></div>
+    <div class="ch"><div class="ch-k">물가</div><div class="ch-v">상방 압력</div><div class="ch-n">수입물가 경로<br>시차 1~3개월</div></div>
+    <div class="ch"><div class="ch-k">정책</div><div class="ch-v">인하 기대 소멸</div><div class="ch-n">2.75%<br>7월 인상 직후</div></div>
+    <div class="ch end"><div class="ch-k">내 자산</div><div class="ch-v">양방향 역풍</div><div class="ch-n">원가↑ + 원화강세<br>수출 채산성↓</div></div>
+  </div>
+  <p style="color:var(--sub);font-size:.9rem">
+    각 칸은 뒤 칸의 <em>필요조건</em>이지 충분조건이 아닙니다. 유가가 물가로 전이되는 데는
+    시차가 있고, 원화 강세가 수입물가를 일부 상쇄합니다. 다만 <strong>방향은 한쪽</strong>입니다.
+  </p>
+</section>
+
+<!-- ═════ 결론 먼저 ═════ -->
+<section>
+  <h2>결론부터 <span class="kick">0절 · 0.5절</span></h2>
+  <div class="verdict">
+    <div class="vt">⛔ 오늘 신규 매매 없음 · 내일 결과 보고 판단</div>
+    <p style="margin:0;color:var(--sub)">
+      단, <strong>집중도 상한 설정</strong>은 오늘 하십시오 — 이건 금리 결과와 무관합니다.
+    </p>
+  </div>
+  <div class="stat-row">
+    <div class="stat"><div class="stat-k">SK하이닉스 신호</div><div class="stat-v wrn">HOLD 50%</div><div class="stat-n">하한 55% 미달 = 무판단</div></div>
+    <div class="stat"><div class="stat-k">부동산</div><div class="stat-v">WAIT 60%</div><div class="stat-n">금리 인상 방향 → 강화</div></div>
+    <div class="stat"><div class="stat-k">반도체 집중도</div><div class="stat-v neg">96.1%</div><div class="stat-n">+ 급여·PS·퇴직연금</div></div>
+    <div class="stat"><div class="stat-k">조정 가능</div><div class="stat-v">181주</div><div class="stat-n">67주 2027-02 락업</div></div>
+    <div class="stat"><div class="stat-k">HBM 사이클</div><div class="stat-v">75.3</div><div class="stat-n">경계 · 붕괴조건 1/5</div></div>
+  </div>
+</section>
+
+<!-- ═════ 지정학 ═════ -->
+<section>
+  <h2>지정학 <span class="kick">유가를 움직인 실물</span></h2>
+
+  <div class="hero-fig">
+    <div class="big">+34.7<span class="u">%</span></div>
+    <div class="big-cap">브렌트유 7/01 저점 <strong>$69.24</strong> → 8/11 <strong>$93.26</strong> ·
+      이 중 <strong>7/15→7/22 한 주에만 +13.3%</strong></div>
+  </div>
+
+  <div class="sm">
+    <div class="sm-t">브렌트유 12주 · 홍해 항행금지 시점 표시</div>
+    <svg viewBox="0 0 300 100" role="img" aria-label="브렌트유가 7월 초 69달러 저점에서 7월 20일 홍해 봉쇄 직후 94달러로 급등한 뒤 93달러 유지">
+      <g class="grid-l"><line x1="10" y1="18" x2="290" y2="18"/><line x1="10" y1="47" x2="290" y2="47"/><line x1="10" y1="76" x2="290" y2="76"/></g>
+      <g class="axis-t" text-anchor="end"><text x="6" y="21">94</text><text x="6" y="50">82</text><text x="6" y="79">69</text></g>
+      <line class="ev-l" x1="159" y1="10" x2="159" y2="84"/>
+      <text class="ev-t" x="163" y="16">7/20 홍해</text>
+      <polyline fill="none" stroke="var(--s2)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"
+        points="10,71.1 50,78.0 90,60.5 130,44.6 170,18.0 210,23.2 250,36.0 290,20.1"/>
+      <circle cx="50" cy="78.0" r="3.5" fill="var(--surface)" stroke="var(--s2)" stroke-width="2"/>
+      <circle cx="290" cy="20.1" r="4" fill="var(--s2)" stroke="var(--surface)" stroke-width="2"/>
+      <g class="axis-t" text-anchor="middle"><text x="50" y="94">07-01</text><text x="170" y="94">07-22</text><text x="290" y="94">08-11</text></g>
+    </svg>
+  </div>
+
+  <div class="tw">
+    <table>
+      <thead><tr><th>지정학 사건</th><th>시점</th><th>자산 경로</th></tr></thead>
+      <tbody>
+        <tr><td class="rowlab">후티, 홍해 항행금지 선언</td><td class="n">7/20</td><td>유가 ↑ → 물류비 ↑ → 수입물가 ↑ <span class="tag m">부정</span></td></tr>
+        <tr><td class="rowlab">미국–이란 휴전 종료, 충돌 재격화</td><td class="n">7월</td><td>중동 리스크 프리미엄 유지 <span class="tag m">부정</span></td></tr>
+        <tr><td class="rowlab">미–중 기술 제재 지속</td><td>진행 중</td><td>CXMT HBM3 양산 재지연 → 경쟁 압력 완화 <span class="tag p">긍정</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="callout info">
+    <span class="ct">지정학이 항상 나쁘기만 한 건 아닙니다</span>
+    <p>미–중 기술 갈등은 유가 쪽으로는 악재지만 <strong>메모리 경쟁 구도에서는 방패</strong>입니다.
+    중국 CXMT의 HBM3 양산이 <strong>연내 불투명으로 재차 지연</strong>됐고, SK하이닉스 대비
+    <strong>1~2세대 뒤처진</strong> 상태가 유지되고 있습니다. 제재가 유지되는 한
+    이 격차가 급히 좁혀질 가능성은 낮습니다.</p>
+  </div>
+</section>
+
+<!-- ═════ 거시 ═════ -->
+<section>
+  <h2>거시 <span class="kick">금리 · 환율 · 국면</span></h2>
+
+  <div class="sm-grid">
+    <div class="sm">
+      <div class="sm-t">원/달러 환율</div>
+      <div class="sm-v n">1,415.0원</div>
+      <div class="sm-d">고점 1,548.4 대비 <strong style="color:var(--s1)">−8.6%</strong> · 8주 중 6주 하락</div>
+      <svg viewBox="0 0 300 80" role="img" aria-label="원달러 환율 1548원에서 1415원으로 지속 하락">
+        <g class="grid-l"><line x1="10" y1="12" x2="290" y2="12"/><line x1="10" y1="40" x2="290" y2="40"/><line x1="10" y1="68" x2="290" y2="68"/></g>
+        <g class="axis-t" text-anchor="end"><text x="6" y="15">1548</text><text x="6" y="43">1482</text><text x="6" y="71">1415</text></g>
+        <polyline fill="none" stroke="var(--s1)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"
+          points="10,16.7 50,12.0 90,21.2 130,35.6 170,42.6 210,46.5 250,62.5 290,68.0"/>
+        <circle cx="290" cy="68" r="4" fill="var(--s1)" stroke="var(--surface)" stroke-width="2"/>
+      </svg>
+      <div class="sm-d" style="margin:.5rem 0 0">수출기업엔 역풍 · FX 점수 37.7/100 최하위</div>
+    </div>
+    <div class="sm">
+      <div class="sm-t">미국 10년물 국채금리</div>
+      <div class="sm-v n">4.70%</div>
+      <div class="sm-d">12주 전 4.48% · <strong style="color:var(--s3)">+4.9%</strong></div>
+      <svg viewBox="0 0 300 80" role="img" aria-label="미국 10년물 금리 4.41에서 4.70으로 상승">
+        <g class="grid-l"><line x1="10" y1="12" x2="290" y2="12"/><line x1="10" y1="40" x2="290" y2="40"/><line x1="10" y1="68" x2="290" y2="68"/></g>
+        <g class="axis-t" text-anchor="end"><text x="6" y="15">4.70</text><text x="6" y="43">4.56</text><text x="6" y="71">4.41</text></g>
+        <polyline fill="none" stroke="var(--s3)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"
+          points="10,68.0 50,54.5 90,39.0 130,41.0 170,17.8 210,17.8 250,25.5 290,12.0"/>
+        <circle cx="290" cy="12" r="4" fill="var(--s3)" stroke="var(--surface)" stroke-width="2"/>
+      </svg>
+      <div class="sm-d" style="margin:.5rem 0 0">ERP 산출 직결 · 한–미 금리차 312bp</div>
+    </div>
+  </div>
+
+  <div class="tw">
+    <table>
+      <thead><tr><th>항목</th><th class="n">값</th><th>판단</th></tr></thead>
+      <tbody>
+        <tr><td class="rowlab">한국 국면</td><td class="n">Early Expansion</td><td>총점 +1 · 8월 내내 불변, 라벨만 경계선 진동</td></tr>
+        <tr><td class="rowlab">미국 국면</td><td class="n">Recession</td><td>⚠️ 물가 하락만으로 성립 — 위기지수는 <span class="n">5/100 GREEN</span>으로 정반대 (0.5절에서 위기지수 채택)</td></tr>
+        <tr><td class="rowlab">기준금리</td><td class="n">2.75%</td><td>2026-07 <strong>인상</strong> (2.50→2.75)</td></tr>
+        <tr><td class="rowlab">금리 환경 점수</td><td class="n">65/100</td><td>중립~약한 완화</td></tr>
+        <tr><td class="rowlab">위기지수 CCI</td><td class="n">5/100</td><td>GREEN · 침체 전조 지표 전부 0점</td></tr>
+        <tr><td class="rowlab">투자환경 점수</td><td class="n">69.8</td><td>우호적 구간 유지</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="callout warn">
+    <span class="ct">내일 08-14 한국은행 — 인하를 기대할 근거가 없습니다</span>
+    <p>지난달 <strong>인상</strong>했고, 그 위에 <strong>유가가 6주간 +34.7%</strong>입니다.
+    연속 회의에서 인상 직후 인하로 뒤집는 경우는 드뭅니다. 현실적 경로는
+    <strong>동결 우세 · 추가 인상 가능 · 인하 매우 낮음</strong>입니다.</p>
+    <p style="margin-top:.6rem"><strong>확률은 적지 않습니다</strong> — 시장 컨센서스를 조회할 수 없는 상태에서
+    숫자를 만드는 것보다 미확인으로 두는 편이 낫습니다. (8/9자 캘린더의 "3.50% 동결 / 인하 시 매수"는
+    금리 수준과 방향이 모두 틀렸던 오류이며 8/10에 정정했습니다.)</p>
+  </div>
+</section>
+
+<!-- ═════ 미시 ═════ -->
+<section>
+  <h2>미시 · 펀더멘털 <span class="kick">SK하이닉스</span></h2>
+
+  <div class="stat-row">
+    <div class="stat"><div class="stat-k">HBM 사이클 점수</div><div class="stat-v">75.3<span style="font-size:.7em;color:var(--muted)">/100</span></div><div class="stat-n">경계(60~80)</div></div>
+    <div class="stat"><div class="stat-k">붕괴 조건</div><div class="stat-v wrn">1/5</div><div class="stat-n">외국인 수급만 충족</div></div>
+    <div class="stat"><div class="stat-k">D램 ASP</div><div class="stat-v pos">+30%</div><div class="stat-n">QoQ · 사상 최대폭</div></div>
+    <div class="stat"><div class="stat-k">HBM3E 컨트랙트</div><div class="stat-v pos">+20%</div><div class="stat-n">QoQ</div></div>
+    <div class="stat"><div class="stat-k">목표가 스펙트럼</div><div class="stat-v">148~470만</div><div class="stat-n">증권사 편차 극심</div></div>
+  </div>
+
+  <div class="tw">
+    <table>
+      <thead><tr><th>붕괴 조건 (5개)</th><th>상태</th><th class="n">근거</th></tr></thead>
+      <tbody>
+        <tr><td class="rowlab">① ASP 3주 연속 하락</td><td><span class="tag p">미충족</span></td><td class="n">+30% QoQ</td></tr>
+        <tr><td class="rowlab">② 엔비디아 주문 축소</td><td><span class="tag p">미충족</span></td><td class="n">부정 신호 없음</td></tr>
+        <tr><td class="rowlab">③ CoWoS 활용률 95% 이하</td><td><span class="tag p">미충족</span></td><td class="n">캐파 4배 확장</td></tr>
+        <tr><td class="rowlab">④ 외국인 20일 누적 순매도</td><td><span class="tag m">충족</span></td><td class="n">−5.89조원</td></tr>
+        <tr><td class="rowlab">⑤ 반도체 수출 YoY 10% 미만</td><td><span class="tag p">미충족</span></td><td class="n">+178.8% YoY</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="callout ok">
+    <span class="ct">핵심 구분 — 8/6 −10.37% 급락은 펀더멘털 훼손이 아니었습니다</span>
+    <p>같은 날 ASP·엔비디아 주문·CoWoS 어디에서도 부정 신호가 나오지 않았습니다.
+    촉발은 <strong>미국 반도체주 4거래일 약세 + 외국인 대량매도</strong>(코스피 전체 1.7조 중
+    본주가 1.68조)였습니다. 즉 <strong>거시심리·수급발 조정</strong>이며,
+    5개 붕괴조건 중 실제로 켜진 것도 수급 항목 하나뿐입니다.</p>
+  </div>
+</section>
+
+<!-- ═════ 뉴스 ═════ -->
+<section>
+  <h2>뉴스 <span class="kick">8/10 ~ 8/11</span></h2>
+
+  <div class="tw">
+    <table>
+      <thead><tr><th>재료</th><th>내용</th><th>내 포지션 영향</th></tr></thead>
+      <tbody>
+        <tr>
+          <td class="rowlab">하이퍼스케일러 CapEx 상향</td>
+          <td>2026년 <span class="n">$595B → $725~785B</span>, <strong>+77% YoY</strong>.
+              2027년 기술지출 1조 달러 가능성</td>
+          <td><span class="tag p">강한 긍정</span> HBM 수요의 근원이 커짐</td>
+        </tr>
+        <tr>
+          <td class="rowlab">NVIDIA Rubin Ultra 메모리 축소</td>
+          <td>목표 <span class="n">1TB → 256/192GB</span>, HBM4E → 일반 HBM4 대체 검토.
+              "HBM4E 공급 희소가 2027~2028 로드맵 제약"</td>
+          <td><span class="tag n">양면</span> 탑재량↓는 악재, <strong>HBM4E 품귀는 공급자 우위</strong></td>
+        </tr>
+        <tr>
+          <td class="rowlab">DRAM 현물 시장 둔화</td>
+          <td>DDR4 8G 3200 = <span class="n">$42.45</span> 보합, "quiet market", 수요 문의 둔화</td>
+          <td><span class="tag m">부정</span> 단, <strong>범용 DRAM</strong> 한정 — HBM과 디커플링</td>
+        </tr>
+        <tr>
+          <td class="rowlab">CXMT HBM3 양산 재지연</td>
+          <td>연내 양산 불투명, SK·삼성 대비 <strong>1~2세대 뒤처짐</strong></td>
+          <td><span class="tag p">긍정</span> 경쟁 압력 지연</td>
+        </tr>
+        <tr>
+          <td class="rowlab">메모리 공급부족 장기화 전망</td>
+          <td>Deloitte·Silicon Motion: <strong>2028~2029까지 지속</strong></td>
+          <td><span class="tag p">긍정</span> 근접 공급과잉 리스크 하향</td>
+        </tr>
+        <tr>
+          <td class="rowlab">SK하이닉스 HBF 표준 발표</td>
+          <td>샌디스크와 <strong>세계 최초</strong> High Bandwidth Flash 표준 (FMS 2026)</td>
+          <td><span class="tag p">긍정</span> HBM 이후 로드맵 확보</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="callout info">
+    <span class="ct">이 뉴스들을 한 문장으로</span>
+    <p><strong>AI 인프라 수요는 더 세졌고(+77%), 범용 DRAM은 식었고, 중국 추격은 늦어졌습니다.</strong>
+    SK하이닉스의 HBM 비중이 높을수록 유리한 조합입니다.
+    다만 NVIDIA가 메모리 탑재량 자체를 줄이는 신호는 <strong>수량 측면의 첫 경고</strong>이므로
+    다음 분기 출하량 가이던스에서 확인이 필요합니다.</p>
+  </div>
+</section>
+
+<!-- ═════ 기술적 ═════ -->
+<section>
+  <h2>차트 · 기술적 위치 <span class="kick">SK하이닉스</span></h2>
+
+  <div class="sm" style="margin:1.2rem 0">
+    <div class="sm-t">52주 레인지에서의 현재 위치</div>
+    <div class="pbar">
+      <div class="pbar-t"></div>
+      <div class="pbar-m" style="left:47.8%"></div>
+      <div class="pbar-lab" style="left:47.8%;color:var(--s1)">1,436,000</div>
+      <div class="pbar-e" style="left:0">244,000</div>
+      <div class="pbar-e" style="right:0">3,002,000</div>
+    </div>
+    <div class="sm-d" style="margin-top:.8rem">
+      52주 저점 대비 <strong style="color:var(--good)">+489%</strong> ·
+      전고점 대비 <strong style="color:var(--crit)">−52.2%</strong> ·
+      레인지 내 위치 <strong>47.8%</strong>
+    </div>
+  </div>
+
+  <div class="tw">
+    <table>
+      <thead><tr><th>지표</th><th class="n">값</th><th>해석</th></tr></thead>
+      <tbody>
+        <tr><td class="rowlab">기준 주가</td><td class="n">1,436,000</td><td>2026-08-07 장중 (사용자 제보, 종가 아님)</td></tr>
+        <tr><td class="rowlab">RSI(14)</td><td class="n">37.98</td><td>과매도(30) 근접이나 <strong>미도달</strong></td></tr>
+        <tr><td class="rowlab">최근 3거래일</td><td class="n">+5.77 → −10.37 → −3.95%</td><td>급등 후 급락, 변동성 확대 국면</td></tr>
+        <tr><td class="rowlab">외국인 20일 누적</td><td class="n">−5.89조</td><td><strong>수급 최대 악재</strong> · 붕괴조건 유일 충족</td></tr>
+        <tr><td class="rowlab">평단 대비</td><td class="n">+200.8%</td><td>3.01배 · 매수원가 1.18억</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="callout warn">
+    <span class="ct">기술적 판단은 여기까지가 한계입니다</span>
+    <p>이 환경에서는 <strong>실시간 시세 API에 접근할 수 없습니다.</strong> 위 주가는 8/7 장중
+    제보값이라 6일 지났고, 이동평균·거래량·볼린저 같은 지표는 <strong>가격 시계열이 없어 계산하지
+    않았습니다</strong>. 추정치로 채우는 대신 비워 둡니다 — 여기서 지어낸 숫자가 실제 매매로
+    이어지면 그게 가장 큰 손실 경로입니다.</p>
+  </div>
+</section>
+
+<!-- ═════ 정치 ═════ -->
+<section>
+  <h2>정치 <span class="kick">미국 중간선거</span></h2>
+
+  <div class="tw">
+    <table>
+      <thead><tr><th>카테고리</th><th>상태</th><th>근거</th></tr></thead>
+      <tbody>
+        <tr><td class="rowlab">🏛️ 지지율</td><td><span class="tag m">불리 ↘</span></td><td>32~39% (Quinnipiac 32% 집권2기 최저 · CNN 34% · Emerson 39%)</td></tr>
+        <tr><td class="rowlab">🗳️ 제네릭 밸럿</td><td><span class="tag m">불리</span></td><td>민주 <strong>D+7 ~ D+11</strong> · 여성 유권자 27%p 격차</td></tr>
+        <tr><td class="rowlab">💰 경제</td><td><span class="tag n">판정 보류</span></td><td>정부 셧다운으로 <strong>10월 노동·물가 통계 영구 결측</strong> 경고(백악관)</td></tr>
+        <tr><td class="rowlab">⚔️ 외교</td><td><span class="tag m">불리 ↘</span></td><td>이란 휴전 종료 · 홍해 항행금지 → <strong>위 유가 사슬의 출발점</strong></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="callout info">
+    <span class="ct">정치가 내 자산에 닿는 두 경로</span>
+    <p><strong>① 관세</strong> — 트럼프는 관세를 중간선거 치적으로 자평하나 <strong>공화당 내부에서도
+    권한 제한 법안</strong>이 나오는 상황입니다. 반도체 관세 향방은 수출 채산성에 직결됩니다.</p>
+    <p style="margin-top:.6rem"><strong>② 통계 공백</strong> — 셧다운으로 10월 미국 지표가 결측되면
+    <strong>이 시스템의 미국 거시 판정 신뢰도 자체가 떨어집니다.</strong>
+    데이터가 없는 구간에서는 판정보다 포지션 관리가 우선입니다.</p>
+  </div>
+</section>
+
+<!-- ═════ 자산 가이드 ═════ -->
+<section>
+  <h2>내 상황 기준 자산 가이드 <span class="kick">개인 정보 반영</span></h2>
+
+  <div class="tw">
+    <table>
+      <thead><tr><th>내 조건</th><th>값</th><th>이번 사슬에서의 의미</th></tr></thead>
+      <tbody>
+        <tr><td class="rowlab">직장</td><td>SK하이닉스 재직 (PS 비중 큼)</td><td>메모리 사이클에 <strong>소득까지</strong> 연동</td></tr>
+        <tr><td class="rowlab">주식·ETF</td><td class="n">4.02억 (반도체 96.1%)</td><td>사실상 단일 사이클 베팅</td></tr>
+        <tr><td class="rowlab">SK하이닉스</td><td class="n">248주 / 3.56억 / 3.01배</td><td>락업 67주 제외 <strong>181주만 조정 가능</strong></td></tr>
+        <tr><td class="rowlab">퇴직연금</td><td class="n">IRP/DC 1,902만</td><td>퇴직까지 잠김 — 유동성 아님</td></tr>
+        <tr><td class="rowlab">현금</td><td class="n">2,000만</td><td>총자산 대비 매우 얇음</td></tr>
+        <tr><td class="rowlab">주거</td><td>용인 수지 진산마을푸르지오 <strong>전세</strong></td><td>금리 인상 = 전세 대출 부담·재계약 리스크</td></tr>
+        <tr><td class="rowlab">청약통장</td><td class="n">2,830만 / 250회</td><td>20년 9개월 · <strong>가점 만점권</strong></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="callout err">
+    <span class="ct">가장 큰 리스크는 종목이 아니라 상관관계입니다</span>
+    <p>메모리 사이클이 꺾이면 <strong>①주식 3.56억 ②급여·PS ③퇴직연금</strong>이 동시에 나빠집니다.
+    분산이 아니라 <strong>같은 베팅을 세 번</strong> 한 구조입니다.
+    이건 내일 금리가 무엇이 나오든, CPI가 어떻든 <strong>오늘 이미 참인 사실</strong>이고,
+    데이터 없이도 판단 가능한 유일한 항목입니다.</p>
+  </div>
+
+  <h3>실행 가이드</h3>
+  <div class="acts">
+    <div class="act">
+      <span class="act-w now">오늘</span>
+      <div>
+        <h4>반도체 비중 상한선을 숫자로 정할 것</h4>
+        <p>"총자산의 몇 %까지 반도체로 두겠다"를 <strong>미리</strong> 정해두면, 내일 발표 직후
+        감정이 아니라 규칙으로 움직입니다. 제약 조건 두 개를 함께 넣으십시오 —
+        조정 가능 물량은 <strong>181주뿐</strong>이고, 락업 67주를 만기 전 팔면
+        마크업 <span class="n">879만원</span>이 소멸합니다.</p>
+      </div>
+    </div>
+    <div class="act">
+      <span class="act-w d1">내일 D-1</span>
+      <div>
+        <h4>금리 결과별 대응을 지금 적어둘 것 (실행은 결과 확인 후)</h4>
+        <p><strong>동결</strong> → 현 상태 유지, 집중도 계획만 진행.
+        <strong>인상</strong> → 전세 대출·재계약 부담 재점검 + 부동산 진입 추가 지연 확정.
+        <strong>인하</strong>(가능성 낮음) → 유가 상승과 상충하므로 <em>왜</em> 인하했는지부터 확인.
+        <strong>확률은 적지 마십시오</strong> — 지난번 그렇게 만든 표가 방향까지 틀렸습니다.</p>
+      </div>
+    </div>
+    <div class="act">
+      <span class="act-w wk">이번 주</span>
+      <div>
+        <h4>현금 비중을 점검할 것</h4>
+        <p>현금 <span class="n">2,000만</span>은 4억대 자산 대비 얇습니다.
+        전세 만기·이사 계획이 걸려 있다면 <strong>주식을 팔아야만 현금이 생기는 구조</strong>인데,
+        그 매각 시점이 시장이 나쁠 때와 겹치면 최악입니다. 집중도 완화와 현금 확보는
+        <strong>같은 실행 하나</strong>로 동시에 해결됩니다.</p>
+      </div>
+    </div>
+    <div class="act">
+      <span class="act-w wk">이번 주</span>
+      <div>
+        <h4>어제 미국 CPI 결과 확인 + 유가 전이 시차 관찰</h4>
+        <p>컨센서스 대비 <span class="n">0.5%p</span> 이상 차이면 신호 재평가 대상입니다.
+        유가 +34.7%는 <strong>이번 CPI가 아니라 다음 1~3개월 물가</strong>에 반영될 가능성이 큽니다.</p>
+      </div>
+    </div>
+    <div class="act">
+      <span class="act-w hold">보류</span>
+      <div>
+        <h4>신규 매수 · 전량 매도 · 부동산 진입</h4>
+        <p>신호 신뢰도 <span class="n">50%</span>(무판단), 엔진 충돌 3건 미해소, 실시간 시세 부재.
+        <strong>이 조건에서 실행은 근거가 없습니다.</strong>
+        전고점 −52.2%라는 사실이 매수 근거가 되지 못하는 것도 같은 이유입니다 —
+        하락 폭 자체는 밸류에이션이 아닙니다.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout ok">
+    <span class="ct">지금 파는 게 정답이라는 뜻은 아닙니다</span>
+    <p>펀더멘털 신호는 <strong>여전히 우호적</strong>입니다 — ASP +30% QoQ, 붕괴조건 1/5,
+    하이퍼스케일러 CapEx +77%, 중국 추격 지연. 8/6 급락도 수급발이었습니다.
+    <strong>문제는 방향이 아니라 크기</strong>입니다. 좋은 자산이라도 소득·연금까지 같은 곳에
+    묶여 있으면, 옳은 판단이 틀렸을 때의 대가가 감당 범위를 넘습니다.
+    상한선은 전망을 부정하는 장치가 아니라 <strong>틀렸을 때 살아남는 장치</strong>입니다.</p>
+  </div>
+</section>
+
+<hr>
+
+<section>
+  <h2>세 줄 요약</h2>
+  <ol style="font-size:1.02rem">
+    <li><strong>7/20 홍해 봉쇄 → 브렌트 1주 +13.3%, 6주 +34.7%.</strong> 이 유가가 물가로 가는 경로에
+    내일 금통위가 놓여 있고, 인하를 기대할 근거는 없습니다.</li>
+    <li><strong>펀더멘털은 여전히 좋습니다</strong> — ASP +30% QoQ, 붕괴조건 1/5(수급만), CapEx +77%,
+    CXMT 지연. 8/6 −10.37%는 수급발이지 실적 훼손이 아니었습니다.</li>
+    <li><strong>그래서 오늘 할 일은 매매가 아니라 상한선 설정입니다.</strong> 반도체 96.1% + 급여 + 퇴직연금은
+    같은 베팅 세 번이고, 조정 가능한 건 181주뿐입니다.</li>
+  </ol>
+</section>
+
+<footer>
+  <p><strong>생성</strong> — <code>python -m engine.report.run --month 2026-08</code> 실제 실행 (13.3초) +
+  위키 인텔리전스 계층(hbm-cycle-score-status, sk-hynix-analyst-thesis-checkpoints-status,
+  trump-midterm-tracker, cxl-daily-update-2026-08-11, user-profile, portfolio.yaml).</p>
+  <p style="margin-top:.6rem"><strong>데이터 층 구분</strong> — 유가·환율·금리는
+  <code>macro-data-sync-bot</code>이 오늘 00:10 UTC 수집한 실측값. 거시 판정 지표(GDP·CPI 등)는
+  이번 실행 환경의 외부 접근 제한으로 이월됐으며, 정상 수집 실행(8/12) 기준 신뢰도는 한국 80.6 / 미국 96.9.</p>
+  <p style="margin-top:.6rem"><strong>미확인 / 미산출</strong> — 8/12 미국 CPI 결과, 8/14 기준금리 컨센서스,
+  SK하이닉스 실시간 시세(8/7 제보값 사용), 이동평균·거래량 등 가격 시계열 기반 기술지표(원자료 부재로 미계산),
+  MOLIT 8월 실거래(최신 2026-07). 뉴스·정치·지정학은 위키에 축적된 8/6~8/11 조사 결과이며
+  이 환경에서 신규 웹 조회는 불가했습니다.</p>
+  <p style="margin-top:.6rem">투자 판단의 참고 자료이며 투자 권유가 아닙니다. 최종 판단과 책임은 본인에게 있습니다.</p>
+</footer>
+
+</div>

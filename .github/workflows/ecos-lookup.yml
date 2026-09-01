@@ -23,9 +23,23 @@ jobs:
       - name: Install dependencies
         run: pip install requests
 
+      # 2026-08-21 추가 — 이건 사람이 수동 실행 후 결과를 바로 보는 진단
+      # 도구라 sk-hynix-daily-report.yml 등 예약 실행 워크플로처럼 6시간
+      # 재시도를 걸면 안 됨(그동안 사람이 기다려야 함) — 네트워크 순단
+      # 정도만 흡수하는 가벼운 재시도(3회, 20초 간격)만 적용.
       - name: Look up ECOS statistic tables
         env:
           ECOS_API_KEY: ${{ secrets.ECOS_API_KEY }}
         # Intentionally unquoted so a "--items <code> <keyword>" input word-splits into
         # separate argv entries; this is a manually-dispatched diagnostic tool only.
-        run: python -m scripts.ecos_lookup ${{ github.event.inputs.keyword }}
+        run: |
+          attempt=1; max_attempts=3
+          until python -m scripts.ecos_lookup ${{ github.event.inputs.keyword }}; do
+            if [ "$attempt" -ge "$max_attempts" ]; then
+              echo "::error::${max_attempts}회 재시도했지만 실패"
+              exit 1
+            fi
+            echo "[재시도 $attempt/$max_attempts] 실패 — 20초 후 재시도"
+            attempt=$((attempt + 1))
+            sleep 20
+          done
