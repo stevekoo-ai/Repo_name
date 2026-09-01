@@ -60,7 +60,10 @@ def main() -> None:
         if analysis["status"] == "ok":
             tag = "⚠️예외" if analysis.get("exceptions") else "✅일치"
             print(f"{tag} {analysis['business_type']}/{analysis['income_scope']}")
-        elif analysis.get("stage") == "discover" and r.get("PBLANC_URL"):
+        elif analysis.get("stage") == "discover" and r.get("PBLANC_URL") and i == 1:
+            # Full HTML dump only for the first failure — subsequent ones are
+            # almost certainly the same page shell, and dumping all 4 would
+            # blow past the job log tail_lines limit.
             # DIAGNOSTIC (temporary, for this trace only): find_pdf_link()
             # failed — dump enough of the raw detail page to figure out why
             # (SPA/JS-rendered? different attachment mechanism?) without a
@@ -84,7 +87,11 @@ def main() -> None:
                     c = page_html.count(kw)
                     if c:
                         print(f"    [진단] 키워드 {kw!r}: {c}회")
-                print(f"    [진단] 앞부분 800자: {page_html[:800]!r}")
+                        for pos in [m.start() for m in re.finditer(re.escape(kw), page_html)][:4]:
+                            ctx = page_html[max(0, pos - 150):pos + 150].replace("\n", " ").replace("\r", "")
+                            print(f"    [진단]   ctx: ...{ctx}...")
+                print(f"    [진단] 전체 HTML ({len(page_html)}자):")
+                print(page_html)
             except Exception as diag_e:
                 print(f"    [진단] 페이지 재요청도 실패: {diag_e}")
             continue
