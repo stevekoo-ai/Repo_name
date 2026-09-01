@@ -229,7 +229,11 @@ jobs:
           username: ${{ secrets.GMAIL_ADDRESS }}
           password: ${{ secrets.GMAIL_APP_PASSWORD }}
           subject: "[SK하이닉스 자동 리포트] ${{ github.event.repository.name }}"
-          to: ${{ secrets.GMAIL_ADDRESS }}
+          # 2026-09-01: daily-peos-report.yml과 동일하게 gmail 자신 +
+          # COMPANY_EMAIL(회사 메일) 둘 다로 발송 — dawidd6/action-send-mail은
+          # to에 콤마로 구분된 여러 수신자를 그대로 받는다(core/notify.py의
+          # EmailChannel과는 별개 코드경로라 이쪽은 이 action 자체가 분리 처리).
+          to: ${{ secrets.GMAIL_ADDRESS }},${{ secrets.COMPANY_EMAIL }}
           from: SK하이닉스 자동 리포트 봇
           body: file:///tmp/report.md
 
@@ -274,7 +278,7 @@ jobs:
         env:
           GMAIL_ADDRESS: ${{ secrets.GMAIL_ADDRESS }}
           GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
-          NOTIFY_EMAIL_TO: ${{ secrets.NOTIFY_EMAIL_TO }}
+          NOTIFY_EMAIL_TO: ${{ secrets.GMAIL_ADDRESS }},${{ secrets.COMPANY_EMAIL }}
         run: |
           python3 -m scripts.send_report_email \
             --failure-alert "sk-hynix-daily-report 워크플로가 실패했습니다 (KIS 시세·수급 수집~리포트 생성 중 한 단계) — 이 실행 시간대(07:00/10:00/19:00 KST)의 SK하이닉스 자동 데이터는 없는 것으로 취급하세요."
