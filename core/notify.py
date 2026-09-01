@@ -62,7 +62,15 @@ class EmailChannel:
         self.smtp_port = smtp_port
         self.user = user
         self.password = password
-        self.to_addr = to_addr
+        # 2026-09-01: to_addr may itself be a comma-separated list (e.g.
+        # NOTIFY_EMAIL_TO="stevekoo.kr@gmail.com, byeongho.koo@sk.com") — split
+        # it once here into the actual per-recipient list SMTP needs, while
+        # keeping self.to_addr as the comma-joined string the "To" header wants.
+        # Before this, sendmail(self.user, [self.to_addr], raw) wrapped the
+        # whole comma-string as a single RFC821 address, so a second recipient
+        # would have silently never been delivered to.
+        self.to_addrs = [addr.strip() for addr in to_addr.split(",") if addr.strip()]
+        self.to_addr = ", ".join(self.to_addrs)
 
     def send(self, subject: str, body_text: str) -> None:
         msg = MIMEText(body_text)
@@ -110,7 +118,7 @@ class EmailChannel:
     def _deliver(self, raw: str) -> None:
         with smtplib.SMTP_SSL(self.smtp_host, self.smtp_port) as server:
             server.login(self.user, self.password)
-            server.sendmail(self.user, [self.to_addr], raw)
+            server.sendmail(self.user, self.to_addrs, raw)
 
 
 def build_channel() -> NotificationChannel:
@@ -127,6 +135,11 @@ def build_channel() -> NotificationChannel:
       real Gmail account, so this reuses that instead of asking for a second,
       redundant set of SMTP_* secrets. Recipient defaults to GMAIL_ADDRESS
       itself (send-to-self) unless NOTIFY_EMAIL_TO overrides it.
+
+    NOTIFY_EMAIL_TO accepts a comma-separated list (e.g.
+    "stevekoo.kr@gmail.com, byeongho.koo@sk.com") to deliver to several
+    recipients at once — EmailChannel splits it into the actual SMTP
+    recipient list.
 
     Add the relevant env vars as GitHub Actions secrets to enable a push
     channel without touching any caller.
