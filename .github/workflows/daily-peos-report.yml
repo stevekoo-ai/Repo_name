@@ -63,7 +63,11 @@ jobs:
           SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
           GMAIL_ADDRESS: ${{ secrets.GMAIL_ADDRESS }}
           GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
-          NOTIFY_EMAIL_TO: ${{ secrets.NOTIFY_EMAIL_TO }}
+          # 2026-09-01: gmail 자신 + COMPANY_EMAIL(회사 메일) 둘 다로 발송 —
+          # core/notify.py의 EmailChannel이 콤마로 구분된 여러 수신자를
+          # 분리해서 각각 sendmail()에 넘기도록 이미 수정됨. NOTIFY_EMAIL_TO
+          # 시크릿을 따로 유지할 필요 없이 여기서 두 시크릿을 조합.
+          NOTIFY_EMAIL_TO: ${{ secrets.GMAIL_ADDRESS }},${{ secrets.COMPANY_EMAIL }}
         run: |
           if [ -n "${{ github.event.inputs.month }}" ]; then
             python -m engine.report.run --month "${{ github.event.inputs.month }}"
@@ -142,7 +146,7 @@ jobs:
         env:
           GMAIL_ADDRESS: ${{ secrets.GMAIL_ADDRESS }}
           GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
-          NOTIFY_EMAIL_TO: ${{ secrets.NOTIFY_EMAIL_TO }}
+          NOTIFY_EMAIL_TO: ${{ secrets.GMAIL_ADDRESS }},${{ secrets.COMPANY_EMAIL }}
         run: python -m scripts.send_report_email
 
       - name: Report that the report did not arrive
@@ -153,7 +157,7 @@ jobs:
         env:
           GMAIL_ADDRESS: ${{ secrets.GMAIL_ADDRESS }}
           GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
-          NOTIFY_EMAIL_TO: ${{ secrets.NOTIFY_EMAIL_TO }}
+          NOTIFY_EMAIL_TO: ${{ secrets.GMAIL_ADDRESS }},${{ secrets.COMPANY_EMAIL }}
         run: |
           python -m scripts.send_report_email \
             --failure-alert "daily-peos-report 워크플로가 실패했습니다 (생성·커밋·전달 중 한 단계)"
