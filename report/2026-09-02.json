@@ -17090,6 +17090,18 @@
         "investment_env_score": 67.4,
         "semiconductor_score": 83.8,
         "bond_score": 37.8
+      },
+      {
+        "date": "2026-09-02",
+        "kr_regime": "Late Expansion",
+        "kr_score": 1.0,
+        "kr_confidence": 90.5,
+        "us_regime": "Recession",
+        "us_score": -2.0,
+        "us_confidence": 96.4,
+        "investment_env_score": 67.4,
+        "semiconductor_score": 83.8,
+        "bond_score": 37.8
       }
     ],
     "trend_summary": {
