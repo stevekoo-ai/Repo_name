@@ -31,6 +31,11 @@ jobs:
       - name: Install poppler-utils (pdftotext, for income_analysis.py PDF parsing)
         run: sudo apt-get update && sudo apt-get install -y --no-install-recommends poppler-utils
 
+      - name: Install Playwright + Chromium (for income_analysis.py's LH청약플러스 PDF search — only NEW_MATCH pays this cost, but the browser must exist for that case)
+        run: |
+          pip install playwright
+          playwright install --with-deps chromium
+
       - name: Fetch listings, check 플랫폼시티 alerts, render page
         env:
           DATA_GO_KR_KEY: ${{ secrets.DATA_GO_KR_KEY }}

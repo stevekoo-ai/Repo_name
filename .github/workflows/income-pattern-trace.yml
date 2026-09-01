@@ -29,5 +29,7 @@ jobs:
           pip install playwright
           playwright install --with-deps chromium
 
-      - name: DEBUG apply.lh.or.kr structure probe
-        run: python3 collectors/subscription_monitor/_debug_lh_playwright.py
+      - name: Trace income requirement pattern across 서울/경기 국민주택
+        env:
+          DATA_GO_KR_KEY: ${{ secrets.DATA_GO_KR_KEY }}
+        run: python3 collectors/subscription_monitor/income_pattern_trace.py
