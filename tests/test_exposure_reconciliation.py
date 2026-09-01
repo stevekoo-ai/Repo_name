@@ -434,6 +434,64 @@ def test_report_email_carries_the_html_body_and_the_file():
     assert msg["Date"] and msg["Message-ID"]
 
 
+def test_email_channel_splits_comma_separated_recipients():
+    """2026-09-01: NOTIFY_EMAIL_TO="stevekoo.kr@gmail.com, byeongho.koo@sk.com"
+    (personal + company inbox) must reach BOTH addresses. Before this fix,
+    to_addr was passed through as one opaque string and sendmail() got called
+    as `sendmail(user, [to_addr], raw)` — wrapping the whole comma-string as a
+    single RFC821 recipient, so SMTP servers would either bounce it or (worse)
+    silently deliver to nowhere. This pins the fix: the constructor must split
+    on commas into the real per-recipient list SMTP needs, while the "To"
+    header stays a single human-readable comma-joined string."""
+    from core.notify import EmailChannel
+
+    ch = EmailChannel(
+        "smtp.example.com", 465, "me@example.com", "pw",
+        "stevekoo.kr@gmail.com, byeongho.koo@sk.com",
+    )
+
+    assert ch.to_addrs == ["stevekoo.kr@gmail.com", "byeongho.koo@sk.com"], (
+        "sendmail() must receive each address as its own list item"
+    )
+    assert ch.to_addr == "stevekoo.kr@gmail.com, byeongho.koo@sk.com", (
+        "the 'To' header should stay a single readable comma-joined string"
+    )
+
+    delivered_to = {}
+
+    class _FakeServer:
+        def __init__(self, *a, **kw): pass
+        def __enter__(self): return self
+        def __exit__(self, *a): return False
+        def login(self, user, password): pass
+        def sendmail(self, from_addr, to_addrs, raw):
+            delivered_to["to_addrs"] = to_addrs
+
+    import core.notify as notify_mod
+    real_smtp_ssl = notify_mod.smtplib.SMTP_SSL
+    notify_mod.smtplib.SMTP_SSL = _FakeServer
+    try:
+        ch.send("subject", "body")
+    finally:
+        notify_mod.smtplib.SMTP_SSL = real_smtp_ssl
+
+    assert delivered_to["to_addrs"] == ["stevekoo.kr@gmail.com", "byeongho.koo@sk.com"], (
+        "both recipients must actually be passed to smtplib.sendmail(), not just "
+        "stored on the object"
+    )
+
+
+def test_email_channel_single_recipient_unaffected():
+    """Backward compatibility: a plain single address (no comma) must keep
+    working exactly as before — this is the shape every existing secret/test
+    already uses."""
+    from core.notify import EmailChannel
+
+    ch = EmailChannel("smtp.example.com", 465, "me@example.com", "pw", "me@example.com")
+    assert ch.to_addrs == ["me@example.com"]
+    assert ch.to_addr == "me@example.com"
+
+
 def test_slack_does_not_try_to_post_raw_html():
     """A webhook cannot carry a document. Posting 300KB of markup into a channel
     is worse than sending the headline and pointing at the repo copy."""
