@@ -1357,6 +1357,20 @@ def read_latest_short_sale(ticker):
     return rows[-1]
 
 
+def read_short_sale_rows(ticker):
+    """공매도 CSV에서 해당 종목 행만 날짜순 정렬 — 1개월 추이 계산용(daily_report.py).
+    2026-09-01 신설."""
+    if not SHORT_SALE_CSV_PATH.exists():
+        return []
+    rows = []
+    with SHORT_SALE_CSV_PATH.open(newline="", encoding="utf-8") as f:
+        for row in csv.DictReader(f):
+            if row["ticker"] == ticker:
+                rows.append(row)
+    rows.sort(key=lambda r: r["date"])
+    return rows
+
+
 def read_latest_index(index_code):
     """지수 CSV에서 해당 업종코드 최신 행(코스피=0001/코스닥=1001/코스피200=2001).
     2026-08-05 신설."""
@@ -1371,6 +1385,20 @@ def read_latest_index(index_code):
         return None
     rows.sort(key=lambda r: r["date"])
     return rows[-1]
+
+
+def read_index_rows(index_code):
+    """지수 CSV에서 해당 업종코드 행만 날짜순 정렬 — 1개월 추이 계산용(daily_report.py).
+    2026-09-01 신설."""
+    if not INDEX_CSV_PATH.exists():
+        return []
+    rows = []
+    with INDEX_CSV_PATH.open(newline="", encoding="utf-8") as f:
+        for row in csv.DictReader(f):
+            if row["index_code"] == index_code:
+                rows.append(row)
+    rows.sort(key=lambda r: r["date"])
+    return rows
 
 
 def read_ticker_rows(ticker):
