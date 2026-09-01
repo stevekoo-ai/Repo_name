@@ -86,8 +86,18 @@ class IncomeAnalysis:
 def _search_keyword(house_name: str) -> str:
     """HOUSE_NM's leading token is what LH청약플러스 통합검색 matches on
     reliably (e.g. '성남복정2 A1블록 신혼희망타운(공공분양)(본청약)' -> '성남복정2') —
-    the full name (with 블록/괄호 suffixes) does not reliably match."""
-    return (house_name or "").split()[0] if (house_name or "").strip() else ""
+    the full name (with 블록/괄호 suffixes) does not reliably match.
+
+    A trailing '지구' also breaks the match — LH청약플러스 lists projects
+    under their short form (e.g. '남양주진접2지구 A-4블록...' -> HOUSE_NM's
+    leading token '남양주진접2지구' finds 0 results, but '남양주진접2' finds
+    the listing; confirmed empirically for both '남양주진접2지구' and
+    '양주회천지구' — '성남복정2'/'의정부우정', which have no '지구' suffix,
+    matched fine as-is)."""
+    first = (house_name or "").split()[0] if (house_name or "").strip() else ""
+    if first.endswith("지구"):
+        first = first[:-len("지구")]
+    return first
 
 
 def search_and_download_lh_pdf(house_name: str, download_dir: str) -> tuple[str, str]:
@@ -128,7 +138,10 @@ def search_and_download_lh_pdf(house_name: str, download_dir: str) -> tuple[str,
                     f"LH청약플러스에서 '{keyword}' 검색결과에 공고 상세 링크 없음 "
                     "(아직 미등록이거나 검색어가 실제 공고명과 다를 수 있음)"
                 )
-            detail_url = detail_link.get_attribute("href")
+            # NOTE: get_attribute("href") returns the raw (often relative)
+            # DOM attribute, which page.goto() cannot navigate to directly —
+            # .href via evaluate() returns the browser-resolved absolute URL.
+            detail_url = detail_link.evaluate("el => el.href")
 
             page.goto(detail_url, wait_until="networkidle", timeout=LH_NAV_TIMEOUT_MS)
 
