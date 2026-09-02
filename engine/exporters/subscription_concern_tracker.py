@@ -153,6 +153,9 @@ def _check_platform_city_privatization_risk(profile: dict, alerted_state: dict) 
         recommendation="공고 없음. subscription-monitor.yml이 5~30분마다 자동 감시 중, 조치 불필요",
         detail=[
             "과거 사례: 라온프라이빗 아르디에·e편한세상 용인역 플랫폼시티 → 전부 민영 분류",
+            "2026-09-02 웹 검색 확인(공식 미확정, wiki/concepts/yongin-platform-city-project-facts.md 참고): "
+            "공공주택은 A1~A4 블록(국민임대·영구임대 약 3,500세대 + 공공분양 약 1,500세대), "
+            "공공분양 예상 시기 2026년 하반기~2027년 초 — 정식 공고일은 아직 어디서도 확정 발표 안 됨",
             f"실시간 감시 키워드: {', '.join(ALERT_KEYWORDS)}",
         ],
     )
