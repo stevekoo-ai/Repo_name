@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>CXL Daily Update Report — 2026-08-20 (재조사)</title>
+<style>
+:root { --accent: #0066cc; --star3: #d32f2f; --star2: #f57c00; --star1: #6a8caf; --bg: #fafbfc; --card: #ffffff; --border: #d0d7de; --text: #1f2328; --muted: #656d76; }
+* { box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Malgun Gothic', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 24px; line-height: 1.55; font-size: 14px; }
+h1 { font-size: 22px; border-bottom: 2px solid var(--accent); padding-bottom: 8px; margin: 0 0 6px; }
+.meta { color: var(--muted); font-size: 12px; margin-bottom: 20px; border-left: 3px solid var(--accent); padding-left: 10px; }
+h2 { font-size: 17px; margin-top: 28px; margin-bottom: 10px; padding: 6px 0 6px 10px; border-left: 4px solid var(--accent); background: #eef3f8; }
+h3 { font-size: 14px; margin: 16px 0 8px; color: var(--text); }
+.delta { background: var(--card); border: 1px solid var(--border); border-radius: 6px; padding: 14px 16px; margin: 10px 0; }
+.delta h3 { margin-top: 0; }
+.star3 { color: var(--star3); font-weight: bold; }
+.star2 { color: var(--star2); font-weight: bold; }
+.star1 { color: var(--star1); font-weight: bold; }
+.delta .label { display: inline-block; font-weight: bold; color: var(--accent); margin-top: 8px; font-size: 13px; }
+table { border-collapse: collapse; width: 100%; margin: 10px 0; background: var(--card); font-size: 12.5px; }
+th, td { border: 1px solid var(--border); padding: 6px 9px; text-align: left; vertical-align: top; }
+th { background: #eef3f8; font-weight: 600; }
+tr:nth-child(even) { background: #f6f8fa; }
+.unchanged td { color: var(--muted); }
+.matrix td { font-size: 12px; }
+.insights-lead { background: #fff8e1; border: 1px solid #ffe082; border-left: 4px solid #ff8f00; border-radius: 6px; padding: 12px 16px; margin: 10px 0; }
+.insights-lead .lead-note { margin: 0 0 8px 0; font-size: 12px; color: #6d4c41; font-style: italic; }
+.insights-lead ol { margin: 0; padding-left: 20px; }
+.insights-lead li { margin: 8px 0; line-height: 1.55; }
+.insights-lead a { color: #1565c0; text-decoration: none; word-break: break-all; }
+.insights-lead a:hover { text-decoration: underline; }
+.actions { background: #e8f5e9; border: 1px solid #a5d6a7; border-radius: 6px; padding: 12px 16px; margin: 10px 0; }
+.actions ul { margin: 0; padding-left: 18px; }
+.actions li { margin: 4px 0; font-size: 13px; }
+.limitations { background: #fce4ec; border: 1px solid #f8bbd0; border-radius: 6px; padding: 10px 16px; font-size: 12px; color: #444; }
+.files { font-size: 12.5px; color: var(--muted); }
+.files a { color: var(--accent); text-decoration: none; }
+.files a:hover { text-decoration: underline; }
+code { background: #f0f0f0; padding: 1px 4px; border-radius: 3px; font-size: 12px; }
+.footer { margin-top: 30px; padding-top: 12px; border-top: 1px solid var(--border); color: var(--muted); font-size: 11px; }
+.headlines { background: var(--card); border: 1px solid var(--border); border-radius: 6px; padding: 12px 16px; margin: 10px 0; }
+.headlines ul { margin: 0; padding-left: 18px; }
+.headlines li { margin: 5px 0; }
+.diag { background: #e3f2fd; border: 1px solid #90caf9; border-left: 4px solid #1976d2; border-radius: 6px; padding: 12px 16px; margin: 10px 0; font-size: 14px; }
+.dynamo { background: #fff3e0; border: 1px solid #ffcc80; border-left: 4px solid #e65100; border-radius: 6px; padding: 12px 16px; margin: 10px 0; }
+.dynamo h3 { margin-top: 0; }
+.dynamo-list { margin: 0; padding-left: 18px; font-size: 12.5px; }
+.dynamo-list li { margin: 3px 0; }
+.dynamo-new { color: #d32f2f; font-weight: bold; }
+.dynamo-updated { color: #f57c00; font-weight: bold; }
+</style>
+</head>
+<body>
+
+<h1>CXL Daily Update Report — 2026-08-20 (재조사 21호)</h1>
+<div class="meta">
+발행일: 2026-08-20 07:37 KST &nbsp;|&nbsp;
+이전 호: 20호 (06:30 KST) &nbsp;|&nbsp;
+기준선: DRAFT v1.0(2026-08-19) + 20호 &nbsp;|&nbsp;
+조사항목: 12개 카테고리 추가 WebFetch 재조사
+</div>
+
+<div class="diag">
+<strong>🔍 오늘 한 줄 진단</strong><br>
+<strong>AMD MI455X 432GB HBM4 + TrendForce AI Inference 메모리 수요 5배 + Supermicro 단일 EPYC 9005 160-bay = CXL 생태계 인프라 압력 가중.</strong> AI 가속기의 메모리 요구가 HBM 단일 경로를 넘어 CPU RAM·KV offload·CMX로 분산되는 구조가 TrendForce 보고서로 정량화됨.
+</div>
+
+<h2>🟢 핵심 헤드라인 (★★★/★★)</h2>
+
+<div class="delta">
+<h3>AMD Instinct MI455X CDNA 5 — 432GB HBM4, 23.3TB/s 메모리 대역폭 <span class="star2">★★</span></h3>
+<div class="label">[변경]</div>
+<ul>
+<li>AMD가 Instinct MI455X CDNA 5 발표: 12 HBM4 스택, 432GB 로컬 메모리, 23.3 TB/s 메모리 대역폭 (세 대 2.9x), 3.6 TB/s UAL(Ultra Accelerator Link) 대역폭, 320B 트랜지스터(+72%).</li>
+<li>CXL 직접 지원 명시 없음 (UAL로 스케일업).</li>
+</ul>
+<div class="label">[영향]</div>
+<ul>
+<li>ServeTheHome(2026-08-12)는 AMD Instinct MI455X가 12개 HBM4 스택, 총 432GB 로컬 메모리를 탑재했다고 보도함. 메모리 대역폭은 초당 23.3TB로 전 세대 대비 2.9배 증가함.</li>
+</ul>
+<div class="label">[해석]</div>
+<ul>
+<li>MI455X의 432GB HBM4는 CXL 메모리 확장 필요성에 복합적 영향: (1) HBM 용량이 1.5x 증가했으나 여전히 AI 추론 워크로드(KV cache)에 충분치 않음 → CXL 메모리 풀링 수요 지속, (2) UAL로 스케일업하지만 CPU 호스트 메모리 확장(CXL)과는 다른 축 → CXL 메모리 확장은 CPU 호스트 레벨에서 여전히 의미 있음, (3) HBM4 램프가 가속기 단가 상승 요인 → CXL 확장으로 비용 절감 유인 강화.</li>
+</ul>
+<div class="label">[액션]</div>
+<ul>
+<li>DRAFT v1.0 5.2절(GPU/Accelerator):<br>
+<code>기존: "AMD Instinct MI350: 288GB HBM3E (Blackwell B200 192GB 대비 우세), CXL 지원 명시 없음"</code><br>
+<code>→ 변경: "AMD Instinct MI455X (CDNA 5): 12 HBM4 스택, 432GB 로컬, 23.3 TB/s 메모리 대역폭 (세 2.9x), 3.6 TB/s UAL. CXL 직접 지원 명시 없음. 320B 트랜지스터 (+72%)." ⬆️(21호 delta-1 ★★)</code></li>
+<li>DRAFT v1.0 5.3절(POR 매트릭스):<br>
+<code>기존: "AI 가속기 카드 (MI350): O (288GB), CXL 직접 지원 명시 없음"</code><br>
+<code>→ 변경: "AMD Instinct MI455X (CDNA 5): O (432GB HBM4), CXL 직접 지원 명시 없음 (UAL 스케일업). CXL 메모리 확장은 CPU 호스트 레벨에서 계속 의미." ⬆️(21호 delta-1 ★★)</code></li>
+</ul>
+</div>
+
+<div class="delta">
+<h3>TrendForce: AI Inference 메모리 수요 5배 증가, CMX 9,600TB/rack <span class="star1">★</span></h3>
+<div class="label">[변경]</div>
+<ul>
+<li>TrendForce (2026-07 보고): AI inference 쿼리 출력 30K-40K tokens (연 5배 증가), Agentic CPU:GPU 1:4~1:8 → 1:1 변화, CMX 9,600TB/rack (BlueField-4 DPU 관리).</li>
+<li>Jensen Huang: "AI memory system이 storage system을 완전히 혁신."</li>
+</ul>
+<div class="label">[영향]</div>
+<ul>
+<li>TrendForce는 AI inference가 메모리 수요를 연 5배로 증가시키고 있다고 분석함. Agentic 워크로드로 인해 CPU:GPU 비율이 1:4~1:8에서 1:1로 변하며 CPU RAM 요구가 급증함.</li>
+</ul>
+<div class="label">[해석]</div>
+<ul>
+<li>TrendForce 보고는 CXL 메모리 확장(CMX)의 장기적 가치에 강력한 정량적 근거를 제공: (1) Agentic workflows의 CPU:GPU 1:1 비율 변화는 CXL 메모리 풀링이 CPU 호스트 레벨에서 가장 cleanest win인 영역임을 재확인, (2) CMX 9,600TB/rack는 CSP 수준의 대용량 KV cache 풀이 실제로 필요함을 수치화 — DRAFT 8장(AI Rack/KV offload)과 연결, (3) Jensen Huang 발언은 메모리 시스템의 재구성이 AI 산업의 핵심 과제가 되었음을 보여줌.</li>
+</ul>
+<div class="label">[액션]</div>
+<ul>
+<li>DRAFT v1.0 8.2절(KV cache offloading):<br>
+<code>기존: "CXL shared memory pools로 인프라 비용 절감 + 확장 효율(연구 진행)"</code><br>
+<code>→ 변경: "TrendForce(2026-07): AI inference 쿼리 출력 30K-40K tokens (연 5배 증가), Agentic CPU:GPU 1:4~1:8 → 1:1, CMX 9,600TB/rack (BlueField-4 DPU 관리). Jensen Huang: 'AI memory system이 storage system을 완전히 혁신.' CXL 메모리 확장은 CPU RAM 요구 1:1 변화에서 cleanest win 영역." ⬆️(21호 delta-2 ★)</code></li>
+<li>DRAFT v1.0 9.3절(TCO/CAPEX):<br>
+<code>기존: "HBM 확장: 최고 성능, 최고 비용, 수급 제약"</code><br>
+<code>→ 변경: "HBM 확장: 최고 성능, 최고 비용, 수급 제약 (TrendForce: LPDRAM 부족으로 AI 서버가 스마트폰을 넘어 소비재 1위 추이, Nvidia 차세대 플랫폼 메모리 할당 감축)"</code></li>
+</ul>
+</div>
+
+<h2>🟡 참고 신호 (★)</h2>
+
+<div class="headlines">
+<ul>
+<li><strong>Cerebras WSE-3 Turbo + CS-4</strong> (ServeTheHome, Aug 19): 900,000 AI cores, 132GB on-die SRAM (3-chip), 129.6PB/sec — CXL 미언급. <em>Wafer-scale SRAM 대안 vs CXL 메모리 풀 경쟁 구도.</em> <a href="https://www.servethehome.com/cerebras-intros-faster-wse-3-turbo-processor-and-first-rack-scale-cs-4-system/">[출처]</a></li>
+<li><strong>Supermicro ASG-4116S-NU160R</strong> (ServeTheHome, Aug 14): 단일 AMD EPYC 9005로 160-bay NVMe 4U, 7개 CPU + 72 DIMM 절약. <em>EPYC 9005(CXL 2.0 지원) 기반이지만 CXL 미사용 — CXL 메모리 확장 가치 간접 근거.</em> <a href="https://www.servethehome.com/160-bay-nvme-ssd-4u-server-shown-at-fms-2026-supermicro-asg-4116s-nu160r/">[출처]</a></li>
+<li><strong>Qualcomm Modular 오픈소스</strong> (ServeTheHome, Aug 19): Apache 2.0, NVIDIA/AMD/AWS Trainium/Google TPUs 지원. <em>AI 스택 벤더 중립화 = CXL "진영 중립" 포지셔닝과 맥을 같이 함.</em> <a href="https://www.servethehome.com/qualcomm-modular-amd-open-sourced-at-modcon-2026/">[출처]</a></li>
+<li><strong>YMTC NAND 3위 진입 (14%)</strong> (Tom's Hardware, Aug 12): AI 서버 48% 플래시 소비. <em>CMM-H Hybrid CXL 원물 공급망 다변화.</em> <a href="https://www.tomshardware.com/tech-industry/ymtc-breaks-into-the-top-three-nand-makers-for-the-first-time">[출처]</a></li>
+<li><strong>RAM 가격 인덱스 2026</strong> (Tom's Hardware, Aug 17): 공급 제약 지속. <em>DRAM 가격 상승 20호 repeat.</em> <a href="https://www.tomshardware.com/pc-components/ram/ram-price-index-2026-lowest-price-on-ddr5-and-ddr4-memory-of-all-capacities">[출처]</a></li>
+</ul>
+</div>
+
+<h2>📋 12카테고리 Delta 매트릭스</h2>
+<table class="matrix">
+<tr><th>#</th><th>카테고리</th><th>상태</th><th>등급</th><th>핵심 신호</th></tr>
+<tr><td>1</td><td>CXL 스펙/표준</td><td>🟦 미변경</td><td>—</td><td>Consortium 404 4주 연속</td></tr>
+<tr><td>2</td><td>CXL 디바이스/미디어</td><td>🟨 △변경</td><td>★</td><td>TrendForce AI Inference 5배, CMX 9,600TB/rack</td></tr>
+<tr><td>3</td><td>컨트롤러 벤더</td><td>🟦 미변경</td><td>—</td><td>Panmnesia 신규 없음, ScaleFlux 403</td></tr>
+<tr><td>4</td><td>풀링 SW</td><td>🟦 미변경</td><td>—</td><td>신규 발표 없음</td></tr>
+<tr><td>5</td><td>서버 OEM</td><td>🟨 △변경</td><td>★</td><td>Supermicro EPYC 9005 단일 CPU 160-bay</td></tr>
+<tr><td>6</td><td>CPU/GPU CXL</td><td>🟨 △변경</td><td>★★</td><td>AMD MI455X 432GB HBM4, 23.3TB/s</td></tr>
+<tr><td>7</td><td>AI 패브릭</td><td>🟨 △변경</td><td>★</td><td>Qualcomm Modular 오픈소스</td></tr>
+<tr><td>8</td><td>Main Memory</td><td>🟨 △변경</td><td>★</td><td>RAM 인덱스 지속 상승 (repeat)</td></tr>
+<tr><td>9</td><td>AI Rack/KV offload</td><td>🟨 △변경</td><td>★</td><td>Cerebras CS-4 132GB SRAM, TrendForce KV offload</td></tr>
+<tr><td>10</td><td>LLM TCO</td><td>🟨 △변경</td><td>★</td><td>Supermicro CPU 7개 절약</td></tr>
+<tr><td>11</td><td>메모리 가격/실적</td><td>🟨 △변경</td><td>★</td><td>YMTC 3위(14%), NAND AI 48% 소비</td></tr>
+<tr><td>12</td><td>시장/CSP</td><td>🟨 △변경</td><td>★</td><td>Qualcomm Modular 오픈소스</td></tr>
+</table>
+
+<h2>📊 NVIDIA Dynamo Blog Digest (2026-08-20)</h2>
+<div class="dynamo">
+<h3>NVIDIA Dynamo 추론 서빙 시스템 — 전체 6개 포스트, NEW: 0, UPDATED: 0</h3>
+<ul class="dynamo-list">
+<li>2026-06-12 — Full-Stack Optimizations for Agentic Inference with Dynamo</li>
+<li>2026-05-29 — DynoSim: Simulating the Pareto Frontier</li>
+<li>2026-05-28 — Dynamo Snapshot: Fast Startup for Inference Workloads on Kubernetes</li>
+<li>2026-05-06 — Dynamo Day 0 support for TokenSpeed</li>
+<li>2026-04-30 — Streaming Tokens and Tools: Multi-Turn Agentic Harness Support</li>
+<li>2026-02-23 — Flash Indexer: A Story of Inter-Galactic KV Routing</li>
+</ul>
+<p style="margin: 8px 0 0 0; font-size: 12px; color: var(--muted);">전체 6개, 이번 발행 이후 신규 없음. Agentic Inference 최적화(6월)가 최신. CMX 9,600TB/rack과의 연결점: Dynamo의 KV offload + TrendForce의 CMX 아키텍처는 동일한 메모리 계층화 패러다임의 두 축.</p>
+</div>
+
+<h2>📝 후속 액션</h2>
+<div class="actions">
+<ul>
+<li>☐ DRAFT 5.2/5.3: AMD MI455X 432GB HBM4, 23.3TB/s 메모리 대역폭 추가 — delta-1</li>
+<li>☐ DRAFT 8.2: TrendForce AI Inference 5배 증가, CMX 9,600TB/rack — delta-2</li>
+<li>☐ DRAFT 9.3: LPDRAM 부족으로 AI 서버 &gt; 스마트폰 — delta-2</li>
+<li>△ Consortium 404 4주 연속 → LinkedIn/Twitter 폴백 경로 모색</li>
+<li>△ AMD MI455X CXL 지원 여부 확인 (3연속 미확인)</li>
+</ul>
+</div>
+
+<h2>⚠️ 데이터 한계 공개</h2>
+<div class="limitations">
+<ul>
+<li><strong>WebFetch 7개 도메인</strong>: ServeTheHome(3), Tom's Hardware(2), TrendForce, Astera Labs — 2026-08-12~20 기간 뉴스 수집.</li>
+<li><strong>🔴 LLM 종합</strong>: Delta 식별, 등급 부여, [해석] 서술은 LLM 추론.</li>
+<li><strong>차단 사이트</strong>: CXL Consortium(404, 4주 연속), ScaleFlux(403), RAM Price Index(403).</li>
+<li><strong>단일 출처</strong>: YMTC 14%(Tom's Hardware 단일), RAM 인덱스(403으로 상세 미확인).</li>
+</ul>
+</div>
+
+<div class="footer">
+CXL Daily Update 21호 · 2026-08-20 07:37 KST (재조사) · 기준선 DRAFT v1.0 + 20호 · 12개 카테고리 추가 WebFetch · delta 8건 (★★★ 0 / ★★ 1 / ★ 6 / 미변경 3)
+</div>
+
+</body>
+</html>

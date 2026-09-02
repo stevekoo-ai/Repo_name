@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CXL Daily Update 22호 — 2026-08-21</title>
+<style>
+  :root {
+    --canvas: #f5f5f7;
+    --surface: #ffffff;
+    --surface-2: #f0f0f5;
+    --ink: #1d1d1f;
+    --sub: #6e6e73;
+    --muted: #9e9ea7;
+    --border: rgba(29,29,31,0.08);
+    --accent: #4f46e5;
+    --accent-ink: #4338ca;
+    --accent-soft: #eef2ff;
+    --good: #0a8a5c;
+    --good-soft: #e6f6ef;
+    --warn: #b6720a;
+    --warn-soft: #fdf1de;
+    --bad: #c22b3a;
+    --bad-soft: #fbe9eb;
+    --shadow: 0 1px 3px rgba(29,29,31,0.05), 0 6px 20px rgba(29,29,31,0.06);
+    color-scheme: light;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    background: var(--canvas); color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", sans-serif;
+    line-height: 1.55; padding: 2rem 1rem 4rem;
+  }
+  .wrap { max-width: 1100px; margin: 0 auto; }
+  a { color: var(--accent-ink); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  /* Hero */
+  .hero { margin-bottom: 2rem; }
+  .eyebrow {
+    display:flex; align-items:center; gap:0.5rem; margin-bottom:0.7rem;
+    font-size: 0.7rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--accent-ink);
+  }
+  .eyebrow .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
+  h1 {
+    font-size: clamp(1.7rem, 3.5vw, 2.4rem); font-weight: 800; letter-spacing: -0.02em;
+    line-height: 1.15; margin-bottom: 0.4rem;
+  }
+  .hero-sub { color: var(--sub); font-size: 0.95rem; max-width: 58ch; margin-bottom: 0.8rem; }
+  .meta-row { display:flex; flex-wrap:wrap; gap: 0.4rem; }
+  .pill {
+    display:inline-flex; align-items:center; gap:0.3rem; padding: 0.28rem 0.65rem;
+    border-radius: 999px; font-size: 0.74rem; font-weight: 600; background: var(--surface-2);
+    border: 1px solid var(--border); color: var(--sub);
+  }
+  .pill.auto { color: var(--good); background: var(--good-soft); border-color: transparent; }
+  .pill.llm { color: var(--accent-ink); background: var(--accent-soft); border-color: transparent; }
+
+  /* Diagnosis */
+  .diagnosis {
+    background: var(--surface); border:1px solid var(--border); border-radius: 14px;
+    padding: 1.2rem 1.4rem; margin-bottom: 1.8rem; box-shadow: var(--shadow);
+    border-left: 4px solid var(--accent);
+    animation: fadeUp 0.4s ease-out;
+  }
+  .diagnosis .label { font-size:0.7rem; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; color:var(--accent-ink); margin-bottom:0.4rem; }
+  .diagnosis p { font-size: 0.98rem; font-weight: 500; }
+
+  /* Stat tiles */
+  .tiles { display:grid; grid-template-columns: repeat(4,1fr); gap:0.85rem; margin-bottom: 2rem; }
+  @media (max-width: 700px) { .tiles { grid-template-columns: repeat(2,1fr); } }
+  .tile {
+    background: var(--surface); border:1px solid var(--border); border-radius: 12px;
+    padding: 1rem 1.1rem; box-shadow: var(--shadow); transition: transform 0.15s, box-shadow 0.15s;
+  }
+  .tile:hover { transform: translateY(-2px); box-shadow: 0 2px 6px rgba(79,70,229,0.08), 0 8px 24px rgba(29,29,31,0.08); }
+  .tile .t-label { font-size:0.7rem; color: var(--sub); font-weight:600; margin-bottom:0.3rem; }
+  .tile .t-value { font-size:1.45rem; font-weight:800; letter-spacing:-0.01em; }
+  .tile .t-note { font-size:0.76rem; color: var(--sub); margin-top:0.2rem; }
+  .v-3star { color: var(--bad); } .v-2star { color: var(--warn); } .v-1star { color: var(--accent); } .v-0star { color: var(--good); }
+
+  /* Sections */
+  section { margin-bottom: 2.2rem; animation: fadeUp 0.4s ease-out; }
+  .sec-head { display:flex; align-items:baseline; gap:0.7rem; margin-bottom:0.9rem; flex-wrap:wrap; }
+  .sec-title { font-size:1.15rem; font-weight:800; letter-spacing:-0.01em; }
+  .sec-badge { font-size:0.7rem; font-weight:600; padding:0.15rem 0.5rem; border-radius:6px; background:var(--accent-soft); color:var(--accent-ink); }
+
+  /* Cards */
+  .card {
+    background: var(--surface); border:1px solid var(--border); border-radius: 14px;
+    padding: 1.2rem 1.3rem; box-shadow: var(--shadow); margin-bottom: 0.8rem;
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+  .card:hover { transform: translateY(-1px); box-shadow: 0 2px 6px rgba(79,70,229,0.07), 0 6px 20px rgba(29,29,31,0.07); }
+  .card-head { display:flex; align-items:flex-start; justify-content:space-between; gap:0.5rem; margin-bottom:0.6rem; }
+  .card-title { font-size:0.92rem; font-weight:700; line-height:1.35; }
+  .card-source { font-size:0.74rem; color:var(--sub); white-space:nowrap; }
+  .card-body { font-size:0.88rem; line-height:1.6; }
+  .card-body p { margin-bottom:0.4rem; }
+  .section-label {
+    display:inline-flex; align-items:center; gap:0.25rem; font-size:0.72rem; font-weight:700;
+    padding:0.15rem 0.5rem; border-radius:5px; margin-bottom:0.3rem; letter-spacing:0.03em;
+  }
+  .sl-fact { background: var(--good-soft); color: var(--good); }
+  .sl-impact { background: var(--warn-soft); color: var(--warn); }
+  .sl-interpret { background: var(--accent-soft); color: var(--accent-ink); }
+  .sl-action { background: var(--surface-2); color: var(--sub); }
+  .diff-block {
+    background: var(--surface-2); border:1px solid var(--border); border-radius:8px;
+    padding:0.7rem 0.9rem; margin-top:0.4rem; font-size:0.82rem; font-family: "SF Mono", "Fira Code", monospace;
+    line-height: 1.6;
+  }
+  .diff-old { color: var(--bad); } .diff-new { color: var(--good); }
+
+  /* Matrix table */
+  .scrollx { overflow-x:auto; margin-bottom:1rem; }
+  table.matrix { width:100%; border-collapse:collapse; font-size:0.8rem; }
+  table.matrix th { text-align:left; padding:0.5rem 0.5rem; border-bottom:2px solid var(--border); font-weight:700; color:var(--ink); font-size:0.74rem; }
+  table.matrix td { padding:0.45rem 0.5rem; border-bottom:1px solid var(--border); }
+  table.matrix tr:hover { background: #eef2ff; }
+  table.matrix .changed { color: var(--warn); font-weight:600; }
+  table.matrix .unchanged { color: var(--good); }
+
+  /* Delta matrix */
+  .delta-matrix { background: var(--surface); border:1px solid var(--border); border-radius:14px; padding:1.2rem; box-shadow: var(--shadow); }
+
+  /* Dynamo digest */
+  .dynamo-list { list-style:none; }
+  .dynamo-list li { padding:0.4rem 0; border-bottom:1px solid var(--border); font-size:0.84rem; }
+  .dynamo-list li:last-child { border-bottom:none; }
+  .dynamo-list a { font-weight:600; }
+  .dynamo-note { font-size:0.82rem; color:var(--sub); margin-top:0.4rem; }
+
+  /* Limitations */
+  .limitations { background: var(--surface); border:1px solid var(--border); border-radius:14px; padding:1rem 1.2rem; box-shadow: var(--shadow); }
+  .limitations li { font-size:0.82rem; margin-bottom:0.3rem; padding-left:0.3rem; }
+
+  /* Action items */
+  .action-list { list-style:none; counter-reset: action; }
+  .action-list li { counter-increment: action; font-size:0.86rem; padding:0.35rem 0 0.35rem 2rem; position:relative; border-bottom:1px solid var(--border); }
+  .action-list li:last-child { border-bottom:none; }
+  .action-list li::before {
+    content: counter(action); position:absolute; left:0; top:0.35rem;
+    width:1.5rem; height:1.5rem; border-radius:50%; background:var(--accent-soft); color:var(--accent-ink);
+    font-size:0.74rem; font-weight:700; display:flex; align-items:center; justify-content:center;
+  }
+
+  /* Footer */
+  .footer { margin-top:2rem; padding-top:1rem; border-top:1px solid var(--border); font-size:0.76rem; color:var(--muted); text-align:center; }
+
+  /* Animations */
+  @keyframes fadeUp {
+    from { opacity:0; transform:translateY(10px); }
+    to { opacity:1; transform:translateY(0); }
+  }
+  section:nth-child(2) { animation-delay: 0.05s; }
+  section:nth-child(3) { animation-delay: 0.1s; }
+  section:nth-child(4) { animation-delay: 0.15s; }
+  section:nth-child(5) { animation-delay: 0.2s; }
+  section:nth-child(6) { animation-delay: 0.25s; }
+  section:nth-child(7) { animation-delay: 0.3s; }
+  section:nth-child(8) { animation-delay: 0.35s; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<!-- Hero -->
+<div class="hero">
+  <div class="eyebrow"><span class="dot"></span>Steve's Wiki — CXL Daily Update</div>
+  <h1>CXL Daily Update 22호</h1>
+  <div class="hero-sub">CXL 기반 차세대 메모리 상품기획 — 매일 전수 조사 + 심층 분석</div>
+  <div class="meta-row">
+    <span class="pill">📅 2026-08-21 (목) 07:42 KST</span>
+    <span class="pill">📊 기준선: DRAFT v1.2</span>
+    <span class="pill">📈 직전: 21호 재조사</span>
+    <span class="pill auto">🟢 자동화(사실층)</span>
+    <span class="pill llm">🔴 LLM(해석층)</span>
+  </div>
+</div>
+
+<!-- Diagnosis -->
+<div class="diagnosis">
+  <div class="label">오늘의 한 줄 진단</div>
+  <p>CXL이 GPU 메모리 확장 영역으로 진전(LIQID-NVIDIA GTC 데모) + Hyperscaler 실제 spend $600B(DRAFT $725B 대비 H1 교차검증) + Mooncake Store 정량 3.8x/46x/95%+ — CXL 메모리 풀링의 <strong>cleanest win 영역이 정량적으로 입증</strong>.</p>
+</div>
+
+<!-- Stat tiles -->
+<div class="tiles">
+  <div class="tile">
+    <div class="t-label">총 delta 건수</div>
+    <div class="t-value">5</div>
+    <div class="t-note">변경 6건 / 미변경 6건</div>
+  </div>
+  <div class="tile">
+    <div class="t-label">★★★ 등급</div>
+    <div class="t-value v-3star">0</div>
+    <div class="t-note">판도 변경 없음</div>
+  </div>
+  <div class="tile">
+    <div class="t-label">★★ 등급</div>
+    <div class="t-value v-2star">2</div>
+    <div class="t-note">LIQID-NVIDIA / $600B spend</div>
+  </div>
+  <div class="tile">
+    <div class="t-label">★ 등급</div>
+    <div class="t-value v-1star">3</div>
+    <div class="t-note">Mooncake / SMART NV-CMM / CXL-GPU</div>
+  </div>
+</div>
+
+<!-- NVIDIA Dynamo Digest -->
+<section>
+  <div class="sec-head">
+    <span class="sec-title">📡 NVIDIA Dynamo Blog Digest</span>
+    <span class="sec-badge">매일 추적</span>
+  </div>
+  <div class="card">
+    <div class="card-body">
+      <p style="margin-bottom:0.5rem; font-size:0.84rem; color:var(--sub);">전체 6개 포스트 | NEW: 0 | UPDATED: 0</p>
+      <ul class="dynamo-list">
+        <li>Jun 12, 2026 — <a href="https://docs.nvidia.com/dynamo/dev/digest/agentic-inference" target="_blank">Full-Stack Optimizations for Agentic Inference with Dynamo</a></li>
+        <li>May 29, 2026 — <a href="https://docs.nvidia.com/dynamo/dev/digest/dynosim-pareto-frontier" target="_blank">DynoSim: Simulating the Pareto Frontier</a></li>
+        <li>May 28, 2026 — <a href="https://docs.nvidia.com/dynamo/dev/digest/dynamo-snapshot-fast-startup" target="_blank">Dynamo Snapshot: Fast Startup for Inference Workloads on Kubernetes</a></li>
+        <li>May 6, 2026 — <a href="https://docs.nvidia.com/dynamo/dev/digest/tokenspeed-day-0" target="_blank">Dynamo Day 0 support for TokenSpeed</a></li>
+        <li>April 30, 2026 — <a href="https://docs.nvidia.com/dynamo/dev/digest/agentic-harnesses" target="_blank">Streaming Tokens and Tools: Multi-Turn Agentic Harness Support in Dynamo</a></li>
+        <li>Feb 23, 2026 — <a href="https://docs.nvidia.com/dynamo/dev/digest/flash-indexer" target="_blank">Flash Indexer: A Story of Inter-Galactic KV Routing</a></li>
+      </ul>
+      <p class="dynamo-note">→ 전체 6개, 이번 발행 이후 신규 없음.</p>
+      <p style="margin-top:0.4rem; font-size:0.82rem; color:var(--accent-ink);">💡 CXL 상품기획 연결점: Dynamo의 KV cache 라우팅(Flash Indexer), Agentic Inference 최적화 — CXL 메모리 풀링과 직접 연계 가능한 KV offload 아키텍처.</p>
+    </div>
+  </div>
+</section>
+
+<!-- Headline deltas -->
+<section>
+  <div class="sec-head">
+    <span class="sec-title">🟢 핵심 헤드라인 (★★★/★★)</span>
+  </div>
+
+  <!-- Delta 1: LIQID-NVIDIA -->
+  <div class="card">
+    <div class="card-head">
+      <div class="card-title">★★ LIQID-NVIDIA GTC 2026: GPU + CXL 메모리 풀링/셰어링 솔루션 실증</div>
+      <div class="card-source">BusinessWire · 2026-03-12</div>
+    </div>
+    <div class="card-body">
+      <p><span class="section-label sl-fact">🟢 변경</span> LIQID가 NVIDIA GTC 2026 부스 #121에서 GPU와 CXL 메모리 풀링/셰어링 솔루션 live demo 발표. CXL 풀링이 CPU 메모리 확장에서 GPU 메모리 확장 영역으로 직접 적용되는 첫 대규모 행사 실증.</p>
+      <p><span class="section-label sl-impact">🔴 영향</span> BusinessWire (2026-03-12)는 LIQID가 NVIDIA GTC 2026 부스 #121에서 GPU+CXL 메모리 풀링/셰어링 솔루션을 live demonstrate한다고 보도함.</p>
+      <p><span class="section-label sl-interpret">🔴 해석</span> CXL이 CPU → GPU 메모리 확장으로 진전. NVIDIA GTC에서 GPU+CXL 제시 = NVLink 폐쇄 생태에 대한 CXL 대안 포지셔닝. DRAFT 6.3절 보강.</p>
+      <div class="diff-block">
+        <span class="diff-old">기존: "GPU 스케일업(NVLink/UALink)과 경쟁하지 않음."</span><br>
+        <span class="diff-new">→ 변경: "GPU 스케일업과 경쟁하지 않으나 보완을 넘어 통합 진전. LIQID-NVIDIA GTC 2026 GPU+CXL 메모리 풀링/셰어링 데모 실증."</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Delta 2: The Register $600B -->
+  <div class="card">
+    <div class="card-head">
+      <div class="card-title">★★ The Register (Aug 4): Cloud giants $600B+ capex spend — DRAFT $725B 전망과 실제 교차검증</div>
+      <div class="card-source">The Register · 2026-08-04</div>
+    </div>
+    <div class="card-body">
+      <p><span class="section-label sl-fact">🟢 변경</span> The Register (2026-08-04): 하이퍼스케일러 2026년 AI 인프라에 약 $600B 투자의 기록 — 연간 DRAFT 전망 $725B 대비 H1 기준 타당성 교차검증. "Revenue soaring, yet still more needed" — AI 투자 ROI 의문 지속.</p>
+      <p><span class="section-label sl-impact">🔴 영향</span> The Register (2026-08-04)는 하이퍼스케일러가 2026년 AI 인프라에 약 $600B를 투자의 기록했다고 보도함. 수익은 폭증하고 있으나, 하이퍼스케일러들은 여전히 더 많은 투자가 필요하다고 주장함.</p>
+      <p><span class="section-label sl-interpret">🔴 해석</span> DRAFT의 $725B 연간 전망 대비 H1 spend $600B+는 타당성 교차검증. CXL 풀링의 비용 절감 가치는 capex 효율성 의문이 지속되는 환경에서 부각될 수 있으나, spend 지연은 CXL 채택 속도에도 영향 가능. DRAFT 11.2절 갱신 필요.</p>
+      <div class="diff-block">
+        <span class="diff-old">기존: "2026 hyperscaler capex: $725B(+77% YoY, 2025 $410B 대비)"</span><br>
+        <span class="diff-new">→ 변경: "The Register(Aug 4) 실제 spend $600B+ 기록 — 연간 DRAFT 전망 $725B 대비 H1 기준 타당성 교차검증. 'Revenue soaring, yet still more needed' — AI 투자 ROI 의문 지속."</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Reference signals -->
+<section>
+  <div class="sec-head">
+    <span class="sec-title">🟡 참고 신호 (★)</span>
+  </div>
+
+  <div class="card">
+    <div class="card-head">
+      <div class="card-title">★ SMART Modular NV-CMM E3.S 2T — CXL Hybrid(NV-CMM) 실제 상용화</div>
+      <div class="card-source">Penguin Solutions/SMART · 2026-08-21</div>
+    </div>
+    <div class="card-body">
+      <p>SMART Modular의 CXL NV-CMM E3.S 2T가 CXL Compliance 달성. E3.S 폼팩터 — SSD 호환으로 데이터센터에서 CXL non-volatile memory 설치 가능. CMM-H 연구 단계 → 실제 상용화 단계 진입.</p>
+      <p style="margin-top:0.3rem; font-size:0.82rem; color:var(--accent-ink);">💡 CXL Hybrid(CMM-H)의 구체적 구현. NAND 공급 기반(SK Hynix Dalian Fab, YMTC 14%)과 시너지.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head">
+      <div class="card-title">★ Mooncake Store 정량 성능 — 3.8x throughput, 46x TTFT 감소, 95%+ cache hit rate</div>
+      <div class="card-source">vLLM Blog · 2026-05-06</div>
+    </div>
+    <div class="card-body">
+      <p>vLLM x Mooncake Store 통합 결과: 3.8x 처리량, 46x 낮은 TTFT, 95%+ cache hit rate, 60 workers까지 선형 확장. 실제 Kimi 서비스에서 검증. CXL 메모리 풀링에 직접 적용 가능한 아키텍처.</p>
+      <p style="margin-top:0.3rem; font-size:0.82rem; color:var(--accent-ink);">💡 동일 하드웨어로 3.8배 동시 추론 = CXL 풀링의 TCO 개선 가치 정량화. 95%+ cache hit rate = CXL shared memory pool에서 더 큰 효과 기대.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head">
+      <div class="card-title">★ arxiv "CXL-GPU" 논문 — GPU Storage Expansion with CXL</div>
+      <div class="card-source">arxiv 2506.15601 · 2025-06-19</div>
+    </div>
+    <div class="card-body">
+      <p>CXL을 통한 GPU storage expansion 솔루션 제안 — GPU 시스템 설계에 CXL 통합, SMT5 대비 CXL-Opt 레이턴시 우세. LIQID-NVIDIA GTC 데모의 연구적 배경.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 12 Category Delta Matrix -->
+<section>
+  <div class="sec-head">
+    <span class="sec-title">📋 12카테고리 Delta 매트릭스</span>
+  </div>
+  <div class="delta-matrix">
+    <div class="scrollx">
+      <table class="matrix">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>카테고리</th>
+            <th>상태</th>
+            <th>등급</th>
+            <th>핵심 신호</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>1</td>
+            <td>CXL 스펙/표준</td>
+            <td class="unchanged">미변경</td>
+            <td>—</td>
+            <td>백서 이미 v1.2 반영</td>
+          </tr>
+          <tr>
+            <td>2</td>
+            <td>CXL 디바이스/미디어</td>
+            <td class="changed">△변경</td>
+            <td><span style="color:var(--accent);font-weight:700;">★</span></td>
+            <td>SMART Modular NV-CMM E3.S 2T CXL Compliance</td>
+          </tr>
+          <tr>
+            <td>3</td>
+            <td>컨트롤러 벤더</td>
+            <td class="unchanged">미변경</td>
+            <td>—</td>
+            <td>검색 오류로 확인 불가, v1.2 기준 유지</td>
+          </tr>
+          <tr>
+            <td>4</td>
+            <td>풀링 SW/어플라이언스</td>
+            <td class="changed">△변경</td>
+            <td><span style="color:var(--accent);font-weight:700;">★</span></td>
+            <td>LIQID-NVIDIA GTC GPU+CXL 풀링 데모</td>
+          </tr>
+          <tr>
+            <td>5</td>
+            <td>서버 OEM</td>
+            <td class="unchanged">미변경</td>
+            <td>—</td>
+            <td>신규 없음</td>
+          </tr>
+          <tr>
+            <td>6</td>
+            <td>CPU/GPU CXL</td>
+            <td class="changed">△변경</td>
+            <td><span style="color:var(--warn);font-weight:700;">★★</span></td>
+            <td>LIQID-NVIDIA GTC + CXL-GPU 논문</td>
+          </tr>
+          <tr>
+            <td>7</td>
+            <td>AI 패브릭</td>
+            <td class="changed">△변경</td>
+            <td><span style="color:var(--accent);font-weight:700;">★</span></td>
+            <td>Vera Rubin NVL72 실제 생산 라인업</td>
+          </tr>
+          <tr>
+            <td>8</td>
+            <td>Main Memory</td>
+            <td class="unchanged">미변경</td>
+            <td>—</td>
+            <td>JEDEC LPDDR6 이미 반영</td>
+          </tr>
+          <tr>
+            <td>9</td>
+            <td>AI Rack/KV offload</td>
+            <td class="changed">△변경</td>
+            <td><span style="color:var(--warn);font-weight:700;">★★</span></td>
+            <td>Mooncake Store 3.8x/46x/95%+ 정량</td>
+          </tr>
+          <tr>
+            <td>10</td>
+            <td>LLM TCO 모델</td>
+            <td class="unchanged">미변경</td>
+            <td>—</td>
+            <td>DRAFT v1.2 기준 유지</td>
+          </tr>
+          <tr>
+            <td>11</td>
+            <td>메모리 가격/실적</td>
+            <td class="unchanged">미변경</td>
+            <td>—</td>
+            <td>DRAFT v1.2 기준 유지</td>
+          </tr>
+          <tr>
+            <td>12</td>
+            <td>시장/CSP</td>
+            <td class="changed">△변경</td>
+            <td><span style="color:var(--warn);font-weight:700;">★★</span></td>
+            <td>The Register $600B+ spend 교차검증</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- 미변경 카테고리 -->
+<section>
+  <div class="sec-head">
+    <span class="sec-title">🔍 미변경 카테고리 — 재검사 결과</span>
+  </div>
+  <div class="limitations">
+    <ul>
+      <li><strong>CXL 스펙/표준(1)</strong> — 백서 이미 v1.2 반영, 신규 없음</li>
+      <li><strong>컨트롤러 벤더(3)</strong> — 검색 engine 오류, DRAFT v1.2 기준 유지</li>
+      <li><strong>서버 OEM(5)</strong> — 검색 engine 오류, DRAFT v1.2 기준 유지</li>
+      <li><strong>Main Memory(8)</strong> — JEDEC LPDDR6 이미 v0.7 반영, 신규 없음</li>
+      <li><strong>LLM TCO(10)</strong> — 검색 engine 오류, DRAFT v1.2 기준 유지</li>
+      <li><strong>메모리 가격(11)</strong> — 검색 결과 DRAFT v1.2 내용과 중복, 신규 delta 없음</li>
+    </ul>
+  </div>
+</section>
+
+<!-- Limitations -->
+<section>
+  <div class="sec-head">
+    <span class="sec-title">📊 데이터 한계 공개</span>
+  </div>
+  <div class="limitations">
+    <ul>
+      <li><span class="section-label sl-fact">🟢 자동화</span> — `python search.py` DuckDuckGo 기반 12카테고리 전수 조사. 원시 데이터 <code>sources/cxl-daily-raw-2026-08-21.md</code>에 보존.</li>
+      <li><span class="section-label sl-interpret">🔴 LLM</span> — Delta 식별, 등급 부여, [해석] 서술은 LLM 추론.</li>
+      <li><strong>사실/의견 분리:</strong> [영향](제공자 발언 인용)과 [해석](LLM CXL 분석) 엄격 분리 준수.</li>
+      <li><strong>차단/검색 오류:</strong> 컨트롤러 벤더(3번), 서버 OEM(5번), LLM TCO(10번) — <code>python search.py</code>가 특정 키워드에서 무관한 결과 반환. DuckDuckGo 검색 quality 불안정.</li>
+      <li><strong>단일 출처:</strong> The Register $600B(단일), Mooncake Store 성능(vLLM 공식 — 단일이지만 1차 출처).</li>
+    </ul>
+  </div>
+</section>
+
+<!-- 후속 액션 -->
+<section>
+  <div class="sec-head">
+    <span class="sec-title">⚡ 후속 액션</span>
+  </div>
+  <div class="card">
+    <div class="card-body">
+      <ol class="action-list">
+        <li><strong>SMART Modular NV-CMM E3.S 2T</strong> → DRAFT 2.4/2.5절(CXL Hybrid) 보강</li>
+        <li><strong>컨트롤러 벤더(3번)</strong> — 다음 발행 시 <code>python search.py</code> 재시도 실패 시 직접 WebFetch로 Panmnesia/ScaleFlux/Montage 사이트 확인</li>
+        <li><strong>The Register $600B spend</strong> — DRAFT 11.2절에 연간 전망 vs 실제 spend 격차 서술</li>
+        <li><strong>LIQID-NVIDIA GTC GPU+CXL 풀링</strong> — DRAFT 6.3절(CXL의 역할) 보강</li>
+        <li><strong>Mooncake Store</strong> — CXL 메모리 풀링 아키텍처로 직접 적용 가능성 심층 분석</li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
+<div class="footer">
+  <p>CXL Daily Update 22호 | 발행: 2026-08-21 07:42 KST | DRAFT v1.3 반영 완료</p>
+  <p>MD: <code>wiki/daily-updates/cxl-daily-update-2026-08-21.md</code> | HTML: <code>wiki/cxl-daily-report-2026-08-21-0742.html</code></p>
+  <p>delta 건수: ★★★ 0건, ★★ 2건, ★ 3건, 미변경 6건 | 조사 소스: The Register, BusinessWire, vLLM Blog, NVIDIA 공식, Penguin Solutions/SMART, arxiv</p>
+</div>
+
+</div>
+</body>
+</html>

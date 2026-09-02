@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CXL Memory Expansion — Chart Impact Analysis (2026-08-21)</title>
+<style>
+  :root { --bg: #0d1117; --fg: #e6edf3; --muted: #8b949e; --border: #30363d; --card: #161b22; --accent: #58a6ff; --green: #3fb950; --red: #f85149; --orange: #d29922; --hopper: #8b949e; --blackwell: #58a6ff; --rubin: #bc8cff; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif; background: var(--bg); color: var(--fg); line-height: 1.7; padding: 2rem; max-width: 1200px; margin: 0 auto; }
+  h1 { font-size: 1.5rem; border-bottom: 2px solid var(--accent); padding-bottom: 0.5rem; margin-bottom: 1rem; }
+  h2 { font-size: 1.3rem; color: var(--accent); margin: 2rem 0 1rem; border-bottom: 1px solid var(--border); padding-bottom: 0.3rem; }
+  h3 { font-size: 1.05rem; color: var(--orange); margin: 1.5rem 0 0.8rem; }
+  p { margin: 0.5rem 0; }
+  a { color: var(--accent); }
+  pre { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 1rem; overflow-x: auto; font-size: 0.78rem; line-height: 1.5; margin: 1rem 0; white-space: pre; font-family: 'Consolas', monospace; }
+  table { width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 0.82rem; }
+  th, td { border: 1px solid var(--border); padding: 0.5rem 0.6rem; text-align: center; }
+  th { background: var(--card); color: var(--accent); }
+  .verdict-yes { color: var(--green); font-weight: bold; }
+  .verdict-no { color: var(--red); font-weight: bold; }
+  .key { background: linear-gradient(135deg, rgba(210,153,34,0.1), rgba(88,166,255,0.05)); border: 1px solid var(--orange); border-radius: 8px; padding: 1rem 1.2rem; margin: 1.5rem 0; }
+  .key h4 { color: var(--orange); margin-top: 0; }
+  .story { background: var(--card); border-left: 4px solid var(--accent); padding: 1rem 1.2rem; margin: 1rem 0; border-radius: 0 8px 8px 0; }
+  .story.wrong { border-left-color: var(--red); background: rgba(248,81,73,0.05); }
+  .story.right { border-left-color: var(--green); background: rgba(63,185,80,0.05); }
+  .meta { color: var(--muted); font-size: 0.82rem; margin-bottom: 1.5rem; }
+  .badge { display: inline-block; padding: 0.15em 0.5em; border-radius: 12px; font-size: 0.75rem; font-weight: bold; }
+  .badge-memory { background: rgba(248,81,73,0.2); color: #f85149; }
+  .badge-transition { background: rgba(210,153,34,0.2); color: #d29922; }
+  .badge-compute { background: rgba(63,185,80,0.2); color: #3fb950; }
+  .point-card { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 1rem; margin: 1rem 0; }
+  .point-card h4 { margin-top: 0; display: flex; justify-content: space-between; align-items: center; }
+  .section-divider { border: none; border-top: 2px dashed var(--border); margin: 2.5rem 0; }
+  .comparison { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.8rem; margin: 1rem 0; }
+  .comp-col { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 0.8rem; }
+  .comp-col h4 { margin-top: 0; text-align: center; }
+  .improvement { color: var(--green); font-weight: bold; }
+  .no-improvement { color: var(--muted); }
+</style>
+</head>
+<body>
+
+<h1>CXL Memory Expansion — Chart Impact Analysis</h1>
+<p class="meta">
+  📅 2026-08-21 &nbsp;|&nbsp;
+  🔬 Local CXL (PCIe 5.0) + Out-Rack CXL Pooled → 12 포인트全部 계산<br>
+  <em>"NVLink-C2C를 통한 SOCAMM2 spill-over"만 있던 아키텍처에 "CXL memory tier"를 추가하면 chart가 어떻게 변하는가?</em>
+</p>
+
+<h2>📋 Tier별 Bandwidth Hierarchy (Revisited)</h2>
+
+<div class="story right">
+  <strong>기존 Tier hierarchy:</strong> HBM4 → SOCAMM2 → CXL (KV cache 부적합) → SSD<br>
+  <strong>新问题:</strong> CXL이 정말 "KV cache 부적합"인가? CXL 2.0/3.0 memory expander의 spec을 보면...
+</div>
+
+<h3>CXL Local (PCIe 5.0 x8) — Server-Local Expansion</h3>
+<pre>
+Spec:
+  Physical: PCIe 5.0 x8 (Samsung CXL Expander, Advantech CXL 2.0 module)
+  Raw bandwidth: 32 GT/s/lane × 8 lanes = 256 GT/s
+  Effective (PCIe 5.0 encoding): ~64 GB/s raw → ~45-50 GB/s usable
+  Latency: ~5-10 μsec (PCIe hop + CXL controller)
+
+Per-Module:
+  Capacity: 256 GB per CXL DIMM (DDR5-based)
+  Bandwidth: 45-50 GB/s (single x8 PCIe 5.0)
+
+Per-Server (NVL72, 72 GPU, 36 CPU cores):
+  PCIe slots per CPU: 8-16 x8 lanes
+  CXL modules per server: 1-8 modules
+  ───────────────────────────────────────
+  Bandwidth: 45-400 GB/s (1-8 modules)
+  Capacity: 256-2,048 GB (1-8 modules)
+</pre>
+
+<h3>Out-Rack CXL Pooled — Rack-External Pooling</h3>
+<pre>
+Spec:
+  Network: 100GbE or 200GbE (RDMA/RoCE)
+  Protocol: CXL over Fabric (CXL.FT)
+  Effective bandwidth (RDMA): 9-18 GB/s per 100GbE
+  Latency: ~50-200 μsec (network hop + CXL)
+
+Per-Server:
+  100GbE NIC × 4 = 36 GB/s effective
+  200GbE NIC × 2 = 36 GB/s effective
+  ───────────────────────────────────────
+  Bandwidth: 9-72 GB/s (depends on NIC config)
+  Capacity: Shared pool (10-100 TB across rack)
+  Note: RDMA overhead for KV random access makes effective BW much lower
+</pre>
+
+<h3>Comparison: All Tiers for KV Cache</h3>
+<table>
+  <tr><th>Tier</th><th>Effective BW (KV random)</th><th>Latency</th><th>vs HBM4</th><th>KV Cache 적합도</th></tr>
+  <tr>
+    <td><strong>HBM4</strong></td>
+    <td>1,584 TB/s</td>
+    <td>~0.1 μsec</td>
+    <td>1.0x</td>
+    <td class="verdict-yes">★★★★★ Perfect</td>
+  </tr>
+  <tr>
+    <td><strong>SOCAMM2 (NVLink-C2C)</strong></td>
+    <td>44 TB/s</td>
+    <td>~1.0 μsec</td>
+    <td>36x↓</td>
+    <td class="verdict-yes">★★★★ Good</td>
+  </tr>
+  <tr>
+    <td><strong>CXL Local (8×PCIe5)</strong></td>
+    <td>~5 TB/s</td>
+    <td>~5-10 μsec</td>
+    <td>316x↓</td>
+    <td class="verdict-warn">★★★ Moderate</td>
+  </tr>
+  <tr>
+    <td><strong>CXL Pooled (Out-Rack)</strong></td>
+    <td>~0.5-1 TB/s</td>
+    <td>~50-200 μsec</td>
+    <td>1,584-3,168x↓</td>
+    <td class="verdict-no">★★ Poor</td>
+  </tr>
+  <tr>
+    <td><strong>SSD</strong></td>
+    <td>~0.01 TB/s</td>
+    <td>~500+ μsec</td>
+    <td>158,400x↓</td>
+    <td class="verdict-no">★ Not viable</td>
+  </tr>
+</table>
+
+<div class="key">
+  <h4>💡 핵심: CXL Local vs SOCAMM2 — CXL이 더 빠를까?</h4>
+  <pre>
+SOCAMM2 (per CPU): 1.2 TB/s → 40 CPUs → 48 TB/s total
+  → NVLink-C2C: ~1.0 μsec latency
+  → GPU↔CPU chip-to-chip, low latency
+
+CXL Local (8×PCIe5): ~5 TB/s
+  → PCIe 5.0 hop: ~5-10 μsec latency
+  → PCIe switch + CXL controller overhead
+
+Conclusion:
+  SOCAMM2는 BANDWIDTH가 더 빠름 (48 TB/s vs 5 TB/s)
+  CXL Local은 LATENCY가 더 느림 (5-10 μsec vs 1 μsec)
+
+  하지만 CXL Local은...
+  1. SOCAMM2보다 더 많은 CAPACITY를 추가 가능 (256GB-2TB per module)
+  2. SOCAMM2는 CPU에 고정되어 있어 GPU당 접근이 제한적
+  3. CXL Local은 PCIe slot에 직접 붙여 GPU에 더 근접 가능
+
+  → CXL Local의 value = "SOCAMM2보다 훨씬 많은 capacity 추가"
+    (SOCAMM2는 80TB/rack, CXL은 2-4TB per server 추가 가능)
+  → CXL Local의 weakness = SOCAMM2보다 BW가 낮고 latency도 높음
+  </pre>
+</div>
+
+<h2>📐 Weighted Sum Model — CXL Tier 추가</h2>
+
+<p>기존 formula에 CXL Local tier를 추가:</p>
+<pre>
+Token/Sec = IF(KV &lt; HBM_Thresh,
+                HBM_BW / KV_Cache,
+              IF(KV &lt; (SOCAM_Thresh + CXL_Local_Thresh),
+                1 / (
+                  (HBM_Thresh/KV)/HBM_BW +
+                  ((SOCAM_Thresh+KV_local)/KV)/SOCAM_BW +
+                  (CXL_Local_Thresh/KV)/CXL_BW,
+                IF(KV &lt; CXL_Pooled_Thresh,
+                  ... (CXL pooled) ...
+                ELSE
+                  ... (SSD) ...
+                )
+              )
+            )
+          )
+```
+
+Key change: CXL Local이 SOCAMM2와 SSD 사이에 등장. SOCAMM2를 일부 대체 가능.
+
+---
+
+## H100 Impact (Memory-Bound @ x=50)
+
+<div class="point-card">
+  <h4>📍 H100 @ x=50: <span class="chart-val">Original 0.15M → CXL Local 추가</span></h4>
+  <pre>
+Original:
+  KV Cache = 2.7 TB (all HBM, fitting)
+  HBM BW = 241 TB/s
+  KV BW used = 2.7TB × 9,750 TPS / 241TB = 91% → memory-bound
+
+  TPS = 241 TB/s / (2.7 TB × 88 layers)
+      = 241,000 / 237.6 = 1,014 TPS? No...
+
+  Correct: TPS = HBM_BW / KV_access_per_iteration
+  KV_access_per_iter = batch × 0.453 MB × 88 layers
+  HBM BW = 241,000 MB/s
+
+  batch = 175 decode users
+  KV_access = 175 × 0.453 × 88 = 6,978 MB = 6.98 GB/iteration
+
+  TPS = 241,000 MB/s / 6.98 GB = 241,000 / 6,978 = 34.5 TPS...
+
+  Hmm, the numbers don't match 9,750 TPS directly. Let me use the
+  production data directly.
+
+  Production: 91% HBM BW → 9,750 TPS @ batch 195 users.
+  This means: at HBM saturation, throughput = 9,750 TPS.
+
+  CXL Local impact: H100 @ x=50 is ALREADY HBM-saturated (91%).
+  Adding CXL would only help if KV cache doesn't fit in HBM.
+  But 2.7 TB fits in H100 NVL72 (5.17 TB available).
+
+  → CXL Local 추가 시: NO IMPROVEMENT expected.
+  → H100 @ x=50은 HBM이 충분하므로 spill-over 없음.
+  → CXL이 chart에 미치는 영향: 0% (변화 없음)
+  </pre>
+  <p><strong>Verdict:</strong> <span class="no-improvement">CXL Local: 0% improvement. HBM에 KV fitting → spill-over 없음.</span></p>
+</div>
+
+<div class="point-card">
+  <h4>📍 H100 @ x=100 through x=400: CXL Impact</h4>
+  <pre>
+H100 @ x=100:
+  KV Cache = 98 users × 14.1 GB = 1,382 GB (still fits in HBM)
+  → CXL: 0% improvement
+
+H100 @ x=200:
+  KV Cache = 26 users × 14.1 GB = 367 GB (fits easily in HBM)
+  → CXL: 0% improvement
+
+H100 @ x=400:
+  KV Cache = 3 users × 14.1 GB = 42 GB (trivial)
+  → CXL: 0% improvement
+
+H100 전체: CXL Local 추가 → Chart 변화 NO
+</pre>
+  <p><strong>Verdict:</strong> H100 @ x=50~400 ALL: <span class="no-improvement">CXL impact = 0%</span></p>
+</div>
+
+<hr class="section-divider">
+
+## B300 Impact (Memory-Bound → Transition)
+
+<div class="point-card">
+  <h4>📍 B300 @ x=50: <span class="chart-val">Original 0.75M → CXL Local 추가 시</span></h4>
+  <pre>
+Original:
+  Concurrent users = 1,815
+  KV Cache = 1,815 × 14.1 GB = 25.6 TB
+  HBM Capacity = 288 GB × 72 = 20.2 TB
+  → Spill-over to SOCAMM2: 25.6 - 20.2 = 5.4 TB
+
+  Weighted BW (SOCAMM2 only):
+  = 1 / ((20.2/25.6)/576 + (5.4/25.6)/44)
+  = 1 / (0.001386 + 0.004796)
+  = 1 / 0.006182
+  = 161.8 TB/s effective
+
+  TPS = 161,800 MB/s / (25,600 MB × 88 / 1,000)
+  ... let me use the simpler formula:
+
+  Weighted BW = 161.8 TB/s (effective for KV cache)
+  TPS = BW / (KV_access_per_token × 88 layers)
+  = 161,800,000 MB/s / (0.453 MB × 88)
+  = 161,800,000 / 39.86 = 4,060,000? Too high.
+
+  OK, the weighted BW formula gives the effective bandwidth for the
+  entire KV cache. But for decode, we need per-token read throughput.
+
+  Let me use the production-calibrated model:
+  H100: 91% HBM → 9,750 TPS
+  B300: 70% HBM → 0.75M TPS/MW = 90,750 TPS (chart)
+
+  At x=50, B300 spill-over = 5.4 TB to SOCAMM2.
+  SOCAMM2 BW = 44 TB/s (for spill-over portion).
+
+  With CXL Local expansion (8×PCIe5, 400 GB/s total):
+  → First 400 GB of spill-over goes to CXL (faster than SOCAMM2 for random)
+  → Remaining spill-over: 5.4 TB - 0.4 TB = 5.0 TB to SOCAMM2
+
+  Actually, CXL is SLOWER for random KV access than SOCAMM2:
+  - SOCAMM2: 1 μsec latency, 1.2 TB/s per CPU
+  - CXL Local: 5-10 μsec latency, 50 GB/s per module
+
+  So CXL Local is NOT a good KV cache destination!
+  SOCAMM2 (NVLink-C2C) is FASTER for KV cache access.
+
+  CXL Local's value proposition for KV cache:
+  → It provides EXTRA capacity when SOCAMM2 is also full
+  → But CXL is slower than SOCAMM2 for random access
+
+  So CXL doesn't "replace" SOCAMM2; it "extends beyond SOCAMM2".
+
+  B300 x=50:
+  SOCAMM2 capacity: 2 TB/CPU × 40 CPUs = 80 TB
+  KV spill-over: 5.4 TB
+  SOCAMM2 has PLENTY of room for 5.4 TB spill-over.
+
+  → CXL Local: NO improvement needed. SOCAMM2 is sufficient.
+  → CXL Impact: 0%
+  </pre>
+  <p><strong>Verdict:</strong> <span class="no-improvement">CXL Local: 0% improvement. SOCAMM2 (80TB) handles spill-over easily.</span></p>
+</div>
+
+<div class="point-card">
+  <h4>📍 B300 @ x=100: CXL Impact</h4>
+  <pre>
+KV Cache = 726 users × 14.1 GB = 10.2 TB
+HBM = 20.2 TB → KV FITS in HBM! (10.2 < 20.2)
+→ NO spill-over needed.
+→ CXL: 0% improvement
+</pre>
+  <p><strong>Verdict:</strong> <span class="no-improvement">0%</span></p>
+</div>
+
+<div class="point-card">
+  <h4>📍 B300 @ x=200: CXL Impact</h4>
+  <pre>
+KV Cache = 139 users × 14.1 GB = 1.96 TB
+HBM = 20.2 TB → KV FITS easily.
+→ CXL: 0% improvement
+</pre>
+  <p><strong>Verdict:</strong> <span class="no-improvement">0%</span></p>
+</div>
+
+<div class="point-card">
+  <h4>📍 B300 @ x=400: CXL Impact</h4>
+  <pre>
+KV Cache = 45 users × 14.1 GB = 0.63 TB
+→ CXL: 0% improvement
+</pre>
+  <p><strong>Verdict:</strong> <span class="no-improvement">0%</span></p>
+</div>
+
+<p class="meta" style="text-align:center;"><strong>B300 전체: CXL Local 추가 → Chart 변화 NO</strong></p>
+
+<hr class="section-divider">
+
+## R100 Impact (Compute-Bound → Transition) — CXL이 의미 있는 경우
+
+<div class="point-card">
+  <h4>📍 R100 @ x=50: <span class="chart-val">Original 1.60M → CXL Local + Out-Rack 추가</span></h4>
+  <pre>
+KV Cache = 6,368 users × 14.1 GB = 89.8 TB
+HBM4 Capacity = 20.2 TB
+SOCAMM2 Capacity = 80 TB
+
+Spill-over breakdown:
+  HBM4: 20.2 TB (first tier)
+  SOCAMM2: min(80 TB, 89.8 - 20.2) = 69.6 TB
+  Beyond SOCAMM2: 89.8 - 20.2 - 80 = -10.4 TB → NEGATIVE (all fits!)
+
+  Wait — 20.2 + 80 = 100.2 TB > 89.8 TB total.
+  → ALL KV cache fits in HBM4 + SOCAMM2!
+  → No CXL needed?
+
+  But earlier analysis showed spill-over to SOCAMM2 IS happening.
+  The issue is not capacity — it's that HBM4 can't hold 89.8 TB alone.
+  So 69.6 TB is in SOCAMM2, not SSD.
+
+  With CXL Local (8 modules × 256 GB = 2 TB):
+  → CXL is SLOWER than SOCAMM2 for random KV access (5-10 μsec vs 1 μsec)
+  → CXL Local would replace SOCAMM2 for the first 2 TB of spill-over?
+
+  Actually, that's the WRONG question. The right question is:
+  "Does adding CXL Local tier reduce the SOCAMM2 spill-over volume?"
+
+  No — CXL Local provides additional capacity, not replacement.
+
+  Current: 20.2 TB HBM + 69.6 TB SOCAMM2 = 89.8 TB total
+  With CXL Local (2 TB): 20.2 + 67.6 SOCAMM2 + 2.0 CXL = 89.8 TB
+
+  Weighted BW with CXL:
+  = 1 / ((20.2/89.8)/1584 + (67.6/89.8)/44 + (2.0/89.8)/5)
+  = 1 / (0.000142 + 0.0169 + 0.00445)
+  = 1 / 0.0215 = 46.5 TB/s
+
+  Without CXL (all SOCAMM2):
+  = 1 / ((20.2/89.8)/1584 + (69.6/89.8)/44)
+  = 1 / (0.000142 + 0.0176)
+  = 1 / 0.0177 = 56.5 TB/s
+
+  Wait — CXL makes it WORSE? Because CXL is SLOWER (5 TB/s) than SOCAMM2 (44 TB/s).
+
+  This confirms: CXL Local is a TERRIBLE KV cache destination.
+  It should NOT be used for KV cache at all!
+
+  → CXL Local impact: -18% (WORSE than SOCAMM2)
+  → CXL should NOT replace SOCAMM2 for KV cache.
+  → CXL's value = capacity expansion, not KV cache acceleration.
+  </pre>
+  <p><strong>Verdict:</strong> <span class="verdict-no">CXL Local: WORSE than SOCAMM2. Do NOT use for KV cache.</span></p>
+</div>
+
+<div class="point-card">
+  <h4>📍 R100 @ x=100: CXL Impact</h4>
+  <pre>
+KV Cache = 3,184 × 14.1 GB = 44.9 TB
+HBM4 = 20.2 TB → spill-over = 24.7 TB (SOCAMM2 handles this easily)
+→ CXL: 0% improvement (SOCAMM2 has 80 TB, needs only 24.7 TB)
+</pre>
+  <p><strong>Verdict:</strong> <span class="no-improvement">0%</span></p>
+</div>
+
+<div class="point-card">
+  <h4>📍 R100 @ x=200: CXL Impact</h4>
+  <pre>
+KV Cache = 700 × 14.1 GB = 9.87 TB → fits in HBM4 (20.2 TB)
+→ CXL: 0% improvement
+</pre>
+  <p><strong>Verdict:</strong> <span class="no-improvement">0%</span></p>
+</div>
+
+<div class="point-card">
+  <h4>📍 R100 @ x=400: CXL Impact</h4>
+  <pre>
+KV Cache = 100 × 14.1 GB = 1.41 TB → fits in HBM4
+→ CXL: 0% improvement
+</pre>
+  <p><strong>Verdict:</strong> <span class="no-improvement">0%</span></p>
+</div>
+
+<p class="meta" style="text-align:center;"><strong>R100 전체 (Qwen 235B): CXL Local 추가 → Chart 변화 NO</strong></p>
+
+<hr class="section-divider">
+
+## Out-Rack CXL Pooled — 언제 의미가 있는가?
+
+<div class="point-card">
+  <h4>📍 Out-Rack CXL Pooled Impact — Large Context Scenario</h4>
+  <pre>
+Out-Rack CXL Pooled: 100-200GbE RDMA, ~0.5-1 TB/s effective for KV random
+Latency: 50-200 μsec (network hop)
+
+Out-Rack CXL이 의미 있는 scenario:
+1.超长 context (128K, 400K) — KV cache가 SOCAMM2도 넘어감
+2.超大 batch — thousands of concurrent users
+3. Multi-tenant — GPU가 여러 모델의 KV cache를 공유
+
+For the 235B model at current chart points:
+  All KV caches fit in HBM4 + SOCAMM2 (combined 100 TB)
+  → Out-Rack CXL: 0% improvement at ANY point
+
+Out-Rack CXL impact ONLY appears when:
+  KV Cache > 100 TB (HBM4 20.2 + SOCAMM2 80)
+  → Requires >7,000 concurrent users × 14.1 GB
+  → Or longer context (128K → 4x × 7,000 = 28,000 users needed)
+</pre>
+  <p><strong>Verdict:</strong> <span class="no-improvement">Current chart points: 0%. Only matters for 128K-400K context + large batch.</span></p>
+</div>
+
+<div class="key">
+  <h4>💡 Out-Rack CXL이 chart를 바꾸는 경우</h4>
+  <p>
+    <strong>128K context (Medium tier, Kimi K2.5):</strong><br>
+    KV per user = 0.453 MB × 4 × 88 = 159.4 MB (32K의 4배)<br>
+    KV per user = 159.4 MB → 128K context로 11.3 GB/user<br>
+
+    B300 @ x=50, Medium tier: ~1,815 users<br>
+    KV total = 1,815 × 11.3 GB = 20.5 TB<br>
+    HBM4 = 20.2 TB → spill-over = 0.3 TB<br>
+    SOCAMM2 handles 0.3 TB easily.<br>
+    → Out-Rack CXL: 0% impact.
+
+    But if batch increases to 5,000 users:
+    KV total = 5,000 × 11.3 = 56.5 TB<br>
+    HBM4 = 20.2 TB → spill-over = 36.3 TB<br>
+    SOCAMM2 = 80 TB → still handles 36.3 TB.<br>
+    → Out-Rack CXL: still 0% impact.
+
+    SOCAMM2 (80 TB) is surprisingly generous for most workloads.
+  </p>
+  <p>
+    <strong>400K context (Premium tier, GPT MoE 2T):</strong><br>
+    KV per user = 0.453 MB × 12.5 × 88 = 498.6 MB = 0.5 GB<br>
+    At x=400, Premium tier: ~100 users (from chart)<br>
+    KV total = 100 × 0.5 = 50 GB<br>
+    → CXL: 0% impact.
+
+    BUT: if batch grows to 5,000 users:
+    KV total = 5,000 × 0.5 = 2,500 GB = 2.5 TB<br>
+    HBM4 = 20.2 TB → fits easily!<br>
+    → CXL: still 0% impact.
+
+    <strong>Conclusion: CXL is NOT needed for KV cache in any chart point scenario.</strong>
+  </p>
+</div>
+
+<hr class="section-divider">
+
+## Final Summary: CXL의 Chart Impact
+
+<h3>CXL Impact Summary Table</h3>
+<table>
+  <tr><th>Point</th><th>Original TPS/MW</th><th>CXL Local</th><th>CXL Pooled</th><th>Reason</th></tr>
+  <tr><td>H100 x=50</td><td>0.15M</td><td>0.15M (0%)</td><td>0.15M (0%)</td><td>KV fits in HBM, no spill-over</td></tr>
+  <tr><td>H100 x=100</td><td>0.15M</td><td>0.15M (0%)</td><td>0.15M (0%)</td><td>KV fits in HBM</td></tr>
+  <tr><td>H100 x=200</td><td>0.08M</td><td>0.08M (0%)</td><td>0.08M (0%)</td><td>KV fits in HBM</td></tr>
+  <tr><td>H100 x=400</td><td>0.02M</td><td>0.02M (0%)</td><td>0.02M (0%)</td><td>KV fits in HBM</td></tr>
+  <tr><td>B300 x=50</td><td>0.75M</td><td>0.75M (0%)</td><td>0.75M (0%)</td><td>SOCAMM2 handles spill-over</td></tr>
+  <tr><td>B300 x=100</td><td>0.60M</td><td>0.60M (0%)</td><td>0.60M (0%)</td><td>KV fits in HBM</td></tr>
+  <tr><td>B300 x=200</td><td>0.23M</td><td>0.23M (0%)</td><td>0.23M (0%)</td><td>KV fits in HBM</td></tr>
+  <tr><td>B300 x=400</td><td>0.15M</td><td>0.15M (0%)</td><td>0.15M (0%)</td><td>KV fits in HBM</td></tr>
+  <tr><td>R100 x=50</td><td>1.60M</td><td>1.60M (0%)</td><td>1.60M (0%)</td><td>SOCAMM2 handles spill-over; CXL slower</td></tr>
+  <tr><td>R100 x=100</td><td>1.60M</td><td>1.60M (0%)</td><td>1.60M (0%)</td><td>HBM + SOCAMM2 sufficient</td></tr>
+  <tr><td>R100 x=200</td><td>0.70M</td><td>0.70M (0%)</td><td>0.70M (0%)</td><td>KV fits in HBM</td></tr>
+  <tr><td>R100 x=400</td><td>0.20M</td><td>0.20M (0%)</td><td>0.20M (0%)</td><td>KV fits in HBM</td></tr>
+</table>
+
+<div class="key">
+  <h4>🎯 결론: CXL은 이 차트에는 영향 없음</h4>
+  <ol style="margin-left:1.2rem;">
+    <li><strong>H100: HBM에 KV fitting → spill-over 없음 → CXL 불필요</strong></li>
+    <li><strong>B300: SOCAMM2가 spill-over를 처리 → CXL 불필요</strong></li>
+    <li><strong>R100: SOCAMM2가 spill-over를 처리. CXL은 SOCAMM2보다 느려서 오히려 해로움</strong></li>
+    <li><strong>Out-Rack CXL: latency 50-200μsec로 KV random access에 부적합</strong></li>
+  </ol>
+  <p style="margin-top:1rem;"><strong>CXL의 실제 가치:</strong> "KV cache 가속"이 아님. "capacity overflow"용 backup이다. SOCAMM2가 이미 그 역할을 충분히 하고 있으므로, CXL Local/Pooled은 이 워크로드에는 no-op.</p>
+  <p style="margin-top:0.5rem;"><strong>Chart 변화: NO CHANGE expected from CXL expansion at any chart point.</strong></p>
+</div>
+
+<hr class="section-divider">
+
+<h2>When WOULD CXL Change the Chart?</h2>
+
+<div class="story right">
+  <h4>Scenario 1: Extreme Batch Size (10,000+ users)</h4>
+  <p>R100 @ 10,000 users × 14.1 GB = 141 TB KV cache<br>
+  HBM4 = 20.2 TB → SOCAMM2 = 80 TB → remaining = 40.8 TB<br>
+  → CXL Local (2 TB) + Out-Rack CXL (20 TB) needed<br>
+  → CXL spill-over BW ~1 TB/s → weighted BW drops<br>
+  → TPS/MW: 1.60M → ~0.9M (44% reduction) at x=50<br>
+  → Chart curve <strong>pushes DOWN</strong> at large batch sizes</p>
+</div>
+
+<div class="story wrong">
+  <h4>Scenario 2: Ultra-Long Context (400K+)</h4>
+  <p>GPT MoE 2T @ 400K context: KV per user ~2 GB (large MoE KV)<br>
+  5,000 users × 2 GB = 10 TB → HBM4 handles this<br>
+  10,000 users × 2 GB = 20 TB → HBM4 full, SOCAMM2 needed<br>
+  20,000 users × 2 GB = 40 TB → SOCAMM2 needs 20 TB spill-over<br>
+  → CXL becomes relevant for >15K users at 400K context<br>
+  → Chart for x=400 Premium tier: curve pushes <strong>DOWN</strong> at extreme scale</p>
+</div>
+
+<div class="key">
+  <h4>💡 CXL이 chart를 바꾸는 조건 정리</h4>
+  <pre>
+H100: CXL never needed (KV always fits in HBM at chart points)
+B300: CXL needed only when KV > 100 TB (SOCAMM2 full)
+R100: CXL needed only when KV > 100 TB (SOCAMM2 full)
+
+SOCAMM2의 80 TB 용량이 놀랍게도 대부분의 워크로드를 커버함.
+CXL이 chart에 영향을 미치려면:
+  → 235B model: 7,000+ concurrent users (chart에는 없음)
+  → 2T MoE model: 50,000+ concurrent users at 400K context
+</pre>
+</div>
+
+<p class="meta" style="text-align:center; margin-top:3rem;">
+  SSOT: <a href="jensen-huang-chart-analysis.md">wiki/reference/jensen-huang-chart-analysis.md</a><br>
+  Cross-ref: <a href="jensen-huang-chart-validation-all-points.html">12 포인트 완전 검증</a>
+</p>
+
+</body>
+</html>

@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CXL Daily Update 27호 — 2026-09-02</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config = {
+  theme: { extend: { colors: {
+    canvas: '#f5f5f7', ink: '#1d1d1f', sub: '#6e6e73', indigo: '#4f46e5', indigoLight: '#eef2ff',
+  }, fontFamily: { sans: ['Inter','-apple-system','BlinkMacSystemFont','Segoe UI','sans-serif'] } } }
+}
+</script>
+<style>
+body { background:#f5f5f7; color:#1d1d1f; }
+.card { background:#fff; border-radius:12px; border:1px solid #e5e7eb; transition:all .2s ease; }
+.card:hover { box-shadow:0 4px 12px rgba(79,70,229,.12), 0 1px 3px rgba(79,70,229,.08); transform:translateY(-1px); }
+.fade-in { animation:fadeIn .4s ease-out; }
+@keyframes fadeIn { from{opacity:0;transform:translateY(8px);} to{opacity:1;transform:translateY(0);} }
+.chip { display:inline-block; padding:2px 10px; border-radius:999px; font-size:11px; font-weight:600; }
+.chip-star3 { background:#fef2f2; color:#dc2626; }
+.chip-star2 { background:#fff7ed; color:#ea580c; }
+.chip-star1 { background:#eff6ff; color:#3b82f6; }
+.row-hover:hover { background:#eef2ff; }
+</style>
+</head>
+<body class="font-sans">
+<div class="max-w-4xl mx-auto p-6">
+
+<div class="fade-in mb-8">
+  <div class="bg-gradient-to-r from-indigo to-indigoLight rounded-2xl p-8">
+    <p class="text-indigo font-semibold text-sm mb-1">CXL Daily Update — 27호</p>
+    <h1 class="text-2xl font-bold text-ink mb-2">Big Three 2027 capacity 전량 판매 — 메모리 부족이 계약 구조를 재편</h1>
+    <p class="text-sub text-sm">2026-09-02 05:02 KST · 33시간 간격 (8/31→9/2) · DRAFT v1.6→v1.7 · Bing News RSS 폴백 수집</p>
+  </div>
+</div>
+
+<div class="card p-5 mb-6 fade-in">
+  <h2 class="text-base font-semibold mb-2">🔍 오늘 한 줄 진단</h2>
+  <p class="text-ink leading-relaxed">
+    26호 이후 33시간 간극 중 <strong>Big Three 2027년 메모리 capacity 전량 판매 완료</strong>(DigiTimes, 8/4-6) +
+    <strong>NVIDIA AI 서버 가격 15%+ 인상</strong>(8/23-24) — 메모리 부족이 가격 문제를 넘어 <strong>계약 구조 자체를 재편</strong>하는 국면.
+    CXL 풀링의 가치 서사가 "비용 절감"에서 <strong>"조달 확보"</strong>로 전환. DRAFT 10.1절 + 3장(XCENA/Primeas) + 7.1절(SK하이닉스 로드맵) 반영.
+  </p>
+</div>
+
+<div class="grid grid-cols-3 gap-3 mb-6 fade-in">
+  <div class="card p-4"><span class="chip chip-star3">★★★</span><p class="text-sm font-semibold mt-2">Big Three 2027 sold out</p><p class="text-xs text-sub mt-1">DigiTimes · NVIDIA 서버 가격 15%+ 인상</p></div>
+  <div class="card p-4"><span class="chip chip-star2">★★</span><p class="text-sm font-semibold mt-2">XCENA Hot Chips 실측</p><p class="text-xs text-sub mt-1">처리량 4.7x · 에너지 18.7x · K-팹리스 최초</p></div>
+  <div class="card p-4"><span class="chip chip-star2">★★</span><p class="text-sm font-semibold mt-2">SK하이닉스 2031 로드맵</p><p class="text-xs text-sub mt-1">2세대 CXL 익스팬더 2027-28 공식화</p></div>
+</div>
+
+<div class="card p-5 mb-6 fade-in">
+  <h2 class="text-base font-semibold mb-3">⚡ NVIDIA Dynamo Blog Digest <span class="chip" style="background:#f3f4f6;color:#6b7280;">전체 7개 · NEW 0</span></h2>
+  <div class="space-y-1 text-sm">
+    <div class="row-hover rounded px-2 py-1 flex justify-between items-center gap-2"><a href="https://docs.nvidia.com/dynamo/dev/digest/tokenspeed-day-0" class="text-indigo hover:underline text-sm">Dynamo Day 0 support for TokenSpeed</a><span class="text-xs text-sub whitespace-nowrap">May 6, 2026</span></div>
+    <div class="row-hover rounded px-2 py-1 flex justify-between items-center gap-2"><a href="https://docs.nvidia.com/dynamo/dev/digest/dynosim-pareto-frontier" class="text-indigo hover:underline text-sm">DynoSim: Simulating the Pareto Frontier</a><span class="text-xs text-sub whitespace-nowrap">May 29, 2026</span></div>
+    <div class="row-hover rounded px-2 py-1 flex justify-between items-center gap-2"><a href="https://docs.nvidia.com/dynamo/dev/digest/dynamo-snapshot-fast-startup" class="text-indigo hover:underline text-sm">NVIDIA Dynamo Snapshot: Fast Startup for Inference Workloads on Kubernetes</a><span class="text-xs text-sub whitespace-nowrap">May 28, 2026</span></div>
+    <div class="row-hover rounded px-2 py-1 flex justify-between items-center gap-2"><a href="https://docs.nvidia.com/dynamo/dev/digest/agentic-inference" class="text-indigo hover:underline text-sm">Full-Stack Optimizations for Agentic Inference with Dynamo</a><span class="text-xs text-sub whitespace-nowrap">June 12, 2026</span></div>
+    <div class="row-hover rounded px-2 py-1 flex justify-between items-center gap-2"><a href="https://docs.nvidia.com/dynamo/dev/digest/flash-indexer" class="text-indigo hover:underline text-sm">Flash Indexer: A Story of Inter-Galactic KV Routing</a><span class="text-xs text-sub whitespace-nowrap">February 23, 2026</span></div>
+    <div class="row-hover rounded px-2 py-1 flex justify-between items-center gap-2"><a href="https://docs.nvidia.com/dynamo/dev/digest/agent-optimization-skills" class="text-indigo hover:underline text-sm">Dynamo Agent Optimization Skills</a><span class="text-xs text-sub whitespace-nowrap">August 21, 2026</span></div>
+    <div class="row-hover rounded px-2 py-1 flex justify-between items-center gap-2"><a href="https://docs.nvidia.com/dynamo/dev/digest/agentic-harnesses" class="text-indigo hover:underline text-sm">Streaming Tokens and Tools: Multi-Turn Agentic Harness Support in Dynamo</a><span class="text-xs text-sub whitespace-nowrap">April 30, 2026</span></div>
+  </div>
+  <p class="text-xs text-sub mt-3">→ 이번 발행 이후 신규 없음. 마지막 신규: "Dynamo Agent Optimization Skills" (Aug 21). Dynamo는 KV 라우팅/추론 서빙 계층 — KV offload 인프라 수요 지표로 지속 관찰.</p>
+</div>
+
+<div class="mb-6 fade-in">
+  <h2 class="text-lg font-bold mb-3">📊 12카테고리 Delta 상세</h2>
+  <div class="card p-5 mb-4">
+    <div class="flex items-start justify-between gap-3 mb-2">
+      <h3 class="text-base font-bold">Big Three 2027 capacity 전량 판매 + NVIDIA 서버 가격 15%+ 인상</h3>
+      <span class="chip chip-star3">★★★</span>
+    </div>
+    <p class="text-xs text-sub mb-3">출처: DigiTimes → TweakTown/IGN (Aug 4-6, 2026) · SBS News/BusinessKorea (Aug 23-24, 2026)</p>
+    <div class="space-y-3 text-sm leading-relaxed">
+      <div class="rounded-lg p-3" style="background:#f0fdf4;"><span class="font-semibold text-green-700">[변경]</span> <span class="text-ink">삼성·SK하이닉스·마이크론 Big Three의 <b>2027년 메모리 생산 capacity 전량 판매 완료</b> — DRAM/HBM 모두 추가 공급 불가. NVIDIA AI 서버 <b>가격 15%+ 인상</b>, 메모리 crunch 비용 고객 전가. SK하이닉스: 2027년부터 2030년 이후까지 공급 부족 예측.</span></div>
+      <div class="rounded-lg p-3" style="background:#eff6ff;"><span class="font-semibold text-blue-700">[영향]</span> <span class="text-ink">TweakTown (2026-08-04): "Memory capacity for all of 2027 has reportedly been booked and sold, with no more DRAM or HBM available". SBS News (2026-08-23): "NVIDIA Raises AI Server Prices by Over 15% Amid Memory Shortage". SK하이닉스 전망 (MSN, 2026-08-10): "unprecedented memory supply shortages starting in 2027, with deficits expected to persist past 2030".</span></div>
+      <div class="rounded-lg p-3" style="background:#faf5ff;"><span class="font-semibold text-purple-700">[해석]</span> <span class="text-ink">&lt;b&gt;① 조달 불가 국면&lt;/b&gt; — 가격 문제를 넘어 물리적 조달 불가능 국면. CXL 풀링 가치가 '비용 절감'에서 '조달 확보'로 전환. &lt;b&gt;② CXL 모듈 capacity 할당 리스크&lt;/b&gt; — CXL 모듈도 DDR5 웨이퍼 원물 사용, capacity 전량 계약 시 신규 CXL 모듈 양산 슬롯 확보 자체가 경쟁. &lt;b&gt;③ NVIDIA 가격 인상&lt;/b&gt;은 메모리가 랙 가격에서 GPU 다음 비중 항목으로 부상함을 실증 — 'AI memory system' 내러티브와 정합.</span></div>
+      <div class="rounded-lg p-3" style="background:#fff7ed;"><span class="font-semibold text-orange-700">[액션]</span> <span class="text-ink">DRAFT 10.1절: "DataCenterDisk(Aug 17): Server RAM Prices Doubled..." 뒤 신규 문단 추가 — "DigiTimes(Aug 4-6): Big Three 2027 capacity 전량 판매, NVIDIA 서버 가격 15%+ 인상. CXL 풀링 가치 '비용 절감'→'조달 확보' 전환 + capacity 할당 우선순위 리스크. ⬆️(27호 delta-1 ★★★)"</span></div>
+    </div>
+  </div>
+  <div class="card p-5 mb-4">
+    <div class="flex items-start justify-between gap-3 mb-2">
+      <h3 class="text-base font-bold">XCENA Hot Chips 2026 — MX1 실측 공개 (4.7x 처리량 / 18.7x 에너지 효율)</h3>
+      <span class="chip chip-star2">★★</span>
+    </div>
+    <p class="text-xs text-sub mb-3">출처: 매일경제 (Aug 26) · 스포탈코리아 (Aug 26) · IT동아 (Aug 25, 2026)</p>
+    <div class="space-y-3 text-sm leading-relaxed">
+      <div class="rounded-lg p-3" style="background:#f0fdf4;"><span class="font-semibold text-green-700">[변경]</span> <span class="text-ink">XCENA(엑시나)가 Hot Chips 2026(8/23-25, Stanford)에서 <b>한국 팹리스 최초 메모리 세션 참여</b>, MX1 아키텍처+실측 공개. 단일 MX1 연산 vs 호스트 CPU CXL 링크 처리 대비 <b>처리량 최대 4.7배, 에너지 효율 최대 18.7배</b>. 삼성과 CXL-PNM 성능 입증. FMS 2026 Startup Growth Award(8/7), 시리즈 B 2,000억원(6/1).</span></div>
+      <div class="rounded-lg p-3" style="background:#eff6ff;"><span class="font-semibold text-blue-700">[영향]</span> <span class="text-ink">매일경제 (2026-08-26): "엑시나는 25일(현지시간) 스탠퍼드대학교에서 열린 '핫칩스(Hot Chips) 2026'에서 CXL 기반 연산 메모리 장치 'MX1'의 아키텍처와 실측 성능을 공개했다고 26일 밝혔다." 스포탈코리아 (2026-08-26): "처리량은 최대 4.7배, 에너지 효율은 최대 18.7배 높았다."</span></div>
+      <div class="rounded-lg p-3" style="background:#faf5ff;"><span class="font-semibold text-purple-700">[해석]</span> <span class="text-ink">&lt;b&gt;① near-data processing 경제성 첫 공개 정량&lt;/b&gt; — DRAFT 12.1절 'PIM/CXL 결합'과 '저지연 컨트롤러 IP' 행 사이 영역의 경제성을 정량으로 보여주는 첫 사례. &lt;b&gt;② 에너지 효율 18.7배&lt;/b&gt;는 데이터센터 전력 +55%(Southern Co) 환경에서 전력 병목 완화 경로 후보. &lt;b&gt;③ K-팹리스 CXL 트랙&lt;/b&gt; — XCENA+프라임마스+Panmnesia가 컨트롤러 레이어 동시 부상.</span></div>
+      <div class="rounded-lg p-3" style="background:#fff7ed;"><span class="font-semibold text-orange-700">[액션]</span> <span class="text-ink">DRAFT 3.x절 XCENA 최신 열: "Hot Chips 데모 예정 ⬆️(7호 delta-7)" → "실측 공개 완료: 4.7x/18.7x, 삼성 CXL-PNM 입증, FMS 2026 수상, 시리즈 B 2,000억원 ⬆️(27호 delta-2 ★★)" + 3장 벤더 패턴 관찰에 K-팹리스 트랙 신설.</span></div>
+    </div>
+  </div>
+  <div class="card p-5 mb-4">
+    <div class="flex items-start justify-between gap-3 mb-2">
+      <h3 class="text-base font-bold">SK하이닉스 2031 DRAM 로드맵 — 2세대 CXL 익스팬더 2027-28 공식화</h3>
+      <span class="chip chip-star2">★★</span>
+    </div>
+    <p class="text-xs text-sub mb-3">출처: 인벤 재보도 (원문 2025-11-07, SK하이닉스 공개 자료)</p>
+    <div class="space-y-3 text-sm leading-relaxed">
+      <div class="rounded-lg p-3" style="background:#f0fdf4;"><span class="font-semibold text-green-700">[변경]</span> <span class="text-ink">SK하이닉스 2031년까지 DRAM 로드맵 공개: DDR6·GDDR8·LPDDR6·3D DRAM. MRDIMM Gen2(12,800MT/s) 2026-27, <b>2세대 CXL 메모리 익스팬더 2027-28</b> 출시 예상. DDR6는 2029-2030.</span></div>
+      <div class="rounded-lg p-3" style="background:#eff6ff;"><span class="font-semibold text-blue-700">[영향]</span> <span class="text-ink">인벤 재보도 (2025-11-07): "2027~2028년에 출시될 것으로 예상되는 2세대 CXL 메모리 확장기와 같은 폼 팩터로... DDR6는 2029년이나 2030년에야 출시될 예정".</span></div>
+      <div class="rounded-lg p-3" style="background:#faf5ff;"><span class="font-semibold text-purple-700">[해석]</span> <span class="text-ink">&lt;b&gt;① DDR6 타임라인 교차검증&lt;/b&gt; — PCGH(5/4) '2028 도입' vs 벤더 로드맵 2029-2030 → 벤더 기준으로 DRAFT 정합. &lt;b&gt;② CXL 익스팬더 세대 트랙 공식화&lt;/b&gt; — '2세대 CXL 익스팬더'가 벤더 공식 로드맵에 오른 첫 사례. &lt;b&gt;③ MRDIMM 폼팩터 공유&lt;/b&gt; — CXL 모듈이 서버 메모리 표준 폼팩터에 흡수되는 방향 시사.</span></div>
+      <div class="rounded-lg p-3" style="background:#fff7ed;"><span class="font-semibold text-orange-700">[액션]</span> <span class="text-ink">DRAFT 7.1절: "JEDEC DDR6: CAMM2 폼팩터, 8.8~21 Gbps..." 뒤 추가 — "SK하이닉스 2031 로드맵: DDR6 2029-2030(벤더 기준), MRDIMM Gen2 12,800MT/s 2026-27, 2세대 CXL 익스팬더 2027-28. ⬆️(27호 delta-3 ★★)"</span></div>
+    </div>
+  </div>
+  <div class="card p-5 mb-4">
+    <div class="flex items-start justify-between gap-3 mb-2">
+      <h3 class="text-base font-bold">프라임마스 JBOM 풀드 메모리 — $200M 목표 + 마이크론 협력 + 미 DOE</h3>
+      <span class="chip chip-star1">★</span>
+    </div>
+    <p class="text-xs text-sub mb-3">출처: TheLEC (Aug 20, 2026) · ZDNet Korea (Aug 20, 2026)</p>
+    <div class="space-y-3 text-sm leading-relaxed">
+      <div class="rounded-lg p-3" style="background:#f0fdf4;"><span class="font-semibold text-green-700">[변경]</span> <span class="text-ink">프라임마스 8/20 기자간담회: CXL 풀드 메모리 'JBOM'으로 서버당 100TB+, 내년 말까지 $200M(약 2,800억원) 매출 목표. 마이크론 협력 100TB급 구현 + 미 DOE AI/HPC 프로젝트 참여. CXL 컨트롤러+모듈 자체 개발.</span></div>
+      <div class="rounded-lg p-3" style="background:#eff6ff;"><span class="font-semibold text-blue-700">[영향]</span> <span class="text-ink">TheLEC (2026-08-20): "프라임마스가 서버 하나로 100TB 이상 메모리 용량을 지원하는 CXL 메모리 솔루션으로 내년 말까지 매출 2억달러(약 2800억원)를 올리겠다고 밝혔다."</span></div>
+      <div class="rounded-lg p-3" style="background:#faf5ff;"><span class="font-semibold text-purple-700">[해석]</span> <span class="text-ink">25호 delta-2 'FMS 2026 신규 진출'을 기자간담회 수준 수치로 정밀화. K-팹리스 CXL 트랙의 두 번째 축. 마이크론 협력은 25호 'Big Three 외부 IP 채택' 흐름과 정합 — 마이크론이 외부 컨트롤러 채택 경로로 K-팹리스 컨트롤러를 쓰는 방향일 수 있음.</span></div>
+      <div class="rounded-lg p-3" style="background:#fff7ed;"><span class="font-semibold text-orange-700">[액션]</span> <span class="text-ink">DRAFT 3장 Primetas 항목: "FMS 2026 신규 진출" → "JBOM 풀드 메모리 — 서버당 100TB+, $200M 목표(내년 말), 마이크론 협력, 미 DOE 프로젝트. ⬆️(27호 delta-4 ★)"</span></div>
+    </div>
+  </div>
+  <div class="card p-5 mb-4">
+    <div class="flex items-start justify-between gap-3 mb-2">
+      <h3 class="text-base font-bold">ScaleFlux — NVIDIA CMX 대응 KV SSD 플랫폼 (1M-token KV 320GB+)</h3>
+      <span class="chip chip-star1">★</span>
+    </div>
+    <p class="text-xs text-sub mb-3">출처: PRNewswire (Jul 30, 2026) · MSN (Aug 1, 2026)</p>
+    <div class="space-y-3 text-sm leading-relaxed">
+      <div class="rounded-lg p-3" style="background:#f0fdf4;"><span class="font-semibold text-green-700">[변경]</span> <span class="text-ink">ScaleFlux, NVIDIA CMX+KV cache offload 대응 AI-optimized SSD 플랫폼 발표: Context-Insight 워크로드 인텔리전스, 7-10+ effective DWPD, 200+ FDP write streams. 1M-token 대화 KV cache <b>1인당 320GB+</b> — KV churn이 SSD 수명 소진.</span></div>
+      <div class="rounded-lg p-3" style="background:#eff6ff;"><span class="font-semibold text-blue-700">[영향]</span> <span class="text-ink">PRNewswire (2026-07-30): "Platform combines Context-Insight workload intelligence, 7-10+ effective DWPD, and support for more than 200 FDP write streams per drive". MSN (2026-08-01): "...one-million-token conversation... can exceed 320 gigabytes for a single user".</span></div>
+      <div class="rounded-lg p-3" style="background:#faf5ff;"><span class="font-semibold text-purple-700">[해석]</span> <span class="text-ink">DRAFT 8.2절 SSD 계층 상용화 사례. 1M-token KV 320GB+는 DRAFT 9.1절 표(7B@1M≈128GB)와 출처 간 2.5배+ 격차 — 9.1절에 출처별 범위 표기 필요. ScaleFlux의 CXL 컨트롤러(MC600)+KV SSD 이중 포지셔닝 확인.</span></div>
+      <div class="rounded-lg p-3" style="background:#fff7ed;"><span class="font-semibold text-orange-700">[액션]</span> <span class="text-ink">DRAFT 9.1절: 7B@1M ≈ 128GB 표에 "1M-token KV 1인당 320GB+ (27호 delta-5 ★) — 출처별 범위 표기 필요" 추가.</span></div>
+    </div>
+  </div>
+  <div class="card p-5 mb-4">
+    <div class="flex items-start justify-between gap-3 mb-2">
+      <h3 class="text-base font-bold">Hyperscaler capex — S&amp;P $1.3T(2027) + UBS '매출의 102% 재투자' + FOCF 마이너스</h3>
+      <span class="chip chip-star1">★</span>
+    </div>
+    <p class="text-xs text-sub mb-3">출처: Securities.io (Aug 27, 2026) · 24/7 Wall St. (Aug 22, 2026)</p>
+    <div class="space-y-3 text-sm leading-relaxed">
+      <div class="rounded-lg p-3" style="background:#f0fdf4;"><span class="font-semibold text-green-700">[변경]</span> <span class="text-ink">S&P Global: 6대 hyperscaler 2027 capex <b>$1.3T 초과</b> 전망, 6개사 모두 2026-27 FOCF 마이너스 예측. UBS: 클라우드 매출의 <b>102%를 capex로 재투자</b>. BofA(8/3): $1.2T 돌파. Fed(9/1): 최근 사업투자 강세 대부분 AI 인프라 귀속.</span></div>
+      <div class="rounded-lg p-3" style="background:#eff6ff;"><span class="font-semibold text-blue-700">[영향]</span> <span class="text-ink">Securities.io (2026-08-27): "Combined capital expenditure... is projected to exceed $1.3 trillion by 2027, and all six will run negative free operating cash flow through 2026 and 2027". 24/7 Wall St. (2026-08-22): UBS 추정 클라우드 매출의 102% capex 재투자.</span></div>
+      <div class="rounded-lg p-3" style="background:#faf5ff;"><span class="font-semibold text-purple-700">[해석]</span> <span class="text-ink">DRAFT 11.2절 capex 트래킹이 $775-800B(23호) → $1.2T(BofA) → $1.3T(S&amp;P)로 연속 상향. FOCF 마이너스 예측은 CXL 풀링 비용 절감 가치 부각 + 총 capex 감축 국면 시 채택 속도 리스크 양면성 재확인. AI capex가 Fed 기준 거시 GDP 변수로 공식 인식.</span></div>
+      <div class="rounded-lg p-3" style="background:#fff7ed;"><span class="font-semibold text-orange-700">[액션]</span> <span class="text-ink">DRAFT 11.2절: "$775-800B" 뒤 추가 — "S&amp;P(8/27): $1.3T+(2027), 6개사 FOCF 마이너스. UBS(8/22): 매출의 102% 재투자. BofA(8/3): $1.2T. ⬆️(27호 delta-6 ★)"</span></div>
+    </div>
+  </div>
+  <div class="card p-5 mb-4">
+    <div class="flex items-start justify-between gap-3 mb-2">
+      <h3 class="text-base font-bold">CXMT — 6조원대 IPO + DDR5 수율 90% 주장 + 글로벌 모듈 진입</h3>
+      <span class="chip chip-star1">★</span>
+    </div>
+    <p class="text-xs text-sub mb-3">출처: The Dong-a Ilbo (Jul 16, 2026) · EBN (Aug 14, 2026)</p>
+    <div class="space-y-3 text-sm leading-relaxed">
+      <div class="rounded-lg p-3" style="background:#f0fdf4;"><span class="font-semibold text-green-700">[변경]</span> <span class="text-ink">CXMT(창신메모리): 상하이 科创板 IPO 295억 위안(약 6조원) 조달, 세계 4위 DRAM. 17nm급 DDR5 수율 90%+ 주장(중국 매체, 미검증). 커세어 DDR5 Vengeance 모듈 탑재 정황(5/22).</span></div>
+      <div class="rounded-lg p-3" style="background:#eff6ff;"><span class="font-semibold text-blue-700">[영향]</span> <span class="text-ink">Dong-a Ilbo (2026-07-16): "CXMT priced its IPO at 8.66 yuan a share ahead of its Shanghai debut". EBN (2026-08-14): "17나노급 DDR5 수율을 90% 이상으로 끌어올렸다는 중국 매체 보도".</span></div>
+      <div class="rounded-lg p-3" style="background:#faf5ff;"><span class="font-semibold text-purple-700">[해석]</span> <span class="text-ink">DRAFT 10.4절에 &lt;b&gt;제4의 공급자 축&lt;/b&gt; 등장. CXL 모듈 원물(DDR5) 공급 구조의 장기 변수. 단, 수율 90%는 중국 매체 단일 출처 — 국가 전략 산업 홍보 가능성 고려, 신중한 가중치.</span></div>
+      <div class="rounded-lg p-3" style="background:#fff7ed;"><span class="font-semibold text-orange-700">[액션]</span> <span class="text-ink">DRAFT 10.4절 신규 행: "CXMT: IPO 295억 위안(7월), 세계 4위. DDR5 수율 90%+ 주장(단일 출처, 미검증). 커세어 모듈 진입. CXL 원물 공급 장기 변수. ⬆️(27호 delta-7 ★)"</span></div>
+    </div>
+  </div>
+</div>
+
+<div class="card p-5 mb-6 fade-in">
+  <h2 class="text-base font-semibold mb-3">📋 12카테고리 Delta 매트릭스</h2>
+  <table class="w-full text-sm">
+    <thead><tr class="text-left text-sub border-b"><th class="py-2 pr-2">#</th><th class="py-2 pr-2">카테고리</th><th class="py-2 pr-2">상태</th><th class="py-2 pr-2">등급</th><th class="py-2">핵심 신호</th></tr></thead>
+    <tbody>
+    <tr class="row-hover border-b"><td class="py-2 pr-2">1</td><td class="py-2 pr-2 font-medium">CXL 스펙/표준</td><td class="py-2 pr-2" style="color:#6e6e73;font-weight:600;">미변경</td><td class="py-2 pr-2"><span class="text-sub">—</span></td><td class="py-2 text-xs">CXL 4.0(23호 ★★★) 이후 신규 없음</td></tr>
+    <tr class="row-hover border-b"><td class="py-2 pr-2">2</td><td class="py-2 pr-2 font-medium">CXL 디바이스/미디어</td><td class="py-2 pr-2" style="color:#059669;font-weight:600;">▲변경</td><td class="py-2 pr-2"><span class="chip chip-star1">★</span></td><td class="py-2 text-xs">프라임마스 JBOM/마이크론/DOE (delta-4)</td></tr>
+    <tr class="row-hover border-b"><td class="py-2 pr-2">3</td><td class="py-2 pr-2 font-medium">컨트롤러 벤더</td><td class="py-2 pr-2" style="color:#059669;font-weight:600;">▲변경</td><td class="py-2 pr-2"><span class="chip chip-star2">★★</span></td><td class="py-2 text-xs">XCENA Hot Chips 실측 4.7x/18.7x (delta-2)</td></tr>
+    <tr class="row-hover border-b"><td class="py-2 pr-2">4</td><td class="py-2 pr-2 font-medium">풀링 SW/어플라이언스</td><td class="py-2 pr-2" style="color:#6e6e73;font-weight:600;">미변경</td><td class="py-2 pr-2"><span class="text-sub">—</span></td><td class="py-2 text-xs">Liqid FMS 2026(26호) 이후 신규 없음</td></tr>
+    <tr class="row-hover border-b"><td class="py-2 pr-2">5</td><td class="py-2 pr-2 font-medium">서버 OEM</td><td class="py-2 pr-2" style="color:#6e6e73;font-weight:600;">미변경</td><td class="py-2 pr-2"><span class="text-sub">—</span></td><td class="py-2 text-xs">신규 없음</td></tr>
+    <tr class="row-hover border-b"><td class="py-2 pr-2">6</td><td class="py-2 pr-2 font-medium">CPU/GPU CXL</td><td class="py-2 pr-2" style="color:#6e6e73;font-weight:600;">미변경</td><td class="py-2 pr-2"><span class="text-sub">—</span></td><td class="py-2 text-xs">Intel/AMD 중국 장기계약 — CXL 직접 delta 아님</td></tr>
+    <tr class="row-hover border-b"><td class="py-2 pr-2">7</td><td class="py-2 pr-2 font-medium">AI 패브릭</td><td class="py-2 pr-2" style="color:#6e6e73;font-weight:600;">미변경</td><td class="py-2 pr-2"><span class="text-sub">—</span></td><td class="py-2 text-xs">NVSwitch 분석(8/31) — 오피니언, ★ 미만</td></tr>
+    <tr class="row-hover border-b"><td class="py-2 pr-2">8</td><td class="py-2 pr-2 font-medium">Main Memory</td><td class="py-2 pr-2" style="color:#059669;font-weight:600;">▲변경</td><td class="py-2 pr-2"><span class="chip chip-star2">★★</span></td><td class="py-2 text-xs">SK하이닉스 2031 로드맵 — 2세대 CXL 익스팬더 (delta-3)</td></tr>
+    <tr class="row-hover border-b"><td class="py-2 pr-2">9</td><td class="py-2 pr-2 font-medium">AI Rack/KV offload</td><td class="py-2 pr-2" style="color:#059669;font-weight:600;">▲변경</td><td class="py-2 pr-2"><span class="chip chip-star1">★</span></td><td class="py-2 text-xs">ScaleFlux CMX 대응 SSD, KV 320GB+ (delta-5)</td></tr>
+    <tr class="row-hover border-b"><td class="py-2 pr-2">10</td><td class="py-2 pr-2 font-medium">LLM TCO</td><td class="py-2 pr-2" style="color:#6e6e73;font-weight:600;">미변경</td><td class="py-2 pr-2"><span class="text-sub">—</span></td><td class="py-2 text-xs">신규 없음</td></tr>
+    <tr class="row-hover border-b"><td class="py-2 pr-2">11</td><td class="py-2 pr-2 font-medium">메모리 가격/실적</td><td class="py-2 pr-2" style="color:#059669;font-weight:600;">▲변경</td><td class="py-2 pr-2"><span class="chip chip-star3">★★★</span></td><td class="py-2 text-xs">Big Three 2027 sold out + NVIDIA 15%+ (delta-1) + CXMT (delta-7)</td></tr>
+    <tr class="row-hover border-b"><td class="py-2 pr-2">12</td><td class="py-2 pr-2 font-medium">시장/CSP</td><td class="py-2 pr-2" style="color:#059669;font-weight:600;">▲변경</td><td class="py-2 pr-2"><span class="chip chip-star1">★</span></td><td class="py-2 text-xs">S&amp;P $1.3T + UBS 102% + FOCF 마이너스 (delta-6)</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="card p-5 mb-6 fade-in">
+  <h2 class="text-base font-semibold mb-3">🔍 미변경 카테고리 — 재검사 결과</h2>
+  <p class="text-sm text-sub">미변경 6개(1·4·5·6·7·10) — 재검사 완료, 신규 delta 없음. 상세 근거는 MD 본문 참조.</p>
+</div>
+
+<div class="card p-5 mb-6 fade-in">
+  <h2 class="text-base font-semibold mb-3">⚠️ 데이터 한계 공개</h2>
+  <ul class="text-sm space-y-1 list-disc pl-5">
+    <li><strong>🟢 자동화(사실층)</strong>: Bing News RSS 폴백 수집 — scripts/bing_news_fetch.py (2026-09-02 신설). search.py(DuckDuckGo) 무관한 결과 반환으로 폐기 전환.</li>
+    <li><strong>🔴 LLM 종합(해석층)</strong>: Delta 식별·등급 부여·[해석] 서술은 LLM 추론 — [영향](제공자 인용)과 엄격 분리.</li>
+    <li><strong>RSS 인덱스 수준 검증</strong>: 제목+요약+날짜 기반, 원문 전문 미수집 — 다음 발행 시 보강.</li>
+    <li><strong>단일 출처 리스크</strong>: Big Three sold out(DigiTimes 1개 원출처), CXMT 수율 90%(중국 매체, 미검증) — 교차검증 필요.</li>
+    <li><strong>수집 간극</strong>: 26호(8/31 20:03)→27호(9/2 05:02) 33시간 — 2일치 뉴스 일괄 커버.</li>
+  </ul>
+</div>
+
+<div class="card p-5 mb-6 fade-in">
+  <h2 class="text-base font-semibold mb-3">⚡ 후속 액션</h2>
+  <ol class="text-sm space-y-1 list-decimal pl-5">
+    <li>delta-1 1차 출처(DigiTimes 원문) 재확인 — 다음 발행</li>
+    <li>DRAFT 9.1절 KV cache 요구량 출처별 범위 표기 (128GB vs 320GB+)</li>
+    <li>ScaleFlux CMX SSD ↔ MC600 CXL 컨트롤러 라인업 관계 정리</li>
+    <li>CXMT DDR5 수율 90% 교차검증 (중국 매체 외 소스)</li>
+    <li>DRAFT 3장 K-팹리스 CXL 트랙 섹션 신설 검토</li>
+  </ol>
+</div>
+
+<div class="text-center text-xs text-sub py-4">
+  CXL Daily Update 27호 · 2026-09-02 05:02 KST · DRAFT v1.6→v1.7 ·
+  원시 데이터: sources/cxl-daily-raw-2026-09-02.md · 업로드 없음(2026-08-11 최우선 정책 — 로컬 파일 생성으로 종료)
+</div>
+
+</div>
+</body>
+</html>

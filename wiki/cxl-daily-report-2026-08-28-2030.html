@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CXL Daily Update 23호 — 2026-08-28</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      colors: {
+        canvas: '#f5f5f7',
+        ink: '#1d1d1f',
+        sub: '#6e6e73',
+        indigo: '#4f46e5',
+        indigoLight: '#eef2ff',
+        star3: '#dc2626',
+        star2: '#ea580c',
+        star1: '#93c5fd',
+      },
+      fontFamily: { sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'sans-serif'] },
+    }
+  }
+}
+</script>
+<style>
+body { background: canvas; color: ink; }
+.card { background: white; border-radius: 12px; border: 1px solid #e5e7eb; transition: all 0.2s ease; }
+.card:hover { box-shadow: 0 4px 12px rgba(79,70,229,0.12), 0 1px 3px rgba(79,70,229,0.08); transform: translateY(-1px); }
+.fade-in { animation: fadeIn 0.4s ease-out; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+.chip { display: inline-block; padding: 2px 10px; border-radius: 999px; font-size: 11px; font-weight: 600; }
+.chip-star3 { background: #fef2f2; color: #dc2626; }
+.chip-star2 { background: #fff7ed; color: #ea580c; }
+.chip-star1 { background: #eff6ff; color: #3b82f6; }
+.row-hover:hover { background: #eef2ff; }
+</style>
+</head>
+<body class="font-sans">
+<div class="max-w-4xl mx-auto p-6">
+
+<!-- HERO -->
+<div class="fade-in mb-8">
+  <div class="bg-gradient-to-r from-indigo to-indigoLight rounded-2xl p-8">
+    <p class="text-indigo font-semibold text-sm mb-1">CXL Daily Update — 23호</p>
+    <h1 class="text-2xl font-bold text-ink mb-2">CXL 4.0 공식 사양 출시 + Samsung CXL 풀링 실증</h1>
+    <p class="text-sub text-sm">2026-08-28 20:30 KST · 7일간 조사 간격 (8/21→8/28) · DRAFT v1.3→v1.4</p>
+  </div>
+</div>
+
+<!-- 한 줄 진단 -->
+<div class="card p-5 mb-6 fade-in">
+  <h2 class="text-base font-semibold mb-2 flex items-center gap-2">
+    <span class="text-lg">🔍</span> 오늘 한 줄 진단
+  </h2>
+  <p class="text-ink leading-relaxed">
+    DRAFT "보고"(2025.11)에 머물렀던 <strong>CXL 4.0</strong>이 어제(8/27) <strong>공식 사양 제공</strong>으로 격상 — 64→128 GT/s 대역폭, 멀티랙 메모리 풀링 명시. DRAFT 2.1 테이블의 "2025.11(보고)" → <strong>"2026-08-27 Official Release"</strong> 변경 필요. 삼성 CXL 메모리 풀링 테크 블로그(near-DRAM 성능+용량 확장)는 DRAFT 4장/12장 보강.
+  </p>
+</div>
+
+<!-- Delta 매트릭스 -->
+<div class="card p-5 mb-6 fade-in">
+  <h2 class="text-base font-semibold mb-3 flex items-center gap-2">
+    <span class="text-lg">📋</span> 12카테고리 Delta 매트릭스
+  </h2>
+  <table class="w-full text-sm">
+    <thead>
+      <tr class="border-b border-gray-200">
+        <th class="text-left py-2 font-semibold text-sub w-8">#</th>
+        <th class="text-left py-2 font-semibold text-sub">카테고리</th>
+        <th class="text-left py-2 font-semibold text-sub w-20">상태</th>
+        <th class="text-left py-2 font-semibold text-sub w-16">등급</th>
+        <th class="text-left py-2 font-semibold text-sub">핵심 신호</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="border-b border-gray-100 row-hover"><td>1</td><td>CXL 스펙/표준</td><td><span class="text-indigo font-medium">변경</span></td><td><span class="chip chip-star3">★★★</span></td><td>CXL 4.0 공식 사양 제공</td></tr>
+      <tr class="border-b border-gray-100 row-hover"><td>2</td><td>CXL 디바이스/미디어</td><td>미변경</td><td>—</td><td>신규 없음</td></tr>
+      <tr class="border-b border-gray-100 row-hover"><td>3</td><td>컨트롤러 벤더</td><td><span class="text-sub">△변경</span></td><td><span class="chip chip-star1">★</span></td><td>Synopsys CXL 4.0 IP</td></tr>
+      <tr class="border-b border-gray-100 row-hover"><td>4</td><td>풀링 SW</td><td><span class="text-indigo font-medium">변경</span></td><td><span class="chip chip-star2">★★</span></td><td>Samsung CXL 풀링 테크 블로그</td></tr>
+      <tr class="border-b border-gray-100 row-hover"><td>5</td><td>서버 OEM</td><td>미변경</td><td>—</td><td>신규 없음</td></tr>
+      <tr class="border-b border-gray-100 row-hover"><td>6</td><td>CPU/GPU CXL</td><td>미변경</td><td>—</td><td>DRAFT v1.3 기준</td></tr>
+      <tr class="border-b border-gray-100 row-hover"><td>7</td><td>AI 패브릭</td><td>미변경</td><td>—</td><td>DRAFT v1.3 기준</td></tr>
+      <tr class="border-b border-gray-100 row-hover"><td>8</td><td>Main Memory</td><td>미변경</td><td>—</td><td>DRAFT v1.3 기준</td></tr>
+      <tr class="border-b border-gray-100 row-hover"><td>9</td><td>AI Rack/KV</td><td><span class="text-sub">△변경</span></td><td><span class="chip chip-star1">★</span></td><td>NVIDIA Dynamo Agent Opt.</td></tr>
+      <tr class="border-b border-gray-100 row-hover"><td>10</td><td>LLM TCO</td><td>미변경</td><td>—</td><td>DRAFT v1.3 기준</td></tr>
+      <tr class="border-b border-gray-100 row-hover"><td>11</td><td>메모리 가격</td><td>미변경</td><td>—</td><td>DRAFT v1.3 기준</td></tr>
+      <tr class="border-b border-gray-100 row-hover"><td>12</td><td>시장/CSP</td><td><span class="text-sub">△변경</span></td><td><span class="chip chip-star1">★</span></td><td>Hyperscaler Capex $775-800B</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- 핵심 헤드라인 -->
+<div class="mb-6 fade-in">
+  <h2 class="text-lg font-semibold mb-3 flex items-center gap-2">
+    <span class="text-lg">🟢</span> 핵심 헤드라인
+  </h2>
+
+  <!-- delta-1: CXL 4.0 -->
+  <div class="card p-5 mb-4">
+    <div class="flex items-center justify-between mb-2">
+      <h3 class="text-base font-bold text-ink">★★★ CXL 4.0 Specification Now Available (2026-08-27)</h3>
+      <span class="chip chip-star3">★★★</span>
+    </div>
+    <p class="text-sub text-xs mb-3">
+      출처: <a href="https://computeexpresslink.org/" class="text-indigo hover:underline" target="_blank">Compute Express Link</a> + <a href="https://computeexpresslink.org/wp-content/uploads/2025/11/CXL_4.0-White-Paper_FINAL.pdf" class="text-indigo hover:underline" target="_blank">CXL 4.0 White Paper</a>
+    </p>
+    <div class="bg-green-50 border-l-4 border-green-400 p-3 rounded-r mb-3">
+      <p class="font-semibold text-green-800 text-xs mb-1">[변경]</p>
+      <p class="text-green-900 text-sm">CXL Consortium가 2026-08-27 CXL 4.0 Specification을 공식 제공. 주요 변경사항: (1) 대역폭 <strong>64 GT/s → 128 GT/s</strong> (2배), (2) <strong>멀티랙 메모리 풀링</strong> 명시적 정의, (3) CXL 3.x 하위호환 유지.</p>
+    </div>
+    <div class="bg-blue-50 border-l-4 border-blue-400 p-3 rounded-r mb-3">
+      <p class="font-semibold text-blue-800 text-xs mb-1">[영향]</p>
+      <p class="text-blue-900 text-sm">Compute Express Link Consortium (2026-08-27)가 "CXL 4.0 Specification Now Available" 공식 게시. 2025.11 백서 발표 이후 약 9개월 만에 정식 사양 제공. Synopsys (2026-08-04)는 "128 GT/s 대역폭, 랙 단위 풀링 가능" 설명.</p>
+    </div>
+    <div class="bg-amber-50 border-l-4 border-amber-400 p-3 rounded-r mb-3">
+      <p class="font-semibold text-amber-800 text-xs mb-1">[해석]</p>
+      <p class="text-amber-900 text-sm">CXL 4.0은 AI 워크로드의 메모리 대역폭 요구를 크게 완화. 멀티랙 메모리 풀링 명시 — DRAFT 12.2 옵션4("진영 중립적 메모리 풀")의 기술적 기반 강화. Synopsys 첫 IP 솔루션 — CXL 4.0 기반 컨트롤러 설계 시작.</p>
+    </div>
+    <div class="bg-gray-50 border-l-4 border-gray-400 p-3 rounded-r">
+      <p class="font-semibold text-gray-800 text-xs mb-1">[액션]</p>
+      <pre class="text-gray-900 text-xs whitespace-pre-wrap font-mono">DRAFT v1.3 2.1절 스펙 테이블:
+  기존: "4.0 | 2025.11(보고) | 128 GT/s, 멀티랙 메모리 풀링 명시..."
+  → 변경: "4.0 | 2026-08-27 공식 제공 | 128 GT/s (2배), 멀티랙 풀링 명시, CXL 3.x 호환. Synopsys CXL 4.0 IP (2026-08-04)"
+
+DRAFT v1.3 3장 (IP 벤더):
+  기존: "(상세 미수집)"
+  → 변경: "Synopsys: CXL 4.0 IP (2026-08-04). 128 GT/s. Cadence/Rambus와 CXL 4.0 IP 3사 경쟁 구도"</pre>
+    </div>
+  </div>
+
+  <!-- delta-2: Samsung CXL 풀링 -->
+  <div class="card p-5 mb-4">
+    <div class="flex items-center justify-between mb-2">
+      <h3 class="text-base font-bold text-ink">★★ Samsung CXL Memory Pooling Tech Blog (2026-08-26)</h3>
+      <span class="chip chip-star2">★★</span>
+    </div>
+    <p class="text-sub text-xs mb-3">
+      출처: <a href="https://semiconductor.samsung.com/news-events/tech-blog/breaking-ai-memory-limits-with-cxl-memory-pooling/" class="text-indigo hover:underline" target="_blank">Samsung Semiconductor Blog</a>
+    </p>
+    <div class="bg-green-50 border-l-4 border-green-400 p-3 rounded-r mb-3">
+      <p class="font-semibold text-green-800 text-xs mb-1">[변경]</p>
+      <p class="text-green-900 text-sm">삼성 CXL 메모리 풀링 테크 블로그. <strong>near-DRAM 성능</strong> + <strong>대용량 메모리 용량 확장</strong> 동시 달성 평가.</p>
+    </div>
+    <div class="bg-amber-50 border-l-4 border-amber-400 p-3 rounded-r mb-3">
+      <p class="font-semibold text-amber-800 text-xs mb-1">[해석]</p>
+      <p class="text-amber-900 text-sm">CXL 메모리 레이턴시 트레이드오프(로컬 대비 2.2~4x)가 실제 AI 워크로드에서 용인 가능. Samsung은 CMM-D 2.0/3.1, CMM-H Hybrid 출시 — 풀스택 전략 공식 문서화.</p>
+    </div>
+    <div class="bg-gray-50 border-l-4 border-gray-400 p-3 rounded-r">
+      <p class="font-semibold text-gray-800 text-xs mb-1">[액션]</p>
+      <pre class="text-gray-900 text-xs whitespace-pre-wrap font-mono">DRAFT v1.3 4장 풀링 SW:
+  기존: "삼성 CXL Memory Appliance + Orchestration Console (Memcon 2024)"
+  → 변경: "... Aug 26 2026 tech blog: CXL 메모리 풀링 — near-DRAM 성능 + 대용량 메모리 확장 동시 달성"</pre>
+    </div>
+  </div>
+</div>
+
+<!-- 참고 신호 -->
+<div class="mb-6 fade-in">
+  <h2 class="text-lg font-semibold mb-3 flex items-center gap-2">
+    <span class="text-lg">🟡</span> 참고 신호
+  </h2>
+
+  <div class="card p-5 mb-3">
+    <div class="flex items-center gap-2 mb-2">
+      <h3 class="text-sm font-bold text-ink">★ NVIDIA Dynamo: Agent Optimization Skills (Aug 21)</h3>
+      <span class="chip chip-star1">★</span>
+    </div>
+    <p class="text-sub text-xs mb-2">
+      <a href="https://docs.nvidia.com/dynamo/dev/digest/agent-optimization-skills" class="text-indigo hover:underline" target="_blank">NVIDIA Dynamo Blog</a>
+    </p>
+    <p class="text-ink text-sm">AI agent 추론 파이프라인 최적화 — CXL 메모리 풀링이 agent orchestration의 메모리 효율성과 직결. CXL 풀링이 Dynamo agent의 memory tiering과 상호작용 가능.</p>
+  </div>
+
+  <div class="card p-5 mb-3">
+    <div class="flex items-center gap-2 mb-2">
+      <h3 class="text-sm font-bold text-ink">★ Hyperscaler Capex $775-800B — DRAFT 상향 수정 필요</h3>
+      <span class="chip chip-star1">★</span>
+    </div>
+    <p class="text-sub text-xs mb-2">
+      <a href="https://alcapitaladvisory.com/research/intelligence/ai-infrastructure.html" class="text-indigo hover:underline" target="_blank">A.L. Capital Advisory</a>
+    </p>
+    <p class="text-ink text-sm">Big-5 하이퍼스케일러 2026 combined capex <strong>$775-800B</strong> (Q1 2026 earnings). DRAFT v1.3 $725B 대비 ~10% 상향. The Register $600B+ spend(H1)와 조화됨.</p>
+  </div>
+</div>
+
+<!-- NVIDIA Dynamo Digest -->
+<div class="card p-5 mb-6 fade-in">
+  <h2 class="text-base font-semibold mb-3 flex items-center gap-2">
+    <span class="text-lg">⚡</span> NVIDIA Dynamo Blog Digest
+  </h2>
+  <div class="flex items-center gap-2 mb-3">
+    <span class="chip chip-star2">전체 7개</span>
+    <span class="chip chip-star3">NEW: 1</span>
+    <span class="chip" style="background:#f0fdf4;color:#16a34a">UPDATED: 0</span>
+  </div>
+  <div class="space-y-1 text-sm">
+    <p>Feb 23, 2026 — Flash Indexer: A Story of Inter-Galactic KV Routing</p>
+    <p>May 6, 2026 — Dynamo Day 0 support for TokenSpeed</p>
+    <p>May 28, 2026 — Dynamo Snapshot: Fast Startup for Inference Workloads</p>
+    <p>May 29, 2026 — DynoSim: Simulating the Pareto Frontier</p>
+    <p>Jun 12, 2026 — Full-Stack Optimizations for Agentic Inference</p>
+    <p>Apr 30, 2026 — Streaming Tokens and Tools: Multi-Turn Agentic Harness</p>
+    <p class="font-semibold text-indigo">🆕 Aug 21, 2026 — <a href="https://docs.nvidia.com/dynamo/dev/digest/agent-optimization-skills" class="hover:underline" target="_blank">Dynamo Agent Optimization Skills</a></p>
+  </div>
+</div>
+
+<!-- DRAFT 반영 현황 -->
+<div class="card p-5 mb-6 fade-in">
+  <h2 class="text-base font-semibold mb-3 flex items-center gap-2">
+    <span class="text-lg">📊</span> DRAFT v1.4 반영 현황
+  </h2>
+  <table class="w-full text-sm">
+    <thead>
+      <tr class="border-b border-gray-200">
+        <th class="text-left py-2 font-semibold text-sub w-24">DRAFT 위치</th>
+        <th class="text-left py-2 font-semibold text-sub">반영 delta</th>
+        <th class="text-left py-2 font-semibold text-sub w-16">등급</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="border-b border-gray-100"><td>2.1절 스펙 테이블</td><td>CXL 4.0 공식 사양 제공 (2026-08-27, 64→128 GT/s)</td><td><span class="chip chip-star3">★★★</span></td></tr>
+      <tr class="border-b border-gray-100"><td>3장 (IP 벤더)</td><td>Synopsys CXL 4.0 IP (2026-08-04)</td><td><span class="chip chip-star1">★</span></td></tr>
+      <tr class="border-b border-gray-100"><td>4장 (풀링 SW)</td><td>Samsung CXL 메모리 풀링 테크 블로그 (2026-08-26)</td><td><span class="chip chip-star2">★★</span></td></tr>
+      <tr class="border-b border-gray-100"><td>8.2절 (KV offload)</td><td>NVIDIA Dynamo Agent Optimization Skills</td><td><span class="chip chip-star1">★</span></td></tr>
+      <tr class="border-b border-gray-100"><td>11.2절 (Hyperscaler)</td><td>Capex $775-800B 상향 (A.L. Capital Advisory)</td><td><span class="chip chip-star1">★</span></td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- 후속 액션 -->
+<div class="card p-5 mb-6 fade-in">
+  <h2 class="text-base font-semibold mb-3 flex items-center gap-2">
+    <span class="text-lg">⚡</span> 후속 액션
+  </h2>
+  <ol class="list-decimal list-inside space-y-1 text-sm">
+    <li><strong>[당장]</strong> CXL 4.0 공식 사양 → DRAFT 2.1절 테이블 + 3장(Synopsys CXL 4.0 IP) 보강</li>
+    <li><strong>[당장]</strong> Samsung CXL 메모리 풀링 블로그 → DRAFT 4장(풀링 SW) 보강</li>
+    <li><strong>[다음]</strong> Hyperscaler Capex $775-800B → DRAFT 11.2절 상향 반영</li>
+    <li><strong>[다음]</strong> 컨트롤러 벤더 — ScaleFlux/Montage/Panmnesia 신규 동향 재시도</li>
+    <li><strong>[다음]</strong> 7일간 누락된 일간 보고에 대한 delta 누계 검토</li>
+  </ol>
+</div>
+
+<!-- 데이터 한계 -->
+<div class="text-center text-xs text-sub mb-6 fade-in">
+  <p>🟢 자동화(사실층) · 🔴 LLM 종합(해석층) · [영향] 제공자 발언 인용 / [해석] LLM CXL 분석 분리 준수</p>
+  <p>검색 한계: DuckDuckGo 영어 기술 키워드에서 낮은 관련성. CXL 4.0 — computeexpresslink.org (1차 출처, 신뢰도 높음)</p>
+</div>
+
+</div>
+</body>
+</html>

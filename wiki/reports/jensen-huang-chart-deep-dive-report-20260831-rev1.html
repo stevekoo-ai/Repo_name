@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jensen Huang Inference Economics — 심층 분석 보고서</title>
+<style>
+:root{
+  --navy:#0f2333; --blue:#1a6fc4; --green:#1e9e5a; --gray:#6b7a8a;
+  --bg:#f7f9fb; --card:#ffffff; --border:#dfe6ec; --accent:#c0392b; --gold:#b8860b;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Malgun Gothic','Segoe UI',sans-serif;background:var(--bg);color:var(--navy,#1c2b36);line-height:1.75;font-size:15.5px}
+.wrap{max-width:980px;margin:0 auto;padding:36px 28px 80px}
+h1{font-size:27px;color:var(--navy,#122a3f);margin-bottom:6px;letter-spacing:-.5px}
+h2{font-size:20px;color:var(--blue);margin:46px 0 14px;padding-bottom:8px;border-bottom:2px solid var(--blue);letter-spacing:-.3px}
+h3{font-size:17px;color:#1c3d5a;margin:26px 0 10px}
+p{margin:10px 0}
+.meta{color:#7b8a99;font-size:13px;margin-bottom:26px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:22px 26px;margin:18px 0;box-shadow:0 1px 3px rgba(15,35,51,.05)}
+.exec{background:linear-gradient(135deg,#0f2333,#1a3c5e);color:#eaf2f8;border:none}
+.exec h2{color:#9fd0ff;border-color:rgba(255,255,255,.2)}
+.exec p,.exec li{color:#dbe8f4}
+.keybox{border-left:5px solid var(--blue,#1a6fc4);background:#eef5fc;border-radius:0 8px 8px 0;padding:14px 18px;margin:16px 0}
+.keybox.green{border-left-color:#1e9e5a;background:#ecf7f0}
+.keybox.red{border-left-color:#c0392b;background:#fbeeec}
+table{width:100%;border-collapse:collapse;margin:14px 0;font-size:13.5px}
+th{background:#eef3f8;color:#25445e;padding:8px 10px;border:1px solid var(--border);text-align:left;font-size:13px}
+td{padding:7px 10px;border:1px solid var(--border);vertical-align:top}
+tr:nth-child(even) td{background:#fafcfe}
+.num{text-align:right;font-variant-numeric:tabular-nums}
+.ok{color:#1e8a50;font-weight:700}.bad{color:#c0392b;font-weight:700}.warn{color:#b8860b;font-weight:700}
+.foot{font-size:12.8px;color:#7b8a99;border-top:1px dashed #cfd8e0;margin-top:6px;padding-top:8px}
+sup{color:var(--blue);font-weight:700;cursor:help}
+.note{background:#f4f8fb;border:1px dashed #b9cbd9;border-radius:6px;padding:10px 14px;font-size:13px;color:#41586c;margin:12px 0}
+.note b{color:#1a6fc4}
+.tag{display:inline-block;background:#e3eef9;color:#155a9e;border-radius:4px;padding:1px 8px;font-size:12px;font-weight:700;margin-right:6px}
+.svgwrap{text-align:center;margin:14px 0}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:760px){.grid2{grid-template-columns:1fr}}
+.kpi{background:#fff;border:1px solid var(--border);border-radius:10px;padding:14px 16px;text-align:center}
+.kpi .v{display:block;font-size:22px;font-weight:800;color:#1a6fc4}
+.kpi .l{font-size:12px;color:#7b8a99}
+.fn-list{font-size:12.8px;color:#5a6b7c}
+.fn-list li{margin:6px 0}
+code{background:#eef2f6;padding:1px 6px;border-radius:4px;font-size:13px}
+blockquote{border-left:4px solid #1a6fc4;background:#f0f6fc;padding:10px 16px;margin:14px 0;color:#2a4a66;font-style:italic}
+.apx h2{border-bottom-color:#b9c8d4}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<h1>NVIDIA Inference Economics — 심층 분석 보고서 <span style="font-size:14px;color:#7b8a99">Rev.1</span></h1>
+<div class="meta">GTC 2026 Jensen Huang "Inference Economics" 차트 정밀 재해석 · 2026-08-31 (Rev.1) · 분석 기준: R100 NVL72 = 101 kW 운영 전력<sup>※1</sup></div>
+
+<!-- ================================================================ -->
+<div class="card exec">
+<h2>Executive Summary — 세 가지 결론</h2>
+<p><b>결론 1. 이 그래프는 "HBM이 허용하는 범위"의 경제학이다.</b>
+12개 점은 전부 HBM 용량 안에서 서비스 가능한 (컨텍스트 길이 × 동시 사용자) 조합을 보여준다.
+가장 빡빡한 지점은 R100의 Free 티어(x=50)로 HBM 사용률 <b>99%</b> — 그 위의 모든 티어는 용량 여유가 있으며,
+<b>SOCAMM·CXL은 이 범위에서 사용되지 않는다(standby).</b></p>
+<p><b>결론 2. 곡선을 나누는 것은 연산력(TFLOPS)이 아니라 메모리 대역폭(HBM BW)이다.</b>
+LLM 디코딩은 연산 병목이 아니라 <b>메모리 읽기 병목</b>이며<sup>※2</sup>,
+HBM BW의 세대 격차(H100 3.35 → B300 8.0 → R100 22.0 TB/s, 최대 <b>6.6×</b>)가 곡선의 순위를 결정한다.
+R100이 같은 Premium 서비스에서 B300 대비 2.4배의 사용자를 수용하는 이유는 순수히 HBM4 22 TB/s 때문이다.
+두 축의 설계 의도는 §2.4 — X는 "지능의 단가", Y는 "에너지의 단가"를 재는 축이며, 두 축의 교차점을
+GPU 세대가 어떻게 밀어올리는지가 이 차트의 서사다.</p>
+<p><b>결론 3. CXL 메모리는 이 그래프의 X=400 구간 안에서는 아무것도 바꾸지 못한다.</b>
+CXL은 용량은 주지만 대역폭이 HBM의 1/86~1/300 수준이라 Y축(TPS/MW)을 움직이지 못한다.
+CXL이 진짜로 활약하는 조건은 두 가지 — <b>① X축 확장(x&gt;400) 영역의 용량 보험</b>, 그리고
+<b>② KV Cache Reuse·CXL Sharing으로 "중복 KV를 1벌로" 만들 때</b>다. 후자는 HBM 천장을 소프트웨어·하드웨어로 확장해
+그래프의 <b>프론티어를 x=400 너머로 연장</b>시킨다.</p>
+</div>
+
+<!-- ================================================================ -->
+<h2>1. 그래프가 말하는 것 — 두괄 요약</h2>
+<div class="card">
+<p>젠슨황의 차트는 세 축의 경제학을 한 장에 압축했다: <b>X축</b>은 상호작용성(사용자 1명이 소모하는 TPS 부하, x),
+<b>Y축</b>은 전력 효율(TPS/MW), 그리고 세 곡선은 세대별 GPU 랙(H100 32구성 / B300·R100 NVL72 72구성)이다.
+이 보고서의 분석 결론은 다음과 같다.</p>
+
+<div class="svgwrap">
+<svg width="980" height="540" viewBox="0 0 1000 520" font-family="Malgun Gothic,sans-serif">
+  <!-- plot area -->
+  <rect x="70" y="40" width="830" height="440" fill="#fbfdff" stroke="#d7e0e8"/>
+  <!-- gridlines -->
+  <g stroke="#e4ebf1" stroke-width="1">
+    <line x1="70" y1="431" x2="900" y2="431"/><line x1="70" y1="382" x2="900" y2="382"/>
+    <line x1="70" y1="333" x2="900" y2="333"/><line x1="70" y1="284" x2="900" y2="284"/>
+    <line x1="70" y1="236" x2="900" y2="236"/><line x1="70" y1="187" x2="900" y2="187"/>
+    <line x1="70" y1="138" x2="900" y2="138"/><line x1="70" y1="89" x2="900" y2="89"/>
+  </g>
+  <!-- y labels -->
+  <g font-size="11" fill="#7b8a99" text-anchor="end">
+    <text x="64" y="435">0.2</text><text x="70" y="386" x="70">0.4</text>
+    <text x="70" y="337">0.6</text><text x="70" y="288">0.8</text>
+    <text x="70" y="240">1.0</text><text x="70" y="191">1.2</text>
+    <text x="70" y="142">1.4</text><text x="70" y="93">1.6</text>
+  </g>
+  <!-- curves -->
+  <polyline points="70,443 347,465" fill="none" stroke="#888888" stroke-width="2.4"/>
+  <polyline points="70,309 347,333 623,443 900,463" fill="none" stroke="#17a2b8" stroke-width="2.6"/>
+  <polyline points="70,77 347,89 623,309 900,431" fill="none" stroke="#28a745" stroke-width="2.6"/>
+  <!-- markers -->
+  <g fill="#888"><circle cx="70" cy="443" r="5"/><circle cx="347" cy="465" r="5"/></g>
+  <g fill="#17a2b8"><circle cx="70" cy="309" r="6"/><circle cx="347" cy="333" r="6"/><circle cx="623" cy="443" r="6"/><circle cx="900" cy="463" r="6"/></g>
+  <g fill="#28a745"><circle cx="70" cy="77" r="6"/><circle cx="347" cy="89" r="6"/><circle cx="623" cy="309" r="6"/><circle cx="900" cy="431" r="6"/></g>
+  <!-- H100 death marker -->
+  <g><line x1="623" y1="470" x2="623" y2="490" stroke="#c0392b" stroke-width="2" stroke-dasharray="3,3"/>
+     <text x="623" y="505" font-size="11" fill="#c0392b" text-anchor="middle" font-weight="bold">H100 x=200/400 사망 ● (가중치 4TB &gt; HBM 2.56TB)</text></g>
+  <!-- series labels -->
+  <text x="78" y="70" font-size="13" fill="#28a745" font-weight="bold">R100 Vera Rubin (22 TB/s, 101kW)</text>
+  <text x="78" y="300" font-size="13" fill="#17869c" font-weight="bold">B300 Blackwell (8 TB/s, 121kW)</text>
+  <text x="78" y="425" font-size="13" fill="#777" font-weight="bold">H100 Hopper (3.35 TB/s, 40kW)</text>
+  <!-- axes -->
+  <g font-size="12" fill="#445" text-anchor="middle">
+    <text x="70" y="478">x=50</text><text x="347" y="478">x=100</text>
+    <text x="623" y="478">x=200</text><text x="900" y="478">x=400</text>
+  </g>
+  <g font-size="11" fill="#7b8a99" text-anchor="end">
+    <text x="930" y="472">0.07</text><text x="905" y="435">0.15</text>
+    <text x="905" y="315">0.70</text><text x="905" y="93">1.65</text>
+  </g>
+  <text x="500" y="514" font-size="12.5" text-anchor="middle" fill="#445">X: TPS/User (x=50 Free · 100 Medium · 200 High · 400 Premium) →</text>
+  <text x="18" y="30" font-size="12.5" fill="#445">Y: TPS/MW</text>
+</svg>
+</div>
+<p class="foot">▲ 본 보고서 기준(101 kW) 12점 재현. Y축 세 곡선의 격차 = HBM 대역폭 격차. H100은 x≥200에서 모델 로드 자체가 불가(1차 사망).</p>
+
+<h3>핵심 수치 (한눈에)</h3>
+<div class="grid2">
+<div class="kpi"><span class="v">6.6×</span><span class="l">HBM BW: H100 3.35 → R100 22.0 TB/s</span></div>
+<div class="kpi"><span class="v">101 kW</span><span class="l">R100 운영 전력 (HBM 99% 역산 확정)</span></div>
+<div class="kpi"><span class="v">3,333 vs 50</span><span class="l">R100 Free 3,333명 ↔ Premium 50명</span></div>
+<div class="kpi"><span class="v">0 spill</span><span class="l">12점 전부 HBM 안착 — CXL standby</span></div>
+</div>
+</div>
+
+<!-- ================================================================ -->
+<!-- ================================================================ -->
+<h2>2.0 왜 이 두 축인가 — X축 TPS/User, Y축 TPS/MW 의 의도</h2>
+<div class="card">
+<div class="keybox"><b>두괄 결론</b> — 젠슨황은 X축으로 <b>"지능의 단가(1인당 부하)"</b>를, Y축으로 <b>"에너지의 단가(와트당 효율)"</b>를 재고,
+두 단가의 교차점을 GPU 세대가 어떻게 밀어올리는지를 한 장에 그렸다. <b>"서비스 등급이 올라갈수록 전력 효율은 떨어지고 — 새 세대는 그 하락 곡선 전체를 위로 들어올린다."</b></div>
+
+<h3>X축 = TPS/User — "상호작용성 1인당 부하"이자 서비스 등급의 대리 변수</h3>
+<p><code>x = 사용자 1명이 초당 소모하는 TPS 부하</code> — 개별 사용자에게 돌려주는 체감 속도(interactivity)의 척도다.
+x=50은 가볍고 다수 동시, x=400은 무겁고 소수 집중. 그러나 x를 올리는 것은 단순히 "더 빨리"가 아니다.
+x=50/100/200/400은 각각 <b>Free/Medium/High/Premium 티어</b>에 대응되며, 동시에 <b>LLM 가중치(470→2,000→4,000GB)와
+컨텍스트(32K→128K→400K)가 같이 커지는 점</b>이다 (Appendix A-2).</p>
+<p>즉 X축은 "속도 축"인 척하면서, 실제로는 <b>"서비스 등급이 올라갈수록 부풀어오르는 1인당 부하"</b>를 한 축에 압축한다.
+모델이 커지면 per-token 가중치 읽기가 늘고, 컨텍스트가 길어지면 per-user KV가 커진다
+(<b>6.03 → 9.00 → 30.75 → 96.09 GB</b>) — 합쳐져 x=400의 1인당 부하는 x=50의 약 8배.
+젠슨황이 말하려 한 것은 "사용자 수를 늘리는 게 아니라, <b>더 지능적인 서비스로 올라갈 때 1인당 부하가 비선형적으로 커지는 경제 구조</b>"다.</p>
+
+<h3>Y축 = TPS/MW — "에너지 효율(와트당 처리량)"</h3>
+<p><code>TPS/MW = HBM_BW ÷ (KV_per_token × Context × MW)</code> — 전력 1W로 1초당 처리하는 토큰 수, 곧 에너지 단가(economics)의 축이다.
+인퍼런스 비용의 최대 항목은 칩 원가가 아니라 <b>전력</b>(데이터센터 TCO에서 전력이 지배적)이므로,
+TPS(절대량)가 아니라 TPS/MW(전력당 효율)로 잡아야 "이 세대가 전력을 얼마나 잘 쓰는가"가 직접 비교된다.
+그리고 이 Y축은 TFLOPS가 아니라 <b>HBM 대역폭(3.35 → 8.0 → 22.0 TB/s)</b>이 결정한다<sup>※2</sup> —
+즉 Y축은 "메모리 대역폭을 전력으로 나눈 효율"이다.</p>
+
+<h3>두 축이 말하는 메시지</h3>
+<table>
+<tr><th>현상</th><th>축의 움직임</th><th>의미</th></tr>
+<tr><td>같은 세대 곡선 내에서 등급↑</td><td>x↑ → per-user KV↑ → <b>Y↓</b></td><td>더 지능적인 서비스일수록 전력 효율 하락 = 경제적 trade-off</td></tr>
+<tr><td>세대 전환(H100→B300→R100)</td><td>같은 x에서 <b>Y가 위로 점프</b></td><td>HBM BW 6.6× → 같은 등급·전력으로 더 많은 사용자·더 높은 효율</td></tr>
+<tr><td>H100 x=200/400 사망 ●</td><td>곡선 단절</td><td>구세대는 Premium 서비스 자체가 불가능 (가중치 4TB &gt; HBM 2.56TB)</td></tr>
+</table>
+<div class="keybox green"><b>한 문장</b> — X축 = 지능의 단가, Y축 = 에너지의 단가. 두 단가의 교차점을 GPU 세대가 밀어올리는 그림.
+이것이 "HBM 대역폭 전쟁이 곧 인퍼런스 경제학의 승부"라는 §6 결론 및 §5 C-Level 시사점과 정확히 일관된다.</div>
+</div>
+
+<!-- ================================================================ -->
+<h2>2. 그래프의 물리 — Y축(TPS/MW)은 무엇이 결정하는가</h2>
+<div class="card">
+<div class="keybox"><b>핵심 공식</b><br>
+<code>TPS = HBM 대역폭 ÷ KV Cache</code> &nbsp;→&nbsp; <code>TPS/MW = HBM_BW ÷ (KV/token × Context × MW)</code><br>
+<span style="font-size:13px">디코딩 단계에서 LLM은 연산이 아니라 <b>메모리 읽기</b>가 병목이다<sup>※2</sup>. 따라서 Y축은 TFLOPS가 아니라 <b>HBM 대역폭과 컨텍스트 길이</b>가 결정한다.</span></div>
+
+<h3>2.1 인과의 방향 — "사용자가 적어서 느린 게 아니다"</h3>
+<p>흔한 오해가 여기 있다. Premium(x=400)에서 그래프가 내려가는 것을 "사용자가 적어서"로 설명하면 안 된다.
+실제 인과는 반대다. <b>컨텍스트가 길수록 사용자 1명의 KV Cache가 커지고(분모 ↑), TPS/MW가 낮아지며(원인),
+그 결과 역산되는 동시 사용자 수가 줄어드는 것(결과)</b>이다.</p>
+
+<h3>2.2 KV Cache의 역설 — 세 값은 서로 다른 축이다</h3>
+<table>
+<tr><th>지표</th><th>High (x=200)</th><th>Premium (x=400)</th><th>의미</th></tr>
+<tr><td>총 KV Cache</td><td>10,870 GB</td><td><b>4,853 GB (↓)</b></td><td>사용자 7.1× 감소 효과가 컨텍스트 3.1× 증가를 압도 — "시스템 총 부하" 축</td></tr>
+<tr><td>per-user KV</td><td>30.75 GB</td><td><b>96.09 GB (↑3.1×)</b></td><td>컨텍스트 증가 그대로 반영 — "컨텍스트 길이" 축</td></tr>
+<tr><td>TPS/MW</td><td>0.70M</td><td><b>0.20M (↓3.5×)</b></td><td>per-user KV가 분모를 키움 — "효율" 축</td></tr>
+</table>
+<p class="foot">총량(부하)·개인(컨텍스트)·효율(BW) — 세 지표는 서로 다른 축이다. 총 KV가 줄어도 TPS/MW는 컨텍스트에 반비례해 하락한다.</p>
+
+<h3>2.3 세대 격차의 근원 — "그냥 BW가 10배 차이 난다"</h3>
+<p>HBM 대역폭은 세대마다 비약적으로 증가한다: H100 3.35 → B300 8.0 (2.4×) → R100 22.0 TB/s (2.75×).
+H100 대비 R100은 <b>6.6배</b>다. 같은 Premium 티어에서 B300이 21명, R100이 50명을 수용하는 이유는
+per-user KV(96.09 GB)가 동일함에도 <b>랙의 물리 대역폭 차이</b>가 TPS/MW 격차(0.07M vs 0.20M)를 만들기 때문이다.</p>
+<div class="keybox green"><b>전략적 의미</b> — GPU 경쟁의 본질은 TFLOPS 경쟁이 아니라 <b>메모리 대역폭 전쟁</b>이다.
+인퍼런스 경제에서 HBM 대역폭이 곧 사용자 수용력이고, HBM이 곧 랙의 생산성이다.</div>
+
+<h3>2.4 축 설계의 심화 — "1인당 부하 8배"가 아니라 <u>15.9배</u>다</h3>
+<p>X축의 부하 팽창을 정밀히 보면: x 자체는 8배(400÷50)지만, 1인당 메모리 부하(per-user KV)는
+6.03 → 96.09 GB로 <b>15.9배</b>다 (KV/token 1.27× × 컨텍스트 12.5×). 즉 등급이 오르면
+TPS 부하는 선형(8×)으로, 메모리 부하는 그 이상(15.9×)으로 불어난다 — "속도 축인 척하면서
+실제로는 부하 축"이라는 §2.0의 해석을 더 강화하는 수치다.</p>
+
+<p>또한 비용의 성격이 다르다는 구분이 붙는다. decode 단계에서 <b>가중치는 배치 전체가 공유하는 비용</b>이고
+(토큰당 1회 읽음, 사용자 수로 amortize), <b>KV cache는 1인당 전용 비용</b>이다 (상쇄 불가, 컨텍스트에 정비례).
+따라서 큰 모델은 사용자를 많이 받아야 가중치 비용이 상쇄되고, 긴 컨텍스트는 누가 쓰든 1인당 비용이 그대로 부과된다 —
+<b>"Premium 티어가 소수 정예일 수밖에 없는 구조적 이유"</b>(KV가 1인당 전용)가 여기에 있다.</p>
+
+<p>마지막으로 두 축의 조합에는 <b>역산 공식이 내장</b>되어 있다: <code>사용자 수 = Y × MW ÷ X</code>.
+축만 놓아도 "각 서비스 등급에서 랙이 버는 고객 수"가 자동으로 도출된다 —
+차트가 곧 사용자 수용력의 지도인 이유다.</p>
+</div>
+
+<!-- ================================================================ -->
+<h2>3. R100 = 101 kW의 의미 — "전력을 낮춘" 것이 아니라 "HBM 경계 안의 정격"이다</h2>
+<div class="card">
+<p>이 분석의 좌표계는 R100 랙 운영 전력을 <b>101 kW</b>로 봤다. 이 값은 "동시 사용자가 늘어 LLM+KV 총필요량이
+HBM의 99%에 도달하는 지점"을 역산한 값이며, NVIDIA의 소프트웨어 전력 최적화(MaxLPS<sup>※3</sup>) 하한과 거의 일치한다.</p>
+<p>이 선택의 의미는 명확하다. <b>199 kW 정격(기존 위키 기준)으로 운영하면 Free 티어의 총 필요 용량이 40,077 GB로
+HBM+Main Memory(39,168 GB)를 102% 초과</b>한다 — 이 순간 TPS가 나락으로 떨어지고 그래프의 R100 곡선은 성립하지 않는다.
+즉 <b>그래프가 성립한다는 것 자체가 101 kW급 전력 최적화 운영을 전제</b>한다.</p>
+<table>
+<tr><th>전력 모드</th><th>Free(x=50) 사용자</th><th>총 필요(GB)</th><th>vs 39,168 GB</th><th>판정</th></tr>
+<tr><td><b>101 kW (MaxLPS) ★ 채택</b></td><td class="num">3,333</td><td class="num">20,572</td><td class="num">53%</td><td class="ok">✓ 채택</td></tr>
+<tr><td>144 kW (공급망 Nominal)</td><td class="num">4,752</td><td class="num">29,130</td><td class="num">74%</td><td class="ok">✓ 가능</td></tr>
+<tr><td>199 kW (구 정격)</td><td class="num">6,567</td><td class="num">40,077</td><td class="num">102%</td><td class="bad">✗ Free 초과 → 폐기</td></tr>
+</table>
+<p class="foot">전체 시나리오(120/165.6 kW 포함)는 Appendix A-4. 산출 근거와 폐기 사유는 각주 및 핸드오프 문서 참조.</p>
+<div class="note"><b>Note — 왜 101 kW가 물리적으로 가능한가</b>: R100 GPU TDP 상한은 2,300W(Max-P)이나,
+TDP는 "최대 성능 모드의 설계 상한"이지 평균 소비전력이 아니다. 추론 워크로드는 MaxLPS 같은 전력 관리 소프트웨어로
+처리량을 유지하며 정격을 크게 낮출 수 있으며, 공급망 실측도 120~166 kW 범위를 보고한다.
+단, 이 선택은 <b>"B300(121 kW)보다 낮은 전력"이라는 물리 트렌드와 반대되는 운영 모드</b>임을 명시한다 —
+그래프가 그려진 조건은 전력 다이어트 운영 모드다.</div>
+</div>
+
+<!-- ================================================================ -->
+<h2>4. CXL·SOCAMM의 역할 — 언제 standby이고, 언제 깨어나는가</h2>
+<div class="card">
+<div class="keybox"><b>3단 메모리 계층 (R100 전용)</b><br>
+HBM4 20.7TB (핫 KV, 22 TB/s) → SOCAMM 80TB (웜, LPDDR 기반) → CXL 100TB (콜드/공유, ~1/86 BW)<br>
+<span style="font-size:13px">X=400 이내에서는 1단(HBM)만으로 충분 — 2·3단은 설계 여유분이다.</span></div>
+
+<h3>4.1 현재 그래프 범위: standby</h3>
+<p>R100 101kW 기준 최대 부하(Free 99%)에서도 spill이 0이므로 SOCAMM·CXL은 미사용 상태다.
+CXL을 추가해도 X·Y 좌표는 하나도 움직이지 않는다 — CXL의 대역폭은 HBM 대비 1/86(PCIe Gen7 x16 기준) 수준이라,
+decode 경로에 끼어드는 순간 TPS가 붕괴하기 때문이다. <b>용량을 주지, 속도를 주지는 못한다.</b></p>
+
+<h3>4.2 X축 확장( x &gt; 400 ): CXL이 깨어나는 조건과 한계</h3>
+<p>더 큰 LLM + 더 긴 컨텍스트 + 더 많은 사용자로 X축을 확장하면 KV가 HBM을 넘어 SOCAMM→CXL로 offloading 되는 조건이 생긴다.
+단, 이때 CXL 대역폭(단일 링크 1/86, 10대 Disaggregated<sup>※4</sup> 풀링으로도 HBM 대비 1/4~1/9)으로는
+서비스 수준의 TPS를 보장할 수 없다. <b>"KV re-computation을 막을 수는 있으나, heavy context를 옮길 BW가 없다"</b> —
+결국 CXL 단독 serving은 불가하고, CXL의 역할은 콜드 KV 저장과 프리페치 소스로 한정된다.</p>
+
+<h3>4.3 KV Cache Reuse + CXL Sharing — 그래프의 점이 아니라 "경계"를 바꾼다</h3>
+<p>여러 GPU 서버가 공통 KV(시스템 프롬프트, RAG 문서)를 각각 복제해 두었다면, 이를 CXL 풀에 1벌만 두고 공유하면
+<b>공통 KV × (서버 수 − 1)</b> 만큼 HBM이 절감된다. 예: 18대 서버가 동일 prefix 보유 시 절감 = A × 17.</p>
+<p>그러나 이 절감이 주는 효과를 정확히 보아야 한다.</p>
+<table>
+<tr><th>기대</th><th>판정</th><th>근거</th></tr>
+<tr><td>HBM 용량 절감</td><td class="ok">✓</td><td>중복 KV 1벌화 (dedup)</td></tr>
+<tr><td>랙 MW 절감</td><td class="bad">✗ (랙 단위)</td><td>GPU 72개는 그대로 — MW 절감은 "같은 사용자를 더 적은 랙으로" 처리할 때만(데이터센터 총량)</td></tr>
+<tr><td>사용자 수 증가</td><td class="bad">✗ (Free 제외 불가)</td><td>Medium/High/Premium은 BW가 묶는 티어 — 용량을 아껴도 BW 포화로 사용자 불가</td></tr>
+<tr><td><b>프론티어 X축 확장</b></td><td class="ok"><b>✓ 핵심 효과</b></td><td>총 KV가 reuse 비율만큼 축소 → x=800·1M 구간이 "사망" 대신 HBM 내 프론티어 <b>연장</b>으로 등장</td></tr>
+</table>
+<div class="keybox"><b>한 문장 결론</b> — KV Reuse + CXL Sharing은 그래프의 점들을 옮기는 것이 아니라,
+<b>x=400 너머의 새로운 프론티어를 여는 열쇠</b>다. 여전히 decode는 HBM 안에서 serving하고,
+CXL은 용량만 빌려주는 방식 — "CXL standby" 원칙과 정확히 일관된다.</div>
+</div>
+
+<!-- ================================================================ -->
+<h2>5. C-Level 전략 시사점</h2>
+<div class="card">
+<table>
+<tr><th>전략 질문</th><th>차트가 주는 답</th></tr>
+<tr><td><b>세대 업그레이드의 실익은?</b></td><td>HBM 대역폭이 곧 사용자 수용력. H100→R100은 BW 6.6× → 같은 전력·컨텍스트에서 수용 사용자 수십 배. "BW가 곧 매출 용량"</td></tr>
+<tr><td><b>전력 예산은 어떻게?</b></td><td>R100은 101 kW(MaxLPS) 운영이 그래프 성립 조건. Full-power(199kW) 운영은 Free 티어에서 메모리 초과로 TPS 붕괴 — <b>전력 다이어트가 성능이 아니라 서비스 존재 조건</b></td></tr>
+<tr><td><b>CXL 투자는 언제 회수되나?</b></td><td>현 12점 범위에서는 standby. 회수는 ① x&gt;400 초장문맥 신규 서비스 ② KV Reuse 기반 중복 제거 ③ 데이터센터 풀링 peak-shaving — 세 경로에서만</td></tr>
+<tr><td><b>모델 선택 전략은?</b></td><td>MLA(중국계)는 KV 44% 절감으로 동일 하드웨어에서 더 많은 사용자 — 그러나 정밀도·속도 trade-off. Premium 시장은 GQA+BF16, 대중 시장은 MLA+저정밀의 <b>등급별 하이브리드 포트폴리오</b>가 최적</td></tr>
+</table>
+</div>
+
+<!-- ================================================================ -->
+<h2>6. 결론</h2>
+<div class="card">
+<p>이 그래프의 본질은 <b>"전력 효율 경쟁의 실체는 메모리 대역폭 전쟁"</b>이라는 것이다.
+세 곡선의 격차는 TFLOPS가 아니라 HBM 세대(3.35 → 8.0 → 22.0 TB/s)가 만들었고,
+R100의 압도적 우위는 3단 메모리(HBM+SOCAMM+CXL)라는 <b>용량 아키텍처</b>가 아니라
+<b>속도 아키텍처</b>에서 나온다.</p>
+<p>축의 언어로 다시 말하면 — X축은 등급이 오를수록 부풀어오르는 <b>"지능의 단가"(1인당 부하 15.9×)</b>를,
+Y축은 <b>"에너지의 단가"</b>를 재며, GPU 세대는 그 교차점을 계속 위로 밀어올린다.
+두 축의 조합에는 역산 공식(사용자 수 = Y × MW ÷ X)이 내장되어 있어,
+이 차트는 곧 "각 서비스 등급에서 한 랙이 버는 고객 수"의 지도이기도 하다.</p>
+
+<p>그리고 12개 점이 모두 HBM 안에 안착한다는 사실은 역설적인 통찰을 준다 —
+<b>NVIDIA가 SOCAMM·CXL이라는 거대한 2·3단 메모리를 설계한 이유는 "지금의 서비스"가 아니라
+"x=400 너머의 미래 워크로드"를 위한 것</b>이며, 그 미래를 여는 열쇠는 하드웨어 추가가 아니라
+KV Reuse·CXL Sharing 같은 <b>중복 제거 소프트웨어 전략</b>이다. 용량은 넉넉히, 대역폭은 아껴 쓰는 것 —
+그것이 이 차트가 말하는 인퍼런스 경제학의 최종 결론이다.</p>
+</div>
+
+<!-- ================================================================
+     APPENDIX
+================================================================ -->
+<div class="apx">
+<h2 style="margin-top:56px;color:#5a6b7c">Appendix — 스펙 · 계산 근거</h2>
+
+<h3>A-1. GPU Rack 스펙 (확정)</h3>
+<table>
+<tr><th>항목</th><th>H100 (Hopper)</th><th>B300 NVL72 (Blackwell)</th><th>R100 NVL72 (Vera Rubin)</th></tr>
+<tr><td>운영 전력 ★</td><td>0.040 MW (40kW, NVIDIA 공식)</td><td>0.121 MW (121kW)</td><td><b>0.101 MW (101kW)</b><sup>※1</sup></td></tr>
+<tr><td>GPU 구성</td><td>8/서버 × 4서버 = 32</td><td>4/서버 × 18서버 = 72</td><td>4/서버 × 18서버 = 72</td></tr>
+<tr><td>HBM</td><td>HBM3 80GB×32 = 2,560 GB</td><td>HBM3e 288GB×72 = 20,736 GB</td><td>HBM4 288GB×72 = 20,736 GB</td></tr>
+<tr><td>HBM BW (GPU/랙)</td><td>3.35 TB/s / 85.8 TB/s</td><td>8.0 / 576 TB/s</td><td><b>22.0 / 1,584 TB/s</b></td></tr>
+<tr><td>Main Memory</td><td>DDR5 2TB×4 = 8,192 GB</td><td>LPDDR5X 256GB×72 = 18,432 GB</td><td>18,432 GB</td></tr>
+<tr><td>2·3단 메모리</td><td>—</td><td>—</td><td>SOCAMM 80TB + CXL 100TB</td></tr>
+<tr><td>GPU TDP</td><td>700W</td><td>1,400W</td><td>2,300W (Max 상한)</td></tr>
+</table>
+
+<h3>A-2. LLM 스펙</h3>
+<table>
+<tr><th>x</th><th>등급</th><th>모델</th><th>Attention</th><th>KV/token</th><th>가중치</th><th>Context</th><th>per-user KV</th></tr>
+<tr><td>50</td><td>Free</td><td>Qwen3-235B-A22B</td><td>GQA (KV heads=4, 94L)</td><td>0.193 MB</td><td>470 GB</td><td>32,000</td><td>6.03 GB</td></tr>
+<tr><td>100</td><td>Medium</td><td>Kimi K2.5</td><td>MLA (latent=512)</td><td>0.072 MB</td><td>2,000 GB</td><td>128,000</td><td>9.00 GB</td></tr>
+<tr><td>200</td><td>High</td><td>GPT MoE 2T</td><td>GQA (KV heads=6, 80L)</td><td>0.246 MB</td><td>4,000 GB</td><td>128,000</td><td>30.75 GB</td></tr>
+<tr><td>400</td><td>Premium</td><td>GPT MoE 2T</td><td>GQA</td><td>0.246 MB</td><td>4,000 GB</td><td>400,000</td><td>96.09 GB</td></tr>
+</table>
+<p class="foot">per-user KV = Context × KV/token ÷ 1024 (GiB 규약). GPU 세대와 무관 — 동일 모델+컨텍스트면 동일.
+MLA는 GQA 대비 KV/token 약 44% 절감 (중국계 LLM: MLA+INT4 / 미국계: GQA+BF16 전략 차이).</p>
+
+<h3>A-3. 12점 좌표 + 역산 사용자 수 (R100=101kW 확정본)</h3>
+<table>
+<tr><th>세대</th><th>등급</th><th>모델</th><th>사용자(명)</th><th>Context</th><th>총 KV(GB)</th><th>LLM(GB)</th><th>HBM(GB)</th><th>총필요(GB)</th><th>HBM 사용률</th></tr>
+<tr><td>H100</td><td>Free</td><td>Qwen3 23B</td><td>120</td><td>32,000</td><td>724</td><td>470</td><td>2,560</td><td>1,194</td><td>47%</td></tr>
+<tr><td>H100</td><td>Medium</td><td>KIMI K2.5</td><td>24</td><td>128,000</td><td>216</td><td>2,000</td><td>2,560</td><td>2,216</td><td>87%</td></tr>
+<tr><td>H100</td><td>High</td><td>GPT MoE 2T</td><td colspan="7" class="bad">1차 사망 ● (가중치 4,000GB &gt; HBM 2,560GB — 모델 로드 불가)</td></tr>
+<tr><td>H100</td><td>Premium</td><td>GPT MoE 2T</td><td colspan="7" class="bad">1차 사망 ●</td></tr>
+<tr><td>B300</td><td>Free</td><td>Qwen3 23B</td><td>1,694</td><td>32,000</td><td>10,217</td><td>470</td><td>20,736</td><td>10,687</td><td>52%</td></tr>
+<tr><td>B300</td><td>Medium</td><td>KIMI K2.5</td><td>726</td><td>128,000</td><td>6,534</td><td>2,000</td><td>20,736</td><td>8,534</td><td>41%</td></tr>
+<tr><td>B300</td><td>High</td><td>GPT MoE 2T</td><td>91</td><td>128,000</td><td>2,791</td><td>4,000</td><td>20,736</td><td>6,791</td><td>33%</td></tr>
+<tr><td>B300</td><td>Premium</td><td>GPT MoE 2T</td><td>21</td><td>400,000</td><td>2,035</td><td>4,000</td><td>20,736</td><td>6,035</td><td>29%</td></tr>
+<tr><td><b>R100</b></td><td>Free</td><td>Qwen3 23B</td><td>3,333</td><td>32,000</td><td>20,102</td><td>470</td><td>20,736</td><td>20,572</td><td class="bad">99%</td></tr>
+<tr><td><b>R100</b></td><td>Medium</td><td>KIMI K2.5</td><td>1,616</td><td>128,000</td><td>14,544</td><td>2,000</td><td>20,736</td><td>16,544</td><td>80%</td></tr>
+<tr><td><b>R100</b></td><td>High</td><td>GPT MoE 2T</td><td>354</td><td>128,000</td><td>10,870</td><td>4,000</td><td>20,736</td><td>14,870</td><td>72%</td></tr>
+<tr><td><b>R100</b></td><td>Premium</td><td>GPT MoE 2T</td><td>50</td><td>400,000</td><td>4,853</td><td>4,000</td><td>20,736</td><td>8,853</td><td>43%</td></tr>
+</table>
+
+<h3>A-4. 공식 모음 & 전력 시나리오</h3>
+<table>
+<tr><th>공식</th><th>식</th></tr>
+<tr><td>사용자 역산</td><td>users = (TPS/MW × 1e6 × Rack MW) ÷ x</td></tr>
+<tr><td>총 KV cache</td><td>kv_total_GB = Context × users × KV_per_tok_MB ÷ 1024</td></tr>
+<tr><td>per-user KV</td><td>kv_per_user_GB = Context × KV_per_tok_MB ÷ 1024</td></tr>
+<tr><td>총 필요 용량</td><td>total = LLM_GB + KV_total</td></tr>
+<tr><td>HBM 사용률</td><td>total ÷ HBM_GB (100% 초과 = spill)</td></tr>
+<tr><td>전력 역산 (HBM 점유율 p 기준)</td><td>P_MW = users × x ÷ (TPS_MW × 1e6), users = (p×HBM − LLM) ÷ per-user KV</td></tr>
+</table>
+<table>
+<tr><th>R100 시나리오</th><th>P_MW</th><th>Free 사용자</th><th>총 필요(GB)</th><th>vs 39,168</th><th>판정</th></tr>
+<tr><td>101 kW (MaxLPS) ★</td><td>0.101</td><td>3,333</td><td>20,572</td><td>53%</td><td class="ok">✓ 채택</td></tr>
+<tr><td>120 kW (공급망 하한)</td><td>0.120</td><td>3,960</td><td>24,354</td><td>62%</td><td class="ok">✓</td></tr>
+<tr><td>144 kW (Nominal)</td><td>0.144</td><td>4,752</td><td>29,130</td><td>74%</td><td class="ok">✓</td></tr>
+<tr><td>165.6 kW (GPU-only Max-P)</td><td>0.166</td><td>5,465</td><td>33,430</td><td>85%</td><td class="ok">✓</td></tr>
+<tr><td>199 kW (구 정격)</td><td>0.199</td><td>6,567</td><td>40,077</td><td>102%</td><td class="bad">✗ 폐기</td></tr>
+</table>
+
+<h3>A-5. 계산 규약 & 검증</h3>
+<ul style="margin:8px 0 0 22px;font-size:13.5px">
+<li>모든 파생 숫자는 <code>jensen_chart_calc.py</code> (python 엔진)로 산출 — 손계산 단정 금지 원칙</li>
+<li>GB 환산 규약: ÷1024 (이전 ÷1000 혼용 오류 정정)</li>
+<li>TPS = Memory BW ÷ KV cache (decode phase 기준)</li>
+<li>사용자 수 = (TPS/MW × 1e6 × MW) ÷ x — "x = 사용자 1명이 초당 소모하는 TPS 부하"</li>
+</table>
+
+<h3>A-6. 참고 문서 (위키)</h3>
+<ul style="margin-left:22px;font-size:13.5px">
+<li>jensen-huang-chart-session-handoff-20260828.md — 세션 핸드오프 (SSOT)</li>
+<li>jensen_chart_calc.py — 계산 엔진</li>
+<li>jensen-huang-chart-analysis-v3.md — v3 전체 분석 (R100 전력 표기 갱신 대상)</li>
+<li>jensen-huang-dgx-h100-official-specs.md — H100 공식 스펙 검증</li>
+<li>jensen-huang-r100-rack-specs.md — R100 표준 테이블</li>
+<li>gpu-inference-tpssocam-weighted-sum.md — SOCAMM 배경 및 TDP 이력</li>
+</ul>
+</div>
+
+<!-- ============ FOOTNOTES ============ -->
+<h2>주요 개념 각주</h2>
+<div class="card fn-list">
+<ol class="fn-list">
+<li id="fn1"><b>※1 R100 운영 전력 101 kW</b> — "동시 사용자가 LLM+KV 총필요를 HBM의 99%로 채우는 지점"을 역산한 값 (3,326명 × 50 ÷ 1.65M = 0.1008 MW). NVIDIA MaxLPS 소프트웨어 전력 최적화 공표 하한(~101kW)과 일치. 대안: 144kW(공급망 Nominal), 199kW(구 정격 — Free 티어에서 HBM+MainMem 102% 초과로 폐기).</li>
+<li id="fn2"><b>※2 Decode 병목</b> — LLM 토큰 생성(decode) 단계에서는 연산보다 KV cache를 메모리에서 읽는 대역폭이 속도를 결정한다. TPS = Memory BW ÷ KV cache. 따라서 TPS/MW의 세대 격차는 TFLOPS가 아니라 HBM 대역폭(3.35→8.0→22.0 TB/s)의 격차다.</li>
+<li id="fn3"><b>※3 MaxLPS</b> — NVIDIA의 랙 전력 관리 소프트웨어. 처리량을 유지하면서 정격 전력을 낮추는 모드. Vera Rubin NVL72에서 136kW 수준을 최대 101kW까지 절감한다고 공식 발표된 바 있다.</li>
+<li id="fn4"><b>※4 Disaggregated Memory</b> — CXL 메모리 풀을 별도 랙/서버로 분리해 여러 GPU 서버가 공유하는 구조. 단일 링크는 HBM 대비 1/86~1/300이지만, 서버 10대 풀링 시 10배 병렬화로 2.5~5 TB/s 확보 — HBM 대비 1/4~1/9 수준. 콜드 KV 저장·프리페치 소스로 실용적, 단독 serving은 TPS 붕괴로 불가.</li>
+<li id="fn5"><b>※5 KV Cache Reuse</b> — 여러 사용자가 동일 prompt prefix(시스템 프롬프트, RAG 공통 문서)를 공유할 때 KV를 1회만 계산·저장하고 참조. 소프트웨어 계층(계산 1회)과 하드웨어 계층(CXL Sharing, 저장 1벌)이 같은 목적을 다른 계층에서 실현. 절감 = 공통 KV × (서버 수 − 1).</li>
+<li id="fn6"><b>※6 Peak-shaving</b> — 각 서버가 최대 부하 대비로 비축하던 HBM 여유분을 공유 풀이 흡수해, 서버당 HBM 탑재량을 평균 부하 수준으로 줄이는 구조. 절감분 = 서버별 (peak − 평균)의 합.</li>
+<li id="fn7"><b>※7 GQA / MLA</b> — GQA(Grouped Query Attention)는 KV 헤드 수를 줄여 캐시를 절약. MLA(Multi-Latent Attention)는 잠재 벡터 압축 + INT4 양자화로 KV/token을 약 44%까지 절감(중국계 LLM 채택, 메모리 효율 극대화 / 미국계는 GQA+BF16 정밀도 유지).</li>
+
+</ol>
+</div>
+
+</div>
+</body>
+</html>

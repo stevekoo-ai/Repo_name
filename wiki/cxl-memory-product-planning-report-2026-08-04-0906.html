@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CXL 기반 차세대 메모리 상품기획 - 경영 보고서</title>
+<style>
+  :root {
+    --primary: #1a3a5c;
+    --accent: #c9a961;
+    --bg: #fafafa;
+    --card: #ffffff;
+    --text: #2c2c2c;
+    --muted: #6b6b6b;
+    --border: #e0e0e0;
+    --good: #2e7d32;
+    --warn: #ed6c02;
+    --bad: #c62828;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Segoe UI', 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.7;
+    font-size: 15px;
+  }
+  .cover {
+    background: linear-gradient(135deg, var(--primary) 0%, #0d2540 100%);
+    color: white;
+    padding: 80px 60px 60px;
+    text-align: center;
+    position: relative;
+  }
+  .cover::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 6px;
+    background: var(--accent);
+  }
+  .cover .confidential {
+    position: absolute;
+    top: 24px; right: 32px;
+    font-size: 12px;
+    letter-spacing: 2px;
+    color: var(--accent);
+    border: 1px solid var(--accent);
+    padding: 4px 12px;
+    border-radius: 2px;
+  }
+  .cover h1 { font-size: 38px; font-weight: 300; margin-bottom: 12px; letter-spacing: -1px; }
+  .cover .subtitle { font-size: 18px; opacity: 0.85; font-weight: 300; margin-bottom: 40px; }
+  .cover .meta { font-size: 14px; opacity: 0.7; line-height: 2; }
+  .version-tag {
+    display: inline-block;
+    background: var(--accent);
+    color: var(--primary);
+    padding: 6px 16px;
+    font-size: 13px;
+    font-weight: 600;
+    border-radius: 2px;
+    margin-top: 20px;
+  }
+  .container { max-width: 1100px; margin: 0 auto; padding: 40px 40px 80px; }
+
+  .toc {
+    background: var(--card);
+    border-left: 4px solid var(--accent);
+    padding: 28px 36px;
+    margin-bottom: 48px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+    border-radius: 0 6px 6px 0;
+  }
+  .toc h2 { color: var(--primary); font-size: 18px; margin-bottom: 14px; font-weight: 600; }
+  .toc ol { padding-left: 22px; }
+  .toc li { margin: 6px 0; }
+  .toc a { color: var(--text); text-decoration: none; }
+  .toc a:hover { color: var(--accent); }
+
+  section { margin-bottom: 48px; background: var(--card); padding: 36px 40px; border-radius: 6px; box-shadow: 0 1px 4px rgba(0,0,0,0.05); }
+  h2 {
+    color: var(--primary);
+    font-size: 24px;
+    font-weight: 600;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid var(--accent);
+  }
+  h3 { color: var(--primary); font-size: 18px; font-weight: 600; margin: 26px 0 12px; }
+  h4 { color: #34495e; font-size: 15px; font-weight: 600; margin: 18px 0 8px; }
+  p { margin-bottom: 12px; }
+  ul, ol { padding-left: 24px; margin-bottom: 12px; }
+  li { margin: 5px 0; }
+  strong { color: var(--primary); }
+  code { background: #f0f0f0; padding: 2px 6px; border-radius: 3px; font-family: 'Consolas', monospace; font-size: 13px; }
+
+  table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 13.5px; }
+  th { background: var(--primary); color: white; padding: 10px 12px; text-align: left; font-weight: 600; font-size: 13px; }
+  td { padding: 9px 12px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  tr:nth-child(even) td { background: #f7f9fb; }
+  tr:hover td { background: #eef3f8; }
+
+  blockquote {
+    border-left: 4px solid var(--accent);
+    background: #fbf7ee;
+    padding: 14px 20px;
+    margin: 16px 0;
+    color: #5a4a2a;
+    border-radius: 0 4px 4px 0;
+  }
+  blockquote.warn { border-left-color: var(--warn); background: #fff5e6; color: #7a4a00; }
+  blockquote.key { border-left-color: var(--good); background: #eaf5ea; color: #1b5e20; }
+
+  .exec-summary { background: linear-gradient(135deg, #f7f9fb 0%, #eef3f8 100%); border: 1px solid var(--border); }
+  .exec-summary h2 { border-bottom-color: var(--primary); }
+
+  .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin: 20px 0; }
+  .kpi-card { background: white; border: 1px solid var(--border); border-top: 3px solid var(--accent); padding: 18px; border-radius: 4px; }
+  .kpi-card .label { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
+  .kpi-card .value { font-size: 22px; font-weight: 700; color: var(--primary); }
+  .kpi-card .desc { font-size: 12px; color: var(--muted); margin-top: 4px; }
+
+  .stars { color: var(--accent); letter-spacing: 2px; }
+  .badge { display: inline-block; padding: 2px 10px; border-radius: 10px; font-size: 12px; font-weight: 600; }
+  .badge.good { background: #e3f2e3; color: var(--good); }
+  .badge.warn { background: #fff0e0; color: var(--warn); }
+  .badge.bad { background: #fce4e4; color: var(--bad); }
+  .badge.new { background: #e3eaf5; color: var(--primary); }
+
+  .recommendation { border: 2px solid var(--primary); border-radius: 6px; padding: 24px 28px; margin: 20px 0; background: #f7f9fb; }
+  .recommendation h3 { margin-top: 0; }
+
+  footer { text-align: center; padding: 30px; color: var(--muted); font-size: 12px; border-top: 1px solid var(--border); margin-top: 40px; }
+  .source-list { font-size: 11px; color: var(--muted); }
+  .source-list a { color: var(--primary); text-decoration: none; word-break: break-all; }
+  .note { font-size: 12px; color: var(--muted); font-style: italic; }
+  @media print { .cover { padding: 50px 40px; } section { break-inside: avoid; } }
+</style>
+</head>
+<body>
+
+<div class="cover">
+  <div class="confidential">CONFIDENTIAL</div>
+  <h1>CXL 기반 차세대 메모리 상품기획</h1>
+  <div class="subtitle">차세대 상품기획 논의용 기반 자료 (DRAFT v0.3)</div>
+  <div class="version-tag">v0.3 (데이터 기준일: 2026-08-03)</div>
+  <div class="meta">
+    작성일: 2026년 8월 3일 (KST)<br>
+    데이터 수집: WebFetch 기반 웹 크롤링 + 백그라운드 에이전트 조사<br>
+    보고 대상: 경영진
+  </div>
+</div>
+
+<div class="container">
+
+<!-- 0. 최신 업데이트 -->
+<section class="exec-summary" id="s0">
+  <h2>0. 최신 업데이트 (2026-08-03/04 훑어보기) <span class="badge new">NEW</span></h2>
+  <p>최근 며칠~주 사이의 주요 변동. DRAFT 본문 대비 변경/확정된 사항.</p>
+
+  <h3>0.1 메가 파트너십 (2026년 7-8월, 핵심)</h3>
+  <ul>
+    <li><strong>NVIDIA ↔ SK Group: $500B+ 전략 동맹</strong> (2026.07). <strong>SK Hynix가 Vera Rubin 가속기용 HBM 장기 공급</strong>. 2GW 한국 데이터센터(2027년) 포함. → SK하이닉스 HBM 로드맵이 NVIDIA 차세대(Vera Rubin)에 묶임</li>
+    <li><strong>Samsung ↔ Broadcom: $200B 협력</strong> — 메모리·파운드리·패키징, 2030년까지</li>
+    <li>의미: <strong>메모리사가 AI 확장 속도의 실질적 통제권 확보</strong>. HBM 수급이 AI 전체 캐파 제약. NVIDIA가 소비자 GPU 축소하며 HBM 확보</li>
+  </ul>
+
+  <h3>0.2 CXL 제품/스펙 최신 (2026년 중순)</h3>
+  <ul>
+    <li><strong>CXL 4.0 표준 확정(2025.11.18)</strong>: 64→<strong>128 GT/s</strong>(대역폭 2배), 응답시간 유지, bundled ports</li>
+    <li><strong>CXL 3.2 올해 양산</strong>: 주요 메모리사 2026년 양산 스케줄링</li>
+    <li><strong>Panmnesia:</strong> PCIe 6.4-CXL 3.2 fusion switch <strong>양산</strong> — "세계 유일 port-based routing(ASIC 스위치 칩)"</li>
+    <li><strong>Kioxia XL1 시리즈:</strong> XL-FLASH(저지연 플래시) + CXL 인터페이스. <strong>DRAM 사용량 최적화</strong>, DRAM-플래시 성능 갭 브리지. → CXL 스토리지 라인 신규</li>
+    <li><strong>Montage:</strong> CXL 3.2 메모리 익스팬더 컨트롤러 <strong>시험 생산</strong> 시작 — 다중 호스트 자원 풀링</li>
+    <li><strong>ScaleFlux:</strong> 호환 실리콘 + 차세대 NVMe 공개 (2026.07)</li>
+    <li><strong>Marvell:</strong> CXL 3.0 스위치 <strong>4TB/s</strong>(Structera 라인 확장, 근접 메모리 가속+메모리 스케일링)</li>
+  </ul>
+
+  <h3>0.3 메모리사 실적 (2026 Q2)</h3>
+  <div class="kpi-grid">
+    <div class="kpi-card"><div class="label">SK Hynix Q2 2026 매출</div><div class="value">79.3조 원</div><div class="desc">사상 최대, 영업이익률 76% (이익 예상 약간 밑돌)</div></div>
+    <div class="kpi-card"><div class="label">HBM 양산</div><div class="value">SK 시작 / 삼성 Q3 3배</div><div class="desc">DRAM·NAND 가격 인상 + 원가 개선</div></div>
+    <div class="kpi-card"><div class="label">Alphabet 2026 캐피탄</div><div class="value">$195~205B</div><div class="desc">상향 → 하이퍼스케일러 AI 투자 가속</div></div>
+  </div>
+
+  <h3>0.4 본문 대비 변경/확정 사항 요약</h3>
+  <table>
+    <tr><th>항목</th><th>본문(DRAFT v0.3)</th><th>최신 업데이트</th><th>상태</th></tr>
+    <tr><td>CXL 4.0</td><td>2025.11 보고</td><td><strong>2025.11.18 확정</strong>, 128GT/s</td><td><span class="badge good">일치/확정</span></td></tr>
+    <tr><td>CXL 3.2 양산</td><td>올해 예정</td><td>주요 메모리사 2026 양산 스케줄링</td><td><span class="badge good">일치</span></td></tr>
+    <tr><td>Panmnesia switch</td><td>fusion switch 발표</td><td><strong>양산</strong>("세계 유일 PBR ASIC")</td><td><span class="badge warn">상승(양산 전환)</span></td></tr>
+    <tr><td>Kioxia XL1</td><td>미언급</td><td><strong>XL-FLASH+CXL 신규 라인</strong></td><td><span class="badge new">신규</span></td></tr>
+    <tr><td>Montage CXL 3.2</td><td>2026 중 실리콘</td><td><strong>시험 생산 시작</strong></td><td><span class="badge warn">진전</span></td></tr>
+    <tr><td>Marvell CXL 3.0 스위치</td><td>2026 Q3 샘플링</td><td>4TB/s Structera 확장</td><td><span class="badge good">일치</span></td></tr>
+    <tr><td>NVIDIA-SK Hynix</td><td>미언급</td><td><strong>$500B 동맹, Vera Rubin HBM</strong></td><td><span class="badge new">신규(중요)</span></td></tr>
+    <tr><td>Samsung-Broadcom</td><td>미언급</td><td>$200B 협력</td><td><span class="badge new">신규</span></td></tr>
+    <tr><td>SK Hynix Q2 실적</td><td>미수집</td><td><strong>79.3조, 76% 영업이익률</strong></td><td><span class="badge new">신규</span></td></tr>
+    <tr><td>Google 캐피탄</td><td>미수집</td><td><strong>$195-205B 상향</strong></td><td><span class="badge new">신규</span></td></tr>
+  </table>
+
+  <blockquote class="key">
+    <strong>기획 시사점:</strong> ① SK하이닉스가 NVIDIA Vera Rubin HBM 독점 공급자로 확정 → SK하이닉스 CXL 전략도 NVIDIA 생태와 정렬 필요. ② CXL 스토리지(Kioxia XL1) 신규 카테고리 부상. ③ CXL 3.2 양산 + CXL 4.0 확정으로 2026-2027 전환점 확인. ④ 하이퍼스케일러 캐피탄(Google $200B급) → CXL 풀링 채택 자본 여력 충분.
+  </blockquote>
+</section>
+
+<!-- 목차 -->
+<div class="toc">
+  <h2>📑 목차</h2>
+  <ol>
+    <li><a href="#s0">최신 업데이트 (2026-08-03/04 훑어보기)</a> <span class="badge new">NEW</span></li>
+    <li><a href="#s1">요약 &amp; 핵심 쟁점 (Executive Summary)</a></li>
+    <li><a href="#s2">CXL 표준 &amp; 디바이스 레벨 기술</a></li>
+    <li><a href="#s3">CXL 컨트롤러/칩셋 벤더 동향 (핵심)</a></li>
+    <li><a href="#s4">CXL 풀링 SW/어플라이언스 생태</a></li>
+    <li><a href="#s5">CPU/GPU 벤더 CXL 지원 &amp; POR 메모리 조합 (핵심)</a></li>
+    <li><a href="#s6">AI 패브릭 진영 대치</a></li>
+    <li><a href="#s7">Main Memory ↔ CXL 미디어 연관성</a></li>
+    <li><a href="#s8">AI Rack 메모리 계층 &amp; KV offload 응용</a></li>
+    <li><a href="#s9">수치 모델링: LLM × Context × TPS × TCO</a></li>
+    <li><a href="#s10">메모리 가격 &amp; 시장 사이클</a></li>
+    <li><a href="#s11">시장 인텔리전스</a></li>
+    <li><a href="#s12">차세대 상품기획 방향 (종합 제언)</a></li>
+  </ol>
+</div>
+
+<!-- 1. Executive Summary -->
+<section class="exec-summary" id="s1">
+  <h2>1. 요약 &amp; 핵심 쟁점 (Executive Summary)</h2>
+  <p>CXL은 2019년 PCIe PHY 위에 캐시 일관성을 올린 개방형 인터커넥트로 출발해, <strong>2025-2026년 AI 랙의 메모리 계층 재설계</strong>라는 전환점에 진입했습니다. 핵심 쟁점 3가지:</p>
+
+  <div class="kpi-grid">
+    <div class="kpi-card">
+      <div class="label">쟁점 1</div>
+      <div class="value">AI 패브릭 진영 대치</div>
+      <div class="desc">NVIDIA NVLink(NVL72) vs UALink 컨소시엄. CXL은 GPU 스케일업이 아닌 메모리 분해 영역에서 보완</div>
+    </div>
+    <div class="kpi-card">
+      <div class="label">쟁점 2</div>
+      <div class="value">Memory Wall &amp; TCO</div>
+      <div class="desc">LLM 추론 KV cache가 주요 제약 (70B@128k≈40GB, 405B≈66GB). HBM 부족/고가 → CXL 풀로 CAPEX 절감</div>
+    </div>
+    <div class="kpi-card">
+      <div class="label">쟁점 3</div>
+      <div class="value">컨트롤러 벤더 생태 분화</div>
+      <div class="desc">Panmnesia/XCENA/ScaleFlux/Marvell/Montage/Astera/Microchip이 각기 다른 use case로 시장 공략</div>
+    </div>
+  </div>
+
+  <blockquote class="key">
+    <strong>핵심 인사이트:</strong> 컨트롤러 벤더 솔루션 맵핑이 신제품 컨셉 기획의 핵심 입력입니다. 특히 <strong>XCENA(액시나)</strong>의 RISC-V 기반 컴퓨테이셔널 메모리 컨트롤러(MX1, CXL 3.2, KV cache 오프로드)는 신제품 컨셉에 핵심 반영 대상입니다.
+  </blockquote>
+</section>
+
+<!-- 2. CXL 표준 -->
+<section id="s2">
+  <h2>2. CXL 표준 &amp; 디바이스 레벨 기술</h2>
+
+  <h3>2.1 CXL 스펙 진화</h3>
+  <table>
+    <tr><th>버전</th><th>발표</th><th>핵심 변화</th></tr>
+    <tr><td><strong>1.0</strong></td><td>2019.03</td><td>CXL.io/cache/mem 3 프로토콜 정의</td></tr>
+    <tr><td><strong>1.1</strong></td><td>2019.09</td><td>마이너 개정, 단일 루트 직접 연결</td></tr>
+    <tr><td><strong>2.0</strong></td><td>2020.11</td><td><strong>스위칭 도입</strong> → 메모리 풀링, 엔드포인트당 16 LD, IDE(256-bit AES-GCM)</td></tr>
+    <tr><td><strong>3.0</strong></td><td>2022.08</td><td><strong>PCIe 6.0 PHY + PAM-4</strong> (64→128 GT/s), <strong>패브릭</strong>(멀티홉 스위칭, 비-트리 토폴로지), P2P DMA/메모리 공유</td></tr>
+    <tr><td><strong>3.1</strong></td><td>2023.11</td><td><strong>GDR</strong>(Global Decision Routing), <strong>TEE/TSP</strong> 보안, 메모리 스패링/스크러빙 RAS, 256B flit FEC</td></tr>
+    <tr><td><strong>3.2</strong></td><td>2024.12</td><td>TSP 확장, CXL 메모리 디바이스 모니터링/컴플라이언스 강화</td></tr>
+    <tr><td><strong>4.0</strong></td><td>2025.11(보고)</td><td>128 GT/s, <strong>멀티랙 메모리 풀링</strong> 명시, 데이터센터 규모 확장</td></tr>
+  </table>
+
+  <h3>2.2 디바이스 타입</h3>
+  <table>
+    <tr><th>타입</th><th>프로토콜</th><th>캐시 일관성</th><th>용도</th></tr>
+    <tr><td><strong>Type 1</strong></td><td>io + cache</td><td>O (H→D)</td><td>스마트 NIC, 로컬 메모리 없는 가속기</td></tr>
+    <tr><td><strong>Type 2</strong></td><td>io + cache + mem</td><td>O (양방향)</td><td>GPU/FPGA/AI 가속기 (포인터 공유 + 로컬 버퍼)</td></tr>
+    <tr><td><strong>Type 3</strong></td><td>io + mem</td><td>X</td><td><strong>메모리 확장 카드/풀링</strong>, persistent storage</td></tr>
+  </table>
+
+  <h3>2.4 CXL 하이브리드(DRAM+NAND) &amp; PNM</h3>
+  <p><strong>Hybrid (Samsung CMM-H):</strong> DDR5 DRAM + NAND을 CXL 2.0 Type 3 / PCIe Gen5 x8 결합. 디바이스 측 캐싱으로 근-DRAM 레이턴시 + TB급 용량.</p>
+  <p><strong>PNM/PIM:</strong> Samsung HBM-PIM(성능 2배/에너지 절감), SK Hynix AiM(GDDR6 기반), UPMEM. SK Hynix × Naver Cloud(2025.09) CXL+PIM 실서버 검증.</p>
+
+  <h3>2.6 최신 제품 동향</h3>
+  <ul>
+    <li><strong>Samsung:</strong> CMM-D 128GB(Lenovo 공동 검증, 10% 처리량↑/20% 레이턴시↓), CMM-D 2.0(256GB, 36GB/s), CMM-D 3.1(1TB, 72GB/s), CXL Memory Appliance+Orchestration Console</li>
+    <li><strong>SK Hynix:</strong> 96GB CMM-DDR5(24Gb/1a nm), 인하우스 CXL 컨트롤러 도입, Naver Cloud 검증, <strong>HPE Discover 2026: 256GB 2세대 CXL 3.2 + Liqid 풀링 통합</strong></li>
+    <li><strong>Micron:</strong> CZ120(E3.S, 128/256GB, 서버당 2TB 추가, "DB 쿼리 96% 증가")</li>
+    <li><strong>Microchip:</strong> XpressConnect PCIe 6.0/CXL 3.1 Retimers(핀-투-핀 12ns 미만, 80% 감소)</li>
+  </ul>
+</section>
+
+<!-- 3. 컨트롤러 벤더 -->
+<section id="s3">
+  <h2>3. CXL 컨트롤러/칩셋 벤더 동향 <span class="badge new">핵심</span></h2>
+  <p>각 벤더가 해결하는 use case/pain point 매핑 — <strong>신제품 컨셉의 핵심 입력</strong>.</p>
+
+  <table>
+    <tr><th>벤더</th><th>제품군</th><th>해결 use case</th><th>pain point</th><th>최신(2024-26)</th></tr>
+    <tr><td><strong>Panmnesia</strong></td><td>CXL Controller IP, CXL 3.2 fusion switch</td><td>AI 데이터센터, HPC, 메모리 중심 패브릭</td><td>에너지/레이턴시, 링크 오버헤드, runtime SW 단계, CAPEX/OPEX</td><td>2026.03 Openchip CXL 랙 검증; PCIe 6.4+CXL 3.2 fusion switch; ISCA 2026 "Silicon-Proven Unified Low-Latency CXL Controller"; SKTelecom/Openchip 파트너십; UALink 멤버</td></tr>
+    <tr><td><strong>XCENA (액시나)</strong></td><td><strong>MX1 컴퓨테이셔널 메모리 컨트롤러</strong>(RISC-V 수천 코어). MX1P/MX1S. 최대 256GB DIMM(1TB), <strong>CXL 3.2</strong></td><td>AI/분석 데이터 집약 워크로드, <strong>near-data processing + KV cache 오프로드</strong></td><td><strong>하이퍼스케일 AI 추론 인프라 메모리 병목</strong>, CPU-메모리 제약, 데이터 이동 한계</td><td>MX1 FMS 2025 데뷔, MX1P 2025 출시, MX1S 2026 양산, <strong>Intel 협력</strong>, 2025.10 선정 파트너 샘플+SW 툴킷, FMS 2026 발표</td></tr>
+    <tr><td><strong>ScaleFlux</strong></td><td>MC600 PCIe Gen6 CXL 3.2 Type 3, FC6116 NVMe SSD, MC500</td><td>AI/데이터센터 메모리 확장·풀링</td><td>시스템 스케일링, ECC/전력효율/상호운용성</td><td>2026.07 MC600/FC6116 Gen6 실리콘</td></tr>
+    <tr><td><strong>Marvell</strong></td><td>Alaska P retimer; <strong>Structera A</strong>(200GB/s, 16 Arm Neoverse V2, LZ4 압축), <strong>Structera X</strong>(3.64배 압축, 12 DDR4), <strong>S 20256</strong>(CXL 2.0 스위치 양산), <strong>S 30260</strong>(260-lane CXL 3.0, 4TB/s)</td><td>AI 클러스터 signal integrity; 인라인 압축+Arm 처리(업계 첫); DDR5 공급 제약 대응</td><td>연결 스케일; 용량 스케일링</td><td>2024.07.31 Structera 발표; 2026 Q3 S30260 샘플링</td></tr>
+    <tr><td><strong>Montage (澜起科技)</strong></td><td>RCD/MRCD/DB/MDB, CXL MXC M88MX6852(CXL 3.1) + 3.2 변종, PCIe 6.x AEC</td><td>메모리 인터페이스 + CXL 용량/대역폭 확장</td><td>DDR5 랙 vs DDR5+CXL 하이브리드 비교</td><td>2025.11 AEC; 2025 말 M88MX6852; 2026 중 CXL 3.2 MXC 실리콘(dual DDR5 8000)</td></tr>
+    <tr><td><strong>Astera Labs</strong></td><td>Leo CXL Smart Memory Controller(E/P/A1000), Scorpio Smart Fabric Switches, Aries DSP Retimers, COSMOS SW</td><td>AI 서버/클러스터, fleet 관리</td><td><strong>"AI has outgrown the server. The rack is now the unit of compute"</strong>, 대역폭, 다중 벤더 호환성</td><td>320-lane Scorpio X-Series, COSMOS 자동 자원 최적화, <strong>Microsoft Azure M-Series VM 통합(업계 첫 CXL 클라우드 배치)</strong></td></tr>
+    <tr><td><strong>Microchip</strong></td><td>PM8691 XpressConnect PCIe 6.0/CXL 3.1 Retimer (64 GT/s)</td><td>AI 패브릭 스케일</td><td>지터/스큐/지연 보상, 신호 무결성</td><td>2026.06, PCIe Gen3/4/5 하위호환</td></tr>
+  </table>
+
+  <blockquote class="key">
+    <strong>벤더 솔루션 패턴 관찰:</strong> 에너지/레이턴시(Panmnesia) → <strong>컴퓨테이셔널 메모리 + KV cache 오프로드(XCENA, RISC-V 수천 코어)</strong> → 랙 단위 컴퓨팅(Astera) → signal integrity(Marvell/Microchip) → 용량/대역폭 확장(Montage/ScaleFlux)로 pain point가 계층화됨. <strong>XCENA는 신제품 컨셉 핵심 반영 대상</strong>(near-data processing + KV cache).
+  </blockquote>
+</section>
+
+<!-- 4. 풀링 SW -->
+<section id="s4">
+  <h2>4. CXL 풀링 SW/어플라이언스 생태</h2>
+
+  <h3>4.1 풀링 솔루션 벤더</h3>
+  <table>
+    <tr><th>벤더</th><th>제품/스펙</th><th>핵심 포인트</th></tr>
+    <tr><td><strong>Liqid</strong></td><td>EX-5410C(CXL 2.0, <strong>최대 100TB DRAM을 32대 서버 풀링</strong>), Matrix 3.6 오케스트레이션 SW</td><td>LLM/인메모리 DB 타겟 컴포저블 어플라이언스. K8s/VMware/OpenShift/Slurm 통합</td></tr>
+    <tr><td><strong>Penguin/SMART</strong></td><td><strong>MemoryAI KV Cache Server</strong>(업계 첫 양산형, 11TB, NVIDIA Dynamo 통합)</td><td>2026.03 출시. OriginAI(B200/MI325X 지원). 7-나인 가용성</td></tr>
+    <tr><td><strong>MemVerge</strong></td><td>Memory Machine X for CXL + XConn Apollo. <strong>100TiB 스케일 CXL 풀</strong>, <strong>SSD 대비 5배+ AI 추론 성능</strong></td><td>OCP 2025 데모. NVIDIA Dynamo+NIXL. CXL 3.1</td></tr>
+    <tr><td><strong>Astera Labs</strong></td><td>Leo 컨트롤러(Type 3, CXL 1.1/2.0, 2TB/컨트롤러, 50ns)</td><td><strong>Microsoft Azure M-Series VM 탑재, 업계 첫 CXL 클라우드 배치(2025.11)</strong></td></tr>
+    <tr><td><strong>Marvell Structera</strong></td><td>A/X 컨트롤러 + S 20256/S 30260 스위치</td><td><strong>2026 Q3 CXL 3.0 스위치 샘플링</strong>(260-lane, 4TB/s)</td></tr>
+    <tr><td><strong>XConn</strong></td><td>Apollo(256-lane CXL 2.0, 2048GB/s)</td><td>MemVerge와 100TiB 풀 데모</td></tr>
+  </table>
+
+  <h3>4.2 서버 HW 제조사</h3>
+  <table>
+    <tr><th>OEM</th><th>주요 모델 / CXL</th><th>특이사항</th></tr>
+    <tr><td><strong>HPE</strong></td><td>Gen11(DL360/DL380 CXL 1.1/2.0), Gen12(DL325/DL345 Gen12 Turin, DL380 Gen12 Xeon 6)</td><td>자체 CXL 모듈 미판매(파트너 검증 모델). <strong>SK Hynix 256GB 2세대 CXL 3.2 + Liqid 통합(Discover 2026)</strong></td></tr>
+    <tr><td><strong>Dell</strong></td><td>PowerEdge R7625/R7725(CXL 2.0 Type 3)</td><td>SMART Modular 협력 8x DDR5 확장 카드(최대 4TB)</td></tr>
+    <tr><td><strong>Supermicro</strong></td><td>X14/Petascale(CXL 2.0 ready)</td><td>Xeon 6(344코어), Micron CZ120 파트너십</td></tr>
+    <tr><td><strong>Lenovo</strong></td><td>ThinkSystem SR860 V3(Sapphire Rapids), SR650 V4</td><td>Astera Labs Leo 통합(128 DIMM 슬롯, 16TB DDR5)</td></tr>
+    <tr><td><strong>Inspur</strong></td><td>Yuanbrain NF5280G7(2026.07)</td><td>전용 CXL 확장 카드(16 모듈), cache-coherent, 1~4TB</td></tr>
+  </table>
+
+  <h3>4.5 확인된 파트너십 맵</h3>
+  <ul>
+    <li>Supermicro↔Micron / Lenovo↔Astera / Dell↔SMART Modular / Intel↔Micron(5.6TB 데모)</li>
+    <li>MemVerge↔XConn(Apollo+Memory Machine X) / MemVerge↔Penguin+AMD / Penguin↔NVIDIA(Dynamo)</li>
+    <li><strong>Astera Labs↔Microsoft Azure(업계 첫 CXL 클라우드 배치)</strong></li>
+    <li><strong>HPE↔SK Hynix(가장 강한 파트너십) — Discover 2026: 256GB CXL 3.2 + Liqid</strong></li>
+  </ul>
+
+  <h3>4.7 풀링 심층 (아키텍처 모드·티어링·use case·TCO)</h3>
+
+  <h4>4.7.1 세 가지 메모리 모델 구분 <span class="badge new">상품기획 핵심</span></h4>
+  <table>
+    <tr><th>모델</th><th>CXL 버전</th><th>토폴로지</th><th>특성</th></tr>
+    <tr><td><strong>Expansion(확장)</strong></td><td>1.1+</td><td>단일 호스트 직접 연결</td><td>용량 증설, 단순. seamless capacity upgrade</td></tr>
+    <tr><td><strong>Pooling(풀링)</strong></td><td><strong>2.0</strong></td><td>PCIe 스위치 패브릭, 다중 호스트</td><td>독립 노드가 공유 풀에서 <strong>격리된 할당</strong>. stranded memory 제거</td></tr>
+    <tr><td><strong>Sharing(공유)</strong></td><td><strong>3.0</strong></td><td>멀티홉 패브릭</td><td>다중 호스트가 <strong>동일 데이터 동시 읽기</strong>, 복제 없는 진정한 공유</td></tr>
+  </table>
+  <blockquote><strong>핵심:</strong> CXL 2.0 = pooling(격리 할당), CXL 3.0 = sharing(동시 공유)로 진화. 이 차이가 상품기획 포지셔닝의 핵심.</blockquote>
+
+  <h4>4.7.5 레이턴시/성능 트레이드오프 (중요)</h4>
+  <blockquote class="warn"><strong>remote CXL 액세스 = 로컬 대비 레이턴시 2.2x~4x 증가</strong>, 처리량 감소. "remote DRAM과 비슷하나 bandwidth는 낮음". CXL 4.0(128 GT/s)이 개선하나 오버헤드 잔존. → <strong>latency-sensitive 워크로드는 local DDR5 우위</strong>. 풀링은 용량/탄력 이점이 필요한 워크로드에 적합.</blockquote>
+
+  <h4>4.7.6 Use case 적합성 <span class="badge new">상품기획 성패 좌우</span></h4>
+  <table>
+    <tr><th>Use case</th><th>적합도</th><th>비고</th></tr>
+    <tr><td>AI 추론 KV cache 오프로드</td><td class="stars">★★★ cleanest win</td><td>long-context 병목이 처리력→저장용량으로 이동</td></tr>
+    <tr><td>Redis</td><td class="stars">★★★ cleanest win</td><td>인메모리 DB, 용량 집약</td></tr>
+    <tr><td>Spark shuffle</td><td class="stars">★★★ cleanest win</td><td>피크 시 용량 폭증, 풀로 흡수</td></tr>
+    <tr><td>RAG 피크 ingestion</td><td class="stars">★★</td><td>피크 구간 용량</td></tr>
+    <tr><td>인메모리 DB / SAP HANA</td><td class="stars">★★</td><td>용량 확장</td></tr>
+    <tr><td><strong>OLTP</strong></td><td><span class="badge bad">✗ 회피</span></td><td>레이턴시 민감, local DDR5 우위 → 초기 도입 회피 권고</td></tr>
+  </table>
+  <blockquote class="key">"AI inference KV cache offload, Redis, Spark shuffle이 가장 깨끗한 파일럿 승리처". OLTP는 회피. <strong>use case 선택이 상품기획 성패 좌우</strong>.</blockquote>
+</section>
+
+<!-- 5. CPU/GPU -->
+<section id="s5">
+  <h2>5. CPU/GPU 벤더 CXL 지원 &amp; POR 메모리 조합 <span class="badge new">핵심</span></h2>
+
+  <h3>5.1 Intel Xeon</h3>
+  <table>
+    <tr><th>플랫폼</th><th>출시</th><th>CXL</th><th>PCIe</th><th>특이사항</th></tr>
+    <tr><td><strong>Sapphire Rapids</strong></td><td>2023.01</td><td>CXL 1.1</td><td>5.0</td><td>Type 1, Type 3는 동작하나 공식 미지원. <strong>Xeon Max만 HBM2e+CXL 조합(유일)</strong></td></tr>
+    <tr><td><strong>Emerald Rapids</strong></td><td>2023.12</td><td><strong>CXL 1.1</strong></td><td>5.0</td><td><strong>핵심 개선 = Type 3 공식 인증</strong>(버전업 아님). HBM 변형 없음</td></tr>
+    <tr><td><strong>Granite Rapids</strong></td><td>2024.09</td><td><strong>CXL 2.0</strong></td><td>5.0</td><td>Intel 최초 CXL 2.0. Flat Memory Mode, Micron 파트너십. CXL 3.0은 DR로 이월</td></tr>
+    <tr><td><strong>Diamond Rapids</strong></td><td><strong>mid-2027</strong></td><td><strong>CXL 3.0/3.1</strong></td><td>6.0</td><td>192 Panther Cove 코어, 16ch DDR5, 멀티레벨 패브릭(4,096 노드). <strong>2026→mid-2027 지연</strong></td></tr>
+  </table>
+
+  <h3>5.1b AMD EPYC</h3>
+  <table>
+    <tr><th>플랫폼</th><th>출시</th><th>CXL</th><th>특이사항</th></tr>
+    <tr><td><strong>Genoa</strong> (Zen 4)</td><td>2022.11</td><td>CXL 1.1+ (2.0 subset, 비호환)</td><td>Type 3 only, <strong>풀링 불가</strong>(직접 연결만). 커스텀 9V64H에 HBM3 128GB on-package</td></tr>
+    <tr><td><strong>Bergamo</strong> (Zen 4c)</td><td>2023.06</td><td>CXL 1.1+</td><td>Type 3 only. 128코어/socket</td></tr>
+    <tr><td><strong>Turin</strong> (Zen 5)</td><td>2024.10</td><td><strong>CXL 2.0</strong> (full)</td><td>mid-2026 dominant. <strong>Meta Vistara CXL 2.0 익스팬더로 legacy DDR4-2400 + DDR5-6400 결합</strong></td></tr>
+    <tr><td><strong>Venice</strong> (Zen 6)</td><td>2026 Q4 GA</td><td><strong>미확정</strong> (CXL 3.x 후보)</td><td>DDR5-8000/MRDIMM-12800, PCIe Gen6, 256코어, TSMC N2(2nm). <strong>AMD 공식 미확인</strong></td></tr>
+  </table>
+  <blockquote class="warn"><strong>정정 주의:</strong> Turin은 CXL 2.0(<strong>3.0 아님</strong>). 2026.08 기준 CXL 3.0 구현한 AMD EPYC CPU 없음. <strong>CXL 3.x 시대는 2027년 이후</strong>(양사 모두 보수적).</blockquote>
+
+  <h3>5.2 GPU/Accelerator</h3>
+  <ul>
+    <li><strong>NVIDIA Blackwell B200:</strong> ~180GB HBM3E. NVLink 우선, CXL 직접 지원 없음. Grace+Blackwell은 NVLink-C2C + Scalable Coherency Fabric(CXL 별개)</li>
+    <li><strong>AMD Instinct MI350</strong> (mid-2025): <strong>288GB HBM3E, 피크 대역폭 8.0 TB/s</strong>(Blackwell 대비 용량 우위). <strong>MI300 라인업은 CXL Type-3 경로 지원</strong>(단 AMD 주력 아님)</li>
+    <li><strong>GPU에서 CXL의 역할:</strong> GPU 자체는 CXL 미사용. CXL은 호스트(CPU) 측 메모리 확장/풀링 → GPU가 쓸 KV cache를 호스트-CXL 풀에 두는 간접 결합(Mooncake/Penguin MemoryAI 모델)</li>
+  </ul>
+
+  <h3>5.3 POR 메모리 조합 매트릭스</h3>
+  <table>
+    <tr><th>플랫폼</th><th>HBM</th><th>DDR5 Main</th><th>CXL Expander</th><th>CXL Pool</th></tr>
+    <tr><td>Intel Sapphire Rapids</td><td>O(Xeon Max만)</td><td>O 8ch DDR5-4800</td><td>△(공식 미지원)</td><td>X</td></tr>
+    <tr><td>Intel Emerald Rapids</td><td>X</td><td>O 8ch DDR5-5600</td><td>O CXL 1.1 Type 3</td><td>X</td></tr>
+    <tr><td>Intel Granite Rapids</td><td>X</td><td>O 12ch DDR5-8800(MRDIMM)</td><td>O CXL 2.0 Type 3</td><td>O (2.0)</td></tr>
+    <tr><td>Intel Diamond Rapids</td><td>(미정)</td><td>O 16ch DDR5</td><td>O CXL 3.0/3.1</td><td>O (3.0 멀티레벨)</td></tr>
+    <tr><td>AMD Turin</td><td>X</td><td>O 12ch DDR5</td><td>O CXL 2.0 Type 3</td><td>O (2.0)</td></tr>
+    <tr><td>AMD Venice</td><td>X</td><td>O 16ch DDR5-8000</td><td>TBD</td><td>TBD</td></tr>
+    <tr><td>NVIDIA GB200/300 NVL72</td><td>O (HBM3E)</td><td>O (Grace CPU)</td><td>X (NVLink 우선)</td><td>X</td></tr>
+  </table>
+</section>
+
+<!-- 6. AI 패브릭 -->
+<section id="s6">
+  <h2>6. AI 패브릭 진영 대치</h2>
+  <table>
+    <tr><th>진영</th><th>내용</th></tr>
+    <tr><td><strong>NVIDIA NVLink</strong></td><td>NVLink 4/5세대, NVSwitch, NVLink Fusion(호환성 확대), in-network 연산 오프로드, 랙 단위 복원력. GB200/300 NVL72: 72/36-GPU 랙, 1.8TB/s 대역폭</td></tr>
+    <tr><td><strong>UALink 진영</strong></td><td>2024.05 컨소시엄 설립(Intel, AMD, Google, Meta, AWS, Microsoft, TSMC, Broadcom). <strong>UALink 1.0(2025.04): 단일 패브릭에 1,024 가속기</strong>, sub-μs 지연. 상용 구현 2026 말 목표</td></tr>
+    <tr><td><strong>CXL의 역할</strong></td><td>GPU 스케일업(NVLink/UALink)과 <strong>경쟁하지 않음</strong>. CXL 4.0(2025.11)은 128 GT/s + <strong>멀티랙 메모리 풀링</strong>에 집중 → "shared memory resources throughout the data center". <strong>메모리 분해 계층</strong>에서 AI 패브릭 보완</td></tr>
+  </table>
+  <blockquote class="key"><strong>진영별 시사점:</strong> NVIDIA는 폐쇄적 NVLink 생태(벤더 종속+고비용). UALink는 개방형 대안. <strong>CXL은 두 진영 모두에 메모리 풀 레이어로 부착 가능 → 진영 중립적 기회</strong>.</blockquote>
+</section>
+
+<!-- 7. Main Memory -->
+<section id="s7">
+  <h2>7. Main Memory ↔ CXL 미디어 연관성</h2>
+  <h3>7.1 메인메모리 DRAM 동향</h3>
+  <ul>
+    <li><strong>DDR6:</strong> 목표 <strong>최대 17.6 Gbps</strong>. 프리미엄 2026년 상용화, <strong>2027년 대량 채택</strong> 예상</li>
+    <li><strong>LPDDR6:</strong> JEDEC <strong>2025.07 최종 스펙 확정</strong>. CAMM2 호환, LPCAMM2/SOCAMM2 도입, 512GB 전망, PIM 변종 개발 중</li>
+    <li><strong>Micron MRDIMM/MCRDIMM:</strong> DDR5-8800, 최대 256GB. <strong>128GB DDR5-8800 MRDIMM이 DDR5-6400 RDIMM 대비 로디드 레이턴시 40% 감소</strong>. 듀얼소켓 Granite Rapids + MCRDIMM: <strong>피크 메모리 처리량 1.5 TB/s</strong></li>
+  </ul>
+  <h3>7.2 3계층 분담</h3>
+  <table>
+    <tr><th>계층</th><th>위치</th><th>특성</th><th>역할</th></tr>
+    <tr><td><strong>HBM</strong></td><td>GPU 온패키지</td><td>최고 대역폭(MI350 8.0 TB/s), 최소 용량</td><td>weights, activations, 핫 KV cache</td></tr>
+    <tr><td><strong>Main DRAM</strong></td><td>CPU 온보드</td><td>본질/저지연, 호스트 메모리</td><td>호스트 OS, 웜 KV cache, DB</td></tr>
+    <tr><td><strong>CXL 메모리</strong></td><td>외부(Type 3)</td><td>용량/탄력/공유, 높은 레이턴시</td><td>용량 확장, 풀링, 콜드 KV cache</td></tr>
+  </table>
+  <blockquote><strong>주의:</strong> CXL은 로컬 DDR5 대비 레이턴시 높음 → "latency-sensitive 워크로드는 여전히 local DDR5 우위". 용량/풀링 이점이 필요한 워크로드에 적합.</blockquote>
+</section>
+
+<!-- 8. AI Rack -->
+<section id="s8">
+  <h2>8. AI Rack 메모리 계층 &amp; KV offload 응용</h2>
+  <h3>8.1 계층</h3>
+  <p>GPU HBM(온패키지, 최고 대역/최소 용량) → CPU DRAM(호스트) → CXL 메모리 풀(용량/탄력/공유) → NVMe SSD(청크 로딩, KV cache 스필). weights → HBM, activations → HBM, KV cache → CPU/CXL/SSD 계층화.</p>
+  <h3>8.2 KV cache offloading</h3>
+  <ul>
+    <li><strong>vLLM/PagedAttention:</strong> KV cache를 CPU/CXL/SSD로 오프로드</li>
+    <li><strong>Mooncake (Kimi):</strong> prefill/decode 분리(disaggregated), 중앙 집중 KV 캐시 저장소. Kimi K2 대규모 배포. vLLM/SGLang 호환</li>
+    <li><strong>LMCache / NVFP4 양자화 / CPU offloading</strong>으로 VRAM 압박 완화</li>
+    <li><strong>CXL shared memory pools</strong>로 인프라 비용 절감 + 확장 효율</li>
+  </ul>
+  <h3>8.3 관련 논문</h3>
+  <ul>
+    <li><strong>Mooncake:</strong> prefill/decode 분리, 그렇지 않으면 유휴인 CPU/RAM/SSD/NIC을 중앙 집중 KV 캐시 저장소로 통합. "HBM alone cannot hold full weights + KV cache" → CXL 풀링으로 용량 확장</li>
+    <li><strong>DeepSeek V3, DistServe, Splitwise:</strong> prefill/decode 분리 서빙 아키텍처 — GPU 자원 활용률 극대화</li>
+  </ul>
+</section>
+
+<!-- 9. 수치 모델링 -->
+<section id="s9">
+  <h2>9. 수치 모델링: LLM × Context × TPS × TCO</h2>
+
+  <h3>9.1 KV cache 메모리 요구량</h3>
+  <table>
+    <tr><th>모델</th><th>컨텍스트</th><th>KV cache 메모리</th></tr>
+    <tr><td>7B</td><td>1M tokens</td><td>~128 GB</td></tr>
+    <tr><td>70B</td><td>128k</td><td>~40 GB</td></tr>
+    <tr><td>405B</td><td>128k</td><td>~66 GB</td></tr>
+  </table>
+  <p>KV cache는 sequence length + 동시 요청에 선형 증가 → 주요 하드웨어 제약.</p>
+
+  <h3>9.3 TCO/CAPEX 비교 ($/GB 수치)</h3>
+  <div class="kpi-grid">
+    <div class="kpi-card"><div class="label">HBM3</div><div class="value">~$200/스택</div><div class="desc">2026 DRAM 웨이퍼 23% 소비, DDR5 대비 300% 웨이퍼</div></div>
+    <div class="kpi-card"><div class="label">HBM4</div><div class="value">~$500/스택</div><div class="desc">프리미엄 최고가. 웨이퍼 잠식 → DDR5 가격 상승</div></div>
+    <div class="kpi-card"><div class="label">CXL 풀</div><div class="value">96% 병목 감소</div><div class="desc">HBM 대비 저비용, 용량 탄력, 공유</div></div>
+  </div>
+  <ul>
+    <li><strong>HBM 확장:</strong> 최고 성능, 최고 비용($200~500/스택), 수급 제약(LTA 매진)</li>
+    <li><strong>CXL 메모리 풀링:</strong> HBM 대비 저비용, 용량 탄력, 공유 → KV cache 오프로드로 CAPEX 절감. <strong>96% 병목 감소</strong>, overprovisioning 비용 절감</li>
+    <li><strong>CPU DRAM 증설:</strong> 단순하나 stranded DRAM 발생 → CXL 풀 = stranded DRAM → shared pool 전환</li>
+  </ul>
+
+  <h3>9.5 MI350 vs Blackwell</h3>
+  <ul>
+    <li><strong>AMD Instinct MI350</strong> (mid-2025): <strong>288GB HBM3E, 8.0 TB/s</strong> → 단일 칩 대규모 LLM 탑재</li>
+    <li><strong>NVIDIA Blackwell B200:</strong> ~180GB HBM3E (MI350 대비 용량 열위). NVIDIA는 NVLink 생태(NVL72)로 확장</li>
+  </ul>
+</section>
+
+<!-- 10. 가격 -->
+<section id="s10">
+  <h2>10. 메모리 가격 &amp; 시장 사이클</h2>
+  <ul>
+    <li><strong>DRAM 상승 사이클</strong> 지속(AI 서버 수요). 표준 메모리 수요 연 20%+ 성장. DDR5 계약가 인상(US$0.65/Gb)</li>
+    <li><strong>HBM3E 심각 수급 부족:</strong> SK Hynix/Samsung/Micron <strong>2026년 재고 LTA로 매진</strong>. <strong>HBM3E $300/36GB</strong>(mid-2026). 단 <strong>2026년 계약가 하방 압력</strong>(경쟁 심화)</li>
+    <li><strong>SK Hynix 부문 지배.</strong> HBM 부족/고가 → CXL 메모리 풀링으로 KV cache 오프로드하는 대안 가치 상승</li>
+    <li>현재 상승 국면 → CXL 메모리 채택 가속 자본 여력. HBM LTA 매진 = 수급 가시성 확보이나 경쟁으로 가격 하방</li>
+  </ul>
+</section>
+
+<!-- 11. 시장 인텔리전스 -->
+<section id="s11">
+  <h2>11. 시장 인텔리전스</h2>
+  <h3>11.1 시장 규모/세분화</h3>
+  <div class="kpi-grid">
+    <div class="kpi-card"><div class="label">2025년 CXL 메모리 시장</div><div class="value">$1.9~2.8B</div></div>
+    <div class="kpi-card"><div class="label">2030-34년 전망</div><div class="value">$12.3~28.6B</div></div>
+    <div class="kpi-card"><div class="label">CAGR</div><div class="value">17.8~33.5%</div></div>
+    <div class="kpi-card"><div class="label">DRAM-based 비중</div><div class="value">92.14%</div><div class="desc">2025년 세그먼트 수익</div></div>
+  </div>
+
+  <h3>11.2 CSP/hyperscaler 동향</h3>
+  <ul>
+    <li><strong>Microsoft Azure:</strong> M-Series VM 프리뷰에서 Astera Labs Leo 통합 — <strong>업계 첫 CXL 클라우드 배치</strong></li>
+    <li><strong>Google:</strong> CXL 우선순위 — AI 메모리 병목 해소를 위한 disaggregated 아키텍처. TPU Pod와 분리 가능 메모리</li>
+    <li><strong>AWS:</strong> EC2 CXL, disaggregated 인프라 추진</li>
+    <li><strong>Meta:</strong> 커스텀 Vistara CXL 2.0 익스팬더로 legacy DDR4-2400 + DDR5-6400 결합(Turin 서버) — stranded DDR4 재활용</li>
+    <li><strong>공통 목표:</strong> idle DRAM 풀링 → overprovisioning 비용 절감. <strong>2025년 CXL 3.0 생태 성숙 → 초기 풀링, 2026 말~2027년 CXL 4.0 HW(2배 전송속도)</strong></li>
+  </ul>
+
+  <h3>11.3 경쟁사 (메모리)</h3>
+  <ul>
+    <li><strong>삼성:</strong> CMM-D 2.0/3.1, CMM-H 하이브리드, CXL Appliance(오케스트레이션 콘솔) — <strong>풀 스택 선도</strong></li>
+    <li><strong>SK하이닉스:</strong> 96GB CMM-DDR5, 인하우스 컨트롤러, Naver Cloud 실서버 검증, HPE Discover 2026 통합 — <strong>AI/PIM 결합 + HPE 파트너십 차별화</strong></li>
+    <li><strong>마이크론:</strong> CZ120(E3.S, 128/256GB, 2TB/서버) — <strong>DB 성능 어필</strong></li>
+  </ul>
+</section>
+
+<!-- 12. 상품기획 제언 -->
+<section id="s12">
+  <h2>12. 차세대 상품기획 방향 (종합 제언)</h2>
+
+  <div class="recommendation">
+  <h3>12.1 컨트롤러 벤더 솔루션 → 신제품 컨셉 반영 <span class="badge new">핵심</span></h3>
+  <table>
+    <tr><th>제품 컨셉</th><th>반영 벤더 솔루션</th><th>타겟 pain point</th></tr>
+    <tr><td>저지연 CXL 컨트롤러 IP</td><td>Panmnesia low-latency</td><td>runtime SW 오버헤드</td></tr>
+    <tr><td><strong>컴퓨테이셔널 메모리 컨트롤러(KV cache 오프로드)</strong></td><td><strong>XCENA MX1P/MX1S</strong>(RISC-V 수천 코어, CXL 3.2, near-data processing)</td><td><strong>AI 추론 메모리 병목, KV cache, 데이터 이동</strong></td></tr>
+    <tr><td>랙 스케일 CXL 패브릭 스위치</td><td>Astera Scorpio/COSMOS</td><td>랙 단위 자원 최적화</td></tr>
+    <tr><td>AI 메모리 확장 컨트롤러</td><td>Montage MXC, ScaleFlux MC600</td><td>용량/대역폭 확장, ECC/전력</td></tr>
+    <tr><td>signal integrity(retimer)</td><td>Marvell Alaska P, Microchip PM8691</td><td>고속 PHY 신호 무결성</td></tr>
+    <tr><td>하이브리드(DRAM+NAND) CXL</td><td>Samsung CMM-H</td><td>비용/용량/속도 트레이드옵</td></tr>
+    <tr><td>PIM/CXL 결합</td><td>SK Hynix AiM + Naver</td><td>메모리 월, 전력</td></tr>
+  </table>
+  </div>
+
+  <h3>12.2 제품 포지셔닝 옵션</h3>
+  <ol>
+    <li><strong>풀 스택(Appliance+SW):</strong> 삼성식 — 컨트롤러+모듈+스위치+오케스트레이션 콘솔</li>
+    <li><strong>컨트롤러/IP 전문:</strong> Panmnesia/Montage식 — 벤더에 IP 공급</li>
+    <li><strong>AI 랙 특화:</strong> KV cache 오프로드 CXL 풀 + GPU 호스트 통합</li>
+    <li><strong>진영 중립적 메모리 풀:</strong> NVLink/UALink 모두에 부착 가능</li>
+    <li><strong>풀링 단계별 포지셔닝:</strong> <strong>Expansion(1.1) → Pooling(2.0) → Sharing(3.0)</strong> 3단계 라인업. 각 단계별 타겟 워크로드 분리</li>
+  </ol>
+
+  <h3>12.3 핵심 기회 영역 &amp; 차별화 use case</h3>
+  <ul>
+    <li><strong>AI 추론 KV cache 풀:</strong> Mooncake/vLLM disagg 서빙 결합 — <strong>가장 큰 단기 기회, cleanest pilot win</strong>. Penguin MemoryAI(11TB)/MemVerge+XConn(100TiB, SSD 대비 5배+) 검증</li>
+    <li><strong>Redis / Spark shuffle:</strong> 풀링 cleanest win — 피크 용량 흡수, overprovisioning 절감</li>
+    <li><strong>장문 컨텍스트(128k~1M) 지원:</strong> CXL 풀로 HBM 한정 우회</li>
+    <li><strong>DB/인메모리 분석:</strong> 마이크론 CZ120 실적(쿼리 96%↑) 검증</li>
+    <li><strong>CSP composable infra:</strong> stranded DRAM → shared pool</li>
+    <li><strong>(회피) OLTP:</strong> 레이턴시 민감, local DDR5 우위 → 초기 풀링 타겟 아님</li>
+  </ul>
+
+  <h3>12.4 후속 논의 agenda</h3>
+  <ol>
+    <li>~~"Axaina" 벤더 확인~~ ✅ <strong>XCENA(액시나)</strong> 완료</li>
+    <li>~~풀링 SW(Liqid/Penguin/MemVerge) 상세~~ ✅ 완료</li>
+    <li>~~Main Memory(D) 상세~~ ✅ 완료 (DDR6/LPDDR6/CAMM2/MRDIMM)</li>
+    <li>~~LLM TCO 정량 모델~~ ✅ 완료 (HBM3 $200/HBM4 $500, 96% 병목 감소)</li>
+    <li>~~HBM 가격/수급~~ ✅ 완료</li>
+    <li>~~CSP별 전략~~ ✅ 완료 (Azure/Google/AWS/Meta)</li>
+    <li>~~관련 논문~~ ✅ 완료 (Mooncake/DeepSeek/DistServe/Splitwise)</li>
+    <li>~~Intel/AMD CXL 상세~~ ✅ 완료 (정정 포함)</li>
+    <li>삼성/SK하이닉스/마이크론 최신 실적 가이던스 (기존 wiki 연계) — <span class="badge warn">후속</span></li>
+  </ol>
+</section>
+
+<!-- 데이터 한계 -->
+<section>
+  <h2>📊 데이터 한계 공개</h2>
+  <ul>
+    <li>WebSearch API 백엔드 장애(tool_choice 검증 오류) → WebFetch 직접 크롤링 + 에이전트 병행</li>
+    <li>다수 에이전트가 429 속도제한(50요청/500K토큰)으로 실패 — 일부는 리셋 후 완료</li>
+    <li>수집 미흡: 삼성/SK하이닉스/마이크론 최신 실적 가이던스(기존 wiki 연계 권장)</li>
+    <li><strong>XCENA(액시나)</strong> 확인 완료 — 초기 "Axaina" 철자 오기 정정</li>
+    <li>중요 의사결정 시 1차 출처(CXL 컨소시엄 사양서, 각 사 보도자료) 재확인 권장</li>
+  </ul>
+</section>
+
+<footer>
+  <p>CXL 기반 차세대 메모리 상품기획 DRAFT v0.3 · 작성일 2026-08-03 (KST) · 데이터 기준일: 2026-08-03</p>
+  <p class="note">본 보고서는 WebFetch 기반 웹 크롤링 + 백그라운드 에이전트 조사로 작성되었습니다. 일부 수치는 단일 출처에 기반할 수 있습니다.</p>
+</footer>
+
+</div>
+</body>
+</html>
