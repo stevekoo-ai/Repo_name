@@ -103,3 +103,4 @@ timestamp_utc,workflow,step,attempts_used,max_attempts,result
 2026-09-02T14:09:43Z,sk-hynix-daily-report,investor_flow_fetch,1,36,success
 2026-09-02T14:09:45Z,sk-hynix-daily-report,price_snapshot,1,36,success
 2026-09-02T14:09:50Z,sk-hynix-daily-report,report_generation,1,36,success
+2026-09-02T14:21:35Z,portfolio-holdings-sync,holdings_sync,1,36,success
