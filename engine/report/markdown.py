@@ -741,191 +741,6 @@ def _cci_analysis(payload: dict) -> str:
     return "\n".join(lines)
 
 
-def _sale_trend_section(re_data: dict | None, title: str, highlight_label: str = "청약 타겟 지역") -> str:
-    """국토교통부 실거래가 기반 서울/수도권/전국 가격 추세 + 하이라이트 지역 — 아파트/연립다세대
-    /오피스텔 매매 세 종류가 데이터 소스(collector)만 다르고 형식은 동일해서 공용으로 뺐다."""
-    if not re_data:
-        return ""
-
-    lines = [f"## {title} 실거래가 동향 (국토교통부 실거래가 공개시스템)", ""]
-
-    is_pending = re_data["fetch_status"] == "pending"
-    is_dead_source_error = re_data["fetch_status"] == "source_error" and not any(
-        t.get("data_status") == "ok" for t in re_data.get("tiers", {}).values()
-    )
-    if is_pending or is_dead_source_error:
-        if is_pending:
-            lines.append(f"- [사실] 데이터 상태: Pending — {re_data.get('fetch_note') or 'DATA_GO_KR_KEY 미설정'}")
-        else:
-            lines.append(f"- [사실] 데이터 상태: Source Error — {re_data.get('fetch_note') or '국토교통부 API 응답 없음'}")
-        lines.append("")
-        lines.append("**데이터 준비 중:** 다음 리포트에서 재시도됩니다. 아래는 채워질 정보의 형식입니다.")
-        lines.append("")
-        lines.append("| 지역군 | 기준월 | 평당가(만원) | MoM | 3개월 추세 | 거래량 | 시장 온도 |")
-        lines.append("|---|---|---|---|---|---|---|")
-        lines.append("| 서울 | - | - | - | - | - | - |")
-        lines.append("| 수도권 | - | - | - | - | - | - |")
-        lines.append("| 전국(대표표본) | - | - | - | - | - | - |")
-        lines.append("")
-        lines.append(f"### {highlight_label} 하이라이트 — 용인 기흥구")
-        lines.append("- [사실] 플랫폼시티 인근 지역의 월간 실거래가 추세")
-        lines.append("- 기준: 평당가(만원), 전월비 변화율, 월간 거래량, 시장 온도(과열/보합/냉각)")
-        lines.append("")
-        lines.append("### 서울 구별 순위")
-        lines.append("- [분석] 25개 자치구를 실거래가 상승률로 순위화")
-        lines.append("- 상승 TOP 3 (Gainers)")
-        lines.append("- 하락 TOP 3 (Decliners)")
-        return "\n".join(lines)
-
-    coverage = re_data.get("regions_covered")
-    total = re_data.get("regions_total")
-    if coverage is not None and total:
-        lines.append(f"- [사실] 조회 지역 커버리지: {coverage}/{total}개 지역")
-        lines.append("")
-
-    lines += ["| 지역군 | 기준월 | 평당가(만원) | MoM | 3개월 추세 | 거래량 | 시장 온도 |",
-              "|---|---|---|---|---|---|---|"]
-    for tier in ("seoul", "capital_area", "nationwide"):
-        t = re_data["tiers"][tier]
-        if t.get("data_status") != "ok":
-            lines.append(f"| {_tier_label(tier)} | - | Pending | - | - | - | - |")
-            continue
-        lines.append(
-            f"| {t['label']} | {t['reference_month']} | {_fmt(t['price_per_pyeong_manwon'])} | "
-            f"{_fmt(t['mom_change_pct'], '%')} | {_fmt(t['trend_3m_pct'], '%')} | "
-            f"{_fmt(t['transaction_count'])}건 | {t['market_heat']} |"
-        )
-    lines.append("")
-    lines.append("- [해석] '전국'은 250여개 시군구 전수조사가 아니라 8개 특·광역시 + 주요 도청소재지 대표 도시 표본 기준 추정치.")
-    lines.append("")
-
-    hl = re_data["highlight"]
-    lines.append(f"### {highlight_label} 하이라이트 — {hl['region_name']}")
-    if hl.get("note"):
-        lines.append(f"- [사실] {hl['note']}")
-    if hl.get("data_status") == "ok":
-        lines.append(
-            f"- [사실] {hl['reference_month']} 기준 평당가 {_fmt(hl['price_per_pyeong_manwon'])}만원 "
-            f"(MoM {_fmt(hl.get('mom_change_pct'), '%')}), 거래 {_fmt(hl.get('transaction_count'))}건, "
-            f"시장 온도 {hl.get('market_heat', 'N/A')}"
-        )
-    else:
-        lines.append("- [사실] 데이터 상태: Pending — 최근 조회 기간 내 확인된 실거래 없음")
-    lines.append("")
-
-    movers = re_data.get("seoul_district_movers", {})
-    if movers.get("data_status") == "ok":
-        lines.append("### 서울 자치구 MoM 상승/하락 TOP")
-        gainers = ", ".join(f"{g['name']} ({_fmt(g['mom_change_pct'], '%')})" for g in movers["gainers"])
-        decliners = ", ".join(f"{d['name']} ({_fmt(d['mom_change_pct'], '%')})" for d in movers["decliners"])
-        lines.append(f"- 상승 TOP: {gainers or '데이터 부족'}")
-        lines.append(f"- 하락 TOP: {decliners or '데이터 부족'}")
-
-    return "\n".join(lines)
-
-
-def _real_estate_trend(payload: dict) -> str:
-    return _sale_trend_section(payload.get("real_estate"), "아파트 매매")
-
-
-def _villa_trend(payload: dict) -> str:
-    return _sale_trend_section(payload.get("real_estate_villa"), "연립다세대(빌라) 매매")
-
-
-def _officetel_trend(payload: dict) -> str:
-    return _sale_trend_section(payload.get("real_estate_officetel"), "오피스텔 매매")
-
-
-def _rent_trend(payload: dict) -> str:
-    """아파트 전월세 실거래가 — 전세(평당 보증금)와 월세(평당 보증금+평당 월세)를 함께 표시.
-    현재 전월세로 거주 중인 사용자의 갱신·이사 판단에 바로 쓰이는 섹션이라 청약 타겟 지역
-    하이라이트를 매매 섹션들과 동일한 비중으로 유지한다."""
-    re_data = payload.get("real_estate_rent")
-    if not re_data:
-        return ""
-
-    lines = ["## 아파트 전월세 실거래가 동향 (국토교통부 실거래가 공개시스템)", ""]
-
-    is_pending = re_data["fetch_status"] == "pending"
-    is_dead_source_error = re_data["fetch_status"] == "source_error" and not any(
-        t.get("data_status") == "ok" for t in re_data.get("jeonse_tiers", {}).values()
-    )
-    if is_pending or is_dead_source_error:
-        if is_pending:
-            lines.append(f"- [사실] 데이터 상태: Pending — {re_data.get('fetch_note') or 'DATA_GO_KR_KEY 미설정'}")
-        else:
-            lines.append(f"- [사실] 데이터 상태: Source Error — {re_data.get('fetch_note') or '국토교통부 API 응답 없음'}")
-        lines.append("")
-        lines.append("**데이터 준비 중:** 다음 리포트에서 재시도됩니다.")
-        return "\n".join(lines)
-
-    coverage = re_data.get("regions_covered")
-    total = re_data.get("regions_total")
-    if coverage is not None and total:
-        lines.append(f"- [사실] 조회 지역 커버리지: {coverage}/{total}개 지역")
-        lines.append("")
-
-    lines.append("### 전세 (평당 보증금)")
-    lines += ["| 지역군 | 기준월 | 평당 보증금(만원) | MoM | 3개월 추세 | 거래량 | 시장 온도 |",
-              "|---|---|---|---|---|---|---|"]
-    for tier in ("seoul", "capital_area", "nationwide"):
-        t = re_data["jeonse_tiers"][tier]
-        if t.get("data_status") != "ok":
-            lines.append(f"| {_tier_label(tier)} | - | Pending | - | - | - | - |")
-            continue
-        lines.append(
-            f"| {t['label']} | {t['reference_month']} | {_fmt(t['price_per_pyeong_manwon'])} | "
-            f"{_fmt(t['mom_change_pct'], '%')} | {_fmt(t['trend_3m_pct'], '%')} | "
-            f"{_fmt(t['transaction_count'])}건 | {t['market_heat']} |"
-        )
-    lines.append("")
-
-    lines.append("### 월세 (평당 보증금 + 평당 월세)")
-    lines += ["| 지역군 | 기준월 | 평당 보증금(만원) | 보증금 MoM | 평당 월세(만원) | 월세 MoM | 거래량 |",
-              "|---|---|---|---|---|---|---|"]
-    for tier in ("seoul", "capital_area", "nationwide"):
-        t = re_data["wolse_tiers"][tier]
-        if t.get("data_status") != "ok":
-            lines.append(f"| {_tier_label(tier)} | - | Pending | - | - | - | - |")
-            continue
-        lines.append(
-            f"| {t['label']} | {t['reference_month']} | {_fmt(t['deposit_per_pyeong_manwon'])} | "
-            f"{_fmt(t.get('deposit_mom_change_pct'), '%')} | {_fmt(t.get('rent_per_pyeong_manwon'))} | "
-            f"{_fmt(t.get('rent_mom_change_pct'), '%')} | {_fmt(t.get('transaction_count'))}건 |"
-        )
-    lines.append("")
-    lines.append("- [해석] '전국'은 250여개 시군구 전수조사가 아니라 8개 특·광역시 + 주요 도청소재지 대표 도시 표본 기준 추정치.")
-    lines.append("")
-
-    hl = re_data["jeonse_highlight"]
-    lines.append(f"### 청약 타겟 지역(현 거주 지역군) 전세 하이라이트 — {hl['region_name']}")
-    if hl.get("note"):
-        lines.append(f"- [사실] {hl['note']}")
-    if hl.get("data_status") == "ok":
-        lines.append(
-            f"- [사실] {hl['reference_month']} 기준 평당 보증금 {_fmt(hl['price_per_pyeong_manwon'])}만원 "
-            f"(MoM {_fmt(hl.get('mom_change_pct'), '%')}), 거래 {_fmt(hl.get('transaction_count'))}건, "
-            f"시장 온도 {hl.get('market_heat', 'N/A')}"
-        )
-    else:
-        lines.append("- [사실] 데이터 상태: Pending — 최근 조회 기간 내 확인된 실거래 없음")
-    lines.append("")
-
-    movers = re_data.get("seoul_jeonse_district_movers", {})
-    if movers.get("data_status") == "ok":
-        lines.append("### 서울 자치구 전세 MoM 상승/하락 TOP")
-        gainers = ", ".join(f"{g['name']} ({_fmt(g['mom_change_pct'], '%')})" for g in movers["gainers"])
-        decliners = ", ".join(f"{d['name']} ({_fmt(d['mom_change_pct'], '%')})" for d in movers["decliners"])
-        lines.append(f"- 상승 TOP: {gainers or '데이터 부족'}")
-        lines.append(f"- 하락 TOP: {decliners or '데이터 부족'}")
-
-    return "\n".join(lines)
-
-
-def _tier_label(tier: str) -> str:
-    return {"seoul": "서울", "capital_area": "수도권", "nationwide": "전국(대표표본)"}.get(tier, tier)
-
-
 # ========== NEW 5-SECTION STRUCTURE (Phase 1 Refactoring) ==========
 
 
@@ -1196,46 +1011,6 @@ def _real_estate_decision_section(payload: dict) -> str:
         f"{decision.next_check}",
         "",
     ])
-
-    return "\n".join(lines)
-
-
-def _subscription_concerns_section(payload: dict) -> str:
-    """Section 3.5: 청약 우려사항 daily 추적.
-
-    사용자 요청 원문: "정보를 취득하면 항상 나를 바라봐야해. 내가 현재 우려하는
-    것들에 대해서 그 정보들이 진행되고 있는 방향을 분석해서 긴급하게 처리해야
-    하는지 전략을 수정해야하는지를 알려주는 daily보고서가 되어야하는거야."
-
-    5개 우려사항(소득제한/플랫폼시티 민영분류/전세만료/통학거리/자금갭)을 매일
-    재평가해 🔴긴급 / 🟡전략재검토 / 🟢관망 3단계로 판정한다. 새 정보가 들어와도
-    urgency가 바뀌지 않으면 조용히 관망 — 매일 똑같은 경보를 반복하지 않는다.
-    """
-    from engine.exporters.subscription_concern_tracker import compute_subscription_concerns
-
-    report = compute_subscription_concerns(payload)
-
-    urgency_emoji_line = {
-        "🔴 긴급": "🔴",
-        "🟡 전략재검토": "🟡",
-        "🟢 관망": "🟢",
-    }
-
-    lines = [
-        "# 3.5. 청약 우려사항 daily 추적",
-        "",
-        f"**{report.headline}**",
-        "",
-    ]
-
-    for c in report.concerns:
-        emoji = urgency_emoji_line.get(c.urgency, "❔")
-        lines.append(f"## {emoji} {c.name} — {c.urgency}")
-        lines.append(f"- 현황: {c.status}")
-        lines.append(f"- 권고: {c.recommendation}")
-        for d in c.detail:
-            lines.append(f"  - {d}")
-        lines.append("")
 
     return "\n".join(lines)
 
@@ -1726,11 +1501,11 @@ def render_markdown(payload: dict) -> str:
         _data_center_construction_section(payload),  # 고객재고 축 보조 참고자료 (2.6)
         _wiki_digest_section(payload),  # 위키 판단형 지식 브리지 (2.7)
         _real_estate_decision_section(payload),
-        _subscription_concerns_section(payload),
-        _real_estate_trend(payload),  # 3절 보조 근거 — 아파트 매매 실거래 트렌드
-        _rent_trend(payload),  # 3절 보조 근거 — 아파트 전월세 실거래 트렌드
-        _villa_trend(payload),  # 3절 보조 근거 — 빌라 매매 실거래 트렌드
-        _officetel_trend(payload),  # 3절 보조 근거 — 오피스텔 매매 실거래 트렌드
+        # 2026-09-02: 청약 우려사항 daily 추적 + 매매/전세 실거래 트렌드 4종은
+        # engine/report/subscription_report.py(별도 daily "청약 리포트")로 이관 —
+        # 사용자 요청 "PEOS는 너무 무거워서 좀 나눠야해". real_estate_decision(WAIT/
+        # ENTER)은 거시 신호와 결합돼 있어 PEOS에 남고, "시세가 지금 어떤가"는
+        # 그 리포트가 전담한다.
         generate_event_section(payload),  # 경제 달력 통합 (Section 3.5)
         _monthly_rolling_window_section(payload),  # 월별 추이 (Section 4)
         _quarterly_rolling_window_section(payload),  # 분기별 추이 (Section 5)

@@ -32,6 +32,7 @@ INDEX_PATH = DOCS_DIR / "reports-index.html"
 DATED_RE = re.compile(r"^(\d{4}-\d{2}-\d{2})\.(md|html)$")
 MONTHLY_RE = re.compile(r"^(\d{4}-\d{2})\.(md|html)$")
 SK_HYNIX_RE = re.compile(r"^sk-hynix-auto-report-(\d{4}-\d{2}-\d{2})-(\d{4})\.md$")
+SUBSCRIPTION_REPORT_RE = re.compile(r"^subscription-report-(\d{4}-\d{2}-\d{2})\.md$")
 
 
 def _repo_slug() -> str:
@@ -113,6 +114,20 @@ def _collect_sk_hynix_reports() -> list[dict]:
     return sorted(out, key=lambda r: (r["date"], r["time"]), reverse=True)
 
 
+def _collect_subscription_reports() -> list[dict]:
+    """2026-09-02 신설 — PEOS와 분리된 daily 청약 리포트 (engine/report/
+    subscription_report.py). report/subscription-report-YYYY-MM-DD.md."""
+    if not REPORT_DIR.exists():
+        return []
+    out = []
+    for path in REPORT_DIR.glob("subscription-report-*.md"):
+        m = SUBSCRIPTION_REPORT_RE.match(path.name)
+        if not m:
+            continue
+        out.append({"date": m.group(1), "md": _blob_url(f"report/{path.name}")})
+    return sorted(out, key=lambda r: r["date"], reverse=True)
+
+
 def _collect_misc_html_reports() -> list[dict]:
     """report/ 안의 그 외 일회성 HTML 산출물(daily-brief-*, subscription-desktop-*,
     peos-audit/full/morning-*, PEOS-Final-Report-* 등) — 정기 파이프라인 파일명
@@ -145,10 +160,15 @@ def _row_misc(r: dict) -> str:
     return f'<tr><td>{r["name"]}</td><td><a href="{r["html"]}">HTML</a></td></tr>'
 
 
+def _row_subscription(r: dict) -> str:
+    return f'<tr><td>{r["date"]}</td><td><a href="{r["md"]}">MD</a></td></tr>'
+
+
 def build_index() -> Path:
     daily = _collect_peos_reports()
     monthly = _collect_monthly_reports()
     sk_hynix = _collect_sk_hynix_reports()
+    subscription = _collect_subscription_reports()
     misc = _collect_misc_html_reports()
 
     now = datetime.now().strftime("%Y-%m-%d %H:%M")
@@ -175,7 +195,7 @@ def build_index() -> Path:
 <body>
 <h1>생성된 리포트 전체 목록</h1>
 <p class="updated">마지막 갱신: {now} · 이 페이지 자체도 리포트가 새로 생성될 때마다 자동 갱신됩니다
-(scripts/build_reports_index.py, daily-peos-report.yml/sk-hynix-daily-report.yml에서 호출).</p>
+(scripts/build_reports_index.py, daily-peos-report.yml/sk-hynix-daily-report.yml/subscription-daily-report.yml에서 호출).</p>
 <p><a href="report.html">최신 월간 PEOS 리포트(HTML)</a> · <a href="peos-daily.html">PEOS Daily Dashboard</a> · <a href="index.html">거시경제 투자 시계</a></p>
 
 <h2>PEOS 일일 리포트 ({len(daily)}건)</h2>
@@ -191,6 +211,11 @@ def build_index() -> Path:
 <h2>SK하이닉스 자동 리포트 ({len(sk_hynix)}건, 07:00/10:00/19:00 KST)</h2>
 <table><tr><th>일시</th><th>링크</th></tr>
 {"".join(_row_sk_hynix(r) for r in sk_hynix) or '<tr><td colspan="2">없음</td></tr>'}
+</table>
+
+<h2>청약 리포트 ({len(subscription)}건, 07:10 KST — PEOS와 분리, 청약 우려사항 + 부동산 매매/전세 동향)</h2>
+<table><tr><th>날짜</th><th>링크</th></tr>
+{"".join(_row_subscription(r) for r in subscription) or '<tr><td colspan="2">없음</td></tr>'}
 </table>
 
 <h2>기타 리포트 ({len(misc)}건)</h2>

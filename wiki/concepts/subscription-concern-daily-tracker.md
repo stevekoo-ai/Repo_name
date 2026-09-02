@@ -18,11 +18,21 @@ daily보고서가 되어야하는거야."
 ## 구현 위치
 
 `engine/exporters/subscription_concern_tracker.py` — `compute_subscription_concerns(payload)`.
-`engine/report/payload.py`가 매일 리포트 payload 빌드 시 자동 호출
-(`payload["subscription_concerns"]`), `engine/report/markdown.py`의
-`_subscription_concerns_section()`이 PEOS 일일 리포트 3.5절로 렌더링.
 다른 결정 엔진(`sk_hynix_decision.py`, `real_estate_decision.py`)과 동일한
 "@dataclass 결과 + compute_X(payload) 함수" 패턴을 그대로 따른다.
+
+**2026-09-02 이관**: 사용자 요청("PEOS가 아니라 하루 한번 보내는 청약
+리포트에 내용을 추가해줘" + "PEOS는 너무 무거워서 좀 나눠야해")에 따라
+PEOS(`engine/report/payload.py`/`markdown.py`)에서 완전히 분리해
+`engine/report/subscription_report.py`(별도 daily "청약 리포트")로 옮겼다.
+이 리포트는 거시 엔진(ECOS/KOSIS/FRED)도 CCI도 SK하이닉스 실측도 import하지
+않는다 — `_subscription_concerns_section()`이
+`.github/workflows/subscription-daily-report.yml`(07:10 KST)을 통해 매일
+렌더링되고, `scripts/send_subscription_report_email.py`가 발송한다. 이 이관
+전엔 PEOS 3.5절에 있었으나, 실제 PEOS 이메일은 `markdown.py`가 아니라
+`html_new.py`로 렌더링돼서 이 섹션이 한 번도 실제 이메일에 나타난 적이
+없었다는 것도 이번에 확인됐다 — 별도 리포트로 분리하면서 그 드리프트
+문제 자체가 해소됐다(html_new.py를 동기화할 필요가 없어짐).
 
 ## 3단계 긴급도
 
@@ -62,6 +72,17 @@ detail)` 반환 시그니처), (c) `compute_subscription_concerns()`의 concerns
 리스트에 연결, (d) 단위테스트(`tests/test_subscription_concern_tracker.py`)에
 경계 케이스 추가. 우려사항을 다른 세션의 판단만으로 제거하지 않는다 —
 사용자가 "이제 이건 신경 안 써도 된다"고 명시할 때만 제거.
+
+## 이 리포트가 담는 것 (2026-09-02 기준)
+
+"청약 리포트"는 이 우려사항 추적만이 아니라 부동산 실거래가 동향(국토교통부,
+아파트/연립다세대/오피스텔 매매 + 아파트 전월세)도 함께 담는다 — 둘 다
+청약 의사결정에 실제로 쓰이지만 거시경제 판단(PEOS)과는 무관해 같은 자리로
+옮겼다. `engine/report/subscription_report.py`가 두 부분을 한 markdown으로
+조립하고, 매매/전세 동향의 원 구현(각 `_*_trend()` 함수)은 원래 markdown.py에
+있던 것을 그대로 옮겨왔다 — PEOS의 `real_estate_decision`(WAIT/ENTER 진입
+판단)은 거시 신호와 결합돼 있어 PEOS에 남았고, 이 리포트에는 순수 시세
+데이터만 있다.
 
 ## 알려진 한계 (2026-09-01 기준)
 

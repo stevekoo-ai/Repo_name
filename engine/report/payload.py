@@ -20,7 +20,7 @@ from engine.personal import mapping
 from engine.rate_analysis import scoring as rate_scoring
 from engine.crisis_analysis import scoring as cci_scoring
 from engine.real_estate import market_trend as real_estate_trend
-from engine.real_estate import officetel_trend, rent_trend, villa_trend
+from engine.real_estate import rent_trend
 from . import discussion as discussion_mod
 from . import scenario as scenario_mod
 
@@ -279,13 +279,12 @@ def build_report_payload(month_key: str | None = None) -> dict:
     cci_analysis = _cci_section()
     payload["cci_analysis"] = cci_analysis
 
-    # Add real estate transaction price trend (서울/수도권/전국) — 아파트 매매/전월세/
-    # 연립다세대 매매/오피스텔 매매 4종. 각 collector는 별도 data.go.kr 활용신청이 필요해
-    # 승인 전까지는 개별적으로 "pending"일 수 있다 (7.9 — 소스 없다고 파이프라인이 막히지 않음).
+    # 아파트 매매/전월세 실거래가 — real_estate_decision(아래)의 _compute_affordability와
+    # _analyze_rent_trend가 읽는 최소한만 여기서 계산한다. 연립다세대/오피스텔 매매와
+    # 상세 트렌드 테이블 전체는 2026-09-02부터 engine/report/subscription_report.py(별도
+    # daily "청약 리포트")로 이관 — 사용자 요청 "PEOS는 너무 무거워서 좀 나눠야해".
     payload["real_estate"] = real_estate_trend.compute_real_estate_trend()
     payload["real_estate_rent"] = rent_trend.compute_rent_trend()
-    payload["real_estate_villa"] = villa_trend.compute_villa_trend()
-    payload["real_estate_officetel"] = officetel_trend.compute_officetel_trend()
 
     # Add daily dashboard history integration
     payload["daily_history_summary"] = _daily_history_summary(month_key)
@@ -362,19 +361,9 @@ def build_report_payload(month_key: str | None = None) -> dict:
         log_event("real_estate_decision.failed", error=str(exc), level="warning")
         payload["real_estate_decision"] = None
 
-    # 청약 우려사항 daily 추적 — 사용자 요청: "정보를 취득하면 항상 나를 바라봐야
-    # 해...긴급하게 처리해야하는지 전략을 수정해야하는지를 알려주는 daily보고서".
-    # exposure 모델(위)이 이미 payload에 있어야 자금조달 갭 체크가 동작하므로
-    # real_estate_decision 다음 자리에 둔다.
-    try:
-        from engine.exporters.subscription_concern_tracker import compute_subscription_concerns
-
-        payload["subscription_concerns"] = compute_subscription_concerns(payload)
-        log_event("subscription_concerns.computed",
-                  overall_urgency=payload["subscription_concerns"].overall_urgency)
-    except Exception as exc:
-        log_event("subscription_concerns.failed", error=str(exc), level="warning")
-        payload["subscription_concerns"] = None
+    # 2026-09-02: 청약 우려사항 daily 추적은 engine/report/subscription_report.py
+    # (별도 daily "청약 리포트")로 이관 — 사용자 요청 "PEOS는 너무 무거워서 좀
+    # 나눠야해". PEOS payload는 더 이상 이 항목을 계산하지 않는다.
 
     # Record daily signal (Phase 3c: Signal Persistence)
     try:

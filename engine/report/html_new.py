@@ -459,10 +459,6 @@ def render_html(payload: dict) -> str:
     month = payload["report_month"]
     cci = payload.get("cci_analysis", {})
     rate = payload.get("rate_analysis", {})
-    real_estate = payload.get("real_estate", {})
-    real_estate_rent = payload.get("real_estate_rent", {})
-    real_estate_villa = payload.get("real_estate_villa", {})
-    real_estate_officetel = payload.get("real_estate_officetel", {})
 
     state_color = {"GREEN": "#10B981", "YELLOW": "#F59E0B", "RED": "#EF4444"}
     cci_state = cci.get("state", "UNKNOWN")
@@ -704,11 +700,9 @@ def render_html(payload: dict) -> str:
             {_render_sk_hynix_action(cci.get('sk_hynix_action', {}))}
         </div>
 
-        <!-- 부동산 실거래가 동향 -->
-        {_render_real_estate_section(real_estate)}
-        {_render_rent_section(real_estate_rent)}
-        {_render_villa_section(real_estate_villa)}
-        {_render_officetel_section(real_estate_officetel)}
+        <!-- 2026-09-02: 부동산 실거래가 동향(매매 3종 + 전세) + 청약 우려사항은
+             engine/report/subscription_report.py(별도 daily "청약 리포트")로
+             이관 — 사용자 요청 "PEOS는 너무 무거워서 좀 나눠야해". -->
 
         <!-- 포트폴리오 추천 -->
         <div class="card" style="margin-bottom: 30px;">

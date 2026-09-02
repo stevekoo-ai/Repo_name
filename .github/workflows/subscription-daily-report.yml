@@ -1,0 +1,117 @@
+name: Daily 청약 리포트
+
+# TRACK A ONLY — 청약(주택 구입) 판단 리포트, PEOS와 분리된 별도 파이프라인.
+# 설계 근거: wiki/concepts/subscription-concern-daily-tracker.md
+#
+# 2026-09-02 신설 — 사용자 요청 "PEOS가 아니라 하루 한번 보내는 청약 리포트에
+# 내용을 추가해줘" + "부동산 관련 가격 매매 전세 동향등도 청약 리포트로
+# 분리해서 가져와. PEOS는 너무 무거워서 좀 나눠야해." engine/report/payload.py
+# (거시/CCI/SK하이닉스 실측)는 이 워크플로가 전혀 건드리지 않는다 — ECOS/
+# KOSIS/FRED 호출 0건, 유일한 네트워크 의존은 MOLIT(DATA_GO_KR_KEY)뿐.
+#
+# 생성(engine.report.subscription_report)과 발송(scripts.send_subscription_
+# report_email)을 분리한 이유는 daily-peos-report.yml이 이미 얻은 교훈과
+# 같다 — 생성이 조용히 실패를 삼켜도 되는 것과, 발송이 조용히 실패해선 안
+# 되는 것은 다른 요구사항이다.
+
+on:
+  schedule:
+    # 22:10 UTC = 07:10 KST (next day) — PEOS(06:00 KST) 이후, real-estate-sync
+    # (03:00 KST)가 그날 MOLIT 데이터를 이미 커밋해둔 뒤.
+    - cron: "10 22 * * *"
+  workflow_dispatch:
+    inputs:
+      date:
+        description: "리포트 대상 날짜 (YYYY-MM-DD). 비워두면 실행 시점의 오늘(KST)."
+        required: false
+        default: ""
+
+permissions:
+  contents: write
+
+concurrency:
+  group: subscription-daily-report
+  cancel-in-progress: false
+
+jobs:
+  run-subscription-report:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run 청약 리포트 파이프라인
+        env:
+          DATA_GO_KR_KEY: ${{ secrets.DATA_GO_KR_KEY }}
+        run: |
+          if [ -n "${{ github.event.inputs.date }}" ]; then
+            python3 -c "from engine.report.subscription_report import run; run(archive_date='${{ github.event.inputs.date }}')"
+          else
+            python -m engine.report.subscription_report
+          fi
+
+      - name: 리포트 링크 인덱스 갱신
+        run: python3 scripts/build_reports_index.py
+
+      - name: Commit updated report and normalized data
+        run: |
+          git config user.name "peos-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add report/subscription-report-*.md data/normalized/ data/raw/ docs/reports-index.html
+          if git diff --cached --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "chore: 청약 리포트 $(date -u +%Y-%m-%d)"
+            # daily-peos-report.yml의 실측 사례(2026-08-08~10, 3일치 리포트가
+            # push 거부로 통째로 폐기)와 동일한 재시도+rebase 루프.
+            BRANCH="${GITHUB_REF_NAME:-main}"
+            for i in 1 2 3 4 5; do
+              git push && break
+              echo "push rejected, rebasing onto latest $BRANCH (attempt $i)"
+              git fetch origin "$BRANCH"
+              git rebase "origin/$BRANCH"
+              sleep $((i * 3))
+            done
+          fi
+
+      - name: Fail loudly if the report never reached the repo
+        run: |
+          BRANCH="${GITHUB_REF_NAME:-main}"
+          git fetch origin "$BRANCH"
+          if ! git merge-base --is-ancestor HEAD "origin/$BRANCH"; then
+            echo "::error::청약 리포트가 생성됐지만 $BRANCH에 push되지 않았습니다 — 전달 실패"
+            exit 1
+          fi
+          echo "report delivered: $(git rev-parse --short HEAD) is on origin/$BRANCH"
+
+      - name: Email the report
+        env:
+          GMAIL_ADDRESS: ${{ secrets.GMAIL_ADDRESS }}
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+          NOTIFY_EMAIL_TO: ${{ secrets.GMAIL_ADDRESS }},${{ secrets.COMPANY_EMAIL }}
+        run: |
+          if [ -n "${{ github.event.inputs.date }}" ]; then
+            python -m scripts.send_subscription_report_email --date "${{ github.event.inputs.date }}"
+          else
+            python -m scripts.send_subscription_report_email
+          fi
+
+      - name: Report that the report did not arrive
+        if: failure()
+        env:
+          GMAIL_ADDRESS: ${{ secrets.GMAIL_ADDRESS }}
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+          NOTIFY_EMAIL_TO: ${{ secrets.GMAIL_ADDRESS }},${{ secrets.COMPANY_EMAIL }}
+        run: |
+          python -m scripts.send_subscription_report_email \
+            --failure-alert "subscription-daily-report 워크플로가 실패했습니다 (생성·커밋·전달 중 한 단계)"
