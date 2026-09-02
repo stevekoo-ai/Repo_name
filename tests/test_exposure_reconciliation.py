@@ -98,6 +98,52 @@ def test_deployable_cash_excludes_locked_value():
     assert m.liquid_valued == m.total_valued - m.locked_valued
 
 
+def test_housing_entry_funds_total_includes_jeonse_deposit_and_retirement():
+    """2026-09-02: 부동산 진입 자금 계산이 '지금 당장 파는' 자산만 보고 있었다 —
+    회수 예정인 전세보증금과, 무주택자 특별중도인출로 쓸 수 있는 IRP·DC 전체
+    평가액이 빠져 있었다. 사용자 지적: "부동산 가용 현금에 현재 전세금
+    462000000원 포함해야하는 거 아니냐?" / "ISA계좌와 IRP 그리고 DC계좌도
+    주택 마련에 사용될 수 있다". housing_entry_funds_total은 세 값의 합이어야
+    하고, deployable_cash는 그대로 '지금 당장' 기준을 유지해야 한다(섞이면
+    안 됨 — R3와 같은 이유로 시점이 다른 돈을 하나로 뭉개면 안 된다)."""
+    m = build_exposure_model()
+    assert m.jeonse_deposit_krw == 462_000_000
+    assert m.jeonse_deposit_available_from == "2027-02-22"
+    assert m.retirement_total_krw > m.retirement_krw, (
+        "retirement_total_krw는 cash_like_balance뿐 아니라 holdings 평가액도 "
+        "합산해야 한다 — cash-like sliver만 반영하는 옛 retirement_krw와 같으면 안 된다"
+    )
+    assert m.housing_entry_funds_total == (
+        m.deployable_cash + m.jeonse_deposit_krw + m.retirement_total_krw
+    )
+    # '지금 당장' 기준(deployable_cash)은 전세보증금·퇴직연금과 섞이지 않는다.
+    assert m.deployable_cash == m.cash_krw + m.liquid_valued
+
+
+def test_retirement_total_krw_sums_cash_like_and_all_holdings_valuations():
+    """portfolio.yaml의 IRP+DC 각각 cash_like_balance_krw + holdings[].valuation_krw
+    전부를 더한 값과 일치해야 한다 — 일부만 반영하면 조용히 숫자가 틀린다."""
+    from core.config import portfolio_config
+
+    m = build_exposure_model()
+    cfg = portfolio_config()
+    expected = 0.0
+    for acct in (cfg.get("retirement_accounts") or {}).values():
+        expected += float(acct.get("cash_like_balance_krw") or 0)
+        expected += sum(float(h.get("valuation_krw") or 0) for h in (acct.get("holdings") or []))
+    assert m.retirement_total_krw == expected
+
+
+def test_housing_funds_notes_only_appear_when_values_are_nonzero():
+    """전세보증금·퇴직연금 안내 문구는 해당 값이 0이 아닐 때만 notes에 붙어야
+    한다 — 값이 없는데 문구만 뜨면 사용자가 있지도 않은 돈을 있다고 오해한다."""
+    m = build_exposure_model()
+    jeonse_notes = [n for n in m.notes if "전세보증금" in n and "주택 진입 총 가용" in n]
+    retirement_notes = [n for n in m.notes if "IRP·DC 퇴직연금 전체 평가액" in n]
+    assert bool(m.jeonse_deposit_krw) == bool(jeonse_notes)
+    assert bool(m.retirement_total_krw) == bool(retirement_notes)
+
+
 def test_exposure_model_needs_no_network():
     """Section 0 exists precisely so it survives a day when every collector fails.
     If this ever starts making requests, that guarantee is gone."""

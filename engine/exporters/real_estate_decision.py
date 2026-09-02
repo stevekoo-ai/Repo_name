@@ -194,15 +194,26 @@ def _compute_affordability(payload: dict) -> dict | None:
     jeonse_pp = _pyeong_price(payload.get("real_estate_rent", {}), "jeonse_tiers")
 
     cash = exposure.deployable_cash
+    # 2026-09-02 — 사용자 지적: "부동산 가용 현금에 현재 전세금 포함해야 하는
+    # 거 아니냐?"·"ISA계좌와 IRP 그리고 DC계좌도 주택 마련에 사용될 수 있다".
+    # deployable_cash(지금 당장 매도로 확보 가능)와 total(전세보증금 회수 +
+    # IRP/DC 특별중도인출까지 포함한 최종 총액)을 분리해서 보여준다 — 매도
+    # 없이 지금 쓸 수 있는 돈과, 시점·절차가 필요한 돈을 섞지 않는다.
+    total = exposure.housing_entry_funds_total
     out = {
         "deployable_cash": cash,
         "cash_only": exposure.cash_krw,
         "from_liquidation": exposure.liquid_valued,
         "locked": exposure.locked_valued,
+        "jeonse_deposit": exposure.jeonse_deposit_krw,
+        "jeonse_deposit_available_from": exposure.jeonse_deposit_available_from,
+        "retirement_total": exposure.retirement_total_krw,
+        "housing_entry_funds_total": total,
         "buy_pyeong_price": buy_pp,
         "jeonse_pyeong_price": jeonse_pp,
         "buy_pyeong_equivalent": (cash / buy_pp) if buy_pp else None,
         "jeonse_pyeong_equivalent": (cash / jeonse_pp) if jeonse_pp else None,
+        "buy_pyeong_equivalent_total": (total / buy_pp) if buy_pp else None,
         "semi_pct": exposure.semi_pct,
         "reference_month": ((payload.get("real_estate") or {}).get("tiers", {})
                             .get("seoul", {}).get("reference_month")),

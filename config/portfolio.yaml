@@ -20,7 +20,7 @@ portfolio_version: 1
 updated_at: "2026-07-14T00:00:00"
 
 cash:
-  krw: 20000000     # EXAMPLE
+  krw: 27000000     # REAL — 사용자 확인 2026-09-02 (이전 2,000만원 EXAMPLE에서 갱신)
   usd: 2000         # EXAMPLE
 
 stocks:

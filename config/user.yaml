@@ -58,6 +58,12 @@ housing:
   subscription_account_start: "2005-11-03"  # REAL — 국민은행, config/portfolio.yaml subscription_savings와 동일
   subscription_priority_strategy: "저축총액(납입총액) 기준 경쟁 — 85㎡ 초과 일반공급, 소득제한 없는 84㎡ 이상 우선"
   moveout_deadline: "2027-02-22"       # 현 거주지 전세 계약 만료일(갱신청구권 이미 사용) — 입주 전 임시 거주 필요
+  # REAL — 사용자 확인 2026-09-02. 현재 거주 중인 전셋집의 보증금 — moveout_deadline에
+  # 계약이 끝나야 돌려받는 돈이라 "지금 당장 가용"은 아니지만, 다음 집 계약도 통상
+  # 그 시점 전후로 이뤄지므로 주택 진입 자금 계산에는 포함해야 하는 자산이다
+  # (engine/exposure/model.py의 deployable_cash와는 별도로 housing_entry_funds_total에
+  # 합산 — "지금 가용"과 "회수 시점 도래 시 가용"을 구분해서 보여준다).
+  current_jeonse_deposit_krw: 462000000
 
 travel:
   business_trip_enabled: true

@@ -56,7 +56,7 @@ from dataclasses import dataclass, field
 from datetime import date
 from pathlib import Path
 
-from core.config import portfolio_config
+from core.config import portfolio_config, user_profile
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 
@@ -141,7 +141,8 @@ class ExposureModel:
     as_of: str
     holdings: list[Holding]
     cash_krw: float
-    retirement_krw: float
+    retirement_krw: float                # IRP+DC 현금성 잔고만
+    retirement_total_krw: float = 0.0     # IRP+DC 전체 평가액(현금성+펀드) — 주택 특별중도인출 후보
 
     total_cost: float = 0.0
     total_valued: float = 0.0
@@ -154,7 +155,17 @@ class ExposureModel:
 
     locked_valued: float = 0.0
     liquid_valued: float = 0.0
-    deployable_cash: float = 0.0         # what could actually fund a house
+    deployable_cash: float = 0.0         # available RIGHT NOW (cash + liquid stock)
+
+    # 2026-09-02 추가 — 사용자 지적: "부동산 가용 현금에 현재 전세금 포함해야
+    # 하는 거 아니냐?". deployable_cash와 의도적으로 분리한다 — 전세보증금은
+    # moveout_deadline(계약 만료)이 와야 돌려받는 돈이라 "지금 당장" 쓸 수
+    # 있는 현금이 아니다. 다만 다음 집 계약도 통상 그 시점 전후로 이뤄지므로
+    # 주택 진입 총 자금 계산에는 포함해야 맞다 — 그래서 별도 필드로 만들어
+    # "지금 가용"과 "전세 회수 시점 기준 총 가용"을 구분해서 보여준다.
+    jeonse_deposit_krw: float = 0.0
+    jeonse_deposit_available_from: str | None = None
+    housing_entry_funds_total: float = 0.0   # deployable_cash + jeonse_deposit_krw
 
     notes: list[str] = field(default_factory=list)
 
@@ -195,10 +206,22 @@ def build_exposure_model() -> ExposureModel:
 
     cash = float((cfg.get("cash") or {}).get("krw") or 0)
 
+    # 2026-09-02 — retirement_krw는 계좌 안의 "현금성 잔고"만이다(투자된 펀드
+    # 평가액은 안 셈). retirement_total_krw는 IRP/DC 계좌 전체 평가액(현금성 +
+    # 보유 펀드 평가액 전부)이다 — 사용자 지적: "ISA계좌와 IRP 그리고 DC계좌도
+    # 주택 마련에 사용될 수 있다" — 소득세법 시행령상 무주택자의 주택구입·
+    # 전세자금 목적 중도인출이 IRP/DC 둘 다 허용 사유에 해당하므로, 현금성
+    # 잔고만이 아니라 계좌 전체가 주택 자금 후보다(단, 일반 매도와 달리
+    # 사유 증빙이 필요한 특별 중도인출 — housing_entry_funds_total에서
+    # 별도로 표시한다).
     retirement = 0.0
+    retirement_total = 0.0
     for acct in (cfg.get("retirement_accounts") or {}).values():
         if isinstance(acct, dict):
-            retirement += float(acct.get("cash_like_balance_krw") or 0)
+            cash_like = float(acct.get("cash_like_balance_krw") or 0)
+            retirement += cash_like
+            holdings_value = sum(float(h.get("valuation_krw") or 0) for h in (acct.get("holdings") or []))
+            retirement_total += cash_like + holdings_value
 
     m = ExposureModel(
         as_of=date.today().isoformat(),
@@ -206,6 +229,7 @@ def build_exposure_model() -> ExposureModel:
         cash_krw=cash,
         retirement_krw=retirement,
     )
+    m.retirement_total_krw = retirement_total
 
     m.total_cost = sum(h.cost for h in holdings)
     m.total_valued = sum(h.valued for h in holdings)
@@ -229,6 +253,17 @@ def build_exposure_model() -> ExposureModel:
     # depends on and never received.
     m.deployable_cash = m.cash_krw + m.liquid_valued
 
+    # 2026-09-02 추가 — 현재 전세보증금은 지금 당장 가용은 아니지만(계약 만료
+    # 시점에 회수), 다음 집 계약도 통상 그 시점 전후로 이뤄지므로 주택 진입
+    # 총 자금엔 포함해야 한다. user.yaml에 없으면(사용자가 아직 임대가 아니거나
+    # 미입력) 0으로 조용히 빠진다 — 지어내지 않는다.
+    housing = user_profile().get("housing", {})
+    m.jeonse_deposit_krw = float(housing.get("current_jeonse_deposit_krw") or 0)
+    m.jeonse_deposit_available_from = housing.get("moveout_deadline")
+    # retirement_total_krw(IRP+DC 전체 평가액)도 포함 — 소득세법 시행령상
+    # 무주택자의 주택구입·전세자금 목적 중도인출이 IRP/DC 둘 다 허용 사유다.
+    m.housing_entry_funds_total = m.deployable_cash + m.jeonse_deposit_krw + m.retirement_total_krw
+
     if m.priced_coverage_pct < 99:
         m.notes.append(
             f"검증된 시세가 있는 자산은 평가액의 {m.priced_coverage_pct:.0f}%뿐 — "
@@ -244,4 +279,17 @@ def build_exposure_model() -> ExposureModel:
         "급여·성과급(PS)과 퇴직연금이 같은 회사·같은 메모리 사이클에 연동됩니다. "
         "실질 집중도는 아래 지분율보다 높습니다."
     )
+    if m.jeonse_deposit_krw:
+        m.notes.append(
+            f"주택 진입 총 가용({m.housing_entry_funds_total:,.0f}원)에는 현재 거주지 "
+            f"전세보증금 {m.jeonse_deposit_krw:,.0f}원이 포함돼 있습니다 — "
+            f"{m.jeonse_deposit_available_from or '계약 만료일 미입력'}에 계약이 끝나야 실제로 "
+            "회수되는 돈이라 지금 당장 쓸 수 있는 현금은 아닙니다."
+        )
+    if m.retirement_total_krw:
+        m.notes.append(
+            f"주택 진입 총 가용에는 IRP·DC 퇴직연금 전체 평가액 {m.retirement_total_krw:,.0f}원도 "
+            "포함돼 있습니다 — 무주택자의 주택구입·전세자금 목적 중도인출 사유에 해당하지만, "
+            "일반 주식 매도와 달리 사유 증빙·신청 절차가 필요한 특별 인출이라 즉시 현금화되지 않습니다."
+        )
     return m

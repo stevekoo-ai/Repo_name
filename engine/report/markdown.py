@@ -81,9 +81,24 @@ def _exposure_section(payload: dict) -> str:
 
     lines += [
         "## 주택 진입에 실제로 쓸 수 있는 돈",
-        f"- 현금 {won(m.cash_krw)} + 매각가능 자산 {won(m.liquid_valued)} = **{won(m.deployable_cash)}**",
+        f"- **지금 당장** — 현금 {won(m.cash_krw)} + 매각가능 자산 {won(m.liquid_valued)} = **{won(m.deployable_cash)}**",
+    ]
+    if m.jeonse_deposit_krw:
+        lines.append(
+            f"- **+ 전세보증금 회수 시** ({m.jeonse_deposit_available_from or '계약만료일 미입력'}) "
+            f"{won(m.jeonse_deposit_krw)}"
+        )
+    if m.retirement_total_krw:
+        lines.append(
+            f"- **+ IRP·DC 특별 중도인출 시** (무주택자 주택구입·전세자금 목적, 사유 증빙 필요) "
+            f"{won(m.retirement_total_krw)}"
+        )
+    if m.jeonse_deposit_krw or m.retirement_total_krw:
+        lines.append(f"- **총 가용 (시점·절차 포함)**: **{won(m.housing_entry_funds_total)}**")
+    lines += [
         "- [해석] 부동산 진입 여력은 기준금리가 아니라 **이 숫자**가 결정한다.",
-        "  3절(부동산)의 WAIT/ENTER 판단은 이 값과 함께 읽어야 의미가 있다.",
+        "  3절(부동산)의 WAIT/ENTER 판단은 이 값과 함께 읽어야 의미가 있다. "
+        "전세보증금·퇴직연금은 즉시 현금화되는 돈이 아니므로 '지금 당장' 실행 가능한 액수와는 구분해서 본다.",
         "",
         "## 집중도 경고",
         f"- 반도체 섹터가 주식·ETF의 **{m.semi_pct:.1f}%** — SK하이닉스 단독이 아니라 "
@@ -977,9 +992,19 @@ def _real_estate_decision_section(payload: dict) -> str:
         ]
         if aff.get("locked"):
             lines.append(f"- 동원 불가(락업): {_eok(aff['locked'])}")
+        if aff.get("jeonse_deposit"):
+            lines.append(f"- + 현재 전세보증금 회수 시 ({aff.get('jeonse_deposit_available_from') or '만료일 미입력'}): "
+                         f"{_eok(aff['jeonse_deposit'])}")
+        if aff.get("retirement_total"):
+            lines.append(f"- + IRP·DC 특별 중도인출 시 (무주택자 주택구입·전세자금 목적): "
+                         f"{_eok(aff['retirement_total'])}")
+        if aff.get("jeonse_deposit") or aff.get("retirement_total"):
+            lines.append(f"- **총 가용 (시점·절차 포함)**: **{_eok(aff['housing_entry_funds_total'])}**")
         if aff.get("buy_pyeong_equivalent"):
             lines.append(f"- 서울 아파트 매매 평당 {aff['buy_pyeong_price']/10_000:,.0f}만원{ref} "
-                         f"→ 대출 없이 **약 {aff['buy_pyeong_equivalent']:.1f}평**")
+                         f"→ 대출 없이 **약 {aff['buy_pyeong_equivalent']:.1f}평** (지금 당장 가용 기준)")
+        if aff.get("buy_pyeong_equivalent_total") and aff.get("buy_pyeong_equivalent_total") != aff.get("buy_pyeong_equivalent"):
+            lines.append(f"- 같은 평당가 기준, 총 가용(시점·절차 포함)으로는 **약 {aff['buy_pyeong_equivalent_total']:.1f}평**")
         if aff.get("jeonse_pyeong_equivalent"):
             lines.append(f"- 서울 전세 평당 {aff['jeonse_pyeong_price']/10_000:,.0f}만원{ref} "
                          f"→ **약 {aff['jeonse_pyeong_equivalent']:.1f}평**")
