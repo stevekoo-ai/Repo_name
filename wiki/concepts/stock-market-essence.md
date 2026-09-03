@@ -217,6 +217,7 @@ G/I/L](macro-regime-history.md)). 이 세 축이 결국 "미래 현금흐름"에
 
 ## Sources
 
+- [헤벨(Hevel) 투자철학 — 전도서의 "헛됨"과 주식시장](hevel-investment-philosophy.md) (§1·§9·§12·§13을 전도서의 '헤벨' 개념 하나로 묶어 읽는 렌즈)
 - [sources/investment-philosophy-capitalism-game-board-2026-09-03.md](../../sources/investment-philosophy-capitalism-game-board-2026-09-03.md) (사용자 제공 투자 철학 정리본, §10-13의 출처)
 - [Position & Exposure Model (보고서 0절)](position-exposure-model.md) (§13 "실물 자산 전환"의 실행판 — `housing_entry_funds_total`)
 - [Real Estate Market Entry Framework](real-estate-market-framework.md) (§13이 "왜 보유하는가"에 답한다면, 이 페이지는 "언제 진입하는가"에 답함)
