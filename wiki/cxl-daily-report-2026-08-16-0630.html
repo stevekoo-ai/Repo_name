@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CXL Daily Update — 2026-08-16 (9호)</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      colors: {
+        canvas: '#f5f5f7',
+        ink: '#1d1d1f',
+        sub: '#6e6e73',
+        indigo: '#4f46e5',
+        indigoLight: '#eef2ff',
+      },
+      fontFamily: {
+        sans: ['-apple-system', 'BlinkMacSystemFont', 'SF Pro Display', 'Segoe UI', 'Roboto', 'sans-serif'],
+      },
+    },
+  },
+}
+</script>
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif; background: #f5f5f7; color: #1d1d1f; }
+  .card { background: #fff; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.06); transition: all 0.2s ease; }
+  .card:hover { box-shadow: 0 4px 12px rgba(79,70,229,0.12), 0 2px 6px rgba(0,0,0,0.08); transform: translateY(-2px); }
+  .fade-in { animation: fadeIn 0.5s ease-in; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+  .pill { display: inline-block; padding: 2px 10px; border-radius: 9999px; font-size: 12px; font-weight: 500; }
+  .pill-indigo { background: #eef2ff; color: #4f46e5; }
+  .row-hover:hover { background: #eef2ff; }
+  table { width: 100%; border-collapse: collapse; }
+  th { text-align: left; padding: 8px 12px; border-bottom: 2px solid #e5e7eb; color: #6e6e73; font-weight: 500; font-size: 13px; }
+  td { padding: 8px 12px; border-bottom: 1px solid #f3f4f6; font-size: 14px; }
+  .hero-gradient { background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%); }
+</style>
+</head>
+<body class="min-h-screen">
+
+<div class="max-w-4xl mx-auto px-4 py-8 fade-in">
+
+  <!-- HERO -->
+  <div class="hero-gradient rounded-2xl p-6 text-white mb-6">
+    <div class="flex items-center gap-3 mb-2">
+      <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+      <span class="text-sm font-medium opacity-80">CXL 기반 차세대 메모리 상품기획</span>
+    </div>
+    <h1 class="text-2xl font-bold mb-1">CXL Daily Update — 2026-08-16 (9호)</h1>
+    <p class="text-sm opacity-80">발행일: 2026-08-16 06:30 KST · 기준선: DRAFT v0.9 + Daily Update 8호</p>
+  </div>
+
+  <!-- 한 줄 진단 -->
+  <div class="card p-4 mb-6">
+    <p class="text-sm"><strong>진단:</strong> 8호(8/15) delta 7건 이후 24시간 기준선 대비 <strong>신규 delta 0건</strong>. 8호가 8/12-8/14 기간 주요 사실(Samsung 2nm HBM/Micron 부족/SK Hynix Fab 2/Nanya Tech/Lenovo/NVIDIA NeMo/Southern Co)을 모두 커버. 8/15-8/16 기간 신규 사실 없음.</p>
+  </div>
+
+  <!-- NVIDIA Dynamo Digest -->
+  <div class="card p-4 mb-6">
+    <h2 class="text-lg font-semibold mb-3 flex items-center gap-2">
+      <span class="w-2 h-2 rounded-full bg-indigo inline-block"></span>
+      NVIDIA Dynamo Blog Digest
+    </h2>
+    <p class="text-sm text-sub mb-2">전체 6개 포스트, <span class="pill pill-indigo">NEW 0건</span> · UPDATED 0건</p>
+    <ul class="space-y-1 text-sm">
+      <li class="row-hover p-1 rounded">📄 <a href="https://docs.nvidia.com/dynamo/dev/digest/agentic-inference" class="text-indigo hover:underline" target="_blank">Full-Stack Optimizations for Agentic Inference with Dynamo</a> <span class="text-sub">(2026-06-12)</span></li>
+      <li class="row-hover p-1 rounded">📄 <a href="https://docs.nvidia.com/dynamo/dev/digest/dynamo-snapshot-fast-startup" class="text-indigo hover:underline" target="_blank">Dynamo Snapshot: Fast Startup for Inference Workloads on Kubernetes</a> <span class="text-sub">(2026-05-28)</span></li>
+      <li class="row-hover p-1 rounded">📄 <a href="https://docs.nvidia.com/dynamo/dev/digest/dynosim-pareto-frontier" class="text-indigo hover:underline" target="_blank">DynoSim: Simulating the Pareto Frontier</a> <span class="text-sub">(2026-05-29)</span></li>
+      <li class="row-hover p-1 rounded">📄 <a href="https://docs.nvidia.com/dynamo/dev/digest/tokenspeed-day-0" class="text-indigo hover:underline" target="_blank">Dynamo Day 0 support for TokenSpeed</a> <span class="text-sub">(2026-05-06)</span></li>
+      <li class="row-hover p-1 rounded">📄 <a href="https://docs.nvidia.com/dynamo/dev/digest/agentic-harnesses" class="text-indigo hover:underline" target="_blank">Streaming Tokens and Tools: Multi-Turn Agentic Harness Support</a> <span class="text-sub">(2026-04-30)</span></li>
+      <li class="row-hover p-1 rounded">📄 <a href="https://docs.nvidia.com/dynamo/dev/digest/flash-indexer" class="text-indigo hover:underline" target="_blank">Flash Indexer: A Story of Inter-Galactic KV Routing</a> <span class="text-sub">(2026-02-23)</span></li>
+    </ul>
+    <p class="text-xs text-sub mt-3">💡 <strong>CXL 상품기획 연결점:</strong> 최신 게시물 6/12 "Full-Stack Optimizations for Agentic Inference" — Dynamo의 inference 최적화가 CXL KV offload와 상호보완적. KV cache 디인코딩 최적화와 CXL 풀링의 결합 가능성.</p>
+  </div>
+
+  <!-- 8호 핵심 인사이트 유지 -->
+  <div class="card p-4 mb-6">
+    <h2 class="text-lg font-semibold mb-3 flex items-center gap-2">
+      <span class="w-2 h-2 rounded-full bg-indigo inline-block"></span>
+      종합 인사이트 (상품기획 시사점)
+    </h2>
+    <p class="text-sm text-sub mb-3">8호(delta 7건) 인사이트 유지 — 8/15-8/16 신규 인사이트 없음</p>
+    <ol class="space-y-2 text-sm list-decimal list-inside">
+      <li><strong>Samsung 2nm HBM base die 생산 라인 전환 검토</strong> — HBM 수급 게임 체인저 가능성. DRAFT 10.2/11.3 반영.</li>
+      <li><strong>Micron 데이터센터 메모리 공급 부족</strong> — CXL 풀링 저비용 대안 가치 한층 강화. DRAFT 10.1 반영.</li>
+      <li><strong>SK Hynix Dalian Fab 2 재가동</strong> — CMM-H용 NAND 공급 기반 확대. DRAFT 10.4 반영.</li>
+    </ol>
+  </div>
+
+  <!-- 12 카테고리 상태 -->
+  <div class="card p-4 mb-6">
+    <h2 class="text-lg font-semibold mb-3 flex items-center gap-2">
+      <span class="w-2 h-2 rounded-full bg-indigo inline-block"></span>
+      12 카테고리 상태 (8/15-8/16)
+    </h2>
+    <table>
+      <thead><tr><th>#</th><th>카테고리</th><th>상태</th><th>비고</th></tr></thead>
+      <tbody>
+        <tr class="row-hover"><td>1</td><td>CXL 스펙/표준</td><td><span class="pill" style="background:#f0fdf4;color:#166534;">미변경</span></td><td class="text-sub">CXL 4.0 변경 없음</td></tr>
+        <tr class="row-hover"><td>2</td><td>CXL 디바이스/미디어</td><td><span class="pill" style="background:#f0fdf4;color:#166534;">미변경</span></td><td class="text-sub">ServeTheHome FMS 2026 160-bay NVMe</td></tr>
+        <tr class="row-hover"><td>3</td><td>컨트롤러 벤더</td><td><span class="pill" style="background:#f0fdf4;color:#166534;">미변경</span></td><td class="text-sub">Panmnesia/Astera 403/ENOTFOUND</td></tr>
+        <tr class="row-hover"><td>4</td><td>풀링 SW/어플라이언스</td><td><span class="pill" style="background:#f0fdf4;color:#166534;">미변경</span></td><td class="text-sub">403 차단 지속</td></tr>
+        <tr class="row-hover"><td>5</td><td>서버 OEM</td><td><span class="pill" style="background:#f0fdf4;color:#166534;">미변경</span></td><td class="text-sub">Supermicro 160-bay(CXL 직접 아님)</td></tr>
+        <tr class="row-hover"><td>6</td><td>CPU/GPU CXL</td><td><span class="pill" style="background:#f0fdf4;color:#166534;">미변경</span></td><td class="text-sub">AMD MI455X CDNA 5 — CXL 명시 없음</td></tr>
+        <tr class="row-hover"><td>7</td><td>AI 패브릭</td><td><span class="pill" style="background:#f0fdf4;color:#166534;">미변경</span></td><td class="text-sub">3-way rivalry 변화 없음</td></tr>
+        <tr class="row-hover"><td>8</td><td>Main Memory</td><td><span class="pill" style="background:#f0fdf4;color:#166534;">미변경</span></td><td class="text-sub">JEDEC DDR6/LPDDR6 6호 반영 유지</td></tr>
+        <tr class="row-hover"><td>9</td><td>AI Rack/KV offload</td><td><span class="pill" style="background:#f0fdf4;color:#166534;">미변경</span></td><td class="text-sub">Dynamo 최신 6/12</td></tr>
+        <tr class="row-hover"><td>10</td><td>LLM TCO 모델</td><td><span class="pill" style="background:#f0fdf4;color:#166534;">미변경</span></td><td class="text-sub">NeMo Switchyard 8호 delta로 반영</td></tr>
+        <tr class="row-hover"><td>11</td><td>메모리 가격/실적</td><td><span class="pill" style="background:#f0fdf4;color:#166534;">미변경</span></td><td class="text-sub">Samsung/Micron/SK Hynix/Nanya 반영</td></tr>
+        <tr class="row-hover"><td>12</td><td>시장/CSP</td><td><span class="pill" style="background:#f0fdf4;color:#166534;">미변경</span></td><td class="text-sub">Southern Co 8호 delta로 반영</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 다음 이벤트 -->
+  <div class="card p-4 mb-6">
+    <h2 class="text-lg font-semibold mb-3 flex items-center gap-2">
+      <span class="w-2 h-2 rounded-full bg-indigo inline-block"></span>
+      다음 이벤트
+    </h2>
+    <ul class="space-y-1 text-sm">
+      <li><strong>Hot Chips 2026</strong> — 8/23-25, Palo Alto (D-7). XCENA CXL-based memory expansion 데모 예정.</li>
+      <li><strong>Intel Vision 2026</strong> — 8/18-20, San Jose. Diamond Rapids 관련 발표 예상.</li>
+    </ul>
+  </div>
+
+  <!-- 데이터 한계 -->
+  <div class="card p-4 mb-6" style="border-left: 3px solid #f59e0b;">
+    <h2 class="text-sm font-semibold mb-2 text-amber-700">⚠️ 데이터 한계</h2>
+    <ul class="space-y-1 text-sm text-sub">
+      <li>• <strong>WebSearch API 400</strong>: tool_choice 검증 오류 지속 — Google Search 대체 불가</li>
+      <li>• <strong>TrendForce 404</strong>: /press/, /pressarchive/ 접근 불가 — 1차 소스 제한</li>
+      <li>• <strong>DuckDuckGo CAPTCHA</strong>: 검색 폴백 불가</li>
+      <li>• <strong>컨트롤러 벤더 7개</strong>: 403/ENOTFOUND — 8/15-8/16 신규 확인 불가</li>
+      <li>• <strong>8호 커버리지 영향</strong>: 8호가 8/12-8/14 주요 뉴스 모두 커버 — delta 0건의 "사실 없음" vs "미확인" 구분 불가</li>
+    </ul>
+  </div>
+
+  <div class="text-xs text-sub text-center pb-4">CXL Daily Update 9호 · 2026-08-16 06:30 KST · 로컬 발행 (업로드 금지 정책)</div>
+
+</div>
+
+</body>
+</html>

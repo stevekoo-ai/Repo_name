@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CXL Daily Update — 2026-08-10 (4호, full-stack 개정 첫 적용)</title>
+<style>
+  :root{
+    --bg:#fafafa; --card:#ffffff; --ink:#1d1d1f; --muted:#6e6e73; --accent:#0066cc;
+    --star:#f5a623; --l1:#6a8caf; --l2:#7fb069; --l3:#e8a87c; --l4:#c38d9e; --l5:#85929e; --l6:#a8d5e2; --l7:#b8a6c9;
+    --hi:#fff8e1; --hi3:#ffe6e6;
+  }
+  *{box-sizing:border-box;}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Malgun Gothic",Roboto,Helvetica,Arial,sans-serif;margin:0;background:var(--bg);color:var(--ink);line-height:1.65;-webkit-font-smoothing:antialiased;}
+  .wrap{max-width:1040px;margin:0 auto;padding:32px 20px 80px;}
+  header.hero{background:linear-gradient(135deg,#0a2540 0%,#1e3a5f 100%);color:#fff;padding:36px 28px;border-radius:18px;box-shadow:0 4px 22px rgba(10,37,64,.18);}
+  header.hero h1{margin:0 0 6px;font-size:26px;font-weight:700;letter-spacing:-.01em;}
+  header.hero .sub{opacity:.92;font-size:14px;}
+  header.hero .meta{margin-top:14px;display:flex;flex-wrap:wrap;gap:8px;}
+  header.hero .pill{background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.22);padding:5px 11px;border-radius:999px;font-size:12.5px;}
+  .note{background:var(--card);border-left:4px solid var(--accent);padding:14px 18px;border-radius:8px;margin:22px 0;font-size:14px;box-shadow:0 1px 4px rgba(0,0,0,.04);}
+  .note.warn{border-left-color:#e0a800;background:#fffbea;}
+  .note.fs{border-left-color:#7a3ff2;background:#f6f1ff;}
+  section{background:var(--card);margin:22px 0;padding:24px 26px;border-radius:14px;box-shadow:0 1px 6px rgba(0,0,0,.05);}
+  h2{font-size:20px;margin:0 0 14px;padding-bottom:8px;border-bottom:2px solid #eef0f3;font-weight:700;letter-spacing:-.01em;}
+  h3{font-size:16px;margin:22px 0 8px;font-weight:600;}
+  h3.delta{border-left:4px solid var(--accent);padding-left:12px;}
+  .stars{color:var(--star);font-weight:700;}
+  .layer-tag{display:inline-block;font-size:11px;font-weight:700;padding:2px 8px;border-radius:6px;margin-left:6px;color:#fff;letter-spacing:.02em;}
+  .L1{background:var(--l1)} .L2{background:var(--l2)} .L3{background:var(--l3)} .L4{background:var(--l4)} .L5{background:var(--l5)} .L6{background:var(--l6)} .L7{background:var(--l7)}
+  ul.head{list-style:none;padding:0;margin:0;}
+  ul.head li{padding:10px 14px;border-radius:9px;margin:7px 0;background:#f7f9fb;border:1px solid #eef1f4;font-size:14px;}
+  ul.head li.hi{background:var(--hi);border-color:#ffe08a;}
+  .insight{border:1px solid #e8ecf0;border-radius:10px;padding:14px 16px;margin:12px 0;background:#fbfcfd;}
+  .insight .n{font-weight:700;color:var(--accent);font-size:13px;}
+  .insight a{color:var(--accent);text-decoration:none;}
+  .insight a:hover{text-decoration:underline;}
+  .delta-card{border:1px solid #e6eaef;border-radius:11px;padding:16px 18px;margin:14px 0;background:#fff;}
+  .delta-card .lbl{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--accent);}
+  .delta-card .lbl.neg{color:#c0392b;}
+  .delta-card p{margin:6px 0;font-size:14px;}
+  .delta-card .diff{background:#0f172a;color:#e2e8f0;border-radius:7px;padding:11px 14px;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12.5px;overflow-x:auto;line-height:1.5;}
+  .delta-card .diff .old{color:#fca5a5;} .delta-card .diff .new{color:#86efac;} .delta-card .diff .arrow{color:#93a3b8;}
+  table{width:100%;border-collapse:collapse;font-size:13px;margin:10px 0;}
+  th,td{text-align:left;padding:9px 11px;border-bottom:1px solid #eef0f3;vertical-align:top;}
+  th{background:#f4f6f8;font-weight:600;}
+  tr:hover td{background:#fbfcfd;}
+  .matrix td:nth-child(5),.matrix th:nth-child(5){text-align:center;}
+  .cluster{border:1px solid #e8ecf0;border-radius:10px;padding:14px 16px;margin:12px 0;}
+  .cluster h4{margin:0 0 8px;font-size:14.5px;color:#0a2540;}
+  .cluster ul{margin:6px 0 0;padding-left:18px;}
+  .cluster li{font-size:13.5px;margin:5px 0;}
+  .cluster a{color:var(--accent);text-decoration:none;} .cluster a:hover{text-decoration:underline;}
+  .fs-scenario{border:1px solid #d8c8f5;background:#fbf9ff;border-radius:12px;padding:16px 18px;margin:16px 0;}
+  .fs-scenario h3{color:#5a32a8;margin-top:0;}
+  .fs-scenario .layers{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0;}
+  .fs-scenario .layer-tag{margin-left:0;}
+  .fs-scenario .comp{background:#fff;border:1px solid #ece6f7;border-radius:7px;padding:9px 12px;font-size:13px;margin:6px 0;}
+  .fs-scenario .comp b{color:#5a32a8;}
+  a{color:var(--accent);}
+  code{background:#f0f2f5;padding:1px 5px;border-radius:4px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12.5px;}
+  .footer{text-align:center;color:var(--muted);font-size:12px;margin-top:30px;padding-top:18px;border-top:1px solid #e5e7eb;}
+  .chk{font-size:13px;} .chk li{margin:5px 0;}
+  .chk .done{color:var(--muted);text-decoration:line-through;}
+  .lim{font-size:13px;color:#444;}
+  .lim li{margin:6px 0;}
+  @media (max-width:640px){header.hero{padding:24px 18px;} section{padding:18px 16px;} .delta-card .diff{font-size:11.5px;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="hero">
+  <h1>CXL Daily Update — 2026-08-10 (4호)</h1>
+  <div class="sub">full-stack 7-layer 개정 첫 적용 · 12개 카테고리 + L1~L7 관점 전수 WebFetch 조사</div>
+  <div class="meta">
+    <span class="pill">발행 2026-08-10 07:30 KST</span>
+    <span class="pill">기준선 DRAFT v0.5 + Daily Update 3호(11:15 KST)</span>
+    <span class="pill">delta 5건</span>
+    <span class="pill">Full-Stack 시나리오 2건</span>
+  </div>
+</header>
+
+<div class="note fs">
+  <b>본 4호의 특수성:</b> 2026-08-10 사용자 피드백("조사가 표면적·단순 나열. full-stack solution으로 보고서 구성. Kyocera/Pegatron/SMART CXL-over-optics 데모 miss")으로 시스템 프롬프트가 <b>7개 stack 레이어(L1~L7) + Full-Stack 솔루션 시나리오 섹션 + 의미 클러스터</b>로 개정. <b>본 4호는 이 개정이 적용된 첫 발행</b>이다. 3호(11:15 KST)는 구 구조(사이트별 나열)로 발행되어 full-stack 시나리오·L1~L7 태그가 없었다 — 본 4호가 그 품질 개선을 검증한다.
+</div>
+
+<section>
+<h2>📰 헤드라인 (오늘의 핵심)</h2>
+<details style="margin-bottom:10px;font-size:13px;color:var(--muted);"><summary>용어 주석 (처음 등장하는 줄임말·기술 용어 풀이)</summary>
+<p><b>CXL</b>(Compute Express Link): CPU와 메모리를 고속으로 연결하는 산업 표준 규격. 여러 서버가 메모리를 나눠 씀. · <b>HBM</b>(High Bandwidth Memory): 고대역폭 메모리, AI 연산용. · <b>HBM4</b>: HBM 4세대, NVIDIA "Vera Rubin"에 탑재. · <b>DRAM</b>: PC·서버 주기억장치. <b>NAND</b>: 비휘발성 플래시. · <b>FMS</b>(Flash Memory Summit): 플래시/메모리 산업 행사. · <b>ISCA</b>(International Symposium on Computer Architecture): 컴퓨터 아키텍처 학회. · <b>CapEx</b>(Capital Expenditure): 설비투자. <b>YoY</b>: 전년 동기 대비. <b>TCO</b>: 총소유비용. · <b>KV cache</b>: AI 추론 시 이전 결과를 임시 저장·재사용하는 메모리. · <b>메모리 풀링</b>: 여러 서버가 하나의 메모리 자원을 나눠 씀. <b>메모리 확장(expansion)</b>: 한 서버에 메모리를 직접 추가. · <b>LTA</b>(Long-Term Agreement): 장기공급계약. <b>MR-MUF</b>: SK Hynix HBM 선진 패키징. · <b>Vistara</b>: Meta 자체 설계 CXL 2.0 메모리 확장용 커스텀 칩. · <b>TC-NDEF</b>: Samsung HBM 고밀도 적층 공정. <b>CXMT</b>: 중국 메모리사 창샹메모리. · <b>CoWoS/FOPLP/CoPoS</b>: TSMC 선진 패키징 기술.</p>
+</details>
+<ul class="head">
+  <li class="hi"><b>Samsung HBM4 수율 80% 도달 + 2026 HBM 점유율 ~38% 목표</b> <span class="stars">★★★</span> <span class="layer-tag L1">L1</span><span class="layer-tag L7">L7</span> — 2월 양산 시작 시 &lt;60%에서 80%로 급상승, HBM4 매출 Q3 3배+ 목표. SK Hynix 5차 단체교섭 분쟁이 출하 위협 → HBM 점유율 구도 재편 (2026-08-10 TrendForce).</li>
+  <li class="hi"><b>Meta, CXL 메모리 실배포 상세 메트릭 공개 (ISCA 2026)</b> <span class="stars">★★★</span> <span class="layer-tag L1">L1</span><span class="layer-tag L2">L2</span><span class="layer-tag L7">L7</span> — Vistara ASIC으로 DDR4를 CXL 2.0 확장, <b>DDR5 대비 13% 비용</b>, 플릿 43.7%가 RAM 부족으로 정체. 단, 풀링(스위치 기반)은 여전히 "largely a demo".</li>
+  <li><b>Winbond/Adata "2027년까지 DRAM/NAND 공급 타이트"</b> <span class="stars">★★</span> <span class="layer-tag L1">L1</span><span class="layer-tag L7">L7</span> — Q3 DRAM +20~30%, NAND +35~40% (1호 기준선 +13~18% 상향). 고객 2030년까지 LTAs 요청.</li>
+  <li><b>Delta GoCool-150 150kW 액체-공기 냉각 (ASRock Rack VR NVL72)</b> <span class="stars">★</span> <span class="layer-tag L5">L5</span> — 고밀도 AI 랙 열/전력 상한 150kW급 상향 (2026-08-08).</li>
+  <li><b>AMD Helios 아키텍처 = CXL 없는 rack-scale 시스템</b> <span class="stars">★★</span> <span class="layer-tag L4">L4</span><span class="layer-tag L5">L5</span><span class="layer-tag L7">L7</span> — 72 가속기·31TB HBM4·2.9 EFLOPS, GPU 패브릭 기반. CXL과는 다른 레이어 실증.</li>
+</ul>
+</section>
+
+<section>
+<h2>🎯 종합 인사이트 (상품기획 시사점) — 두괄식, 최고위층 보고용</h2>
+<p style="font-size:13px;color:var(--muted);margin-top:0;">사실·수치 중심. 영향도 높은 내용은 cross check 표시. 단일 출처 수치는 "(단일 출처)" 명시.</p>
+
+<div class="insight">
+<div class="n">1. HBM 점유율 구도가 "SK Hynix 압도적 우위"에서 "Samsung 추격 + SK Hynix 리스크"로 재편</div>
+<p>Samsung HBM4 수율이 2월 양산 시작 시 &lt;60%에서 <b>80%</b>로 급상승(TC-NDEF + 1c DRAM 베이스 출하 80% 초과), 2026 종료 전 HBM 점유율 ~38% 목표로 NVIDIA Vera Rubin 공급 가속. 반대로 SK Hynix는 2026 5차 단체교섭이 이익공유구조(전년 영업이익 10% 보너스, 80% 즉시+20% 2년, treasury shares lock-up)를 둘러싸 교착되어 <b>출하 차질 리스크</b> 부상. TrendForce는 Samsung 점유율 급증·SK Hynix 잠정 트리밍 예상. 1호 기준선 "SK 62/Micron 21/Samsung 17"은 범위·방향성 재정정 필요. CXL 시사점: HBM4 공급 원활화 → GPU/AI 가속기 확대 → CXL 풀의 호스트 기반 확대. 단, SK Hynix 노사 분쟁은 HBM 단기 공급 리스크. <a href="https://www.trendforce.com/news/2026/08/10/news-samsungs-hbm4-yield-reportedly-hits-80-as-race-to-supply-vera-rubin-heats-up-sk-hynix-labor-talks-add-a-twist/">출처</a> (단일 출처 — TrendForce 단독 보도)</p>
+</div>
+
+<div class="insight">
+<div class="n">2. Meta의 CXL 실배포 정량 메트릭 획득 — "CXL 메모리 = DDR5의 13%"은 강력한 TCO 신호이나 조건부</div>
+<p>Meta가 ISCA 2026에서 자체 설계 <b>Vistara ASIC</b>(두 개 72-bit DDR4 채널을 CXL 2.0 Gen5로 브리지)로 CXL 메모리를 실배포. 256GB CXL + 768GB DDR5 = 1TB/노드(AMD Turin), <b>플릿 43.7%가 RAM 부족으로 정체</b> 해소가 목적. 비용 "13센트/달러"는 강력하나 <b>"이미 건물에 있고 이미 지불한 폐기 DDR4 재활용"</b>이라는 조건이 붙어 신규 CXL 카드 비용과는 다름. 성능 DDR5 614GB/s@130ns vs CXL 76GB/s@250ns(8:1 대역폭, ~60% 지연 패널티) — CXL은 <b>대역폭이 아닌 용량</b> 목적임이 정량 확인. 핵심: <b>"스위치/패브릭 기반 풀링은 여전히 largely a demo"</b> — CXL 2.0 직접 확장(expansion)은 실배포, CXL 3.x 다자간 풀링은 데모 단계. 상품기획은 <b>확장 먼저, 풀링 후속</b> 단계 분리로 접근. <a href="https://how2shout.com/technology/cxl-memory-2026-servers-explained.html">출처</a> (2차 보도 — 근거 Meta ISCA 2026 paper)</p>
+</div>
+
+<div class="insight">
+<div class="n">3. DRAM/NAND 가격 상승폭이 기준선 상향 — "저비용 NAND 오프로드" 가정에 압력</div>
+<p>Adata는 Q3 DRAM +20~30%, NAND +35~40% 예상(NAND가 DRAM 상승폭 상회). 1호 기준선 "Q3 DRAM +13~18%" 상향이자, DRAFT 2.4절(CXL 하이브리드 DRAM+NAND)의 "NAND 저비용 계층" 가정에 직접 영향 — NAND 단가 상승이 진행 중이면 CXL 하이브리드에서 NAND의 비용 우위 약화. Winbond는 고객이 2029/2030년까지 LTAs 요청, "2027년이 2026년보다 메모리 더 타이트" 전망. CXMT 증설로도 공급 부족 상쇄 불가, 2027년 H1까지 가격 상승 지속. <a href="https://www.trendforce.com/news/2026/08/07/news-winbond-says-customers-seek-ltas-through-2030-adata-expects-even-tighter-dram-supply-in-2027/">출처</a></p>
+</div>
+
+<div class="insight">
+<div class="n">4. "CXL 없는 rack-scale AI 시스템"과 "CXL over optics 랙 간 풀링"은 같은 AI rack의 두 얼굴</div>
+<p>AMD Helios는 72 가속기·31TB HBM4·2.9 EFLOPS의 rack-scale 시스템을 <b>CXL 없이</b> GPU 패브릭(scale-up 260TB/s, scale-out 43TB/s)으로 구성 — DRAFT 6장 "CXL vs GPU 패브릭은 다른 레이어" 결론 실증. 반면 Kyocera/Pegatron/SMART CXL-over-optics 데모(Computex 2025)는 CXL/PCIe 링크를 광으로 전송해 고밀도 AI 랙에서 저밀도 랙으로 메모리 오프로드. 즉, <b>AI 랙의 고밀도화(Helios·VR NVL72, 150kW 냉각)가 진행될수록, 그 열/전력/공간 제약을 완화하기 위해 CXL 원격 메모리 풀링(광 링크 경유)의 가치가 올라간다</b> — 두 경로는 경쟁이 아닌 보완 레이어. <a href="https://www.servethehome.com/amd-helios-architecture-deep-dive-amd-broadcom-hardware-combined/">출처</a> · <a href="https://www.servethehome.com/kyocera-pegatron-and-smart-show-cxl-over-optics-at-computex-2025/">출처</a></p>
+</div>
+
+<div class="insight">
+<div class="n">5. 풀링(pooling) vs 확장(expansion)의 단계 분리가 상품기획의 핵심</div>
+<p>Meta 실배포 정량이 명시한 "스위치 기반 풀링은 여전히 데모"는, CXL 상품기획이 <b>(1) CXL 2.0 직접 확장(실배포, Meta Vistara식 DDR4 재활용 또는 신규 CXL 카드) → (2) CXL 3.x 다자간 풀링(스위치 필요, 데모→실배포 전환 중)</b>의 2단계 로드맵으로 접근해야 함을 시사. 즉각 상품화 후보는 확장(단일 호스트 용량 병목 해소), 풀링은 다자간 활용도·composability 확립 후속. <a href="https://how2shout.com/technology/cxl-memory-2026-servers-explained.html">출처</a></p>
+</div>
+</section>
+
+<section>
+<h2>📊 Delta 상세 (기준선 대비 변경)</h2>
+
+<div class="delta-card">
+<h3 class="delta">Delta-1: Samsung HBM4 수율 80% + 2026 점유율 ~38% 목표 + SK Hynix 노사 분쟁 <span class="stars">★★★</span> <span class="layer-tag L1">L1</span><span class="layer-tag L7">L7</span></h3>
+<p><span class="lbl">[변경]</span> (2026-08-10 TrendForce, <a href="https://www.trendforce.com/news/2026/08/10/news-samsungs-hbm4-yield-reportedly-hits-80-as-race-to-supply-vera-rubin-heats-up-sk-hynix-labor-talks-add-a-twist/">출처</a>) Samsung HBM4 수율: 2월 양산 시작 시 &lt;60% → 현재 <b>80%</b>(TC-NDEF + 1c DRAM 베이스 80% 초과). HBM4 매출 Q3 3배+, 2026 H2 HBM volume 60%+를 HBM4로. 점유율 목표 ~<b>38%</b>(Vera Rubin 공급 가속). SK Hynix: 수율 80%대(MR-MUF), 단 <b>5차 단체교섭 분쟁</b>(이익공유 10% 보너스+treasury shares lock-up)로 출하 차질 리스크. HBM 가격 파워 2027년까지 지속, bit 출하 50-60% YoY 성장해도 수요 미충족.</p>
+<p><span class="lbl">[영향]</span> DRAFT 10.2절 HBM 점유율 기준선(1호: SK 62/Micron 21/Samsung 17)의 정면 delta. Samsung 17%→~38% 상향, SK Hynix 노사 분쟁으로 점유율 방어 위협 — "SK Hynix 압도적 우위"에서 "Samsung 추격+SK Hynix 리스크"로 재편.</p>
+<p><span class="lbl">[액션]</span> 기준: DRAFT v0.5(2026-08-06) 10.2절 / Daily Update 1호 delta(HBM 점유율 62/21/17)</p>
+<div class="diff"><span class="old">기존:</span> "HBM 점유율(2026 mid): SK Hynix 62% / Micron 21% / Samsung 17%, Samsung 내년 30%+ 목표"<br><span class="arrow">→</span> <span class="new">변경:</span> "HBM 점유율(2026): Samsung 17%→~38% 목표(HBM4 수율 80%, Q3 매출 3배+, Vera Rubin 공급) + SK Hynix 노사 분쟁(5차 교섭 교착)로 방어 위협 — 'Samsung 추격+SK Hynix 리스크' 재편. HBM 가격 파워 2027까지 지속, bit 출하 50-60% YoY 성장해도 수요 미충족. ⬆️(4호 delta-1)"</div>
+</div>
+
+<div class="delta-card">
+<h3 class="delta">Delta-2: Meta CXL 메모리 실배포 상세 메트릭 (ISCA 2026, Vistara ASIC) <span class="stars">★★★</span> <span class="layer-tag L1">L1</span><span class="layer-tag L2">L2</span><span class="layer-tag L7">L7</span></h3>
+<p><span class="lbl">[변경]</span> (Meta ISCA 2026, 2차 보도 how2shout 기사일 2026-08-06, <a href="https://how2shout.com/technology/cxl-memory-2026-servers-explained.html">출처</a>) — 3호 누락 핵심 full-stack 사례. Vistara ASIC(두 72-bit DDR4 채널을 CXL 2.0 Gen5로 브리지). 256GB CXL + 768GB DDR5 = 1TB/노드(AMD Turin 158c). 비용 DDR5의 <b>13%</b>(폐기 DDR4 재활용 전제). 성능 DDR5 614GB/s@130ns vs CXL 76GB/s@250ns(8:1 대역폭, ~60% 지연 패널티). <b>플릿 43.7% RAM 부족 정체</b> → CXL은 용량 병목 해소(대역폭 아님). <b>풀링(스위치 기반)은 "largely a demo"</b> — CXL 2.0 확장은 실배포, CXL 3.x 풀링은 데모. KV cache/AI 추론 아닌 일반 워크로드.</p>
+<p><span class="lbl">[영향]</span> CXL 상품기획 핵심 정량 획득. (1) 13% 비용은 폐기 DDR4 전제 조건부 — 신규 CXL 카드는 DRAM/NAND 단가(delta-3) 영향. (2) 확장 vs 풀링 단계 분리 핵심. (3) CXL이 대역폭 아닌 용량 목적 정량 확인. (4) DRAFT 11.2절 "Meta: DDR4 대체" 1줄을 상세 메트릭으로 보강. (2차 보도 단일 출처 — 1차는 Meta ISCA 2026 paper)</p>
+<p><span class="lbl">[액션]</span> 기준: DRAFT v0.5 11.2절 / 8장 / 9장</p>
+<div class="diff"><span class="old">기존:</span> "Meta: DDR4 대체 보고" (1줄)<br><span class="arrow">→</span> <span class="new">변경:</span> "Meta CXL 실배포(ISCA 2026): Vistara ASIC(CXL 2.0 Gen5)로 DDR4 256GB + DDR5 768GB = 1TB/노드(AMD Turin). 비용 DDR5의 13%(폐기 DDR4 재활용). 성능 DDR5 614GB/s@130ns vs CXL 76GB/s@250ns. 플릿 43.7% RAM 정체 → 용량 병목 해소. ⚠️스위치 풀링은 'largely a demo' — CXL 2.0 확장 실배포, CXL 3.x 풀링 데모. ⬆️(4호 delta-2)"</div>
+<p><span class="lbl">[액션 - 9장 TCO]</span></p>
+<div class="diff"><span class="old">기존:</span> (DDR4 재활용 vs 신규 CXL 카드 비교 없음)<br><span class="arrow">→</span> <span class="new">변경:</span> "TCO에 '폐기 DDR4 재활용 CXL(Meta 13%)' vs '신규 CXL 카드' 비교 추가 — 13%는 자본 회수된 DDR4 전제, 신규 카드는 DRAM/NAND 단가 영향. ⬆️(4호 delta-2)"</div>
+</div>
+
+<div class="delta-card">
+<h3 class="delta">Delta-3: Winbond/Adata "2027년까지 DRAM/NAND 공급 타이트" + Q3 가격 상승폭 상향 <span class="stars">★★</span> <span class="layer-tag L1">L1</span><span class="layer-tag L7">L7</span></h3>
+<p><span class="lbl">[변경]</span> (2026-08-07 TrendForce, <a href="https://www.trendforce.com/news/2026/08/07/news-winbond-says-customers-seek-ltas-through-2030-adata-expects-even-tighter-dram-supply-in-2027/">출처</a>) Winbond: 고객 2030년까지 LTAs 요청, "2027년이 2026년보다 더 타이트". Q2 매출 TWD 51.7B, 영업이익률 56.9%, 100% 가동. Adata: Q2 레코드(NT$38.1B 매출), <b>Q3 DRAM +20~30%, NAND +35~40%</b> 예상. CXMT 증설로도 공급 부족 상쇄 불가, 2027년 H1까지 가격 상승 지속.</p>
+<p><span class="lbl">[영향]</span> DRAFT 10장 정면 delta. 1호 기준선 "Q3 DRAM +13~18%" → +20~30%로 상승폭 상향. NAND +35~40%는 DRAFT 2.4절(CXL 하이브리드 DRAM+NAND) "NAND 저비용 계층" 가정에 압력 — NAND 단가 상승으로 비용 우위 약화.</p>
+<p><span class="lbl">[액션]</span> 기준: DRAFT v0.5 10.1절 / Daily Update 1호 delta(Q3 +13~18%)</p>
+<div class="diff"><span class="old">기존:</span> "Q3 2026 DRAM 가격 13~18% 상승"<br><span class="arrow">→</span> <span class="new">변경:</span> "Q3 2026 DRAM +20~30%, NAND +35~40% 상향(Adata, NAND가 DRAM 상회). Winbond '2027 더 타이트', 고객 2030년 LTAs. CXMT 증설로도 부족 상쇄 불가, 2027 H1까지 가격 상승. ⬆️(4호 delta-3)"</div>
+</div>
+
+<div class="delta-card">
+<h3 class="delta">Delta-4: Delta GoCool-150 150kW 액체-공기 냉각 (ASRock Rack VR NVL72) <span class="stars">★</span> <span class="layer-tag L5">L5</span></h3>
+<p><span class="lbl">[변경]</span> (2026-08-08 STH, <a href="https://www.servethehome.com/deltas-gocool-150-goes-big-to-enable-150kw-liquid-to-air-cooling-for-asrock-racks-vr-nvl72/">출처</a>) 150kW 액체-공기 냉각, ASRock Rack NVIDIA VR NVL72(72-GPU 고밀도 랙)용. 고밀도 AI 랙 열/전력 상한 150kW급 상향.</p>
+<p><span class="lbl">[영향]</span> AI 랙(L5) 밀도 상향이 냉각 인프라로 뒷받침. CXL 원격 메모리 오프로드(고밀도→저밀도 랙, Kyocera 시나리오)의 동기 강화 — 150kW 열/전력 제약 완화 수단.</p>
+<p><span class="lbl">[액션]</span> 기준: DRAFT v0.5 8장(AI Rack 물리)</p>
+<div class="diff"><span class="old">기존:</span> (고밀도 AI 랙 냉각 용량 수치 명시 없음)<br><span class="arrow">→</span> <span class="new">변경:</span> "고밀도 AI 랙 냉각: Delta GoCool-150 150kW 액체-공기(VR NVL72 72-GPU 랙, 2026-08-08 STH). 랙 밀도 상향 → CXL 원격 메모리 오프로드 동기 강화. ⬆️(4호 delta-4)"</div>
+</div>
+
+<div class="delta-card">
+<h3 class="delta">Delta-5: AMD Helios 아키텍처 딥다이브 — CXL 없는 rack-scale 시스템 실증 <span class="stars">★★</span> <span class="layer-tag L4">L4</span><span class="layer-tag L5">L5</span><span class="layer-tag L7">L7</span></h3>
+<p><span class="lbl">[변경]</span> (2026-08-03 STH, <a href="https://www.servethehome.com/amd-helios-architecture-deep-dive-amd-broadcom-hardware-combined/">출처</a>) Helios = "여러 서버를 단일 coherent machine으로 클러스터링". 구성: EPYC 9006 Venice + Instinct MI455X + Pensando NIC/DPU + ZT Systems(Broadcom 언급 없음). 72 가속기, 2.9 EFLOPS(MXFP4), 31TB HBM4(1.7PB/s). scale-up 260TB/s, scale-out 43TB/s. <b>CXL 언급 없음</b> — GPU 패브릭 기반.</p>
+<p><span class="lbl">[영향]</span> AMD의 rack-scale AI 시스템(L7)이 CXL 없이 구성되는 경로 실증. DRAFT 6장 "CXL vs GPU 패브릭은 다른 레이어" 결론 정합. CXL은 Helios와 경쟁 아닌 보완. 3호 헤드라인만 → 4호 딥다이브 보강.</p>
+<p><span class="lbl">[액션]</span> 기준: DRAFT v0.5 6장 / 8장</p>
+<div class="diff"><span class="old">기존:</span> (AMD Helios 상세 명시 없음)<br><span class="arrow">→</span> <span class="new">변경:</span> "AMD Helios(STH 2026-08-03): 72 가속기·2.9 EFLOPS·31TB HBM4, scale-up 260TB/s / scale-out 43TB/s. CXL 미사용 — GPU 패브릭 기반 rack-scale. 'CXL vs GPU 패브릭 다른 레이어' 실증(보완·공존). ⬆️(4호 delta-5)"</div>
+</div>
+</section>
+
+<section>
+<h2>🧩 Full-Stack 솔루션 시나리오</h2>
+<div class="note fs" style="margin-top:0;"><b>목적:</b> delta는 기준선 대비 수치/사실 변경을 잡는 도구일 뿐. 최종 목표는 부품 나열이 아닌 "이번에 등장한 부품/카드/기술/SW가 어떤 full-stack 시스템 솔루션을 구성하는가, 그것이 AI + Pooled Memory + Rack-in/out 아키텍처를 어떻게 바꾸는가"를 도출하는 것.</div>
+
+<div class="fs-scenario">
+<h3>시나리오 1: CXL over optics → 랙 간 원격 메모리 풀링 실증 (Computex 2025, 맥락 실증 사례)</h3>
+<p style="font-size:12.5px;color:#7a3ff2;">⚠️ 2025-07-06 과거 기사(Computex 2025). 2026-08-10 사용자 피드백이 "이런 full-stack 사례를 놓쳤다"고 지적한 회취용 실증 사례. delta가 아닌 full-stack 시나리오 실증 사례로 사용(날짜 규칙 준수).</p>
+<div class="layers">
+  <span class="layer-tag L1">L1 미디어</span><span class="layer-tag L2">L2 컨트롤러</span><span class="layer-tag L3">L3 링크/물리</span><span class="layer-tag L4">L4 스위치</span><span class="layer-tag L5">L5 랙</span><span class="layer-tag L7">L7 시스템</span>
+</div>
+<div class="comp"><b>L1 미디어:</b> SMART CXL memory card(opposed DIMM mounting)</div>
+<div class="comp"><b>L2 컨트롤러:</b> SMART CXL 카드 통합 컨트롤러</div>
+<div class="comp"><b>L3 링크/물리:</b> Kyocera PCIe-to-optical 변환 카드 + MTP/MPO multimode cable + near-packaged optical engine. x16 연결(광엔진 추가, Kioxia FMS 2024 x4 대비 고속화)</div>
+<div class="comp"><b>L4 스위치/패브릭:</b> CXL 3 switch(향후 배포 참조, 본 데모엔 미포함)</div>
+<div class="comp"><b>L5 랙/물리:</b> Pegatron server — 고밀도 샤시에서 저밀도 랙으로 메모리 오프로드</div>
+<div class="comp"><b>L7 시스템:</b> AI 클러스터의 메모리/가속기를 저밀도 랙으로 오프로드 → 고밀도 AI 랙 공간/전력/열 제약 완화</div>
+<p><b>동작 방식:</b> 전기 CXL/PCIe 신호를 Kyocera 카드에서 광으로 변환 → multimode fiber(MTP/MPO 4본)로 원격 전송 → Pegatron 서버가 원격 CXL 메모리 카드에 접근. CXL/PCIe 링크를 광으로 "running" — 물리적 분리 가능한 메모리 풀 구성.</p>
+<p><b>AI Rack 관점:</b> AI 클러스터가 메모리/가속기를 저밀도 랙으로 오프로드 → 고밀도 AI 랙(Helios·VR NVL72, 150kW 냉각)의 공간/전력/열 제약 완화. Rack-in/out에서 메모리를 물리적으로 분리된 랙에 두는 disaggregation 실증.</p>
+<p><b>시스템 의미/시사점:</b> CXL이 단일 랙 내 기술에서 랙 간 fabric 기술로 확장되는 실증. 광물리(L3)가 CXL 메모리 풀링(L1+L4)의 물리적 범위 결정 — InP 부족(3호 delta-7)이 이 확장의 상류 제약. DRAFT 2장 + 8장 연결. 단, 본 데모는 풀링 SW(L6)와 CXL 3 switch(L4) 미포함 → "풀링은 여전히 데모"(Meta ISCA 2026)와 정합.</p>
+<p><b>출처:</b> <a href="https://www.servethehome.com/kyocera-pegatron-and-smart-show-cxl-over-optics-at-computex-2025/">ServeTheHome</a> (단일 출처)</p>
+</div>
+
+<div class="fs-scenario">
+<h3>시나리오 2: Meta Vistara ASIC → CXL 2.0 직접 확장 실배포 (확장 vs 풀링 단계 분리)</h3>
+<div class="layers">
+  <span class="layer-tag L1">L1 미디어</span><span class="layer-tag L2">L2 컨트롤러</span><span class="layer-tag L3">L3 링크</span><span class="layer-tag L5">L5 랙</span><span class="layer-tag L6">L6 오케스트레이션</span><span class="layer-tag L7">L7 시스템</span>
+</div>
+<div class="comp"><b>L1 미디어:</b> 폐기 DDR4 DIMM(32GB ×4 = 128GB/칩, 듀얼 256GB) — 이미 지불된 자본 재활용</div>
+<div class="comp"><b>L2 컨트롤러:</b> Meta 커스텀 Vistara ASIC(두 72-bit DDR4 채널을 CXL 2.0 Gen5로 브리지)</div>
+<div class="comp"><b>L3 링크/물리:</b> CXL 2.0 over PCIe Gen5(광 아닌 전기 직접 연결)</div>
+<div class="comp"><b>L4 스위치/패브릭:</b> <b>없음</b> — 직접 확장(expansion)은 스위치 불필요. 풀링(스위치 필요)은 "largely a demo"</div>
+<div class="comp"><b>L5 랙/물리:</b> 표준 서버 랙(AMD Turin 158-core/316-thread 노드)</div>
+<div class="comp"><b>L6 오케스트레이션:</b> Linux kernel tiering(numa_demotion_enabled=1, numa_balancing=2, zone_reclaim_mode=7), 마이그레이션 오버헤드 &lt;0.5%</div>
+<div class="comp"><b>L7 시스템:</b> Meta 플릿 43.7% RAM 부족 정체 → 용량 병목 해소. DRAM이 서버 탄소배출 69% → 용량 효율로 탄소 절감</div>
+<p><b>동작 방식:</b> Vistara ASIC이 DDR4 채널을 CXL 2.0로 브리지 → 호스트 CPU가 CXL 메모리를 second-tier capacity로 인식 → Linux tiering이 hot/cold 페이지를 DDR5/CXL 간 자동 마이그레이션. 스위치 없이 단일 호스트에 직접 연결(expansion).</p>
+<p><b>AI Rack 관점:</b> 본 배포는 AI 추론/KV cache 아닌 일반 워크로드 용량 확장. CXL이 <b>대역폭(76GB/s)이 아닌 용량(256GB 추가)</b> 목적임이 정량 확인 — KV cache 오프로드(대역폭 민감)에는 한계, 용량 병목(43.7% 정체) 해소에 강점.</p>
+<p><b>시스템 의미/시사점:</b> <b>확장(expansion) vs 풀링(pooling) 단계 분리</b>가 핵심. (1) CXL 2.0 직접 확장 = 실배포(Meta, 스위치 불필요, 용량 목적). (2) CXL 3.x 다자간 풀링 = 데모(스위치 필요, composability 목적). 상품기획은 <b>확장 먼저, 풀링 후속</b> 로드맵. "13% 비용"은 폐기 DDR4 전제 조건부. DRAFT 8장 + 9장 + 11.2절 연결.</p>
+<p><b>출처:</b> <a href="https://how2shout.com/technology/cxl-memory-2026-servers-explained.html">how2shout</a> (2차 보도, 근거 Meta ISCA 2026 paper)</p>
+</div>
+</section>
+
+<section>
+<h2>🎪 업계 이벤트 / 학회 — 딥다이브</h2>
+<h3>ISCA 2026 — Meta CXL 실배포 딥다이브</h3>
+<p><b>개요:</b> ISCA 2026. Meta가 CXL 2.0 메모리 확장(Vistara ASIC) 실배포 결과 발표. <b>트랙:</b> 컴퓨터 아키텍처/시스템 → L1(DDR4)+L2(Vistara ASIC)+L7(Meta 플릿). <b>핵심:</b> Vistara ASIC, 256GB CXL + 768GB DDR5 = 1TB/노드, 13% 비용(폐기 DDR4 전제), 43.7% RAM 정체 해소, 풀링은 "largely a demo". <b>시스템 의미:</b> "확장 먼저, 풀링 후속" 2단계 로드맵의 정량 근거. <a href="https://how2shout.com/technology/cxl-memory-2026-servers-explained.html">자료 링크</a>(2차; 1차는 Meta ISCA 2026 paper). <b>연결점:</b> DRAFT 8장 + 9장 + 11.2절.</p>
+<h3>FMS 2026 (후속 잔존, 3호 트랙별 정리 완료)</h3>
+<p>3호에서 Samsung V10 NAND / Kioxia GP1 / DapuStor 512TB / FMS 하드웨어 4종 트랙별 정리 완료. 본 4호 FMS 신규 delta 없음 — 8/7~8/10 후속 보도 잔존하나 3호 범위와 중복.</p>
+</section>
+
+<section>
+<h2>🗞️ 이번 주 테크 신호 클러스터</h2>
+<p style="font-size:13px;color:var(--muted);margin-top:0;">개정: 사이트별 랭킹 나열 폐지 → 주제 클러스터. CXL·메모리·AI 인프라·광·스위치·랙·풀링 SW full-stack과 관련된 항목만. 캡처 2026-08-10 07:00 KST 대략.</p>
+
+<div class="cluster"><h4>CXL/메모리 풀링 신호 ★★★ (CXL 직접 관련)</h4>
+<ul>
+<li><b>Meta CXL 2.0 실배포(Vistara ASIC, DDR4 13% 비용, 풀링은 데모)</b> ★★★ — ISCA 2026. 확장 실배포 vs 풀링 데모 단계 분리 정량 근거. <a href="https://how2shout.com/technology/cxl-memory-2026-servers-explained.html">how2shout</a></li>
+<li><b>Marvell 48TB behind single CXL switch (FMS 2026)</b> ★ — 2호 반영. <a href="https://futumgroup.com/insights/marvell-scales-ai-memory-to-48tb-behind-a-single-cxl-switch-at-fms-2026/">futumgroup</a></li>
+</ul></div>
+
+<div class="cluster"><h4>메모리 가격/HBM 점유율 신호 ★★★</h4>
+<ul>
+<li><b>Samsung HBM4 수율 80%, 점유율 ~38% 목표 + SK Hynix 노사 분쟁</b> ★★★ — Delta-1. <a href="https://www.trendforce.com/news/2026/08/10/news-samsungs-hbm4-yield-reportedly-hits-80-as-race-to-supply-vera-rubin-heats-up-sk-hynix-labor-talks-add-a-twist/">TrendForce 8/10</a></li>
+<li><b>Winbond/Adata "2027까지 공급 타이트", Q3 DRAM +20~30%/NAND +35~40%</b> ★★ — Delta-3. <a href="https://www.trendforce.com/news/2026/08/07/news-winbond-says-customers-seek-ltas-through-2030-adata-expects-even-tighter-dram-supply-in-2027/">TrendForce 8/7</a></li>
+<li><b>SK Hynix 신규 DRAM/NAND 팹 ₩54.3T</b> ★★★ — 3호 Delta-1. <a href="https://www.trendforce.com/news/2026/08/07/news-memory-giants-race-ahead-sk-hynix-targets-2029-yongin-y2-cleanroom-samsung-advances-pyeongtaek-p5-p5-fab-2/">TrendForce 8/7</a></li>
+</ul></div>
+
+<div class="cluster"><h4>AI 인프라/rack 신호 ★★ (hyperscaler/CSP/rack/냉각/전원)</h4>
+<ul>
+<li><b>AMD Helios rack-scale(72 가속기·31TB HBM4, CXL 없음)</b> ★★ — Delta-5. <a href="https://www.servethehome.com/amd-helios-architecture-deep-dive-amd-broadcom-hardware-combined/">STH 8/3</a></li>
+<li><b>Delta GoCool-150 150kW 액체-공기 냉각(VR NVL72)</b> ★ — Delta-4. <a href="https://www.servethehome.com/deltas-gocool-150-goes-big-to-enable-150kw-liquid-to-air-cooling-for-asrock-racks-vr-nvl72/">STH 8/8</a></li>
+<li><b>Amazon 텍사스 7.65GW AI 데이터센터(미국 최대 CO2 배출원 가능성)</b> ★ — L7/L5 전력·열 상한. <a href="https://www.tomshardware.com/tech-industry/data-centers/amazons-new-7-65gw-texas-ai-data-center-power-plant-could-become-the-largest-source-of-co2-pollution-in-the-us-custom-35-turbine-gas-plant-authorized-to-emit-33-million-tons-of-annual-greenhouse-gases">Tom's Hardware 8/9</a></li>
+<li><b>SMR(소형 원자로) 데이터센터 도입 MoU(Nuclea-New Mining)</b> — L5 전원. <a href="https://www.datacenterdynamics.com/en/news/smr-firm-nuclea-inks-mou-with-new-mining-to-evaluate-deployment-of-smrs-at-data-centers-across-us/">DCD 8/7</a></li>
+<li><b>Hyperscaler 2026 capex ~$595B + Q2 클라우드 매출 고성장</b> ★★ — 3호 Delta-3. <a href="https://www.theregister.com/off-prem/2026/08/04/cloud-giants-pour-nearly-600b-into-capex-as-ai-demand-surges/5282679">The Register 8/4</a></li>
+</ul></div>
+
+<div class="cluster"><h4>광인터커넥트/패브릭 신호 ★</h4>
+<ul>
+<li><b>InP 부족 — AI 광인터커넥트 병목</b> ★ — 3호 Delta-7. CXL over optics 상류 소재 제약. <a href="https://www.trendforce.com/news/2026/08/06/news-inp-shortage-emerges-as-ai-optical-interconnect-bottleneck/">TrendForce 8/6</a></li>
+<li><b>TSMC AUO fab 인수(FOPLP/CoPoS 선진 패키징)</b> — AI 칩 패키징. <a href="https://www.trendforce.com/news/2026/08/10/news-tsmc-reportedly-eyes-two-auo-fabs-worth-twd-30b-for-foplp-and-copos-longtan-could-add-1-4nm/">TrendForce 8/10</a></li>
+<li><b>중국 업체 고급 PCB 27억 RMB 투자(AI 서버 인프라)</b> — L3/L5. <a href="https://www.trendforce.com/news/2026/08/10/news-chinese-firms-double-down-on-high-end-pcb-with-total-investment-exceeding-rmb-2-7-billion/">TrendForce 8/10</a></li>
+</ul></div>
+
+<div class="cluster"><h4>스토리지/NVMe 신호 (CXL 메모리 계층과 연결)</h4>
+<ul>
+<li><b>Kioxia GP1 10M IOPS(PCIe Gen6 SLC, DRAM 오프로드)</b> — 3호 Delta-8. <a href="https://www.servethehome.com/a-10m-iops-kioxia-gp1-ssd-shown-running-at-fms-2026/">STH 8/7</a></li>
+<li><b>Samsung 400+층 V10 BV-NAND(밀도 +58%, 양산·NVIDIA 공급)</b> — 3호 Delta-4. <a href="https://www.trendforce.com/news/2026/08/05/news-samsung-unveils-industry-first-400-layer-v10-bv-nand-memory-density-up-58-vs-v9/">TrendForce 8/5</a></li>
+</ul></div>
+
+<div class="cluster"><h4>추론 칩 아키텍처 신호 (HBM 우회 경로)</h4>
+<ul>
+<li><b>AMD-Taalas 인수(HBM 없는 모델 특화 추론, 17K outputs/sec)</b> ★★ — 3호 Delta-5. <a href="https://www.theregister.com/systems/2026/08/06/amd-acquires-ai-chip-startup-taalas-to-boost-inference-performance-by-etching-models-into-silicon/5284344">The Register 8/6</a></li>
+</ul></div>
+
+<p style="font-size:12.5px;color:var(--muted);"><b>제외 항목</b>(CXL/메모리/AI 인프라 무관): Musk Terafab, RTX Spark, Kansas 데이터센터 공청회, MIT TONTOU, AI 보안/개발자 도구, 보트 대상 광고. 종전 3호 "Top 헤드라인"에 섞였던 것을 본 4호부터 제외.</p>
+</section>
+
+<section>
+<h2>🔍 미변경 카테고리</h2>
+<table>
+<tr><th>카테고리</th><th>상태</th><th>비고</th></tr>
+<tr><td>1. CXL 스펙/표준</td><td>미변경</td><td>CXL 3.2/4.0 신규 스펙 발표 없음(8/7~8/10)</td></tr>
+<tr><td>2. CXL 디바이스/미디어</td><td>부분변경</td><td>Meta Vistara ASIC(delta-2)가 CXL 2.0 디바이스 실배포 상세</td></tr>
+<tr><td>3. 컨트롤러 벤더(7개)</td><td>미확인</td><td>DuckDuckGo 검색 한계. 8/7~8/10 신규 발표 미확인</td></tr>
+<tr><td>4. 풀링 SW/어플라이언스</td><td>부분변경</td><td>Meta "풀링은 largely a demo"로 풀링 SW 단계 한계 정량화</td></tr>
+<tr><td>5. 서버 OEM</td><td>부분변경</td><td>Delta GoCool-150(delta-4), AMD Helios(delta-5)</td></tr>
+<tr><td>6. CPU/GPU CXL</td><td>부분변경</td><td>AMD Helios(delta-5, CXL 미사용). Venice CXL 3.x 미확정</td></tr>
+<tr><td>7. AI 패브릭</td><td>미변경</td><td>InP 부족(3호) 외 8/7~8/10 신규 UALink/NVLink/Ultra Ethernet 미확인</td></tr>
+<tr><td>8. Main Memory(DDR6/CAMM2/MRDIMM)</td><td>미변경</td><td>신규 표준/제품 발표 없음</td></tr>
+<tr><td>9. AI Rack/KV offload</td><td>부분변경</td><td>Meta CXL 실배포(delta-2) — KV cache 아닌 일반 워크로드 용량</td></tr>
+<tr><td>10. LLM TCO 모델</td><td>부분변경</td><td>Meta 13% 비용(DDR4 재활용 전제)로 TCO 모델 보강 근거</td></tr>
+<tr><td>11. 메모리 가격/실적</td><td><b>변경</b></td><td>Samsung HBM4 수율 80%(delta-1) + Winbond/Adata 상승폭 상향(delta-3) ★★★/★★</td></tr>
+<tr><td>12. 시장/CSP</td><td>부분변경</td><td>Meta 실배포 상세(delta-2). hyperscaler capex는 3호 반영</td></tr>
+</table>
+</section>
+
+<section>
+<h2>📈 기준선 대비 delta 요약 매트릭스</h2>
+<table class="matrix">
+<tr><th>#</th><th>항목</th><th>기준선</th><th>오늘(4호)</th><th>영향도</th><th>레이어</th></tr>
+<tr><td>1</td><td>Samsung HBM4 수율/점유율</td><td>Samsung 17%, 30%+ 목표(1호)</td><td>수율 80%, 점유율 ~38% 목표, SK Hynix 노사 분쟁</td><td>★★★</td><td><span class="layer-tag L1">L1</span><span class="layer-tag L7">L7</span></td></tr>
+<tr><td>2</td><td>Meta CXL 실배포 상세</td><td>"Meta: DDR4 대체"(1줄)</td><td>Vistara ASIC, 256GB CXL, 13% 비용, 43.7% 정체, 풀링은 데모</td><td>★★★</td><td><span class="layer-tag L1">L1</span><span class="layer-tag L2">L2</span><span class="layer-tag L7">L7</span></td></tr>
+<tr><td>3</td><td>DRAM/NAND 가격 상승폭</td><td>Q3 DRAM +13~18%(1호)</td><td>Q3 DRAM +20~30%, NAND +35~40%, 2027까지 타이트</td><td>★★</td><td><span class="layer-tag L1">L1</span><span class="layer-tag L7">L7</span></td></tr>
+<tr><td>4</td><td>고밀도 AI 랙 냉각</td><td>명시 없음</td><td>Delta GoCool-150 150kW(VR NVL72)</td><td>★</td><td><span class="layer-tag L5">L5</span></td></tr>
+<tr><td>5</td><td>AMD Helios rack-scale</td><td>헤드라인만(3호)</td><td>72 가속기·31TB HBM4, CXL 없음, GPU 패브릭</td><td>★★</td><td><span class="layer-tag L4">L4</span><span class="layer-tag L5">L5</span><span class="layer-tag L7">L7</span></td></tr>
+</table>
+</section>
+
+<section>
+<h2>📋 후속 액션 (DRAFT 보강)</h2>
+<ul class="chk">
+<li class="done">[ ] DRAFT 10.2절: Samsung HBM4 수율 80% + 점유율 ~38% + SK Hynix 노사 분쟁 반영 (delta-1)</li>
+<li class="done">[ ] DRAFT 11.2절/8장/9장: Meta Vistara ASIC CXL 실배포 상세 반영 (delta-2)</li>
+<li class="done">[ ] DRAFT 10.1절/2.4절: Q3 DRAM +20~30%/NAND +35~40% 상향 + NAND 저비용 가정 압력 (delta-3)</li>
+<li class="done">[ ] DRAFT 8장: Delta GoCool-150 150kW 냉각 반영 (delta-4)</li>
+<li class="done">[ ] DRAFT 6장/8장: AMD Helios CXL 없는 rack-scale 시스템 반영 (delta-5)</li>
+<li>[ ] (계속 #34) Montage trial production → 양산 전환 시점 추적 (미확인)</li>
+<li>[ ] (계속 #35) HBM4 양산 램프 상세 — delta-1로 Samsung 부분 반영, SK Hynix/Micron 타임라인 계속 추적</li>
+<li>[ ] (신규 #39) Meta Vistara 폐기 DDR4 재활용 모델이 신규 CXL 카드 비용 비교에 미치는 영향 정량화 (TCO 모델)</li>
+<li>[ ] (신규 #40) "확장 vs 풀링 단계 분리" 로드맵을 DRAFT 12장(차세대 상품기획 방향)에 명시</li>
+<li>[ ] (신규 #41) SK Hynix 노사 분쟁이 HBM 단기 공급·CXL 미디어 원물 확보에 미치는 영향 추적</li>
+<li>[ ] (계속 #37) AMD-Taalas "HBM 없는 추론" CXL/HBM 수요 정량 영향 (미확인)</li>
+<li>[ ] (계속 #38) InP 부족 CXL 패브릭 광 확장 영향 (미확인)</li>
+<li style="color:#c0392b;">⚠️ DRAFT 정규 .md 경로 복구 — 현재 `.txt 복사본`(v0.1)만 있고 정규 .md 미존재. 1/2/3/4호 delta의 DRAFT 본문 반영은 정규 경로 복구 후 일괄 적용 필요.</li>
+</ul>
+</section>
+
+<section>
+<h2>📁 관련 파일</h2>
+<ul style="font-size:13.5px;">
+<li>기준선 DRAFT: <code>wiki/concepts/cxl-memory-product-planning-draft - 복사본.txt</code> (v0.1, 정규 .md 미존재 — 경로 복구 필요)</li>
+<li>직전 Daily Update: <code>wiki/daily-updates/cxl-daily-update-2026-08-10.md</code> (3호 11:15 KST — git 이력에 보존)</li>
+<li>핸드오프: <code>wiki/concepts/cxl-product-planning-session-handoff.md</code> 5절</li>
+<li>원시 데이터: <code>sources/cxl-daily-raw-2026-08-10.md</code> (3호 분량 + 4호 보충분 append)</li>
+<li>HTML 보고서: <code>wiki/cxl-daily-report-2026-08-10-0730.html</code></li>
+<li>Full-Stack 프레임워크 concept: <code>wiki/concepts/cxl-fullstack-7layer-framework.md</code></li>
+</ul>
+</section>
+
+<section>
+<h2>데이터 한계 공개</h2>
+<ol class="lim">
+<li><b>WebSearch API 백엔드 장애 지속</b>(GLM-5.2 <code>tool_choice</code> validation error, 3호와 동일) → WebFetch + DuckDuckGo HTML 폴백. DuckDuckGo는 일부 쿼리에서 결과 반환했으나 전문 용어 인식 취약.</li>
+<li><b>컨트롤러 벤더 7개 + 풀링 SW 8/7~8/10 신규 발표 미확인</b>(DuckDuckGo 한계). delta는 확인된 5건. 미변경 단정 아닌 "미확인" 표기.</li>
+<li><b>DRAFT 정규 .md 경로 미존재</b> — <code>.txt 복사본</code>(v0.1)만 있어 1/2/3/4호 delta의 DRAFT 본문 반영이 누적 미적용. 본 4호 [액션]은 반영 위치 diff로 명시만.</li>
+<li><b>Meta CXL 실배포 수치</b>: how2shout 2차 보도 단일 출처(근거 Meta ISCA 2026 paper). 13% 비용·43.7% 정체·76GB/s@250ns 등은 1차 paper 교차검증 권장.</li>
+<li><b>Samsung HBM4 수율 80%/점유율 38%</b>: TrendForce 단일 보도(1차 출처 서울경제/Infostock/ETNews 인용). 점유율은 "목표"이지 확정값 아님.</li>
+<li><b>3호(11:15 KST)와 4호(07:30 KST) 동일 날짜 중복</b>: 3호가 구 구조(사이트별 나열)로 발행됨. 4호는 full-stack 7-layer 개정 적용 첫 발행으로 품질 검증 목적. 3호 MD는 git 이력에 보존.</li>
+<li><b>Winbond/Adata는 2차 메모리사</b> — 1차(Samsung/SK Hynix/Micron) 가이던스와 정합 시 1차 출처로 보강 권장.</li>
+<li><b>Kyocera CXL-over-optics 사례는 2025-07-06 과거 기사</b>(Computex 2025) — delta가 아닌 full-stack 시나리오 실증 사례로 사용(날짜 규칙: 2개월+ 과거 = 맥락 정보).</li>
+</ol>
+</section>
+
+<div class="footer">
+  CXL Daily Update 4호 — full-stack 7-layer 개정 첫 적용 · 2026-08-10 07:30 KST · 기준선 DRAFT v0.5 + Daily Update 3호
+</div>
+
+</div>
+</body>
+</html>

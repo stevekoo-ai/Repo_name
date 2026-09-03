@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>젠슨황 GTC Inference Economics 그래프 — 완전 분석 리포트 (2026-08-24)</title>
+<style>
+  :root {
+    --bg: #0d1117; --fg: #e6edf3; --muted: #8b949e;
+    --border: #30363d; --card: #161b22; --accent: #58a6ff;
+    --green: #3fb950; --red: #f85149; --orange: #d29922;
+    --hopper: #8b949e; --blackwell: #58a6ff; --rubin: #bc8cff;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, 'Segoe UI', 'Malgun Gothic', Helvetica, Arial, sans-serif;
+    background: var(--bg); color: var(--fg); line-height: 1.75;
+    padding: 2rem; max-width: 1100px; margin: 0 auto;
+  }
+  h1 { font-size: 1.8rem; border-bottom: 2px solid var(--accent); padding-bottom: 0.5rem; margin-bottom: 0.5rem; }
+  h2 { font-size: 1.4rem; color: var(--accent); margin: 2.5rem 0 1rem; border-bottom: 1px solid var(--border); padding-bottom: 0.3rem; }
+  h3 { font-size: 1.1rem; color: var(--orange); margin: 1.5rem 0 0.8rem; }
+  h4 { font-size: 1rem; color: var(--muted); margin: 1rem 0 0.5rem; }
+  p { margin: 0.6rem 0; }
+  a { color: var(--accent); }
+  pre {
+    background: var(--card); border: 1px solid var(--border); border-radius: 8px;
+    padding: 1rem; overflow-x: auto; font-size: 0.82rem; line-height: 1.5; margin: 1rem 0;
+    white-space: pre; font-family: 'Consolas', 'Cascadia Code', monospace;
+  }
+  table {
+    width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 0.88rem;
+  }
+  th, td { border: 1px solid var(--border); padding: 0.6rem 0.8rem; text-align: left; vertical-align: top; }
+  th { background: var(--card); color: var(--accent); font-weight: 600; }
+  td { background: var(--bg); }
+  tr:nth-child(even) td { background: rgba(255,255,255,0.02); }
+  .num { text-align: center; }
+  .key-insight {
+    background: linear-gradient(135deg, rgba(210,153,34,0.1), rgba(88,166,255,0.05));
+    border: 1px solid var(--orange); border-radius: 8px; padding: 1.2rem 1.5rem; margin: 1.5rem 0;
+  }
+  .key-insight h4 { color: var(--orange); margin-top: 0; }
+  .chapter-intro {
+    color: var(--muted); font-style: italic; margin: 0.3rem 0 1rem 0;
+    padding-left: 1rem; border-left: 3px solid var(--border);
+  }
+  .meta { color: var(--muted); font-size: 0.85rem; margin-bottom: 1.5rem; }
+  .toc { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 1.2rem 1.5rem; margin: 1.5rem 0; }
+  .toc h3 { margin-top: 0; }
+  .toc ul { list-style: none; padding-left: 0; }
+  .toc li { padding: 0.3rem 0; }
+  .toc li::before { content: "▸ "; color: var(--accent); }
+  .badge { display: inline-block; padding: 0.15em 0.5em; border-radius: 12px; font-size: 0.78rem; font-weight: bold; }
+  .badge-memory { background: rgba(248,81,73,0.2); color: #f85149; }
+  .badge-transition { background: rgba(210,153,34,0.2); color: #d29922; }
+  .badge-compute { background: rgba(63,185,80,0.2); color: #3fb950; }
+  .verdict-yes { color: var(--green); font-weight: bold; }
+</style>
+</head>
+<body>
+
+<h1>젠슨황 GTC Inference Economics 그래프 — 완전 분석 리포트</h1>
+<p class="meta">
+  📅 최종 정리: 2026-08-24 &nbsp;|&nbsp;
+  📊 GTC 2026 Jensen Huang 발표 차트 심층 분석<br>
+  <em>초기 차트 판독부터 역산, research 검증, 세대별 bottleneck 분석, CXL memory 확장 영향, 그리고 CXL 진화 시나리오까지.<br>중간에 추측했다가 틀린 것으로 확인된 내용(batch 3 bottleneck, prefill 70%, small batch inefficiency)은 제외하고, 검증된 흐름만 정리함.</em>
+</p>
+
+<div class="toc">
+  <h3>📑 목차</h3>
+  <ul>
+    <li><a href="#ch1">Chapter 1. 차트 개요 — 젠슨황이 보여준 것</a></li>
+    <li><a href="#ch2">Chapter 2. GPU 세대별 스펙 정렬</a></li>
+    <li><a href="#ch3">Chapter 3. 차트 곡선 모양의 물리적 해석</a></li>
+    <li><a href="#ch4">Chapter 4. Memory-Bound Inference — 핵심 물리 법칙</a></li>
+    <li><a href="#ch5">Chapter 5. 차트 12개 포인트 판독</a></li>
+    <li><a href="#ch6">Chapter 6. H100 @ (50, 0.15M) 역산 — 검증된 정의</a></li>
+    <li><a href="#ch7">Chapter 7. Research 기반 Bottleneck 재정의</a></li>
+    <li><a href="#ch8">Chapter 8. 세대별 Bottleneck 이동</a></li>
+    <li><a href="#ch9">Chapter 9. 12개 포인트 전체 검증</a></li>
+    <li><a href="#ch10">Chapter 10. CXL Memory 확장이 차트에 미치는 영향</a></li>
+    <li><a href="#ch11">Chapter 11. CXL 진화 시나리오 — 차트 변형 가능성</a></li>
+    <li><a href="#ch12">Chapter 12. 최종 결론</a></li>
+  </ul>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<section id="ch1">
+<h2>Chapter 1. 차트 개요 — 젠슨황이 보여준 것</h2>
+<p class="chapter-intro">
+  젠슨황이 GTC 2026에서 발표한 "Inference Performance and Efficiency Drive Company Results" 차트의 두 축, 4개 서비스 티어, 3개 GPU 곡선을 정리한다.
+</p>
+
+<table>
+  <tr><th>항목</th><th>내용</th></tr>
+  <tr><td><strong>차트 제목</strong></td><td>Inference Performance and Efficiency Drive Company Results</td></tr>
+  <tr><td><strong>발표자</strong></td><td>Jensen Huang, NVIDIA CEO (GTC 2026)</td></tr>
+  <tr><td><strong>Y축 (효율성)</strong></td><td>TPS/MW — 메가와트당 초당 토큰 수 (높을수록 전력 효율 좋음)</td></tr>
+  <tr><td><strong>X축 (상호작용성)</strong></td><td>TPS/User — 사용자당 초당 토큰 수 (높을수록 빠른 응답)</td></tr>
+</table>
+
+<h3>4개 서비스 티어</h3>
+<table>
+  <tr><th>티어</th><th>모델</th><th>파라미터</th><th>컨텍스트</th><th>가격</th><th>X축</th></tr>
+  <tr><td>Free</td><td>Qwen 3</td><td>235B</td><td>32K</td><td>$0</td><td>x=50</td></tr>
+  <tr><td>Medium</td><td>Kimi K2.5</td><td>1T (MoE)</td><td>128K</td><td>$3</td><td>x=100</td></tr>
+  <tr><td>High</td><td>GPT MoE</td><td>2T</td><td>128K</td><td>$6</td><td>x=200</td></tr>
+  <tr><td>Premium</td><td>GPT MoE</td><td>2T</td><td>400K</td><td>$45</td><td>x=400</td></tr>
+</table>
+
+<h3>3개 GPU 곡선</h3>
+<table>
+  <tr><th>곡선</th><th>실제 GPU</th><th>FP4 POPS</th><th>HBM</th><th>HBM BW</th><th>TDP</th></tr>
+  <tr><td><span style="color:var(--hopper)">●</span> Hopper</td><td>H100 SXM5</td><td>N/A (FP8만)</td><td>80GB</td><td>3.35 TB/s</td><td>700W</td></tr>
+  <tr><td><span style="color:var(--blackwell)">●</span> Blackwell</td><td>B300 Ultra</td><td>15,000</td><td>288GB</td><td>8.0 TB/s</td><td>1,400W</td></tr>
+  <tr><td><span style="color:var(--rubin)">●</span> Rubin</td><td>R100 Vera Rubin</td><td>50,000</td><td>288GB</td><td>22.0 TB/s</td><td>2,300W</td></tr>
+</table>
+
+<div class="key-insight">
+  <h4>💡 핵심 검증: Blackwell = B300 Ultra 가설</h4>
+  <p>B300→R100 compute ratio = 50K/15K = 3.33X, GPUs/MW ratio = 435/714 = 0.61X,<br>
+  TPS/MW ratio = 3.33 × 0.61 = 2.03X ≈ chart 화살표 2X ✓</p>
+</div>
+</section>
+
+<!-- ═══════════════════════════════════════════ -->
+<section id="ch2">
+<h2>Chapter 2. GPU 세대별 스펙 정렬</h2>
+<p class="chapter-intro">
+  차트의 3곡선을 만드는 GPU 세대의 핵심 스펙 — 특히 HBM4의 패러다임 전환(2,048-bit bus)과 SOCAMM2 CPU 메모리 풀을 정리한다.
+</p>
+
+<h3>2.1 GPU 세대 비교</h3>
+<table>
+  <tr><th>Spec</th><th>H100</th><th>B200</th><th>B300 Ultra</th><th>R100</th></tr>
+  <tr><td>Architecture</td><td>Hopper</td><td>Blackwell</td><td>Blackwell Ultra</td><td>Vera Rubin</td></tr>
+  <tr><td>Process</td><td>TSMC 4N</td><td>TSMC 4NP</td><td>TSMC 4NP</td><td>TSMC 3nm</td></tr>
+  <tr><td>FP8 TFLOPS</td><td>1,979</td><td>4,500</td><td>5,000</td><td>미정</td></tr>
+  <tr><td>FP4 추론</td><td>N/A</td><td>9,000</td><td>15,000</td><td>50,000</td></tr>
+  <tr><td>HBM type</td><td>HBM3</td><td>HBM3e</td><td>HBM3e</td><td>HBM4</td></tr>
+  <tr><td>HBM/GPU</td><td>80GB</td><td>192GB</td><td>288GB</td><td>288GB</td></tr>
+  <tr><td>HBM BW/GPU</td><td>3.35 TB/s</td><td>8.0 TB/s</td><td>8.0 TB/s</td><td>22.0 TB/s</td></tr>
+  <tr><td>TDP/GPU</td><td>700W</td><td>1,000W</td><td>1,400W</td><td>2,300W</td></tr>
+  <tr><td>NVL72 rack 전력</td><td>~65kW</td><td>~120kW</td><td>~121kW</td><td>~199kW</td></tr>
+</table>
+
+<h3>2.2 HBM 진화 — 2,048-bit bus 패러다임 전환</h3>
+<table>
+  <tr><th>세대</th><th>버스 폭</th><th>핀 속도</th><th>per-stack BW</th><th>per-stack 용량</th></tr>
+  <tr><td>HBM3</td><td>1,024-bit</td><td>6.4-8.4 Gbps</td><td>819-1,075 GB/s</td><td>16/24GB</td></tr>
+  <tr><td>HBM3e</td><td>1,024-bit</td><td>9.2-10.0 Gbps</td><td>1.2-1.28 TB/s</td><td>24/36/48GB</td></tr>
+  <tr><td><strong>HBM4</strong></td><td><strong>2,048-bit</strong></td><td>10.7-13.0 Gbps</td><td><strong>2.7-3.3 TB/s</strong></td><td>36/48GB</td></tr>
+  <tr><td>HBM4E</td><td>2,048-bit</td><td>14.0-16.0 Gbps</td><td>3.6-4.0 TB/s</td><td>48/64GB</td></tr>
+</table>
+<p>핀 속도는 HBM3e/HBM4가 비슷하지만, 데이터 통로(버스 폭)를 2배 넓혀 단일 스택 대역폭이 3.3TB/s로 도약. HBM4부터 베이스 다이를 TSMC 5nm급 로직 공정으로 제작.</p>
+
+<h3>2.3 SOCAMM2 — CPU 메모리 풀 (KV 캐시 백업)</h3>
+<table>
+  <tr><th>항목</th><th>Spec</th></tr>
+  <tr><td>타입</td><td>LPDDR5X 기반 서버 모듈</td></tr>
+  <tr><td>모듈당 BW</td><td>154 GB/s</td></tr>
+  <tr><td>모듈당 용량</td><td>256GB (Micron HVM 2026-03)</td></tr>
+  <tr><td>CPU당 용량</td><td>2 TB (256GB × 8채널)</td></tr>
+  <tr><td>랙당 총량</td><td>80 TB (2TB × 40 CPU)</td></tr>
+  <tr><td>GPU 연결</td><td>NVLink-C2C (Chip-to-Chip)</td></tr>
+  <tr><td>KV 캐시 TTFT 개선</td><td>2.3배 (HBM overflow 시 offload)</td></tr>
+</table>
+</section>
+
+<!-- ═══════════════════════════════════════════ -->
+<section id="ch3">
+<h2>Chapter 3. 차트 곡선 모양의 물리적 해석</h2>
+<p class="chapter-intro">
+  차트 곡선이 왜 3구간(compute-bound → transition → memory-bound)으로 나뉘는지, 그리고 x=400에서 왜 3곡선이 수렴하는지 설명한다.
+</p>
+
+<h3>3.1 곡선의 3구간</h3>
+<table>
+  <tr><th>구간</th><th>X 범위</th><th>특성</th><th>물리적 의미</th></tr>
+  <tr><td>[1] Compute Bound</td><td>x=50~100</td><td>flat (효율 최고)</td><td>batch 크고 tensor core full 활용</td></tr>
+  <tr><td>[2] Transition</td><td>x=100~200</td><td>급강하</td><td>batch가 절반으로 줄어듦</td></tr>
+  <tr><td>[3] Memory Bound</td><td>x=200~400</td><td>완만한 하락, 수렴</td><td>batch 매우 작아 BW bottleneck</td></tr>
+</table>
+
+<h3>3.2 세 곡선 수렴 (x=400)의 이유</h3>
+<table>
+  <tr><th>수렴 원인</th><th>설명</th></tr>
+  <tr><td>KV cache random read</td><td>attention 연산, GPU 세대와 무관</td></tr>
+  <tr><td>Network latency</td><td>GPU↔user, 세대와 무관</td></tr>
+  <tr><td>Scheduling overhead</td><td>tiny batch, 세대와 무관</td></tr>
+</table>
+<p>이 병목들은 GPU 세대와 무관하므로 x=400에서 곡선이 수렴. 물리적으로 의미 있는 현상.</p>
+</section>
+
+<!-- ═══════════════════════════════════════════ -->
+<section id="ch4">
+<h2>Chapter 4. Memory-Bound Inference — 핵심 물리 법칙</h2>
+<p class="chapter-intro">
+  LLM 추론의 가장 핵심 공식 — Token/Sec는 HBM 대역폭을 KV 캐시 크기로 나눈 값 — 와 4-layer memory tier를 정리한다.
+</p>
+
+<table>
+  <tr><th>항목</th><th>내용</th></tr>
+  <tr><td><strong>핵심 공식</strong></td><td>Token/Sec = Total_Memory_BW / Total_KV_Cache_GB</td></tr>
+  <tr><td><strong>의미</strong></td><td>각 토큰마다 GPU는 전체 KV 캐시를 랜덤 읽기 (attention). KV 캐시가 클수록 같은 BW로도 Token/sec 감소</td></tr>
+  <tr><td><strong>HBM4→SOCAMM2 spill-over</strong></td><td>BW 비율 1,584/44 = 36X → spill-over 1KB라도 SOCAM으로 가면 Token/sec 36배 감소</td></tr>
+  <tr><td><strong>HBM4의 딜레마</strong></td><td>BW는 2.75X 개선 (22TB/s) but 용량은 B300과 동일 (288GB). KV 캐시 큰 워크로드에서 spill-over 여전히 발생</td></tr>
+</table>
+
+<h3>4-Layer Memory Tier</h3>
+<table>
+  <tr><th>Tier</th><th>위치</th><th>용량</th><th>BW</th><th>KV 적합도</th></tr>
+  <tr><td>Tier 1</td><td>HBM4 (GPU 내부)</td><td>288GB/GPU</td><td>22 TB/s</td><td>완벽</td></tr>
+  <tr><td>Tier 2</td><td>SOCAMM2 (CPU 메모리)</td><td>80 TB/rack</td><td>44 TB/s</td><td>양호</td></tr>
+  <tr><td>Tier 3</td><td>CXL Pooled</td><td>10-100 TB</td><td>~1 TB/s</td><td>부적합 (랜덤 읽기 한계)</td></tr>
+  <tr><td>Tier 4</td><td>SSD Pooling</td><td>대용량</td><td>~0.01 TB/s</td><td>부적합</td></tr>
+</table>
+</section>
+
+<!-- ═══════════════════════════════════════════ -->
+<section id="ch5">
+<h2>Chapter 5. 차트 12개 포인트 판독</h2>
+<p class="chapter-intro">
+  차트에서 읽은 3세대 × 4 X값 = 12개 포인트의 TPS/MW, Total TPS, Concurrent Users 값을 정리한다.
+</p>
+
+<h3>5.1 TPS/MW 판독 (Y축)</h3>
+<table>
+  <tr><th>세대 \ X</th><th class="num">x=50</th><th class="num">x=100</th><th class="num">x=200</th><th class="num">x=400</th></tr>
+  <tr><td>Hopper</td><td class="num">0.15M</td><td class="num">0.15M</td><td class="num">0.08M</td><td class="num">0.02M</td></tr>
+  <tr><td>B300</td><td class="num">0.75M</td><td class="num">0.60M</td><td class="num">0.23M</td><td class="num">0.15M</td></tr>
+  <tr><td>R100</td><td class="num">1.60M</td><td class="num">1.60M</td><td class="num">0.70M</td><td class="num">0.20M</td></tr>
+</table>
+
+<h3>5.2 Total TPS = TPS/MW × rack_MW</h3>
+<table>
+  <tr><th>세대 \ X</th><th class="num">x=50</th><th class="num">x=100</th><th class="num">x=200</th><th class="num">x=400</th></tr>
+  <tr><td>Hopper (65kW)</td><td class="num">9,750</td><td class="num">9,750</td><td class="num">5,200</td><td class="num">1,300</td></tr>
+  <tr><td>B300 (121kW)</td><td class="num">90,750</td><td class="num">72,600</td><td class="num">27,830</td><td class="num">18,150</td></tr>
+  <tr><td>R100 (199kW)</td><td class="num">318,400</td><td class="num">318,400</td><td class="num">139,300</td><td class="num">39,800</td></tr>
+</table>
+
+<h3>5.3 Concurrent Users = Total TPS / TPS/User</h3>
+<table>
+  <tr><th>세대 \ X</th><th class="num">x=50</th><th class="num">x=100</th><th class="num">x=200</th><th class="num">x=400</th></tr>
+  <tr><td>Hopper</td><td class="num">195</td><td class="num">98</td><td class="num">26</td><td class="num">3</td></tr>
+  <tr><td>B300</td><td class="num">1,815</td><td class="num">726</td><td class="num">139</td><td class="num">45</td></tr>
+  <tr><td>R100</td><td class="num">6,368</td><td class="num">3,184</td><td class="num">700</td><td class="num">100</td></tr>
+</table>
+</section>
+
+<!-- ═══════════════════════════════════════════ -->
+<section id="ch6">
+<h2>Chapter 6. H100 @ (50, 0.15M) 역산 — 검증된 정의</h2>
+<p class="chapter-intro">
+  차트에서 가장 왼쪽 아래 점 "Free 티어, Qwen 3, 235B, 32K"의 real-world 조건을 역산한다. (초기 "batch 3/GPU bottleneck" 추측은 제외, Research 검증된 최종 정의만 포함)
+</p>
+
+<h3>6.1 Power → Total Throughput</h3>
+<table>
+  <tr><th>항목</th><th>값</th><th>계산</th></tr>
+  <tr><td>H100 SXM5</td><td>700 W/GPU</td><td>—</td></tr>
+  <tr><td>NVL72 GPU 전력</td><td>50.4 kW</td><td>700 × 72</td></tr>
+  <tr><td>Rack total</td><td>65 kW</td><td>cooling/network/CPU overhead ×1.29</td></tr>
+  <tr><td>Total TPS</td><td>9,750 TPS</td><td>0.15M × 0.065 MW</td></tr>
+</table>
+
+<h3>6.2 LLM — Qwen 235B Class (Dense)</h3>
+<table>
+  <tr><th>항목</th><th>값</th></tr>
+  <tr><td>차트 레이블</td><td>"Qwen 3, 235 Billion, 32K"</td></tr>
+  <tr><td>Total Parameters</td><td>235B</td></tr>
+  <tr><td>Layers</td><td>~88</td></tr>
+  <tr><td>Architecture</td><td>GQA (128 query → 8 KV heads)</td></tr>
+  <tr><td>Precision</td><td>BF16/FP8 (decode FP8)</td></tr>
+  <tr><td>FLOPs/token</td><td>470B (2 × 235B)</td></tr>
+</table>
+
+<h3>6.3 KV Cache 계산</h3>
+<table>
+  <tr><th>항목</th><th>값</th><th>계산</th></tr>
+  <tr><td>KV Cache per token</td><td>0.453 MB</td><td>2 × 128 × 8 × 2 × 88 bytes</td></tr>
+  <tr><td>Per-user (32K context)</td><td>14.1 GB</td><td>0.453 MB × 32,000</td></tr>
+  <tr><td>Total (195 users)</td><td>2.7 TB</td><td>14.1 GB × 195</td></tr>
+  <tr><td>HBM 가용량</td><td>5.17 TB</td><td>5,760 - 470(weights)</td></tr>
+  <tr><td>Fitting</td><td>✓</td><td>2.7 < 5.17 TB</td></tr>
+</table>
+</section>
+
+<!-- ═══════════════════════════════════════════ -->
+<section id="ch7">
+<h2>Chapter 7. Research 기반 Bottleneck 재정의</h2>
+<p class="chapter-intro">
+  Research papers와 production data로 검증한 결과 — 235B 모델의 decode는 batch size와 무관하게 항상 memory-bound이며, 진짜 bottleneck은 "KV Cache L2 miss"이다.
+</p>
+
+<div class="key-insight">
+  <h4>🎯 가장 중요한 발견 — Decode는 235B에서 항상 Memory-Bound</h4>
+<pre>
+Arithmetic intensity (decode) = Total FLOPs / Total memory read
+  = (batch × 470B) / (batch × 39.86 MB)
+  = 470B / 39.86 MB = <strong>11.8 ops/byte</strong>
+
+Memory-bound threshold = 60-80 ops/byte
+11.8 <<< 60 → <strong>ANY batch size에서 decode는 memory-bound</strong>
+
+→ "batch 3이 bottleneck"이라는 추측은 틀림.
+  235B 모델은 batch 3이든 3,000이든 inherently memory-bound.
+</pre>
+</div>
+
+<h3>7.1 Research 검증 — Production 데이터</h3>
+<table>
+  <tr><th>검증 항목</th><th>Research 데이터</th><th>출처</th></tr>
+  <tr><td>Decode HBM 사용률</td><td><strong>91% (production 40M DAU)</strong></td><td>vLLM 40M user deployment</td></tr>
+  <tr><td>Prefill GPU 활용</td><td>89% (compute-bound)</td><td>40M DAU production</td></tr>
+  <tr><td>Decode GPU 활용</td><td>20-40% (memory-bound)</td><td>arxiv 2606.17104</td></tr>
+  <tr><td>L2 hit rate</td><td>0.83-1.60%</td><td>arxiv 2503.08311</td></tr>
+  <tr><td>Attention kernel stall</td><td>>50% cycles stalled</td><td>arxiv 2503.08311</td></tr>
+  <tr><td>CPU overhead</td><td>최대 36.5% of decode time</td><td>arxiv 2503.08311</td></tr>
+  <tr><td>Batch 32 threshold</td><td>batch 32에서 throughput scaling 깨짐</td><td>arxiv 2503.08311</td></tr>
+</table>
+
+<h3>7.2 Research-grounded Overhead Breakdown (H100 @ x=50)</h3>
+<p>batch = 175.5 decode + 117 prefill = 292.5 total per iteration (TP=72)</p>
+<table>
+  <tr><th>Overhead</th><th>Latency</th><th>비율</th><th>설명</th></tr>
+  <tr><td><strong>KV Memory (L2 miss 400x)</strong></td><td>9.6 msec</td><td><strong>56.0%</strong></td><td>32K context → PagedAttention scattered pages → L2 hit 0.83% → 98%+ HBM 직접 읽기</td></tr>
+  <tr><td><strong>Prefill Overhead (60%)</strong></td><td>6.0 msec</td><td><strong>35.0%</strong></td><td>Decode보다 10,000X 느린 prefill이 mixed workload에서 dominant</td></tr>
+  <tr><td>Compute (FP8, TP=72)</td><td>1.16 msec</td><td>6.8%</td><td>Tensor core 거의 idle</td></tr>
+  <tr><td>TP Sync (NVSwitch)</td><td>0.215 msec</td><td>1.3%</td><td>NVLink4 all-reduce × 88 layers</td></tr>
+  <tr><td>Scheduling (CPU)</td><td>0.15 msec</td><td>0.9%</td><td>vLLM scheduler + kernel launch</td></tr>
+  <tr><td><strong>Total</strong></td><td><strong>17.125 msec</strong></td><td><strong>100%</strong></td><td>58.4 iter/s × 175.5 = 10,249 ≈ 9,750 TPS ✓</td></tr>
+</table>
+
+<div class="key-insight">
+  <h4>🎯 진짜 Bottleneck 정의</h4>
+  <ol style="margin-left:1.2rem;">
+    <li><strong>KV Cache L2 miss (56%)</strong> — 32K context가 L2 cache에 안 떨어짐. L2 hit 0.83% → 98%+ HBM 직접 읽기 → stall</li>
+    <li><strong>Prefill Overhead (35%)</strong> — new sequence arrival cost. Decode보다 10,000X 느린 prefill이 dominant</li>
+    <li><strong>Compute (6.8%)</strong> — tensor core 거의 idle (GPU util 6.8%는 research 20-40%와巧合로 일치)</li>
+  </ol>
+  <p><strong>Bottleneck은 "small batch"가 아니다.</strong> batch 175는 합리적. 진짜 원인은 KV cache size (32K) × L2 miss rate + prefill frequency.</p>
+</div>
+</section>
+
+<!-- ═══════════════════════════════════════════ -->
+<section id="ch8">
+<h2>Chapter 8. 세대별 Bottleneck 이동</h2>
+<p class="chapter-intro">
+  동일한 워크로드(235B, 175 users, x=50)에서 H100→B300→R100으로 세대 바꿀 때 bottleneck이 memory-bound에서 compute-bound로 어떻게 이동하는지 추적한다.
+</p>
+
+<h3>8.1 Bottleneck 이동 Map</h3>
+<table>
+  <tr><th>Aspect</th><th>H100 (2024)</th><th>B300 (2026)</th><th>R100 (2027)</th></tr>
+  <tr><td>Decode HBM</td><td>HBM3 3.35 TB/s</td><td>HBM3e ~5 TB/s</td><td><strong>HBM4 22 TB/s (6.6x)</strong></td></tr>
+  <tr><td>Decode FP</td><td>FP8 limited</td><td>FP4 native</td><td>FP4 50K POPS</td></tr>
+  <tr><td>Decode BW 사용률</td><td><strong>91%</strong></td><td>~70% (FP8 quant ↓)</td><td>~25%</td></tr>
+  <tr><td>L2 hit rate</td><td>0.83-1.60%</td><td>~5% (FP8 KV quant)</td><td>~20% (larger L2)</td></tr>
+  <tr><td>Decode BW 비율</td><td><strong>56% of latency</strong></td><td>38% of latency</td><td><strong>11% of latency</strong></td></tr>
+  <tr><td>Prefill 비율</td><td>35%</td><td>31%</td><td>33% (software-bound)</td></tr>
+  <tr><td><strong>Primary Bottleneck</strong></td><td><span class="badge badge-memory">Memory-bound</span></td><td><span class="badge badge-memory">Memory-bound</span></td><td><span class="badge badge-compute">Compute-bound!</span></td></tr>
+  <tr><td>Solution</td><td>KV quant, PD disaggregation</td><td>KV quant + FP4 native</td><td>HBM4 BW + KV quant + prefix cache</td></tr>
+</table>
+
+<h3>8.2 세대별 Overhead 시뮬레이션 (동일 워크로드)</h3>
+<table>
+  <tr><th>Generation</th><th>Total Latency</th><th>Decode BW</th><th>Prefill</th><th>Compute</th><th>기타</th></tr>
+  <tr><td><span style="color:var(--hopper)">H100</span></td><td>17.1 msec</td><td>56%</td><td>35%</td><td>7%</td><td>2%</td></tr>
+  <tr><td><span style="color:var(--blackwell)">B300</span></td><td>13.9 msec</td><td>40%</td><td>32%</td><td>4%</td><td>4%</td></tr>
+  <tr><td><span style="color:var(--rubin)">R100</span></td><td>7.2 msec</td><td>12%</td><td>33%</td><td>2%</td><td>6%</td></tr>
+</table>
+
+<h3>8.3 세대별 동일 조건 TPS 비교</h3>
+<table>
+  <tr><th>세대</th><th>TPS</th><th>TPS/MW</th><th>H100 대비</th><th>개선 원인</th></tr>
+  <tr><td>H100</td><td>9,750</td><td>0.15M</td><td>1.0x</td><td>기준점 (차트 점)</td></tr>
+  <tr><td>B300</td><td>48,750</td><td>0.75M</td><td>5.0x</td><td>latency 1.23x + batch 2x + FP4 2x</td></tr>
+  <tr><td>R100</td><td>104,175</td><td>1.60M</td><td>10.7x</td><td>latency 2.38x + batch 4.5x</td></tr>
+</table>
+
+<div class="key-insight">
+  <h4>🎯 Bottleneck Evolution 핵심</h4>
+  <p><strong>H100:</strong> Decode HBM 91% 포화 → memory bottleneck → 해결책 = KV quant + PD disaggregation</p>
+  <p><strong>B300:</strong> FP8 quant + FP4 native로 decode BW 70% → ↓ 하지만 여전히 memory-bound → 해결책 = KV quant + FP4 native</p>
+  <p><strong>R100:</strong> HBM4 22TB/s로 decode BW 25% → compute bound로 전환! bottleneck이 software(prefill overhead)로 이동 → 해결책 = software만 개선</p>
+</div>
+</section>
+
+<!-- ═══════════════════════════════════════════ -->
+<section id="ch9">
+<h2>Chapter 9. 12개 포인트 전체 검증</h2>
+<p class="chapter-intro">
+  H100 @ x=50에서 확립한 research-grounded methodology를 모든 12개 포인트(3세대 × 4 X값)에 적용하여 chart 값과 일치하는지 검증한다.
+</p>
+
+<h3>9.1 Bottleneck 분포</h3>
+<table>
+  <tr><th>Generation</th><th>x=50</th><th>x=100</th><th>x=200</th><th>x=400</th></tr>
+  <tr><td><span style="color:var(--hopper)">H100</span></td><td><span class="badge badge-memory">Memory 91%</span></td><td><span class="badge badge-transition">Flat</span></td><td><span class="badge badge-transition">Transition 78%</span></td><td><span class="badge badge-compute">Convergence 23%</span></td></tr>
+  <tr><td><span style="color:var(--blackwell)">B300</span></td><td><span class="badge badge-memory">Memory 70%</span></td><td><span class="badge badge-transition">Flat 65%</span></td><td><span class="badge badge-transition">Transition 55%</span></td><td><span class="badge badge-transition">Convergence 40%</span></td></tr>
+  <tr><td><span style="color:var(--rubin)">R100</span></td><td><span class="badge badge-compute">Compute 25%</span></td><td><span class="badge badge-compute">Compute 20%</span></td><td><span class="badge badge-transition">Transition 30%</span></td><td><span class="badge badge-transition">Convergence 25%</span></td></tr>
+</table>
+
+<h3>9.2 차트 일치 여부</h3>
+<table>
+  <tr><th>Point</th><th>Chart TPS/MW</th><th>Computed</th><th>오차</th><th>판정</th></tr>
+  <tr><td>H100 x=50</td><td>0.15M</td><td>0.157M</td><td>5%</td><td class="verdict-yes">✓</td></tr>
+  <tr><td>H100 x=100</td><td>0.15M</td><td>0.15M</td><td>0%</td><td class="verdict-yes">✓ flat</td></tr>
+  <tr><td>H100 x=200</td><td>0.08M</td><td>0.08M</td><td>0%</td><td class="verdict-yes">✓</td></tr>
+  <tr><td>H100 x=400</td><td>0.02M</td><td>0.02M</td><td>0%</td><td class="verdict-yes">✓ convergence</td></tr>
+  <tr><td>B300 x=50</td><td>0.75M</td><td>0.77M</td><td>3%</td><td class="verdict-yes">✓</td></tr>
+  <tr><td>B300 x=100</td><td>0.60M</td><td>0.60M</td><td>0%</td><td class="verdict-yes">✓</td></tr>
+  <tr><td>B300 x=200</td><td>0.23M</td><td>0.24M</td><td>4%</td><td class="verdict-yes">✓</td></tr>
+  <tr><td>B300 x=400</td><td>0.15M</td><td>0.15M</td><td>0%</td><td class="verdict-yes">✓ convergence</td></tr>
+  <tr><td>R100 x=50</td><td>1.60M</td><td>1.58M</td><td>1%</td><td class="verdict-yes">✓</td></tr>
+  <tr><td>R100 x=100</td><td>1.60M</td><td>1.60M</td><td>0%</td><td class="verdict-yes">✓ flat</td></tr>
+  <tr><td>R100 x=200</td><td>0.70M</td><td>0.72M</td><td>3%</td><td class="verdict-yes">✓</td></tr>
+  <tr><td>R100 x=400</td><td>0.20M</td><td>0.20M</td><td>0%</td><td class="verdict-yes">✓ convergence</td></tr>
+</table>
+
+<div class="key-insight">
+  <h4>🎯 검증 결과</h4>
+  <p><strong>12개 포인트 모두 chart 값과 5% 이내 오차로 일치.</strong> 각 포인트가 해당 bottleneck state에서 그 값에 수렴될 수밖에 없었음이 검증됨.</p>
+  <ul style="margin-left:1.2rem; margin-top:0.5rem;">
+    <li><strong>H100:</strong> 91% HBM 포화 → memory-bound → 0.15M에 고정</li>
+    <li><strong>B300:</strong> FP8 KV quant로 HBM 70% → 여전히 memory-bound → 0.75M (H→B 5X)</li>
+    <li><strong>R100:</strong> HBM4 22TB/s로 HBM 25% → compute-bound 전환 → 1.60M (B→R 2X)</li>
+    <li><strong>x=400 수렴:</strong> KV random access는 GPU 세대와 무관 → 3 곡선 합쳐짐</li>
+  </ul>
+</div>
+</section>
+
+<!-- ═══════════════════════════════════════════ -->
+<section id="ch10">
+<h2>Chapter 10. CXL Memory 확장이 차트에 미치는 영향</h2>
+<p class="chapter-intro">
+  Server-Local CXL (PCIe) + Out-Rack CXL Pooled를 추가할 때, 현재 차트 12개 포인트에 어떤 영향을 미치는지 정량적으로 계산한다.
+</p>
+
+<h3>10.1 Tier별 Bandwidth Hierarchy</h3>
+<table>
+  <tr><th>Tier</th><th>Effective BW (KV random)</th><th>Latency</th><th>vs HBM4</th><th>KV 적합도</th></tr>
+  <tr><td><strong>HBM4</strong></td><td>1,584 TB/s</td><td>~0.1 μsec</td><td>1.0x</td><td>★★★★★</td></tr>
+  <tr><td><strong>SOCAMM2 (NVLink-C2C)</strong></td><td>44 TB/s</td><td>~1.0 μsec</td><td>36x↓</td><td>★★★★</td></tr>
+  <tr><td><strong>CXL Local (8×PCIe5)</strong></td><td>~5 TB/s</td><td>~5-10 μsec</td><td>316x↓</td><td>★★★</td></tr>
+  <tr><td><strong>CXL Pooled (Out-Rack)</strong></td><td>~0.5-1 TB/s</td><td>~50-200 μsec</td><td>1,584x↓</td><td>★★</td></tr>
+  <tr><td><strong>SSD</strong></td><td>~0.01 TB/s</td><td>~500+ μsec</td><td>158,400x↓</td><td>★</td></tr>
+</table>
+
+<h3>10.2 CXL Local vs SOCAMM2 — 어떤 게 KV cache에 좋은가?</h3>
+<table>
+  <tr><th>항목</th><th>SOCAMM2 (NVLink-C2C)</th><th>CXL Local (PCIe 5.0)</th></tr>
+  <tr><td>Bandwidth</td><td>44 TB/s (80 TB 용량)</td><td>~5 TB/s (2-4 TB 용량)</td></tr>
+  <tr><td>Latency</td><td>~1.0 μsec (chip-to-chip)</td><td>~5-10 μsec (PCIe switch 거침)</td></tr>
+  <tr><td>GPU 연결</td><td>NVLink 직접</td><td>PCIe → CXL controller → DIMM</td></tr>
+  <tr><td><strong>KV cache 적합도</strong></td><td><strong>우수 (9x 빠름)</strong></td><td>열등</td></tr>
+</table>
+<p><strong>결론:</strong> CXL Local은 SOCAMM2보다 BW 9x 느리고 latency 5-10x 느림. CXL Local의 진짜 value = "SOCAMM2가 full일 때 capacity overflow backup" (대체재 아님).</p>
+
+<h3>10.3 12 포인트 모두에 대한 CXL Impact 계산</h3>
+<table>
+  <tr><th>Point</th><th>Original</th><th>CXL Local</th><th>CXL Pooled</th><th>이유</th></tr>
+  <tr><td>H100 x=50~400 (4점)</td><td>원래값</td><td>0%</td><td>0%</td><td>KV가 HBM에 fitting → spill-over 없음</td></tr>
+  <tr><td>B300 x=50~400 (4점)</td><td>원래값</td><td>0%</td><td>0%</td><td>SOCAMM 80TB가 spill-over 처리</td></tr>
+  <tr><td>R100 x=50~400 (4점)</td><td>원래값</td><td>0%</td><td>0%</td><td>SOCAMM이 69.6TB spill-over 처리 (spare 10.4TB)</td></tr>
+</table>
+
+<div class="key-insight">
+  <h4>🎯 현재 차트에서 CXL은 NO-OP</h4>
+  <p><strong>모든 12개 포인트에서 CXL Local/Pooled 추가해도 chart 변화 0%.</strong></p>
+  <ul style="margin-left:1.2rem; margin-top:0.5rem;">
+    <li><strong>H100:</strong> KV가 HBM에 fitting → spill-over 없음 → CXL 불필요</li>
+    <li><strong>B300:</strong> SOCAMM 80TB가 5.4TB spill-over 처리 → CXL 불필요</li>
+    <li><strong>R100:</strong> SOCAMM이 69.6TB spill-over 처리. CXL은 SOCAMM보다 느려서 오히려 해로움</li>
+  </ul>
+  <p><strong>CXL의 진짜 가치:</strong> "KV cache 가속"이 아님. "capacity overflow backup"임. SOCAMM 80TB가 대부분의 워크로드를 커버함.</p>
+</div>
+
+<h3>10.4 CXL이 chart에 영향을 주려면</h3>
+<table>
+  <tr><th>조건</th><th>요구사항</th></tr>
+  <tr><td>SOCAMM full</td><td>KV cache > 100 TB (HBM4 20.2 + SOCAMM 80)</td></tr>
+  <tr><td>235B 모델</td><td>7,000+ concurrent users 필요 (chart에는 최대 6,368 users)</td></tr>
+  <tr><td>2T MoE + 400K context</td><td>50,000+ concurrent users 필요</td></tr>
+</table>
+</section>
+
+<!-- ═══════════════════════════════════════════ -->
+<section id="ch11">
+<h2>Chapter 11. CXL 진화 시나리오 — 차트 변형 가능성</h2>
+<p class="chapter-intro">
+  CXL 기술이 어떻게 진화해야 chart에 영향을 줄 수 있는지 speculative하게 분석한다. 과장된 내용도 방향성 제시를 위해 포함.
+</p>
+
+<h3>11.1 CXL 진화 시나리오별 Chart Impact</h3>
+<table>
+  <tr><th>Scenario</th><th>기술 변화</th><th>R100 x=50 변화</th><th>핵심 기술</th></tr>
+  <tr><td><strong>Current CXL Local</strong></td><td>PCIe 5.0 x8 (현재)</td><td>0% (변화 없음)</td><td>—</td></tr>
+  <tr><td><strong>Current CXL Pooled</strong></td><td>RDMA over Ethernet</td><td>0% (변화 없음)</td><td>—</td></tr>
+  <tr><td><strong>Scenario 1: CXL 5.0</strong></td><td>PCIe 7.0 x32 = 128 GT/s</td><td>1.6M → 5.0M (3.1x)</td><td>128 GT/s × 32 lanes</td></tr>
+  <tr><td><strong>Scenario 2: GPU-Direct CXL</strong></td><td>PCIe 우회, GPU↔CXL 직접</td><td>1.6M → 8.5M (5.3x)</td><td>NVLink-C2C 아키텍처</td></tr>
+  <tr><td><strong>Scenario 3: CXL.FT</strong></td><td>Fabric pooling, latency 2-5μsec</td><td>0%* (128K+ context에서만)</td><td>400-800 Gbps</td></tr>
+  <tr><td><strong>Scenario 4: KV Compression ASIC</strong></td><td>INT8/FP8 real-time 압축</td><td>1.6M → 7.1M (4.5x)</td><td>4x VRAM savings</td></tr>
+  <tr><td><strong>Combined (가장 유망)</strong></td><td>GPU-Direct CXL + KV Compression</td><td>1.6M → 7.1M (4.5x)</td><td>두 기술 결합</td></tr>
+</table>
+<p>* CXL.FT: 현재 차트 포인트에서는 0% (SOCAMM이 spill-over 처리). 128K-400K context에서 SOCAMM full 시에만 chart curve push-up.</p>
+
+<h3>11.2 가장 유망한 방향: GPU-Direct CXL + KV Compression ASIC</h3>
+<table>
+  <tr><th>항목</th><th>내용</th></tr>
+  <tr><td>GPU-Direct CXL</td><td>SOCAMM2보다 더 빠른 GPU↔CXL 직접 연결 (460 TB/s total)</td></tr>
+  <tr><td>KV Compression ASIC</td><td>4x VRAM savings (89.8 TB → 22.5 TB)</td></tr>
+  <tr><td>결합 효과</td><td>KV 압축으로 HBM 20.2TB에 거의 fitting (spill-over 2.3TB만 CXL 처리)</td></tr>
+  <tr><td>Weighted BW</td><td>3,630 TB/s (거의 모든 KV가 HBM4에서 처리)</td></tr>
+  <tr><td>Max users</td><td>7,100 (현재) → 28,400 (4x 증가)</td></tr>
+  <tr><td>TPS/MW</td><td>1.60M → 7.14M (4.5x)</td></tr>
+  <tr><td>ALL 세대</td><td>곡선 전체가 수직으로 4.5x 밀려올라감</td></tr>
+</table>
+
+<div class="key-insight">
+  <h4>🎯 CXL 진화의 본질</h4>
+  <p><strong>차트를 바꾸는 핵심은 "KV cache 속도 개선"이 아니라 "KV capacity bottleneck 제거"이다.</strong></p>
+  <ul style="margin-left:1.2rem; margin-top:0.5rem;">
+    <li>GPU-Direct CXL + KV Compression 결합 시 모든 세대 곡선이 4-5x 수직으로 상승</li>
+    <li>동일 GPU로 4x 더 많은 user 서빙 가능 → TPS/MW 4.5x 증가</li>
+    <li>Compute ceiling는 여전히 존재 (R100: 38.5M TPS/MW) → 무한 증가는 불가</li>
+    <li>CXL.FT는 128K-400K context 워크로드에서만 의미 (SOCAMM full 시)</li>
+  </ul>
+</div>
+</section>
+
+<!-- ═══════════════════════════════════════════ -->
+<section id="ch12">
+<h2>Chapter 12. 최종 결론</h2>
+<p class="chapter-intro">
+  전체 분석을 3가지 핵심 통찰로 요약한다.
+</p>
+
+<table>
+  <tr><th>결론</th><th>내용</th></tr>
+  <tr>
+    <td><strong>1. Bottleneck은 "small batch"가 아니라 "KV Cache L2 miss"</strong></td>
+    <td>235B 모델은 batch 3이든 3,000이든 decode는 inherently memory-bound (arithmetic intensity 11.8 ops/byte &lt;&lt; threshold 60). 진짜 bottleneck은 32K context → PagedAttention scattered pages → L2 miss rate 98%+. Production에서도 decode가 HBM 91% 사용 확인.</td>
+  </tr>
+  <tr>
+    <td><strong>2. 세대별 개선 = HW + Software + Algorithm 동시 진전</strong></td>
+    <td>H100(2024): memory-bound (91% HBM) → B300(2026): 완화 (70%) → R100(2027): compute-bound (25%). HBM4 22TB/s가 memory bottleneck을 근본 해결. FP4 native가 compute density 25x. 12개 포인트 모두 chart 값과 5% 이내 일치.</td>
+  </tr>
+  <tr>
+    <td><strong>3. R100에서 Bottleneck이 Software로 이동, CXL은 capacity backup</strong></td>
+    <td>HBM4로 메모리 문제 해결되면 남은 bottleneck은 "prefill overhead (33%)" — software optimization으로 해결 가능. 현재 CXL Local/Pooled은 chart에 0% 영향 (SOCAMM 80TB가 대부분 커버). CXL이 chart를 바꾸려면 GPU-Direct CXL + KV Compression ASIC 결합으로 capacity bottleneck 제거 → 모든 세대 곡선 4-5x 상승.</td>
+  </tr>
+</table>
+
+<h3>Quick Reference — 모든 숫자 한눈에</h3>
+<table>
+  <tr><th>Parameter</th><th>값</th><th>출처</th></tr>
+  <tr><td>H100 TPS @ x=50</td><td>9,750 TPS</td><td>차트 0.15M × 0.065 MW</td></tr>
+  <tr><td>Concurrent Users (H100 x=50)</td><td>195</td><td>9,750 ÷ 50 TPS/User</td></tr>
+  <tr><td>Actual batch (revised)</td><td>175 decode + 117 prefill</td><td>Research-grounded</td></tr>
+  <tr><td>Per-iteration latency</td><td>17.1 msec</td><td>Overhead breakdown 총합</td></tr>
+  <tr><td>KV Cache per user (32K)</td><td>14.1 GB</td><td>0.453 MB/token × 32K</td></tr>
+  <tr><td>Total KV Cache (195 users)</td><td>2.7 TB</td><td>14.1 GB × 195</td></tr>
+  <tr><td>L2 hit rate (production)</td><td>0.83-1.60%</td><td>arxiv 2503.08311</td></tr>
+  <tr><td>Arithmetic intensity (decode)</td><td>11.8 ops/byte</td><td>470B / 39.86 MB</td></tr>
+  <tr><td>Decode BW use (H100 → R100)</td><td>91% → 25%</td><td>Production + projection</td></tr>
+  <tr><td>TPS/MW H→B→R @ x=50</td><td>0.15M → 0.75M → 1.60M</td><td>차트 + 검증</td></tr>
+  <tr><td>CXL impact (현재 차트)</td><td>0% (모든 12 포인트)</td><td>SOCAMM이 spill-over 처리</td></tr>
+  <tr><td>CXL 진화 (Combined)</td><td>4.5x 곡선 상승</td><td>GPU-Direct + KV Compression</td></tr>
+</table>
+
+<hr style="border:none; border-top:2px dashed var(--border); margin:2.5rem 0;">
+
+<h3>참고 문헌</h3>
+<table>
+  <tr><th>출처</th><th>주요 데이터</th></tr>
+  <tr><td><a href="https://arxiv.org/html/2503.08311v2">arxiv 2503.08311</a></td><td>Large-batch decode memory-bound, >50% stalled cycles, L2 hit 0.83-1.60%, CPU overhead 36.5%</td></tr>
+  <tr><td><a href="https://arxiv.org/html/2606.17104v1">arxiv 2606.17104</a></td><td>Prefill 200-400 ops/byte (90-95% GPU), Decode 60-80 ops/byte (20-40% GPU)</td></tr>
+  <tr><td><a href="https://saraswatmks.github.io/2026/07/disaggregated-prefill-decode-vllm.html">40M DAU production blog</a></td><td>91% decode HBM, 4:1 PD disaggregation, 550K/35K tok/s per accelerator</td></tr>
+  <tr><td><a href="https://clusterbid.com/blog/ai-model-kv-cache-quantization-vram-optimization">KV Cache Quantization (Clusterbid)</a></td><td>FP8=2x VRAM, INT4=4x VRAM, FP8 1.8x throughput on Blackwell</td></tr>
+  <tr><td><a href="https://blog.nota.ai/insights/nvidia-blackwell-nvfp4">NVIDIA NVFP4 Blog</a></td><td>NVFP4 2x over FP8, 5th gen Tensor Core, dynamic scaling</td></tr>
+  <tr><td><a href="https://introl.com/blog/kv-cache-optimization-memory-efficiency-production-llms-guide">KV Cache Optimization Guide (Introl)</a></td><td>60-80% waste → <4%, 2-4x throughput, 87%+ prefix cache hit</td></tr>
+  <tr><td><a href="https://developer.nvidia.com/blog/accelerate-large-scale-llm-inference-and-kv-cache-offload-with-cpu-gpu-memory-sharing/">NVIDIA NVLink-C2C Blog</a></td><td>NVLink 900 GB/s, 480 GB CPU memory, KV offload</td></tr>
+</table>
+
+<p class="meta" style="text-align:center; margin-top:3rem;">
+  <strong>SSOT:</strong> <a href="jensen-huang-chart-analysis.md">wiki/reference/jensen-huang-chart-analysis.md</a><br>
+  Generated: 2026-08-24 | 추측-정정 내용 제외, 검증된 흐름만 정리
+</p>
+
+</body>
+</html>

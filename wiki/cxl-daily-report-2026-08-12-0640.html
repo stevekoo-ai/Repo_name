@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CXL Daily Update — 2026-08-12</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      colors: {
+        canvas: '#f5f5f7',
+        ink: '#1d1d1f',
+        sub: '#6e6e73',
+        indigo: { DEFAULT: '#4f46e5', glow: '#6366f1' },
+      },
+      fontFamily: {
+        sans: ['-apple-system', 'BlinkMacSystemFont', 'SF Pro Display', 'Segoe UI', 'Roboto', 'sans-serif'],
+      },
+    }
+  }
+}
+</script>
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', sans-serif; }
+  .card { transition: transform .2s ease, box-shadow .2s ease; }
+  .card:hover { transform: translateY(-3px); box-shadow: 0 10px 30px -10px rgba(79,70,229,.25), 0 0 0 1px rgba(79,70,229,.15); }
+  .row:hover { background: #eef2ff; }
+  .pill { display:inline-block; padding:2px 10px; border-radius:9999px; font-size:12px; font-weight:600; }
+  .fade-in { animation: fade .5s ease both; }
+  @keyframes fade { from { opacity:0; transform: translateY(6px);} to {opacity:1; transform:none;} }
+  .glow { box-shadow: 0 0 0 1px rgba(79,70,229,.2), 0 8px 24px -8px rgba(79,70,229,.3); }
+</style>
+</head>
+<body class="bg-canvas text-ink font-sans antialiased">
+
+<div class="max-w-6xl mx-auto px-6 py-10">
+
+  <!-- HERO -->
+  <header class="fade-in mb-8">
+    <div class="flex items-center gap-2 text-sub text-sm mb-2">
+      <span class="pill bg-indigo/10 text-indigo">CXL 상품기획 프로젝트</span>
+      <span>Daily Update 6호</span>
+      <span>·</span>
+      <span>2026-08-12 06:40 KST</span>
+    </div>
+    <h1 class="text-4xl font-bold tracking-tight mb-2">CXL Daily Intelligence</h1>
+    <p class="text-sub text-lg">XCENA MX1 프로덕션 라인업(FMS Intel 부스)이 벤더 생태에 신규 진입 — Hyperscaler CapEx $725B 정밀화와 SK Hynix 1c DRAM node vs Samsung yield 양극화가 CXL 미디어 공급 구도를 재편</p>
+  </header>
+
+  <!-- 한 줄 진단 -->
+  <section class="fade-in mb-8 p-5 rounded-2xl bg-white glow border border-indigo/10">
+    <div class="flex items-start gap-3">
+      <div class="text-2xl">🎯</div>
+      <div>
+        <div class="text-xs uppercase tracking-wider text-sub font-semibold mb-1">한 줄 진단</div>
+        <p class="text-ink leading-relaxed">XCENA MX1 프로덕션 라인업(FMS Intel 부스 공동 전시)이 DRAFT 3장 컨트롤러 벤더 테이블에 신규 진입해야 할 핵심 엔트리가 된 가운데, Hyperscaler CapEx $725B(8개 소스 일관)의 벤더별 정밀화와 SK Hynix 1c DRAM node 급가속이 CXL 미디어 공급의 구도를 재편. Micron 346% 매출 급등은 3사의 장기 CXL 투자 여력 확인.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 헤드라인 타일 -->
+  <section class="fade-in grid grid-cols-1 md:grid-cols-2 gap-4 mb-10">
+    <div class="card p-5 rounded-2xl bg-white border border-gray-200">
+      <div class="flex items-center justify-between mb-2">
+        <span class="pill bg-red-50 text-red-600">★★★</span>
+        <span class="text-xs text-sub">카테고리 3 · 컨트롤러 벤더</span>
+      </div>
+      <h3 class="font-semibold mb-1">XCENA MX1 프로덕션 라인업 (FMS Intel 부스)</h3>
+      <p class="text-sm text-sub">"CXL-based memory architecture for AI inference at scale". RISC-V 수천 코어 컴퓨테이셔널 메모리.</p>
+    </div>
+    <div class="card p-5 rounded-2xl bg-white border border-gray-200">
+      <div class="flex items-center justify-between mb-2">
+        <span class="pill bg-red-50 text-red-600">★★★</span>
+        <span class="text-xs text-sub">카테고리 12 · 시장/CSP</span>
+      </div>
+      <h3 class="font-semibold mb-1">Hyperscaler CapEx $725B — 벤더별 정밀화</h3>
+      <p class="text-sm text-sub">Am~$200B/Ms~$190B/Go~$205B/Meta~$145B. +77% YoY. 8개 소스 일관. 60%+가 전력 인프라.</p>
+    </div>
+    <div class="card p-5 rounded-2xl bg-white border border-gray-200">
+      <div class="flex items-center justify-between mb-2">
+        <span class="pill bg-amber-50 text-amber-600">★★</span>
+        <span class="text-xs text-sub">카테고리 11 · 가격/실적</span>
+      </div>
+      <h3 class="font-semibold mb-1">SK Hynix 1c DRAM node vs Samsung HBM4 yield</h3>
+      <p class="text-sm text-sub">공급 양극화. SK=추론 DRAM 확대, 삼성=HBM4 수율. Micron 346% 매출 급등, 주가 +16%.</p>
+    </div>
+    <div class="card p-5 rounded-2xl bg-white border border-gray-200">
+      <div class="flex items-center justify-between mb-2">
+        <span class="pill bg-amber-50 text-amber-600">★★</span>
+        <span class="text-xs text-sub">카테고리 11 · 가격/실적</span>
+      </div>
+      <h3 class="font-semibold mb-1">Micron 346% 매출 급등</h3>
+      <p class="text-sm text-sub">주가 +16% after hours. 3사 CXL 장기 투자 여력 충분. SK Hynix ~$28B US financing.</p>
+    </div>
+  </section>
+
+  <!-- NVIDIA Dynamo Digest -->
+  <section class="fade-in mb-10 p-5 rounded-2xl bg-white border border-gray-200">
+    <div class="flex items-center gap-2 mb-3">
+      <span class="text-xl">🟢</span>
+      <h2 class="text-lg font-semibold">NVIDIA Dynamo Blog Digest</h2>
+      <span class="pill bg-gray-100 text-sub ml-auto">전체 6 · NEW 0 · UPDATED 0</span>
+    </div>
+    <p class="text-sm text-sub mb-3">이번 발행 이후 신규 게시물 없음. KV offload/추론 인프라 새 신호 없음. 가장 최근: 6/12 "Full-Stack Optimizations for Agentic Inference with Dynamo".</p>
+    <div class="space-y-1.5 text-sm">
+      <div class="row px-2 py-1 rounded flex gap-3"><span class="text-sub w-24 shrink-0">Jun 12, 2026</span><a class="text-indigo hover:underline" href="https://docs.nvidia.com/dynamo/dev/digest/agentic-inference">Full-Stack Optimizations for Agentic Inference with Dynamo</a></div>
+      <div class="row px-2 py-1 rounded flex gap-3"><span class="text-sub w-24 shrink-0">May 29, 2026</span><a class="text-indigo hover:underline" href="https://docs.nvidia.com/dynamo/dev/digest/dynosim-pareto-frontier">DynoSim: Simulating the Pareto Frontier</a></div>
+      <div class="row px-2 py-1 rounded flex gap-3"><span class="text-sub w-24 shrink-0">May 28, 2026</span><a class="text-indigo hover:underline" href="https://docs.nvidia.com/dynamo/dev/digest/dynamo-snapshot-fast-startup">Dynamo Snapshot: Fast Startup on Kubernetes</a></div>
+      <div class="row px-2 py-1 rounded flex gap-3"><span class="text-sub w-24 shrink-0">May 6, 2026</span><a class="text-indigo hover:underline" href="https://docs.nvidia.com/dynamo/dev/digest/tokenspeed-day-0">Dynamo Day 0 support for TokenSpeed</a></div>
+      <div class="row px-2 py-1 rounded flex gap-3"><span class="text-sub w-24 shrink-0">Apr 30, 2026</span><a class="text-indigo hover:underline" href="https://docs.nvidia.com/dynamo/dev/digest/agentic-harnesses">Streaming Tokens and Tools: Agentic Harness Support</a></div>
+      <div class="row px-2 py-1 rounded flex gap-3"><span class="text-sub w-24 shrink-0">Feb 23, 2026</span><a class="text-indigo hover:underline" href="https://docs.nvidia.com/dynamo/dev/digest/flash-indexer">Flash Indexer: Inter-Galactic KV Routing</a></div>
+    </div>
+  </section>
+
+  <!-- 거시 -->
+  <section class="fade-in mb-10">
+    <h2 class="text-xl font-semibold mb-3">🌐 거시 맥락</h2>
+    <div class="p-5 rounded-2xl bg-white border border-gray-200 text-sm leading-relaxed text-ink">
+      <p class="mb-2"><span class="font-semibold text-green-700">[변경] 🟢 자동화(사실층):</span> XCENA MX1 프로덕션 라인업(FMS 2026 Intel 부스). Hyperscaler CapEx $725B 확정(8개 소스 일관). SK Hynix 1c DRAM node vs Samsung HBM4 yield 양극화. Micron 346% 매출 급등. JEDEC LPDDR6 512GB SOCAMM2.</p>
+      <p class="mb-2"><span class="font-semibold text-red-700">[영향] 🔴 LLM 종합(해석층):</span> XCENA MX1은 DRAFT 3장 벤더 테이블에 추가해야 할 핵심 엔트리 — 컴퓨테이셔널 메모리 + KV cache 오프로드 컨셉을 프로덕션 단계로 끌어올림. CapEx $725B는 60%+가 전력 인프라에 집중되어 실제 풀링 장비 할당량은 하향. CXL 풀링 채택 자체에는 긍정(데이터센터 확장 필요조건)이나 타임라인에 간접 영향.</p>
+      <p><span class="font-semibold">한계:</span> XCENA MX1 single-source(DuckDuckGo 검색 요약). SK Hynix 1c 구체적 스펙 미확보. 풀링 SW(카테고리 4) WebFetch 429로 미확인.</p>
+    </div>
+  </section>
+
+  <!-- 12카테고리 delta 상세 -->
+  <section class="fade-in mb-10">
+    <h2 class="text-xl font-semibold mb-4">📊 12카테고리 delta 상세</h2>
+    <div class="space-y-4">
+
+      <!-- Delta 1 -->
+      <div class="card p-5 rounded-2xl bg-white border border-gray-200">
+        <div class="flex items-center gap-2 mb-3">
+          <span class="pill bg-red-50 text-red-600">★★★ Delta-1</span>
+          <h3 class="font-semibold">XCENA MX1 프로덕션 라인업 (FMS 2026, 8/6)</h3>
+          <span class="text-xs text-sub ml-auto">카테고리 3 · Intel 부스 공동 전시</span>
+        </div>
+        <div class="text-sm space-y-2">
+          <p><span class="font-semibold text-green-700">[변경] 🟢</span> XCENA(액시나): **MX1 프로덕션 라인업 발표**. FMS 2026 Intel 부스 공동 전시. "**New memory architecture for AI inference at scale and CXL-based memory architecture**". RISC-V 수천 코어 컴퓨테이셔널 메모리 컨트롤러, CXL 3.2 기반, KV cache 오프로드.</p>
+          <p><span class="font-semibold text-red-700">[영향] 🔴</span> DRAFT 3장 벤더 테이블에 XCENA MX1 프로덕션 사실 반영 필요. 1호~5호에서 "Axaina→XCENA" 정정 완료. Intel 부스 공동 전시는 CXL 생태 내 Intel 협력 심화 의미. **★★★: 벤더 생태 신규 진입.** (단일 출처 — DuckDuckGo 검색 요약, 원문 press release URL 미확보)</p>
+          <div class="bg-gray-50 rounded p-3 font-mono text-xs"><span class="font-semibold text-red-700">[액션]</span> DRAFT 3장 XCENA 행 — 기존: "2026 양산" → 변경: "MX1 프로덕션 라인업(FMS Intel 부스), CXL-based memory architecture for AI inference at scale ⬆️(6호 delta-1)"</div>
+        </div>
+      </div>
+
+      <!-- Delta 2 -->
+      <div class="card p-5 rounded-2xl bg-white border border-gray-200">
+        <div class="flex items-center gap-2 mb-3">
+          <span class="pill bg-amber-50 text-amber-600">★★ Delta-2</span>
+          <h3 class="font-semibold">Hyperscaler CapEx $725B — 벤더별 정밀화</h3>
+          <span class="text-xs text-sub ml-auto">카테고리 12 · 8개 소스 교차검증</span>
+        </div>
+        <div class="text-sm space-y-2">
+          <p><span class="font-semibold text-green-700">[변경] 🟢</span> 합산: **$725B**(8개 이상 8월 소스 일관). 벤더별: **Amazon ~$200B / Microsoft ~$190B / Google $205B / Meta $145B**. **+77% YoY**(2025 $410B 대비). **NextWaves Insight: "60%+가 전력 인프라, 칩 아님"**. Q1 P&E $433.9B vs D&A $149B 격차.</p>
+          <p><span class="font-semibold text-red-700">[영향] 🔴</span> DRAFT 11.2장 "$600-770B" 범위를 $725B로 확정. **핵심: CapEx 60%+가 전력/냉각/그리드** → 하드웨어/풀링 장비 직접 할당량은 더 작을 수 있음. 데이터센터 확장 = CXL 필요조건이나 타임라인에 간접 영향. 8개 소스 교차검증 — 높은 신뢰.</p>
+          <div class="bg-gray-50 rounded p-3 font-mono text-xs"><span class="font-semibold text-red-700">[액션]</span> DRAFT 11.2절 — 기존: "$725-785B(+77% YoY), 벤더별 분해 미확보" → 변경: "$725B, Am~200B/Ms~190B/Go~205B/Meta~145B, 60%+ 전력 인프라 ⬆️(6호 delta-2)"</div>
+        </div>
+      </div>
+
+      <!-- Delta 3 -->
+      <div class="card p-5 rounded-2xl bg-white border border-gray-200">
+        <div class="flex items-center gap-2 mb-3">
+          <span class="pill bg-amber-50 text-amber-600">★★ Delta-3</span>
+          <h3 class="font-semibold">SK Hynix 1c DRAM node vs Samsung HBM4 yield</h3>
+          <span class="text-xs text-sub ml-auto">카테고리 11 · 단일 출처</span>
+        </div>
+        <div class="text-sm space-y-2">
+          <p><span class="font-semibold text-green-700">[변경] 🟢</span> SK Hynix: **1c DRAM node aggressive ramp** (AI inference front-running). Samsung: **HBM4 yield recovery** 집중. 공급 리스크 양극화.</p>
+          <p><span class="font-semibold text-red-700">[영향] 🔴</span> CXL DDR5 모듈 원물 공급에서 SK Hynix 우위 지속 가능성. DRAM 공정 우위가 CXL 미디어 원가 경쟁력으로 이어질 수 있음. (단일 출처 — 1c 구체적 스펙 미확보)</p>
+          <div class="bg-gray-50 rounded p-3 font-mono text-xs"><span class="font-semibold text-red-700">[액션]</span> DRAFT 10.4절/11.3절 — 기존: "3사 capex 지속" → 변경: "SK 1c DRAM node ramp vs Samsung HBM4 yield 양극화 ⬆️(6호 delta-3)"</div>
+        </div>
+      </div>
+
+      <!-- Delta 4 -->
+      <div class="card p-5 rounded-2xl bg-white border border-gray-200">
+        <div class="flex items-center gap-2 mb-3">
+          <span class="pill bg-amber-50 text-amber-600">★★ Delta-4</span>
+          <h3 class="font-semibold">Micron 346% 매출 급등, 주가 +16%</h3>
+          <span class="text-xs text-sub ml-auto">카테고리 11 · 단일 출처</span>
+        </div>
+        <div class="text-sm space-y-2">
+          <p><span class="font-semibold text-green-700">[변경] 🟢</span> Micron: **346% 매출 급등**. 주가: **+16% after hours**. SK Hynix ~$28B US financing.</p>
+          <p><span class="font-semibold text-red-700">[영향] 🔴</span> 3사 모두 CXL 미디어 장기 투자 재정적 여유 충분. DRAFT 10.4절 보강.</p>
+          <div class="bg-gray-50 rounded p-3 font-mono text-xs"><span class="font-semibold text-red-700">[액션]</span> DRAFT 10.4절 — 신규: "Micron 346% 매출 급등, 주가 +16%, 3사 재정적 여유 충분 ⬆️(6호 delta-4)"</div>
+        </div>
+      </div>
+
+      <!-- Delta 5 -->
+      <div class="card p-5 rounded-2xl bg-white border border-gray-200">
+        <div class="flex items-center gap-2 mb-3">
+          <span class="pill bg-gray-100 text-gray-600">★ Delta-5</span>
+          <h3 class="font-semibold">JEDEC LPDDR6 512GB SOCAMM2 preview</h3>
+          <span class="text-xs text-sub ml-auto">카테고리 8 · 3+ 소스 일관</span>
+        </div>
+        <div class="text-sm space-y-2">
+          <p><span class="font-semibold text-green-700">[변경] 🟢</span> JEDEC LPDDR6: **512GB 용량, SOCAMM2**. DDR6: 8.8~21 Gbps. CAMM2 데스크톱: up to 17.6 Gbps. LPDDR6 PIM 개발 중.</p>
+          <p><span class="font-semibold text-red-700">[영향] 🔴</span> CXL DDR5 기반 모듈의 상위 호환 미디어 — 용량/대역폭 증가가 CXL 풀링 미디어 선택에 영향. DRAFT 7장 보강.</p>
+          <div class="bg-gray-50 rounded p-3 font-mono text-xs"><span class="font-semibold text-red-700">[액션]</span> DRAFT 7장 — 기존: "DDR6 로드맵(2026+), 상세 미수집" → 변경: "LPDDR6 512GB SOCAMM2, DDR6 8.8~21 Gbps ⬆️(6호 delta-5)"</div>
+        </div>
+      </div>
+
+      <!-- Delta 6 -->
+      <div class="card p-5 rounded-2xl bg-white border border-gray-200">
+        <div class="flex items-center gap-2 mb-3">
+          <span class="pill bg-gray-100 text-gray-600">★ Delta-6</span>
+          <h3 class="font-semibold">StreamDQ: HBM 내 Weight DeQuantization</h3>
+          <span class="text-xs text-sub ml-auto">카테고리 10 · 단일 출처</span>
+        </div>
+        <div class="text-sm space-y-2">
+          <p><span class="font-semibold text-green-700">[변경] 🟢</span> **StreamDQ**(2026.07): Near-Memory Weight DeQuantization in Custom HBM — HBM bypass 경로 활용, 양자화 가중치 로드/언로드 제거.</p>
+          <p><span class="font-semibold text-red-700">[영향] 🔴</span> DRAFT 9.3절 "HBM 우회 경로" 가설을 뒷받침하는 학술적 진전. HBM 대역폭 효율화 → KV cache CXL 오프로드 필요성 일부 완화. 그러나 전반 CXL 수요에는 미미한 영향(가중치는 고정, KV cache는 동적).</p>
+          <div class="bg-gray-50 rounded p-3 font-mono text-xs"><span class="font-semibold text-red-700">[액션]</span> DRAFT 9.3절/9.4절 — 신규: "StreamDQ HBM 내 weight dequantization — 대역폭 효율화, CXL 수요 미미한 영향 ⬆️(6호 delta-6)"</div>
+        </div>
+      </div>
+
+      <!-- Delta 7 -->
+      <div class="card p-5 rounded-2xl bg-white border border-gray-200">
+        <div class="flex items-center gap-2 mb-3">
+          <span class="pill bg-gray-100 text-gray-600">★ Delta-7</span>
+          <h3 class="font-semibold">Hyperscaler CapEx 60%+ 전력 인프라</h3>
+          <span class="text-xs text-sub ml-auto">카테고리 12 · 단일 출처</span>
+        </div>
+        <div class="text-sm space-y-2">
+          <p><span class="font-semibold text-green-700">[변경] 🟢</span> "**Microsoft, Google, Amazon and Meta spend 60%+ on power, not chips**". 전력 인프라(그리드, 냉각, 배전) 집중. 2026 계획 12~16GW vs 실착공 5GW 괴리.</p>
+          <p><span class="font-semibold text-red-700">[영향] 🔴</span> DRAFT 11.2절 CapEx 분해에 전력 인프라 비중 반영. 전력 선결 = CXL 풀링 배포 필요 조건이나 타임라인 지연 가능성.</p>
+          <div class="bg-gray-50 rounded p-3 font-mono text-xs"><span class="font-semibold text-red-700">[액션]</span> DRAFT 11.2절 — 신규: "CapEx 60%+ 전력 인프라 집중, 착공률 괴리(계획 12~16GW vs 실착공 5GW) ⬆️(6호 delta-7)"</div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- 미변경 카테고리 -->
+  <section class="fade-in mb-10">
+    <h2 class="text-xl font-semibold mb-3">🔍 미변경 카테고리</h2>
+    <div class="overflow-hidden rounded-2xl border border-gray-200 bg-white">
+      <table class="w-full text-sm">
+        <thead class="bg-gray-50 text-sub text-xs uppercase tracking-wider">
+          <tr><th class="text-left px-4 py-3">카테고리</th><th class="text-left px-4 py-3">상태</th><th class="text-left px-4 py-3">비고</th></tr>
+        </thead>
+        <tbody class="divide-y divide-gray-100">
+          <tr class="row"><td class="px-4 py-2">1. CXL 스펙/표준</td><td class="px-4 py-2"><span class="pill bg-gray-100 text-gray-600">미변경</span></td><td class="px-4 py-2 text-sub">CXL Mini DevCon 8/3 이벤트. 스펙 변경 없음</td></tr>
+          <tr class="row"><td class="px-4 py-2">2. CXL 디바이스/미디어</td><td class="px-4 py-2"><span class="pill bg-gray-100 text-gray-600">미변경</span></td><td class="px-4 py-2 text-sub">SMART Modular CMM-E3S 기존 제품군</td></tr>
+          <tr class="row"><td class="px-4 py-2">4. 풀링 SW/어플라이언스</td><td class="px-4 py-2"><span class="pill bg-yellow-50 text-yellow-700">미확인</span></td><td class="px-4 py-2 text-sub">WebFetch 429, 5호 delta-1 유지</td></tr>
+          <tr class="row"><td class="px-4 py-2">5. 서버 OEM</td><td class="px-4 py-2"><span class="pill bg-gray-100 text-gray-600">미변경</span></td><td class="px-4 py-2 text-sub">Dell AI server 주가만. CXL 서버 신제품 없음</td></tr>
+          <tr class="row"><td class="px-4 py-2">6. CPU/GPU CXL</td><td class="px-4 py-2"><span class="pill bg-gray-100 text-gray-600">미변경</span></td><td class="px-4 py-2 text-sub">UALink 2026 말 하드웨어 기존 유지</td></tr>
+          <tr class="row"><td class="px-4 py-2">7. AI 패브릭</td><td class="px-4 py-2"><span class="pill bg-gray-100 text-gray-600">미변경</span></td><td class="px-4 py-2 text-sub">3-way rivalry 유지</td></tr>
+          <tr class="row"><td class="px-4 py-2">9. AI Rack/KV offload</td><td class="px-4 py-2"><span class="pill bg-gray-100 text-gray-600">미변경</span></td><td class="px-4 py-2 text-sub">Mooncake 5/27 업데이트 기존 유지</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- delta 매트릭스 -->
+  <section class="fade-in mb-10">
+    <h2 class="text-xl font-semibold mb-3">📈 delta 매트릭스</h2>
+    <div class="overflow-hidden rounded-2xl border border-gray-200 bg-white">
+      <table class="w-full text-sm">
+        <thead class="bg-gray-50 text-sub text-xs uppercase tracking-wider">
+          <tr><th class="text-left px-4 py-3">#</th><th class="text-left px-4 py-3">항목</th><th class="text-left px-4 py-3">기준선(5호)</th><th class="text-left px-4 py-3">오늘(8/12)</th><th class="text-left px-4 py-3">영향도</th></tr>
+        </thead>
+        <tbody class="divide-y divide-gray-100">
+          <tr class="row"><td class="px-4 py-2">1</td><td class="px-4 py-2">XCENA MX1 프로덕션 라인업</td><td class="px-4 py-2 text-sub">v0.5 기본</td><td class="px-4 py-2">Intel 부스 공동 전시, MX1 프로덕션</td><td class="px-4 py-2"><span class="pill bg-red-50 text-red-600">★★★</span></td></tr>
+          <tr class="row"><td class="px-4 py-2">2</td><td class="px-4 py-2">Hyperscaler CapEx</td><td class="px-4 py-2 text-sub">$725-785B</td><td class="px-4 py-2">$725B 확정, 벤더별, 60%+ 전력</td><td class="px-4 py-2"><span class="pill bg-amber-50 text-amber-600">★★</span></td></tr>
+          <tr class="row"><td class="px-4 py-2">3</td><td class="px-4 py-2">SK vs Samsung HBM4</td><td class="px-4 py-2 text-sub">5호 delta-5 연장</td><td class="px-4 py-2">1c DRAM node vs yield 양극화</td><td class="px-4 py-2"><span class="pill bg-amber-50 text-amber-600">★★</span></td></tr>
+          <tr class="row"><td class="px-4 py-2">4</td><td class="px-4 py-2">Micron 346% 매출 급등</td><td class="px-4 py-2 text-sub">미반영</td><td class="px-4 py-2">주가 +16%, 3사 투자 여력</td><td class="px-4 py-2"><span class="pill bg-amber-50 text-amber-600">★★</span></td></tr>
+          <tr class="row"><td class="px-4 py-2">5</td><td class="px-4 py-2">JEDEC LPDDR6</td><td class="px-4 py-2 text-sub">상세 미수집</td><td class="px-4 py-2">512GB SOCAMM2, DDR6 8.8~21G</td><td class="px-4 py-2"><span class="pill bg-gray-100 text-gray-600">★</span></td></tr>
+          <tr class="row"><td class="px-4 py-2">6</td><td class="px-4 py-2">StreamDQ HBM weight DQ</td><td class="px-4 py-2 text-sub">미반영</td><td class="px-4 py-2">HBM 내 양자화 dequantization</td><td class="px-4 py-2"><span class="pill bg-gray-100 text-gray-600">★</span></td></tr>
+          <tr class="row"><td class="px-4 py-2">7</td><td class="px-4 py-2">CapEx 60%+ 전력</td><td class="px-4 py-2 text-sub">미반영</td><td class="px-4 py-2">전력/냉각 집중, 착공률 괴리</td><td class="px-4 py-2"><span class="pill bg-gray-100 text-gray-600">★</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- 후속 액션 -->
+  <section class="fade-in mb-10 p-5 rounded-2xl bg-white border border-gray-200">
+    <h2 class="text-xl font-semibold mb-3">📋 후속 액션 (DRAFT 보강)</h2>
+    <ul class="text-sm space-y-1.5 text-ink">
+      <li class="flex gap-2"><span class="text-indigo">▸</span> DRAFT 3장: XCENA MX1 프로덕션 라인업 반영 (delta-1)</li>
+      <li class="flex gap-2"><span class="text-indigo">▸</span> DRAFT 11.2절: CapEx $725B + 벤더별 + 60%+ 전력 (delta-2, delta-7)</li>
+      <li class="flex gap-2"><span class="text-indigo">▸</span> DRAFT 10.4절/11.3절: SK 1c DRAM node vs Samsung yield 양극화 (delta-3)</li>
+      <li class="flex gap-2"><span class="text-indigo">▸</span> DRAFT 10.4절: Micron 346% 매출 급등 (delta-4)</li>
+      <li class="flex gap-2"><span class="text-indigo">▸</span> DRAFT 7장: JEDEC LPDDR6 512GB SOCAMM2 (delta-5)</li>
+      <li class="flex gap-2"><span class="text-indigo">▸</span> DRAFT 9.3절: StreamDQ HBM weight dequantization (delta-6)</li>
+      <li class="flex gap-2 text-sub"><span>○</span> (계속 #34) Montage trial production → 양산 전환 시점</li>
+      <li class="flex gap-2 text-sub"><span>○</span> (계속 #35) HBM4 양산 램프 — SK 1c vs Samsung yield</li>
+      <li class="flex gap-2 text-sub"><span>○</span> (신규 #42) XCENA MX1 Independent Verification — Intel 부스 공동 전시 원문 press release 확보</li>
+      <li class="flex gap-2 text-sub"><span>○</span> (계속 #40) Rubin Ultra → UALink/NVLink vs CXL 흡수 경로</li>
+    </ul>
+  </section>
+
+  <!-- 업계 이벤트 -->
+  <section class="fade-in mb-10 p-5 rounded-2xl bg-white border border-gray-200">
+    <h2 class="text-xl font-semibold mb-3">🎪 업계 이벤트</h2>
+    <div class="text-sm space-y-2 text-ink">
+      <p><span class="font-semibold">FMS 2026</span> (8/4-8/6 산타클라라) 후속 보도 지속.</p>
+      <p><span class="font-semibold">CXL Mini DevCon 2026</span> (8/3, Santa Clara Marriott) — 멤버 구현 전시. 스펙 변경 없음.</p>
+      <p><span class="font-semibold">다음 이벤트:</span> Hot Chips(8/17-20, 시애틀) — 이번 조사일 기준 최근.</p>
+    </div>
+  </section>
+
+  <!-- 데이터 한계 공개 -->
+  <section class="fade-in mb-10 p-5 rounded-2xl bg-amber-50 border border-amber-200">
+    <h2 class="text-lg font-semibold mb-2 text-amber-800">⚠️ 데이터 한계 공개</h2>
+    <ul class="text-sm space-y-1 text-amber-900">
+      <li>• WebSearch API → DuckDuckGo HTML + 직접 WebFetch. WebFetch 429로 카테고리 4(풀링 SW) 조사 불가.</li>
+      <li>• XCENA MX1: 단일 출처(DuckDuckGo 검색 요약). 원문 press release URL 미확보.</li>
+      <li>• Hyperscaler CapEx $725B: 8개 소스 교차검증으로 신뢰도 높으나, 벤더별 분해는 회계 기준 상이.</li>
+      <li>• SK Hynix 1c DRAM node: 단일 출처 — 구체적 스펙/타임라인 미확보.</li>
+      <li>• Micron 346%: 단일 출처. CapEx 60%+ 전력: NextWaves Insight 단일 출처.</li>
+      <li>• JEDEC LPDDR6: 3개 이상 8월 소스 일관 — 높은 신뢰.</li>
+      <li>• StreamDQ: 단일 출처(학술 검색).</li>
+      <li>• DRAFT 정규 .md 경로 미존재(.txt 복사본).</li>
+    </ul>
+  </section>
+
+  <footer class="text-center text-sub text-xs pt-6 border-t border-gray-200">
+    CXL Daily Update 6호 · 2026-08-12 06:40 KST · 기준선 DRAFT v0.5 + Daily Update 5호(2026-08-11)<br>
+    🟢 자동화(사실층) / 🔴 LLM 종합(해석층) · KST(UTC+9) 기준 · 사내 GLM 무료 라우팅
+  </footer>
+
+</div>
+</body>
+</html>

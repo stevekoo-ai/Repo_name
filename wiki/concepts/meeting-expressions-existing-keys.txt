@@ -1,0 +1,723 @@
+1	let's get started
+2	we'd like to do short introduction
+3	can you do the short introduction
+4	let me push on to the next one
+5	let's go to page four / next slide
+6	now i see what you are doing
+7	anyway
+8	by the way
+9	as i mentioned
+10	before we dive in
+11	to give you a bit of context
+12	going back to
+13	that wraps up our meeting
+14	thank you for today
+15	let's finish the meeting
+16	let me ask you
+17	i have a (quick) question
+18	can you walk through again?
+19	can you expand on that?
+20	could you tell me
+21	could you share
+22	could you briefly share
+23	what do you think about
+24	do you think
+25	are you saying
+26	if i understand you correctly
+27	just to be clear
+28	so what you're saying is
+29	is that a correct summary?
+30	that is correct, yes
+31	i'm a little bit confused
+32	i'm trying to figure out
+33	i'm trying to understand
+34	i'm thinking aloud here
+35	let me check
+36	let me see
+37	give me one (example)
+38	just a quick question
+39	what if we
+40	why don't we
+41	right
+42	exactly
+43	absolutely
+44	definitely
+45	that's right
+46	makes sense
+47	makes total sense
+48	sounds good
+49	got it
+50	understood
+51	i see
+52	okay, i see
+53	that makes sense
+54	good question
+55	pretty fancy
+56	i don't think
+57	i'm not sure
+58	i don't think that would be ideal
+59	i don't think it's going to be
+60	the problem is
+61	the problem with that is
+62	the issue is
+63	i have a concern
+64	i'm a little skeptical
+65	that's not going to work
+66	it's hard to make that work
+67	that's just moving the problem
+68	i'm not being specific to
+69	but the other part is
+70	i wouldn't say
+71	maybe we can
+72	we can do
+73	we could try
+74	we can set up
+75	let's brainstorm
+76	i'd like to propose
+77	our proposal is to
+78	we'd like to check
+79	we'd like to have
+80	we are going to enable
+81	we will support
+82	we will take a look
+83	couple of samples
+84	can you share the slides
+85	please let me know
+86	i'll get back to you
+87	we'll get back to you
+88	let me think about it
+89	we'll check
+90	we need to check
+91	we'll take it offline
+92	we'll follow up
+93	we'll sync up internally
+94	let's set up a separate meeting
+95	we'll reach out via email
+96	send me an email
+97	we'll forward that
+98	we cannot decide right now
+99	we'll take a look at once again
+100	let's revisit it
+101	let me reiterate
+102	i take it back
+103	i'm missing the point
+104	let's let the team work through
+105	we'll have to dig into the details
+106	i'm not going to commit for that yet
+107	what's the ~ timeframe
+108	the only concern i have is
+109	are we going to run into any ~ issues
+110	either way
+111	let's target that
+112	good point
+113	thanks for letting us know
+114	i respect your decision
+115	it's a bad news / not a bad news
+116	please align with your internal team
+117	we need a double confirm
+118	i need to discuss that internally
+119	there's all from me
+120	should we finish this meeting
+121	have a good day
+122	i understand what you are talking about now
+123	i also have a similar opinion
+124	i totally agree with your opinion
+125	i don't see any difference
+126	what's the reason i don't quite understand
+127	am i correct
+128	it's still under discussion
+129	do you have any plan to
+130	could you please share your timeline again
+131	we will keep an eye on that
+132	let's keep in touch
+133	talk to you later
+134	are you agree with that opinion
+135	i don't disagree with you
+136	you're not wrong
+137	it depends on a lot of things
+138	give us some time
+139	we'll get there
+140	let me summarize / maybe i summarize
+141	let me explain a little bit about
+142	what do you mean by
+143	what does x stand for
+144	i don't quite follow
+145	what timeframe are we looking at
+146	it's too early to tell
+147	we'll keep you posted
+148	still pending on our side
+149	we haven't had a chance to
+150	when do you need this by
+151	schedule is fixed
+152	delayed again and again
+153	cannot meet our schedule
+154	a little bit behind
+155	as soon as possible
+156	we are aligned on
+157	be on board
+158	we needed them yesterday
+159	keep circling with someone
+160	does this make sense
+161	is it possible to support
+162	there is no barrier to
+163	we don't see any problem to
+164	might be possible
+165	it's doable
+166	technically it will be possible
+167	we are considering to
+168	we can also support
+169	it's an option
+170	compare the pros and cons
+171	make trade-offs
+172	if everything goes well
+173	thanks for sharing
+174	thanks for your information
+175	i think so
+176	as far as i know
+177	as you know
+178	as you mentioned
+179	it's huge
+180	quite fast
+181	we have to collaborate
+182	regardless of our decisions
+183	we will have an opportunity to
+184	we are interested in
+185	we have a plan to
+186	let's work on that
+187	if you don't mind
+188	please have that action item
+189	do you want to talk with
+190	can you send me an email
+191	please share with the team
+192	we will support that
+193	maybe we can also work with them
+194	let's discuss next time
+195	it's okay to skip that
+196	we can talk about it later
+197	you can skip that / the rest
+198	back to your question
+199	one second / give me one second
+200	move on to next agenda
+201	let me share my screen
+202	could you see my screen
+203	you guys carry on
+204	i need to drop / i have another meeting
+205	can i drop it
+206	sorry, my network is behaving today
+207	can you repeat that please
+208	i lost you
+209	i just joined back
+210	i lost your previous comments
+211	i lost my network for a few minutes
+212	can you repeat the last (two) statements
+213	that was a statement i missed
+214	pull in (a schedule)
+215	push out
+216	pushed out by (1 year)
+217	pulled in the schedule
+218	pulled in from x to y
+219	it slipped more
+220	the original schedule was probably too aggressive
+221	we are trying to pull in
+222	we are trying to maximize
+223	we are going to launch
+224	we will be ready
+225	we'll be ready
+226	it's getting hard to
+227	we are aligned with
+228	we have alignment with
+229	it kills your allocation
+230	it's still under investigation
+231	we are still finalizing
+232	we are still checking
+233	we haven't decided yet
+234	we haven't got any feedback
+235	we haven't pr'd it yet
+236	we haven't qualified yet
+237	it's all in flux
+238	under consideration
+239	all options under consideration
+240	we will keep monitoring the progress
+241	our plan is
+242	our preference is
+243	our original plan is
+244	our goal is to
+245	our target is
+246	we are targeting
+247	we are preparing
+248	we are planning to
+249	we plan to
+250	we plan to bring this to the committee
+251	we are actively working on
+252	we are evaluating
+253	we are considering
+254	we are also considering
+255	we are still exploring
+256	we are still trying to figure out
+257	we are still trying to finalize
+258	we are still under investigation
+259	it's still being discussed
+260	it's not confirmed yet
+261	it's not a por yet
+262	not yet
+263	we will update
+264	we'll update
+265	we'd like to update
+266	we won't be able to support
+267	we don't think it's feasible
+268	we cannot
+269	we cannot report
+270	we don't have
+271	as of today
+272	so far
+273	right now
+274	it depends
+275	we have to review
+276	we have to review more
+277	we'd need to check
+278	i'm not sure if
+279	we are not ready to say
+280	we don't know yet
+281	we'll see
+282	we'll see what we can do
+283	let's see what we can do
+284	let's see
+285	hopefully
+286	i hope so
+287	i guess
+288	i think we're aligned
+289	generally
+290	certainly
+291	sounds reasonable
+292	that's reasonable
+293	that seems logical to us
+294	it is logical to
+295	reasonable
+296	makes a lot of sense
+297	i agree in principle
+298	in principle
+299	that's a fair point
+300	fair point
+301	that's fair
+302	that's a reasonable concern
+303	we shouldn't argue with that
+304	we are aligned
+305	we are not aligned
+306	are we well aligned
+307	that's pretty well aligned
+308	fully aligned
+309	we are well aligned
+310	that's fine
+311	that's fine with me
+312	are you okay with
+313	that's not unusual
+314	no issue
+315	no problem
+316	no difference
+317	nothing special
+318	there's some correlation
+319	it's not a bad thing
+320	that's not necessarily a bad thing
+321	it's still beneficial
+322	i'm concerned about
+323	my concern is
+324	that's a huge concern for us
+325	that's our concern
+326	our concern is
+327	that is concerning for us
+328	it is still concerning
+329	i get worried when
+330	i'm a little concerned
+331	i worry as we go through
+332	we're a bit worried
+333	that's a little worrisome
+334	hopefully that's not the case
+335	it's worth some more discussion
+336	it's very challenging
+337	it's challenging for us
+338	that's very challenging
+339	it's a big burden for us
+340	it's a big challenge
+341	it's very difficult to
+342	it's a bigger ask
+343	very abrupt
+344	a mountain to surmount
+345	it kind of complicates things
+346	i don't think we
+347	i don't think that's going to be huge
+348	i wouldn't prefer going that way
+349	it's not going to actually help us
+350	that is not my preference
+351	i do not like that
+352	just to be clear, i do not like that
+353	that is a bad word in servers
+354	never silent data corruption
+355	it's the only choice i have
+356	don't bother bidding
+357	i will not support any motion
+358	i am pretty sure that i can say
+359	we were never interested
+360	to me, i have never yet found
+361	i want to be as transparent as possible
+362	i want to be very direct with you
+363	to be clear
+364	just to set the stage
+365	to be honest
+366	honestly
+367	frankly
+368	frankly the best we can do
+369	to be fair
+370	to be very frank with you
+371	i want to start with a thank you
+372	i want to deliver some appreciation
+373	we'd love to
+374	we recognize
+375	we recognize it needs to happen
+376	my takeaway is
+377	that's my read
+378	my read of what's happening
+379	my instinct suggests
+380	i suspect we're going to
+381	that leaves us with the question
+382	i think that leaves us with the question
+383	let's think about this way
+384	think about this way
+385	i think it's important to
+386	it's important that
+387	it's very important
+388	it's important for us to
+389	i think it's important
+390	we believe
+391	we believe that
+392	i believe
+393	you have to understand that, right
+394	please understand
+395	just wanted to highlight that
+396	just wanted to let you know
+397	we wanted to let you know
+398	key enabler
+399	you know what
+400	hypothetically
+401	just hypothetically
+402	just in case
+403	regardless, right
+404	regardless
+405	now that said
+406	that said
+407	at the end of the day
+408	at a high level
+409	give or take
+410	basically
+411	specifically
+412	ultimately
+413	effectively
+414	in any case
+415	anyhow
+416	more or less
+417	that's why
+418	that's it
+419	that's all
+420	obviously
+421	of course
+422	actually
+423	i mean
+424	you know
+425	i have one question
+426	one more question
+427	sorry, one more question
+428	i have two questions
+429	any other questions
+430	are there any questions
+431	any questions before i go
+432	do you have any questions about this page
+433	any questions so far
+434	question on this slide
+435	quick question
+436	one quick question
+437	just one quick question
+438	just one question
+439	just one comment
+440	just one more last question
+441	i have one last question
+442	one last comment before we go
+443	can i ask you a question
+444	could you elaborate on
+445	can you clarify
+446	do you have any idea
+447	do you have any plans for
+448	is there any plan to
+449	do you see it important to
+450	do you anticipate shipping at
+451	when do you expect to
+452	why the sudden jump to
+453	what was your feedback on
+454	anything you want to dig into
+455	dig into
+456	i just want to understand
+457	just to confirm
+458	just to clarify
+459	what you're suggesting is
+460	you mean
+461	do you mean
+462	i'm confused
+463	sorry, i'm confused
+464	i understand
+465	i got it
+466	that's correct
+467	you're correct
+468	your understanding is correct
+469	yep
+470	yes, true
+471	yes, that's our goal
+472	that's our current position
+473	that's the intent
+474	that's a really, really good question
+475	that's a very good question
+476	that's a great question
+477	great question
+478	let me add comment here
+479	let me add a couple more
+480	i'd like to add a comment
+481	i'd like to add just one comment
+482	let me give an example
+483	let me pitch in a little bit
+484	i can pitch in a little bit
+485	let me add to what [name] said
+486	i was just going to add
+487	let me touch (on)
+488	let me briefly introduce
+489	i'll highlight only the key point
+490	this page is
+491	this slide is
+492	as you can see
+493	as you can see here
+494	as you can see on the next slide
+495	if you look at the right side
+496	if you look at the left side
+497	if you look at the right chart
+498	back to the previous table
+499	back to the previous slide
+500	going back to what [name] said
+501	just for your reference
+502	just for information
+503	this is for your reference
+504	let me walk you through
+505	let me share
+506	can you share your screen
+507	could you share your screen
+508	can you share the slide
+509	i can share
+510	let's see this table
+511	next slide please
+512	next page
+513	next slide
+514	can you move on next page
+515	could you move on
+516	go to the next page
+517	let's go to the next page
+518	please go on to the next page
+519	let's move on
+521	could you present
+522	please tell us
+523	over here, yes
+524	go ahead
+525	okay, go ahead
+526	you can just go back
+527	let's not go there
+528	let's not waste all the time
+529	we need to move on
+530	we need to be productive
+531	let's be productive
+532	let's keep going
+533	we need to go through quickly
+534	we're going to be late
+535	we have 50 minutes to go
+536	we have two minutes remaining
+537	we are late
+538	we are really late
+539	we have to go back to the team
+540	we don't want to take too much of your lunch time
+541	we'll resume the meeting at
+542	we'll have a bio-break
+543	thanks for bio-breaking
+544	please have a seat
+545	please mute when speaking
+546	please turn off your mic
+547	i'll pause there
+548	that's all we have
+549	that's all i have
+550	that's all i have prepared for today
+551	this is the last one
+552	that's the final
+553	i think we covered enough
+554	i think we are done for today
+555	we are done for today
+556	thank you to team korea
+557	we'll circle back on this
+558	we'll circle back
+559	i'll coordinate the meeting
+560	i will coordinate the collaboration
+561	we'll coordinate the collaboration
+562	we will coordinate
+563	let's take an action item
+564	we will take an action
+565	let's go back and see
+566	we will go back and see
+567	i'll ask [name] to
+568	i'll take that
+569	let me check it out
+570	let me check on
+571	let me check with
+572	i need to go back and check
+573	i got to check it
+574	we have to confirm
+575	we still have to do some confirmation
+576	we will have a look
+577	we'll have a look
+578	we'll let you know
+579	let us know as soon as possible
+580	let me know if it's wrong
+581	let me know if you need more
+582	i'd like to have the [team] involved
+583	please let us know
+584	please make sure
+585	please make sure you guys communicate with me
+586	please show your timeline
+587	please provide us your sample request
+588	please spend more energy on this
+589	please continue to execute on
+590	please consolidate with our sales team
+591	please talk with
+592	keep us posted
+593	i'll get back to you on that
+594	i'll get back and check
+595	let me get back to you
+596	i will share with you
+597	i will share our server
+598	we'll share more detail
+599	we will decide in the next few weeks
+600	let's revisit your policy
+601	we can pick it up from tomorrow
+602	we'll pick it up from tomorrow
+603	maybe we can target follow-up meeting
+604	we can fix some schedule
+605	we can have some more discussion
+606	we can revisit our numbers
+607	we can come back to that
+608	let's have a separate discussion
+609	let's discuss from there
+610	let's talk more
+611	let's have more discussion
+613	give me a minute
+614	just give me a minute
+615	we have a second
+616	just a second
+617	wait a second
+618	we're back
+619	i lost the internet again
+620	can you hear me
+621	did it turn on
+622	it's working
+623	excuse me
+624	sorry for the delay
+625	i'm sorry
+626	we got to
+627	we've got to
+628	let's march together
+629	let's collaborate
+630	we want to be aligned with you
+631	we want to be really aligned with you guys
+632	i want you guys to investigate it
+633	anything's baked in stone
+634	nothing is baked in stone
+635	we want to share our direction
+636	we want to have technical leadership
+637	we are trying to drive
+638	this is how we are driving industry
+639	we will continue to
+640	i'm hoping you have all the support
+641	i'm keeping my hopes up
+642	i'm going to still request you
+643	i'm trying to encourage you guys
+644	i want to have you guys also at our site
+645	we have to collaborate on
+646	we need to work on that together
+647	we should debate
+648	we should continue the discussion
+649	we'll continue to discuss
+650	we could consider
+651	we could consider applying
+652	we'd like to propose
+653	we would like to propose
+654	we'd like to try
+655	we'd like to get there
+656	we'd like to see
+657	we'd like to understand
+658	we'd like to know
+659	we'd like to confirm
+660	we want to start with
+661	we want to prioritize
+662	we want to continue the development
+663	we want to do that
+664	we prefer to
+665	i would prioritize
+666	anytime we can do without
+667	that's higher priority
+668	highest priority
+669	top priority
+670	we have to be mindful of
+671	we have to assume
+672	we have to figure out
+673	we need to figure out how
+674	we need to start looking at
+675	we want to make sure
+676	let's make sure
+677	let me see if i can
+678	we can take the data back
+679	we continue to want
+680	we just want to
+681	i'd like to talk through it
+682	let's talk through it
+683	thanks for a good discussion
+684	thanks for your feedback
+685	thanks for explaining
+686	i appreciate you guys explaining this
+687	we really appreciate it
+688	we look forward to the next one
+689	thank you for your time, guys
+690	thank you for joining the meeting
+691	thank you for joining me today
+692	thank you very much for
+693	for a very productive discussion
+694	have a good night
+695	have a good night and have a good day
+696	thanks for the proposal
+697	thanks for that
+698	thank you for sharing
+699	thank you for listening
+700	you're welcome
+701	appreciate it
+702	i appreciate it
+703	we'd appreciate it if
+704	much appreciated
+705	thanks for the clarification
+706	let me start with
+707	i'll start at the top
+708	i'll start with
+709	let's start with
+710	let me start
+711	let me explain
+712	let me briefly explain
+713	let me introduce
+714	please introduce yourself
+715	this is [name]
+716	this is [name] from [team]
+717	hi, this is
+718	hello, i am online
+719	let me recap
+720	to recap
+721	just to recap
+722	as we discussed
+723	a couple weeks ago
+724	as you can imagine
+725	today we have

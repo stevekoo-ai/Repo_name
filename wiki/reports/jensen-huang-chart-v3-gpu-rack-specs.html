@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jensen v3 — GPU Rack 하드웨어 스펙 비교 (H100 / GB300 / R100)</title>
+<style>
+  :root {
+    --bg: #f4f5f7; --surface: #ffffff; --fg: #1a1a1a; --sub: #4d5156; --muted: #8a8f94;
+    --line: #e9eaee; --accent: #2459d6; --green: #1ba36a; --red: #e03838;
+    --orange: #e8832a; --purple: #6c4ce0;
+    --shadow: 0 1px 2px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.05);
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, 'Apple SD Gothic Neo', 'Malgun Gothic', 'Segoe UI', Helvetica, Arial, sans-serif;
+    background: var(--bg); color: var(--fg); line-height: 1.6;
+    padding: 0; max-width: 1100px; margin: 0 auto;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { padding: 32px 24px 64px; }
+  h1 { font-size: 1.5rem; font-weight: 800; margin: 0 0 6px; }
+  .meta { color: var(--muted); font-size: 0.82rem; margin-bottom: 20px; padding-bottom: 16px; border-bottom: 1px solid var(--line); }
+  .card { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 20px 24px; margin: 16px 0; box-shadow: var(--shadow); }
+  h2 { font-size: 1.15rem; font-weight: 700; margin: 24px 0 12px; display: flex; align-items: center; gap: 8px; }
+  h2::before { content: ""; width: 4px; height: 18px; background: var(--accent); border-radius: 2px; }
+  h3 { font-size: 0.95rem; font-weight: 700; margin: 16px 0 8px; }
+  p { color: var(--sub); font-size: 0.9rem; margin: 6px 0; }
+
+  table { width: 100%; border-collapse: separate; border-spacing: 0; margin: 10px 0; font-size: 0.82rem; border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
+  th, td { padding: 10px 12px; text-align: left; vertical-align: top; }
+  th { background: var(--bg); color: var(--muted); font-weight: 600; font-size: 0.76rem; letter-spacing: 0.02em; border-bottom: 1px solid var(--line); }
+  td { background: var(--surface); border-bottom: 1px solid var(--line); color: var(--sub); }
+  tr:last-child td { border-bottom: 0; }
+  .center { text-align: center; }
+  .num { text-align: center; font-variant-numeric: tabular-nums; font-weight: 600; color: var(--fg); }
+
+  .section-label {
+    display: inline-block; padding: 3px 12px; border-radius: 20px; font-size: 0.74rem;
+    font-weight: 700; margin-bottom: 8px;
+  }
+  .sec-hopper { background: #e9eaee; color: #4d5156; }
+  .sec-blackwell { background: #eef2ff; color: #2459d6; }
+  .sec-rubin { background: #efecfb; color: #6c4ce0; }
+
+  .badge-note { font-size: 0.72rem; color: var(--muted); }
+  .verdict-yes { color: var(--green); font-weight: 700; }
+  .verdict-warn { color: var(--orange); font-weight: 700; }
+
+  .footnote { font-size: 0.74rem; color: var(--muted); margin-top: 4px; font-style: italic; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<h1>Jensen v3 — GPU Rack 하드웨어 스펙 비교</h1>
+<p class="meta">
+  📅 2026-08-27 &nbsp;|&nbsp; 📊 GTC 2026 Jensen Huang Inference Economics 차트에서 확인된 3개 GPU 세대 스펙<br>
+  <em>기반: NVIDIA GPU Rack Infrastructure Specification Report + jensen-huang-chart-analysis-v3.md</em>
+</p>
+
+<!-- ═══════════════════════════════════════════ -->
+<div class="card">
+<span class="section-label sec-hopper">HOPPER — 공기냉각 표준 42U 랙</span>
+<h2>DGX H100 — 4대 서버 조합 (1 Rack = 32 GPU)</h2>
+<p><em>냉각: 공랭식 · 폼팩터: 8U × 4대 · 아키텍처: 2DPC = 8ch 병목 존재</em></p>
+
+<table>
+  <tr><th>구분</th><th>하드웨어 세부 구성</th><th>용량 (Capacity)</th><th>유효 대역폭 (Bandwidth)</th><th>효율</th></tr>
+  <tr>
+    <td rowspan="5" style="vertical-align:middle; font-weight:700; color:var(--fg);">
+      GPU HBM3<br>(서버 4개 종합)
+    </td>
+    <td>단일 GPU 용량 (GB)</td><td class="num">80</td><td>HBM3 16GB 스택 × 5개 활성화</td><td>—</td>
+  </tr>
+  <tr>
+    <td>GPU 하나당 총량 (GB)</td><td class="num">640</td><td>(80GB × 8개/server)</td><td>—</td>
+  </tr>
+  <tr>
+    <td>1 Rack 총량 (GB)</td><td class="num">2,560</td><td>(80GB × 8개/server × 4 server) = <strong>2.33 TiB</strong></td><td>—</td>
+  </tr>
+  <tr>
+    <td>대역폭 수식</td><td class="num">85,760 GB/s</td><td>(3,350 GB/s × 32개 GPU × 0.8)</td><td><strong>80%</strong></td>
+  </tr>
+  <tr>
+    <td>대역폭 환산</td><td class="num">85.8 TB/s</td><td>약 0.08 PiB/s</td><td>보수적 접근</td>
+  </tr>
+  <tr>
+    <td rowspan="3" style="vertical-align:middle; font-weight:700; color:var(--fg);">
+      시스템 메모리<br>(DDR5)
+    </td>
+    <td>총 DIMM 수</td><td class="num">128개</td><td>(32개/server × 4대)</td><td>—</td>
+  </tr>
+  <tr>
+    <td>1 Rack 총량 (GB)</td><td class="num">8,192</td><td>(2TB/server × 4대) = <strong>8 TB</strong><br>2CPU × 16개 슬롯 (2DPC = 8ch 병목)</td><td>—</td>
+  </tr>
+  <tr>
+    <td>대역폭 수식</td><td class="num">2,212 GB/s</td><td>(4.8 GT/s × 8 BYTE × 8ch × 2CPU × 4대 × 0.9)</td><td><strong>90%</strong></td>
+  </tr>
+</table>
+
+<h3>연산 스펙 (TFLOPS)</h3>
+<table>
+  <tr><th>포맷</th><th>TFLOPS (GPU당)</th><th class="num">Rack 합산 (32 GPU)</th><th>비고</th></tr>
+  <tr><td>FP8 / INT8 (표준 양자화)</td><td class="num">989</td><td class="num">31,648</td><td>H100 공식 FP8 — 32 PFLOPS</td></tr>
+  <tr><td>BF16 / FP16 (지능 보존)</td><td class="num">989</td><td class="num">31,648</td><td>H100 공식 BF16 — 32-bit FP16 유지</td></tr>
+  <tr><td>FP32 (전통 일반)</td><td class="num">51</td><td class="num">1,632</td><td>8 TFLOPS</td></tr>
+</table>
+<p class="footnote">
+  구성: DGX H100 8U = 8 GPU/server × 4 server = 32 GPU 총수 · CPU: 2 × Intel Xeon 8480C/server ·
+  NVLink: 900 GB/s GPU-to-GPU (4th gen NVLink)
+</p>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<div class="card">
+<span class="section-label sec-blackwell">BLACKWELL — 100% 수랭식 랙</span>
+<h2>GB300 NVL72 — 18대 서버 조합 (1 Rack = 72 GPU)</h2>
+<p><em>냉각: 직접 수랭식 (Direct-to-Chip) · 폼팩터: 1U 초고밀도 트레이 · 아키텍처: Grace CPU 32ch 독립 버스</em></p>
+
+<table>
+  <tr><th>구분</th><th>하드웨어 세부 구성</th><th>용량 (Capacity)</th><th>유효 대역폭 (Bandwidth)</th><th>효율</th></tr>
+  <tr>
+    <td rowspan="5" style="vertical-align:middle; font-weight:700; color:var(--fg);">
+      GPU HBM3e<br>(서버 18개 종합)
+    </td>
+    <td>단일 GPU 용량 (GB)</td><td class="num">288</td><td>HBM3e 12단 적층 36GB × 8개 조합</td><td>—</td>
+  </tr>
+  <tr>
+    <td>GPU 하나당 총량 (GB)</td><td class="num">20,736</td><td>(288GB × 72개) — NVL72: 72 GPU = 1 논리 GPU</td><td>—</td>
+  </tr>
+  <tr>
+    <td>1 Rack 총량 (GB)</td><td class="num">20,736</td><td>(4 GPU/server × 18 server × 288GB) = <strong>20.25 TiB</strong></td><td>—</td>
+  </tr>
+  <tr>
+    <td>대역폭 수식</td><td class="num">460,800 GB/s</td><td>(8,000 GB/s × 72개 GPU × 0.8)</td><td><strong>80%</strong></td>
+  </tr>
+  <tr>
+    <td>대역폭 환산</td><td class="num">460.8 TB/s</td><td>약 0.46 PiB/s</td><td>보수적 접근</td>
+  </tr>
+  <tr>
+    <td rowspan="2" style="vertical-align:middle; font-weight:700; color:var(--fg);">
+      인터커넥트<br>(NVLink 5)
+    </td>
+    <td>NVLink 스위치</td><td class="num">130,000 GB/s</td><td>9대 5세대 NVLink 스위치 트레이 · 후면 백플레인 직결</td><td><strong>100%</strong></td>
+  </tr>
+  <tr>
+    <td>역할</td><td colspan="3" style="text-align:center">72개 GPU를 단일 거대 메모리 도메인으로 연결 — GPU 간 데이터 이동 경로</td>
+  </tr>
+  <tr>
+    <td rowspan="3" style="vertical-align:middle; font-weight:700; color:var(--fg);">
+      시스템 메모리<br>(LPDDR5X)
+    </td>
+    <td>총 패키지 수</td><td class="num">1,152개</td><td>(64개/server × 18대) · Grace CPU 32ch 독립 버스</td><td>—</td>
+  </tr>
+  <tr>
+    <td>1 Rack 총량 (GB)</td><td class="num">18,432</td><td>(2CPU × 64개/server × 18대) = <strong>18 TB</strong> (실효 약 17 TB)</td><td>—</td>
+  </tr>
+  <tr>
+    <td>대역폭 수식</td><td class="num">16,589 GB/s</td><td>(512 GB/s × 2CPU × 18대 × 0.9) = <strong>16.6 TB/s</strong></td><td><strong>90%</strong></td>
+  </tr>
+</table>
+
+<h3>연산 스펙 (TFLOPS)</h3>
+<table>
+  <tr><th>포맷</th><th>TFLOPS (NVL72당)</th><th class="num">Rack 합산 (72 GPU)</th><th>비고</th></tr>
+  <tr><td>NVFP4 (초경량 추론)</td><td class="num">15,000</td><td class="num">15,000</td><td>NVL72 공식 — 15 PFLOPS</td></tr>
+  <tr><td>FP8 / INT8 (표준 양자화)</td><td class="num">~5,200</td><td class="num">~5,200</td><td><span class="badge-note">추정 — NVFP4 대비 0.35x</span></td></tr>
+  <tr><td>BF16 / FP16 (지능 보존)</td><td class="num">~5,200</td><td class="num">~5,200</td><td><span class="badge-note">추정</span></td></tr>
+</table>
+<p class="footnote">
+  구성: GB300 NVL72 1U = 4 GPU/server × 18 server = 72 GPU 총수 · 아키텍처: Grace CPU 32ch 온보드 직결 (2DPC 병목 없음)
+</p>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<div class="card">
+<span class="section-label sec-rubin">RUBIN — 수랭식 랙 (예상)</span>
+<h2>R100 Vera Rubin NVL72 — 1 Rack (72 GPU)</h2>
+<p><em>냉각: 수랭식 · 폼팩터: 1U 초고밀도 트레이 (추정) · 아키텍처: 3단계 메모리 (HBM → SOCAMM → CXL)</em></p>
+
+<table>
+  <tr><th>구분</th><th>하드웨어 세부 구성</th><th>용량 (Capacity)</th><th>유효 대역폭 (Bandwidth)</th><th>비고</th></tr>
+  <tr>
+    <td rowspan="4" style="vertical-align:middle; font-weight:700; color:var(--fg);">
+      GPU HBM4<br>(NVL72)
+    </td>
+    <td>단일 GPU 용량 (GB)</td><td class="num">288</td><td>HBM4 288GB (18 Hi)</td><td>공식</td>
+  </tr>
+  <tr>
+    <td>1 Rack 총량 (GB)</td><td class="num">20,736</td><td>(288GB × 72개) = <strong>20.25 TiB</strong></td><td>공식</td>
+  </tr>
+  <tr>
+    <td>대역폭 수식</td><td class="num">1,584,000 GB/s</td><td>(22,000 GB/s × 72개 GPU × 0.8)</td><td>80% 효율</td>
+  </tr>
+  <tr>
+    <td>대역폭 환산</td><td class="num">1,584 TB/s</td><td>약 1.55 PiB/s</td><td>H100 대비 18.5배</td>
+  </tr>
+  <tr>
+    <td rowspan="2" style="vertical-align:middle; font-weight:700; color:var(--fg);">
+      시스템 메모리<br>(SOCAM + CXL)
+    </td>
+    <td>SOCAMM (LPDDR5X)</td><td class="num">81,920</td><td>80TB — 중간 완충지 (HBM→CXL 전환 단계)</td><td>80TB 추정</td>
+  </tr>
+  <tr>
+    <td>CXL 풀드 메모리</td><td class="num">102,400</td><td>100TB — 최종 확장 (SOCAMM 한계 도달 시)</td><td>100TB CXL 3.2</td>
+  </tr>
+</table>
+
+<h3>연산 스펙 (TFLOPS)</h3>
+<table>
+  <tr><th>포맷</th><th>TFLOPS (NVL72당)</th><th class="num">Rack 합산 (72 GPU)</th><th>비고</th></tr>
+  <tr><td>NVFP4 (초경량 추론)</td><td class="num">50,000</td><td class="num">50,000</td><td>Vera Rubin 공식 — 50 PFLOPS</td></tr>
+  <tr><td>FP8 / INT8</td><td class="num">~17,500</td><td class="num">~17,500</td><td><span class="badge-note">추정</span></td></tr>
+  <tr><td>BF16 / FP16</td><td class="num">~17,500</td><td class="num">~17,500</td><td><span class="badge-note">추정</span></td></tr>
+</table>
+<p class="footnote">
+  구성: R100 Vera Rubin NVL72 = 72 GPU / 1 NVL72 블록 / 1 Rack · 아키텍처: 3단계 메모리 (HBM 20.7TB → SOCAMM 80TB → CXL 100TB)
+</p>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<div class="card">
+<h2>3개 GPU 세대 통합 비교 — 핵심 인사이트</h2>
+
+<table>
+  <tr><th>항목</th><th>H100 (Hopper)</th><th>GB300 (Blackwell NVL72)</th><th>R100 (Rubin NVL72)</th></tr>
+  <tr><td><strong>냉각</strong></td><td>공랭식 (42U)</td><td>100% 직접 수랭식</td><td>수랭식 (추정)</td></tr>
+  <tr><td><strong>서버 구성</strong></td><td>8U × 4대</td><td>1U × 18대</td><td>1U × ?대 (추정)</td></tr>
+  <tr><td><strong>HBM 타입</strong></td><td>HBM3</td><td>HBM3e</td><td>HBM4</td></tr>
+  <tr><td><strong>HBM 용량 (총)</strong></td><td class="num">2.56 TB</td><td class="num">20.25 TB</td><td class="num">20.25 TB</td></tr>
+  <tr><td><strong>HBM 대역폭 (Rack)</strong></td><td class="num">85.8 TB/s</td><td class="num">460.8 TB/s</td><td class="num">1,584 TB/s</td></tr>
+  <tr><td><strong>HBM 대역폭 증가율</strong></td><td class="num">1.0×</td><td class="num">5.37×</td><td class="num">18.5×</td></tr>
+  <tr><td><strong>시스템 메모리</strong></td><td>DDR5 8TB</td><td>LPDDR5X 18TB</td><td>SOCAMM 80TB + CXL 100TB</td></tr>
+  <tr><td><strong>SysMem 대역폭</strong></td><td class="num">2.2 TB/s</td><td class="num">16.6 TB/s</td><td>—</td></tr>
+  <tr><td><strong>SysMem 대역폭 증가율</strong></td><td class="num">1.0×</td><td class="num">7.5× </td><td>—</td></tr>
+  <tr><td><strong>인터커넥트</strong></td><td>NVLink 4 (900 GB/s)</td><td>NVLink 5 (130 TB/s)</td><td>NVLink ?</td></tr>
+  <tr><td><strong>x=50 TPS/MW</strong></td><td class="num">0.15M</td><td class="num">0.7M</td><td class="num">1.65M</td></tr>
+  <tr><td><strong>x=200 (GPT 2T)</strong></td><td class="num center verdict-warn">N/A (1차사망 ●)</td><td class="num">0.15M</td><td class="num">0.7M</td></tr>
+</table>
+
+<div style="margin-top:16px;">
+<h3>💡 핵심 인사이트 — 인프라 세대적 진화</h3>
+<p>
+<strong>1. GPU 메모리(VRAM) 용량 폭발: 2.5 TB → 20 TB (약 8배 폭증)</strong><br>
+랙 1대당 적재 가능한 초고속 연산 메모리가 2.5TB에서 20TB로 약 8배 폭증하여, 거대 멀티모달 LLM 모델의
+파라미터 전체 가중치를 단 하나의 랙 노드 내부 메모리 풀에 온전히 적재할 수 있게 되었습니다.
+</p>
+<p>
+<strong>2. 시스템 메모리 인터페이스 혁신: 2.2 TB/s → 16.6 TB/s (약 7.5배 가속)</strong><br>
+호스트 제어를 담당하는 시스템 메인 메모리의 실효 전송 대역폭이 기존 DDR5 슬롯 구조의 2.21TB/s에서
+온보드 LPDDR5X의 16.6TB/s 체제로 약 7.5배 가속되었습니다. 초거대 LLM 추론 시 대규모 컨텍스트 데이터
+오프로딩(Offloading) 병목 현상을 획기적으로 차단했습니다.
+</p>
+<p>
+<strong>3. HBM 대역폭 폭발: 85.8 TB/s → 460.8 TB/s → 1,584 TB/s (약 18.5배)</strong><br>
+R100 Vera Rubin은 H100 대비 HBM 대역폭이 **18.5배**입니다. 그러나 랙 전력(~199kW) 대비
+효율(x=50 기준 1.65M TPS/MW)은 11배(0.15→1.65M). 전력 대비 효율 증가율(11배)이
+대역폭 증가율(18.5배)보다 작은 이유 = <strong>"Too Fast to Fit"</strong> — 컴퓨팅이 메모리를 앞지르는 역설.
+SOCAMM + CXL 3단계 메모리 확장이 R100의 필수 조건입니다.
+</p>
+</div>
+</div>
+
+<p class="footnote" style="margin-top:24px;">
+  — 데이터 출처: NVIDIA GPU Rack Infrastructure Specification Report + jensen-huang-chart-analysis-v3.md<br>
+  — HBM 스펙 = NVIDIA 공식 · TFLOPS = 공식+추정 · 차트 판독 = GTC 2026 이미지 육안 확정<br>
+  — 효율: HBM 80%(보수적), System Memory 90%(합리적), NVLink 100%(이론 패브릭)
+</p>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CXL Daily Update Report - 2026-08-04</title>
+<style>
+  :root {
+    --primary: #1a3a5c;
+    --accent: #c9a961;
+    --bg: #fafafa;
+    --card: #ffffff;
+    --text: #2c2c2c;
+    --muted: #6b6b6b;
+    --border: #e0e0e0;
+    --good: #2e7d32;
+    --warn: #ed6c02;
+    --bad: #c62828;
+    --new: #1565c0;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', 'Malgun Gothic', sans-serif; background: var(--bg); color: var(--text); line-height: 1.7; font-size: 15px; }
+  .cover { background: linear-gradient(135deg, #0d2540 0%, #1a3a5c 100%); color: white; padding: 50px 40px 40px; position: relative; }
+  .cover::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 4px; background: var(--accent); }
+  .cover .confidential { position: absolute; top: 18px; right: 24px; font-size: 11px; letter-spacing: 2px; color: var(--accent); border: 1px solid var(--accent); padding: 3px 10px; }
+  .cover h1 { font-size: 30px; font-weight: 300; margin-bottom: 8px; }
+  .cover .subtitle { font-size: 16px; opacity: 0.85; font-weight: 300; margin-bottom: 20px; }
+  .cover .meta { font-size: 13px; opacity: 0.7; line-height: 1.9; }
+  .version-tag { display: inline-block; background: var(--accent); color: var(--primary); padding: 5px 14px; font-size: 12px; font-weight: 600; margin-top: 14px; }
+  .container { max-width: 1100px; margin: 0 auto; padding: 30px 30px 60px; }
+  section { margin-bottom: 32px; background: var(--card); padding: 28px 32px; border-radius: 6px; box-shadow: 0 1px 4px rgba(0,0,0,0.05); }
+  h2 { color: var(--primary); font-size: 21px; font-weight: 600; margin-bottom: 16px; padding-bottom: 8px; border-bottom: 2px solid var(--accent); }
+  h3 { color: var(--primary); font-size: 17px; font-weight: 600; margin: 20px 0 10px; }
+  p { margin-bottom: 10px; }
+  ul, ol { padding-left: 22px; margin-bottom: 10px; }
+  li { margin: 5px 0; }
+  strong { color: var(--primary); }
+  code { background: #f0f0f0; padding: 2px 5px; border-radius: 3px; font-size: 12px; }
+  table { width: 100%; border-collapse: collapse; margin: 14px 0; font-size: 13px; }
+  th { background: var(--primary); color: white; padding: 9px 11px; text-align: left; font-size: 12px; }
+  td { padding: 8px 11px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  tr:nth-child(even) td { background: #f7f9fb; }
+  blockquote { border-left: 4px solid var(--accent); background: #fbf7ee; padding: 12px 18px; margin: 12px 0; border-radius: 0 4px 4px 0; }
+  blockquote.key { border-left-color: var(--good); background: #eaf5ea; }
+  blockquote.warn { border-left-color: var(--warn); background: #fff5e6; }
+  .delta-card { border: 1px solid var(--border); border-left: 4px solid var(--new); padding: 16px 20px; margin: 14px 0; border-radius: 0 4px 4px 0; background: #f7f9fb; }
+  .delta-card.important { border-left-color: var(--bad); }
+  .delta-card h3 { margin-top: 0; }
+  .delta-card .meta-row { font-size: 12px; color: var(--muted); margin: 4px 0; }
+  .delta-card .label { font-weight: 600; color: var(--primary); }
+  .impact-high { color: var(--bad); font-weight: 600; }
+  .impact-med { color: var(--warn); font-weight: 600; }
+  .impact-low { color: var(--good); font-weight: 600; }
+  .badge { display: inline-block; padding: 2px 9px; border-radius: 10px; font-size: 11px; font-weight: 600; }
+  .badge.new { background: #e3eaf5; color: var(--new); }
+  .badge.important { background: #fce4e4; color: var(--bad); }
+  .badge.changed { background: #fff0e0; color: var(--warn); }
+  .badge.unchanged { background: #e3f2e3; color: var(--good); }
+  .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; margin: 16px 0; }
+  .kpi-card { background: white; border: 1px solid var(--border); border-top: 3px solid var(--accent); padding: 14px; border-radius: 4px; }
+  .kpi-card .label { font-size: 11px; color: var(--muted); text-transform: uppercase; margin-bottom: 4px; }
+  .kpi-card .value { font-size: 20px; font-weight: 700; color: var(--primary); }
+  .kpi-card .desc { font-size: 11px; color: var(--muted); margin-top: 3px; }
+  .insight-box { border: 2px solid var(--primary); border-radius: 6px; padding: 20px 24px; margin: 18px 0; background: #f7f9fb; }
+  footer { text-align: center; padding: 24px; color: var(--muted); font-size: 11px; border-top: 1px solid var(--border); margin-top: 30px; }
+</style>
+</head>
+<body>
+
+<div class="cover">
+  <div class="confidential">CONFIDENTIAL</div>
+  <h1>CXL Daily Update Report</h1>
+  <div class="subtitle">CXL 기반 차세대 메모리 상품기획 — 일간 변동 보고서</div>
+  <div class="version-tag">2026-08-04 09:26 KST · 기준선 DRAFT v0.3 + 0장</div>
+  <div class="meta">
+    발행일: 2026년 8월 4일 09:26 KST<br>
+    기준선: 2026-08-03 DRAFT v0.3 + "0장 최신 업데이트(훑어보기)"<br>
+    조사: 9개 카테고리 전수 WebFetch 조사 (FMS 2026 컨퍼런스 8/4 개막)
+  </div>
+</div>
+
+<div class="container">
+
+<!-- 헤드라인 -->
+<section>
+  <h2>📰 오늘의 헤드라인</h2>
+  <ol>
+    <li><strong>FMS 2026 컨퍼런스 오늘(8/4) 산타클라라 개막</strong> — Kioxia XL1, Marvell, ScaleFlux, CXL Consortium 다수 발표</li>
+    <li><strong>UALink 2.0 (2026.04) 발표</strong> — 기존 DRAFT 1.0까지만 기재 → <span class="badge new">진짜 delta</span></li>
+    <li><strong>AI 패브릭 3-way rivalry 확정</strong> — UALink vs NVIDIA vs <strong>Ultra Ethernet</strong> <span class="badge important">중요</span></li>
+    <li><strong>JEDEC, DDR6/LPDDR6에서 CAMM2 표준화 확정</strong>, 기존 레이아웃 단계적 폐지 예고</li>
+    <li><strong>Q3 DRAM 가격 13~18% 상승</strong> (구체 수치) — 초기 DDR6/CAMM2 "천문학적 가격" 경고</li>
+    <li><strong>HBM 점유율 구체화</strong>: SK Hynix 62% / Micron 21% / Samsung 17% → Samsung 내년 30%+ 목표</li>
+    <li><strong>Hyperscaler 2026 AI 인프라 지출 $600B~$770B</strong> (합산, 기존 Alphabet 단일만 기재)</li>
+    <li><strong>NVIDIA Vera Rubin 상세</strong>: 88-core CPU + 336B 트랜지스터 GPU, "Blackwell 대비 5배 추론 성능"</li>
+  </ol>
+</section>
+
+<!-- Delta 카드 -->
+<section>
+  <h2>📊 Delta 상세 (기준선 대비 변경)</h2>
+
+  <div class="delta-card important">
+    <h3>Delta-1: AI 패브릭 — UALink 2.0 + 3-way rivalry <span class="badge important">★중요</span></h3>
+    <p><span class="label">[변경]</span> 기존 DRAFT(6장)는 UALink 1.0(2025.04, 1,024 가속기)까지만 기재. <strong>UALink 2.0이 2026.04 발표</strong>, 상용 HW <strong>2026.12</strong> 예정. <strong>3-way rivalry 확정</strong>: UALink vs NVIDIA(독점) vs <strong>Ultra Ethernet</strong>(기존 2-way에서 3-way). NVIDIA는 NVLink Fusion으로 제3자 개발자 호환성 개방. UALink는 "최초의 신뢰할 수 있는 개방형 대안".</p>
+    <p><span class="label">[영향]</span> CXL의 진영 중립적 위치가 더 명확해짐 — 3-way 패브릭 경쟁 모두에 메모리 풀 레이어로 부착 가능. Ultra Ethernet이 새로운 변수 — CXL 4.0 패브릭과 Ultra Ethernet 관계 정리 필요. <strong>"진영 중립적 메모리 풀" 포지셔닝(12.2 옵션4) 가치 상승</strong>.</p>
+    <p><span class="label">[액션]</span> DRAFT 6장에 UALink 2.0 + Ultra Ethernet 3-way rivalry 추가 보강. Ultra Ethernet vs CXL 4.0 패브릭 관계 심층 조사.</p>
+  </div>
+
+  <div class="delta-card important">
+    <h3>Delta-2: Main Memory — JEDEC CAMM2 표준화 + 가격 경고 <span class="badge important">★중요</span></h3>
+    <p><span class="label">[변경]</span> 기존 DRAFT(7장)는 CAMM2/LPCAMM2/SOCAMM2를 폼팩터로만 언급. <strong>JEDEC가 표준 레이아웃 단계적 폐지, DDR6/LPDDR6에서 CAMM2로 전환 예고</strong>. <strong>Q3 DRAM 가격 13~18% 상승</strong>(구체 수치, 기존은 "인상" 정성). 원인: 서버 수요 + wafer가 고수익 앱(HBM)으로 이동. <strong>초기 DDR6/CAMM2 HW는 "천문학적 가격" 경고</strong>.</p>
+    <p><span class="label">[영향]</span> 메인메모리 폼팩터 전환이 CXL 메모리 모듈 설계에 직결 — CXL 컨트롤러가 DDR5/6 채널 사용하므로 CAMM2 전환 일정이 CXL 모듈 로드맵에 영향. 가격 상승 → CXL 풀링 비용 절감 가치 상승. 단, 초기 DDR6/CAMM2 고가 → 단기 CXL 비용 프리미엄 확대 가능.</p>
+    <p><span class="label">[액션]</span> DRAFT 7장에 JEDEC CAMM2 표준화 일정 + Q3 가격 13~18% 수치 추가. CAMM2 전환 일정 vs CXL 모듈 로드맵 정합성 검토.</p>
+  </div>
+
+  <div class="delta-card important">
+    <h3>Delta-3: HBM 점유율 + 16-layer 로드맵 <span class="badge important">★중요</span></h3>
+    <p><span class="label">[변경]</span> 기존 0장은 SK Hynix Q2 실적만 기재, 점유율 미기재. <strong>HBM 점유율 구체: SK Hynix 62% / Micron 21% / Samsung 17%</strong>. <strong>Samsung 내년(2027) HBM 점유율 30%+ 목표</strong>(현재 17%에서 대폭 확대). 3사 모두 8-layer HBM3E 양산, 12/16-layer 진행. <strong>NVIDIA 2026 말 16-layer HBM 요청</strong>.</p>
+    <p><span class="label">[영향]</span> Samsung HBM 역공 본격화 — 17%→30%+ 목표는 SK Hynix 62% 지배에 대한 도전. 16-layer HBM 2026 말 NVIDIA 요청 → SK/Samsung 양산 경쟁 격화. HBM 3사 경쟁 심화 → 본문 10장 "2026 HBM 가격 하방 압력" 가설 강화.</p>
+    <p><span class="label">[액션]</span> DRAFT 10장/11.3장에 HBM 점유율(62/21/17) + Samsung 30%+ 목표 + 16-layer 로드맵 추가. SK하이닉스 관점: 점유율 방어 vs CXL 차별화 가치 재검증.</p>
+  </div>
+
+  <div class="delta-card">
+    <h3>Delta-4: Hyperscaler 2026 AI 인프라 지출 $600B~$770B</h3>
+    <p><span class="label">[변경]</span> 기존 0장은 Alphabet $195-205B만 기재. <strong>Google/Microsoft/Meta/Amazon 합산 2026 AI 인프라 지출 $600B~$770B</strong>. CXL 통한 메모리 disaggregation이 자본 효율화 핵심 수단("stranded DRAM → shared pools, overprovisioning 제거").</p>
+    <p><span class="label">[영향]</span> $600-770B 규모 자본이 CXL 풀링 채택 자본 여력 — 본문 11장 "CSP 채택 가속" 강화. composable 아키텍처가 대규모 자본 효율화 핵심 → CXL 풀링 상품 기획 시장 타당성 강화.</p>
+    <p><span class="label">[액션]</span> DRAFT 11.2장에 hyperscaler 합산 $600-770B 수치 추가.</p>
+  </div>
+
+  <div class="delta-card">
+    <h3>Delta-5: NVIDIA Vera Rubin 상세 + SK Hynix 정렬</h3>
+    <p><span class="label">[변경]</span> 기존 0장은 "Vera Rubin 가속기용 HBM 장기 공급"만. <strong>Vera Rubin 상세: 88-core 커스텀 CPU + 336B 트랜지스터 GPU, "Blackwell 대비 5배 추론 성능", 더 저렴한 토큰 생성 목표</strong>. AMD MI350은 "고용량 GPU 메모리로 가격 비효율 주소" 강조.</p>
+    <p><span class="label">[영향]</span> Vera Rubin 5배 추론 성능 → KV cache 메모리 요구 폭증 → CXL 풀링 수요 증폭. SK하이닉스가 Vera Rubin HBM 공급자 → SK하이닉스 CXL 전략을 NVIDIA 생태와 정렬 근거 강화.</p>
+    <p><span class="label">[액션]</span> DRAFT 0장/9장에 Vera Rubin 5배 추론 성능 수치 추가 → KV cache 요구량 모델 업데이트.</p>
+  </div>
+
+  <div class="delta-card">
+    <h3>Delta-6: FMS 2026 컨퍼런스 개막 (8/4 산타클라라)</h3>
+    <p><span class="label">[변경]</span> 기존 DRAFT는 개별 벤더 발표만 산재. <strong>FMS 2026 오늘(8/4) 산타클라라 개막</strong> — Kioxia XL1, Marvell(Agentic AI Inference 포트폴리오), ScaleFlux(2개 Gen6 실리콘), CXL Consortium 모두 참가. Marvell: "Agentic AI Inference" 프레임 신규(기존 "AI 인프라"에서 정제). ScaleFlux: 2개 차세대 PCIe Gen6 실리콘(본문 MC600/FC6116과 정합).</p>
+    <p><span class="label">[영향]</span> FMS 2026이 CXL 3.2 양산/CXL 4.0 생태 마케팅 가속점 — 본문 제품 동향 발표 시점 기준. "Agentic AI Inference" 프레임 — KV cache 오프로드 use case가 더 구체화(agentic 워크플로 캐시 특성).</p>
+    <p><span class="label">[액션]</span> FMS 2026 발표를 DRAFT 3장/4장에 반영(Agentic AI 프레임 추가).</p>
+  </div>
+
+  <div class="delta-card">
+    <h3>Delta-7: Mooncake 메트릭 구체화</h3>
+    <p><span class="label">[변경]</span> 기존 DRAFT(8.3)는 Mooncake 아키텍처만. <strong>Mooncake+vLLM 결합 메트릭: "latency 대폭 감소, agentic 워크플로 처리량 향상"</strong>, CPU/Disk 오프로드로 더 큰 컨텍스트 윈도우.</p>
+    <p><span class="label">[영향]</span> Mooncake의 KV cache 중심 disagg 아키텍처가 CXL 풀과 결합 시 정량적 이점 검증. agentic 워크플로 — 토큰 생성보다 캐시 처리가 병목 → CXL 풀 가치 명확.</p>
+    <p><span class="label">[액션]</span> DRAFT 8.3장에 Mooncake+vLLM 메트릭 추가.</p>
+  </div>
+</section>
+
+<!-- 미변경 -->
+<section>
+  <h2>🔍 미변경 카테고리</h2>
+  <table>
+    <tr><th>카테고리</th><th>상태</th><th>비고</th></tr>
+    <tr><td>CXL 스펙 버전</td><td><span class="badge unchanged">미변경</span></td><td>CXL 4.0(2025.11.18), 3.2 양산 — 0장과 일치</td></tr>
+    <tr><td>CXL 디바이스 타입</td><td><span class="badge unchanged">미변경</span></td><td>Type 1/2/3 — 본문 2.2절 유지</td></tr>
+    <tr><td>Intel/AMD CXL 지원</td><td><span class="badge unchanged">미변경</span></td><td>Granite Rapids CXL 2.0, Turin CXL 2.0, Diamond Rapids mid-2027 — 본문 5장 유지</td></tr>
+    <tr><td>GPU CXL</td><td><span class="badge unchanged">미변경</span></td><td>MI350 288GB/8TB/s, NVIDIA CXL 미사용 — 본문 5.2절 유지</td></tr>
+    <tr><td>풀링 아키텍처</td><td><span class="badge unchanged">미변경</span></td><td>Expansion/Pooling/Sharing — 4.7절 유지</td></tr>
+    <tr><td>XCENA</td><td><span class="badge unchanged">미변경</span></td><td>MX1/MX1P/MX1S — 본문 3장 유지</td></tr>
+  </table>
+</section>
+
+<!-- Delta 매트릭스 -->
+<section>
+  <h2>📈 기준선 대비 delta 요약 매트릭스</h2>
+  <table>
+    <tr><th>#</th><th>항목</th><th>기준선(8/3)</th><th>오늘(8/4)</th><th>영향도</th></tr>
+    <tr><td>1</td><td>UALink</td><td>1.0(2025.04)</td><td><strong>2.0(2026.04) + 3-way</strong></td><td class="impact-high">★★★</td></tr>
+    <tr><td>2</td><td>AI 패브릭 경쟁</td><td>2-way</td><td><strong>3-way (Ultra Ethernet 추가)</strong></td><td class="impact-high">★★★</td></tr>
+    <tr><td>3</td><td>JEDEC CAMM2</td><td>폼팩터 언급</td><td><strong>표준화 확정, 기존 레이아웃 폐지</strong></td><td class="impact-high">★★★</td></tr>
+    <tr><td>4</td><td>Q3 DRAM 가격</td><td>"인상"</td><td><strong>13~18% 상승</strong></td><td class="impact-med">★★</td></tr>
+    <tr><td>5</td><td>DDR6/CAMM2 가격</td><td>미언급</td><td><strong>"천문학적 가격" 경고</strong></td><td class="impact-med">★★</td></tr>
+    <tr><td>6</td><td>HBM 점유율</td><td>미기재</td><td><strong>SK 62 / Micron 21 / Samsung 17</strong></td><td class="impact-high">★★★</td></tr>
+    <tr><td>7</td><td>Samsung HBM 목표</td><td>미기재</td><td><strong>내년 30%+ (17%→30%)</strong></td><td class="impact-high">★★★</td></tr>
+    <tr><td>8</td><td>16-layer HBM</td><td>미기재</td><td><strong>NVIDIA 2026 말 요청</strong></td><td class="impact-med">★★</td></tr>
+    <tr><td>9</td><td>Hyperscaler CapEx</td><td>Alphabet $195-205B</td><td><strong>합산 $600-770B</strong></td><td class="impact-high">★★★</td></tr>
+    <tr><td>10</td><td>Vera Rubin</td><td>"HBM 공급"</td><td><strong>88-core+336B, 5배 추론 성능</strong></td><td class="impact-med">★★</td></tr>
+    <tr><td>11</td><td>FMS 2026</td><td>미언급</td><td><strong>8/4 산타클라라 개막</strong></td><td class="impact-med">★★</td></tr>
+    <tr><td>12</td><td>Marvell 프레임</td><td>"AI 인프라"</td><td><strong>"Agentic AI Inference"</strong></td><td class="impact-low">★</td></tr>
+    <tr><td>13</td><td>Mooncake 메트릭</td><td>아키텍처만</td><td><strong>vLLM 결합 메트릭</strong></td><td class="impact-low">★</td></tr>
+  </table>
+</section>
+
+<!-- 종합 인사이트 -->
+<section>
+  <div class="insight-box">
+    <h2 style="margin-top:0">🎯 종합 인사이트 (상품기획 시사점)</h2>
+    <ol>
+      <li><strong>AI 패브릭 3-way 경쟁 확정</strong> → CXL "진영 중립적 메모리 풀" 포지셔닝(12.2 옵션4) 가치 상승. 3개 진영 모두에 부착 가능한 유일한 메모리 레이어</li>
+      <li><strong>CAMM2 표준화 + Q3 가격 13~18% 상승</strong> → CXL 메모리 풀링 overprovisioning 절감 가치 강화. 단, 초기 DDR6/CAMM2 고가 → CXL 비용 프리미엄 단기 확대 가능성</li>
+      <li><strong>Samsung HBM 역공(17%→30%+)</strong> + NVIDIA 16-layer 요청 → HBM 경쟁 심화 → 가격 하방(본문 10장 가설 강화). SK하이닉스는 점유율 방어 + CXL 차별화 동시 추진 필요</li>
+      <li><strong>Hyperscaler $600-770B 자본</strong> → CXL 풀링 채택 자본 여력 압도적. 상품 기획 시장 타당성 강력</li>
+      <li><strong>Vera Rubin 5배 추론 성능</strong> → KV cache 요구 폭증 → CXL KV cache 풀(cleanest win use case) 수요 확정적 증가</li>
+      <li><strong>Agentic AI Inference 프레임</strong> → agentic 워크플로 캐시 특성이 KV cache 오프로드 use case 더 구체화</li>
+    </ol>
+  </div>
+</section>
+
+<!-- 후속 액션 -->
+<section>
+  <h2>📋 후속 액션 (DRAFT 보강)</h2>
+  <ul>
+    <li>☐ DRAFT 6장: UALink 2.0(2026.04) + Ultra Ethernet 3-way rivalry 추가</li>
+    <li>☐ DRAFT 7장: JEDEC CAMM2 표준화 일정 + Q3 가격 13~18% 수치 + "천문학적 가격" 경고 추가</li>
+    <li>☐ DRAFT 10장/11.3장: HBM 점유율(62/21/17) + Samsung 30%+ 목표 + 16-layer 로드맵 추가</li>
+    <li>☐ DRAFT 11.2장: hyperscaler 합산 $600-770B 수치 추가</li>
+    <li>☐ DRAFT 0장/9장: Vera Rubin 5배 추론 성능 수치 추가</li>
+    <li>☐ DRAFT 3장/4장: FMS 2026 + Marvell "Agentic AI Inference" 프레임 추가</li>
+    <li>☐ DRAFT 8.3장: Mooncake+vLLM 메트릭 추가</li>
+  </ul>
+</section>
+
+<footer>
+  <p>CXL Daily Update Report · 2026-08-04 09:26 KST · 기준선 DRAFT v0.3 + 0장</p>
+  <p style="margin-top:6px;opacity:0.7">WebFetch 기반 9개 카테고리 전수 조사. FMS 2026 발표 진행 중으로 일부는 일정 공개만 확인. 중요 수치는 1차 출처 교차검증 권장.</p>
+</footer>
+
+</div>
+</body>
+</html>

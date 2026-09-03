@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>젠슨황 GTC Inference Economics — C-Level Executive Brief (2026-08-27)</title>
+<style>
+  :root {
+    --bg: #f4f5f7;
+    --surface: #ffffff;
+    --fg: #1a1a1a;
+    --sub: #4d5156;
+    --muted: #8a8f94;
+    --line: #e9eaee;
+    --accent: #2459d6;       /* Toss blue */
+    --accent-soft: #eef2ff;
+    --green: #1ba36a;        /* Toss positive */
+    --green-soft: #e6f6ef;
+    --red: #e03838;          /* Toss negative */
+    --red-soft: #fdeaea;
+    --orange: #e8832a;       /* Toss accent */
+    --orange-soft: #fdf2e4;
+    --purple: #6c4ce0;
+    --purple-soft: #efecfb;
+    --shadow: 0 1px 2px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.05);
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, 'Apple SD Gothic Neo', 'Malgun Gothic', 'Segoe UI', Helvetica, Arial, sans-serif;
+    background: var(--bg); color: var(--fg); line-height: 1.65;
+    padding: 0; max-width: 880px; margin: 0 auto;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { padding: 32px 24px 64px; }
+  h1 {
+    font-size: 1.9rem; letter-spacing: -0.02em; font-weight: 800;
+    margin: 0 0 8px;
+  }
+  h2 {
+    font-size: 1.3rem; letter-spacing: -0.02em; font-weight: 700;
+    margin: 36px 0 14px; color: var(--fg);
+    display: flex; align-items: center; gap: 10px;
+  }
+  h2::before {
+    content: ""; width: 4px; height: 20px; background: var(--accent); border-radius: 2px;
+  }
+  h3 { font-size: 1.05rem; font-weight: 700; color: var(--fg); margin: 24px 0 10px; }
+  h4 { font-size: 0.95rem; font-weight: 700; color: var(--fg); margin: 14px 0 6px; }
+  p { margin: 8px 0; color: var(--sub); font-size: 0.94rem; }
+  .meta {
+    color: var(--muted); font-size: 0.82rem; margin-bottom: 24px;
+    padding-bottom: 20px; border-bottom: 1px solid var(--line);
+  }
+
+  /* Cards */
+  .card {
+    background: var(--surface); border: 1px solid var(--line);
+    border-radius: 16px; padding: 24px; margin: 16px 0;
+    box-shadow: var(--shadow);
+  }
+  .toc { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 20px 24px; margin: 0 0 8px; }
+  .toc h3 { margin: 0 0 10px; color: var(--fg); font-size: 0.95rem; }
+  .toc ul { list-style: none; padding: 0; }
+  .toc li { padding: 7px 0; font-size: 0.9rem; }
+  .toc li::before { content: "›"; color: var(--accent); font-weight: 700; margin-right: 10px; }
+  .toc a { color: var(--sub); text-decoration: none; font-weight: 500; }
+  .toc a:hover { color: var(--accent); }
+
+  /* Hero / exec summary */
+  .exec-summary {
+    background: linear-gradient(135deg, var(--surface), var(--accent-soft));
+    border: 1px solid #d4def7; border-radius: 18px; padding: 28px 28px;
+    margin: 16px 0; box-shadow: var(--shadow);
+  }
+  .exec-summary h3 { color: var(--accent); margin-top: 0; font-size: 1.05rem; }
+  .exec-summary p { color: var(--sub); font-size: 0.94rem; }
+
+  /* Key insight */
+  .key-insight {
+    background: var(--surface); border: 1px solid var(--line); border-left: 4px solid var(--accent);
+    border-radius: 12px; padding: 18px 22px; margin: 14px 0;
+  }
+  .key-insight h4 { color: var(--accent); margin-bottom: 6px; }
+  .key-insight p { color: var(--sub); }
+
+  /* Tables */
+  table { width: 100%; border-collapse: separate; border-spacing: 0; margin: 14px 0; font-size: 0.88rem; border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
+  th, td { padding: 12px 14px; text-align: left; vertical-align: top; }
+  th { background: var(--bg); color: var(--muted); font-weight: 600; font-size: 0.78rem; letter-spacing: 0.02em; border-bottom: 1px solid var(--line); }
+  td { background: var(--surface); border-bottom: 1px solid var(--line); color: var(--sub); }
+  tr:last-child td { border-bottom: 0; }
+  .num { text-align: center; font-variant-numeric: tabular-nums; font-weight: 600; color: var(--fg); }
+  .center { text-align: center; }
+
+  /* Verdict chips */
+  .verdict-yes { color: var(--green); font-weight: 700; }
+  .verdict-no { color: var(--red); font-weight: 700; }
+  .verdict-warn { color: var(--orange); font-weight: 700; }
+
+  /* Markers (Toss-style filled chips) */
+  .marker-red, .marker-black, .marker-orange, .marker-purple {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 22px; height: 22px; border-radius: 50%; font-size: 0.78rem; font-weight: 700;
+    color: #fff;
+  }
+  .marker-red { background: var(--red); }
+  .marker-black { background: #1a1a1a; }
+  .marker-orange { background: var(--orange); }
+  .marker-purple { background: var(--purple); }
+
+  /* KPI cards */
+  .kpi-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin: 16px 0; }
+  .kpi {
+    background: var(--surface); border: 1px solid var(--line); border-radius: 14px;
+    padding: 20px 18px; text-align: center; box-shadow: var(--shadow);
+  }
+  .kpi .val { font-size: 1.8rem; font-weight: 800; color: var(--fg); letter-spacing: -0.02em; display: block; font-variant-numeric: tabular-nums; }
+  .kpi .lbl { font-size: 0.76rem; color: var(--muted); display: block; margin-top: 6px; line-height: 1.4; }
+
+  /* Chart frame */
+  .chart-frame { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 16px; margin: 16px 0; text-align: center; box-shadow: var(--shadow); }
+  .chart-frame img { max-width: 100%; height: auto; border-radius: 8px; }
+  .legend-inline { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 14px 18px; margin: 12px 0; display: flex; flex-wrap: wrap; gap: 16px; justify-content: center; }
+  .legend-inline span { display: inline-flex; align-items: center; gap: 6px; font-size: 0.82rem; color: var(--sub); font-weight: 500; }
+
+  .footnote { color: var(--muted); font-size: 0.76rem; margin-top: 4px; }
+  code { background: var(--bg); padding: 2px 7px; border-radius: 5px; font-size: 0.8em; color: var(--fg); }
+
+  /* Recommend / Risk blocks */
+  .recommend { background: var(--green-soft); border: 1px solid #bfe3cf; border-radius: 16px; padding: 22px 26px; margin: 16px 0; }
+  .recommend h3 { color: var(--green); margin-top: 0; }
+  .risk { background: var(--red-soft); border: 1px solid #f3caca; border-radius: 16px; padding: 22px 26px; margin: 16px 0; }
+  .risk h3 { color: var(--red); margin-top: 0; }
+
+  pre {
+    background: var(--surface); border: 1px solid var(--line); border-radius: 12px;
+    padding: 16px 18px; overflow-x: auto; font-size: 0.82rem; line-height: 1.55; margin: 14px 0;
+    white-space: pre; font-family: 'SF Mono', 'Consolas', 'Malgun Gothic', monospace; color: var(--fg);
+  }
+
+  /* Badges */
+  .badge { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 0.74rem; font-weight: 700; }
+  .badge-imp { background: var(--red-soft); color: var(--red); }
+  .badge-now { background: var(--accent-soft); color: var(--accent); }
+  .badge-fut { background: var(--orange-soft); color: var(--orange); }
+
+  a { color: var(--accent); text-decoration: none; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<h1>젠슨황 GTC Inference Economics — Executive Brief</h1>
+<p class="meta">
+  📅 2026-08-27 &nbsp;|&nbsp; 📊 GTC 2026 Jensen Huang 발표 차트 심층 분석 (v3 기준)<br>
+  <em>대상: C-Level 의사결정자 · 핵심 질문: "다음 GPU 세대에서 무엇이 죽고, 무엇이 살아남는가"</em>
+</p>
+
+<div class="toc">
+  <h3>목차</h3>
+  <ul>
+    <li><a href="#exec">Executive Summary — 한 장 요약</a></li>
+    <li><a href="#kpi">핵심 KPI — 한눈에 보는 세대별 체급</a></li>
+    <li><a href="#death">두 번의 죽음 — GPU 세대별 사망 지점</a></li>
+    <li><a href="#flow">메모리 넘침 흐름 — HBM → Main → CXL</a></li>
+    <li><a href="#chart">분석 그래프 + 마커 상세 테이블</a></li>
+    <li><a href="#strategic">전략적 시사점</a></li>
+    <li><a href="#recommend">권고사항</a></li>
+    <li><a href="#risk">리스크 &amp; 주의사항</a></li>
+  </ul>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<section id="exec">
+<h2>Executive Summary — 한 장 요약</h2>
+
+<div class="exec-summary">
+<h3>📌 핵심 메시지</h3>
+<p>
+젠슨황이 GTC 2026에서 보여준 <strong>"Inference Economics"</strong> 차트는 단순한 성능 비교가 아니다.
+이것은 <strong>GPU 3세대(H100 → B300 → R100)가 각기 다른 지점에서 죽어가는 과정의 지도</strong>다.
+각 세대는 <strong>두 번의 죽음</strong>을 겪는다: ① 가중치가 HBM에 안 들어오는 <strong>1차 사망(모델 로드 불가)</strong>,
+② KV cache가 HBM+Main+CXL 전체를 초과하는 <strong>2차 사망(OOM)</strong>.
+</p>
+<p>
+차트의 본질은 <strong>"메모리가 컴퓨팅을 따라잡지 못하는 시점"</strong>을 보여주는 것이다.
+R100(Vera Rubin)은 컴퓨팅이 너무 빨라 <strong>"Too Fast to Fit"</strong> — 40.5TB를 20.7TB HBM에 담으려다 넘치는,
+즉 성공의 역설을 보여준다. CXL 3.2 PCIe Gen6 100TB Pooled Memory는 이 벽을 허무는 유일한 연장 수단이다.
+</p>
+</div>
+
+<h3>한 줄 결론 (TL;DR)</h3>
+<div class="card" style="padding:0;overflow:hidden">
+<table style="border:0;border-radius:0;margin:0">
+  <tr><th>세대</th><th>1차 사망 (가중치&gt;HBM)</th><th>2차 사망 (OOM)</th><th>전략적 의미</th></tr>
+  <tr><td><strong>H100</strong> <span class="badge badge-imp">Hopper</span></td><td class="verdict-no">x=200 — 1차 사망 ●<br>(4TB 가중치 &gt; 2.56TB HBM)</td><td class="verdict-warn">x=9311 (범위밖)<br>CXL 100TB로도 한계</td><td>2T 모델 서빙 <strong>불가</strong>. 이미 물리적 한계 도달. 신규 투자 비권장.</td></tr>
+  <tr><td><strong>B300</strong> <span class="badge badge-now">Blackwell NVL72</span></td><td class="verdict-yes">해당 없음<br>(20.7TB HBM 안착)</td><td class="verdict-warn">x=1917 — 2차 사망 ×<br>(196TB 한계)</td><td>현재 가성비 최적. 다만 SOCAMM 단계가 없어 CXL로 곧장 넘침 — 용량 확장 설계 시급.</td></tr>
+  <tr><td><strong>R100</strong> <span class="badge badge-fut">Vera Rubin NVL72</span></td><td class="verdict-yes">해당 없음<br>(20.7TB HBM 안착)</td><td class="verdict-warn">x=1936 — 2차 사망 ×<br>(198TB 한계)</td><td>미래 대비. 3단계 메모리(HBM→SOCAMM→CXL) 거치지만, 극단 ctx에서는 CXL로도 부족. 차세대 풀드 메모리 필수.</td></tr>
+</table>
+</div>
+</section>
+
+<!-- ═══════════════════════════════════════════ -->
+<section id="kpi">
+<h2>핵심 KPI — 한눈에 보는 세대별 체급</h2>
+
+<div class="kpi-row">
+  <div class="kpi"><span class="val">2.56TB</span><span class="lbl">H100 HBM / 3.35 TB/s / 40kW</span></div>
+  <div class="kpi"><span class="val">20.7TB</span><span class="lbl">B300 HBM / 8.0 TB/s / 121kW</span></div>
+  <div class="kpi"><span class="val">20.7TB</span><span class="lbl">R100 HBM / 22.0 TB/s / 199kW</span></div>
+  <div class="kpi"><span class="val">100TB</span><span class="lbl">CXL 3.2 Pooled (PCIe Gen6) / ~2-4 TB/s</span></div>
+</div>
+
+<h3>컴퓨팅 효율 (TPS/MW, x=50 기준)</h3>
+<table>
+  <tr><th>세대</th><th>x=50 (Free 32K)</th><th>x=100 (Medium 128K)</th><th>x=200 (High 128K)</th><th>x=400 (Premium 400K)</th></tr>
+  <tr><td><strong>H100</strong></td><td class="num">0.15M</td><td class="num">0.06M <span class="footnote">(급강하)</span></td><td class="verdict-no center">N/A</td><td class="verdict-no center">N/A</td></tr>
+  <tr><td><strong>B300</strong></td><td class="num">0.7M</td><td class="num">0.6M</td><td class="num">0.15M</td><td class="num">0.07M</td></tr>
+  <tr><td><strong>R100</strong></td><td class="num">1.65M</td><td class="num">1.6M <span class="footnote">(flat)</span></td><td class="num">0.7M</td><td class="num">0.2M</td></tr>
+</table>
+<p class="footnote">
+  H100은 x=200부터 차트에서 회색선(점 없음) = GPT 2T 가중치(4TB)가 HBM(2.56TB)에 안 들어와 서빙 불가.
+  R100은 x=100에서도 1.6M flat 유지 — 컨텍스트 4배 증가(32K→128K)에도 효율 유지 = 병목 해소 능력.
+</p>
+</section>
+
+<!-- ═══════════════════════════════════════════ -->
+<section id="death">
+<h2>두 번의 죽음 — GPU 세대별 사망 지점</h2>
+
+<p>
+차트에 표시된 4개 공통 마커는 두 종류의 죽음과 두 종류의 메모리 전환을 나타낸다.
+</p>
+
+<h3>마커 규칙 (공통 표시)</h3>
+<table>
+  <tr><th>마커</th><th>의미</th></tr>
+  <tr><td><span class="marker-red">●</span></td><td><strong>1차 사망</strong> — 가중치 &gt; HBM, 모델 로드 불가 (0 TPS). 모델 자체를 올리지 못하는 치명적 한계.</td></tr>
+  <tr><td><span class="marker-black">×</span></td><td><strong>2차 사망</strong> — OOM: KV cache &gt; HBM + Main Memory + CXL 전체. 모델은 올라갔으나 동시 사용자 수가 폭발해 메모리 초과.</td></tr>
+  <tr><td><span class="marker-orange">▲</span></td><td><strong>HBM → Main Memory(SOCAMM)/CXL 전환</strong> — KV cache가 HBM 한계 초과해 풀드 메모리로 넘치기 시작.</td></tr>
+  <tr><td><span class="marker-purple">◆</span></td><td><strong>Main Memory(SOCAMM) → CXL 전환</strong> — SOCAMM 80TB 한계 도달, 다시 CXL로 넘침.</td></tr>
+</table>
+
+<h3>세대별 사망 지점 상세</h3>
+
+<h4>H100 (HBM3 80GB×32 = 2.56TB, 3.35 TB/s, ~40kW)</h4>
+<p><em>x=100 조건 고정 (Kimi 1T 가중치 2TB, 10.80 GB/user)</em></p>
+<table>
+  <tr><th>마커</th><th>x 위치</th><th>메모리</th><th>내용</th></tr>
+  <tr><td><span class="marker-orange">▲</span></td><td class="num">52</td><td>2TB</td><td>HBM → CXL 전환. KV가 HBM 한계 초과해 CXL 100TB 풀로 넘침.</td></tr>
+  <tr><td><span class="marker-red">●</span></td><td class="num">200</td><td>—</td><td>1차 사망. 가중치 4TB &gt; HBM 2.56TB → 모델 로드 불가, 0 TPS.</td></tr>
+  <tr><td><span class="marker-red">●</span></td><td class="num">400</td><td>—</td><td>1차 사망. 동일 원인, 더 긴 ctx (v2 끝점).</td></tr>
+  <tr><td><span class="marker-black">×</span></td><td class="num">9311</td><td>100TB (CXL)</td><td>2차 사망. CXL 100TB로도 KV 수용 불가 → OOM (그래프 범위 밖).</td></tr>
+</table>
+
+<h4>B300 NVL72 (HBM3e 288GB×72 = 20.7TB, 8.0 TB/s, ~121kW)</h4>
+<p><em>SOCAMM 없음 — HBM 한계 도달 시 곧장 CXL 100TB 풀로 전환</em></p>
+<table>
+  <tr><th>마커</th><th>x 위치</th><th>메모리</th><th>내용</th></tr>
+  <tr><td><span class="marker-orange">▲</span></td><td class="num">159</td><td>16TB</td><td>HBM → CXL 전환. SOCAMM 단계 없이 HBM 한계 초과 시 직접 CXL.</td></tr>
+  <tr><td><span class="marker-black">×</span></td><td class="num">1917</td><td>196TB</td><td>2차 사망. CXL 100TB 풀 + HBM으로도 KV 수용 불가 → OOM.</td></tr>
+</table>
+
+<h4>R100 Vera Rubin NVL72 (HBM4 288GB×72 = 20.7TB, 22.0 TB/s, ~199kW)</h4>
+<p><em>3단계 메모리: HBM → SOCAMM 80TB → CXL 100TB</em></p>
+<table>
+  <tr><th>마커</th><th>x 위치</th><th>메모리</th><th>내용</th></tr>
+  <tr><td><span class="marker-orange">▲</span></td><td class="num">178</td><td>18TB</td><td>HBM → SOCAMM 전환. KV가 HBM 20.7TB 한계 초과 → SOCAMM 80TB 풀로 넘침.</td></tr>
+  <tr><td><span class="marker-purple">◆</span></td><td class="num">940</td><td>96TB</td><td>SOCAMM → CXL 전환. SOCAMM 80TB 한계 도달 → CXL 100TB 풀로 넘침.</td></tr>
+  <tr><td><span class="marker-black">×</span></td><td class="num">940</td><td>96TB</td><td>2차 사망 (R100+SOCAMM). SOCAMM 한계 도달 시점 = 전환점과 동일. CXL 연장 전 사망.</td></tr>
+  <tr><td><span class="marker-black">×</span></td><td class="num">1936</td><td>198TB</td><td>2차 사망 (R100+CXL). CXL 100TB까지 합쳐도 KV 수용 불가 → 최종 OOM.</td></tr>
+</table>
+</section>
+
+<!-- ═══════════════════════════════════════════ -->
+<section id="flow">
+<h2>메모리 넘침 흐름 — HBM → Main → CXL</h2>
+
+<p>3개 GPU 세대의 메모리 확장 경로를 한눈에 비교:</p>
+<pre>
+H100:   HBM 2.56TB ──▲(x=52)──> CXL 100TB ────────×(x=9311, 범위밖)
+B300:   HBM 20.7TB ──▲(x=159)─> CXL 100TB ────────×(x=1917)
+R100:   HBM 20.7TB ──▲(x=178)─> SOCAMM 80TB ──◆(x=940)─> CXL 100TB ──×(x=1936)
+</pre>
+
+<div class="key-insight">
+<h4>핵심 통찰 — 세 가지 구조적 차이</h4>
+<p>
+<strong>1. R100만 3단계 (SOCAMM 포함).</strong> H100과 B300은 SOCAMM 없이 HBM → CXL로 직접 전환.
+R100의 SOCAMM 중간 단계는 80TB의 완충지로, x=178부터 x=940까지 약 <strong>5.3배 구간을 연장</strong>한다.
+</p>
+<p>
+<strong>2. 1차 사망 ●은 H100 전용.</strong> B300과 R100은 20.7TB HBM에 2T 가중치(4TB)가 들어오지만,
+H100은 2.56TB에 4TB가 안 들어온다. 세대 도약 시 가장 먼저 해결되는 것이 '모델 올리기'다.
+</p>
+<p>
+<strong>3. R100의 '성공의 역설'.</strong> R100은 너무 빨라서(22 TB/s) x=50에서 40.5TB를 만들어내고,
+이것이 20.7TB HBM에 넘친다. 이것은 결함이 아니라 <strong>"Too Fast to Fit"</strong> — 컴퓨팅이 메모리를 앞지르는 현상.
+CXL과 SOCAMM은 이 역설을 흡수하기 위한 필수 인프라다.
+</p>
+</div>
+</section>
+
+<!-- ═══════════════════════════════════════════ -->
+<section id="chart">
+<h2>분석 그래프 + 마커 상세 테이블</h2>
+
+<div class="chart-frame">
+  <img src="jensen-huang-chart-v3-b-wide-v2.png" alt="Jensen v3 Frame(b) wide chart">
+  <p class="footnote">Frame (b) x=50~2000. 곡선 + 약속된 공통 마커(●×▲◆)만 표시. 상세 내용은 하단 테이블 참조.</p>
+</div>
+
+<div class="legend-inline">
+  <span><span class="marker-red">●</span> 1차 사망 (가중치&gt;HBM)</span>
+  <span><span class="marker-black">×</span> 2차 사망 (OOM)</span>
+  <span><span class="marker-orange">▲</span> HBM→Main/CXL 전환</span>
+  <span><span class="marker-purple">◆</span> SOCAMM→CXL 전환</span>
+</div>
+
+<p class="footnote">그래프 파일: <code>jensen-huang-chart-v3-b-wide-v2.png</code> · 마커 상세 테이블: <code>jensen-huang-chart-v3-b-markers-table.md</code></p>
+</section>
+
+<!-- ═══════════════════════════════════════════ -->
+<section id="strategic">
+<h2>전략적 시사점</h2>
+
+<div class="key-insight">
+<h4>1. H100 투자 중단 타당성 확보</h4>
+<p>
+H100은 GPT 2T(400GB 가중치, BF16 기준 4TB) 서빙이 물리적으로 불가. 1차 사망 지점 x=200에서 0 TPS.
+신규 대규모 모델 서빙용 H100 추가 투자는 비권장. 기존 H100은 Qwen3-235B(32K)·Kimi K2.5(128K) 범위에서만 운용.
+</p>
+</div>
+
+<div class="key-insight">
+<h4>2. B300 = 현재 가성비 최적, 단 용량 설계 시급</h4>
+<p>
+B300은 x=1917에서 2차 사망(196TB 한계)까지 버틴다. 현재 상용 서비스(GPT 2T 400K) 운용 가능한 가성비 최적점.
+다만 <strong>SOCAMM 중간 단계가 없어</strong> CXL로 곧장 넘치는 구조 — 대규모 동시 사용자 폭증 시 CXL 대역(2-4 TB/s)이 병목될 수 있음. 용량 확장 아키텍처 사전 설계 필요.
+</p>
+</div>
+
+<div class="key-insight">
+<h4>3. R100 + CXL = 미래 대비, 그러나 종착지 아님</h4>
+<p>
+R100은 3단계 메모리(HBM→SOCAMM→CXL)로 x=1936까지 확장하지만, 여기서도 2차 사망(198TB 한계) 발생.
+즉 <strong>CXL 100TB로도 부족한 극단 시나리오</strong>가 존재한다. 차세대 풀드 메모리(CXL 4.0, 256TB+ 또는 다른 계층)가 필요.
+R100 투자는 동시에 CXL 3.2 인프라 투자를 전제로 해야 의미가 있다.
+</p>
+</div>
+
+<div class="key-insight">
+<h4>4. 컴퓨팅 vs 메모리 괴리 확대 — 구조적 전환점</h4>
+<p>
+세대를 거듭할수록 컴퓨팅(TB/s)은 HBM 대역보다 빠르게 성장: H100 3.35 → B300 8.0 → R100 22.0 TB/s (6.6배).
+반면 HBM 용량은 B300·R100 모두 20.7TB로 동일. <strong>메모리 벽이 더 가파르게 다가온다.</strong>
+CXL/SOCAMM 풀드 메모리는 선택이 아닌 필수 — 차세대 서빙 인프라의 핵심 경쟁력은 GPU 자체가 아니라 메모리 계층 설계에 있다.
+</p>
+</div>
+</section>
+
+<!-- ═══════════════════════════════════════════ -->
+<section id="recommend">
+<h2>권고사항</h2>
+
+<div class="recommend">
+<h3>✅ 실행 권고</h3>
+<table>
+  <tr><th>우선순위</th><th>권고</th><th>근거</th></tr>
+  <tr>
+    <td><strong>즉시</strong></td>
+    <td>H100 신규 투자 동결. 기존 H100은 Qwen3/Kimi 범위로 운용 한정.</td>
+    <td>1차 사망 x=200 — 2T 모델 서빙 물리 불가.</td>
+  </tr>
+  <tr>
+    <td><strong>단기 (6개월)</strong></td>
+    <td>B300 중심 서빙 랙 구축. CXL 100TB 풀드 메모리 파일럿.</td>
+    <td>현재 가성비 최적. x=1917까지 운용 가능. CXL 전환 지점(x=159) 대비.</td>
+  </tr>
+  <tr>
+    <td><strong>중기 (12개월)</strong></td>
+    <td>R100 도입 시 SOCAMM 80TB + CXL 100TB 3단계 메모리 아키텍처 동시 설계.</td>
+    <td>R100 단독 HBM(20.7TB)으로는 x=178 초과 불가. C2C + SOCAMM Scale-Out 전제.</td>
+  </tr>
+  <tr>
+    <td><strong>장기 (18개월+)</strong></td>
+    <td>CXL 4.0 / 차세대 풀드 메모리(256TB+) 로드맵 확보. R100 2차 사망(x=1936, 198TB) 대비.</td>
+    <td>R100+CXL 100TB로도 극단 ctx에서 OOM. 다음 메모리 계층 필요.</td>
+  </tr>
+</table>
+</div>
+</section>
+
+<!-- ═══════════════════════════════════════════ -->
+<section id="risk">
+<h2>리스크 &amp; 주의사항</h2>
+
+<div class="risk">
+<h3>⚠️ 추정치 명시</h3>
+<table>
+  <tr><th>항목</th><th>확정/추정</th><th>비고</th></tr>
+  <tr><td>H100/B300/R100 HBM 스펙</td><td class="verdict-yes">확정</td><td>NVIDIA 공식 스펙 기반</td></tr>
+  <tr><td>12포인트 TPS/MW 판독값</td><td class="verdict-yes">확정</td><td>GTC 차트 이미지 육안 판독</td></tr>
+  <tr><td>Qwen3 KV cache (192.51 KB/tok)</td><td class="verdict-yes">확정</td><td>Qwen3-235B-A22B 공식 config (GQA)</td></tr>
+  <tr><td>Kimi K2.5 KV (84.38 KB/tok)</td><td class="verdict-warn">추정</td><td>DeepSeek-V3 MLA 기반 유도. 대외비</td></tr>
+  <tr><td>GPT MoE 2T KV (256 KB/tok)</td><td class="verdict-warn">추정</td><td>공식 스펙 비공개. 상용 시뮬레이션</td></tr>
+  <tr><td>CXL 3.2 100TB 대역/전력</td><td class="verdict-warn">추정</td><td>~2-4 TB/s, ~8kW. 산업 벤치마크 기반</td></tr>
+  <tr><td>사망 지점 x 값 (159/178/940/1917/1936)</td><td class="verdict-warn">추정</td><td>KV 추정치 기반 역산. 정확한 동시 사용자 수는 실측 필요</td></tr>
+</table>
+<p class="footnote">추정치는 합리적 근거 기반이나, 실측 검증 전까지 의사결정 시 안전 마진(±20%) 권장.</p>
+</div>
+
+<div class="risk">
+<h3>⚠️ 구조적 리스크</h3>
+<p><strong>1. CXL 대역 병목.</strong> CXL 3.2는 용량(100TB)은 크지만 대역(2-4 TB/s)이 HBM(8-22 TB/s)에 비해 현저히 낮다.
+대규모 동시 사용자 폭증 시 CXL이 용량은 커버해도 대역이 병목될 수 있다 — 응답 지연(지연 증가) 발생 가능.</p>
+<p><strong>2. SOCAMM 단계 부재(B300).</strong> B300은 HBM→CXL 직접 전환이라, 중간 완충지 없이 CXL 대역에 즉시 의존.
+고동시 사용자 서비스에서 B300+CXL 조합은 R100+SOCAMM+CXL보다 대역 민감도가 높다.</p>
+<p><strong>3. 차트 판독의 한계.</strong> 사망 지점은 추정 KV cache 기반 역산. 모델 아키텍처(MoE 활성 파라미터, attention 최적화)가 바뀌면
+지점이 이동한다. R100 1.65M(x=50)은 차트에서 신뢰하나, 이것이 40.5TB spill이라는 역산은 KV 추정에 의존.</p>
+</div>
+</section>
+
+<!-- ═══════════════════════════════════════════ -->
+<section>
+<h2>결론</h2>
+<div class="card">
+<p>
+젠슨황의 차트가 보여주는 것은 <strong>"GPU 세대별 사망 지도"</strong>다. H100은 이미 1차 사망(가중치 한계),
+B300과 R100은 2차 사망(OOM)까지 버티지만 결국 같은 벽에 부딪힌다 — <strong>메모리가 컴퓨팅을 따라잡지 못하는 벽</strong>.
+</p>
+<p>
+CXL 3.2 100TB 풀드 메모리는 이 벽을 5배(R100 기준 x=178→940) 연장하지만, 영원히 허물지는 못한다(x=1936에서 최종 사망).
+다음 경쟁 우위는 <strong>GPU 자체가 아니라 메모리 계층 설계</strong>에서 결정된다. 이것이 본 차트가 C-Level에 던지는 핵심 메시지다.
+</p>
+<p class="footnote">— 분석 단일 출처(SSOT): jensen-huang-chart-analysis-v3.md · 마커 테이블: jensen-huang-chart-v3-b-markers-table.md —</p>
+</div>
+</section>
+
+</div>
+</body>
+</html>

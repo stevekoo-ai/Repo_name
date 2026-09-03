@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CXL Daily Update 19호 &#x2014; 2026-08-19</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      colors: {
+        canvas: '#f5f5f7',
+        ink: '#1d1d1f',
+        sub: '#6e6e73',
+        indigo: '#4f46e5',
+        indigoLight: '#eef2ff',
+        green: '#059669',
+        yellow: '#d97706',
+        red: '#dc2626',
+        gray: '#6b7280',
+      }
+    }
+  }
+}
+</script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'SF Pro Display', sans-serif; background: #f5f5f7; color: #1d1d1f; }
+  .card { background: white; border-radius: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.06); transition: all 0.2s ease; }
+  .card:hover { box-shadow: 0 4px 12px rgba(79,70,229,0.15), 0 2px 4px rgba(0,0,0,0.08); transform: translateY(-1px); }
+  .pill { display: inline-flex; align-items: center; padding: 2px 10px; border-radius: 999px; font-size: 12px; font-weight: 600; }
+  .pill-green { background: #ecfdf5; color: #059669; }
+  .pill-yellow { background: #fffbeb; color: #d97706; }
+  .pill-red { background: #fef2f2; color: #dc2626; }
+  .pill-gray { background: #f3f4f6; color: #6b7280; }
+  .pill-indigo { background: #eef2ff; color: #4f46e5; }
+  .row { transition: background 0.15s; }
+  .row:hover { background: #eef2ff; }
+  .fade-in { animation: fadeIn 0.5s ease-in; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+  .delta-card { border-left: 3px solid #4f46e5; }
+  .delta-card.urgent { border-left-color: #dc2626; }
+  .delta-card.high { border-left-color: #d97706; }
+  .delta-card.medium { border-left-color: #059669; }
+  .delta-card.low { border-left-color: #6b7280; }
+  .text-sub { color: #6e6e73; font-size: 0.875rem; }
+  .section-title { font-size: 1.5rem; font-weight: 700; margin-bottom: 1rem; color: #1d1d1f; }
+  .hero-tag { background: #4f46e5; color: white; padding: 4px 12px; border-radius: 8px; font-size: 13px; font-weight: 600; }
+</style>
+</head>
+<body class="bg-canvas">
+<div class="max-w-5xl mx-auto px-6 py-8 fade-in">
+
+<!-- HERO -->
+<div class="mb-8">
+  <div class="flex items-center gap-3 mb-3">
+    <span class="hero-tag">CXL Daily Update #19</span>
+    <span class="text-sub">2026-08-19 · 04:00 KST</span>
+  </div>
+  <h1 class="text-3xl font-bold mb-3" style="letter-spacing:-0.02em">AMD Data Center 2x growth + Intel memory return signal → CXL ecosystem acceleration</h1>
+  <p class="text-lg text-sub">H2 2026 CXL Product Planning &#x2014; 8 of 12 categories changed, 4 core signals (★★★/★★)</p>
+</div>
+
+<!-- 한 줄 진단 -->
+<div class="card p-5 mb-6">
+  <div class="flex items-start gap-3">
+    <span class="text-2xl">&#x1f50d;</span>
+    <div>
+      <p class="font-semibold mb-1">One-Line Diagnosis</p>
+      <p class="text-sub leading-relaxed"><strong>AMD Data Center 2x YoY growth + Intel memory business return signal + Vera Rubin NAND spillover → CXL ecosystem expansion accelerating.</strong> 8 of 12 categories shifted from unchanged to changed, 2 of which (Controller Vendors, Memory Price) are ★★-grade core signals.</p>
+    </div>
+  </div>
+</div>
+
+<!-- KEY HEADLINES -->
+<h2 class="section-title">&#x1f7e2; Key Headlines</h2>
+
+<!-- ★★ #1 -->
+<div class="card delta-card high p-5 mb-4">
+  <div class="flex items-center gap-2 mb-2">
+    <span class="pill pill-red">&#x2605;&#x2605;</span>
+    <span class="pill pill-indigo">컨트롤러 벤더 / CPU-GPU</span>
+  </div>
+  <h3 class="text-xl font-bold mb-2">AMD Q2 Record: Data Center Revenue 2x YoY Growth, EPYC Dominance</h3>
+  <p class="text-sub mb-3">Source: <a href="https://www.eenewseurope.com/en/amd-ai-revenue-surges-in-record-quarter/" target="_blank" class="text-indigo hover:underline">eeNews Europe</a>, Aug 19 (approx.)</p>
+  <div class="mb-3">
+    <p class="font-semibold mb-1">[변경]</p>
+    <p class="text-sub">AMD Q2 2026 total revenue $11.5B (+107% YoY). Server+Accelerator $6.7B (58% of total). Data Center revenue <strong>doubled YoY</strong>. EPYC server chips' strong cloud/enterprise purchasing leads. Q3 Server/Accelerator forecast ~$13B.</p>
+  </div>
+  <div class="mb-3">
+    <p class="font-semibold mb-1">[영향]</p>
+    <p class="text-sub">EPYC 9005 (Turin, CXL 2.0) and EPYC 9006 (Venice, CXL 3.1) CXL memory expansion demand directly translates to revenue growth. The 2x surge in the quarter right after Venice July launch means <strong>CXL 3.1 compatible memory pooling adoption is already accelerating</strong>. AMD servers adopting CXL memory expanders as standard option.</p>
+  </div>
+  <div>
+    <p class="font-semibold mb-1">[액션]</p>
+    <p class="text-sub" style="font-size:0.8125rem; line-height:1.6">
+      DRAFT v0.9 3장/5.1b절(AMD EPYC CXL) 반영:<br>
+      <code style="background:#f3f4f6;padding:2px 6px;border-radius:4px">기존: "AMD EPYC 9005 (Turin) — CXL 2.0, 2024 dominant CXL 2.0 서버 세대"<br>
+      → 변경: "AMD EPYC 9005 (Turin) — CXL 2.0, Q2 2026 Data Center 매출 2배 급성장($11.5B). EPYC 클라우더 강세 구매로 Server+Accelerator $6.7B(58%). Q3 예상 $13B. CXL 2.0/3.1 메모리 풀링 채택 가속 신호."</code><br>
+      <code style="background:#f3f4f6;padding:2px 6px;border-radius:4px">기존: "AMD EPYC 9006 (Venice, Zen6) — CXL 3.1 + 5세대 Infinity Fabric, 2026.07"<br>
+      → 변경: "AMD EPYC 9006 (Venice, Zen6) — CXL 3.1 + 5세대 Infinity Fabric, 2026.07 출시. Turin Q2 2배 급성장 직후 출시 — CXL 3.1 메모리 확장 채택의 다음 단계. Q3 Server/Accelerator $13B 예측."</code>
+    </p>
+  </div>
+</div>
+
+<!-- ★★ #2 -->
+<div class="card delta-card high p-5 mb-4">
+  <div class="flex items-center gap-2 mb-2">
+    <span class="pill pill-red">&#x2605;&#x2605;</span>
+    <span class="pill pill-indigo">CPU/GPU CXL</span>
+  </div>
+  <h3 class="text-xl font-bold mb-2">Intel CEO "New Memory Architecture" Pet Project — Memory Business Return Signal</h3>
+  <p class="text-sub mb-3">Source: <a href="https://www.tomshardware.com/pc-components/ram" target="_blank" class="text-indigo hover:underline">Tom's Hardware</a>, Aug 12</p>
+  <div class="mb-3">
+    <p class="font-semibold mb-1">[변경]</p>
+    <p class="text-sub">Intel CEO mentioned "pet project related to a new memory architecture." Signal of Intel's memory/storage business return.</p>
+  </div>
+  <div class="mb-3">
+    <p class="font-semibold mb-1">[영향]</p>
+    <p class="text-sub">Intel withdrew from HBM/DRAM markets long ago, but "new memory architecture" may point to CXL-based memory expansion or PNM (Processing Near Memory). Intel positions CXL memory pooling as the core differentiator in Diamond Rapids (CXL 3.0). Direct hardware re-entry would likely be at the CXL controller/IP layer, not DRAM manufacturing.</p>
+  </div>
+  <div>
+    <p class="font-semibold mb-1">[액션]</p>
+    <p class="text-sub" style="font-size:0.8125rem; line-height:1.6">
+      DRAFT v0.9 5.1절(Intel Xeon) 반영:<br>
+      <code style="background:#f3f4f6;padding:2px 6px;border-radius:4px">기존: "Intel Xeon 6 (Granite Rapids) CXL 2.0"<br>
+      → 변경: "Intel CEO 2026.08 '새 메모리 아키텍처' pet project 언급 — Intel의 메모리/저장 사업 복귀 신호. Diamond Rapids(CXL 3.0)에서 CXL 메모리 풀링을 핵심 차별화 — 하드웨어 복귀는 CXL 컨트롤러/IP 레이어에서 가능."</code>
+    </p>
+  </div>
+</div>
+
+<!-- 중요 변경 신호 -->
+<h2 class="section-title">&#x1f534; Important Changes (★★)</h2>
+
+<!-- ★★ #3 -->
+<div class="card delta-card high p-5 mb-4">
+  <div class="flex items-center gap-2 mb-2">
+    <span class="pill pill-red">&#x2605;&#x2605;</span>
+    <span class="pill pill-indigo">메모리 가격/실적</span>
+  </div>
+  <h3 class="text-xl font-bold mb-2">TrendForce: Samsung/SK Hynix H1 2026 CapEx +35%, NVIDIA drops from Samsung Top 5</h3>
+  <p class="text-sub mb-3">Source: <a href="https://www.trendforce.com/news/" target="_blank" class="text-indigo hover:underline">TrendForce (WebFetch summary)</a>, Aug 17</p>
+  <div class="mb-3">
+    <p class="font-semibold mb-1">[변경]</p>
+    <p class="text-sub">Samsung and SK Hynix H1 2026 semiconductor fabrication facility investment up 35% YoY. NVIDIA confirmed absent from Samsung's top 5 customer list.</p>
+  </div>
+  <div class="mb-3">
+    <p class="font-semibold mb-1">[영향]</p>
+    <p class="text-sub">HBM demand continues growing, but Samsung's top customer structure is reshaping — NVIDIA dependency decreasing, CSP diversification progressing. Samsung/SK Hynix 35% CapEx increase reflects long-term HBM/CXL memory supply expansion plans. Samsung's DRAM scale advantage continues in CXL DDR5 module raw material supply.</p>
+  </div>
+  <div>
+    <p class="font-semibold mb-1">[액션]</p>
+    <p class="text-sub" style="font-size:0.8125rem; line-height:1.6">
+      DRAFT v0.9 10.4절(메모리사 실적) 반영:<br>
+      <code style="background:#f3f4f6;padding:2px 6px;border-radius:4px">기존: "Samsung DRAM 점유율 39% vs SK Hynix 26% 역전 (Counterpoint, 2026-08-04)"<br>
+      → 변경: "Samsung/SK Hynix H1 2026 CapEx +35% (TrendForce, Aug 17). HBM 수요는 지속되나 NVIDIA Samsung top 5 customer 제외 — CSP 다변화 진행. DRAM 점유율 39% 역전과 함께 공급 규모 우위 확인."</code>
+    </p>
+  </div>
+</div>
+
+<!-- ★★ #4 -->
+<div class="card delta-card high p-5 mb-4">
+  <div class="flex items-center gap-2 mb-2">
+    <span class="pill pill-red">&#x2605;&#x2605;</span>
+    <span class="pill pill-indigo">Main Memory / CXL 디바이스</span>
+  </div>
+  <h3 class="text-xl font-bold mb-2">TrendForce: Vera Rubin platform demand spills to NAND — TLC spot price rebound</h3>
+  <p class="text-sub mb-3">Source: <a href="https://www.trendforce.com/news/" target="_blank" class="text-indigo hover:underline">TrendForce (WebFetch summary)</a>, Aug 18</p>
+  <div class="mb-3">
+    <p class="font-semibold mb-1">[변경]</p>
+    <p class="text-sub">AI infrastructure demand (core: NVIDIA Vera Rubin platform) driving TLC NAND spot price recovery from June dip via CXL Memory Extension (CMX) spillover.</p>
+  </div>
+  <div class="mb-3">
+    <p class="font-semibold mb-1">[영향]</p>
+    <p class="text-sub">Vera Rubin (CXL 3.1+PCIe 6.4 first implementation platform) requires hybrid memory structure beyond single device type — HBM + CXL expansion + NAND cache. Additional evidence supporting CXL Hybrid (CMM-H, DRAM+NAND) market viability.</p>
+  </div>
+  <div>
+    <p class="font-semibold mb-1">[액션]</p>
+    <p class="text-sub" style="font-size:0.8125rem; line-height:1.6">
+      DRAFT v0.9 2.4절(Hybrid CXL) 반영:<br>
+      <code style="background:#f3f4f6;padding:2px 6px;border-radius:4px">기존: "Samsung CMM-H: DDR5 DRAM + NAND, CXL 2.0 Type 3/PCIe Gen5 x8 결합"<br>
+      → 변경: "Samsung CMM-H: DDR5 DRAM + NAND, CXL 2.0 Type 3/PCIe Gen5 x8 결합. TrendForce(Aug 18): Vera Rubin 플랫폼 수요가 CXL Memory Extension을 통해 TLC NAND spot price rebound — CXL Hybrid(CMM-H)의 시장 타당성 추가 증거."</code>
+    </p>
+  </div>
+</div>
+
+<!-- NVIDIA Dynamo Digest -->
+<h2 class="section-title">&#x1f4e1; NVIDIA Dynamo Blog Digest</h2>
+<div class="card p-5 mb-6">
+  <p class="text-sub mb-3">Source: <a href="https://docs.nvidia.com/dynamo/dev/digest" target="_blank" class="text-indigo hover:underline">docs.nvidia.com/dynamo/dev/digest</a></p>
+  <div class="flex items-center gap-2 mb-3">
+    <span class="pill pill-gray">Total: 6 posts</span>
+    <span class="pill pill-gray">NEW: 0</span>
+    <span class="pill pill-gray">UPDATED: 0</span>
+  </div>
+  <table class="w-full text-sm" style="font-size:0.8125rem">
+    <tr class="row"><td class="py-1 text-sub">Feb 23, 2026</td><td>Flash Indexer: A Story of Inter-Galactic KV Routing</td></tr>
+    <tr class="row"><td class="py-1 text-sub">Apr 30, 2026</td><td>Streaming Tokens and Tools: Multi-Turn Agentic Harness Support</td></tr>
+    <tr class="row"><td class="py-1 text-sub">May 6, 2026</td><td>Dynamo Day 0 support for TokenSpeed</td></tr>
+    <tr class="row"><td class="py-1 text-sub">May 28, 2026</td><td>NVIDIA Dynamo Snapshot: Fast Startup for Inference Workloads</td></tr>
+    <tr class="row"><td class="py-1 text-sub">May 29, 2026</td><td>DynoSim: Simulating the Pareto Frontier</td></tr>
+    <tr class="row"><td class="py-1 text-sub">Jun 12, 2026</td><td>Full-Stack Optimizations for Agentic Inference with Dynamo</td></tr>
+  </table>
+  <p class="text-sub mt-3">Latest post is Jun 12, 2026 — 2 months stale. No new posts this cycle. Agentic inference optimization remains the latest Dynamo focus area (CXL KV offload relevance).</p>
+</div>
+
+<!-- Reference signals -->
+<h2 class="section-title">&#x1f7e1; Reference Signals (★)</h2>
+
+<div class="card p-5 mb-4">
+  <div class="flex items-center gap-2 mb-2">
+    <span class="pill pill-yellow">&#x2605;</span>
+    <span class="font-semibold">AMD 2026 Rack-Scale AI 4x Energy Efficiency</span>
+  </div>
+  <p class="text-sub">Tom's Hardware, Aug 18. 2026 rack-scale AI solution is 4x more energy efficient than 2024 platform. Pacing ahead of 20x by 2030 target. CXL memory pooling's impact on rack-level power/thermal design needs tracking.</p>
+</div>
+
+<div class="card p-5 mb-4">
+  <div class="flex items-center gap-2 mb-2">
+    <span class="pill pill-yellow">&#x2605;</span>
+    <span class="font-semibold">Chip Equipment Crunch: Lead Time 24 Months</span>
+  </div>
+  <p class="text-sub">TrendForce, Aug 19. Shift from "not enough chips" to "not enough equipment to make them." Fab equipment lead time extended to 24 months. Chinese equipment suppliers benefit. Long-term supply constraint for DRAM/HBM/CXL modules.</p>
+</div>
+
+<div class="card p-5 mb-4">
+  <div class="flex items-center gap-2 mb-2">
+    <span class="pill pill-yellow">&#x2605;</span>
+    <span class="font-semibold">Qualcomm Modular AI Framework Open Source</span>
+  </div>
+  <p class="text-sub">ServeTheHome, Aug 18. Qualcomm releases Modular AI framework publicly. AMD and other major chipmakers support. Data center AI deployment standardization — indirectly connected to CXL host-device interoperability standards.</p>
+</div>
+
+<div class="card p-5 mb-4">
+  <div class="flex items-center gap-2 mb-2">
+    <span class="pill pill-yellow">&#x2605;</span>
+    <span class="font-semibold">Stripe OpenRouter $7B+ Acquisition</span>
+  </div>
+  <p class="text-sub">eWeek, Aug 18. Stripe acquiring OpenRouter for $7B+. AI model gateway infrastructure valuation rising — inference infrastructure investment expansion.</p>
+</div>
+
+<div class="card p-5 mb-4">
+  <div class="flex items-center gap-2 mb-2">
+    <span class="pill pill-yellow">&#x2605;</span>
+    <span class="font-semibold">NVIDIA Ohio 8GW AI Campus</span>
+  </div>
+  <p class="text-sub">eeNews Europe, Aug 18. 8GW AI campus for OpenAI in Ohio. Super-scale AI infrastructure expansion — direct CXL demand multiplier.</p>
+</div>
+
+<div class="card p-5 mb-4">
+  <div class="flex items-center gap-2 mb-2">
+    <span class="pill pill-yellow">&#x2605;</span>
+    <span class="font-semibold">TSMC July Revenue NT$467.58B (+44.7% YoY)</span>
+  </div>
+  <p class="text-sub">eeNews Europe, Aug 10. AI silicon demand continues. Indirect impact on CXL controller/IP supply chain.</p>
+</div>
+
+<div class="card p-5 mb-4">
+  <div class="flex items-center gap-2 mb-2">
+    <span class="pill pill-yellow">&#x2605;</span>
+    <span class="font-semibold">Sivers + SemiNex $3.4M InP Optical Transmitter</span>
+  </div>
+  <p class="text-sub">eeNews Europe, Aug 14. InP optical transmitter for AI data center interconnects. Indirectly connected to CXL over optics.</p>
+</div>
+
+<div class="card p-5 mb-4">
+  <div class="flex items-center gap-2 mb-2">
+    <span class="pill pill-yellow">&#x2605;</span>
+    <span class="font-semibold">Alibaba Sells Gaming Studio $1.5B+ for AI Reinvestment</span>
+  </div>
+  <p class="text-sub">Tom's Hardware, Aug 17. Divesting entertainment division to reinvest in AI infrastructure — AI CapEx expansion trend confirmed.</p>
+</div>
+
+<div class="card p-5 mb-4">
+  <div class="flex items-center gap-2 mb-2">
+    <span class="pill pill-yellow">&#x2605;</span>
+    <span class="font-semibold">China Domestic AI Accelerators Target 90% Local Market</span>
+  </div>
+  <p class="text-sub">Tom's Hardware, Aug 18. CAMBRICON, Huawei benefit. NVIDIA/AMD transition accelerating — open CXL standard could apply to China's domestic accelerators.</p>
+</div>
+
+<!-- 12-Category Matrix -->
+<h2 class="section-title">&#x1f4cb; 12-Category Delta Matrix</h2>
+<div class="card p-5 mb-6 overflow-x-auto">
+  <table class="w-full text-sm">
+    <thead>
+      <tr style="border-bottom:2px solid #e5e7eb">
+        <th class="py-2 text-left font-semibold">#</th>
+        <th class="py-2 text-left font-semibold">Category</th>
+        <th class="py-2 text-left font-semibold">Status</th>
+        <th class="py-2 text-left font-semibold">Grade</th>
+        <th class="py-2 text-left font-semibold">Key Signal</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="row" style="border-bottom:1px solid #f3f4f6"><td class="py-2">1</td><td>CXL Spec/Standards</td><td><span class="pill pill-gray">Unchanged</span></td><td>&mdash;</td><td class="text-sub">Consortium 404 → status unknown</td></tr>
+      <tr class="row" style="border-bottom:1px solid #f3f4f6"><td class="py-2">2</td><td>CXL Devices/Media</td><td><span class="pill pill-gray">Unchanged</span></td><td>&mdash;</td><td class="text-sub">TrendForce 503 → direct fetch failed</td></tr>
+      <tr class="row" style="border-bottom:1px solid #f3f4f6"><td class="py-2">3</td><td>Controller Vendors</td><td><span class="pill pill-green">Changed</span></td><td><span class="pill pill-red">&#x2605;&#x2605;</span></td><td class="text-sub">AMD DC 2x growth + Intel memory return signal</td></tr>
+      <tr class="row" style="border-bottom:1px solid #f3f4f6"><td class="py-2">4</td><td>Pooled SW/Apps</td><td><span class="pill pill-gray">Unchanged</span></td><td>&mdash;</td><td class="text-sub">Liqid/MemVerge/Solidigm no announcements</td></tr>
+      <tr class="row" style="border-bottom:1px solid #f3f4f6"><td class="py-2">5</td><td>Server OEM</td><td><span class="pill pill-gray">Unchanged</span></td><td><span class="pill pill-yellow">&#x2605;</span></td><td class="text-sub">Intel Xeon 658X Granite Rapids CXL 1.1 (workstation)</td></tr>
+      <tr class="row" style="border-bottom:1px solid #f3f4f6"><td class="py-2">6</td><td>CPU/GPU CXL</td><td><span class="pill pill-green">Changed</span></td><td><span class="pill pill-red">&#x2605;&#x2605;</span></td><td class="text-sub">AMD Q2 Data Center 2x growth, 2026 AI 4x efficiency</td></tr>
+      <tr class="row" style="border-bottom:1px solid #f3f4f6"><td class="py-2">7</td><td>AI Fabric</td><td><span class="pill pill-green">Changed</span></td><td><span class="pill pill-yellow">&#x2605;</span></td><td class="text-sub">NVIDIA Ohio 8GW AI campus</td></tr>
+      <tr class="row" style="border-bottom:1px solid #f3f4f6"><td class="py-2">8</td><td>Main Memory</td><td><span class="pill pill-green">Changed</span></td><td><span class="pill pill-yellow">&#x2605;</span></td><td class="text-sub">Intel memory return, DDR5 shortage continues</td></tr>
+      <tr class="row" style="border-bottom:1px solid #f3f4f6"><td class="py-2">9</td><td>AI Rack/KV</td><td><span class="pill pill-green">Changed</span></td><td><span class="pill pill-yellow">&#x2605;</span></td><td class="text-sub">AMD 2026 AI 4x efficiency, Qwen3.8 3B downloads</td></tr>
+      <tr class="row" style="border-bottom:1px solid #f3f4f6"><td class="py-2">10</td><td>LLM TCO</td><td><span class="pill pill-green">Changed</span></td><td><span class="pill pill-yellow">&#x2605;</span></td><td class="text-sub">Stripe OpenRouter $7B+ acquisition</td></tr>
+      <tr class="row" style="border-bottom:1px solid #f3f4f6"><td class="py-2">11</td><td>Memory Price</td><td><span class="pill pill-green">Changed</span></td><td><span class="pill pill-red">&#x2605;&#x2605;</span></td><td class="text-sub">Samsung/SK Hynix CapEx +35%, Vera Rubin NAND spillover</td></tr>
+      <tr class="row"><td class="py-2">12</td><td>Market/CSP</td><td><span class="pill pill-green">Changed</span></td><td><span class="pill pill-yellow">&#x2605;</span></td><td class="text-sub">NVIDIA Ohio 8GW, TSMC +44.7%, Alibaba AI reinvestment</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- Data Limitations -->
+<h2 class="section-title">&#x1f4ca; Data Limitations</h2>
+<div class="card p-5 mb-6">
+  <p class="text-sub mb-2"><strong>&#x1f7e2; Automation (fact layer):</strong> WebFetch across 6 domains, Aug 4-19 2026. Raw data preserved in <code>sources/cxl-daily-raw-2026-08-19.md</code>.</p>
+  <p class="text-sub mb-2"><strong>&#x1f534; LLM synthesis (interpretation layer):</strong> Delta identification, grading, DRAFT linkage via LLM reasoning.</p>
+  <p class="text-sub mb-2"><strong>Blocked sites:</strong> CXL Consortium (404, 2 weeks consecutive), TrendForce (503, 2 weeks consecutive), eeNewsEurope (detail URLs 404). Alternatives: Tom's Hardware, ServeTheHome, eWeek, eeNewsEurope (summary).</p>
+  <p class="text-sub mb-2"><strong>Unconfirmed:</strong> AMD MI455X CDNA 5 CXL support (3rd consecutive unconfirmed).</p>
+  <p class="text-sub">Single source: Samsung/SK Hynix CapEx +35% from TrendForce summary — cross-verification needed.</p>
+</div>
+
+<!-- Follow-up Actions -->
+<h2 class="section-title">&#x26a1; Follow-up Actions</h2>
+<div class="card p-5 mb-6">
+  <ol class="text-sub space-y-2" style="font-size:0.875rem">
+    <li><strong>[Immediate]</strong> AMD Q2 Data Center 2x growth → DRAFT 3장/5.1b절 reflection</li>
+    <li><strong>[Immediate]</strong> Intel memory business return signal → DRAFT 5.1절 reflection</li>
+    <li><strong>[Immediate]</strong> Samsung/SK Hynix CapEx +35% + Vera Rubin NAND spillover → DRAFT 10.4절/2.4절 reflection</li>
+    <li><strong>[Next issue]</strong> Consortium 404 cause + LinkedIn/Twitter fallback</li>
+    <li><strong>[Next issue]</strong> TrendForce 503 → eeNewsEurope/Tom's Hardware direct WebFetch expansion</li>
+    <li><strong>[Next issue]</strong> AMD MI455X CDNA 5 CXL support confirmation (3rd consecutive unconfirmed)</li>
+    <li><strong>[Long-term]</strong> TrendForce 503 persistent → Korean econ media (매일경제/한국경제) fallback route</li>
+  </ol>
+</div>
+
+<!-- Footer -->
+<div class="text-center text-sub mt-8 mb-4" style="font-size:0.75rem">
+  <p>Generated by CXL Daily Update automation &#x2014; CLAUDE.md CXL procedure + 12-category sweep + session handoff §4</p>
+  <p>Raw data: <code>sources/cxl-daily-raw-2026-08-19.md</code> &#x2022; DRAFT: <code>wiki/concepts/cxl-memory-product-planning-draft - 복사본.txt</code> (v0.9)</p>
+</div>
+
+</div>
+</body>
+</html>

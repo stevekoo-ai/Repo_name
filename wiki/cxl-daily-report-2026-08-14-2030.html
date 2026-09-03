@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CXL Daily Update — 2026-08-14</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      colors: {
+        canvas: '#f5f5f7',
+        ink: '#1d1d1f',
+        sub: '#6e6e73',
+        indigo: { DEFAULT: '#4f46e5', glow: '#6366f1' },
+      },
+      fontFamily: {
+        sans: ['-apple-system', 'BlinkMacSystemFont', 'SF Pro Display', 'Segoe UI', 'Roboto', 'sans-serif'],
+      },
+    }
+  }
+}
+</script>
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', sans-serif; }
+  .card { transition: transform .2s ease, box-shadow .2s ease; }
+  .card:hover { transform: translateY(-3px); box-shadow: 0 10px 30px -10px rgba(79,70,229,.25), 0 0 0 1px rgba(79,70,229,.15); }
+  .row:hover { background: #eef2ff; }
+  .pill { display:inline-block; padding:2px 10px; border-radius:9999px; font-size:12px; font-weight:600; }
+  .fade-in { animation: fade .5s ease both; }
+  @keyframes fade { from { opacity:0; transform: translateY(6px);} to {opacity:1; transform:none;} }
+  .glow { box-shadow: 0 0 0 1px rgba(79,70,229,.2), 0 8px 24px -8px rgba(79,70,229,.3); }
+  .delta-table th { text-align: left; font-weight: 600; font-size: 13px; color: #6e6e73; border-bottom: 2px solid #e5e5ea; padding: 8px 12px; }
+  .delta-table td { border-bottom: 1px solid #e5e5ea; padding: 10px 12px; font-size: 14px; vertical-align: top; }
+  .severity-star { color: #4f46e5; font-weight: 700; }
+  .severity-star.low { color: #6e6e73; }
+</style>
+</head>
+<body class="bg-canvas text-ink font-sans antialiased">
+
+<div class="max-w-6xl mx-auto px-6 py-10">
+
+  <!-- HERO -->
+  <header class="fade-in mb-8">
+    <div class="flex items-center gap-2 text-sub text-sm mb-2">
+      <span class="pill bg-indigo/10 text-indigo">CXL 상품기획 프로젝트</span>
+      <span>Daily Update 7호</span>
+      <span>·</span>
+      <span>2026-08-14 20:30 KST</span>
+    </div>
+    <h1 class="text-4xl font-bold tracking-tight mb-2">CXL Daily Intelligence</h1>
+    <p class="text-sub text-lg">Microsoft Azure가 첫 주요 CSP로 CXL attached memory private preview — NVIDIA Vera CPU가 CXL 3.1+PCIe 6.4에서 Intel/AMD 제압. HBM 웨이퍼 23% 흡수로 DDR5 비용 2배 → CXL 풀링 가치 한층 강화</p>
+  </header>
+
+  <!-- 한 줄 진단 -->
+  <section class="fade-in mb-8">
+    <div class="bg-white rounded-xl p-5 glow">
+      <p class="text-sm font-semibold text-sub mb-1">🔍 오늘의 진단</p>
+      <p class="text-ink">CXL은 데모→생산→CSP 배포로 전환점에 진입. Microsoft Azure CXL private preview가 "클라우드에서 CXL이 진짜 쓰이는가"에 대한 첫 답변. NVIDIA Vera CPU가 CXL 3.1+PCIe 6.4에서 Intel/AMD 제압하며 CXL 생태 균형 변화. HBM 생산이 DRAM 웨이퍼 23% 흡수 → CXL DDR5 기반 모듈이 "HBM 대비 저비용" 경로로 더욱 가치.</p>
+    </div>
+  </section>
+
+  <!-- NVIDIA Dynamo Digest -->
+  <section class="fade-in mb-8">
+    <h2 class="text-xl font-bold tracking-tight mb-3">🤖 NVIDIA Dynamo Blog Digest</h2>
+    <div class="bg-white rounded-xl p-5 glow">
+      <p class="text-sub text-sm mb-3">전체 6개 포스트 · 🆕 NEW 0 · ✏️ UPDATED 0 · 이번 발행 이후 신규 없음</p>
+      <div class="space-y-2 text-sm">
+        <div class="row flex items-center gap-2 p-2 rounded">
+          <span class="text-sub">2026-06-12</span>
+          <a href="https://docs.nvidia.com/dynamo/dev/digest/agentic-inference" class="text-indigo hover:underline">Full-Stack Optimizations for Agentic Inference with Dynamo</a>
+        </div>
+        <div class="row flex items-center gap-2 p-2 rounded">
+          <span class="text-sub">2026-05-29</span>
+          <a href="https://docs.nvidia.com/dynamo/dev/digest/dynosim-pareto-frontier" class="text-indigo hover:underline">DynoSim: Simulating the Pareto Frontier</a>
+        </div>
+        <div class="row flex items-center gap-2 p-2 rounded">
+          <span class="text-sub">2026-05-28</span>
+          <a href="https://docs.nvidia.com/dynamo/dev/digest/dynamo-snapshot-fast-startup" class="text-indigo hover:underline">Dynamo Snapshot: Fast Startup for Inference Workloads on Kubernetes</a>
+        </div>
+        <div class="row flex items-center gap-2 p-2 rounded">
+          <span class="text-sub">2026-05-06</span>
+          <a href="https://docs.nvidia.com/dynamo/dev/digest/tokenspeed-day-0" class="text-indigo hover:underline">Dynamo Day 0 support for TokenSpeed</a>
+        </div>
+        <div class="row flex items-center gap-2 p-2 rounded">
+          <span class="text-sub">2026-04-30</span>
+          <a href="https://docs.nvidia.com/dynamo/dev/digest/agentic-harnesses" class="text-indigo hover:underline">Streaming Tokens and Tools: Multi-Turn Agentic Harness Support in Dynamo</a>
+        </div>
+        <div class="row flex items-center gap-2 p-2 rounded">
+          <span class="text-sub">2026-02-23</span>
+          <a href="https://docs.nvidia.com/dynamo/dev/digest/flash-indexer" class="text-indigo hover:underline">Flash Indexer: A Story of Inter-Galactic KV Routing</a>
+        </div>
+      </div>
+      <p class="text-xs text-sub mt-3">💡 상품기획 연결점: Dynamo agentic inference 최적화(6/12)가 CXL KV cache 오프로드 수요와 직접 연결. Snapshot/Fast Startup(5/28)는 CXL 메모리 풀의 탄력적 할당과 시너지.</p>
+    </div>
+  </section>
+
+  <!-- Delta 상세 -->
+  <section class="fade-in mb-8">
+    <h2 class="text-xl font-bold tracking-tight mb-4">📊 Delta 상세 — 기준선(DRAFT v0.7 + 6호) 대비 변경</h2>
+
+    <!-- Delta 1 -->
+    <div class="card bg-white rounded-xl p-5 mb-4 glow">
+      <div class="flex items-center gap-2 mb-2">
+        <span class="severity-star">★★★</span>
+        <span class="pill bg-indigo/10 text-indigo">Delta-1</span>
+        <span class="text-sm text-sub">Microsoft Azure CXL attached memory private preview</span>
+      </div>
+      <p class="text-sm text-sub mb-3">🟢 사실층: Microsoft Azure M-series VM에 Astera Labs Leo CXL Smart Memory Controllers 통합. 타겟: AI inference, LLM KV cache, in-memory DB. <strong>"첫 주요 CSP CXL attached memory 배포"</strong> — private preview 단계.</p>
+      <p class="text-sm text-sub mb-3">🔴 해석층: CSP(hyperscaler)가 CXL attached memory를 실제 서비스에 투입 — "CXL이 클라우드에서 진짜 쓰이는가"에 "예"라는 첫 답변. DRAFT 11.2절 CSP 동향과 12.2(옵션 4: CSP composable infra)에 핵심 반영.</p>
+      <p class="text-sm text-sub">📝 DRAFT 반영: <code>기존: "Meta: DDR4 대체 보고."</code> → <code>→ 변경: "🆕 Microsoft Azure M-series에 Astera Labs Leo CXL Smart Memory Controllers private preview — 첫 주요 CSP CXL 메모리 배포."</code></p>
+    </div>
+
+    <!-- Delta 2 -->
+    <div class="card bg-white rounded-xl p-5 mb-4 glow">
+      <div class="flex items-center gap-2 mb-2">
+        <span class="severity-star">★★★</span>
+        <span class="pill bg-indigo/10 text-indigo">Delta-2</span>
+        <span class="text-sm text-sub">NVIDIA Vera CPU, CXL 3.1 + PCIe 6.4 — Intel/AMD 제압</span>
+      </div>
+      <p class="text-sm text-sub mb-3">🟢 사실층: NVIDIA Vera CPU — 88 Olympus cores, CXL 3.1 + PCIe 6.4 지원. <strong>"Among the first chips to support CXL 3.1 and PCIe 6.4, beating out Intel, and possibly AMD."</strong> 50% faster agentic sandbox, 1.2 TB/s memory throughput.</p>
+      <p class="text-sm text-sub mb-3">🔴 해석층: NVIDIA가 GPU(Vera Rubin)뿐만 아니라 CPU까지 CXL 3.1 구현 → CXL 생태에서 NVIDIA 영향력 GPU → CPU까지 확대. CXL 상품기획: "NVLink + CXL 하이브리드 아키텍처" 가능성 → 진영 중립적 메모리 풀 가치 재확인.</p>
+      <p class="text-sm text-sub">📝 DRAFT 반영: <code>기존: (5.1b에 Vera 없음)</code> → <code>→ 변경: "NVIDIA Vera — CXL 3.1 + PCIe 6.4, 88 Olympus cores, Intel/AMD 제압. Rubin GPU와 AI pair."</code></p>
+    </div>
+
+    <!-- Delta 3 -->
+    <div class="card bg-white rounded-xl p-5 mb-4 glow">
+      <div class="flex items-center gap-2 mb-2">
+        <span class="severity-star">★★★</span>
+        <span class="pill bg-indigo/10 text-indigo">Delta-3</span>
+        <span class="text-sm text-sub">DRAM 웨이퍼 크라우딩 — HBM 23% 흡수, DDR5 비용 2배</span>
+      </div>
+      <p class="text-sm text-sub mb-3">🟢 사실층: HBM 생산이 전 세계 DRAM 웨이퍼의 <strong>~23% 흡수</strong> → DDR5 ECC RDIMM 비용 <strong>2배(doubled)</strong>. Q3 40-50% 추가 상승, Q4 30% 추가 전망.</p>
+      <p class="text-sm text-sub mb-3">🔴 해석층: CXL 풀링 가치 proposition 한층 강화(HBM 비싸고 부족 → CXL DDR5 기반 저비용). 단, DDR5 가격 2배 상승은 CXL 모듈 원가에도 직접 반영 — 양면성.</p>
+      <p class="text-sm text-sub">📝 DRAFT 반영: <code>기존: "AI 서버 수요로 DRAM 상승 사이클 지속"</code> → <code>→ 변경: "🆕 HBM 생산이 DRAM 웨이퍼 23% 흡수 → DDR5 ECC RDIMM 비용 2배. CXL 풀링은 HBM 대비 저비용 경로이나, 원가도 DDR5 가격 영향 받음."</code></p>
+    </div>
+
+    <!-- Delta 4 -->
+    <div class="card bg-white rounded-xl p-5 mb-4 glow">
+      <div class="flex items-center gap-2 mb-2">
+        <span class="severity-star">★★</span>
+        <span class="pill bg-indigo/10 text-indigo">Delta-4</span>
+        <span class="text-sm text-sub">SK Hynix 214% YoY 매출, DRAM 점유율 Samsung 39% 역전</span>
+      </div>
+      <p class="text-sm text-sub mb-3">🟢 사실층: SK Hynix 214% YoY 매출 급등 but DRAM 점유율 <strong>26%</strong> → Samsung <strong>39%</strong> 역전. Samsung HBM에서 "growing traction" 확보.</p>
+      <p class="text-sm text-sub mb-3">🔴 해석층: SK Hynix 매출 성장은 HBM/AI DRAM에서, 표준 DRAM 점유율은 Samsung 주도. CXL CMM-D용 DDR5 원물 공급에서 Samsung 규모 우위 지속 가능성.</p>
+      <p class="text-sm text-sub">📝 DRAFT 반영: <code>기존: "SK Hynix 1c DRAM node aggressive ramp vs Samsung HBM4 yield recovery."</code> → <code>→ 변경: "Samsung DRAM 점유율 39% vs SK Hynix 26% 역전. SK 214% YoY 매출 급등 but 표준 DRAM 점유율 Samsung 주도."</code></p>
+    </div>
+
+    <!-- Delta 5 -->
+    <div class="card bg-white rounded-xl p-5 mb-4 glow">
+      <div class="flex items-center gap-2 mb-2">
+        <span class="severity-star">★★</span>
+        <span class="pill bg-indigo/10 text-indigo">Delta-5</span>
+        <span class="text-sm text-sub">Vistara ASIC — millions of servers 생산, AI inference 서버 25% 절감</span>
+      </div>
+      <p class="text-sm text-sub mb-3">🟢 사실층: Vistara ASIC (Microsoft 커스텀): Legacy DDR4 → DDR5 서버 브리지. <strong>"Production across millions of servers"</strong>. AI inference 서버 수 25% 절감. kernel drivers 공개 중.</p>
+      <p class="text-sm text-sub mb-3">🔴 해석층: CXL 풀링이 데모→생산 단계 진입. "millions of servers production" = CXL 컴포저블 인프라의 현실화. DRAFT 4장(Vistara ASIC 신규 엔트리) + 11.2절(CSP 동향).</p>
+      <p class="text-sm text-sub">📝 DRAFT 반영: <code>기존: "Liqid: CXL 풀링 어플라이언스"</code> → <code>→ 변경: "🆕 Vistara ASIC: Legacy DDR4 → DDR5 브리지, 'millions of servers production', AI inference 서버 25% 절감."</code></p>
+    </div>
+
+    <!-- Delta 6 -->
+    <div class="card bg-white rounded-xl p-5 mb-4 glow">
+      <div class="flex items-center gap-2 mb-2">
+        <span class="severity-star">★★</span>
+        <span class="pill bg-indigo/10 text-indigo">Delta-6</span>
+        <span class="text-sm text-sub">DRAM 가격 Q3 40-50% 추가 상승, TrendForce "둔화 시작"</span>
+      </div>
+      <p class="text-sm text-sub mb-3">🟢 사실층: TrendForce(Aug 12): <strong>"Pricing gains persist but slowing"</strong>. 소비자 DRAM budget limit로 가격 상승 둔화 시작. Q3 40-50% 추가 상승, Q4 30% 추가.</p>
+      <p class="text-sm text-sub mb-3">🔴 해석층: AI 서버 DRAM은 여전히 상승, 소비자 DRAM은 가격 탄력성 한계 도달. CXL 풀링 채택에 양면성: AI DRAM 가격 상승 = CXL 가치 강화, 하지만 CXL 모듈 원가(DDR5)도 상승.</p>
+      <p class="text-sm text-sub">📝 DRAFT 반영: <code>기존: "DRAM 가격 이중 추세(소비자 둔화 + AI/서버 지속)"</code> → <code>→ 변경: "🆕 TrendForce(Aug 12): 가격 상승 지속 but 둔화 시작. Consumer DRAM undersupplied but budget limit 도달."</code></p>
+    </div>
+
+    <!-- Delta 7 -->
+    <div class="card bg-white rounded-xl p-5 mb-4 glow">
+      <div class="flex items-center gap-2 mb-2">
+        <span class="severity-star low">★</span>
+        <span class="pill bg-indigo/10 text-indigo">Delta-7</span>
+        <span class="text-sm text-sub">Hot Chips 2026 — XCENA CXL-based memory expansion 플랫폼 데모</span>
+      </div>
+      <p class="text-sm text-sub mb-3">🟢 사실층: Hot Chips 2026 (8/23-25, <strong>Palo Alto, CA</strong> — 6호 Seattle 오타 정정). XCENA CXL-based memory expansion platform with near-data processing 데모 예정.</p>
+      <p class="text-sm text-sub mb-3">🔴 해석층: FMS 2026 MX1 프로덕션 라인업(6호 delta-1)에 이어 XCENA 두 번째 주요 공개. Hot Chips 데모 결과에 따라 CXL 컴퓨테이셔널 메모리 신뢰도 검증.</p>
+      <p class="text-sm text-sub">📝 DRAFT 반영: <code>기존: "XCENA: FMS 2026에서 MX1 프로덕션 라인업 공개."</code> → <code>→ 변경: "🆕 Hot Chips 2026(8/23-25, Palo Alto)에서 CXL-based memory expansion platform with near-data processing 데모 예정."</code></p>
+    </div>
+  </section>
+
+  <!-- Delta 매트릭스 -->
+  <section class="fade-in mb-8">
+    <h2 class="text-xl font-bold tracking-tight mb-3">📈 delta 요약 매트릭스</h2>
+    <div class="bg-white rounded-xl overflow-hidden glow">
+      <table class="delta-table w-full text-sm">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>항목</th>
+            <th>오늘(2026-08-14)</th>
+            <th>영향도</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="row">
+            <td>1</td>
+            <td>Microsoft Azure CXL private preview</td>
+            <td>첫 주요 CSP CXL 메모리 배포 사례</td>
+            <td><span class="severity-star">★★★</span></td>
+          </tr>
+          <tr class="row">
+            <td>2</td>
+            <td>NVIDIA Vera CPU CXL 3.1 + PCIe 6.4</td>
+            <td>Intel/AMD 제압, 88 cores, 최초 CXL 3.1 구현</td>
+            <td><span class="severity-star">★★★</span></td>
+          </tr>
+          <tr class="row">
+            <td>3</td>
+            <td>DRAM 웨이퍼 크라우딩 (HBM 23% → DDR5 2배)</td>
+            <td>HBM 생산이 DRAM 웨이퍼 23% 흡수, DDR5 ECC RDIMM 비용 2배</td>
+            <td><span class="severity-star">★★★</span></td>
+          </tr>
+          <tr class="row">
+            <td>4</td>
+            <td>SK Hynix 214% YoY 매출, DRAM 점유율 Samsung 역전</td>
+            <td>SK 26% vs Samsung 39% 역전, Samsung HBM traction</td>
+            <td><span class="severity-star">★★</span></td>
+          </tr>
+          <tr class="row">
+            <td>5</td>
+            <td>Vistara ASIC millions of servers 생산</td>
+            <td>AI inference 서버 25% 절감, production 단계</td>
+            <td><span class="severity-star">★★</span></td>
+          </tr>
+          <tr class="row">
+            <td>6</td>
+            <td>DRAM 가격 Q3 40-50% 추가 상승</td>
+            <td>TrendForce Aug 12: "가속 둔화 시작", Q3/Q4 수치</td>
+            <td><span class="severity-star">★★</span></td>
+          </tr>
+          <tr class="row">
+            <td>7</td>
+            <td>Hot Chips 2026 XCENA 데모</td>
+            <td>8/23-25 Palo Alto, near-data processing CXL 데모</td>
+            <td><span class="severity-star low">★</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- 12카테고리 상태 -->
+  <section class="fade-in mb-8">
+    <h2 class="text-xl font-bold tracking-tight mb-3">🗂️ 12카테고리 조사 상태</h2>
+    <div class="bg-white rounded-xl overflow-hidden glow">
+      <table class="delta-table w-full text-sm">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>카테고리</th>
+            <th>상태</th>
+            <th>주요 delta</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="row"><td>1</td><td>CXL 스펙/표준</td><td>미변경</td><td>CXL 4.0 스펙 변경 없음</td></tr>
+          <tr class="row"><td>2</td><td>CXL 디바이스/미디어</td><td>미변경</td><td>SMART Modular CMM-E3S 기존</td></tr>
+          <tr class="row"><td>3</td><td>컨트롤러 벤더(7개)</td><td>미변경</td><td>Marvell 48TB, ScaleFlux MC600 (6호 반영 유지)</td></tr>
+          <tr class="row"><td>4</td><td>풀링 SW/어플라이언스</td><td>변경</td><td>Vistara ASIC delta-5 신규</td></tr>
+          <tr class="row"><td>5</td><td>서버 OEM</td><td>미변경</td><td>Dell AI server 주가만</td></tr>
+          <tr class="row"><td>6</td><td>CPU/GPU CXL</td><td>변경</td><td>NVIDIA Vera CXL 3.1 delta-2</td></tr>
+          <tr class="row"><td>7</td><td>AI 패브릭</td><td>미변경</td><td>3-way rivalry 유지</td></tr>
+          <tr class="row"><td>8</td><td>Main Memory</td><td>미변경</td><td>JEDEC DDR6/LPDDR6 6호 delta-5 반영</td></tr>
+          <tr class="row"><td>9</td><td>AI Rack/KV offload</td><td>미변경</td><td>Mooncake x vLLM 5/27 업데이트 기존</td></tr>
+          <tr class="row"><td>10</td><td>LLM TCO 모델</td><td>미변경</td><td>StreamDQ 6호 delta-6 반영 유지</td></tr>
+          <tr class="row"><td>11</td><td>메모리 가격/실적</td><td><strong>변경</strong></td><td>Wafer crowding delta-3, SK/Samsung delta-4, 가격 delta-6</td></tr>
+          <tr class="row"><td>12</td><td>시장/CSP</td><td>변경</td><td>Azure CXL delta-1, Vistara delta-5</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- 미변경 카테고리 -->
+  <section class="fade-in mb-8">
+    <h2 class="text-xl font-bold tracking-tight mb-3">🔍 미변경 카테고리</h2>
+    <div class="bg-white rounded-xl p-5 glow text-sm text-sub">
+      <p>카테고리 1(스펙), 2(디바이스), 5(OEM), 7(AI 패브릭), 8(Main Memory), 9(KV offload), 10(TCO 모델) — 이번 발행 이후 변동 없음. 6호 delta 반영 상태 유지.</p>
+    </div>
+  </section>
+
+  <!-- 테크 헤드라인 -->
+  <section class="fade-in mb-8">
+    <h2 class="text-xl font-bold tracking-tight mb-3">🗞️ 테크/서버 사이트 Top 헤드라인</h2>
+    <div class="bg-white rounded-xl p-5 glow text-sm">
+      <div class="space-y-3">
+        <div>
+          <span class="pill bg-indigo/10 text-indigo mb-1">NVIDIA</span>
+          <p><strong>Vera CPU, CXL 3.1 + PCIe 6.4 지원</strong> — 88 Olympus cores로 Intel/AMD 제압. The Register, Tech-Insider, Wccftech 5개 소스 교차검증.</p>
+        </div>
+        <div>
+          <span class="pill bg-indigo/10 text-indigo mb-1">Microsoft/Azure</span>
+          <p><strong>Azure M-series, Astera Labs Leo CXL Smart Memory Controllers private preview</strong> — 첫 주요 CSP CXL 메모리 배포.</p>
+        </div>
+        <div>
+          <span class="pill bg-indigo/10 text-indigo mb-1">DRAM</span>
+          <p><strong>TrendForce: 가격 상승 지속 but 둔화 시작</strong> — HBM 웨이퍼 23% 흡수, DDR5 ECC RDIMM 비용 2배. Q3 40-50% 추가 상승.</p>
+        </div>
+        <div>
+          <span class="pill bg-indigo/10 text-indigo mb-1">SK Hynix/Samsung</span>
+          <p><strong>SK Hynix 214% YoY 매출 급등 but DRAM 점유율 26% → Samsung 39% 역전</strong> (Counterpoint, Aug 4).</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 후속 액션 -->
+  <section class="fade-in mb-8">
+    <h2 class="text-xl font-bold tracking-tight mb-3">📋 후속 액션</h2>
+    <div class="bg-white rounded-xl p-5 glow text-sm">
+      <ul class="space-y-2">
+        <li class="flex items-start gap-2"><span class="text-sub">☐</span> DRAFT 11.2절: Microsoft Azure CXL private preview (delta-1)</li>
+        <li class="flex items-start gap-2"><span class="text-sub">☐</span> DRAFT 5.1b/5.3: NVIDIA Vera CPU CXL 3.1 엔트리 추가 (delta-2)</li>
+        <li class="flex items-start gap-2"><span class="text-sub">☐</span> DRAFT 10장: HBM wafer crowding / DDR5 2배 가격 (delta-3)</li>
+        <li class="flex items-start gap-2"><span class="text-sub">☐</span> DRAFT 10.4절/11.3절: Samsung DRAM 점유율 39% 역전 (delta-4)</li>
+        <li class="flex items-start gap-2"><span class="text-sub">☐</span> DRAFT 4장: Vistara ASIC millions of servers (delta-5)</li>
+        <li class="flex items-start gap-2"><span class="text-sub">☐</span> DRAFT 10.1절: TrendForce Aug 12 가격 둔화 시작 (delta-6)</li>
+        <li class="flex items-start gap-2"><span class="text-sub">☐</span> DRAFT 3장 XCENA: Hot Chips 2026 데모 예정 + 위치 정정 (delta-7)</li>
+        <li class="flex items-start gap-2"><span class="text-sub">☐</span> <strong>(신규 #41)</strong> Microsoft Azure CXL private preview → production 전환 시점 추적</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 데이터 한계 공개 -->
+  <section class="fade-in mb-8">
+    <h2 class="text-xl font-bold tracking-tight mb-3">📁 데이터 한계 공개</h2>
+    <div class="bg-white rounded-xl p-5 glow text-xs text-sub space-y-1">
+      <p>1. <strong>Microsoft Azure CXL private preview</strong>: Astera Labs 공식 발표 기반. 다수 매체 교차검증. "private preview" 단계 → production 여부 불확실.</p>
+      <p>2. <strong>NVIDIA Vera CXL 3.1</strong>: The Register(1차) + 5개 매체 교차검증. Vera CPU 출시 시점/가격/사양 불명.</p>
+      <p>3. <strong>DRAM wafer crowding 23%</strong>: DataCenterDisk(단일 출처). TechSpot Q3/Q4 가격 전망은 예측.</p>
+      <p>4. <strong>SK Hynix/Samsung 점유율</strong>: Counterpoint via SammyFans(단일 출처). Counterpoint 신뢰도 높으나 원문 미확보.</p>
+      <p>5. <strong>Vistara ASIC</strong>: CXL Consortium webinar white paper. "millions of servers"은 white paper 주장.</p>
+      <p>6. <strong>TrendForce DRAM 가격</strong>: 8/12 업데이트. 직접 원문 미확보.</p>
+      <p>7. <strong>Hot Chips 2026</strong>: XCENA 데모 예정. 실제 결과 미출시.</p>
+    </div>
+  </section>
+
+  <!-- footer -->
+  <footer class="text-center text-xs text-sub pb-6">
+    <p>CXL Daily Update 7호 · 2026-08-14 20:30 KST · DRAFT v0.7 + 6호 기준 · 7건 delta</p>
+    <p>MD: wiki/daily-updates/cxl-daily-update-2026-08-14.md · HTML: wiki/cxl-daily-report-2026-08-14-2030.html</p>
+  </footer>
+
+</div>
+
+</body>
+</html>

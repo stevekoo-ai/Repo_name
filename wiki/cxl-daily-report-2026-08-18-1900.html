@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CXL Daily Update 18호 &#x2014; 2026-08-18</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      colors: {
+        canvas: '#f5f5f7',
+        ink: '#1d1d1f',
+        sub: '#6e6e73',
+        indigo: '#4f46e5',
+        indigoLight: '#eef2ff',
+        green: '#059669',
+        yellow: '#d97706',
+        red: '#dc2626',
+        gray: '#6b7280',
+      }
+    }
+  }
+}
+</script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'SF Pro Display', sans-serif; background: #f5f5f7; color: #1d1d1f; }
+  .card { background: white; border-radius: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.06); transition: all 0.2s ease; }
+  .card:hover { box-shadow: 0 4px 12px rgba(79,70,229,0.15), 0 2px 4px rgba(0,0,0,0.08); transform: translateY(-1px); }
+  .pill { display: inline-flex; align-items: center; padding: 2px 10px; border-radius: 999px; font-size: 12px; font-weight: 600; }
+  .pill-green { background: #ecfdf5; color: #059669; }
+  .pill-yellow { background: #fffbeb; color: #d97706; }
+  .pill-red { background: #fef2f2; color: #dc2626; }
+  .pill-gray { background: #f3f4f6; color: #6b7280; }
+  .pill-indigo { background: #eef2ff; color: #4f46e5; }
+  .row { transition: background 0.15s; }
+  .row:hover { background: #eef2ff; }
+  .fade-in { animation: fadeIn 0.5s ease-in; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+  .delta-card { border-left: 3px solid #4f46e5; }
+  .delta-card.urgent { border-left-color: #dc2626; }
+  .delta-card.high { border-left-color: #d97706; }
+  .delta-card.medium { border-left-color: #059669; }
+  .delta-card.low { border-left-color: #6b7280; }
+  .text-sub { color: #6e6e73; font-size: 0.875rem; }
+  .section-title { font-size: 1.5rem; font-weight: 700; margin-bottom: 1rem; color: #1d1d1f; }
+  .hero-tag { background: #4f46e5; color: white; padding: 4px 12px; border-radius: 8px; font-size: 13px; font-weight: 600; }
+</style>
+</head>
+<body class="bg-canvas">
+<div class="max-w-5xl mx-auto px-6 py-8 fade-in">
+
+<!-- HERO -->
+<div class="mb-8">
+  <div class="flex items-center gap-3 mb-3">
+    <span class="hero-tag">CXL Daily Update #18</span>
+    <span class="text-sub">2026-08-18 · 19:00 KST</span>
+  </div>
+  <h1 class="text-3xl font-bold mb-3" style="letter-spacing:-0.02em">Memory price +500% surge + GB300 NVL72 &#x2192; CXL pooling timing</h1>
+  <p class="text-lg text-sub">H2 2026 CXL Product Planning &#x2014; 7 of 12 categories changed, 2 core signals (&#x2605;&#x2605;&#x2605;)</p>
+</div>
+
+<!-- 한 줄 진단 -->
+<div class="card p-5 mb-6">
+  <div class="flex items-start gap-3">
+    <span class="text-2xl">&#x1f4a1;</span>
+    <div>
+      <p class="font-semibold mb-1">One-Line Diagnosis</p>
+      <p class="text-sub leading-relaxed"><strong>Memory prices up 500% in 12 months + GB300 NVL72 driving 2.4T-parameter model &#x2192; CXL memory pooling timing is the biggest in H2 2026.</strong> 7 of 12 categories shifted from unchanged to changed, 2 of which (Memory Price, Main Memory) are &#x2605;&#x2605;&#x2605;-grade core signals.</p>
+    </div>
+  </div>
+</div>
+
+<!-- KEY HEADLINES -->
+<h2 class="section-title">&#x1f7e2; Key Headlines</h2>
+
+<!-- &#x2605;&#x2605;&#x2605; #1 -->
+<div class="card delta-card urgent p-5 mb-4">
+  <div class="flex items-center gap-2 mb-3">
+    <span class="pill pill-red">&#x2605;&#x2605;&#x2605; Critical</span>
+    <span class="text-sub">Memory prices +500% in 12 months</span>
+  </div>
+  <h3 class="font-bold text-lg mb-2">DDR5 ASP at record highs &#x2014; CXL pooling strongest value proposition</h3>
+  <div class="mb-3">
+    <p class="mb-2"><strong class="text-green">[Changed]</strong> Global memory market in extreme volatility. 128GB DDR5 kit at $3,399 &#x2014; 10x the lowest ever tracked price.</p>
+    <p class="mb-2"><strong class="text-indigo">[Impact]</strong> DDR5 shortage/high pricing &#x2192; CXL memory expansion &#x2192; server DRAM cost reduction 35%+. Memory price surge is the <strong>strongest value proposition</strong> for CXL memory pooling. For server OEMs, CXL memory expander adoption directly translates to cost savings &#x2014; the moment when CXL moves from theory to practice.</p>
+    <p><strong class="text-indigo">[Action]</strong> DRAFT v0.5 Ch.8 (Memory Price/Results), Ch.2.4 (Server Architecture) &#x2014; Old: "Monitor memory prices" &#x2192; New: "Aug 2026 DDR5 ASP up 500% YoY, 128GB kit $3,399. CXL memory pooling ROI transitions from theory to reality."</p>
+    <div class="mt-2 text-xs text-sub">Source: <a href="https://www.tomshardware.com/pc-components/ram/memory-prices-climb-500-percent-in-12-months-up-to-10x-the-lowest-ever-tracked-prices-128gb-of-ddr5-now-usd3-399" class="text-indigo hover:underline" target="_blank">Tom's Hardware, Aug 17</a></div>
+  </div>
+</div>
+
+<!-- &#x2605;&#x2605;&#x2605; #2 -->
+<div class="card delta-card urgent p-5 mb-4">
+  <div class="flex items-center gap-2 mb-3">
+    <span class="pill pill-red">&#x2605;&#x2605;&#x2605; Critical</span>
+    <span class="text-sub">NVIDIA GB300 NVL72 + 2.4T-parameter Qwen3.8</span>
+  </div>
+  <h3 class="font-bold text-lg mb-2">CXL necessity at rack-scale inference &#x2014; KV cache as memory bottleneck</h3>
+  <div class="mb-3">
+    <p class="mb-2"><strong class="text-green">[Changed]</strong> NVIDIA reveals initial performance metrics of 2.4T-parameter open-weight LLM running on GB300 NVL72 rack-scale hardware.</p>
+    <p class="mb-2"><strong class="text-indigo">[Impact]</strong> 2.4T model weights and context state overwhelm single GPU memory &#x2192; CXL memory pooling emerges as essential architecture for KV offload. Agentic AI workloads (stateful, massive context needs) make CXL memory pooling no longer optional but essential.</p>
+    <p><strong class="text-indigo">[Action]</strong> DRAFT v0.5 Ch.9 (AI Rack/KV Offload) &#x2014; Old: "Mooncake 5/27 update retained" &#x2192; New: "GB300 NVL72 (8/12) + 2.4T Qwen3.8 running successfully &#x2014; CXL pooling essential for rack-scale KV cache management."</p>
+    <div class="mt-2 text-xs text-sub">Source: <a href="https://www.eenewseurope.com/en/nvidia-qwen3-8-model-gb300-nvl72/" class="text-indigo hover:underline" target="_blank">EE Times Europe, Aug 12</a></div>
+  </div>
+</div>
+
+<!-- IMPORTANT CHANGES -->
+<h2 class="section-title mt-8">&#x1f7e0; Important Changes (&#x2605;&#x2605;)</h2>
+
+<!-- &#x2605;&#x2605; #1 -->
+<div class="card delta-card high p-5 mb-4">
+  <div class="flex items-center gap-2 mb-2">
+    <span class="pill pill-yellow">&#x2605;&#x2605;</span>
+    <span class="font-semibold">SK Hynix sets first HBF (High-Bandwidth Flash) standard for AI memory</span>
+  </div>
+  <p class="text-sub mb-2">SK Hynix establishes first specification for new storage tier (HBF) between DRAM and SSD for AI memory. Could become a new target tier for CXL memory pooling.</p>
+  <div class="text-xs text-sub">Source: <a href="https://www.eenewseurope.com/en/sk-hynix-sets-first-hbf-standard-for-ai-memory/" class="text-indigo hover:underline" target="_blank">EE Times Europe, Aug 10</a></div>
+</div>
+
+<!-- &#x2605;&#x2605; #2 -->
+<div class="card delta-card high p-5 mb-4">
+  <div class="flex items-center gap-2 mb-2">
+    <span class="pill pill-yellow">&#x2605;&#x2605;</span>
+    <span class="font-semibold">Agentic AI forces enterprise AI server design rethinking</span>
+  </div>
+  <p class="text-sub mb-2">Agentic AI overwhelms current hardware &#x2014; stateful workloads, massive context needs for conversation state &#x2192; CXL pooling as key solution.</p>
+  <div class="text-xs text-sub">Source: <a href="https://www.networkworld.com/article/4206611/agentic-ai-could-force-a-rethink-of-enterprise-ai-server-design-researchers-say.html" class="text-indigo hover:underline" target="_blank">NetworkWorld, Aug 7</a></div>
+</div>
+
+<!-- &#x2605;&#x2605; #3 -->
+<div class="card delta-card high p-5 mb-4">
+  <div class="flex items-center gap-2 mb-2">
+    <span class="pill pill-yellow">&#x2605;&#x2605;</span>
+    <span class="font-semibold">Microsoft AI power bottleneck &#x2014; Azure expansion constrained</span>
+  </div>
+  <p class="text-sub mb-2">Energy/hardware constraints hamper Azure expansion. "AI success depends on enterprise data proximity" &#x2014; data location problem = CXL pooling solution.</p>
+  <div class="text-xs text-sub">Source: <a href="https://www.eweek.com/news/microsoft-ai-power-bottleneck/" class="text-indigo hover:underline" target="_blank">eWeek, Aug 16</a></div>
+</div>
+
+<!-- REFERENCE SIGNALS -->
+<h2 class="section-title mt-8">&#x1f7e1; Reference Signals (&#x2605;)</h2>
+
+<table class="w-full mb-6">
+  <thead>
+    <tr class="border-b border-gray-200">
+      <th class="text-left py-2 px-3 text-sub font-semibold text-sm w-8">#</th>
+      <th class="text-left py-2 px-3 text-sub font-semibold text-sm">Title</th>
+      <th class="text-left py-2 px-3 text-sub font-semibold text-sm w-36">Source</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr class="row border-b border-gray-100">
+      <td class="py-2 px-3 text-sm">1</td>
+      <td class="py-2 px-3 text-sm">Microchip Switchtec 160-Lane PCIe Gen6 (FMS 2026) &#x2014; equivalent CXL 3.0 bandwidth demand</td>
+      <td class="py-2 px-3 text-xs text-sub">ServeTheHome 8/13</td>
+    </tr>
+    <tr class="row border-b border-gray-100">
+      <td class="py-2 px-3 text-sm">2</td>
+      <td class="py-2 px-3 text-sm">AMD Instinct MI455X CDNA 5 &#x2014; ML parallel processing boost, CXL-over-PCIe support TBD</td>
+      <td class="py-2 px-3 text-xs text-sub">ServeTheHome 8/12</td>
+    </tr>
+    <tr class="row border-b border-gray-100">
+      <td class="py-2 px-3 text-sm">3</td>
+      <td class="py-2 px-3 text-sm">Intel Xeon 658X Granite Rapids CXL 1.1 support (workstation tier)</td>
+      <td class="py-2 px-3 text-xs text-sub">ServeTheHome 8/17</td>
+    </tr>
+    <tr class="row border-b border-gray-100">
+      <td class="py-2 px-3 text-sm">4</td>
+      <td class="py-2 px-3 text-sm">Delta GoCool-150 150kW cooling &#x2014; for NVL72, impacts CXL switch fabric thermal design</td>
+      <td class="py-2 px-3 text-xs text-sub">ServeTheHome 8/8</td>
+    </tr>
+    <tr class="row border-b border-gray-100">
+      <td class="py-2 px-3 text-sm">5</td>
+      <td class="py-2 px-3 text-sm">NEO.AI Memory Platform &#x2014; static + dynamic architecture integration</td>
+      <td class="py-2 px-3 text-xs text-sub">EE Times Europe 8/6</td>
+    </tr>
+    <tr class="row border-b border-gray-100">
+      <td class="py-2 px-3 text-sm">6</td>
+      <td class="py-2 px-3 text-sm">Samsung AI Memory Roadmap &#x2014; next-gen datacenter memory redesign</td>
+      <td class="py-2 px-3 text-xs text-sub">NetworkWorld 8/7</td>
+    </tr>
+    <tr class="row border-b border-gray-100">
+      <td class="py-2 px-3 text-sm">7</td>
+      <td class="py-2 px-3 text-sm">Sivers + SemiNex InP Optical Transceiver $3.4M &#x2014; direct link to CXL-over-optics</td>
+      <td class="py-2 px-3 text-xs text-sub">EE Times Europe 8/14</td>
+    </tr>
+    <tr class="row border-b border-gray-100">
+      <td class="py-2 px-3 text-sm">8</td>
+      <td class="py-2 px-3 text-sm">NVIDIA $500B AI Computing push &#x2014; CXL ROI analysis needed for TCO models</td>
+      <td class="py-2 px-3 text-xs text-sub">EE Times Europe 8/12</td>
+    </tr>
+    <tr class="row border-b border-gray-100">
+      <td class="py-2 px-3 text-sm">9</td>
+      <td class="py-2 px-3 text-sm">OVHcloud servers up 87% &#x2014; CXL ROI becomes even more critical</td>
+      <td class="py-2 px-3 text-xs text-sub">NetworkWorld 8/11</td>
+    </tr>
+    <tr class="row border-b border-gray-100">
+      <td class="py-2 px-3 text-sm">10</td>
+      <td class="py-2 px-3 text-sm">NVIDIA Ohio 8GW AI Campus &#x2014; direct CXL demand amplification</td>
+      <td class="py-2 px-3 text-xs text-sub">EE Times Europe 8/18</td>
+    </tr>
+    <tr class="row border-b border-gray-100">
+      <td class="py-2 px-3 text-sm">11</td>
+      <td class="py-2 px-3 text-sm">IBM + OpenAI enterprise AI partnership &#x2014; CXL pooling data locality solution</td>
+      <td class="py-2 px-3 text-xs text-sub">EE Times Europe 8/14</td>
+    </tr>
+    <tr class="row">
+      <td class="py-2 px-3 text-sm">12</td>
+      <td class="py-2 px-3 text-sm">Google Gemini 3.7 Flash &#x2014; inference cost reduction, CXL KV offload synergy</td>
+      <td class="py-2 px-3 text-xs text-sub">eWeek 8/14</td>
+    </tr>
+  </tbody>
+</table>
+
+<!-- Delta Matrix -->
+<h2 class="section-title">&#x1f4cb; 12-Category Delta Matrix</h2>
+
+<table class="w-full mb-6">
+  <thead>
+    <tr class="border-b border-gray-200">
+      <th class="text-left py-2 px-3 text-sub font-semibold text-sm w-8">#</th>
+      <th class="text-left py-2 px-3 text-sub font-semibold text-sm">Category</th>
+      <th class="text-left py-2 px-3 text-sub font-semibold text-sm w-28">Status</th>
+      <th class="text-left py-2 px-3 text-sub font-semibold text-sm w-16">Grade</th>
+      <th class="text-left py-2 px-3 text-sub font-semibold text-sm">Key Signal</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr class="row border-b border-gray-100">
+      <td class="py-2 px-3 text-sm">1</td>
+      <td class="py-2 px-3 text-sm">CXL Specs/Standards</td>
+      <td class="py-2 px-3"><span class="pill pill-gray">Unchanged (?)</span></td>
+      <td class="py-2 px-3 text-xs text-sub">&#x2014;</td>
+      <td class="py-2 px-3 text-sm text-sub">Consortium site 404 &#x2192; status unclear. LinkedIn/Twitter fallback needed.</td>
+    </tr>
+    <tr class="row border-b border-gray-100">
+      <td class="py-2 px-3 text-sm">2</td>
+      <td class="py-2 px-3 text-sm">CXL Devices/Media</td>
+      <td class="py-2 px-3"><span class="pill pill-gray">Unchanged (?)</span></td>
+      <td class="py-2 px-3 text-xs text-sub">&#x2014;</td>
+      <td class="py-2 px-3 text-sm text-sub">TrendForce blocked &#x2192; SMART Modular CMM-E3S line change: none confirmed.</td>
+    </tr>
+    <tr class="row border-b border-gray-100">
+      <td class="py-2 px-3 text-sm">3</td>
+      <td class="py-2 px-3 text-sm">Controller Vendors</td>
+      <td class="py-2 px-3"><span class="pill pill-yellow">&#x25b3; Changed</span></td>
+      <td class="py-2 px-3"><span class="pill pill-green">&#x2605;</span></td>
+      <td class="py-2 px-3 text-sm text-sub">Microchip Switchtec Gen6 (FMS 2026), Marvell Arm+CXL</td>
+    </tr>
+    <tr class="row border-b border-gray-100">
+      <td class="py-2 px-3 text-sm">4</td>
+      <td class="py-2 px-3 text-sm">Pooling SW</td>
+      <td class="py-2 px-3"><span class="pill pill-gray">Unchanged</span></td>
+      <td class="py-2 px-3 text-xs text-sub">&#x2014;</td>
+      <td class="py-2 px-3 text-sm text-sub">Liqid/MemVerge/Solidigm no new releases in 2 weeks.</td>
+    </tr>
+    <tr class="row border-b border-gray-100">
+      <td class="py-2 px-3 text-sm">5</td>
+      <td class="py-2 px-3 text-sm">Server OEM</td>
+      <td class="py-2 px-3"><span class="pill pill-gray">Unchanged</span></td>
+      <td class="py-2 px-3"><span class="pill pill-green">&#x2605;</span></td>
+      <td class="py-2 px-3 text-sm text-sub">Intel Xeon 658X Granite Rapids CXL 1.1 support (workstation)</td>
+    </tr>
+    <tr class="row border-b border-gray-100">
+      <td class="py-2 px-3 text-sm">6</td>
+      <td class="py-2 px-3 text-sm">CPU/GPU CXL</td>
+      <td class="py-2 px-3"><span class="pill pill-gray">Unchanged</span></td>
+      <td class="py-2 px-3"><span class="pill pill-green">&#x2605;</span></td>
+      <td class="py-2 px-3 text-sm text-sub">AMD MI455X CDNA 5 &#x2014; CXL support TBD</td>
+    </tr>
+    <tr class="row border-b border-gray-100">
+      <td class="py-2 px-3 text-sm">7</td>
+      <td class="py-2 px-3 text-sm">AI Fabric</td>
+      <td class="py-2 px-3"><span class="pill pill-yellow">&#x25b3; Changed</span></td>
+      <td class="py-2 px-3"><span class="pill pill-red">&#x2605;&#x2605;&#x2605;</span></td>
+      <td class="py-2 px-3 text-sm text-sub">GB300 NVL72 + 2.4T model, Sivers InP optical transceiver</td>
+    </tr>
+    <tr class="row border-b border-gray-100">
+      <td class="py-2 px-3 text-sm">8</td>
+      <td class="py-2 px-3 text-sm">Main Memory</td>
+      <td class="py-2 px-3"><span class="pill pill-red">&#x2605; Major Change</span></td>
+      <td class="py-2 px-3"><span class="pill pill-yellow">&#x2605;&#x2605;</span></td>
+      <td class="py-2 px-3 text-sm text-sub">DDR5 +500% surge, SK Hynix HBF, NEO.AI, Samsung roadmap</td>
+    </tr>
+    <tr class="row border-b border-gray-100">
+      <td class="py-2 px-3 text-sm">9</td>
+      <td class="py-2 px-3 text-sm">AI Rack/KV Offload</td>
+      <td class="py-2 px-3"><span class="pill pill-yellow">&#x25b3; Changed</span></td>
+      <td class="py-2 px-3"><span class="pill pill-yellow">&#x2605;&#x2605;</span></td>
+      <td class="py-2 px-3 text-sm text-sub">Agentic AI server rethink, Microsoft Azure bottleneck</td>
+    </tr>
+    <tr class="row border-b border-gray-100">
+      <td class="py-2 px-3 text-sm">10</td>
+      <td class="py-2 px-3 text-sm">LLM TCO Model</td>
+      <td class="py-2 px-3"><span class="pill pill-yellow">&#x25b3; Changed</span></td>
+      <td class="py-2 px-3"><span class="pill pill-green">&#x2605;</span></td>
+      <td class="py-2 px-3 text-sm text-sub">NVIDIA financial push, OVHcloud servers +87%</td>
+    </tr>
+    <tr class="row border-b border-gray-100">
+      <td class="py-2 px-3 text-sm">11</td>
+      <td class="py-2 px-3 text-sm">Memory Price/Results</td>
+      <td class="py-2 px-3"><span class="pill pill-red">&#x2605; Major Change</span></td>
+      <td class="py-2 px-3"><span class="pill pill-red">&#x2605;&#x2605;&#x2605;</span></td>
+      <td class="py-2 px-3 text-sm text-sub">Memory prices +500% surge (core signal)</td>
+    </tr>
+    <tr class="row">
+      <td class="py-2 px-3 text-sm">12</td>
+      <td class="py-2 px-3 text-sm">Market/CSP</td>
+      <td class="py-2 px-3"><span class="pill pill-yellow">&#x25b3; Changed</span></td>
+      <td class="py-2 px-3"><span class="pill pill-green">&#x2605;</span></td>
+      <td class="py-2 px-3 text-sm text-sub">Microsoft bottleneck, NVIDIA Ohio 8GW, IBM-OpenAI</td>
+    </tr>
+  </tbody>
+</table>
+
+<!-- Unchanged Re-investigation -->
+<h2 class="section-title">&#x1f50d; Unchanged Categories &#x2014; Re-investigation Results + Block Analysis</h2>
+
+<div class="card p-5 mb-6">
+  <p class="mb-3 text-sm"><strong>Re-investigation Method (2026-08-18 improved):</strong> Acknowledged limitations of previous "site-by-site" method and applied: (1) Keyword + date-filtered WebFetch, (2) "N/A" &#x2192; "reason + next check point", (3) Block cause analysis, (4) Sub-category breakdown.</p>
+
+  <table class="w-full">
+    <thead>
+      <tr class="border-b border-gray-200">
+        <th class="text-left py-2 px-3 text-sub font-semibold text-sm w-8">#</th>
+        <th class="text-left py-2 px-3 text-sub font-semibold text-sm">Category</th>
+        <th class="text-left py-2 px-3 text-sub font-semibold text-sm w-28">Re-check</th>
+        <th class="text-left py-2 px-3 text-sub font-semibold text-sm w-28">Block Cause</th>
+        <th class="text-left py-2 px-3 text-sub font-semibold text-sm">Alternative</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="row border-b border-gray-100">
+        <td class="py-2 px-3 text-sm">1</td>
+        <td class="py-2 px-3 text-sm">CXL Specs/Standards</td>
+        <td class="py-2 px-3"><span class="pill pill-gray">Unchanged (?)</span></td>
+        <td class="py-2 px-3 text-xs text-sub">Consortium site 404</td>
+        <td class="py-2 px-3 text-sm text-sub">LinkedIn/Twitter: no announcement in 2 weeks confirmed</td>
+      </tr>
+      <tr class="row border-b border-gray-100">
+        <td class="py-2 px-3 text-sm">2</td>
+        <td class="py-2 px-3 text-sm">CXL Devices/Media</td>
+        <td class="py-2 px-3"><span class="pill pill-gray">Unchanged (?)</span></td>
+        <td class="py-2 px-3 text-xs text-sub">TrendForce 403, LightCounting 403</td>
+        <td class="py-2 px-3 text-sm text-sub">SMART Modular CMM-E3S line: no change confirmed</td>
+      </tr>
+      <tr class="row border-b border-gray-100">
+        <td class="py-2 px-3 text-sm">4</td>
+        <td class="py-2 px-3 text-sm">Pooling SW</td>
+        <td class="py-2 px-3"><span class="pill pill-gray">Unchanged</span></td>
+        <td class="py-2 px-3 text-xs text-sub">&#x2014;</td>
+        <td class="py-2 px-3 text-sm text-sub">Liqid/MemVerge/Solidigm: no official announcements</td>
+      </tr>
+      <tr class="row border-b border-gray-100">
+        <td class="py-2 px-3 text-sm">5</td>
+        <td class="py-2 px-3 text-sm">Server OEM</td>
+        <td class="py-2 px-3"><span class="pill pill-gray">Unchanged</span></td>
+        <td class="py-2 px-3 text-xs text-sub">Dell/HPE/Supermicro CXL announcements absent</td>
+        <td class="py-2 px-3 text-sm text-sub">Intel Xeon 658X CXL 1.1 confirmed (workstation tier)</td>
+      </tr>
+      <tr class="row">
+        <td class="py-2 px-3 text-sm">6</td>
+        <td class="py-2 px-3 text-sm">CPU/GPU CXL</td>
+        <td class="py-2 px-3"><span class="pill pill-gray">Unchanged</span></td>
+        <td class="py-2 px-3 text-xs text-sub">AMD MI455X CXL support unconfirmed</td>
+        <td class="py-2 px-3 text-sm text-sub">NVIDIA GB300 NVL72 CXL support confirmed</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="mt-4 p-3 bg-indigoLight rounded-lg">
+    <p class="text-sm font-semibold text-indigo mb-2">&#x1f527; Improvement Points</p>
+    <ul class="text-sm text-sub space-y-1">
+      <li>&#x2022; Consortium site 404 &#x2192; Direct WebFetch of Consortium LinkedIn/Twitter</li>
+      <li>&#x2022; TrendForce &#x2192; Korean economic dailies (MailToday, Korea Economic Daily) CXL article search</li>
+      <li>&#x2022; LightCounting &#x2192; Press Releases page fallback</li>
+      <li>&#x2022; SemiAnalysis &#x2192; newsletter.semianalysis.com latest issue check</li>
+      <li>&#x2022; WebSearch API outage &#x2192; WebFetch cross-search coverage</li>
+    </ul>
+  </div>
+</div>
+
+<!-- Data Limitations -->
+<h2 class="section-title">&#x1f4ca; Data Limitations</h2>
+
+<div class="card p-5 mb-6">
+  <ul class="text-sm space-y-2">
+    <li><strong>&#x1f7e2; Automated (fact layer)</strong>: WebFetch collected news from 8 domains, period 2026-08-04 to 18. Raw data preserved in sources/cxl-daily-raw-2026-08-18.md.</li>
+    <li><strong>&#x1f7e0; LLM synthesis (interpretation layer)</strong>: Delta identification, grading, DRAFT linkage are LLM inference.</li>
+    <li><strong>Blocked sites</strong>: CXL Consortium (404), TrendForce (blocked), LightCounting (403), SemiAnalysis (404). 5 alternative sources ensure sufficient coverage.</li>
+    <li><strong>Unconfirmed</strong>: AMD MI455X CDNA 5 CXL-over-PCIe support. To be confirmed in next release.</li>
+    <li><strong>Single source</strong>: Memory price +500% surge from Tom's Hardware only &#x2014; cross-verification needed.</li>
+  </ul>
+</div>
+
+<!-- Follow-up Actions -->
+<h2 class="section-title">&#x26a1; Follow-up Actions</h2>
+
+<div class="card p-5 mb-6">
+  <ol class="text-sm space-y-2">
+    <li><strong>[Immediate]</strong> Memory price +500% &#x2192; Update DRAFT Ch.8/Ch.2.4 (server DRAM 35% reduction ROI explicit)</li>
+    <li><strong>[Immediate]</strong> GB300 NVL72 + 2.4T Qwen3.8 &#x2192; Update DRAFT Ch.9 (CXL KV offload standardization)</li>
+    <li><strong>[Next release]</strong> Investigate Consortium site 404 cause + secure LinkedIn/Twitter fallback path</li>
+    <li><strong>[Next release]</strong> Confirm AMD MI455X CDNA 5 CXL support status</li>
+    <li><strong>[Next release]</strong> Cross-verify memory +500% surge: Tom's Hardware + additional source</li>
+    <li><strong>[Long-term]</strong> WebSearch API outage &#x2192; establish alternative search paths (Bing/DuckDuckGo direct WebFetch)</li>
+  </ol>
+</div>
+
+<!-- Footer -->
+<div class="text-center text-xs text-sub py-6">
+  <p>CXL Daily Update #18 (2026-08-18) &#x2022; 12-category sweep &#x2022; Raw data: sources/cxl-daily-raw-2026-08-18.md</p>
+  <p>Deltas: &#x2605;&#x2605;&#x2605; 2, &#x2605;&#x2605; 3, &#x2605; 8, unchanged 5 (incl. 2 uncertain)</p>
+  <p class="mt-1">Auto-published per CLAUDE.md CXL procedure + 12-category sweep procedure.</p>
+</div>
+
+</div>
+</body>
+</html>
