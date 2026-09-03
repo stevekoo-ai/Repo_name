@@ -1,7 +1,7 @@
 ---
 title: Real Estate Market Entry Framework
 created: 2026-08-09
-updated: 2026-08-22
+updated: 2026-09-03
 tags: [housing, real-estate, decision-framework, personal, platform-city]
 ---
 
@@ -15,6 +15,14 @@ This page defines the decision framework for real estate market entry timing, sp
 3. **플랫폼시티 추적**: Monitoring 플랫폼시티 공공/일반분양 opportunities
 
 The framework bridges macro economic cycles, interest rate environment, 전세가 market trends, and personal constraints to generate WAIT/ENTER signals with event-based triggers.
+
+**Why this matters (philosophical grounding, 2026-09-03 추가)**: 이 프레임은
+"언제 진입하는가"에 답하지만, "왜 SK하이닉스를 실물자산으로 전환하는가"의
+답은 [주식시장의 본질 §13 — 최종 목표: 실물 자산으로의 전환](stock-market-essence.md#13-최종-목표--실물-자산으로의-전환-2026-09-03-ingest)에
+있다 — 주식 보유는 목적이 아니라 자본 팽창의 과실을 실물 자산(내 집
+마련)으로 확정하는 수단이라는 우선순위. [Position & Exposure
+Model](position-exposure-model.md)의 `housing_entry_funds_total`이 매일
+이 전환 여력을 숫자로 노출한다.
 
 ## Decision Hierarchy
 
@@ -180,6 +188,8 @@ Unlike stock trading, real estate decisions are event-driven. These events are d
 
 ## Sources
 
+- [주식시장의 본질 §13 — 최종 목표: 실물 자산으로의 전환](stock-market-essence.md#13-최종-목표--실물-자산으로의-전환-2026-09-03-ingest) — 이 프레임워크의 철학적 근거
+- [Position & Exposure Model (보고서 0절)](position-exposure-model.md) — `housing_entry_funds_total` 매일 계산
 - [Real Estate Decision Tracker](../monitoring/real-estate-decision-tracker.md) — daily decision log
 - [Korea Macro Regime](../entities/korea-macro-regime.md) — macro framework
 - `engine/exporters/real_estate_decision.py` — decision engine implementation
