@@ -195,8 +195,9 @@ def build_index() -> Path:
 <body>
 <h1>생성된 리포트 전체 목록</h1>
 <p class="updated">마지막 갱신: {now} · 이 페이지 자체도 리포트가 새로 생성될 때마다 자동 갱신됩니다
-(scripts/build_reports_index.py, daily-peos-report.yml/sk-hynix-daily-report.yml/subscription-daily-report.yml에서 호출).</p>
-<p><a href="report.html">최신 월간 PEOS 리포트(HTML)</a> · <a href="peos-daily.html">PEOS Daily Dashboard</a> · <a href="index.html">거시경제 투자 시계</a></p>
+(scripts/build_reports_index.py, daily-peos-report.yml/sk-hynix-daily-report.yml/subscription-daily-report.yml/real-estate-sync.yml에서 호출).</p>
+<p><a href="report.html">최신 월간 PEOS 리포트(HTML)</a> · <a href="peos-daily.html">PEOS Daily Dashboard</a> ·
+<a href="real-estate-daily.html">부동산 매매/전월세 Daily Dashboard</a> · <a href="index.html">거시경제 투자 시계</a></p>
 
 <h2>PEOS 일일 리포트 ({len(daily)}건)</h2>
 <table><tr><th>날짜</th><th>링크</th></tr>

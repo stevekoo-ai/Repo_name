@@ -137,11 +137,22 @@ jobs:
           echo "=== CSV 파일 확인 ==="
           ls -lah sources/molit*.csv 2>/dev/null | head -20 || echo "CSV 파일 없음"
 
+      # 2026-09-03 추가 — 사용자 요청 "HTML보고서에 부동산 매매가 전월세에 대해서
+      # 쌓인 데이터만큼 daily 그래프로 보여줘 트렌드가 보고싶다". 위에서 갱신한
+      # data/normalized/molit_*.csv를 그대로 읽어 docs/real-estate-daily.html을
+      # 매번 다시 그린다(engine/report/daily_dashboard.py와 동일 패턴).
+      - name: 부동산 Daily Dashboard 재생성
+        run: python -m engine.report.real_estate_dashboard
+
+      - name: 리포트 인덱스 갱신 (신규 대시보드 링크 반영)
+        run: python3 scripts/build_reports_index.py
+
       - name: 변경사항 커밋 & 푸시
         run: |
           git config user.name "real-estate-sync-bot"
           git config user.email "actions@users.noreply.github.com"
           git add data/normalized/molit* sources/molit*.csv 2>/dev/null || true
+          git add docs/real-estate-daily.html docs/reports-index.html
           [ -f sources/automation-run-log.csv ] && git add sources/automation-run-log.csv
           if git diff --cached --quiet; then
             echo "No changes to commit"
