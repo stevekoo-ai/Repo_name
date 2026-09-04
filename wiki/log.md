@@ -397,14 +397,3 @@ GitHub Actions(00:20 KST)이 매일 잘라 `log-archive/YYYY-MM/YYYY-MM-DD.md`�
 
 2026-09-03 — INGEST(헤벨(Hevel) 투자철학 신설 — 전도서 렌즈로 stock-market-essence.md §1·§9·§12·§13 통합) → 사용자 "위키에 주식 투자에 대한 헤벨 투자철학으로 저장해 놓자" → 첫 질문에서 "헤벨"의 의미를 확인(자본주의 게임판 프레임 재명명인지, 레버리지 전략 페이지인지 잘못 추측) → 사용자가 직접 정정: 헤벨(הֶבֶל, Hevel)은 구약 전도서(Ecclesiastes)를 관통하는 히브리어로, "헛되고 헛되니 모든 것이 헛되도다"의 '헛됨' — 문자적 원뜻은 숨/증기/안개(잡히지 않고 곧 흩어지는 것). 기존 페이지 근접중복 확인(CLAUDE.md ingest 원칙) 결과, 같은 도메인이지만 장르가 다름(stock-market-essence.md는 시장 메커니즘·애널리스트 인용 기반 [OPINION] 모음, 이번 건은 성경 지혜문학을 렌즈로 쓰는 철학적 프레임) → 새 페이지로 분리하되 깊이 교차링크. **반영**: `sources/hevel-ecclesiastes-explanation-2026-09-03.md`(신규, 사용자 설명 원문 + Claude가 정리한 전도서 배경지식 [OPINION/일반지식] 구분) → `wiki/concepts/hevel-investment-philosophy.md`(신규) — 헤벨의 어원·전도서 논지 → 주가=헤벨(증기, 손에 잡히지 않음)이라는 §1·§9 연결, 폰지적 속성(§12)이 곧 헤벨을 붙잡으려는 시도라는 해석, 실물 자산 전환(§13)이 전도서의 "먹고 마시며 낙을 누리라"는 결론과 구조적으로 같다는 핵심 논증, "헤벨=투자 회피 정당화 아님"이라는 경계 명시. `wiki/concepts/stock-market-essence.md` Sources에 상호 백링크 추가. `wiki/index.md`(두 사본 모두) 신규 항목 추가. 코드 변경 없음(순수 위키 페이지 신설), 별도 테스트 불필요.
 
-2026-09-04 — LINT(wiki/ 전체 점검 + index.md 중복 해소) → 사용자 "lint 돌려서 index.md 중복 정리해줘". 스캔 결과 4개 유형 발견, index.md만 이번에 수정(사용자 명시 승인), 나머지는 보고만 하고 미수정(lint 워크플로 원칙 — 확인 전 자동수정 금지).
-
-**[수정 완료] index.md 파일 전체 이중 첨부**: `wiki/index.md`가 통째로 두 번 이어붙여진 상태(1~119줄, 120~238줄이 사실상 같은 내용의 두 사본)였고, 두 사본이 서로 다른 시점에 각각 편집돼 미세하게 갈라져 있었음(1번 사본만 "CXL Daily Update 4호" 최신 항목 보유, 2번 사본만 "Position & Exposure Model" 항목 보유 — 서로 다른 정보를 갖고 있어 한쪽만 버리면 유실 발생). 두 사본을 diff로 대조해 한쪽에만 있는 두 항목을 전부 보존하며 단일 사본(120줄)으로 병합, `# Index` 헤더도 1개로 정리. 원인은 과거 병합 충돌 해소 시 "양쪽 다 유지" 방식이 반복되며 누적된 것으로 추정(기존 log.md에 "양쪽 사본에 항목 추가"라는 표현이 반복된 것과 일치).
-
-**[보고만, 미수정] 동일 파일명이 concepts/·monitoring/(또는 architecture/) 양쪽에 존재, 내용이 서로 다르게 갈라짐 — 7쌍**: `real-estate-decision-tracker.md`·`sk-hynix-decision-tracker.md`·`hbm-cycle-score-status.md`·`market-cycles-leverage-risk-status.md`·`trump-midterm-tracker-status.md`·`panic-recovery-signals-status.md`(전부 monitoring/ vs concepts/), `decision-intelligence.md`(architecture/ vs concepts/) — index.md와 같은 병합 잔재로 추정되지만 diff 결과 두 사본이 서로 다른 append-only 이력을 담고 있어(각각 독립적으로 갱신돼왔을 가능성) 기계적 병합이 위험 — 페어별 수동 대조 필요, 다음 확인 후 처리.
-
-**[보고만, 미수정] 깨진 상대링크 183개(경로형만, 산문 오탐 제외)**: CXL/고객미팅/Jensen Huang 계열 도메인(104개, 이 세션의 주력 도메인이 아니라 원인 파악 보류) + PEOS/투자 도메인(79개, 대부분 세 유형 — ①`../../monitoring/X-status.md`처럼 경로 깊이가 실제와 다른 링크 ②`market-cycles-leverage-risk.md`처럼 지금은 `-status.md`로만 존재하는 옛 파일명 참조 ③`CLAUDE.md`·`architecture-amendment-4layer.md`의 스키마 예시 템플릿(`some-entity.md`/`foo.md` 등, 실제 오류 아님 — 문서 규약 예시)). `log-archive/` 안의 깨진 링크는 append-only 이력이라 원문 그대로 보존, 수정 대상에서 제외.
-
-**[보고만, 미수정] contradiction/stale-claim 전수 검사**: 이번 CXL/customer-meetings 코퍼스(~150개 파일, 다른 세션/기기에서 병합 유입)는 도메인 밖이라 이번 패스에서 내용 검증 안 함 — PEOS/투자 도메인 페이지들은 최근 세션에서 지속적으로 갱신·교차확인돼 온 터라 이번 스캔에서 새로운 모순 발견 없음.
-
-**Commit**: index.md 병합만 반영(`wiki/index.md` 1개 파일). main에 반영.
