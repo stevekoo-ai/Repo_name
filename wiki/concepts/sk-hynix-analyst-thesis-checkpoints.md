@@ -1,7 +1,7 @@
 ---
 title: SK하이닉스 목표주가 근거 체크리스트 — Framework Definition
 created: 2026-07-15
-updated: 2026-08-25
+updated: 2026-09-04
 tags: [sk-hynix, checkpoints, analyst, concept, framework, roic-framework]
 ---
 
@@ -291,6 +291,55 @@ FCF 대비 "50% 이내"에서 "50% 이상"으로 바뀐 것을 "향후 현금흐
 될 수 있다는 시각**. 다만 이건 미래에셋의 현장 답사에 기반한 정성적 해석이라
 [미검증] — 구체적 물량·시점·거래선은 원문에 없음, 향후 확인 필요 항목으로
 남김.
+
+### 🆕 2026-09-04 INGEST — SK하이닉스 "$1조 클럽" 진입, Micron과 나란히
+
+사용자 질문("오늘 미국장은 반도체가 장난아닌데?!? 무슨일이지!?")에 대한
+WebSearch 조사 결과. **이 세션의 WebFetch가 CNBC·Yahoo Finance·
+Bloomberg 등 주요 뉴스 도메인을 egress 차단해 원문 대조는 못 하고
+WebSearch 스니펫 종합에만 의존** — [체크포인트①]·[체크포인트⑧] 관련
+새 근거로 [미검증] 비중이 높게 기록한다. 원문 전문:
+[sources/websearch-sk-hynix-1-trillion-club-2026-09-04.md](../../sources/websearch-sk-hynix-1-trillion-club-2026-09-04.md).
+
+**[FACT, 다수 소스 교차확인] SK하이닉스가 Micron에 이어 시가총액
+"$1조 클럽" 진입** — "AI memory chip rally accelerates" 헤드라인
+([Yahoo Finance](https://finance.yahoo.com/markets/stocks/article/sk-hynix-joins-micron-in-1-trillion-club-as-ai-memory-chip-rally-accelerates-024514610.html)).
+연초 대비 **SK하이닉스 +248%, Micron +210%, 삼성전자 +165%** — 메모리
+3사 전부 급등. **[미검증]** 정확한 시총 산정 시점·환율 기준은 원문
+미열람으로 확인 못 함, 방향성만 채택.
+
+**[FACT, 다수 소스 교차확인] DRAM·HBM 3사 물량이 2027년까지 완전
+판매완료(sold out)** — [체크포인트①](#1-dramnand-가격-모멘텀)의
+"CY27이 공급부족 피크"(2026-07-23 인제스트) 판정과 정합적, 이번 뉴스는
+그 판정을 한 단계 더 강하게 재확인(단순 공급부족을 넘어 "완판"이라는
+표현까지 등장).
+
+**[OPINION, BofA 프레임 — 미검증] "1990년대급 슈퍼사이클"** — 2026년
+글로벌 DRAM 매출 +51% YoY·NAND +45% YoY, ASP는 DRAM +33%·NAND +26%
+전망. [체크포인트①]이 이미 추적 중인 TrendForce 분기 ASP 전망(D램
++13~18% QoQ, HBM4 $4~5/Gb)과 방향은 같으나, BofA 수치는 원문 미열람이라
+그대로 채택하지 않고 별도 병기.
+
+**[체크포인트⑧ 연동] Micron과 "나란히" 1조 달러 도달했다는 것 자체가
+할인 축소 신호일 수 있음** — 체크포인트⑧이 추적해온 "SK하이닉스가
+마이크론 대비 밸류에이션 할인 상태"라는 논지와, 같은 날 같은 클럽에
+진입했다는 이번 뉴스는 방향이 다소 배치될 수 있다 — 할인이 계속
+유지되는지, 이번 랠리로 일부 좁혀졌는지는 이 저장소가 추적하는 선행
+PER(6.8~6.9배 vs 마이크론 10~11배, 2026-07-22 기준)의 최신값 재확인이
+필요한 [미검증] 항목으로 남긴다.
+
+**[FACT, 이 저장소 실측] 같은 날 국내 주가도 동반 급등** —
+2026-09-04 14:14 KST 스냅샷 기준 **1,676,500원(+80,500원, +5.04%)**,
+거래량 205만주(`sources/sk-hynix-auto-report-2026-09-04-1414.md`).
+단 같은 시점 "투자자별 순매수"는 KRX 정산 지연으로 여전히 전일(9/3)
+확정치만 존재 — 9/4 당일 외국인·기관 수급이 이 급등을 어느 비중으로
+견인했는지는 아직 확인 불가, 저녁/익일 리포트에서 재확인 필요.
+
+**[OPINION, 매크로 엇갈림 — 미검증]** 같은 날 미국 고용지표가 예상보다
+강하게 나오며 Fed 금리인상 베팅이 커져 단기채·전반 증시엔 하방 압력이
+있었다는 보도가 함께 나옴 — "거시는 흔들렸는데 메모리 반도체만 그걸
+무시하고 질주"한 날로 해석 가능. [체크포인트③](#3-빅테크-ai-capex--강세약세가-정면충돌하는-지점)이
+추적 중인 "AI CapEx 확신이 거시 리스크를 압도하는지" 질문과 같은 결.
 
 ### 변동 없음 (2026-07-19 확인치 유지, 이번 주기 재검색 미실시)
 
@@ -877,3 +926,4 @@ Warren Buffett의 최근 AI 인터뷰에서 "AI 시대에도 결국 좋은 기�
 - [SK Hynix (000660) Stock Forecast & Price Target - Investing.com](https://www.investing.com/equities/sk-hynix-inc-consensus-estimates)
 - [SK hynix (SKHY) Stock Forecast & Price Target - Investing.com](https://www.investing.com/equities/sk-hynix-adr-consensus-estimates)
 - [미중 기술 경쟁과 HBM 시장의 미래](us-china-tech-competition-hbm.md) (2026-08-01 국제매체 교차검증 상세)
+- [sources/websearch-sk-hynix-1-trillion-club-2026-09-04.md](../../sources/websearch-sk-hynix-1-trillion-club-2026-09-04.md) (2026-09-04, "$1조 클럽" 진입 INGEST)
