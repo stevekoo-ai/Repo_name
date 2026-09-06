@@ -165,3 +165,6 @@ timestamp_utc,workflow,step,attempts_used,max_attempts,result
 2026-09-06T19:43:16Z,real-estate-sync,apartment_rent,1,36,success
 2026-09-06T19:43:34Z,real-estate-sync,villa_sale,1,36,success
 2026-09-06T19:43:53Z,real-estate-sync,officetel_sale,1,36,success
+2026-09-06T23:26:01Z,sk-hynix-daily-report,investor_flow_fetch,1,36,success
+2026-09-06T23:26:03Z,sk-hynix-daily-report,price_snapshot,1,36,success
+2026-09-06T23:26:09Z,sk-hynix-daily-report,report_generation,1,36,success
