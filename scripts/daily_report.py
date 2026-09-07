@@ -25,6 +25,7 @@ from investor_flow import (
 from stats_utils import zscore, anomaly_label
 from hbm_cycle_score import score_foreign_flow_axis, score_foreign_holding_axis
 from capex_periphery import read_hyperscaler_capex, read_ai_periphery
+from ma120_trend import compute_ma120_trend
 
 KST = timezone(timedelta(hours=9))
 REPORT_DIR = Path(__file__).resolve().parent.parent / "sources"
@@ -243,6 +244,36 @@ def build_report(ticker: str) -> str:
     for k, v in hold_score["detail"].items():
         lines.append(f"  - {k}: {v}")
     lines.append(f"\n**소계: {flow_score['score'] + hold_score['score']:.1f}/30점** (전체 100점 중 나머지 70점은 ASP·엔비디아&CoWoS·공급확대·고객재고 — 뉴스 해석 필요, 자동화 대상 아님)")
+
+    # --- 120일 이동평균선(MA120) 추세 추적 (2026-09-07 신설) ---
+    ma120 = compute_ma120_trend(ticker)
+    lines.append("\n## 120일 이동평균선(MA120) 추세 추적 (순수 가격 기하학, 매매 지시 아님)")
+    if ma120["data_status"] != "ok":
+        lines.append(f"- 데이터 상태: Pending — {ma120.get('note', '이력 부족')}")
+    else:
+        above = "선 위" if ma120["current_above"] else "선 아래"
+        lines.append(
+            f"- {ma120['as_of']} 기준 — 종가 {ma120['current_price']:,.0f}원, "
+            f"MA120 {ma120['current_ma120']:,}원 ({above}, {ma120['current_diff_pct']:+.2f}%)"
+        )
+        lines.append(f"- 최근 {ma120['slope_window_trading_days']}거래일 MA120 기울기: **{ma120['slope_per_trading_day']:+,.0f}원/거래일**")
+        if ma120.get("prev_high"):
+            if not ma120["slope_positive"]:
+                lines.append(
+                    f"- ⚠️ 최근 기울기가 0 이하 — 전고점({ma120['prev_high']:,.0f}원, "
+                    f"{ma120['prev_high_date']}) 도달 시점 추정 불가"
+                )
+            elif ma120.get("eta_date"):
+                lines.append(
+                    f"- 이 기울기 유지 시 전고점({ma120['prev_high']:,.0f}원, {ma120['prev_high_date']}) "
+                    f"도달 예상: 약 {ma120['trading_days_to_prev_high']:.0f}거래일 후 ({ma120['eta_date']}) "
+                    "— 예측 아닌 기계적 선형 외삽"
+                )
+        lines.append(
+            f"- 최근 {ma120['tracking_window_trading_days']}거래일 추적: "
+            f"선 위 {ma120['tracking_above_days']}일 / 선 아래 {ma120['tracking_below_days']}일, "
+            f"교차 {ma120['tracking_crossings']}회, 평균 괴리 {ma120['tracking_avg_diff_pct']:+.2f}%"
+        )
 
     # --- 신용융자잔고 (2026-08-05 신설) ---
     lines.append("\n## 신용융자잔고 (찐반등 신호① — 빚의 청산)")

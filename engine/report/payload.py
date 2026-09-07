@@ -322,6 +322,19 @@ def build_report_payload(month_key: str | None = None) -> dict:
         log_event("hbm_cycle_score.failed", error=str(exc), level="warning")
         payload["hbm_cycle_score"] = None
 
+    # 120일 이동평균선(MA120) 추세 추적 — 2026-09-07 사용자 대화에서 시작된
+    # 분석을 매일 재현 가능한 형태로 코드화(scripts/ma120_trend.py). 순수
+    # 가격 기하학 계산이라 R4(포지션 지시는 단일 출처)와 무관 — 매매 신호
+    # 아님, sk_hynix_decision 위 어디에도 영향 안 줌.
+    try:
+        from scripts.ma120_trend import compute_ma120_trend
+
+        payload["ma120_trend"] = compute_ma120_trend("000660")
+        log_event("ma120_trend.computed", status=payload["ma120_trend"].get("data_status"))
+    except Exception as exc:
+        log_event("ma120_trend.failed", error=str(exc), level="warning")
+        payload["ma120_trend"] = None
+
     # 하이퍼스케일러 CapEx 실측 + SK Hynix 오늘의 실측 데이터 (SEC EDGAR + KIS,
     # 이미 매일/주간 수집되던 CSV를 처음으로 PEOS 쪽에서도 읽는다). 전부
     # 정보/근거용 — 어느 것도 새 매매 지시를 만들지 않는다(R4).

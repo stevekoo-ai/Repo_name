@@ -913,6 +913,47 @@ def _sk_hynix_decision_section(payload: dict) -> str:
                 lines.append(f"- ADR(SKHY) {adr.get('date', '?')}: ${float(adr['price']):,.2f}")
         lines.append("")
 
+    ma120 = payload.get("ma120_trend")
+    if ma120 and ma120.get("data_status") == "ok":
+        lines += [
+            "## 120일 이동평균선(MA120) 추세 추적 (2026-09-07 신설, 순수 가격 기하학·매매 지시 아님)",
+            "",
+            f"- {ma120['as_of']} 기준 — 종가 {ma120['current_price']:,.0f}원, "
+            f"MA120 {ma120['current_ma120']:,}원 ({'선 위' if ma120['current_above'] else '선 아래'}, "
+            f"{ma120['current_diff_pct']:+.2f}%)",
+            f"- 최근 {ma120['slope_window_trading_days']}거래일 MA120 기울기: "
+            f"**{ma120['slope_per_trading_day']:+,.0f}원/거래일**",
+        ]
+        if ma120.get("prev_high"):
+            if not ma120["slope_positive"]:
+                lines.append(
+                    f"- ⚠️ 최근 기울기가 0 이하 — 이 방식으로는 전고점"
+                    f"({ma120['prev_high']:,.0f}원, {ma120['prev_high_date']}) 도달 시점을 추정할 수 없음"
+                )
+            elif ma120.get("eta_date"):
+                lines.append(
+                    f"- 이 기울기가 유지된다면 전고점({ma120['prev_high']:,.0f}원, "
+                    f"{ma120['prev_high_date']}) 도달 예상: **약 {ma120['trading_days_to_prev_high']:.0f}거래일 "
+                    f"후 ({ma120['eta_date']})** — 예측이 아니라 현재 기울기의 기계적 선형 외삽"
+                )
+        lines += [
+            f"- 최근 {ma120['tracking_window_trading_days']}거래일 추적 품질: "
+            f"선 위 {ma120['tracking_above_days']}일 / 선 아래 {ma120['tracking_below_days']}일, "
+            f"교차 {ma120['tracking_crossings']}회, 평균 괴리 {ma120['tracking_avg_diff_pct']:+.2f}%",
+            f"  (최대 {ma120['tracking_max_diff_pct']:+.2f}% {ma120['tracking_max_diff_date']} / "
+            f"최소 {ma120['tracking_min_diff_pct']:+.2f}% {ma120['tracking_min_diff_date']})",
+            "- ⚠️ 위 두 값 모두 '지금 기울기가 그대로 유지된다면'이라는 기계적 계산이다 — "
+            "매매 신호는 이 리포트 최상단의 '최종 의사결정'만 유효(R4). "
+            "판독법 상세는 [wiki/concepts/ma120-trend-tracking.md](../wiki/concepts/ma120-trend-tracking.md).",
+            "",
+        ]
+    elif ma120 and ma120.get("data_status") == "pending":
+        lines += [
+            "## 120일 이동평균선(MA120) 추세 추적",
+            f"- 데이터 상태: Pending — {ma120.get('note', '이력 부족')}",
+            "",
+        ]
+
     lines += [
         "## 위험 신호",
         "",
