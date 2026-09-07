@@ -83,7 +83,7 @@ jobs:
             git push && break
             echo "push rejected, rebasing onto latest main (attempt $i)"
             git fetch origin main
-            git rebase origin/main
+            git rebase --autostash origin/main
             sleep $((i * 3))
           done
 
@@ -106,7 +106,7 @@ jobs:
                 git push && break
                 echo "push rejected, rebasing onto latest main (attempt $i)"
                 git fetch origin main
-                git rebase origin/main
+                git rebase --autostash origin/main
                 sleep $((i * 3))
               done
             fi

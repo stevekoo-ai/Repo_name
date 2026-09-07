@@ -151,7 +151,15 @@ jobs:
         run: |
           git config user.name "real-estate-sync-bot"
           git config user.email "actions@users.noreply.github.com"
-          git add data/normalized/molit* sources/molit*.csv 2>/dev/null || true
+          # 2026-09-07: 예전엔 두 경로를 한 줄에 넣었는데(`git add A B`),
+          # sources/molit*.csv가 존재하지 않아 git add 전체가
+          # "pathspec did not match"로 실패했고 || true가 그걸 감췄다.
+          # 그 결과 정규화 데이터가 스테이징되지 않은 채 남아, 아래 rebase가
+          # "cannot rebase: You have unstaged changes"로 죽었다. 수집이 실제로
+          # 데이터를 만들어낼 때만 터지는 잠복 버그라 그동안 안 보였다.
+          # 경로마다 따로 add해서 하나가 비어도 나머지는 스테이징되게 한다.
+          git add data/normalized/molit* 2>/dev/null || true
+          git add sources/molit*.csv 2>/dev/null || true
           git add docs/real-estate-daily.html docs/reports-index.html
           [ -f sources/automation-run-log.csv ] && git add sources/automation-run-log.csv
           if git diff --cached --quiet; then
@@ -162,7 +170,9 @@ jobs:
               git push && break
               echo "push rejected, rebasing onto latest (attempt $i)"
               git fetch origin main
-              git rebase origin/main
+              # --autostash: 커밋 대상이 아닌 잔여 변경(캐시 등)이 남아 있어도
+              # rebase가 죽지 않게 한다. 위 add 수정과 별개의 안전장치.
+              git rebase --autostash origin/main
               sleep $((i * 3))
             done
           fi

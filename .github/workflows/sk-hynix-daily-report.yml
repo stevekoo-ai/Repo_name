@@ -202,7 +202,10 @@ jobs:
         run: |
           git config user.name "sk-hynix-auto-report-bot"
           git config user.email "actions@users.noreply.github.com"
-          git add sources/sk-hynix-investor-flow.csv sources/sk-hynix-auto-report-*.md
+          # 2026-09-07: 한 줄에 묶으면 글롭이 안 맞을 때 git add 전체가
+          # 실패한다(real-estate-sync에서 실제로 그 사고가 났다). 분리.
+          git add sources/sk-hynix-investor-flow.csv
+          git add sources/sk-hynix-auto-report-*.md 2>/dev/null || true
           git add docs/reports-index.html
           [ -f sources/sk-hynix-adr-quote.csv ] && git add sources/sk-hynix-adr-quote.csv
           [ -f sources/sk-hynix-price-snapshot.csv ] && git add sources/sk-hynix-price-snapshot.csv
@@ -216,7 +219,7 @@ jobs:
             git push && break
             echo "push rejected, rebasing onto latest main (attempt $i)"
             git fetch origin main
-            git rebase origin/main
+            git rebase --autostash origin/main
             sleep $((i * 3))
           done
 
@@ -259,7 +262,7 @@ jobs:
                 git push && break
                 echo "push rejected, rebasing onto latest main (attempt $i)"
                 git fetch origin main
-                git rebase origin/main
+                git rebase --autostash origin/main
                 sleep $((i * 3))
               done
             fi
