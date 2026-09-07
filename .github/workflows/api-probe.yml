@@ -1,0 +1,67 @@
+name: API 전체 생존 프로브
+
+# 2026-09-07 사용자 요청("fred든 뭐든 API를 다 찔러봐")으로 신설.
+# 이 저장소가 등록해둔 모든 외부 데이터 소스에 최소 1회씩 호출을 날려
+# 무엇이 살아 있고 어떤 키가 놀고 있는지 한 표로 확인하는 진단 워크플로.
+#
+# 수동(workflow_dispatch) 전용 — 스케줄로 돌리지 않는다. 정기 실행은
+# 각 소스에 불필요한 부하를 주고, 특히 KIS는 토큰 재발급 제한 사고
+# 이력이 있어(wiki/CLAUDE.md 8-3) 자동 반복이 위험하다.
+
+on:
+  workflow_dispatch:
+    inputs:
+      probe_kis:
+        description: "KIS 토큰까지 찌를지 (1=예). 일일 수집과 시간이 겹치면 403 위험 — 기본 아니오"
+        required: false
+        default: "0"
+      traceback:
+        description: "실패 시 파이썬 traceback 출력 (1=예)"
+        required: false
+        default: "0"
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install requests pyyaml pandas
+
+      # 재시도 없음 — "지금 이 순간 살아 있나"를 보는 진단이라 재시도는
+      # 오히려 일시적 장애를 감춘다. 프로브 자체는 개별 실패를 잡아
+      # DEAD로 기록하고 계속 진행하므로 종료코드는 항상 0.
+      - name: Probe every registered data source
+        env:
+          FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
+          ECOS_API_KEY: ${{ secrets.ECOS_API_KEY }}
+          KOSIS_API_KEY: ${{ secrets.KOSIS_API_KEY }}
+          DATA_GO_KR_KEY: ${{ secrets.DATA_GO_KR_KEY }}
+          BLS_API_KEY: ${{ secrets.BLS_API_KEY }}
+          KIS_APP_KEY: ${{ secrets.KIS_APP_KEY }}
+          KIS_APP_SECRET: ${{ secrets.KIS_APP_SECRET }}
+          KIS_APP_KEY_IRP: ${{ secrets.KIS_APP_KEY_IRP }}
+          KIS_APP_SECRET_IRP: ${{ secrets.KIS_APP_SECRET_IRP }}
+          KIS_APP_KEY_ISP: ${{ secrets.KIS_APP_KEY_ISP }}
+          KIS_APP_SECRET_ISP: ${{ secrets.KIS_APP_SECRET_ISP }}
+          PROBE_KIS: ${{ github.event.inputs.probe_kis }}
+          PROBE_TRACEBACK: ${{ github.event.inputs.traceback }}
+          PYTHONPATH: .
+        run: python scripts/api_probe.py | tee /tmp/api_probe_output.txt
+
+      # 로그를 뒤지지 않아도 Actions 요약 화면에서 바로 표를 볼 수 있게.
+      - name: Publish summary table
+        if: always()
+        run: |
+          {
+            echo "## API 전체 생존 프로브 결과"
+            echo ""
+            sed -n '/^| 소스 |/,/^집계:/p' /tmp/api_probe_output.txt
+          } >> "$GITHUB_STEP_SUMMARY"
