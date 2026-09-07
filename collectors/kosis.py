@@ -9,14 +9,28 @@ verify against the KOSIS OpenAPI '통계표 검색' console before relying on
 these in production; correcting a code here doesn't require touching the
 fetch logic.
 
-Observed (GitHub Actions, 2026-07-14): every KOSIS call failed with a TCP
-connect timeout to kosis.kr, not an API error — the key and stat codes
-were never actually reached. This looks like an access restriction on
-KOSIS's side (some Korean public-data APIs only answer requests from
-Korean IP ranges) rather than a code bug; retrying harder doesn't help,
-so retries/timeout are kept short here to fail fast instead of burning
-CI time. If this keeps happening, check KOSIS OpenAPI's docs/support for
-an IP allowlist or an alternate access method from outside Korea.
+2026-09-07 정정 — 이 자리에 오래 적혀 있던 진단("모든 호출이 TCP connect
+timeout이므로 한국 IP 제한으로 보이고, 재시도해도 소용없다")은 **두 개의
+서로 다른 문제를 하나로 뭉뚱그린 것**이었고, 그 때문에 "네트워크 문제라
+손쓸 수 없다"로 결론나 통계표 좌표를 아무도 고치지 않은 채 몇 달이 갔다.
+
+실제로는 두 가지가 따로 있다:
+
+1. **통계표 좌표(tblId/itmId)가 틀렸다.** API 전수 프로브에서 데이터
+   엔드포인트가 "해당 통계표가 존재하지 않습니다"라고 **응답했다** —
+   서버에 닿았고 인증도 통과했다는 뜻이다. 아래 KOSIS_SERIES의 좌표들이
+   "통계표 ID 확인 필요"라는 메모를 단 채 한 번도 검증되지 않은 게 원인.
+   이건 재시도로 절대 해결되지 않는다. 좌표를 고쳐야 한다.
+2. **kosis.kr 연결이 간헐적으로 불안정하다.** 같은 날 몇 분 뒤 같은
+   호스트의 검색 엔드포인트가 connect timeout=20으로 죽었다. 이쪽은
+   재시도가 유효하다.
+
+즉 (2)는 맞는 관찰이었지만 (1)의 원인이 아니었다. **재시도로 해결되는
+문제와 좌표를 고쳐야 하는 문제를 구분할 것.**
+
+좌표를 다시 찾으려면: `python -m scripts.kosis_lookup --search <키워드>`
+(통합검색 statisticsSearch.do — "KOSIS엔 검색 API가 없다"는 것도 틀린
+전제였다). 전수 현황은 wiki/concepts/api-data-catalog.md 참고.
 """
 from __future__ import annotations
 

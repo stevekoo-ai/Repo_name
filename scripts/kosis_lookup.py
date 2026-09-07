@@ -89,8 +89,26 @@ def search_tables(api_key: str, keyword: str, limit: int = 15) -> list[dict]:
 
 
 def _run_search(api_key: str, keyword: str) -> None:
-    print(f"=== KOSIS 통합검색: {keyword!r} ===")
-    rows = search_tables(api_key, keyword)
+    print(f"=== KOSIS 통합검색: {keyword!r} ===", flush=True)
+    # kosis.kr은 GitHub Actions 러너에서 간헐적으로 TCP connect 자체가 타임아웃
+    # 난다(2026-09-07 실측: 데이터 엔드포인트는 응답하는데 같은 호스트의 검색
+    # 엔드포인트가 connect timeout=20으로 죽음). 한 번 실패로 포기하면 "검색
+    # API가 없다"는 예전의 잘못된 결론으로 되돌아가게 되므로 몇 번 재시도한다.
+    rows = None
+    last_error = None
+    for attempt in range(1, 4):
+        try:
+            rows = search_tables(api_key, keyword)
+            break
+        except Exception as exc:
+            last_error = exc
+            print(f"  [시도 {attempt}/3 실패] {type(exc).__name__}: {str(exc)[:160]}", flush=True)
+            if attempt < 3:
+                time.sleep(10 * attempt)
+    if rows is None:
+        print(f"  3회 모두 실패 — kosis.kr 연결 문제로 보인다(마지막 오류: {last_error})")
+        print("  이건 통계표가 없다는 뜻이 아니다. 잠시 후 다시 시도할 것.")
+        return
     if not rows:
         print("  검색 결과 없음")
         return
