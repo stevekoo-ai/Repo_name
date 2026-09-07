@@ -7,6 +7,10 @@ on:
         description: "확인할 지표 key (비워두면 4개 전부): cpi_index / industrial_production_index / retail_sales_index / unemployment_rate"
         required: false
         default: ""
+      search:
+        description: "통합검색 키워드 (입력하면 series 대신 이걸로 KOSIS 통계표를 검색). 예: 소비자물가지수"
+        required: false
+        default: ""
 
 jobs:
   lookup:
@@ -25,10 +29,17 @@ jobs:
 
       # 2026-08-21 추가 — 수동 실행·즉시 확인용 진단 도구라 가벼운 재시도만
       # (3회, 20초 간격) — 6시간 재시도는 사람을 기다리게 하므로 부적절.
+      # 2026-09-07: 검색 키워드는 ${{ }}로 셸에 직접 보간하지 않고 env로 넘긴다 —
+      # 한글/공백이 들어가고, 보간은 임의 셸 코드가 될 수 있는 형태라서.
       - name: Look up KOSIS candidate tables
         env:
           KOSIS_API_KEY: ${{ secrets.KOSIS_API_KEY }}
+          SEARCH_KEYWORD: ${{ github.event.inputs.search }}
         run: |
+          if [ -n "$SEARCH_KEYWORD" ]; then
+            python -m scripts.kosis_lookup --search "$SEARCH_KEYWORD"
+            exit $?
+          fi
           attempt=1; max_attempts=3
           until python -m scripts.kosis_lookup ${{ github.event.inputs.series }}; do
             if [ "$attempt" -ge "$max_attempts" ]; then
