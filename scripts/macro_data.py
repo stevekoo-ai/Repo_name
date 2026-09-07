@@ -71,6 +71,15 @@ PRESETS = {
     # ERP(Equity Risk Premium) 계산에 필요한 무위험금리. Earnings Yield(1/PER
     # 근사) - 이 시리즈 = ERP. concepts/sk-hynix-investment-thesis.md 참고.
     "us_10y": ("fred", "DGS10", "미국 10년물 국채금리(일별)", "검증됨(FRED 표준 series_id)"),
+    # 2026-09-07 추가 — 사용자 요청("원·달러·엔·위안 4개국 통화 상호 영향 진단").
+    # 기존엔 kr_usdkrw(ECOS) 하나뿐이라 엔/위안과의 상호 움직임을 볼 수가 없었다.
+    # 셋 다 "1달러당 해당 통화" 표기라 방향이 통일돼 있다(값 상승 = 달러 강세)
+    # — 상관계수 부호를 추가 변환 없이 그대로 읽을 수 있다. usd_krw_fred는
+    # kr_usdkrw(ECOS 고시)와 같은 환율의 다른 출처로, 교차검증용(값이 갈리면
+    # R1 실측 우선 원칙에 따라 한국은행 고시인 ECOS를 채택).
+    "usd_jpy": ("fred", "DEXJPUS", "엔/달러 환율(일별)", "검증됨(FRED 표준 series_id)"),
+    "usd_cny": ("fred", "DEXCHUS", "위안/달러 환율(일별)", "검증됨(FRED 표준 series_id)"),
+    "usd_krw_fred": ("fred", "DEXKOUS", "원/달러 환율(일별, ECOS 교차검증용)", "검증됨(FRED 표준 series_id)"),
 }
 
 DEFAULT_LOOKBACK_DAYS = 3652  # 최초 백필 시 과거 10년치
