@@ -95,11 +95,17 @@ def test_fetch_region_month_surfaces_non_json_body_as_likely_auth_error(monkeypa
     """data.go.kr returns an XML error envelope (not JSON) when the gateway rejects a request
     before it reaches the service that would honor type=json — the classic signature of a key
     that's valid but not 활용신청-approved for *this* specific API product. This must produce a
-    message pointing at that, not an opaque JSON-decode failure."""
+    message pointing at that, not an opaque JSON-decode failure.
+
+    2026-09-07 갱신: 예전엔 "JSON이 아니면 곧 인증 오류"라는 논리로 이 메시지를
+    만들었는데, 그 가정이 틀려서 정상 XML 응답까지 인증 오류로 오진했고 부동산
+    수집이 한 달간 조용히 멈췄다. 이제는 형식이 아니라 **게이트웨이 오류 봉투
+    (cmmMsgHeader/errMsg)를 실제로 식별해서** 같은 결론을 내린다 — 결론은 같지만
+    근거가 추측에서 실측으로 바뀌었다."""
     xml_body = "<OpenAPI_ServiceResponse><cmmMsgHeader><errMsg>SERVICE ACCESS DENIED</errMsg></cmmMsgHeader></OpenAPI_ServiceResponse>"
     monkeypatch.setattr(molit.requests, "get", lambda *a, **k: _FakeResponse(xml_body, json_ok=False))
 
-    with pytest.raises(RuntimeError, match="non-JSON response"):
+    with pytest.raises(RuntimeError, match="게이트웨이 거절"):
         molit._fetch_region_month("11110", "202601", "fake-key")
 
 

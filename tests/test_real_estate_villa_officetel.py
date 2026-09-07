@@ -54,7 +54,7 @@ def test_fetch_region_month_surfaces_non_json_body_as_likely_auth_error(module, 
 
     monkeypatch.setattr(module.requests, "get", lambda *a, **k: _FakeResponse())
 
-    with pytest.raises(RuntimeError, match="non-JSON response"):
+    with pytest.raises(RuntimeError, match="게이트웨이 거절"):
         module._fetch_region_month("11110", "202601", "fake-key")
 
 

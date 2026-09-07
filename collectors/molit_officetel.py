@@ -40,24 +40,10 @@ def _fetch_region_month(lawd_cd: str, deal_ymd: str, api_key: str) -> list[dict[
     }
     resp = requests.get(base_url, params=params, timeout=_TIMEOUT_SECONDS)
     base.raise_for_status(resp)
-    try:
-        payload = resp.json()
-    except ValueError:
-        raise RuntimeError(
-            f"MOLIT officetel (오피스텔) returned non-JSON response (likely a service/auth error): "
-            f"{base.redact_url(resp.text[:300])}"
-        )
-    # See collectors/molit.py's _fetch_region_month comment — this API's JSON is flat
-    # ({"header":..., "body":...}), not wrapped in a "response" key. Support both shapes.
-    envelope = payload.get("response", payload)
-    header = envelope.get("header", {})
-    if header.get("resultCode") not in (None, "00", "000"):
-        raise RuntimeError(f"MOLIT officetel (오피스텔) error response: {header.get('resultMsg')}")
-    items = envelope.get("body", {}).get("items")
-    if not items:
-        return []
-    rows = items.get("item", []) if isinstance(items, dict) else items
-    return rows if isinstance(rows, list) else [rows]
+    # 형식(JSON/XML)에 상관없이 파싱 — collectors/base.py의 파서 주석 참고.
+    # 2026-09-07 이전엔 여기서 resp.json()만 부르다 XML 응답에 깨졌고,
+    # 그 실패가 인증 오류로 오진돼 한 달간 조용히 수집이 멈춰 있었다.
+    return base.parse_data_go_kr_items(resp, "MOLIT 오피스텔")
 
 
 def _probe_with_detail(lawd_cd: str, deal_ymd: str, api_key: str,

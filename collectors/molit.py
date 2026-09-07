@@ -77,38 +77,10 @@ def _fetch_region_month(lawd_cd: str, deal_ymd: str, api_key: str) -> list[dict[
     }
     resp = requests.get(base_url, params=params, timeout=_TIMEOUT_SECONDS)
     base.raise_for_status(resp)
-    try:
-        payload = resp.json()
-    except ValueError:
-        # data.go.kr's standard OpenAPI error envelope (SERVICE_ACCESS_DENIED_ERROR,
-        # INVALID_REQUEST_PARAMETER_ERROR, ...) comes back as XML even when type=json is
-        # requested, because the gateway rejects the request before it ever reaches the
-        # service that would honor `type`. This is the exact response shape you get when the
-        # 인증키 is valid but not approved for *this specific* API product (활용신청 is
-        # per-service, not per-key) — e.g. approved for a 한국부동산원 product but not for
-        # 국토교통부_아파트매매 실거래 상세자료. Surface the raw body so that's diagnosable
-        # instead of showing up as an opaque JSON-parse failure.
-        # data.go.kr error bodies occasionally echo request parameters back (including the
-        # key) — redact defensively even though this is response text, not the request URL.
-        raise RuntimeError(
-            f"MOLIT returned non-JSON response (likely a service/auth error): "
-            f"{base.redact_url(resp.text[:300])}"
-        )
-    # This API's JSON is flat — {"header": ..., "body": ...} — not wrapped in a "response" key
-    # the way some other data.go.kr OpenAPI JSON translations are. A live run confirmed this:
-    # real transactions were coming back with resultCode "000"/"OK" and getting silently
-    # discarded because this code was reading payload["response"]["header"/"body"], which
-    # doesn't exist, so it always looked like an empty response. Support both shapes so this
-    # doesn't quietly break again if a future MOLIT product does wrap in "response".
-    envelope = payload.get("response", payload)
-    header = envelope.get("header", {})
-    if header.get("resultCode") not in (None, "00", "000"):
-        raise RuntimeError(f"MOLIT error response: {header.get('resultMsg')}")
-    items = envelope.get("body", {}).get("items")
-    if not items:
-        return []
-    rows = items.get("item", []) if isinstance(items, dict) else items
-    return rows if isinstance(rows, list) else [rows]
+    # 형식(JSON/XML)에 상관없이 파싱 — collectors/base.py의 파서 주석 참고.
+    # 2026-09-07 이전엔 여기서 resp.json()만 부르다 XML 응답에 깨졌고,
+    # 그 실패가 인증 오류로 오진돼 한 달간 조용히 수집이 멈춰 있었다.
+    return base.parse_data_go_kr_items(resp, "MOLIT 아파트매매")
 
 
 def _probe_with_detail(lawd_cd: str, deal_ymd: str, api_key: str,
