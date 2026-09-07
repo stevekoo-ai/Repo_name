@@ -113,3 +113,46 @@ def test_series_catalog_has_no_duplicate_bls_ids():
     """같은 series_id를 두 key에 매핑하면 한 번에 받아 나눠 담을 때 헷갈린다."""
     ids = [sid for sid, _, _ in bls.BLS_SERIES.values()]
     assert len(ids) == len(set(ids))
+
+
+def test_requested_year_span_stays_within_the_keyless_ten_year_limit():
+    """BLS v2의 연도 범위 한도는 **포함 연수**로 센다(키 없이 10년). 초과하면
+    BLS는 에러를 내지 않고 **조용히 앞 10년만 주면서 최신 연도를 버린다**.
+
+    2026-09-07 첫 수집에서 실제로 그랬다: startyear=올해-10 이라 11년을
+    요청했고, 8개 시리즈가 전부 2016-01~2025-12(정확히 120개월)에서 멈췄다.
+    같은 날 프로브는 CPI가 2026-07까지 있음을 확인해줬으니, 최신 9개월치를
+    아무 경고 없이 잃고 있었던 것이다."""
+    from datetime import datetime
+
+    this_year = datetime.utcnow().year
+    start_year = this_year - bls._HISTORY_YEARS
+    span = this_year - start_year + 1     # 포함 연수
+    assert span <= 10, (
+        f"요청 범위가 {span}년이라 키리스 한도(10년)를 넘는다 — "
+        "BLS가 조용히 최신 연도를 잘라낸다"
+    )
+
+
+def test_fetch_raw_sends_the_year_window_it_promises(monkeypatch):
+    """_HISTORY_YEARS를 고쳐도 실제 요청 본문이 따라가지 않으면 의미가 없다."""
+    from datetime import datetime
+
+    captured = {}
+
+    class _Resp:
+        def raise_for_status(self): pass
+        def json(self):
+            return {"status": "REQUEST_SUCCEEDED", "Results": {"series": []}}
+
+    def _post(url, json=None, timeout=None):
+        captured.update(json)
+        return _Resp()
+
+    monkeypatch.setattr(bls.requests, "post", _post)
+    bls._fetch_raw(["CUUR0000SA0"], None)
+
+    this_year = datetime.utcnow().year
+    assert captured["endyear"] == str(this_year)
+    span = this_year - int(captured["startyear"]) + 1
+    assert span <= 10

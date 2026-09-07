@@ -43,7 +43,20 @@ from core.logger import log_event
 from core.models import DataPoint, DataStatus, Frequency, Metadata
 from . import base
 
-_HISTORY_YEARS = 10   # BLS v2는 요청당 최대 20년 — 10년이면 충분하고 응답도 가볍다
+# ⚠️ BLS v2의 "쿼리당 연도 범위" 한도는 **포함 연수**로 센다: 키 없이 10년,
+# 키가 있으면 20년. startyear=올해-10 으로 잡으면 (올해-10 ~ 올해) = **11년**을
+# 요청하는 셈이고, BLS는 이걸 에러로 알리지 않고 **조용히 앞 10년만 돌려주면서
+# 최신 연도를 통째로 버린다**.
+#
+# 2026-09-07 첫 수집에서 정확히 그 일이 났다: 8개 시리즈가 전부 2016-01~2025-12
+# (정확히 120개월)에서 멈췄고, 같은 날 프로브는 CPI가 2026-07까지 있다고
+# 확인해줬다 — 즉 최신 9개월치를 아무 경고 없이 못 받고 있었다. 오늘 MOLIT에서
+# 겪은 것과 같은 종류의 조용한 실패다.
+#
+# 그래서 9로 둔다: startyear=올해-9 → (올해-9 ~ 올해) = 정확히 10년.
+# 키 유무로 분기하지 않는 이유는, 키가 빠졌을 때 조용히 데이터가 잘리는 쪽이
+# 범위를 조금 손해보는 쪽보다 훨씬 나쁘기 때문이다.
+_HISTORY_YEARS = 9
 _TIMEOUT_SECONDS = 20
 
 # series_key -> (BLS series_id, 설명, 단위)
