@@ -21,7 +21,10 @@ jobs:
           python-version: "3.12"
 
       - name: Install dependencies
-        run: pip install requests
+        # 2026-09-07: requests만 깔다가 ModuleNotFoundError로 죽고 있었다.
+        # 이 스크립트들은 collectors.base를 import하고, base는 pandas를,
+        # core.config는 pyyaml을 쓴다 — 진단 도구가 조용히 못 돌고 있었던 셈.
+        run: pip install requests pandas pyyaml
 
       # 2026-08-21 추가 — 이건 사람이 수동 실행 후 결과를 바로 보는 진단
       # 도구라 sk-hynix-daily-report.yml 등 예약 실행 워크플로처럼 6시간

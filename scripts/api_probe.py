@@ -189,9 +189,12 @@ def probe_customs_trade() -> tuple[str, str]:
 
 
 def probe_bls() -> tuple[str, str]:
-    """BLS_API_KEY는 두 워크플로에 주입되지만 이를 쓰는 코드가 저장소에
-    한 줄도 없다(2026-09-07 확인). 키가 실제로 유효한지, 무엇을 받을 수
-    있는지를 여기서 처음으로 확인한다 — CUUR0000SA0 = US CPI-U 전체."""
+    """BLS 원시 엔드포인트 생존 확인 — CUUR0000SA0 = US CPI-U 전체.
+
+    2026-09-07 최초 실행 때 BLS_API_KEY가 두 워크플로에 주입되는데도 이를
+    쓰는 코드가 저장소에 한 줄도 없다는 걸 이 프로브가 발견했고, 그 결과
+    collectors/bls.py를 만들었다. 이 항목은 그 수집기와 별개로 **엔드포인트
+    자체**가 살아 있는지만 본다(수집기 쪽은 probe_bls_collector가 확인)."""
     cfg = api_config()["sources"]["bls"]
     key = get_api_key("bls")
     body = {"seriesid": ["CUUR0000SA0"], "startyear": str(datetime.now().year - 1),
@@ -210,6 +213,21 @@ def probe_bls() -> tuple[str, str]:
     d = data[0]
     tag = "키 사용" if key else "키 없이(v2 무료 한도)"
     return ALIVE, f"[{tag}] CPI-U {d.get('year')}-{d.get('period')} = {d.get('value')} (총 {len(data)}개월)"
+
+
+
+def probe_bls_collector() -> tuple[str, str]:
+    """collectors/bls.py가 실제로 시리즈를 파싱해 정규화까지 하는지.
+
+    엔드포인트 생존(probe_bls)과 수집기 동작은 다른 문제다 — MOLIT에서 정확히
+    그 차이 때문에 한 달을 잃었다(서버는 정상 응답, 파서가 깨짐). 그래서
+    새 수집기는 만들자마자 프로브에 넣는다."""
+    from collectors import bls
+    dp = bls.fetch_series("us_avg_hourly_earnings")
+    if getattr(dp, "value", None) is None:
+        return EMPTY, f"status={getattr(dp, 'status', '?')} — 값 없음"
+    ref = getattr(getattr(dp, "metadata", None), "reference_date", None)
+    return ALIVE, f"미국 시간당 평균임금 ${dp.value} ({ref})"
 
 
 def probe_imf() -> tuple[str, str]:
@@ -283,7 +301,8 @@ PROBES: list[tuple[str, str, callable]] = [
     ("molit_villa", "국토부 연립다세대 실거래", probe_molit_villa),
     ("molit_officetel", "국토부 오피스텔 실거래", probe_molit_officetel),
     ("customs_trade", "관세청 수출입총괄", probe_customs_trade),
-    ("bls", "US BLS (미사용 키 검증)", probe_bls),
+    ("bls", "US BLS 엔드포인트", probe_bls),
+    ("bls_collector", "US BLS 수집기(collectors/bls.py)", probe_bls_collector),
     ("imf", "IMF WEO (미구현 소스)", probe_imf),
     ("oecd", "OECD SDMX (미구현 소스)", probe_oecd),
     ("kis_gen", "KIS 일반계좌 토큰", probe_kis_gen),
