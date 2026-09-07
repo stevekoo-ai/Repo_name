@@ -135,7 +135,12 @@ def probe_kosis() -> tuple[str, str]:
     from collectors import kosis
     dp = kosis.fetch_series("cpi_index")
     if getattr(dp, "value", None) is None:
-        return EMPTY, f"status={getattr(dp, 'status', '?')} — 값 없음 (2026-07 실측: kosis.kr TCP 타임아웃)"
+        # 2026-09-07 프로브 실측으로 기존 진단이 뒤집혔다: collectors/kosis.py 상단
+        # 주석은 "kosis.kr TCP connect timeout, 한국 IP 제한 의심"이라고 적고 있지만,
+        # 실제 응답은 "해당 통계표가 존재하지 않습니다" — 서버는 살아 있고 인증도
+        # 통과했으며 **통계표 ID(tblId/itmId)가 틀린 것**이다. 네트워크 문제가
+        # 아니므로 KOSIS 콘솔에서 통계표 좌표만 다시 확인하면 살릴 수 있다.
+        return EMPTY, f"status={getattr(dp, 'status', '?')} — 값 없음 (원인은 네트워크가 아니라 통계표 ID 오류)"
     return ALIVE, f"CPI지수 {dp.value} (as_of={getattr(dp, 'as_of', '?')})"
 
 
@@ -176,8 +181,11 @@ def probe_customs_trade() -> tuple[str, str]:
     rows = customs_trade._fetch_year_window(ym, ym, get_api_key("customs_trade"))
     if not rows:
         return EMPTY, f"{ym} 수출입 실적 0건"
+    # _fetch_year_window은 원시 XML 필드명(year/expDlr)이 아니라 정규화된 키
+    # (date/exp_dlr/imp_dlr)로 dict를 만들어 돌려준다 — 첫 실행에서 원시 필드명을
+    # 읽다가 전부 None이 나왔다. 프로브가 수집 코드의 실제 반환 형태를 따라가야 한다.
     r = rows[-1]
-    return ALIVE, f"{r.get('year')} 수출 {r.get('expDlr')} / 수입 {r.get('impDlr')} (달러)"
+    return ALIVE, f"{r.get('date')} 수출 {r.get('exp_dlr'):,.0f} / 수입 {r.get('imp_dlr'):,.0f} 달러"
 
 
 def probe_bls() -> tuple[str, str]:
