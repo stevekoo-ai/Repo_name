@@ -1,0 +1,57 @@
+name: 미국 노동·물가 + IMF 전망 수집 (BLS/IMF)
+
+# 2026-09-07 신설. API 전수 프로브에서 BLS_API_KEY가 주입되는데 쓰는 코드가
+# 없고, IMF WEO도 config에 등록만 돼 있는 걸 발견해 수집기를 만든 뒤 그것을
+# 정기적으로 돌리는 워크플로.
+#
+# 주 1회면 충분하다 — BLS는 월간 지표(발표도 월 1회)이고 IMF WEO는 연 2회
+# (4월·10월) 갱신이다. 매일 돌리면 BLS 키리스 한도(일 25회)만 태운다.
+# 월요일 07:00 KST = 일요일 22:00 UTC.
+
+on:
+  schedule:
+    - cron: "0 22 * * 0"
+  workflow_dispatch:
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install requests pandas pyyaml
+
+      - name: BLS + IMF 수집
+        env:
+          BLS_API_KEY: ${{ secrets.BLS_API_KEY }}
+          PYTHONPATH: .
+        run: python3 scripts/collect_us_labor_outlook.py
+
+      - name: 변경사항 커밋 & 푸시
+        run: |
+          git config user.name "us-labor-outlook-bot"
+          git config user.email "actions@users.noreply.github.com"
+          # 경로마다 따로 add — 한 줄에 묶으면 글롭이 안 맞을 때 add 전체가
+          # 실패한다(2026-09-07 real-estate-sync에서 실제로 그 사고가 났다).
+          git add data/normalized/bls_* 2>/dev/null || true
+          git add data/normalized/imf_* 2>/dev/null || true
+          [ -f sources/automation-run-log.csv ] && git add sources/automation-run-log.csv
+          if git diff --cached --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "chore: BLS/IMF data sync $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+            for i in 1 2 3 4 5; do
+              git push && break
+              echo "push rejected, rebasing onto latest (attempt $i)"
+              git fetch origin main
+              git rebase --autostash origin/main
+              sleep $((i * 3))
+            done
+          fi
