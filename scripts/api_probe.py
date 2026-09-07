@@ -50,6 +50,7 @@ if REPO_ROOT not in sys.path:
 import requests  # noqa: E402
 
 from core.config import api_config, get_api_key  # noqa: E402
+from collectors.base import redact_url  # noqa: E402
 
 TIMEOUT = 20
 
@@ -251,7 +252,7 @@ def probe_oecd() -> tuple[str, str]:
     resp = requests.get(url, params={"format": "csvfile", "lastNObservations": 1},
                         headers={"Accept": "text/csv"}, timeout=TIMEOUT)
     if resp.status_code != 200:
-        return DEAD, f"HTTP {resp.status_code}: {resp.text[:150]}"
+        return DEAD, f"HTTP {resp.status_code}: {redact_url(resp.text)[:150]}"
     lines = [ln for ln in resp.text.strip().splitlines() if ln]
     if len(lines) < 2:
         return EMPTY, "CSV 헤더만 옴"
@@ -271,10 +272,10 @@ def _probe_kis_account(appkey_env: str, secret_env: str, label: str) -> tuple[st
         timeout=TIMEOUT,
     )
     if resp.status_code != 200:
-        return DEAD, f"HTTP {resp.status_code}: {resp.text[:200]}"
+        return DEAD, f"HTTP {resp.status_code}: {redact_url(resp.text)[:200]}"
     data = resp.json()
     if not data.get("access_token"):
-        return DEAD, f"토큰 없음: {str(data)[:200]}"
+        return DEAD, f"토큰 없음: {redact_url(str(data))[:200]}"
     return ALIVE, f"{label} 토큰 발급 성공 (만료 {data.get('access_token_token_expired')})"
 
 
@@ -319,7 +320,13 @@ def run_all() -> list[dict]:
             status, detail = fn()
         except Exception as exc:  # noqa: BLE001 — 프로브는 어떤 실패든 기록만 하고 계속 간다
             status = DEAD
-            detail = f"{type(exc).__name__}: {str(exc)[:300]}"
+            # ⚠️ 자르기 전에 redact_url을 통과시킨다. requests 예외 메시지에는
+            # 요청 URL 전체(?serviceKey=/?apiKey=)가 박혀 있고, 그냥 자르면 키가
+            # **중간에서 잘린 채** 찍힌다. GitHub Actions의 시크릿 마스킹은 값
+            # 전체가 일치할 때만 ***로 가리므로 잘린 조각은 마스킹을 통과한다.
+            # 이 저장소는 public이라 Actions 로그도 공개된다 — 2026-09-07
+            # scripts/kosis_lookup.py에서 실제로 이 방식으로 키가 노출됐다.
+            detail = f"{type(exc).__name__}: {redact_url(str(exc))[:300]}"
             if os.environ.get("PROBE_TRACEBACK") == "1":
                 traceback.print_exc()
         elapsed = time.time() - started

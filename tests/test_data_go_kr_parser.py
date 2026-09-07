@@ -188,3 +188,55 @@ def test_molit_timeout_is_generous_enough_for_the_connect_phase():
         connect, read = timeout
         assert connect >= 15, f"{mod.__name__}: connect 타임아웃이 다시 짧아졌다"
         assert read >= connect
+
+
+# --------------------------------------------------------------------------
+# 시크릿 노출 방지 (2026-09-07 실제 유출 회귀 테스트)
+# --------------------------------------------------------------------------
+#
+# scripts/kosis_lookup.py에 재시도 로깅을 추가하면서 `str(exc)[:160]`으로
+# 예외 메시지를 잘라 찍었는데, requests의 ConnectTimeout 메시지에는 요청 URL
+# 전체(?apiKey=...)가 박혀 있었다. GitHub Actions의 시크릿 마스킹은 **값 전체가
+# 일치할 때만** ***로 가리므로, 중간에서 잘린 키 조각은 마스킹을 그대로
+# 통과해 공개 Actions 로그에 남았다(이 저장소는 public이다).
+#
+# 교훈: **자르기 전에 마스킹한다.** 순서가 바뀌면 마스킹이 무력화된다.
+
+def test_redact_url_masks_the_key_before_truncation_defeats_masking():
+    """유출 당시와 같은 형태의 예외 메시지로 검증."""
+    from collectors.base import redact_url
+
+    key = "MzQ2MmVhOWVjMDZkOTlkMWVmOTFmNGRlYWRiZWVm"
+    msg = (f"HTTPSConnectionPool(host='kosis.kr', port=443): Max retries exceeded "
+           f"with url: /openapi/statisticsSearch.do?method=getList&apiKey={key}"
+           f"&format=json&jsonVD=Y (Caused by ConnectTimeoutError(...))")
+
+    # 유출 재현: 마스킹 없이 자르면 키 앞부분이 그대로 남는다.
+    assert key[:20] in msg[:160]
+
+    # 올바른 순서: 마스킹 먼저, 그 다음 자르기.
+    safe = redact_url(msg)[:160]
+    assert "MzQ2" not in safe
+    assert "apiKey=***" in safe
+
+
+def test_redact_url_covers_the_query_param_names_this_repo_actually_uses():
+    """소스마다 키 파라미터 이름이 다르다 — 하나라도 빠지면 그 소스에서 샌다."""
+    from collectors.base import redact_url
+
+    for param in ("serviceKey", "apiKey", "api_key", "key", "token", "secret"):
+        masked = redact_url(f"https://example.com/x?{param}=SUPERSECRET123&a=1")
+        assert "SUPERSECRET123" not in masked, f"{param} 미마스킹"
+
+
+def test_probe_and_lookup_scripts_redact_before_truncating():
+    """소스 코드 수준에서 '자르기 전 마스킹' 순서를 고정한다 — 이 순서가
+    뒤집히면 테스트가 아니라 실제 로그에서만 드러나므로."""
+    from pathlib import Path
+
+    root = Path(__file__).resolve().parents[1]
+    for rel in ("scripts/api_probe.py", "scripts/kosis_lookup.py"):
+        text = (root / rel).read_text(encoding="utf-8")
+        # 예외/응답 본문을 마스킹 없이 자르는 패턴이 남아 있으면 안 된다.
+        assert "str(exc)[:" not in text, f"{rel}: 마스킹 없이 예외를 자르고 있다"
+        assert "resp.text[:" not in text, f"{rel}: 마스킹 없이 응답 본문을 자르고 있다"

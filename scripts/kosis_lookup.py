@@ -33,7 +33,7 @@ from datetime import datetime
 
 import requests
 
-from collectors.base import raise_for_status
+from collectors.base import raise_for_status, redact_url
 
 KOSIS_BASE_URL = "https://kosis.kr/openapi"
 
@@ -102,11 +102,19 @@ def _run_search(api_key: str, keyword: str) -> None:
             break
         except Exception as exc:
             last_error = exc
-            print(f"  [시도 {attempt}/3 실패] {type(exc).__name__}: {str(exc)[:160]}", flush=True)
+            # ⚠️ 반드시 redact_url을 먼저 통과시킨 뒤 자를 것. requests의
+            # ConnectTimeout 메시지에는 요청 URL 전체(= ?apiKey=...)가 박혀 있고,
+            # 그냥 자르면 키가 **중간에서 잘린 채** 찍힌다. GitHub Actions의
+            # 시크릿 마스킹은 값 전체가 일치할 때만 ***로 가리므로, 잘린
+            # 조각은 마스킹을 그대로 통과해 로그에 남는다. 2026-09-07 이
+            # 함수의 첫 버전이 정확히 그렇게 KOSIS 키 앞부분을 노출시켰다.
+            safe = redact_url(str(exc))
+            print(f"  [시도 {attempt}/3 실패] {type(exc).__name__}: {safe[:200]}", flush=True)
             if attempt < 3:
                 time.sleep(10 * attempt)
     if rows is None:
-        print(f"  3회 모두 실패 — kosis.kr 연결 문제로 보인다(마지막 오류: {last_error})")
+        print(f"  3회 모두 실패 — kosis.kr 연결 문제로 보인다"
+              f"(마지막 오류: {redact_url(str(last_error))})")
         print("  이건 통계표가 없다는 뜻이 아니다. 잠시 후 다시 시도할 것.")
         return
     if not rows:
