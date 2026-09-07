@@ -67,3 +67,37 @@ def all_regions() -> list[dict[str, str]]:
     for region in REGION_TIERS["nationwide"]:
         seen.setdefault(region["code"], region)
     return list(seen.values())
+
+
+# 서킷브레이커 카나리아 지역 선택 --------------------------------------------
+#
+# 2026-09-07 신설. MOLIT 수집기들의 서킷브레이커가 all_regions[0](종로구)
+# 한 곳만 찔러보고, 그 한 번이 실패하면 55개 지역 수집을 통째로 포기하고
+# 있었다. 실제로 그 때문에 하루치 수집이 날아갔다 — 같은 러너·같은 시각에
+# 강남구는 정상 응답하는데 종로구 connect timeout 하나로 전량 skip.
+#
+# 서킷브레이커의 목적은 "소스가 진짜 죽었을 때 CI를 몇 분씩 붙잡지 않는 것"
+# 이지 "한 번 삐끗하면 포기하는 것"이 아니다. 그래서 서로 다른 지역 몇 곳을
+# 순차로 찔러보고 **전부** 실패할 때만 소스가 죽었다고 판정한다. 소스가
+# 진짜 죽었으면 여전히 몇 초 안에 끝나므로 원래 목적도 그대로 지켜진다.
+#
+# 지역을 흩어서 고르는 이유: 앞에서부터 3개를 고르면 전부 서울 종로·중·용산
+# 이라 "특정 지역만 응답이 느린" 경우를 못 걸러낸다.
+_PROBE_REGION_COUNT = 3
+
+
+def probe_regions(all_regions: list[dict[str, str]],
+                  count: int = _PROBE_REGION_COUNT) -> list[dict[str, str]]:
+    """서킷브레이커가 순차로 찔러볼 카나리아 지역들 — 목록 전체에 고르게 분산."""
+    if not all_regions:
+        return []
+    count = min(count, len(all_regions))
+    step = max(1, len(all_regions) // count)
+    picked = [all_regions[i * step] for i in range(count)]
+    # 중복 제거(짧은 목록에서 step이 겹칠 수 있음), 순서 유지
+    seen, out = set(), []
+    for r in picked:
+        if r["code"] not in seen:
+            seen.add(r["code"])
+            out.append(r)
+    return out

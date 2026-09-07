@@ -41,11 +41,16 @@ from core.logger import log_event
 from . import base
 from .kr_regions import (
     CAPITAL_AREA_EXTRA, HIGHLIGHT_REGION, NATIONWIDE_EXTRA, REGION_TIERS,
-    SEOUL_DISTRICTS, TIER_LABELS, all_regions as _all_regions,
+    SEOUL_DISTRICTS, TIER_LABELS, all_regions as _all_regions, probe_regions,
 )
 
 _HISTORY_MONTHS_BACKFILL = 4  # first-run backfill depth once normalized history exists it's just 1
-_TIMEOUT_SECONDS = 8  # kept short deliberately — see module docstring on the circuit breaker
+# 2026-09-07: connect 8초는 너무 짧았다. 같은 GitHub Actions 러너에서
+# scripts/api_probe.py가 timeout=20으로 4종 전부 성공한 직후, 이 수집기들은
+# 전부 "connect timeout=8"로 죽었다 — 즉 apis.data.go.kr이 막힌 게 아니라
+# 8초 안에 TCP 핸드셰이크가 안 끝나는 것뿐이었다. requests는 (연결, 응답)
+# 튜플을 받으므로 연결에 넉넉히 주고 응답은 따로 제한한다.
+_TIMEOUT_SECONDS = (15, 30)
 _PAGE_SIZE = 1000  # a single sigungu-month practically never exceeds this many apartment deals
 
 # SEOUL_DISTRICTS/CAPITAL_AREA_EXTRA/NATIONWIDE_EXTRA/REGION_TIERS/TIER_LABELS/HIGHLIGHT_REGION/
@@ -135,8 +140,19 @@ def fetch_and_store() -> dict[str, Any]:
     months_needed = _HISTORY_MONTHS_BACKFILL if thinnest_history < 2 else 1
     target_months = _trailing_deal_months(months_needed)
 
-    probe_region = all_regions[0]
-    probe_rows, probe_error = _probe_with_detail(probe_region["code"], target_months[-1], api_key)
+    # 2026-09-07: 예전엔 all_regions[0](종로구) 한 곳만 찔러보고 실패하면 55개
+    # 지역을 통째로 포기했다. 한 지역의 일시적 connect timeout이 그날 수집
+    # 전체를 날리는 구조 — 실제로 그렇게 됐다(같은 러너에서 강남구는 정상
+    # 응답하는데 종로구 타임아웃 하나로 전량 skip). 서킷브레이커의 목적은
+    # "소스가 진짜 죽었을 때 CI를 오래 붙잡지 않는 것"이지 "한 번 삐끗하면
+    # 포기하는 것"이 아니므로, 서로 다른 지역 몇 곳이 **모두** 실패할 때만
+    # 소스가 죽었다고 판정한다.
+    probe_rows = probe_error = None
+    for probe_region in probe_regions(all_regions):
+        probe_rows, probe_error = _probe_with_detail(
+            probe_region["code"], target_months[-1], api_key)
+        if probe_rows is not None:
+            break
     if probe_rows is None:
         # A single try=1 probe never survived a transient blip (GitHub Actions runner IPs have
         # been observed to intermittently, not permanently, fail to reach apis.data.go.kr — same

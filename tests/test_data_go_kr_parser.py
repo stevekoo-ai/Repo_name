@@ -131,3 +131,60 @@ def test_api_key_is_redacted_from_unknown_response_bodies():
     with pytest.raises(RuntimeError) as exc:
         base.parse_data_go_kr_items(_FakeResponse(body), "MOLIT")
     assert "SUPERSECRETKEY123" not in str(exc.value)
+
+
+# --------------------------------------------------------------------------
+# 서킷브레이커 카나리아 지역 선택 (collectors/kr_regions.probe_regions)
+# --------------------------------------------------------------------------
+#
+# 2026-09-07 두 번째 장애 회귀 테스트. XML 파싱을 고친 뒤에도 수집이 0건이었고,
+# 원인은 서킷브레이커가 all_regions[0](종로구) **한 곳**만 찔러보고 실패하면
+# 55개 지역을 통째로 포기하는 구조였다 — 같은 러너·같은 시각에 강남구는 정상
+# 응답하는데 종로구 connect timeout 하나로 전량 skip됐다.
+
+def test_probe_regions_returns_multiple_canaries_not_just_the_first():
+    """한 지역만 카나리아로 쓰면 그 지역의 일시적 실패가 전체 수집을 죽인다."""
+    from collectors.kr_regions import all_regions, probe_regions
+
+    regions = all_regions()
+    picked = probe_regions(regions)
+    assert len(picked) >= 3
+    assert picked[0]["code"] == regions[0]["code"]   # 첫 지역은 여전히 포함
+
+
+def test_probe_regions_are_spread_across_the_list_not_clustered():
+    """앞에서 3개를 그냥 자르면 전부 서울 종로·중·용산이라 '특정 지역만 느린'
+    경우를 못 걸러낸다 — 목록 전체에 흩어져야 한다."""
+    from collectors.kr_regions import all_regions, probe_regions
+
+    regions = all_regions()
+    picked_codes = [r["code"] for r in probe_regions(regions)]
+    first_three = [r["code"] for r in regions[:3]]
+    assert picked_codes != first_three
+    # 마지막 카나리아는 목록 후반부에서 나와야 한다(수도권/지방까지 확인).
+    assert regions.index(next(r for r in regions if r["code"] == picked_codes[-1])) > len(regions) // 3
+
+
+def test_probe_regions_handles_short_and_empty_lists():
+    """지역 목록이 카나리아 수보다 짧아도 죽지 않아야 한다."""
+    from collectors.kr_regions import probe_regions
+
+    assert probe_regions([]) == []
+    two = [{"name": "A", "code": "1"}, {"name": "B", "code": "2"}]
+    picked = probe_regions(two)
+    assert 1 <= len(picked) <= 2
+    assert len({r["code"] for r in picked}) == len(picked)   # 중복 없음
+
+
+def test_molit_timeout_is_generous_enough_for_the_connect_phase():
+    """connect 8초는 실측으로 너무 짧았다(같은 러너에서 timeout=20 프로브는
+    4종 전부 성공, 수집기는 4종 전부 connect timeout). (연결, 응답) 튜플로
+    연결 단계에 넉넉히 주는 게 이 회귀의 핵심 — 숫자 하나로 되돌리면 재발한다."""
+    from collectors import molit, molit_rent, molit_villa, molit_officetel
+
+    for mod in (molit, molit_rent, molit_villa, molit_officetel):
+        timeout = mod._TIMEOUT_SECONDS
+        assert isinstance(timeout, tuple), f"{mod.__name__}: (connect, read) 튜플이어야 함"
+        connect, read = timeout
+        assert connect >= 15, f"{mod.__name__}: connect 타임아웃이 다시 짧아졌다"
+        assert read >= connect
