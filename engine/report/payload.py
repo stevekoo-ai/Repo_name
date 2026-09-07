@@ -492,6 +492,24 @@ def build_report_payload(month_key: str | None = None) -> dict:
         log_event("data_center_construction.failed", error=str(exc), level="warning")
         payload["data_center_construction"] = None
 
+    # 미국 노동시장(BLS) + IMF 전망 — 2026-09-07 신설.
+    # 이 저장소의 판단 사슬 맨 앞단(미국 고용·임금 → 연준 → 미 10년물 →
+    # 원/달러 → 하이닉스 수급 / 한국 기준금리 → 주담대)이 지금까지 CPI와
+    # 실업률 두 개로만 커버되고 있었다. 임금·구인 축을 채운다.
+    # 네트워크는 쓰지 않는다 — 주 1회 us-labor-outlook-sync.yml이 쌓아둔
+    # 정규화 CSV만 읽는다(수집 실패가 리포트를 막으면 안 된다).
+    try:
+        from engine.report.us_labor_outlook import build_imf_outlook, build_us_labor
+
+        payload["us_labor"] = build_us_labor()          # None -> 렌더러가 섹션 자체를 생략
+        payload["imf_outlook"] = build_imf_outlook()    # 실측/전망 분리된 채로 전달
+        log_event("us_labor_outlook.loaded",
+                  labor_items=len(payload["us_labor"]["items"]) if payload["us_labor"] else 0,
+                  imf_countries=len(payload["imf_outlook"]["rows"]) if payload["imf_outlook"] else 0)
+    except Exception as exc:
+        log_event("us_labor_outlook.failed", error=str(exc), level="warning")
+        payload["us_labor"] = payload["imf_outlook"] = None
+
     # 위키 판단형 지식 브리지 (Phase 4, 2026-08-27) — HBM Cycle Score 정성축,
     # 9체크포인트, 찐반등 4대 신호, 트럼프 트래커 등은 WebSearch·애널리스트
     # 리포트 해석이 필요해 이 LLM-미사용 cron 파이프라인이 재현할 수 없다.

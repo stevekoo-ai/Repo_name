@@ -799,6 +799,77 @@ def _macro_dashboard_section(payload: dict) -> str:
     return "\n".join(lines)
 
 
+def _us_labor_outlook_section(payload: dict) -> str:
+    """Section 1.5: 미국 노동시장(BLS) + IMF 전망.
+
+    2026-09-07 신설. 이 저장소의 판단 사슬 맨 앞단이 미국 고용·임금인데
+    지금까지 CPI와 실업률 두 개로만 보고 있었다 — 물가가 내려가도 임금이
+    안 꺾이면 연준은 못 내린다. 그 축을 채운다.
+
+    두 가지를 엄격히 지킨다:
+    - **전망은 전망이라고 말한다.** IMF는 이 저장소에서 유일하게 미래 값을
+      주는 소스다. 실측 열과 전망 열을 시각적으로 분리하고 라벨을 붙인다.
+    - **R4**: 여기 어떤 숫자도 매매 지시가 아니다. HOLD/BUY/SELL은 여전히
+      결정 엔진 하나만 낸다.
+
+    데이터가 없으면 섹션 자체를 생략한다(R3 — 미수집은 판정이 아니다).
+    """
+    labor = payload.get("us_labor")
+    outlook = payload.get("imf_outlook")
+    if not labor and not outlook:
+        return ""
+
+    lines = ["# 1.5 미국 노동시장 & 국가별 전망", ""]
+
+    if labor:
+        lines.extend([
+            f"## 미국 노동시장 (BLS, {labor['as_of'][:7]} 기준)",
+            "",
+            "| 지표 | 최신 | 전월 대비 |",
+            "|---|---|---|",
+        ])
+        for item in labor["items"]:
+            value = f"{item['value']:,.{item['digits']}f} {item['unit']}"
+            if item["change"] is None:
+                change = "—"
+            else:
+                arrow = "▲" if item["change"] > 0 else ("▼" if item["change"] < 0 else "―")
+                change = f"{arrow} {abs(item['change']):,.{item['digits']}f}"
+            lines.append(f"| {item['label']} | {value} | {change} |")
+        lines.extend([
+            "",
+            "> **읽는 법**: 임금이 안 꺾이면 물가가 내려가도 연준은 금리를 못 내린다. "
+            "실업률은 후행하지만 JOLTS 구인건수는 먼저 꺾인다. 경제활동참가율이 같이 "
+            "떨어지면 실업률 하락은 '취업 증가'가 아니라 '구직 포기'일 수 있다.",
+            "",
+        ])
+
+    if outlook:
+        lines.extend([
+            "## 실질 GDP 성장률 — 실측 vs IMF 전망",
+            "",
+            "| 국가 | 실측 | 전망 |",
+            "|---|---|---|",
+        ])
+        for row in outlook["rows"]:
+            fc = " / ".join(f"{f['date'][:4]}년 {f['value']:.1f}%" for f in row["forecast"]) or "—"
+            lines.append(f"| {row['country']} | {row['actual_year']}년 {row['actual']:.1f}% | {fc} |")
+        lines.extend([
+            "",
+            "> ⚠️ **전망 열은 IMF World Economic Outlook의 예측이지 실측이 아니다.** "
+            "IMF는 이 저장소에서 유일하게 미래 값을 주는 소스이고, 연 2회(4월·10월) "
+            "갱신되며 과거 값도 개정된다. 방향성 참고로만 쓸 것.",
+            "",
+        ])
+
+    lines.append(
+        "> 이 섹션은 **근거이지 매매 지시가 아니다** — 포지션 판단(HOLD/BUY/SELL)은 "
+        "결정 엔진 한 곳에서만 나온다(R4). 소스별 수집 현황과 함정은 "
+        "[API 데이터 카탈로그](../wiki/concepts/api-data-catalog.md) 참고."
+    )
+    return "\n".join(lines)
+
+
 def _sk_hynix_decision_section(payload: dict) -> str:
     """Section 2: SK Hynix 보유/매도 판단 (3-5 min read).
 
@@ -1562,6 +1633,7 @@ def render_markdown(payload: dict) -> str:
         _exposure_section(payload),
         render_reconciliation_section(payload.get("reconciliation")),
         _macro_dashboard_section(payload),
+        _us_labor_outlook_section(payload),  # 미국 노동시장 + IMF 전망 (1.5)
         _sk_hynix_decision_section(payload),
         _weekly_analysis_section(payload),  # Layer 0 supporting evidence
         _data_center_construction_section(payload),  # 고객재고 축 보조 참고자료 (2.6)
