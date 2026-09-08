@@ -174,6 +174,40 @@ def table_item_metadata(org_id: str, tbl_id: str, api_key: str,
     return payload
 
 
+def verify_data(org_id: str, tbl_id: str, itm_id: str, obj_l1: str, api_key: str,
+                obj_l2: str | None = None, prd_se: str = "M") -> list[dict] | None:
+    """statisticsParameterData.do(실제 데이터 조회) — item-meta로 찾은
+    itmId/objL1(/objL2) 조합이 분류표에 *존재*하는 코드라는 것과, 그
+    조합으로 *실제 데이터가 나온다*는 것은 별개다(예: 산업분류는 있어도
+    특정 지표×산업 조합엔 값이 비어있을 수 있음). item-meta로 후보를
+    찾은 뒤 KOSIS_SERIES에 넣기 전에 반드시 이 함수로 실데이터를 한 번
+    확인한다 — collectors/kosis.py._fetch_table과 같은 엔드포인트·파라미터
+    형태를 그대로 쓴다(단, 최근 1개월치만 조회해 결과를 빠르게 눈으로
+    확인하는 용도)."""
+    from datetime import datetime, timedelta
+
+    today = datetime.utcnow()
+    start = (today - timedelta(days=90)).strftime("%Y%m")
+    end = today.strftime("%Y%m")
+    params = {
+        "method": "getList", "apiKey": api_key, "format": "json", "jsonVD": "Y",
+        "orgId": org_id, "tblId": tbl_id, "itmId": itm_id, "objL1": obj_l1,
+        "prdSe": prd_se, "startPrdDe": start, "endPrdDe": end,
+    }
+    if obj_l2:
+        params["objL2"] = obj_l2
+    resp = requests.get(f"{KOSIS_BASE_URL}/Param/statisticsParameterData.do", params=params, timeout=_TIMEOUT)
+    raise_for_status(resp)
+    payload = resp.json()
+    if isinstance(payload, dict) and payload.get("err"):
+        print(f"❌ KOSIS 오류 {payload.get('err')}: {payload.get('errMsg')}", flush=True)
+        return None
+    if not isinstance(payload, list):
+        print(f"❌ 예상과 다른 응답 형식: {str(payload)[:300]}", flush=True)
+        return None
+    return payload
+
+
 def _print_category_rows(rows: list[dict]) -> None:
     for r in rows:
         if r.get("TBL_ID"):
@@ -218,6 +252,14 @@ def main() -> int:
     p_item.add_argument("--tbl-id", required=True)
     p_item.add_argument("--obj-id", default=None, help="분류코드로 좁혀서 조회(선택, 생략시 전체)")
     p_item.add_argument("--itm-id", default=None, help="자료코드로 좁혀서 조회(선택, 생략시 전체)")
+
+    p_verify = sub.add_parser("verify-data", help="itmId/objL1(/objL2) 조합으로 실데이터가 나오는지 확인")
+    p_verify.add_argument("--org-id", required=True)
+    p_verify.add_argument("--tbl-id", required=True)
+    p_verify.add_argument("--itm-id", required=True)
+    p_verify.add_argument("--obj-l1", required=True)
+    p_verify.add_argument("--obj-l2", default=None, help="산업별처럼 분류가 2개 이상인 표에서만 필요")
+    p_verify.add_argument("--prd-se", default="M", help="주기 코드 (기본 M=월)")
 
     args = parser.parse_args()
 
@@ -273,6 +315,36 @@ def main() -> int:
         _print_item_rows(rows)
         path = _save_raw(f"item_meta_{args.org_id}_{args.tbl_id}", rows)
         print(f"\n{len(rows)}행 저장: {path}", flush=True)
+        return 0
+
+    if args.cmd == "verify-data":
+        print(f"=== 실데이터 확인: orgId={args.org_id} tblId={args.tbl_id} "
+              f"itmId={args.itm_id} objL1={args.obj_l1} objL2={args.obj_l2!r} ===", flush=True)
+        rows = None
+        last_error = None
+        for attempt in range(1, 4):
+            try:
+                rows = verify_data(args.org_id, args.tbl_id, args.itm_id, args.obj_l1, api_key,
+                                   obj_l2=args.obj_l2, prd_se=args.prd_se)
+                break
+            except Exception as exc:
+                last_error = exc
+                print(f"  [시도 {attempt}/3 실패] {type(exc).__name__}: "
+                      f"{redact_url(str(exc))[:200]}", flush=True)
+                if attempt < 3:
+                    time.sleep(10 * attempt)
+        if rows is None:
+            if last_error is not None:
+                print(f"3회 모두 실패 — 연결 문제로 보인다: {redact_url(str(last_error))[:200]}",
+                      flush=True)
+            return 1
+        if not rows:
+            print("⚠️ 0행 — 조합은 유효하지만 실데이터가 없다(기간/코드 재검토 필요)", flush=True)
+            return 1
+        for r in rows[:5]:
+            print(f"  {r}", flush=True)
+        path = _save_raw(f"verify_{args.org_id}_{args.tbl_id}_{args.itm_id}_{args.obj_l1}", rows)
+        print(f"\n{len(rows)}행 확인됨: {path}", flush=True)
         return 0
 
     return 1

@@ -16,25 +16,37 @@ on:
   workflow_dispatch:
     inputs:
       command:
-        description: "manual(PDF 다운로드) / list-category(통계목록) / item-meta(표 하나의 항목코드)"
+        description: "manual(PDF) / list-category(통계목록) / item-meta(표의 항목코드) / verify-data(itmId·objL 조합의 실데이터 확인)"
         required: true
         type: choice
-        options: [manual, list-category, item-meta]
+        options: [manual, list-category, item-meta, verify-data]
         default: manual
       vw_cd:
         description: "[list-category] 뷰 코드 (기본 MT_ZTITLE=국내통계 주제별)"
         required: false
         default: "MT_ZTITLE"
       parent_list_id:
-        description: "[list-category] 시작 목록 ID (비우면 최상위 시도)"
+        description: "[list-category] 시작 목록 ID (비우면 최상위 30개 대분류, 2026-09-08 실측 확정)"
         required: false
         default: ""
       org_id:
-        description: "[item-meta] 기관 ID (예: 101)"
+        description: "[item-meta/verify-data] 기관 ID (예: 101)"
         required: false
         default: "101"
       tbl_id:
-        description: "[item-meta] 통계표 ID (예: DT_1JH20151)"
+        description: "[item-meta/verify-data] 통계표 ID (예: DT_1F02001)"
+        required: false
+        default: ""
+      itm_id:
+        description: "[verify-data] 자료코드 (item-meta의 ITM_ID)"
+        required: false
+        default: ""
+      obj_l1:
+        description: "[verify-data] 분류1 코드 (예: 시도별 00=전국)"
+        required: false
+        default: ""
+      obj_l2:
+        description: "[verify-data] 분류2 코드 (산업별처럼 분류가 2개 이상인 표에서만, 선택)"
         required: false
         default: ""
 
@@ -79,10 +91,25 @@ jobs:
                 --org-id "${{ github.event.inputs.org_id }}" \
                 --tbl-id "${{ github.event.inputs.tbl_id }}"
               ;;
+            verify-data)
+              if [ -z "${{ github.event.inputs.tbl_id }}" ] || [ -z "${{ github.event.inputs.itm_id }}" ] || [ -z "${{ github.event.inputs.obj_l1 }}" ]; then
+                echo "::error::verify-data는 tbl_id·itm_id·obj_l1 입력이 필요합니다"
+                exit 1
+              fi
+              python -u -m scripts.kosis_catalog verify-data \
+                --org-id "${{ github.event.inputs.org_id }}" \
+                --tbl-id "${{ github.event.inputs.tbl_id }}" \
+                --itm-id "${{ github.event.inputs.itm_id }}" \
+                --obj-l1 "${{ github.event.inputs.obj_l1 }}" \
+                --obj-l2 "${{ github.event.inputs.obj_l2 }}"
+              ;;
           esac
 
-      # 결과(매뉴얼 PDF, data/raw/kosis/ 원본 응답)를 저장소에 커밋 —
-      # 이게 이번 작업의 핵심 목적(카탈로그를 저장해 두는 것)이다.
+      # docs/kosis/(매뉴얼 PDF)는 저장소에 커밋된다. data/raw/kosis/(원본
+      # JSON)는 .gitignore(data/raw/*/*.json, 이 저장소 전체 정책 — raw-tier는
+      # 재현 가능한 중간 산출물이라 버전관리 대상 아님)에 걸려 커밋되지
+      # 않는다(2026-09-08 발견 — 실측 결과의 실제 저장처는
+      # wiki/concepts/kosis-category-catalog.md, 사람이 직접 기록).
       - name: Commit downloaded catalog artifacts
         run: |
           git config user.name "kosis-catalog-bot"

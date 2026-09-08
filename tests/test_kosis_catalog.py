@@ -143,6 +143,42 @@ def test_raw_responses_are_saved_with_a_timestamped_filename_not_overwritten(mon
     assert json.loads(p2.read_text())[0]["a"] == 2
 
 
+def test_verify_data_returns_rows_on_success(monkeypatch):
+    rows = [{"PRD_DE": "202508", "DT": "123.4"}]
+    captured = {}
+
+    def fake_get(url, params=None, timeout=None):
+        captured.update(params)
+        return _FakeResponse(rows)
+
+    monkeypatch.setattr(mod.requests, "get", fake_get)
+    result = mod.verify_data("101", "DT_1F02001", "T11", "00", "fake-key", obj_l2="C261")
+    assert result == rows
+    assert captured["itmId"] == "T11"
+    assert captured["objL1"] == "00"
+    assert captured["objL2"] == "C261"
+
+
+def test_verify_data_omits_obj_l2_when_not_given(monkeypatch):
+    captured = {}
+
+    def fake_get(url, params=None, timeout=None):
+        captured.update(params)
+        return _FakeResponse([])
+
+    monkeypatch.setattr(mod.requests, "get", fake_get)
+    mod.verify_data("101", "DT_1J22003", "T", "T10", "fake-key")
+    assert "objL2" not in captured
+
+
+def test_verify_data_returns_none_on_kosis_error_envelope(monkeypatch, capsys):
+    monkeypatch.setattr(mod.requests, "get",
+                        lambda *a, **k: _FakeResponse({"err": "30", "errMsg": "데이터가 존재하지 않습니다"}))
+    result = mod.verify_data("101", "DT_1F02001", "T99", "00", "fake-key")
+    assert result is None
+    assert "데이터가 존재하지 않습니다" in capsys.readouterr().out
+
+
 def test_error_messages_are_redacted_before_truncation():
     """2026-09-07 KOSIS 키 유출 사고와 같은 클래스의 실수를 반복하지 않기
     위한 소스 코드 수준 고정 — 마스킹 없이 자르는 패턴이 있으면 안 된다."""
