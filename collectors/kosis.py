@@ -31,6 +31,24 @@ timeout이므로 한국 IP 제한으로 보이고, 재시도해도 소용없다"
 좌표를 다시 찾으려면: `python -m scripts.kosis_lookup --search <키워드>`
 (통합검색 statisticsSearch.do — "KOSIS엔 검색 API가 없다"는 것도 틀린
 전제였다). 전수 현황은 wiki/concepts/api-data-catalog.md 참고.
+
+2026-09-08 좌표 확정 작업 — 3/7 확정, 4/7 미해결(각 시리즈 note 참고):
+
+✅ 확정: `cpi_index`(DT_1J22003), `unemployment_rate`(DT_1DA7004S, tbl_id는
+원래도 맞았고 itm_id만 틀려 있었다), `retail_sales_index`(DT_1K41002 —
+단 지수가 아니라 명목 경상금액임에 주의).
+
+⚠️ 미해결: `industrial_production_index`·`semiconductor_shipment_index`·
+`semiconductor_inventory_index`(후보 전부 "표 없음" 또는 "표는 있으나 이
+파라미터 조합엔 데이터 없음"), `k_employed_yoy`(표는 연결되지만 레벨값만
+주고 YoY 계산 로직이 없어 좌표만 바꾸면 조용한 오작동이 된다 — §
+KOSIS_SERIES의 k_employed_yoy note 참고).
+
+과정에서 발견한 것: 연결 자체가 하루 사이 완전히 끊겼다가(2026-09-08 새벽,
+14개 후보 전부 connect timeout) 다시 살아난 사례가 있었다 — `kosis.kr`은
+좌표가 맞아도 이 저장소의 실행 시점에 따라 아예 응답하지 않을 수 있다.
+`scripts/kosis_lookup.py`의 `_connectivity_check()`가 이걸 8초 안에
+싸게 확인한다.
 """
 from __future__ import annotations
 
@@ -46,33 +64,67 @@ from . import base
 _HISTORY_YEARS = 10
 
 KOSIS_SERIES: dict[str, dict] = {
+    # ✅ 2026-09-08 실측 확정(scripts/kosis_lookup.py 후보검증, GitHub Actions
+    # run 34183313334) — itmId=ALL/objL1=ALL(objL2 없이)로 228행 정상 수신,
+    # ITM_NM="소비자물가지수(총지수)" C1_NM="전국"(2025-09 117.06) 확인.
     "cpi_index": {
-        "org_id": "101", "tbl_id": "DT_1J17009", "itm_id": "T60", "obj_l1": "0000",
-        "cycle": "M", "unit": "2020=100", "note": "소비자물가지수 총지수(레벨) — 통계표 ID 확인 필요",
+        "org_id": "101", "tbl_id": "DT_1J22003", "itm_id": "T", "obj_l1": "T10",
+        "cycle": "M", "unit": "2020=100", "note": "소비자물가지수 총지수(전국) — 2026-09-08 실측 확정",
     },
+    # ✅ 2026-09-08 실측 확정 — tbl_id는 원래도 맞았다(itm_id만 틀렸었다:
+    # "13103005"는 존재하지 않는 코드). itmId=ALL/objL1=ALL로 1881행 수신,
+    # ITM_NM="실업률" C1_NM="계"(전국, 2025-09 2.1%) 확인.
     "unemployment_rate": {
-        "org_id": "101", "tbl_id": "DT_1DA7004S", "itm_id": "13103005", "obj_l1": "00",
-        "cycle": "M", "unit": "%", "note": "실업률 — 통계표 ID 확인 필요",
+        "org_id": "101", "tbl_id": "DT_1DA7004S", "itm_id": "T80", "obj_l1": "00",
+        "cycle": "M", "unit": "%", "note": "실업률(전국) — 2026-09-08 실측 확정",
     },
+    # ⚠️ 2026-09-08 후보 2개 전부 실패 — 아직 미해결.
+    # DT_1JH20151: "해당 통계표가 존재하지 않습니다"(표 자체가 없음).
+    # DT_1F01012: "데이터가 존재하지 않습니다"(표는 실재하나 이 파라미터
+    # 조합엔 데이터 없음 — itmId/objL1을 "ALL" 대신 구체적 코드로 지정해야
+    # 할 가능성. WebSearch로는 이 표가 "광공업생산지수"(2015=100, 산업별)로
+    # 확인됨 — "전산업생산지수"와는 포괄범위가 다를 수 있어 재검토 필요).
     "industrial_production_index": {
         "org_id": "101", "tbl_id": "DT_1JH20151", "itm_id": "13103141670T4", "obj_l1": "00",
-        "cycle": "M", "unit": "2020=100", "note": "전산업생산지수 — 통계표 ID 확인 필요",
+        "cycle": "M", "unit": "2020=100", "note": "전산업생산지수 — 통계표 ID 미확정(2026-09-08 재검증 필요, kosis_lookup.py CANDIDATES 참고)",
     },
+    # ✅ 2026-09-08 실측 확정 — 단, **지수(index)가 아니라 경상금액(억원)이다.**
+    # itmId=ALL/objL1=ALL로 220행 수신, ITM_NM="경상금액" C1_NM="합계"
+    # (2025-09 56,873,548백만원). 원래 unit 메모("2020=100" 지수)는 틀렸다 —
+    # 이 표는 명목 판매액이지 물가효과를 제거한 지수가 아니다. 진짜
+    # "소매판매액지수"(2020=100) 표가 따로 있을 수 있으나 이번 검증에선
+    # 못 찾았다. 지수가 필요하면 FRED OECD 미러(kr_retail_sales_mom_oecd)를
+    # 계속 쓰고, 이건 명목 판매액 실측 보조지표로만 쓸 것.
     "retail_sales_index": {
-        "org_id": "101", "tbl_id": "DT_1K31009", "itm_id": "13103159999T2A", "obj_l1": "00",
-        "cycle": "M", "unit": "2020=100", "note": "소매판매액지수 — 통계표 ID 확인 필요",
+        "org_id": "101", "tbl_id": "DT_1K41002", "itm_id": "T1", "obj_l1": "G0",
+        "cycle": "M", "unit": "억원(경상금액, 지수 아님)", "note": "소매판매액(명목, 합계) — 2026-09-08 실측 확정, 지수 아닌 금액임에 주의",
     },
+    # ⚠️ 2026-09-08 실측 — 표 자체는 살아있다(DT_1DA7012S/DT_1DA7004S 둘 다
+    # 연결되고 취업자 수 "레벨"을 정상 수신, 2025-09 전국 29,153.5천명).
+    # 하지만 **이 값은 레벨이지 전년동월비(YoY)가 아니다** — KOSIS가 YoY를
+    # 미리 계산해서 주는 별도 항목을 이 두 표에서 찾지 못했다. 좌표만
+    # 바꿔서 이 레벨값을 그대로 흘려보내면 engine/crisis_analysis/scoring.py
+    # score_k_sahm()의 `weak_months = v < 0` 판정이 절대 참이 될 수 없는
+    # 값(2,900만 명대 양수)을 "YoY"라는 이름으로 받게 돼 겉보기엔 정상
+    # 작동하는 것처럼 보이면서 실제로는 항상 0점을 내는, 이전보다 더
+    # 발견하기 어려운 조용한 실패가 된다 — 그래서 **좌표를 아직 바꾸지
+    # 않았다.** 고치려면 fetch_series에 전년동월 대비 증감률 계산을
+    # 추가하거나(레벨 시계열에서 자체 계산), 이 값 자체를 이미 YoY로 주는
+    # 다른 표를 찾아야 한다(둘 다 이번 세션 범위 밖).
     "k_employed_yoy": {
         "org_id": "101", "tbl_id": "DT_1DA7001S", "itm_id": "13103005", "obj_l1": "00",
-        "cycle": "M", "unit": "Persons", "note": "취업자 수(YoY 변화) — CCI 모듈 H용",
+        "cycle": "M", "unit": "Persons", "note": "취업자 수(YoY 변화) — CCI 모듈 H용. 2026-09-08: 좌표 후보(DT_1DA7012S/DT_1DA7004S)는 연결되지만 레벨값만 준다 — YoY 계산 로직 추가 전까지 좌표 교체 보류",
     },
+    # ⚠️ 2026-09-08 후보 2개 전부 실패 — DT_1F01012 "데이터가 존재하지
+    # 않습니다"(표는 실재), DT_1E66010 "해당 통계표가 존재하지 않습니다"
+    # (표 자체가 없음). 미해결 — 아래 semiconductor_inventory_index와 동일.
     "semiconductor_shipment_index": {
         "org_id": "101", "tbl_id": "DT_1E66010", "itm_id": "T10", "obj_l1": "0000",
-        "cycle": "M", "unit": "2020=100", "note": "반도체 산업생산지수(출하) — CCI 모듈 I용",
+        "cycle": "M", "unit": "2020=100", "note": "반도체 산업생산지수(출하) — CCI 모듈 I용. 통계표 ID 미확정(2026-09-08 재검증 필요)",
     },
     "semiconductor_inventory_index": {
         "org_id": "101", "tbl_id": "DT_1E66010", "itm_id": "T30", "obj_l1": "0000",
-        "cycle": "M", "unit": "2020=100", "note": "반도체 산업생산지수(재고) — CCI 모듈 I용",
+        "cycle": "M", "unit": "2020=100", "note": "반도체 산업생산지수(재고) — CCI 모듈 I용. 통계표 ID 미확정(2026-09-08 재검증 필요, kosis_lookup.py CANDIDATES 참고)",
     },
 }
 

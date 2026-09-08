@@ -78,3 +78,46 @@ def test_main_proceeds_to_the_candidate_sweep_when_connectivity_check_succeeds(m
 
     mod.main()   # 정상 흐름에선 예외 없이 끝까지 실행돼야 함
     assert len(called) == len(mod.CANDIDATES["cpi_index"])
+
+
+# --------------------------------------------------------------------------
+# 확정 좌표 고정 (2026-09-08 GitHub Actions run 34183313334 실측)
+# --------------------------------------------------------------------------
+#
+# KOSIS_SERIES의 값은 손으로 추측한 것과 실제 API로 검증된 것을 구분할 방법이
+# 코드만 봐서는 없다 — 이번에도 "13103005" 같은 그럴듯해 보이는 코드가 사실은
+# 존재하지도 않는 값이었다. 실측으로 확정한 좌표를 여기 고정해, 누군가 이
+# 값을 "정리"랍시고 되돌리면 바로 여기서 걸리게 한다.
+
+def test_confirmed_coordinates_have_not_drifted_back_to_the_old_wrong_guesses():
+    """실측 확정 3개 시리즈 — 예전 오답으로 되돌아가면 이 테스트가 잡는다."""
+    import collectors.kosis as kosis_mod
+
+    cpi = kosis_mod.KOSIS_SERIES["cpi_index"]
+    assert (cpi["tbl_id"], cpi["itm_id"], cpi["obj_l1"]) == ("DT_1J22003", "T", "T10")
+
+    unemployment = kosis_mod.KOSIS_SERIES["unemployment_rate"]
+    # tbl_id는 원래부터 맞았다 — itm_id("13103005", 존재하지 않는 코드)만 틀렸었다.
+    assert (unemployment["tbl_id"], unemployment["itm_id"], unemployment["obj_l1"]) \
+        == ("DT_1DA7004S", "T80", "00")
+
+    retail = kosis_mod.KOSIS_SERIES["retail_sales_index"]
+    assert (retail["tbl_id"], retail["itm_id"], retail["obj_l1"]) == ("DT_1K41002", "T1", "G0")
+    # 지수(index)가 아니라 명목 경상금액이다 — unit 메모가 "2020=100"으로
+    # 되돌아가면 안 된다(그 표는 이제 안 쓴다).
+    assert "지수" not in retail["unit"] or "아님" in retail["unit"]
+
+
+def test_k_employed_yoy_coordinates_were_not_swapped_for_a_level_series_without_yoy_logic():
+    """표는 연결되지만 레벨값만 주는 DT_1DA7012S/DT_1DA7004S로 좌표를 바꾸면,
+    score_k_sahm()의 `v < 0` 판정이 절대 참이 될 수 없는 양수 레벨값을
+    "YoY"라는 이름으로 받게 돼 늘 0점을 내는 조용한 오작동이 된다 — 이게
+    바로 이 저장소가 이번에 반복해서 겪은 실패 패턴(멀쩡해 보이지만 틀림)과
+    같은 종류라 좌표를 일부러 그대로 뒀다. YoY 계산 로직 없이 이 값이
+    바뀌면 이 테스트가 잡는다."""
+    import collectors.kosis as kosis_mod
+
+    k_emp = kosis_mod.KOSIS_SERIES["k_employed_yoy"]
+    assert k_emp["tbl_id"] not in ("DT_1DA7012S", "DT_1DA7004S"), (
+        "레벨 표로 좌표가 바뀌었다 — fetch_series에 YoY 계산 로직을 먼저 추가할 것"
+    )
