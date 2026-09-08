@@ -41,6 +41,15 @@ WebSearch로 확인한 사실 — **KOSIS는 이 저장소가 안 쓰고 있던 
 저장 위치: `data/raw/kosis/`(원본 JSON, 이 저장소의 raw-tier 관례 그대로)
 + `docs/kosis/openApi_manual_v1.0.pdf`(매뉴얼).
 
+**주의(2026-09-08 발견)**: `.gitignore`가 `data/raw/*/*.json`을 저장소
+전체에서 의도적으로 무시한다("재현 가능한 중간 산출물, git에 안 넣는다"는
+기존 정책) — 즉 `data/raw/kosis/`에 저장하는 원본 JSON은 **로컬 작업
+파일일 뿐 커밋되지 않는다**(kosis-catalog.yml의 커밋 스텝이 매번 "No new
+catalog artifacts"만 찍는 게 이것 때문). 실측으로 확인한 카테고리/통계표
+목록처럼 **재사용해야 하는 지식**은
+[wiki/concepts/kosis-category-catalog.md](../wiki/concepts/kosis-category-catalog.md)에
+직접 기록한다 — 이 모듈은 그 문서를 채우기 위한 실측 도구다.
+
 Usage (모두 GitHub Actions, KOSIS_API_KEY 필요):
     python -m scripts.kosis_catalog manual
     python -m scripts.kosis_catalog list-category --vw-cd MT_ZTITLE --parent-list-id ""
