@@ -37,7 +37,7 @@ jobs:
           DATA_GO_KR_KEY: ${{ secrets.DATA_GO_KR_KEY }}
         run: |
           attempt=1; max_attempts=3
-          until python -m scripts.molit_diagnostic "${{ github.event.inputs.lawd_cd }}" "${{ github.event.inputs.deal_ymd }}"; do
+          until python -u -m scripts.molit_diagnostic "${{ github.event.inputs.lawd_cd }}" "${{ github.event.inputs.deal_ymd }}"; do
             if [ "$attempt" -ge "$max_attempts" ]; then
               echo "::error::${max_attempts}회 재시도했지만 실패"
               exit 1

@@ -37,7 +37,7 @@ jobs:
         # separate argv entries; this is a manually-dispatched diagnostic tool only.
         run: |
           attempt=1; max_attempts=3
-          until python -m scripts.ecos_lookup ${{ github.event.inputs.keyword }}; do
+          until python -u -m scripts.ecos_lookup ${{ github.event.inputs.keyword }}; do
             if [ "$attempt" -ge "$max_attempts" ]; then
               echo "::error::${max_attempts}회 재시도했지만 실패"
               exit 1

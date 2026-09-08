@@ -40,11 +40,11 @@ jobs:
           SEARCH_KEYWORD: ${{ github.event.inputs.search }}
         run: |
           if [ -n "$SEARCH_KEYWORD" ]; then
-            python -m scripts.kosis_lookup --search "$SEARCH_KEYWORD"
+            python -u -m scripts.kosis_lookup --search "$SEARCH_KEYWORD"
             exit $?
           fi
           attempt=1; max_attempts=3
-          until python -m scripts.kosis_lookup ${{ github.event.inputs.series }}; do
+          until python -u -m scripts.kosis_lookup ${{ github.event.inputs.series }}; do
             if [ "$attempt" -ge "$max_attempts" ]; then
               echo "::error::${max_attempts}회 재시도했지만 실패"
               exit 1

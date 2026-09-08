@@ -190,7 +190,7 @@ def main() -> None:
 
     first = True
     for key in series_keys:
-        print(f"\n=== {key} ===")
+        print(f"\n=== {key} ===", flush=True)
         for org_id, tbl_id in CANDIDATES[key]:
             # KOSIS appears to rate/burst-limit at the connection level (seen as a
             # sudden run of TCP connect timeouts to every subsequent call once
@@ -199,19 +199,19 @@ def main() -> None:
             if not first:
                 time.sleep(5)
             first = False
-            print(f"-- orgId={org_id} tblId={tbl_id} (prdSe=M, {start_m}-{end_m})")
+            print(f"-- orgId={org_id} tblId={tbl_id} (prdSe=M, {start_m}-{end_m})", flush=True)
             result = _try_candidate(api_key, org_id, tbl_id, start_m, end_m, "M")
             if not result["ok"] and "timed out" in result["error"]:
-                print(f"   FAILED (timeout, retrying once after 15s): {result['error']}")
+                print(f"   FAILED (timeout, retrying once after 15s): {result['error']}", flush=True)
                 time.sleep(15)
                 result = _try_candidate(api_key, org_id, tbl_id, start_m, end_m, "M")
             if not result["ok"]:
-                print(f"   FAILED: {result['error']}")
+                print(f"   FAILED: {result['error']}", flush=True)
                 continue
             rows = result["rows"]
             seen: set[tuple[str, str]] = set()
             print(f"   OK (param_shape={result.get('param_shape')}) — {len(rows)} rows returned. "
-                  f"Distinct ITM_ID/C1 combos:")
+                  f"Distinct ITM_ID/C1 combos:", flush=True)
             for r in rows:
                 combo = (r.get("ITM_ID"), r.get("C1"))
                 if combo in seen:
@@ -219,7 +219,7 @@ def main() -> None:
                 seen.add(combo)
                 print(f"     ITM_ID={r.get('ITM_ID')} ITM_NM={r.get('ITM_NM')} "
                       f"C1={r.get('C1')} C1_NM={r.get('C1_NM')} "
-                      f"(sample: PRD_DE={r.get('PRD_DE')} DT={r.get('DT')})")
+                      f"(sample: PRD_DE={r.get('PRD_DE')} DT={r.get('DT')})", flush=True)
 
 
 if __name__ == "__main__":
