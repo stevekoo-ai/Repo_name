@@ -46,10 +46,41 @@ def test_list_category_returns_none_on_kosis_error_envelope(monkeypatch, capsys)
 
 
 def test_table_item_metadata_returns_rows_on_success(monkeypatch):
-    rows = [{"OBJ_ID": "T", "OBJ_NM": "항목", "OBJ_VAL_ID": "T10", "OBJ_VAL_NM": "전국"}]
+    """필드명은 공식 매뉴얼(§2.5.3.4, 152쪽)의 실제 출력 스펙과 일치해야
+    한다 — ITM_ID/ITM_NM(자료코드)·OBJ_ID/OBJ_NM(분류), OBJ_VAL_ID/
+    OBJ_VAL_NM이 아니다(이건 매뉴얼을 읽기 전 잘못 추측했던 이름)."""
+    rows = [{"OBJ_ID": "T", "OBJ_NM": "항목", "ITM_ID": "T10", "ITM_NM": "전국"}]
     monkeypatch.setattr(mod.requests, "get", lambda *a, **k: _FakeResponse(rows))
     result = mod.table_item_metadata("101", "DT_1J22003", "fake-key")
     assert result == rows
+
+
+def test_table_item_metadata_passes_obj_id_and_itm_id_when_given(monkeypatch):
+    """objId/itmId는 선택 파라미터 — 넘기면 요청에 실려야 하고, 안 넘기면
+    빠져야 한다(KOSIS가 빈 값과 누락을 다르게 취급할 수 있어서)."""
+    captured = {}
+
+    def fake_get(url, params=None, timeout=None):
+        captured.update(params)
+        return _FakeResponse([])
+
+    monkeypatch.setattr(mod.requests, "get", fake_get)
+    mod.table_item_metadata("101", "DT_1J22003", "fake-key", obj_id="T", itm_id="T10")
+    assert captured.get("objId") == "T"
+    assert captured.get("itmId") == "T10"
+
+
+def test_table_item_metadata_omits_obj_id_and_itm_id_when_not_given(monkeypatch):
+    captured = {}
+
+    def fake_get(url, params=None, timeout=None):
+        captured.update(params)
+        return _FakeResponse([])
+
+    monkeypatch.setattr(mod.requests, "get", fake_get)
+    mod.table_item_metadata("101", "DT_1J22003", "fake-key")
+    assert "objId" not in captured
+    assert "itmId" not in captured
 
 
 def test_table_item_metadata_returns_none_on_unexpected_shape(monkeypatch, capsys):

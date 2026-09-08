@@ -127,14 +127,27 @@ def list_category(vw_cd: str, parent_list_id: str, api_key: str) -> list[dict] |
     return payload
 
 
-def table_item_metadata(org_id: str, tbl_id: str, api_key: str) -> list[dict] | None:
+def table_item_metadata(org_id: str, tbl_id: str, api_key: str,
+                        obj_id: str | None = None, itm_id: str | None = None) -> list[dict] | None:
     """statisticsData.do?method=getMeta&type=ITM — 표 하나의 분류/항목
     코드 목록을 직접 가져온다. 이게 있으면 itmId=ALL로 추측할 필요가
-    없다 — 정확히 어떤 itmId/objL1 조합이 존재하는지 여기서 알 수 있다."""
+    없다 — 정확히 어떤 itmId/objL1 조합이 존재하는지 여기서 알 수 있다.
+
+    2026-09-08 공식 매뉴얼(docs/kosis/openApi_manual_v1.0.pdf, §2.5.3.4,
+    152쪽)로 파라미터·출력 필드를 확인 — 처음엔 objId/itmId를 아예 안
+    쓰고 OBJ_VAL_ID/OBJ_VAL_NM이라는 필드를 기대했는데 둘 다 틀렸었다.
+    실제로는 orgId/tblId만 필수(objId/itmId는 선택, 좁혀서 조회할 때만
+    씀)이고, 출력 필드는 OBJ_ID/OBJ_NM(분류)·ITM_ID/ITM_NM(자료코드,
+    바로 이게 데이터 조회 때 itmId/objL1 자리에 넣는 값)·UP_ITM_ID
+    (상위 코드, 계층 분류일 때)다."""
     params = {
         "method": "getMeta", "type": "ITM", "apiKey": api_key,
         "format": "json", "jsonVD": "Y", "orgId": org_id, "tblId": tbl_id,
     }
+    if obj_id:
+        params["objId"] = obj_id
+    if itm_id:
+        params["itmId"] = itm_id
     resp = requests.get(f"{KOSIS_BASE_URL}/statisticsData.do", params=params, timeout=_TIMEOUT)
     raise_for_status(resp)
     payload = resp.json()
@@ -158,10 +171,14 @@ def _print_category_rows(rows: list[dict]) -> None:
 
 
 def _print_item_rows(rows: list[dict]) -> None:
+    """공식 출력 필드(§2.5.3.4): OBJ_ID/OBJ_NM=분류, ITM_ID/ITM_NM=자료코드
+    (데이터 조회 때 itmId/objL1 자리에 넣는 실제 값), UP_ITM_ID=상위 코드
+    (계층형 분류일 때만 채워짐, 없으면 최상위)."""
     for r in rows:
+        up = r.get("UP_ITM_ID")
         print(f"  OBJ_ID={r.get('OBJ_ID')} OBJ_NM={r.get('OBJ_NM')}  "
-              f"OBJ_VAL_ID={r.get('OBJ_VAL_ID') or r.get('ITM_ID')} "
-              f"OBJ_VAL_NM={r.get('OBJ_VAL_NM') or r.get('ITM_NM')}", flush=True)
+              f"ITM_ID={r.get('ITM_ID')} ITM_NM={r.get('ITM_NM')}"
+              + (f"  (상위: {up})" if up else ""), flush=True)
 
 
 def main() -> int:
@@ -172,11 +189,18 @@ def main() -> int:
 
     p_cat = sub.add_parser("list-category", help="통계목록 한 층 조회")
     p_cat.add_argument("--vw-cd", default="MT_ZTITLE", help="뷰 코드 (기본: MT_ZTITLE=국내통계 주제별)")
-    p_cat.add_argument("--parent-list-id", default="", help="시작 목록 ID (빈 문자열=최상위 시도)")
+    # "A"가 최상위 목록 sentinel — 공식 매뉴얼(§2.1.3.1, 24쪽) Python/R
+    # 예제 코드에 "# 최상위 목록 생성" 주석과 함께 명시돼 있다. 처음엔
+    # 빈 문자열로 추측했다가 연결 장애로 검증조차 못 했던 값 — 매뉴얼을
+    # 실제로 읽고서야 확정했다.
+    p_cat.add_argument("--parent-list-id", default="A",
+                       help="시작 목록 ID (기본 'A'=최상위, 공식 매뉴얼 확인됨)")
 
     p_item = sub.add_parser("item-meta", help="통계표 하나의 분류/항목 코드 조회")
     p_item.add_argument("--org-id", required=True)
     p_item.add_argument("--tbl-id", required=True)
+    p_item.add_argument("--obj-id", default=None, help="분류코드로 좁혀서 조회(선택, 생략시 전체)")
+    p_item.add_argument("--itm-id", default=None, help="자료코드로 좁혀서 조회(선택, 생략시 전체)")
 
     args = parser.parse_args()
 
@@ -215,7 +239,8 @@ def main() -> int:
         last_error = None
         for attempt in range(1, 4):
             try:
-                rows = table_item_metadata(args.org_id, args.tbl_id, api_key)
+                rows = table_item_metadata(args.org_id, args.tbl_id, api_key,
+                                          obj_id=args.obj_id, itm_id=args.itm_id)
                 break
             except Exception as exc:
                 last_error = exc
