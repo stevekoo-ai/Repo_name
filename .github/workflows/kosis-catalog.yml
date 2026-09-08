@@ -1,0 +1,102 @@
+name: KOSIS 공식 카탈로그 (통계목록 · 통계표설명 · 매뉴얼)
+
+# 2026-09-08 신설. 사용자 질문 "지금 요청하는 항목이 실제 제공 가능한 게
+# 맞아? 전체 제공 가능 리스트는 확보해서 저장했어?"에서 출발 — 지금까지는
+# 통계표 하나하나를 itmId=ALL로 찍어보고 사람이 항목명을 읽어 판단했다.
+# KOSIS가 공식으로 제공하는 통계목록(카테고리 카탈로그)·통계표설명(항목/
+# 분류 코드 조회) 서비스를 대신 쓴다 — scripts/kosis_catalog.py 참고.
+#
+# kosis.kr은 이 저장소가 실측으로 확인한 대로 간헐적으로 완전히 응답하지
+# 않는 시간대가 있다(2026-09-08 API 전수 프로브·좌표 확정 작업 참고) —
+# 그래서 결과는 항상 나온다는 보장이 없고, 실패하면 그냥 다시 실행하면
+# 된다(수동 진단 도구라 6시간 자동 재시도는 부적절 — kosis-lookup.yml과
+# 동일한 판단).
+
+on:
+  workflow_dispatch:
+    inputs:
+      command:
+        description: "manual(PDF 다운로드) / list-category(통계목록) / item-meta(표 하나의 항목코드)"
+        required: true
+        type: choice
+        options: [manual, list-category, item-meta]
+        default: manual
+      vw_cd:
+        description: "[list-category] 뷰 코드 (기본 MT_ZTITLE=국내통계 주제별)"
+        required: false
+        default: "MT_ZTITLE"
+      parent_list_id:
+        description: "[list-category] 시작 목록 ID (비우면 최상위 시도)"
+        required: false
+        default: ""
+      org_id:
+        description: "[item-meta] 기관 ID (예: 101)"
+        required: false
+        default: "101"
+      tbl_id:
+        description: "[item-meta] 통계표 ID (예: DT_1JH20151)"
+        required: false
+        default: ""
+
+jobs:
+  catalog:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      # collectors.base(redact_url 등) 임포트에 필요 — kosis-lookup.yml과 동일.
+      - name: Install dependencies
+        run: pip install requests pandas pyyaml
+
+      - name: Run KOSIS catalog command
+        env:
+          KOSIS_API_KEY: ${{ secrets.KOSIS_API_KEY }}
+          PYTHONPATH: .
+        run: |
+          case "${{ github.event.inputs.command }}" in
+            manual)
+              python -u -m scripts.kosis_catalog manual
+              ;;
+            list-category)
+              python -u -m scripts.kosis_catalog list-category \
+                --vw-cd "${{ github.event.inputs.vw_cd }}" \
+                --parent-list-id "${{ github.event.inputs.parent_list_id }}"
+              ;;
+            item-meta)
+              if [ -z "${{ github.event.inputs.tbl_id }}" ]; then
+                echo "::error::item-meta는 tbl_id 입력이 필요합니다"
+                exit 1
+              fi
+              python -u -m scripts.kosis_catalog item-meta \
+                --org-id "${{ github.event.inputs.org_id }}" \
+                --tbl-id "${{ github.event.inputs.tbl_id }}"
+              ;;
+          esac
+
+      # 결과(매뉴얼 PDF, data/raw/kosis/ 원본 응답)를 저장소에 커밋 —
+      # 이게 이번 작업의 핵심 목적(카탈로그를 저장해 두는 것)이다.
+      - name: Commit downloaded catalog artifacts
+        run: |
+          git config user.name "kosis-catalog-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add docs/kosis/ 2>/dev/null || true
+          git add data/raw/kosis/ 2>/dev/null || true
+          if git diff --cached --quiet; then
+            echo "No new catalog artifacts"
+          else
+            git commit -m "chore: KOSIS 카탈로그 자료 갱신 ($(date -u +%Y-%m-%dT%H:%M:%SZ))"
+            for i in 1 2 3; do
+              git push && break
+              git fetch origin main
+              git rebase --autostash origin/main
+              sleep $((i * 3))
+            done
+          fi
