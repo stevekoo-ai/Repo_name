@@ -39,33 +39,70 @@ KOSIS_BASE_URL = "https://kosis.kr/openapi"
 
 # A few plausible (orgId, tblId) candidates per indicator, gathered from
 # public references (KOSIS itself has no reachable-from-here keyword search).
+# 2026-09-08: kosis.kr이 이 샌드박스에서 완전히 차단돼(EGRESS_BLOCKED) 로컬
+# WebFetch로 devGuide/통계표 페이지를 열어볼 수 없다 — GitHub Actions에서
+# 실제로 찔러보는 것만이 검증 수단이다. 아래 후보는 WebSearch로 찾은,
+# 실제 KOSIS 웹 화면(statHtml.do) URL에 등장하는 tblId들 — 웹 화면에 존재한다고
+# OpenAPI에서도 항상 되는 건 아니므로(예: DT_1DA7004S는 웹엔 있는데 예전 실측에서
+# "잘못된 요청 변수" 오류) 여러 후보를 순서대로 실측 검증한다.
 CANDIDATES: dict[str, list[tuple[str, str]]] = {
     "cpi_index": [("101", "DT_1J22003"), ("101", "DT_1J17009")],
-    "industrial_production_index": [("101", "DT_1JH20151")],
+    "industrial_production_index": [("101", "DT_1JH20151"), ("101", "DT_1F01012")],
     "retail_sales_index": [("101", "DT_1K41002"), ("101", "DT_1K31009")],
-    "unemployment_rate": [("101", "DT_1DA7004S")],
+    "unemployment_rate": [("101", "DT_1DA7004S"), ("101", "DT_1DA7012S")],
+    # k_employed_yoy: 취업자수(전년동월비) — CCI K-Sahm Rule 축. 경제활동인구조사
+    # 계열의 취업자수 원표(DT_1DA7012S)에서 전년동월비 항목(ITM_ID)을 찾거나,
+    # 못 찾으면 실업률 표(DT_1DA7004S)에 취업자수 항목이 같이 들어있을 수 있어
+    # 함께 시도한다.
+    "k_employed_yoy": [("101", "DT_1DA7012S"), ("101", "DT_1DA7004S")],
+    # 반도체 출하/재고 — 광공업생산지수(2020=100, 산업별) 표 안에 "반도체" 세세분류
+    # 항목이 C1(objL1)로 들어있는 구조로 추정. DT_1F01012가 그 원표일 가능성이 커
+    # 우선 시도, 안 되면 예전 추정치(DT_1E66010)도 함께.
+    "semiconductor_shipment_index": [("101", "DT_1F01012"), ("101", "DT_1E66010")],
+    "semiconductor_inventory_index": [("101", "DT_1F01012"), ("101", "DT_1E66010")],
 }
+
+
+# 2026-09-08: 표마다 분류축(classification dimension) 개수가 다르다 — 어떤
+# 표는 itmId 하나뿐이고(objL1 없음), 어떤 표는 objL1까지, 어떤 표는 objL2까지
+# 쓴다. 실측(2026-07-14)에서 unemployment_rate 후보가 "잘못된 요청 변수를
+# 호출 하였습니다"로 실패했던 게 tblId 자체가 틀려서가 아니라 이 표가 objL2를
+# 안 쓰는데 objL2=ALL을 보내서였을 가능성이 있다 — objL1까지만 보내는 조합도
+# 시도해서 tblId 자체는 유효한데 파라미터 모양만 틀렸던 경우를 구제한다.
+_PARAM_SHAPES: tuple[dict, ...] = (
+    {"itmId": "ALL", "objL1": "ALL", "objL2": "ALL"},
+    {"itmId": "ALL", "objL1": "ALL"},
+    {"itmId": "ALL"},
+)
 
 
 def _try_candidate(api_key: str, org_id: str, tbl_id: str, start: str, end: str, prd_se: str) -> dict:
     url = f"{KOSIS_BASE_URL}/Param/statisticsParameterData.do"
-    params = {
-        "method": "getList", "apiKey": api_key, "itmId": "ALL",
-        "objL1": "ALL", "objL2": "ALL", "format": "json", "jsonVD": "Y",
-        "prdSe": prd_se, "startPrdDe": start, "endPrdDe": end,
-        "orgId": org_id, "tblId": tbl_id,
-    }
-    try:
-        resp = requests.get(url, params=params, timeout=15)
-        raise_for_status(resp)
-        payload = resp.json()
-    except Exception as exc:  # network/JSON errors reported as-is, not raised
-        return {"ok": False, "error": str(exc)}
-    if isinstance(payload, dict) and payload.get("err"):
-        return {"ok": False, "error": payload.get("errMsg", "unknown error"), "err_code": payload.get("err")}
-    if not isinstance(payload, list) or not payload:
-        return {"ok": False, "error": "empty response"}
-    return {"ok": True, "rows": payload}
+    last_error = last_err_code = None
+    for shape in _PARAM_SHAPES:
+        params = {
+            "method": "getList", "apiKey": api_key, "format": "json", "jsonVD": "Y",
+            "prdSe": prd_se, "startPrdDe": start, "endPrdDe": end,
+            "orgId": org_id, "tblId": tbl_id, **shape,
+        }
+        try:
+            resp = requests.get(url, params=params, timeout=15)
+            raise_for_status(resp)
+            payload = resp.json()
+        except Exception as exc:  # network/JSON errors reported as-is, not raised
+            return {"ok": False, "error": str(exc)}
+        if isinstance(payload, dict) and payload.get("err"):
+            last_error = payload.get("errMsg", "unknown error")
+            last_err_code = payload.get("err")
+            # "해당 통계표가 존재하지 않습니다"는 tblId 자체가 없다는 뜻이라 파라미터
+            # 모양을 바꿔봐야 소용없다 — 그런 경우만 다음 후보로 바로 넘어간다.
+            if "존재하지 않습니다" in str(last_error):
+                break
+            continue   # 그 외 오류(파라미터 모양 등)는 다음 shape로 재시도
+        if isinstance(payload, list) and payload:
+            return {"ok": True, "rows": payload, "param_shape": shape}
+        last_error, last_err_code = "empty response", None
+    return {"ok": False, "error": last_error or "unknown error", "err_code": last_err_code}
 
 
 def search_tables(api_key: str, keyword: str, limit: int = 15) -> list[dict]:
@@ -173,7 +210,8 @@ def main() -> None:
                 continue
             rows = result["rows"]
             seen: set[tuple[str, str]] = set()
-            print(f"   OK — {len(rows)} rows returned. Distinct ITM_ID/C1 combos:")
+            print(f"   OK (param_shape={result.get('param_shape')}) — {len(rows)} rows returned. "
+                  f"Distinct ITM_ID/C1 combos:")
             for r in rows:
                 combo = (r.get("ITM_ID"), r.get("C1"))
                 if combo in seen:
