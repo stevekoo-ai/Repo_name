@@ -54,6 +54,18 @@ k_employed_yoy note 참고).
 좌표가 맞아도 이 저장소의 실행 시점에 따라 아예 응답하지 않을 수 있다.
 `scripts/kosis_lookup.py`의 `_connectivity_check()`가 이걸 8초 안에
 싸게 확인한다.
+
+⚠️ **후속 과제(2026-09-08 발견, 이번 세션 범위 밖)**: 좌표는 확정됐지만
+`semiconductor_shipment_index`·`semiconductor_inventory_index`를 실제로
+호출하는 수집 진입점이 코드베이스 어디에도 없다 — `fetch_series()`는
+스스로를 호출해 주지 않으므로, 좌표만 고쳐서는
+`engine/crisis_analysis/scoring.py::score_semiconductor_cycle()`이 읽는
+`data/normalized/kosis_semiconductor_shipment_index.csv` 등이 여전히
+생성되지 않고, 이 모듈은 계속 US industrial production 폴백만 쓰게 된다.
+`scripts/collect_core10.py::KOSIS_KEYS`는 자기 docstring대로 Core-10
+4개 지표 전용이라 여기에 그냥 얹지 않았다 — CCI 반도체 사이클 모듈을
+언제·어디서 갱신할지(새 진입점? collect_core10.py 확장? 스케줄은?)는
+설계 결정이 필요해 다음 세션/사용자 확인으로 넘긴다.
 """
 from __future__ import annotations
 
