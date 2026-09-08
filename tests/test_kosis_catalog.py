@@ -35,6 +35,28 @@ def test_list_category_returns_rows_on_success(monkeypatch):
     assert result == rows
 
 
+def test_main_list_category_uses_empty_string_root_by_default(monkeypatch):
+    """2026-09-08 실측으로 뒤집힌 값 — 매뉴얼 예제가 parentListId='A'를
+    "최상위 목록 생성"이라 주석 달아서 처음엔 'A'를 기본값으로 잡았는데,
+    실제로 호출해보니 'A'는 root가 아니라 "인구" 대분류 자체였다(그
+    예제 앱이 데모용으로 하드코딩한 시작점일 뿐). 진짜 최상위 30개
+    대분류는 parentListId=""(빈 문자열)로 나온다 — main()을 인자 없이
+    (`list-category`만) 실행했을 때 실제로 그 값이 list_category()에
+    전달되는지, mock으로 감시해 확인한다."""
+    captured = {}
+
+    def fake_list_category(vw_cd, parent_list_id, api_key):
+        captured["parent_list_id"] = parent_list_id
+        return []
+
+    monkeypatch.setattr(mod, "list_category", fake_list_category)
+    monkeypatch.setattr(mod, "_get_api_key", lambda: "fake-key")
+    monkeypatch.setattr(mod, "_save_raw", lambda label, payload: __import__("pathlib").Path("/dev/null"))
+    monkeypatch.setattr(mod.sys, "argv", ["kosis_catalog", "list-category"])
+    mod.main()
+    assert captured["parent_list_id"] == ""
+
+
 def test_list_category_returns_none_on_kosis_error_envelope(monkeypatch, capsys):
     """KOSIS는 오류를 HTTP 200 + {"err": ...} 형태로 준다 — 예외가 아니라
     dict로 온다. 이걸 리스트로 착각하면 안 된다."""
