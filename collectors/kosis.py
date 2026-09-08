@@ -55,17 +55,17 @@ k_employed_yoy note 참고).
 `scripts/kosis_lookup.py`의 `_connectivity_check()`가 이걸 8초 안에
 싸게 확인한다.
 
-⚠️ **후속 과제(2026-09-08 발견, 이번 세션 범위 밖)**: 좌표는 확정됐지만
+2026-09-08 수집 진입점 부재 발견·해소: 좌표는 확정됐지만
 `semiconductor_shipment_index`·`semiconductor_inventory_index`를 실제로
-호출하는 수집 진입점이 코드베이스 어디에도 없다 — `fetch_series()`는
-스스로를 호출해 주지 않으므로, 좌표만 고쳐서는
+호출하는 곳이 코드베이스 어디에도 없어서(`fetch_series()`는 스스로를
+호출해 주지 않는다), 좌표만 고쳐서는
 `engine/crisis_analysis/scoring.py::score_semiconductor_cycle()`이 읽는
-`data/normalized/kosis_semiconductor_shipment_index.csv` 등이 여전히
-생성되지 않고, 이 모듈은 계속 US industrial production 폴백만 쓰게 된다.
-`scripts/collect_core10.py::KOSIS_KEYS`는 자기 docstring대로 Core-10
-4개 지표 전용이라 여기에 그냥 얹지 않았다 — CCI 반도체 사이클 모듈을
-언제·어디서 갱신할지(새 진입점? collect_core10.py 확장? 스케줄은?)는
-설계 결정이 필요해 다음 세션/사용자 확인으로 넘긴다.
+정규화 CSV가 계속 안 생기는 상태였다. `collect_core10.py::KOSIS_KEYS`는
+자기 docstring대로 Core-10 4개 지표 전용이라 얹지 않기로 하고, 대신
+같은 파일의 `score_k_sahm()`이 이미 쓰던 패턴(스코어링 함수 안에서 직접
+`kosis.fetch_series()` 호출 → 계산 전에 스스로 최신 데이터를 채움)을
+`score_semiconductor_cycle()`에도 그대로 적용 — 새 스크립트나 워크플로
+없이, CCI가 계산될 때마다(리포트 생성 시점) 자동으로 갱신된다.
 """
 from __future__ import annotations
 

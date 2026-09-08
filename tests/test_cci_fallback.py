@@ -167,6 +167,56 @@ def test_k_sahm_fallback_value_is_informational_only_not_scored():
     assert value == 2.8
 
 
+def test_semiconductor_cycle_calls_fetch_series_for_both_shipment_and_inventory(monkeypatch):
+    """2026-09-08: coordinates for these two KOSIS series were confirmed
+    (DT_1F02001) but nothing in the codebase ever called fetch_series() for
+    them, so the normalized CSVs never got created and this module silently
+    ran the US-proxy fallback forever. Mirrors the pattern score_k_sahm()
+    already used (call fetch_series() directly inside the scoring function)
+    — this pins that both series keys actually get requested."""
+    import collectors.kosis as kosis_mod
+
+    requested = []
+
+    def fake_fetch(series_key):
+        requested.append(series_key)
+        return DataPoint(series_id=series_key, status=DataStatus.PENDING, note="test stub")
+
+    monkeypatch.setattr(kosis_mod, "fetch_series", fake_fetch)
+    cci_scoring.score_semiconductor_cycle()
+
+    assert "semiconductor_shipment_index" in requested
+    assert "semiconductor_inventory_index" in requested
+
+
+def test_semiconductor_cycle_scores_from_real_kosis_series_when_available(monkeypatch):
+    """With real shipment/inventory histories present (fetch_series stubbed
+    to a no-op so this test doesn't touch the network), the KOSIS-primary
+    path must compute cycle_index from them rather than falling through to
+    the US industrial-production proxy."""
+    import collectors.base as collector_base
+    import collectors.kosis as kosis_mod
+    from datetime import date, timedelta
+
+    monkeypatch.setattr(kosis_mod, "fetch_series",
+        lambda series_key: DataPoint(series_id=series_key, status=DataStatus.PENDING, note="test stub"))
+
+    today = date.today()
+    for days_ago, v in [(30, 100.0), (5, 110.0)]:
+        d = (today - timedelta(days=days_ago)).isoformat()
+        collector_base.append_normalized("kosis_semiconductor_shipment_index", [{"date": d, "value": v}])
+    for days_ago, v in [(30, 90.0), (5, 95.0)]:
+        d = (today - timedelta(days=days_ago)).isoformat()
+        collector_base.append_normalized("kosis_semiconductor_inventory_index", [{"date": d, "value": v}])
+
+    score, cycle_index = cci_scoring.score_semiconductor_cycle()
+
+    assert cycle_index is not None
+    ship_change = (110.0 - 100.0) / 100.0
+    inv_change = (95.0 - 90.0) / 90.0
+    assert cycle_index == pytest.approx(ship_change - inv_change)
+
+
 def test_series_as_of_reports_staleness_without_a_freshness_cutoff():
     """2026-09-01: _get_series_window() silently drops values older than its
     window (e.g. 60 days), while _get_latest() returns them anyway with zero

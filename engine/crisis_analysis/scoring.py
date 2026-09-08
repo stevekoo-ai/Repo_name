@@ -406,8 +406,20 @@ def score_semiconductor_cycle() -> tuple[int, Optional[float]]:
 
     Primary: KOSIS semiconductor data → Fallback: US industrial production proxy
 
+    2026-09-08: 좌표는 DT_1F02001로 확정됐지만(collectors/kosis.py)
+    fetch_series()를 실제로 호출하는 곳이 코드베이스 어디에도 없어 정규화
+    CSV가 계속 안 생기고 있었다 — score_k_sahm()이 이미 쓰고 있는 패턴
+    (스코어링 함수 안에서 직접 fetch_series 호출해 스스로 정규화 데이터를
+    채움)을 그대로 따라 여기도 호출하도록 추가. 실패해도(오프라인·API 키
+    없음·kosis.kr 연결 두절) fetch_series는 예외를 던지지 않고 상태만
+    OK가 아닌 DataPoint를 돌려주므로, 아래 _get_latest 폴백 경로가 그대로
+    안전망 역할을 한다.
+
     Returns: (score, cycle_index)
     """
+    kosis.fetch_series("semiconductor_shipment_index")
+    kosis.fetch_series("semiconductor_inventory_index")
+
     ship = _get_latest("kosis_semiconductor_shipment_index")
     inv = _get_latest("kosis_semiconductor_inventory_index")
 
