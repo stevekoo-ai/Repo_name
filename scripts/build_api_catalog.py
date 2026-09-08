@@ -36,7 +36,7 @@ OUTPUT_PATH = REPO_ROOT / "wiki" / "concepts" / "api-data-catalog.md"
 LIVE_STATUS: dict[str, str] = {
     "fred": "✅ 정상",
     "ecos": "✅ 정상",
-    "kosis": "🟡 2026-09-08 좌표 확정: 7개 중 3개 확정(cpi/실업률/소매판매액) — 4개 미해결. 연결은 간헐적으로 완전 두절될 수 있음(사전확인 로직 있음)",
+    "kosis": "🟢 2026-09-08 좌표 확정: 7개 중 6개 확정(cpi/실업률/소매판매액/산업생산/반도체출하/반도체재고) — k_employed_yoy만 미해결(YoY 계산 로직 필요). 연결은 간헐적으로 완전 두절될 수 있음(사전확인 로직 있음)",
     "molit": "✅ 정상 (2026-09-07 복구)",
     "customs_trade": "✅ 정상",
     "bls": "✅ 정상 (2026-09-07 신설)",
@@ -64,7 +64,9 @@ def _kosis_rows() -> list[tuple[str, str, str]]:
     from collectors import kosis
     out = []
     for key, spec in sorted(kosis.KOSIS_SERIES.items()):
-        coord = f"{spec['org_id']}/{spec['tbl_id']} itm={spec['itm_id']}"
+        coord = f"{spec['org_id']}/{spec['tbl_id']} itm={spec['itm_id']} objL1={spec['obj_l1']}"
+        if spec.get("obj_l2"):
+            coord += f" objL2={spec['obj_l2']}"
         out.append((key, coord, spec.get("cycle", "?")))
     return out
 
@@ -193,17 +195,24 @@ def build() -> str:
     A("**kosis.kr은 좌표가 맞아도 이 저장소의 실행 시점에 따라 아예 응답하지")
     A("않을 수 있다**는 게 이번에 새로 확인된 사실.")
     A("")
-    A("**✅ 2026-09-08 좌표 확정 결과 — 7개 중 3개 확정, 4개 미해결**:")
+    A("**✅ 2026-09-08 좌표 확정 결과 — 7개 중 6개 확정, 1개 미해결**:")
+    A("")
+    A("전반부(itmId=ALL로 응답을 받아본 뒤 항목명을 사람이 읽는 방식)로는")
+    A("3개만 확정하고 막혔다. 이후 KOSIS 공식 통계목록(statisticsList.do)·")
+    A("통계표설명(getMeta type=ITM) API로 전환해(`scripts/kosis_catalog.py`,")
+    A("드릴다운 기록은")
+    A("[wiki/concepts/kosis-category-catalog.md](../../wiki/concepts/kosis-category-catalog.md))")
+    A("나머지 3개도 추측 없이 확정했다.")
     A("")
     A("| 지표 | 결과 | 비고 |")
     A("|---|---|---|")
     A("| `cpi_index` | ✅ 확정 | DT_1J22003/T/T10(전국). 228행 수신, 2025-09 117.06 |")
     A("| `unemployment_rate` | ✅ 확정 | tbl_id는 원래도 맞았음 — itm_id만 오류(13103005→T80) |")
     A("| `retail_sales_index` | ✅ 확정(단, 단위 정정) | DT_1K41002 — **지수가 아니라 명목 경상금액(억원)**. 기존 \"2020=100\" 단위 메모가 틀렸었다 |")
-    A("| `industrial_production_index` | ⚠️ 미해결 | 후보 2개 다 실패(표 없음 / 표는 있으나 이 파라미터엔 데이터 없음) |")
+    A("| `industrial_production_index` | ✅ 확정 | DT_1F02001(시도/산업별 광공업생산지수) T10/objL1=00/objL2=0(총지수). **광공업 범위**(전산업 아님) 주의 |")
+    A("| `semiconductor_shipment_index` | ✅ 확정 | 같은 표, T11/objL2=C261(반도체 제조업). 2026-07 159.1 |")
+    A("| `semiconductor_inventory_index` | ✅ 확정 | 같은 표, T12/objL2=C261. 2026-07 106.5 |")
     A("| `k_employed_yoy` | ⚠️ 미해결 | 표는 연결되나 **레벨값만 주고 YoY가 없다** — 좌표만 바꾸면 조용한 오작동(늘 0점)이 되므로 보류. YoY 계산 로직 추가 필요 |")
-    A("| `semiconductor_shipment_index` | ⚠️ 미해결 | 후보 2개 다 실패 |")
-    A("| `semiconductor_inventory_index` | ⚠️ 미해결 | 후보 2개 다 실패 |")
     A("")
     A("| 지표 key | orgId/tblId/itmId | 주기 | 단위 |")
     A("|---|---|---|---|")
@@ -316,7 +325,7 @@ def build() -> str:
     A("| 원하는 데이터 | 현재 상태 | 다음 수순 |")
     A("|---|---|---|")
     A("| 품목별 수출입(반도체 단독) | 관세청 별도 상품 미신청 | data.go.kr에서 nitemtrade 활용신청 |")
-    A("| 한국 산업생산·반도체 출하/재고·취업자YoY | KOSIS 통계표 4개 미확정 | `kosis_lookup.py` 후보검증(§3 표 참고) — k_employed_yoy는 YoY 계산 로직도 필요 |")
+    A("| 한국 취업자 YoY | 표는 연결되나 레벨값만 줌 | `fetch_series`에 YoY 계산 로직 추가 필요(§3 표 참고) |")
     A("| DRAM/NAND/HBM 현물가 | 공식 무료 API 없음 | 수동 입력(`data/manual_inputs/semiconductor.yaml`) 유지 |")
     A("| 청약 공고 | 개인 대상 공식 API 미제공 | 수동 입력 유지 |")
     A("| 산업부 수출입 동향 | 공식 API 미공개 | 관세청 API로 대체 중 |")
