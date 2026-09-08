@@ -12,7 +12,12 @@ WebSearch로 확인한 사실 — **KOSIS는 이 저장소가 안 쓰고 있던 
 1. **통계목록** (`statisticsList.do`) — 카테고리(대분류→중분류→…)를 타고
    내려가며 그 아래 실제 존재하는 통계표(TBL_ID/TBL_NM) 전체를 나열하는
    진짜 "카탈로그" API. 파라미터: `vwCd`(뷰 코드, 예: MT_ZTITLE=국내통계
-   주제별), `parentListId`(시작 목록 ID — 최상위는 아직 실측 확인 전).
+   주제별), `parentListId`(시작 목록 ID — **2026-09-08 실측 확정: 빈
+   문자열이 최상위 30개 대분류**(A=인구, D=노동, L=광업ㆍ제조업, P2=물가
+   등). 매뉴얼 예제가 parentListId='A'를 "최상위 목록 생성"이라 주석
+   달았길래 처음엔 'A'가 root sentinel인 줄 알았는데, 실측해보니 'A'는
+   root가 아니라 "인구" 대분류 자체의 LIST_ID였다 — 그 예제 앱이 그냥
+   데모용으로 '인구'를 시작점으로 하드코딩한 것뿐).
 2. **통계표설명** (`statisticsData.do?method=getMeta&type=ITM`) — 통계표
    하나(orgId+tblId)가 실제로 갖고 있는 분류/항목 코드(itmId/objL1 등)
    목록을 직접 돌려준다. 지금까지 `collectors/kosis.py`/`kosis_lookup.py`가
@@ -189,12 +194,15 @@ def main() -> int:
 
     p_cat = sub.add_parser("list-category", help="통계목록 한 층 조회")
     p_cat.add_argument("--vw-cd", default="MT_ZTITLE", help="뷰 코드 (기본: MT_ZTITLE=국내통계 주제별)")
-    # "A"가 최상위 목록 sentinel — 공식 매뉴얼(§2.1.3.1, 24쪽) Python/R
-    # 예제 코드에 "# 최상위 목록 생성" 주석과 함께 명시돼 있다. 처음엔
-    # 빈 문자열로 추측했다가 연결 장애로 검증조차 못 했던 값 — 매뉴얼을
-    # 실제로 읽고서야 확정했다.
-    p_cat.add_argument("--parent-list-id", default="A",
-                       help="시작 목록 ID (기본 'A'=최상위, 공식 매뉴얼 확인됨)")
+    # 2026-09-08 실측으로 확정 — 매뉴얼(§2.1.3.1, 24쪽) Python/R 예제가
+    # "# 최상위 목록 생성" 주석과 함께 parentListId='A'를 쓰길래 처음엔
+    # 'A'가 범용 root sentinel인 줄 알고 그렇게 기본값을 잡았다. 실측
+    # 결과 'A'는 root가 아니라 "인구"(대분류 하나)의 LIST_ID였다 — 그
+    # 매뉴얼 예제 앱은 그냥 자기 데모용으로 '인구'를 시작점으로 하드코딩한
+    # 것뿐이었다. **진짜 최상위 30개 대분류(인구·물가·노동·광업제조업 등)는
+    # parentListId=""(빈 문자열)로 나온다** — 이게 실측 확정값.
+    p_cat.add_argument("--parent-list-id", default="",
+                       help="시작 목록 ID (기본 ''=최상위 30개 대분류, 2026-09-08 실측 확정)")
 
     p_item = sub.add_parser("item-meta", help="통계표 하나의 분류/항목 코드 조회")
     p_item.add_argument("--org-id", required=True)
