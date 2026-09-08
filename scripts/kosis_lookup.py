@@ -167,6 +167,40 @@ def _run_search(api_key: str, keyword: str) -> None:
           f"ITM_ID/C1(objL1)까지 확인할 것.")
 
 
+def _connectivity_check(api_key: str) -> bool:
+    """후보 14개를 순서대로 찔러보기 전에, kosis.kr 데이터 엔드포인트가 지금
+    이 순간 아예 연결이 되는지 딱 한 번만 빠르게(8초) 확인한다.
+
+    2026-09-08 실측: 후보검증 실행 한 번이 14개 후보 × connect timeout(15초)
+    × 최대 2회 재시도로 약 12분을 태웠는데, **결과가 전부 ConnectTimeoutError**
+    였다 — tblId가 뭐든 상관없이 TCP 연결 자체가 안 됐다는 뜻. 바로 전날
+    (2026-09-07) 같은 엔드포인트가 정상 연결돼 JSON 에러 응답("해당 통계표가
+    존재하지 않습니다")을 받았던 것과 대조적이다. 즉 좌표 문제와 완전히 별개로,
+    **연결 자체가 지금 이 순간 죽어 있을 수 있다** — 이걸 모르고 후보 14개를
+    다 돌리면 12분을 그냥 태운다. 이 사전 확인이 실패하면 바로 알리고
+    끝낸다."""
+    try:
+        resp = requests.get(
+            f"{KOSIS_BASE_URL}/Param/statisticsParameterData.do",
+            params={"method": "getList", "apiKey": api_key, "itmId": "T60",
+                    "objL1": "0000", "format": "json", "jsonVD": "Y", "prdSe": "M",
+                    "startPrdDe": "202601", "endPrdDe": "202601",
+                    "orgId": "101", "tblId": "DT_1J17009"},
+            timeout=8,
+        )
+        raise_for_status(resp)
+        resp.json()  # 형식만 확인 — 내용(성공/실패)은 신경 안 씀, 연결됐다는 것만 중요
+        return True
+    except Exception as exc:
+        print(f"⚠️  kosis.kr 연결 사전확인 실패: {redact_url(str(exc))[:200]}", flush=True)
+        print("   좌표 문제가 아니라 지금 이 순간 연결 자체가 안 되는 것으로 보인다 —",
+              flush=True)
+        print("   후보 14개를 순서대로 찔러도 전부 같은 결과일 가능성이 높아 여기서 멈춘다.",
+              flush=True)
+        print("   잠시 후(또는 다른 시간대에) 다시 시도할 것.", flush=True)
+        return False
+
+
 def main() -> None:
     api_key = os.environ.get("KOSIS_API_KEY")
     if not api_key:
@@ -184,6 +218,13 @@ def main() -> None:
             sys.exit(1)
         _run_search(api_key, " ".join(args[1:]))
         return
+
+    if not _connectivity_check(api_key):
+        # exit 1 — 워크플로의 기존 "3회, 20초 간격" 재시도가 진짜 일시적 블립일
+        # 때는 잡아준다. 사전확인 자체가 8초로 싸기 때문에 이 경로는 최악의
+        # 경우에도 3×(8초+20초)≈84초로 끝난다 — 예전처럼 14개 후보를 다
+        # 돌리고서야 전멸을 확인하는 12분짜리 낭비를 반복하지 않는다.
+        sys.exit(1)
 
     only = args[0] if args else None
     series_keys = [only] if only else list(CANDIDATES)
