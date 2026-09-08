@@ -32,17 +32,22 @@ timeout이므로 한국 IP 제한으로 보이고, 재시도해도 소용없다"
 (통합검색 statisticsSearch.do — "KOSIS엔 검색 API가 없다"는 것도 틀린
 전제였다). 전수 현황은 wiki/concepts/api-data-catalog.md 참고.
 
-2026-09-08 좌표 확정 작업 — 3/7 확정, 4/7 미해결(각 시리즈 note 참고):
+2026-09-08 좌표 확정 작업 — 6/7 확정, 1/7 미해결(각 시리즈 note 참고).
+전반부(itmId=ALL 추측 기반)는 3개만 확정하고 막혔으나, 이후 KOSIS 공식
+통계목록·통계표설명 API(`scripts/kosis_catalog.py`, 카테고리 드릴다운
+기록은 wiki/concepts/kosis-category-catalog.md)로 넘어가면서 나머지
+3개도 추측 없이 확정했다:
 
 ✅ 확정: `cpi_index`(DT_1J22003), `unemployment_rate`(DT_1DA7004S, tbl_id는
 원래도 맞았고 itm_id만 틀려 있었다), `retail_sales_index`(DT_1K41002 —
-단 지수가 아니라 명목 경상금액임에 주의).
+단 지수가 아니라 명목 경상금액임에 주의), `industrial_production_index`·
+`semiconductor_shipment_index`·`semiconductor_inventory_index`(모두
+DT_1F02001 — 시도/산업별 광공업생산지수, item-meta로 산업별 분류에
+C261=반도체 제조업이 있음을 찾고 verify-data로 실데이터까지 확인).
 
-⚠️ 미해결: `industrial_production_index`·`semiconductor_shipment_index`·
-`semiconductor_inventory_index`(후보 전부 "표 없음" 또는 "표는 있으나 이
-파라미터 조합엔 데이터 없음"), `k_employed_yoy`(표는 연결되지만 레벨값만
-주고 YoY 계산 로직이 없어 좌표만 바꾸면 조용한 오작동이 된다 — §
-KOSIS_SERIES의 k_employed_yoy note 참고).
+⚠️ 미해결: `k_employed_yoy`(표는 연결되지만 레벨값만 주고 YoY 계산
+로직이 없어 좌표만 바꾸면 조용한 오작동이 된다 — § KOSIS_SERIES의
+k_employed_yoy note 참고).
 
 과정에서 발견한 것: 연결 자체가 하루 사이 완전히 끊겼다가(2026-09-08 새벽,
 14개 후보 전부 connect timeout) 다시 살아난 사례가 있었다 — `kosis.kr`은
@@ -78,15 +83,20 @@ KOSIS_SERIES: dict[str, dict] = {
         "org_id": "101", "tbl_id": "DT_1DA7004S", "itm_id": "T80", "obj_l1": "00",
         "cycle": "M", "unit": "%", "note": "실업률(전국) — 2026-09-08 실측 확정",
     },
-    # ⚠️ 2026-09-08 후보 2개 전부 실패 — 아직 미해결.
-    # DT_1JH20151: "해당 통계표가 존재하지 않습니다"(표 자체가 없음).
-    # DT_1F01012: "데이터가 존재하지 않습니다"(표는 실재하나 이 파라미터
-    # 조합엔 데이터 없음 — itmId/objL1을 "ALL" 대신 구체적 코드로 지정해야
-    # 할 가능성. WebSearch로는 이 표가 "광공업생산지수"(2015=100, 산업별)로
-    # 확인됨 — "전산업생산지수"와는 포괄범위가 다를 수 있어 재검토 필요).
+    # ✅ 2026-09-08 실측 확정 — 통계목록(statisticsList.do)·통계표설명
+    # (getMeta type=ITM)으로 광업ㆍ제조업(L)→광업제조업동향조사(L_4)→
+    # 생산·출하·재고(101_G131)를 드릴다운해 DT_1F02001(시도/산업별
+    # 광공업생산지수)을 찾고, verify-data로 실데이터까지 확인(2026-06
+    # 123.3 / 2026-07 120.4). itmId=T10(생산지수 원지수)·objL1=00(전국)·
+    # objL2=0(총지수). **주의**: 이 표는 "광공업"(광업+제조업) 총지수다 —
+    # 서비스업·건설업까지 포함하는 "전산업생산지수"(과거 note에 적혀
+    # 있던 이름)와는 포괄범위가 다르다. 한국 언론·한은이 "산업생산"이라
+    # 지칭할 때 통상 이 광공업생산지수를 가리키므로 매크로 프록시로는
+    # 적절하지만, engine 쪽에서 "전산업" 스케일을 가정한 로직이 있다면
+    # 재검토 필요(wiki/concepts/kosis-category-catalog.md 참고).
     "industrial_production_index": {
-        "org_id": "101", "tbl_id": "DT_1JH20151", "itm_id": "13103141670T4", "obj_l1": "00",
-        "cycle": "M", "unit": "2020=100", "note": "전산업생산지수 — 통계표 ID 미확정(2026-09-08 재검증 필요, kosis_lookup.py CANDIDATES 참고)",
+        "org_id": "101", "tbl_id": "DT_1F02001", "itm_id": "T10", "obj_l1": "00", "obj_l2": "0",
+        "cycle": "M", "unit": "2020=100", "note": "광공업생산지수 총지수(전국) — 2026-09-08 실측 확정. 전산업(서비스업 포함)이 아니라 광업+제조업 범위임에 주의",
     },
     # ✅ 2026-09-08 실측 확정 — 단, **지수(index)가 아니라 경상금액(억원)이다.**
     # itmId=ALL/objL1=ALL로 220행 수신, ITM_NM="경상금액" C1_NM="합계"
@@ -115,16 +125,19 @@ KOSIS_SERIES: dict[str, dict] = {
         "org_id": "101", "tbl_id": "DT_1DA7001S", "itm_id": "13103005", "obj_l1": "00",
         "cycle": "M", "unit": "Persons", "note": "취업자 수(YoY 변화) — CCI 모듈 H용. 2026-09-08: 좌표 후보(DT_1DA7012S/DT_1DA7004S)는 연결되지만 레벨값만 준다 — YoY 계산 로직 추가 전까지 좌표 교체 보류",
     },
-    # ⚠️ 2026-09-08 후보 2개 전부 실패 — DT_1F01012 "데이터가 존재하지
-    # 않습니다"(표는 실재), DT_1E66010 "해당 통계표가 존재하지 않습니다"
-    # (표 자체가 없음). 미해결 — 아래 semiconductor_inventory_index와 동일.
+    # ✅ 2026-09-08 실측 확정 — industrial_production_index와 같은 표
+    # (DT_1F02001)의 산업별(objL2) 분류에 C261=반도체 제조업이 있다는 걸
+    # item-meta로 발견, verify-data로 실데이터 확인(2026-07 159.1).
+    # itmId=T11(생산자제품 출하지수 원지수)·objL1=00(전국)·objL2=C261.
     "semiconductor_shipment_index": {
-        "org_id": "101", "tbl_id": "DT_1E66010", "itm_id": "T10", "obj_l1": "0000",
-        "cycle": "M", "unit": "2020=100", "note": "반도체 산업생산지수(출하) — CCI 모듈 I용. 통계표 ID 미확정(2026-09-08 재검증 필요)",
+        "org_id": "101", "tbl_id": "DT_1F02001", "itm_id": "T11", "obj_l1": "00", "obj_l2": "C261",
+        "cycle": "M", "unit": "2020=100", "note": "반도체 제조업 출하지수(전국) — CCI 모듈 I용. 2026-09-08 실측 확정",
     },
+    # ✅ 2026-09-08 실측 확정 — 위와 동일한 표·산업코드, itmId만 T12(재고
+    # 지수)로 교체. verify-data로 실데이터 확인(2026-06 88.7, 2026-07 106.5).
     "semiconductor_inventory_index": {
-        "org_id": "101", "tbl_id": "DT_1E66010", "itm_id": "T30", "obj_l1": "0000",
-        "cycle": "M", "unit": "2020=100", "note": "반도체 산업생산지수(재고) — CCI 모듈 I용. 통계표 ID 미확정(2026-09-08 재검증 필요, kosis_lookup.py CANDIDATES 참고)",
+        "org_id": "101", "tbl_id": "DT_1F02001", "itm_id": "T12", "obj_l1": "00", "obj_l2": "C261",
+        "cycle": "M", "unit": "2020=100", "note": "반도체 제조업 재고지수(전국) — CCI 모듈 I용. 2026-09-08 실측 확정",
     },
 }
 
@@ -145,6 +158,12 @@ def _fetch_table(spec: dict, api_key: str, start: str, end: str, timeout: int = 
         "orgId": spec["org_id"],
         "tblId": spec["tbl_id"],
     }
+    # obj_l2는 선택 — 분류가 2개 이상인 표(예: 시도별×산업별)에서만 필요.
+    # 2026-09-08 DT_1F02001(시도/산업별 광공업생산지수) 좌표 확정 때 추가 —
+    # 이 표는 objL1(시도)만으로는 어느 산업인지 특정이 안 돼 objL2(산업
+    # 코드, 예: C261=반도체 제조업)까지 줘야 원하는 계열이 나온다.
+    if spec.get("obj_l2"):
+        params["objL2"] = spec["obj_l2"]
     resp = requests.get(url, params=params, timeout=timeout)
     base.raise_for_status(resp)
     payload = resp.json()

@@ -108,6 +108,23 @@ def test_confirmed_coordinates_have_not_drifted_back_to_the_old_wrong_guesses():
     assert "지수" not in retail["unit"] or "아님" in retail["unit"]
 
 
+def test_industrial_production_and_semiconductor_coordinates_use_the_confirmed_dt_1f02001_table():
+    """2026-09-08 KOSIS 공식 카탈로그(statisticsList.do·getMeta) 드릴다운으로
+    확정 — 세 시리즈 모두 DT_1F02001(시도/산업별 광공업생산지수)의 서로
+    다른 itmId/objL2 조합이다. verify-data로 실데이터까지 확인된 값이라
+    옛 추측 좌표(DT_1JH20151/DT_1E66010 등)로 되돌아가면 안 된다."""
+    import collectors.kosis as kosis_mod
+
+    ip = kosis_mod.KOSIS_SERIES["industrial_production_index"]
+    assert (ip["tbl_id"], ip["itm_id"], ip["obj_l1"], ip.get("obj_l2")) == ("DT_1F02001", "T10", "00", "0")
+
+    ship = kosis_mod.KOSIS_SERIES["semiconductor_shipment_index"]
+    assert (ship["tbl_id"], ship["itm_id"], ship["obj_l1"], ship.get("obj_l2")) == ("DT_1F02001", "T11", "00", "C261")
+
+    inv = kosis_mod.KOSIS_SERIES["semiconductor_inventory_index"]
+    assert (inv["tbl_id"], inv["itm_id"], inv["obj_l1"], inv.get("obj_l2")) == ("DT_1F02001", "T12", "00", "C261")
+
+
 def test_k_employed_yoy_coordinates_were_not_swapped_for_a_level_series_without_yoy_logic():
     """표는 연결되지만 레벨값만 주는 DT_1DA7012S/DT_1DA7004S로 좌표를 바꾸면,
     score_k_sahm()의 `v < 0` 판정이 절대 참이 될 수 없는 양수 레벨값을
@@ -121,3 +138,54 @@ def test_k_employed_yoy_coordinates_were_not_swapped_for_a_level_series_without_
     assert k_emp["tbl_id"] not in ("DT_1DA7012S", "DT_1DA7004S"), (
         "레벨 표로 좌표가 바뀌었다 — fetch_series에 YoY 계산 로직을 먼저 추가할 것"
     )
+
+
+def test_fetch_table_includes_obj_l2_when_spec_has_it(monkeypatch):
+    """DT_1F02001(시도/산업별)처럼 분류가 2개인 표는 objL1만으로는 어느
+    산업인지 특정이 안 된다 — obj_l2가 spec에 있으면 요청 파라미터에
+    실려야 한다."""
+    import collectors.kosis as kosis_mod
+
+    captured = {}
+
+    class _Resp:
+        def raise_for_status(self):
+            pass
+
+        def json(self):
+            return []
+
+    def fake_get(url, params=None, timeout=None):
+        captured.update(params)
+        return _Resp()
+
+    monkeypatch.setattr(kosis_mod.requests, "get", fake_get)
+    spec = {"org_id": "101", "tbl_id": "DT_1F02001", "itm_id": "T11", "obj_l1": "00",
+            "obj_l2": "C261", "cycle": "M"}
+    kosis_mod._fetch_table(spec, "fake-key", "202501", "202512")
+    assert captured.get("objL2") == "C261"
+
+
+def test_fetch_table_omits_obj_l2_when_spec_has_none(monkeypatch):
+    """cpi_index처럼 분류가 1개뿐인 표에 objL2를 실으면 KOSIS가 빈 값과
+    누락을 다르게 취급할 수 있다 — obj_l2가 없는 spec은 파라미터에서도
+    빠져야 한다."""
+    import collectors.kosis as kosis_mod
+
+    captured = {}
+
+    class _Resp:
+        def raise_for_status(self):
+            pass
+
+        def json(self):
+            return []
+
+    def fake_get(url, params=None, timeout=None):
+        captured.update(params)
+        return _Resp()
+
+    monkeypatch.setattr(kosis_mod.requests, "get", fake_get)
+    spec = {"org_id": "101", "tbl_id": "DT_1J22003", "itm_id": "T", "obj_l1": "T10", "cycle": "M"}
+    kosis_mod._fetch_table(spec, "fake-key", "202501", "202512")
+    assert "objL2" not in captured
