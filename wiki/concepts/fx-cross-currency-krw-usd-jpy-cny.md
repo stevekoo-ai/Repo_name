@@ -126,5 +126,6 @@ FRED 환율 시리즈 자체가 아직 8/28 이후분을 공개하지 않은 것
 - `sources/macro-series.csv` — kr_usdkrw(ECOS), usd_jpy(DEXJPUS), usd_cny(DEXCHUS), usd_krw_fred(DEXKOUS)
 - `scripts/macro_data.py` PRESETS — 2026-09-07 엔/위안/원(FRED) 3종 추가, 10년 백필
 - [원엔위안 환율 트래커](https://claude.ai/code/artifact/ba6513ed-3ee6-4aa9-bc34-d54543157ce2) — 2026-09-08 Artifact, §3.5 이번 주 업데이트의 시각화
+- [원/달러가 36개월 이동평균을 하회한 국면들](usdkrw-below-ma36-episodes.md) — 2026-09-09 신설. 이 페이지가 "지금 얼마나 강한가"를 본다면, 그쪽은 "이 강세가 역사적으로 어떤 국면에 속하는가"를 본다
 - [주식시장의 본질](stock-market-essence.md) — 환율은 §11(부채·통화팽창)과 연결되는 축
 - [SK하이닉스 목표주가 근거 체크리스트](sk-hynix-analyst-thesis-checkpoints.md) — 원화 강세는 수출 채산성에 직결(체크포인트⑨ 실적/마진)
