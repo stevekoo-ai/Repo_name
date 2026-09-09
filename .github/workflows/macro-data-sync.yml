@@ -43,7 +43,7 @@ jobs:
           FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
           ECOS_API_KEY: ${{ secrets.ECOS_API_KEY }}
         run: |
-          python3 scripts/macro_data.py fetch \
+          python3 scripts/macro_data.py fetch --save \
             --series "${{ github.event.inputs.backfill_series }}" \
             ${{ github.event.inputs.backfill_start != '' && format('--start {0}', github.event.inputs.backfill_start) || '' }}
 

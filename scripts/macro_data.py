@@ -266,9 +266,21 @@ def cmd_fetch(args):
         start = start or _fmt_ecos(date.today() - timedelta(days=DEFAULT_LOOKBACK_DAYS), cycle)
         end = end or _fmt_ecos(date.today(), cycle)
 
-    _, rows = _fetch_preset(args.series, start, end, raw=False)
+    provider_used, rows = _fetch_preset(args.series, start, end, raw=False)
     for d, v in rows:
         print(f"{d}\t{v}")
+
+    # 2026-09-09 추가 — fetch는 원래 출력 전용이었고 sync는 "기존 마지막
+    # 날짜 - 7일"부터만 증분 수집한다. 그래서 이미 있는 데이터보다 *과거*로
+    # 넓히는 경로가 코드 어디에도 없었다(36개월 이동평균 분석에 2007년치가
+    # 필요해지면서 드러남). --save는 fetch가 방금 가져온 걸 그대로 저장만
+    # 하게 한다 — upsert가 (series,date) 키 멱등 병합이라 기존 행은 안 깨진다.
+    if getattr(args, "save", False):
+        if not rows:
+            print("저장할 행이 없습니다(응답 0건) — CSV를 건드리지 않습니다.", file=sys.stderr)
+            return
+        n = upsert_series_rows(args.series, rows, provider_used)
+        print(f"저장 완료: {args.series} {n}행 ({rows[0][0]} ~ {rows[-1][0]})", file=sys.stderr)
 
 
 def cmd_ecos_raw(args):
@@ -330,6 +342,8 @@ def main():
     pf.add_argument("--start", help="FRED: YYYY-MM-DD, ECOS: 주기에 맞는 포맷(YYYYMM 등)")
     pf.add_argument("--end")
     pf.add_argument("--raw", action="store_true")
+    pf.add_argument("--save", action="store_true",
+                    help="가져온 값을 macro-series.csv에 저장(기본은 출력만) — 과거 구간 백필용")
     pf.set_defaults(func=cmd_fetch)
 
     pe = sub.add_parser("ecos-raw", help="ECOS 임의 통계표코드로 직접 조회(프리셋에 없는 지표)")
