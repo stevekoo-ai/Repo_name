@@ -3,7 +3,16 @@ name: 거시지표 자동 수집 (금리·GDP·환율)
 on:
   schedule:
     - cron: "10 22 * * *"  # 07:10 KST, 매일 1회 — 금리/GDP는 하루 여러 번 바뀔 이유가 없음
-  workflow_dispatch: {}    # 수동 실행(테스트용)
+  workflow_dispatch:       # 수동 실행(테스트용 + 일회성 장기 백필)
+    inputs:
+      backfill_series:
+        description: "[선택] 이 프리셋 하나만 장기 백필 (예: usd_krw_fred). 비우면 평소대로 전체 sync"
+        required: false
+        default: ""
+      backfill_start:
+        description: "[선택] 백필 시작일 YYYY-MM-DD (FRED 기준). backfill_series와 함께 사용"
+        required: false
+        default: ""
 
 permissions:
   contents: write
@@ -23,7 +32,23 @@ jobs:
           python-version: "3.12"
 
       # 2026-08-21 추가 — 실패하면 성공할 때까지(최대 6시간, 10분 간격) 재시도.
+      # 2026-09-09 추가 — 36개월 이동평균 분석에 2010년 이전 데이터가 필요했는데
+      # sync는 DEFAULT_LOOKBACK_DAYS(10년)로 고정이라 장기 이력을 못 가져왔다.
+      # macro_data.py fetch --start는 원래 있던 기능이고, upsert가 (series,date)
+      # 키 기반 멱등 병합이라 기존 행을 깨지 않는다 — 워크플로에서 그 기능에
+      # 닿을 입력만 없었을 뿐이라 통로만 뚫는다.
+      - name: 일회성 장기 백필 (backfill_series 지정 시에만)
+        if: ${{ github.event.inputs.backfill_series != '' }}
+        env:
+          FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
+          ECOS_API_KEY: ${{ secrets.ECOS_API_KEY }}
+        run: |
+          python3 scripts/macro_data.py fetch \
+            --series "${{ github.event.inputs.backfill_series }}" \
+            ${{ github.event.inputs.backfill_start != '' && format('--start {0}', github.event.inputs.backfill_start) || '' }}
+
       - name: 프리셋 전체 동기화
+        if: ${{ github.event.inputs.backfill_series == '' }}
         env:
           FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
           ECOS_API_KEY: ${{ secrets.ECOS_API_KEY }}
