@@ -64,7 +64,12 @@ def test_full_pipeline_produces_a_readable_report():
 
     markdown = render_markdown(payload)
     assert markdown.startswith("# PEOS 일일 리포트 - 1999-01")
-    for heading in ("Executive Summary", "Macro Dashboard", "Action Plan", "Personal Executive Brief"):
+    # 2026-09-10 — "Macro Dashboard"는 5섹션 개편 때 "1. 거시 경제 대시보드"로
+    # **이름만** 바뀌었는데(내용은 한국/미국 거시 상황 그대로) 이 단정이 옛
+    # 영문 헤딩에 묶여 있어 계속 실패하고 있었다. 나머지 세 헤딩은 legacy
+    # Appendix에 그대로 남아 있어 영문 그대로 둔다.
+    for heading in ("Executive Summary", "1. 거시 경제 대시보드", "Action Plan",
+                    "Personal Executive Brief"):
         assert heading in markdown
 
     assert isinstance(payload["discussion_points"], list)
@@ -109,3 +114,28 @@ def test_pipeline_marks_missing_indicators_as_pending_not_guessed():
     # show up as Pending rather than silently defaulting to a fabricated value.
     assert any(r["indicator"] == "실질 GDP 성장률" for r in pending_rows)
     assert all(r["current"] is None for r in pending_rows)
+
+
+def test_the_production_html_renderer_also_produces_a_usable_report():
+    """⚠ 2026-09-10 발견 — 위 test_full_pipeline_produces_a_readable_report는
+    `engine/report/html.py`의 render_html을 검증하는데, **매일 실제로 발송·
+    게시되는 리포트를 만드는 건 `engine/report/html_new.py`** 다
+    (run.py 34행: `from .html_new import render_html`).
+
+    즉 production 렌더러엔 파이프라인 테스트가 없었다. html.py::render_html은
+    이 테스트 파일에서만 호출되고, 그 모듈이 살아 있는 실질적 이유는
+    daily_dashboard/real_estate_dashboard가 재사용하는 _CSS·_esc 뿐이다.
+
+    두 렌더러를 통합하거나 한쪽을 정리하는 건 별건이라, 여기서는 최소한
+    **실제로 나가는 렌더러가 깨지지 않는지**를 고정한다."""
+    from engine.report.html_new import render_html as render_production_html
+
+    payload = payload_mod.build_report_payload(month_key="1999-04")
+    html_doc = render_production_html(payload)
+
+    assert html_doc.startswith("<!DOCTYPE html>")
+    assert html_doc.rstrip().endswith("</html>")
+    assert html_doc.count("<div") == html_doc.count("</div>"), "div 짝이 안 맞는다"
+    # 이 리포트의 뼈대 — 하나라도 빠지면 사용자가 받는 페이지가 반쪽이 된다
+    for marker in ("PEOS 일일 리포트", "포지션", "위기지수"):
+        assert marker in html_doc, marker
