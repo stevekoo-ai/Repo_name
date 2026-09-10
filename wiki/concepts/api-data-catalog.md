@@ -1,7 +1,7 @@
 ---
 title: API 데이터 카탈로그 — 무엇을 어느 API로 가져오는가
 created: 2026-09-07
-updated: 2026-09-08
+updated: 2026-09-10
 tags: [api, data-source, lookup-table, automation, reference]
 ---
 
