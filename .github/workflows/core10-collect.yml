@@ -48,7 +48,48 @@ jobs:
           FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
         # Not --strict: one dead upstream should not stop the others from
         # landing. The freshness audit below is what makes a failure visible.
-        run: python -m scripts.collect_core10
+        #
+        # 2026-09-10 추가 — 재시도 루프. 다른 수집 워크플로는 전부
+        # `until <명령>; do sleep; done` 형태인데 여기만 없었다. 그런데 같은
+        # 형태를 그대로 쓸 수 없다: collect_core10은 --strict 없이는 항상
+        # exit 0이라 until이 한 번도 돌지 않고, --strict를 붙이면 **구조적으로
+        # 못 가져오는 계열**(KOSIS 좌표가 아직 확정 안 된 k_employed_yoy 등)
+        # 때문에 매일 실패해 6시간을 헛되이 태운다.
+        #
+        # 그래서 exit code가 아니라 **성과("N/M succeeded")가 나아지는 동안만**
+        # 재시도한다. 일시적 네트워크 실패는 다음 시도에서 N이 오르고,
+        # 구조적 실패는 N이 그대로라 즉시 멈춘다. upsert가 멱등이라
+        # 다시 돌려도 기존 데이터는 안 깨진다.
+        run: |
+          best=-1
+          attempt=1
+          max_attempts=4
+          while [ "$attempt" -le "$max_attempts" ]; do
+            python -m scripts.collect_core10 | tee /tmp/core10.txt
+            line=$(grep -oE '[0-9]+/[0-9]+ succeeded' /tmp/core10.txt | tail -1)
+            got=${line%%/*}
+            total=$(echo "$line" | sed -E 's|[0-9]+/([0-9]+) succeeded|\1|')
+            echo "[시도 $attempt/$max_attempts] $got/$total 수집"
+            if [ -n "$total" ] && [ "$got" = "$total" ]; then
+              echo "전부 수집 완료"
+              python3 scripts/log_automation_run.py core10-collect core10 "$attempt" "$max_attempts" success || true
+              break
+            fi
+            if [ "$got" -le "$best" ]; then
+              echo "::warning::재시도해도 수집 건수가 늘지 않음($best → $got) — 구조적 결손으로 보고 중단"
+              python3 scripts/log_automation_run.py core10-collect core10 "$attempt" "$max_attempts" partial || true
+              break
+            fi
+            best=$got
+            attempt=$((attempt + 1))
+            if [ "$attempt" -le "$max_attempts" ]; then
+              echo "5분 후 재시도"
+              sleep 300
+            else
+              echo "::warning::${max_attempts}회 시도 후에도 $got/$total — 아래 신선도 감사 확인"
+              python3 scripts/log_automation_run.py core10-collect core10 "$attempt" "$max_attempts" exhausted || true
+            fi
+          done
 
       - name: Commit collected data
         run: |
