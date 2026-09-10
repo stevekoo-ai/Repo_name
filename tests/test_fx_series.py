@@ -37,16 +37,28 @@ def test_observations_are_sorted_ascending():
 def test_latest_as_of_drops_values_older_than_max_age():
     """오래된 값을 조용히 '최신'으로 쓰는 걸 막는다 — CCI의 62일 사고 재발 방지.
 
-    ⚠ 이 테스트는 처음에 "2010년엔 kr_base_rate가 없다"를 전제로 썼다가,
-    같은 날 백필로 그 시리즈가 2005년까지 늘어나면서 깨졌다. 데이터
-    커버리지에 기대는 단정은 백필 한 번에 무너지므로, 어떤 시리즈도
-    존재할 수 없는 시점을 쓰고 나이 제한 자체를 직접 검증한다."""
-    before_everything = date(1900, 1, 1)
-    assert S.latest_as_of("kr_base_rate", before_everything) is None
-    # 나이 제한이 없으면 마지막 값이 나오지만, 제한을 걸면 None으로 떨어진다
-    cutoff = date(2026, 9, 9)
-    assert S.value_as_of("us_10y", cutoff, max_age_days=3650) is not None
-    assert S.value_as_of("us_10y", cutoff, max_age_days=0) is None
+    ⚠ 이 테스트는 두 번 깨졌다. 처음엔 "2010년엔 kr_base_rate가 없다"를
+    전제로 썼다가 백필로 그 시리즈가 2005년까지 늘어나며 깨졌고, 다음엔
+    "2026-09-09 기준 us_10y는 0일보다 오래됐다"를 전제로 썼다가 main 병합으로
+    그날 값이 새로 들어오며 깨졌다. **데이터 커버리지에 기대는 단정은
+    수집이 진행될수록 반드시 깨진다.**
+
+    그래서 여기서는 어떤 날짜도 하드코딩하지 않는다. 실제 마지막 관측일을
+    읽어와 그 상대적 거리로만 나이 제한을 검증한다."""
+    from datetime import timedelta
+
+    rows = S.load_series("us_10y")
+    assert rows, "us_10y는 이 저장소에 항상 있어야 한다"
+    last = rows[-1].date
+
+    # 마지막 관측 당일에 조회하면 나이 0 — 어떤 제한에도 살아남는다
+    assert S.value_as_of("us_10y", last, max_age_days=0) is not None
+    # 10일 뒤 시점에서 보면 나이 10 — 제한 9면 걸러지고 10이면 통과한다
+    later = last + timedelta(days=10)
+    assert S.value_as_of("us_10y", later, max_age_days=9) is None
+    assert S.value_as_of("us_10y", later, max_age_days=10) is not None
+    # 데이터가 존재할 수 없는 시점은 나이 제한과 무관하게 None
+    assert S.latest_as_of("us_10y", date(1900, 1, 1)) is None
 
 
 def test_value_n_months_before_walks_back_across_year_boundaries():
