@@ -172,7 +172,7 @@ StatisticItemList) — ecos-lookup.yml 워크플로로 실행.
 |---|---|---|---|
 | `cpi_index` | `101/DT_1J22003 itm=T objL1=T10` | M | 2020=100 |
 | `industrial_production_index` | `101/DT_1F02001 itm=T10 objL1=00 objL2=0` | M | 2020=100 |
-| `k_employed_yoy` | `101/DT_1DA7001S itm=13103005 objL1=00` | M | Persons |
+| `k_employed_yoy` | `101/DT_1DA7001S itm=13103005 objL1=00` | M | % |
 | `retail_sales_index` | `101/DT_1K41002 itm=T1 objL1=G0` | M | 억원(경상금액, 지수 아님) |
 | `semiconductor_inventory_index` | `101/DT_1F02001 itm=T12 objL1=00 objL2=C261` | M | 2020=100 |
 | `semiconductor_shipment_index` | `101/DT_1F02001 itm=T11 objL1=00 objL2=C261` | M | 2020=100 |

@@ -133,9 +133,14 @@ KOSIS_SERIES: dict[str, dict] = {
     # 않았다.** 고치려면 fetch_series에 전년동월 대비 증감률 계산을
     # 추가하거나(레벨 시계열에서 자체 계산), 이 값 자체를 이미 YoY로 주는
     # 다른 표를 찾아야 한다(둘 다 이번 세션 범위 밖).
+    # ✅ 2026-09-10 해소 — 2026-09-08에 "좌표는 연결되지만 레벨값만 준다"며
+    # 보류했던 건. 이제 derive="yoy"로 선언하면 fetch_series가
+    # _to_year_over_year()로 변환한다. unit도 Persons에서 %로 바꿨다 —
+    # 단위 표기가 그대로면 리포트가 "2,900만 %"를 찍는다.
     "k_employed_yoy": {
         "org_id": "101", "tbl_id": "DT_1DA7001S", "itm_id": "13103005", "obj_l1": "00",
-        "cycle": "M", "unit": "Persons", "note": "취업자 수(YoY 변화) — CCI 모듈 H용. 2026-09-08: 좌표 후보(DT_1DA7012S/DT_1DA7004S)는 연결되지만 레벨값만 준다 — YoY 계산 로직 추가 전까지 좌표 교체 보류",
+        "cycle": "M", "unit": "%", "derive": "yoy",
+        "note": "취업자 수 전년동월비 — CCI 모듈 H(K-Sahm)용. KOSIS는 레벨(명)만 주므로 derive=yoy로 변환해서 쓴다",
     },
     # ✅ 2026-09-08 실측 확정 — industrial_production_index와 같은 표
     # (DT_1F02001)의 산업별(objL2) 분류에 C261=반도체 제조업이 있다는 걸
@@ -184,6 +189,32 @@ def _fetch_table(spec: dict, api_key: str, start: str, end: str, timeout: int = 
     return payload if isinstance(payload, list) else None
 
 
+def _to_year_over_year(rows: list[dict]) -> list[dict]:
+    """월별 레벨 시계열 → 전년동월 대비 증감률(%).
+
+    ⚠ 왜 필요한가 (2026-09-08 기록 → 2026-09-10 해소):
+    `k_employed_yoy`는 이름이 YoY인데 KOSIS의 후보 표들이 전부 **레벨값**
+    (취업자 수 2,900만 명대)만 준다. 좌표만 바꾸면 CCI의 K-Sahm 모듈이
+    "2,900만"을 증감률로 받아 **겉보기엔 정상인데 항상 같은 점수를 내는
+    조용한 실패**가 된다 — 그래서 그때는 좌표 교체를 보류했다.
+
+    여기서 레벨을 YoY로 바꿔 그 공백을 메운다. 12개월 전 같은 달을
+    **날짜로 직접 찾는다**(인덱스 -12가 아니라). 월이 빠진 구간이 있으면
+    인덱스 기준은 엉뚱한 달과 비교하게 되고, 그 오차는 값이 그럴듯해서
+    눈에 띄지 않는다. 짝을 못 찾은 달은 버린다(R3 — 없는 건 없는 것).
+    """
+    by_month = {r["date"]: r["value"] for r in rows}
+    out: list[dict] = []
+    for r in sorted(rows, key=lambda x: x["date"]):
+        y, m, _ = r["date"].split("-")
+        prior_key = f"{int(y) - 1:04d}-{m}-01"
+        prior = by_month.get(prior_key)
+        if prior in (None, 0):
+            continue
+        out.append({"date": r["date"], "value": (r["value"] / prior - 1) * 100})
+    return out
+
+
 def fetch_series(series_key: str) -> DataPoint:
     spec = KOSIS_SERIES[series_key]
     api_key = get_api_key("kosis")
@@ -217,6 +248,11 @@ def fetch_series(series_key: str) -> DataPoint:
         {"date": _prd_to_date(r["PRD_DE"]), "value": float(r["DT"])}
         for r in rows if r.get("DT") not in (None, "", "-")
     ]
+    # KOSIS가 레벨만 주는 지표를 YoY로 쓰려면 여기서 변환한다. spec에
+    # 명시적으로 선언해야만 동작하므로, 이름만 _yoy인 지표가 레벨을
+    # 그대로 흘리는 사고(2026-09-08 k_employed_yoy)가 재발하지 않는다.
+    if spec.get("derive") == "yoy":
+        normalized = _to_year_over_year(normalized)
     base.append_normalized(f"kosis_{series_key}", normalized)
 
     if not normalized:
