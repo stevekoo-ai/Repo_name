@@ -14,7 +14,7 @@ from core.models import DataPoint, DataStatus
 from engine.macro import indicators as indicators_mod
 from engine.macro import snapshot as snapshot_mod
 from engine.report import payload as payload_mod
-from engine.report.html import render_html
+from engine.report.html_new import render_html
 from engine.report.markdown import render_markdown
 
 
@@ -76,10 +76,16 @@ def test_full_pipeline_produces_a_readable_report():
     for point in payload["discussion_points"]:
         assert point["id"] and point["topic"] and point["context"] and point["question"]
 
+    # 2026-09-10 — engine/report/html.py를 삭제하고 이 단정을 production
+    # 렌더러(html_new.py)로 옮겼다. 지운 쪽은 아무 데서도 호출되지 않는
+    # 죽은 코드였는데, 여기서만 테스트되고 있어 "검증된 렌더러"처럼
+    # 보였다. Executive Summary·Action Plan·논의사항은 그 파일에만 있던
+    # 섹션이라 삭제 전에 html_new로 이식했다 — 그래서 아래 단정이 그대로
+    # 성립한다(이번엔 실제로 발송되는 리포트에 대해).
     html_doc = render_html(payload)
-    assert html_doc.startswith("<!doctype html>")
-    assert html_doc.count("<section") == html_doc.count("</section>")
-    for heading in ("Executive Summary", "Macro Dashboard", "Action Plan", "논의가 필요한 결정 사항"):
+    assert html_doc.startswith("<!DOCTYPE html>")
+    assert html_doc.count("<div") == html_doc.count("</div>")
+    for heading in ("Executive Summary", "Action Plan", "논의가 필요한 결정 사항"):
         assert heading in html_doc
 
 

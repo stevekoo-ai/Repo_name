@@ -24,7 +24,7 @@ from pathlib import Path
 
 from collectors import base as collector_base
 from collectors import kr_regions
-from .html import _CSS, _esc
+from .html_shared import _CSS, _esc
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 

@@ -27,7 +27,7 @@ tags: [automation, architecture, roadmap, sk-hynix, peos, api]
 1. **PEOS 파이프라인**(`engine/`, `collectors/`, `main` 브랜치) — ECOS/KOSIS/
    FRED API → 지표 계산 → 룰엔진 스코어링 → 마크다운/HTML 렌더링까지
    **완전히 LLM-free**로 이미 동작 중. `engine/rule/engine.py`가 threshold
-   기반 채점을, `engine/report/markdown.py`·`html.py`가 템플릿 렌더링을
+   기반 채점을, `engine/report/markdown.py`·`html_new.py`가 템플릿 렌더링을
    담당한다. 이게 사용자가 원하는 아키텍처의 정확한 선례다.
 2. **`scripts/investor_flow.py`** — KIS Open API로 8개 TR(수급/신용잔고/
    공매도/지수/ETF NAV/ADR 등)을 이미 실계정 검증까지 마친 상태로 수집
@@ -450,7 +450,7 @@ SEC 미제출이라 여전히 🔴** — DART/일본/대만 공시는 별도 API
 - `scripts/daily_report.py` (규칙기반 리포트 조립기, B·E 적용)
 - `scripts/stats_utils.py` (z-score/percentile/anomaly_label/logistic_scale, 2026-08-06 신설)
 - `scripts/sec_edgar_capex.py`, `.github/workflows/sec-edgar-capex.yml` (2단계 SEC EDGAR 자동수집)
-- `engine/rule/engine.py`, `engine/report/markdown.py`, `engine/report/html.py` (PEOS 템플릿 렌더링 선례)
+- `engine/rule/engine.py`, `engine/report/markdown.py`, `engine/report/html_new.py` (PEOS 템플릿 렌더링 선례 — `html.py`는 2026-09-10 삭제, 공용 `_CSS`/`_esc`는 `html_shared.py`로 분리)
 - [hbm-cycle-score.md](hbm-cycle-score.md) "1. HBM Cycle Score" (6축 가중치 공식)
 - `data/manual_inputs/semiconductor.yaml` (반도체 신호가 왜 수동 입력인지 근거)
 - WebSearch 2026-08-05: SEC EDGAR XBRL API, FMP/Finnhub 목표가 API, DRAM/NAND 무료 데이터, Polymarket, KIS 국내주식 목표주가 TR, TSMC HPC 매출비중, 네이버금융/FnGuide/DART

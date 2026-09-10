@@ -583,6 +583,413 @@ def _render_fx_regime(payload: dict) -> str:
 """
 
 
+# ─────────────────────────────────────────────────────────────
+# 2026-09-10 이식 — 마크다운엔 있는데 HTML엔 없던 섹션들
+#
+# 이 저장소는 리포트 렌더러가 둘인데(markdown.py / html_new.py) 사용자가
+# 매일 이메일로 받고 docs/report.html로 보는 건 **HTML 쪽**이다. 그런데
+# 실측해보니 HTML에 Executive Summary·Action Plan·시나리오·논의사항·
+# 경제캘린더가 통째로 빠져 있었다(마크다운엔 Action Plan만 11군데).
+#
+# 구현 자체는 engine/report/html.py에 있었지만 그 파일의 render_html은
+# 아무 데서도 호출되지 않는 죽은 코드였다 — "구현은 있는데 전달은 안 되는"
+# 상태로 방치돼 있었다. 여기로 옮기고 html.py는 삭제한다.
+#
+# ⚠ 마크업을 그대로 복사하지 않았다. html.py는 밝은 테마(--surface 등)에
+# <section class="card">를 쓰고 이 파일은 어두운 그라데이션에 자체 인라인
+# CSS를 쓴다 — 클래스가 서로 없다. 내용만 가져오고 표현은 이 파일 양식
+# (.card / <h2> / <table>)으로 다시 썼다.
+
+_TIER_LABEL = {
+    5: "★★★★★ 반드시 확인/실행", 4: "★★★★☆ 검토", 3: "★★★☆☆ 관찰",
+    2: "★★☆☆☆ 참고", 1: "보류",
+}
+_TIER_COLOR = {5: "#EF4444", 4: "#F59E0B", 3: "#38BDF8", 2: "#94A3B8", 1: "#64748B"}
+
+
+def _kv_rows(rows) -> str:
+    return "".join(
+        f'<div class="metric"><span class="metric-label">{k}</span>'
+        f'<span style="text-align:right;max-width:70%">{v}</span></div>'
+        for k, v in rows)
+
+
+_STATUS_KR = {
+    "ok": "정상", "stale": "이월", "pending": "미수집",
+    "not_released": "미발표", "source_error": "수집실패",
+}
+
+
+def _fmt_num(value, suffix: str = "") -> str:
+    if value is None:
+        return '<span style="color:#64748B">Pending</span>'
+    if isinstance(value, (int, float)):
+        return f"{value:,.2f}{suffix}"
+    return _esc(value)
+
+
+def _sparkline_svg(history, years: int, width: int = 176, height: int = 44) -> str:
+    """표 칸 안에 들어가는 자립형 SVG 추세선.
+
+    2026-09-10 이식 — 단일 색상(판단이 아니라 크기·추세 표현), 2px 선,
+    점마다 숫자를 찍지 않고 양끝만 직접 라벨링, 호버는 네이티브 <title>로
+    처리해 차트 라이브러리를 안 쓴다. 색만 이 파일의 어두운 테마에 맞게
+    var(--accent) → 고정 색으로 바꿨다(이 파일엔 CSS 변수가 없다)."""
+    history = history or []
+    if len(history) < 2:
+        return f'<span style="color:#64748B; font-size:0.8em">{years}년 이력 부족</span>'
+    values = [h["value"] for h in history]
+    lo, hi = min(values), max(values)
+    span = (hi - lo) or 1.0
+    pad = 4
+    n = len(values)
+
+    def x(i):
+        return pad + (width - 2 * pad) * i / (n - 1)
+
+    def y(v):
+        return height - pad - (height - 2 * pad) * (v - lo) / span
+
+    points = " ".join(f"{x(i):.1f},{y(v):.1f}" for i, v in enumerate(values))
+    start_date, end_date = history[0]["date"][:7], history[-1]["date"][:7]
+    start_val, end_val = values[0], values[-1]
+    tooltip = _esc(f"{start_date} {start_val:.2f} → {end_date} {end_val:.2f}")
+    return (
+        f'<svg class="spark" viewBox="0 0 {width} {height}" width="{width}" height="{height}"'
+        f' role="img" aria-label="{tooltip}"><title>{tooltip}</title>'
+        f'<polyline points="{points}" fill="none" stroke="#38BDF8" stroke-width="2"'
+        ' stroke-linecap="round" stroke-linejoin="round"/>'
+        f'<circle cx="{x(n - 1):.1f}" cy="{y(end_val):.1f}" r="2.5" fill="#38BDF8"/></svg>'
+        f'<div style="display:flex;justify-content:space-between;color:#64748B;font-size:0.7em">'
+        f'<span>{_esc(start_date)}·{start_val:.1f}</span>'
+        f'<span>{_esc(end_date)}·{end_val:.1f}</span></div>')
+
+
+def _render_macro_dashboard(payload: dict, dashboard_key: str = "macro_dashboard",
+                            title: str = "Macro Dashboard") -> str:
+    """10개 거시 지표 표 + 10년 추세 스파크라인.
+
+    ⚠ 2026-09-10 발견 — 이 섹션이 production HTML에 **통째로 없었다**.
+    마크다운 §1은 "거시 경제 대시보드"로 10개 지표를 싣는데, 매일 이메일로
+    나가는 HTML엔 실질 GDP도 실업률도 한 줄이 없었다. 구현은 죽은
+    html.py에만 있었다.
+
+    † ‡ 각주는 그대로 옮겼다 — "이월"과 "전월 스냅샷 없어 원자료 이력 사용"을
+    구분해 표기하는 게 R2·R3의 실무적 표현이라, 표기가 사라지면 이월값이
+    실시간값처럼 보인다."""
+    rows_data = payload.get(dashboard_key) or []
+    if not rows_data:
+        return ""
+    has_fallback = any(r.get("previous_source") == "series_history" for r in rows_data)
+    has_stale = any(r.get("status") == "stale" for r in rows_data)
+
+    rows = ""
+    for r in rows_data:
+        stale_mark = ('<sup style="color:#F59E0B" title="오늘 실시간 조회 실패 — 마지막으로 확인된 값 유지 중">‡</sup>'
+                      if r.get("status") == "stale" else "")
+        fallback_mark = ('<sup style="color:#94A3B8" title="전월 리포트 스냅샷이 아직 없어 원자료 이력의 직전 값을 사용">†</sup>'
+                         if r.get("previous_source") == "series_history" else "")
+        source = r.get("source") or _STATUS_KR.get(r.get("status"), r.get("status"))
+        rows += (
+            f'<tr><td>{_esc(r.get("indicator"))}</td>'
+            f'<td>{_fmt_num(r.get("current"))}{stale_mark}</td>'
+            f'<td>{_fmt_num(r.get("previous"))}{fallback_mark}</td>'
+            f'<td>{_esc(r.get("trend"))}</td><td>{_fmt_num(r.get("score"))}</td>'
+            f'<td>{_sparkline_svg(r.get("history"), r.get("history_years", 10))}</td>'
+            f'<td style="color:#94A3B8; font-size:0.85em">{_esc(source)}</td></tr>')
+
+    notes = []
+    if has_stale:
+        notes.append("‡ 오늘 실시간 조회에 실패한 지표입니다 — 마지막으로 확인된 값을 "
+                     "그대로 유지해 표시했습니다(추측·대체 데이터 아님).")
+    if has_fallback:
+        notes.append("† 전월 PEOS 리포트가 아직 쌓이지 않아, 해당 지표는 원자료(공식 통계) "
+                     "이력의 직전 발표값으로 대체 표시했습니다.")
+    footnote = (f'<p style="color:#94A3B8; font-size:0.82em; margin-top:12px;">{" ".join(notes)}</p>'
+                if notes else "")
+
+    return (
+        '\n        <div class="card" style="margin-bottom:40px;">\n'
+        f'            <h2>📊 {_esc(title)}</h2>\n'
+        '            <table><tr><th>지표</th><th>현재</th><th>이전</th><th>추세</th>'
+        '<th>점수</th><th>10년 추세</th><th>출처</th></tr>'
+        f'{rows}</table>\n'
+        f'            {footnote}\n'
+        '        </div>\n'
+    )
+
+
+def _render_us_macro_dashboard(payload: dict) -> str:
+    if not payload.get("us_macro_dashboard"):
+        return ""
+    return _render_macro_dashboard(payload, "us_macro_dashboard", "US Macro Dashboard")
+
+
+def _render_executive_summary(payload: dict) -> str:
+    macro = payload.get("macro")
+    brief = payload.get("personal_executive_brief")
+    if not macro or not brief:
+        return ""
+    actions = payload.get("actions") or []
+    changes = "; ".join(c["message"] for c in macro.get("changes", [])[:3]) or "데이터 부족"
+    readiness = payload.get("report_readiness", "")
+    rc = {"final": "#10B981", "draft": "#94A3B8"}.get(readiness, "#F59E0B")
+    transition = (f"({_esc(macro.get('transition'))})" if macro.get("transition")
+                  else "(변동 없음)")
+    rows = [
+        ("현재 경기 국면",
+         f"{_esc(macro.get('regime'))} ({_esc(macro.get('score_band_label'))}, 총점 {macro.get('score')})"),
+        ("지난달 대비 변화",
+         f"{_esc(macro.get('previous_regime'))} → {_esc(macro.get('regime'))} {transition}"),
+        ("핵심 원인", _esc(changes)),
+        ("사용자에게 중요한 의미", _esc(brief.get("one_line_diagnosis"))),
+        ("이번 달 핵심 행동",
+         _esc(actions[0]["title"]) if actions else "핵심 지표 확보 후 재평가 필요"),
+        ("리포트 충족도",
+         f'<span style="color:{rc};font-weight:600">{_esc(readiness)}</span>'),
+    ]
+    return (
+        '\n        <div class="card" style="margin-bottom:40px;">\n'
+        '            <h2>📋 Executive Summary</h2>\n'
+        f'            {_kv_rows(rows)}\n'
+        '        </div>\n'
+    )
+
+
+def _render_action_plan(payload: dict) -> str:
+    actions = payload.get("actions") or []
+    if not actions:
+        return ""
+    by_tier: dict[int, list] = {}
+    for a in actions:
+        by_tier.setdefault(a.get("priority", 3), []).append(a)
+
+    groups = []
+    for tier in (5, 4, 3, 2, 1):
+        items = by_tier.get(tier)
+        if not items:
+            continue
+        color = _TIER_COLOR[tier]
+        cards = ""
+        for a in items:
+            conflict = (f'<div><b style="color:#F59E0B">조정</b> {_esc(a["conflict_note"])}</div>'
+                        if a.get("conflict_note") else "")
+            cards += (
+                f'<div style="border-left:3px solid {color}; padding:12px 16px; margin:12px 0;'
+                ' background:rgba(0,0,0,0.25); border-radius:6px;">'
+                f'<div style="font-weight:600; color:#F1F5F9; margin-bottom:8px;">{_esc(a.get("title"))}</div>'
+                '<div style="color:#CBD5E1; font-size:0.92em; line-height:1.7;">'
+                f'<div><b style="color:#94A3B8">이유</b> {_esc(a.get("reason"))}</div>'
+                f'<div><b style="color:#94A3B8">보류 조건</b> {_esc(a.get("invalid_condition"))}</div>'
+                f'<div><b style="color:#94A3B8">재점검</b> {_esc(a.get("recheck"))}</div>'
+                f'{conflict}</div></div>')
+        groups.append(
+            f'<h3 style="margin-top:20px; color:{color};">{_esc(_TIER_LABEL[tier])}</h3>{cards}')
+
+    return (
+        '\n        <div class="card" style="margin-bottom:40px;">\n'
+        '            <h2>✅ 이번 달 Action Plan</h2>\n'
+        f'            {"".join(groups)}\n'
+        '        </div>\n'
+    )
+
+
+def _render_scenarios(payload: dict) -> str:
+    s = payload.get("scenarios")
+    if not s:
+        return ""
+    colors = {"base": "#38BDF8", "bull": "#10B981", "bear": "#EF4444"}
+    cards = ""
+    for name, label in (("base", "Base"), ("bull", "Bull"), ("bear", "Bear")):
+        item = s.get(name)
+        if not isinstance(item, dict):
+            continue
+        cards += (
+            f'<div class="card" style="border-top:3px solid {colors[name]};">'
+            f'<h3 style="color:{colors[name]}; margin-bottom:12px;">{label}'
+            f'<span style="float:right; color:#CBD5E1;">{item.get("probability")}%</span></h3>'
+            f'<p style="color:#CBD5E1; margin:8px 0;"><b>전제</b> {_esc(item.get("premise"))}</p>'
+            f'<p style="color:#CBD5E1; margin:8px 0;"><b>기대되는 변화</b> {_esc(item.get("expected_change"))}</p>'
+            f'<p style="color:#CBD5E1; margin:8px 0;"><b>사용자 영향</b> {_esc(item.get("user_impact"))}</p>'
+            '</div>')
+    conditions = "".join(f"<li>{_esc(c)}</li>" for c in s.get("invalid_conditions", []))
+    return (
+        '\n        <div class="card" style="margin-bottom:40px;">\n'
+        '            <h2>🔀 시나리오 분석</h2>\n'
+        f'            <div class="grid-2" style="margin:20px 0;">{cards}</div>\n'
+        '            <h3 style="color:#CBD5E1;">깨지는 조건</h3>\n'
+        f'            <ul style="color:#CBD5E1; padding-left:20px; line-height:1.8;">{conditions}</ul>\n'
+        '        </div>\n'
+    )
+
+
+def _render_calendar(payload: dict) -> str:
+    events = payload.get("calendar") or []
+    if not events:
+        # 없는 걸 "확정된 일정 없음"으로 매일 찍으면 그것도 신호처럼 읽힌다 —
+        # 이벤트가 없으면 섹션 자체를 생략한다(R3).
+        return ""
+    rows = "".join(
+        f'<tr><td>{_esc(e.get("date"))}</td><td>{_esc(e.get("name"))}</td>'
+        f'<td>{_esc(e.get("importance_label"))}</td><td>{e.get("priority_score")}점</td></tr>'
+        for e in events)
+    return (
+        '\n        <div class="card" style="margin-bottom:40px;">\n'
+        '            <h2>🗓️ 경제 캘린더</h2>\n'
+        '            <table><tr><th>날짜</th><th>이벤트</th><th>중요도</th><th>영향도</th></tr>'
+        f'{rows}</table>\n'
+        '        </div>\n'
+    )
+
+
+def _render_discussion(payload: dict) -> str:
+    """논의가 필요한 결정 사항 — 답변을 적어 복사·이슈 제출할 수 있는 섹션.
+
+    ⚠ 이메일 본문에서는 JS가 동작하지 않는다. 그래도 넣는 이유는 이 리포트가
+    docs/report.html로도 게시되고 거기서는 버튼이 실제로 동작하기 때문이다.
+    이메일에서는 질문과 입력칸이 정적으로 보일 뿐 손해가 없다."""
+    points = payload.get("discussion_points") or []
+    if not points:
+        return ""
+    cards = ""
+    for p in points:
+        cards += (
+            f'<div class="discuss-card" data-id="{_esc(p.get("id"))}"'
+            f' data-topic="{_esc(p.get("topic"))}" data-question="{_esc(p.get("question"))}"'
+            ' style="background:rgba(0,0,0,0.25); border-radius:8px; padding:16px; margin:12px 0;">'
+            f'<div style="font-weight:600; color:#F1F5F9;">💬 {_esc(p.get("topic"))}</div>'
+            f'<p style="color:#94A3B8; font-size:0.92em; margin:8px 0;">{_esc(p.get("context"))}</p>'
+            f'<p style="color:#CBD5E1; margin:8px 0;">{_esc(p.get("question"))}</p>'
+            '<textarea class="discuss-input" rows="3" style="width:100%;'
+            ' background:rgba(15,23,42,0.8); color:#E2E8F0; border:1px solid #334155;'
+            ' border-radius:6px; padding:8px;"'
+            ' placeholder="생각을 적어보세요 (비워두면 복사·제출에서 빠집니다)"></textarea>'
+            '<div style="margin-top:8px;">'
+            '<button type="button" class="btn-fb" onclick="peosCopyOne(this)">📋 이 답변 복사</button>'
+            '<button type="button" class="btn-fb" onclick="peosIssueOne(this)">🔗 GitHub Issue로 제출</button>'
+            '</div></div>')
+    return (
+        '\n        <div class="card" style="margin-bottom:40px;">\n'
+        '            <h2>🗣️ 논의가 필요한 결정 사항</h2>\n'
+        f'            {cards}\n'
+        '            <div style="margin-top:16px;">'
+        '<button type="button" class="btn-fb" onclick="peosCopyAll(this)">📋 작성한 답변 전체 복사</button>'
+        '<span style="color:#94A3B8; font-size:0.85em;">비워둔 항목은 자동 제외됩니다.'
+        ' "GitHub Issue로 제출"은 공개 저장소에 남으니 공개돼도 괜찮은 항목에만 사용하세요.</span>'
+        '</div>\n        </div>\n'
+    )
+
+
+def _render_personal_brief(payload: dict) -> str:
+    b = payload.get("personal_executive_brief")
+    if not b:
+        return ""
+    summary = ", ".join(f"{k}={v}" for k, v in (b.get("asset_summary") or {}).items() if v)
+    events = "; ".join(b.get("top_events") or []) or "없음"
+    rows = [("한 줄 진단", _esc(b.get("one_line_diagnosis"))),
+            ("자산 요약", _esc(summary) if summary else "—"),
+            ("주요 이벤트", _esc(events))]
+    return (
+        '\n        <div class="card" style="margin-bottom:40px;">\n'
+        '            <h2>🧾 Personal Executive Brief</h2>\n'
+        f'            {_kv_rows(rows)}\n'
+        '        </div>\n'
+    )
+
+
+_FEEDBACK_JS = """
+function peosFindCard(el) { return el.closest('.discuss-card'); }
+
+function peosBuildEntry(card) {
+  var ta = card.querySelector('textarea');
+  var val = (ta.value || '').trim();
+  if (!val) return null;
+  return { topic: card.dataset.topic, question: card.dataset.question, answer: val };
+}
+
+function peosEntryText(entry) {
+  return '### ' + entry.topic + '\\n질문: ' + entry.question + '\\n답변: ' + entry.answer;
+}
+
+// Some viewers (e.g. a preview rendered inside a sandboxed iframe) block
+// navigator.clipboard, document.execCommand('copy'), window.alert, and
+// window.open outright — silently, with no error thrown, and even
+// programmatic focus()/select() can land the browser's actual selection
+// somewhere else entirely (that's what copied the whole page once already).
+// So: no modal, no scripted select() the user has to trust blindly. One
+// always-visible, always-in-place output box; the user clicks into it
+// themselves and selects with their own Ctrl+A, which is native browser
+// behavior no page script can misdirect.
+function peosShowOutput(message, text, linkUrl) {
+  var box = document.getElementById('peos-copy-output');
+  var msgEl = document.getElementById('peos-copy-output-msg');
+  var taEl = document.getElementById('peos-copy-output-text');
+  var linkEl = document.getElementById('peos-copy-output-link');
+  msgEl.textContent = message;
+  taEl.value = text || '';
+  if (linkUrl) {
+    linkEl.style.display = 'inline-block';
+    linkEl.href = linkUrl;
+  } else {
+    linkEl.style.display = 'none';
+    linkEl.removeAttribute('href');
+  }
+  if (box.scrollIntoView) box.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+function peosCopyText(text, btn) {
+  // Best-effort only — never trusted as the source of truth for whether the
+  // copy actually landed on the system clipboard, since these can silently
+  // no-op or misfire depending on the viewer.
+  try {
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text);
+  } catch (e) { /* ignore */ }
+  peosShowOutput(
+    '아래 박스에 복사할 내용을 넣어뒀습니다. 자동 복사를 시도했지만 확실하지 않으니, ' +
+    '박스를 직접 클릭한 뒤 Ctrl+A(Mac: Cmd+A) → Ctrl+C(Mac: Cmd+C)로 복사해주세요.',
+    text, null
+  );
+}
+
+function peosCopyOne(btn) {
+  var entry = peosBuildEntry(peosFindCard(btn));
+  if (!entry) { peosShowOutput('먼저 답변을 입력해주세요.', '', null); return; }
+  peosCopyText(peosEntryText(entry), btn);
+}
+
+function peosCopyAll(btn) {
+  var section = document.getElementById('discussion-section');
+  var month = section.dataset.month;
+  var cards = section.querySelectorAll('.discuss-card');
+  var parts = [];
+  cards.forEach(function (card) {
+    var entry = peosBuildEntry(card);
+    if (entry) parts.push(peosEntryText(entry));
+  });
+  if (!parts.length) { peosShowOutput('입력한 답변이 없습니다.', '', null); return; }
+  peosCopyText('PEOS ' + month + ' 리포트 피드백\\n\\n' + parts.join('\\n\\n'), btn);
+}
+
+function peosIssueOne(btn) {
+  var card = peosFindCard(btn);
+  var entry = peosBuildEntry(card);
+  if (!entry) { peosShowOutput('먼저 답변을 입력해주세요.', '', null); return; }
+  var section = document.getElementById('discussion-section');
+  var repo = section.dataset.repo;
+  var month = section.dataset.month;
+  if (!repo) { peosShowOutput('연결된 GitHub 저장소 정보가 없습니다.', '', null); return; }
+  var title = encodeURIComponent('[피드백] ' + month + ' - ' + entry.topic);
+  var body = encodeURIComponent('**질문**\\n' + entry.question + '\\n\\n**답변**\\n' + entry.answer);
+  var url = 'https://github.com/' + repo + '/issues/new?title=' + title + '&body=' + body;
+  var opened = null;
+  try { opened = window.open(url, '_blank', 'noopener'); } catch (e) { /* blocked — fall through */ }
+  if (!opened) {
+    peosShowOutput('이 화면에서는 새 창 열기가 막혀 있습니다. 아래 링크를 눌러 GitHub 이슈 작성 페이지로 이동해주세요.', '', url);
+  }
+}
+"""
+
+
 def render_html(payload: dict) -> str:
     """Render comprehensive PEOS report as beautiful, responsive HTML."""
     month = payload["report_month"]
@@ -641,6 +1048,20 @@ def render_html(payload: dict) -> str:
             border-bottom: 1px solid #334155;
         }}
         .metric:last-child {{ border-bottom: none; }}
+
+        /* 2026-09-10 이식 — 논의 섹션 버튼. html.py에서 옮겨온 섹션이
+           쓰는 유일한 클래스라 여기 한 벌만 둔다. */
+        .btn-fb {{
+            background: rgba(56, 130, 229, 0.15);
+            color: #93C5FD;
+            border: 1px solid #3987e5;
+            border-radius: 6px;
+            padding: 6px 12px;
+            margin-right: 8px;
+            font-size: 0.85em;
+            cursor: pointer;
+        }}
+        .btn-fb:hover {{ background: rgba(56, 130, 229, 0.3); }}
         .metric-label {{ color: #CBD5E1; }}
         .metric-value {{ font-size: 1.3em; font-weight: 600; }}
 
@@ -746,9 +1167,15 @@ def render_html(payload: dict) -> str:
             <div class="date">{datetime.now().strftime('%Y년 %m월 %d일')} 생성</div>
         </div>
 
+        {_render_executive_summary(payload)}
+
         {_render_exposure_and_reconciliation(payload)}
 
         {_render_fx_regime(payload)}
+
+        {_render_macro_dashboard(payload)}
+
+        {_render_us_macro_dashboard(payload)}
 
         <div class="grid-2">
             <!-- CCI 카드 -->
@@ -881,10 +1308,21 @@ def render_html(payload: dict) -> str:
             </div>
         </div>
 
+        {_render_action_plan(payload)}
+
+        {_render_scenarios(payload)}
+
+        {_render_calendar(payload)}
+
+        {_render_discussion(payload)}
+
+        {_render_personal_brief(payload)}
+
         <div class="footer">
             <p>PEOS Monthly Report © 2026 | 생성일: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} KST</p>
         </div>
     </div>
+    <script>{_FEEDBACK_JS}</script>
 </body>
 </html>"""
     return html

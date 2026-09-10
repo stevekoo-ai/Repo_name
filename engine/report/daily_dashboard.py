@@ -7,7 +7,7 @@ tracked metric (headline composite scores, then every KR indicator, then
 every US indicator), plus a compact regime-change history (regime is
 categorical, not chartable as a line).
 
-Reuses html.py's _CSS/_esc so this page looks like the same product as the
+Reuses html_shared.py's _CSS/_esc so this page looks like the same product as the
 monthly report rather than a separate one-off style.
 """
 from __future__ import annotations
@@ -22,7 +22,7 @@ from collectors import base as collector_base
 from core.config import rules_config
 from . import payload as payload_mod
 from .daily_history import DAILY_HISTORY_PATH
-from .html import _CSS, _esc
+from .html_shared import _CSS, _esc
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 
