@@ -47,8 +47,45 @@ LIVE_STATUS: dict[str, str] = {
 
 
 def _fred_rows() -> list[tuple[str, str, str]]:
+    """FRED 시리즈 목록 — **두 레지스트리를 합쳐서** 낸다.
+
+    ⚠ 2026-09-10 발견: 이 저장소엔 FRED 시리즈 정의가 두 벌 있다.
+
+      collectors/fred.py SERIES        → data/normalized/fred_*.csv
+      scripts/macro_data.py PRESETS    → sources/macro-series.csv
+
+    같은 지표가 이름만 다르게 양쪽에 있고(`us_2y` vs `us_2y_treasury`),
+    어느 쪽이 더 긴 이력을 갖는지는 지표마다 다르다(10년물은 normalized가
+    1962년부터, 원/달러는 macro-series가 2005년부터).
+
+    이 카탈로그가 `collectors/` 쪽만 읽는 바람에 **macro-series.csv 계열이
+    문서에 아예 안 나왔고**, 그래서 "이미 있는지"를 카탈로그에서 확인할
+    방법이 없었다. 2026-09-10에 미국 금리 4종을 이미 있는데 또 백필한 게
+    그 직접 결과다. 레지스트리 통합은 별건이라, 최소한 **문서에서는 둘 다
+    보이게** 해서 같은 중복이 반복되지 않게 한다.
+    """
     from collectors import fred
-    return [(key, sid, "일/월") for key, sid in sorted(fred.SERIES.items())]
+
+    rows: dict[str, tuple[str, str, str]] = {
+        key: (key, sid, "일/월 · collectors/fred.py")
+        for key, sid in fred.SERIES.items()
+    }
+
+    # macro_data.py는 스크립트라 import 부작용이 없도록 파일에서 직접 읽는다.
+    import importlib.util
+
+    spec = importlib.util.spec_from_file_location(
+        "_macro_data_for_catalog", Path(__file__).resolve().parent / "macro_data.py")
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    for key, (provider, series_id, _desc, _verified) in module.PRESETS.items():
+        if provider != "fred":
+            continue
+        if key in rows:
+            continue  # 같은 이름이면 collectors 쪽을 정본으로 둔다
+        rows[key] = (key, series_id, "일/월 · macro_data.py PRESETS")
+
+    return [rows[k] for k in sorted(rows)]
 
 
 def _ecos_rows() -> list[tuple[str, str, str]]:
@@ -132,8 +169,15 @@ def build() -> str:
     A("")
     A("## 1. FRED — 미국·글로벌 거시")
     A("")
-    A("키 없이 도는 CSV 엔드포인트가 기본 경로, `FRED_API_KEY`는 폴백. 코드:")
-    A("[collectors/fred.py](../../collectors/fred.py)")
+    A("키 없이 도는 CSV 엔드포인트가 기본 경로, `FRED_API_KEY`는 폴백.")
+    A("")
+    A("**⚠️ 이 저장소엔 FRED 시리즈 정의가 두 벌 있다**(2026-09-10 확인) —")
+    A("[collectors/fred.py](../../collectors/fred.py)는 `data/normalized/fred_*.csv`에,")
+    A("[scripts/macro_data.py](../../scripts/macro_data.py) PRESETS는")
+    A("`sources/macro-series.csv`에 쌓는다. 같은 지표가 이름만 다르게 양쪽에")
+    A("있고(`us_2y` vs `us_2y_treasury`) 이력 길이도 다르다(10년물은 전자가")
+    A("1962년부터, 원/달러는 후자가 2005년부터). 아래 표는 **양쪽을 합친 것**이며")
+    A("마지막 열이 출처를 밝힌다 — 새 지표를 넣기 전에 여기서 먼저 확인할 것.")
     A("")
     A("**⚠️ 신선도 함정**: 환율 시리즈(`DEX*`)는 관측 시점이 **뉴욕 정오**이고")
     A("발표가 며칠 밀린다 — 2026-09-07 실측에서 최신값이 08-28이었다(10일 지연).")
@@ -141,10 +185,14 @@ def build() -> str:
     A("상관계수를 내면 관측시각 차이 때문에 가짜 선후관계가 만들어진다 —")
     A("[4개국 통화 상호영향 분석](fx-cross-currency-krw-usd-jpy-cny.md) 참고.")
     A("")
-    A("| 지표 key | FRED series_id |")
-    A("|---|---|")
-    for key, sid, _ in _fred_rows():
-        A(f"| `{key}` | `{sid}` |")
+    A("| 지표 key | FRED series_id | 정의 위치 → 저장 위치 |")
+    A("|---|---|---|")
+    for key, sid, origin in _fred_rows():
+        # origin은 "일/월 · <파일>" 꼴 — 표에는 파일 부분만 보여준다.
+        where = origin.split("·")[-1].strip()
+        store = ("`data/normalized/`" if "collectors" in where
+                 else "`sources/macro-series.csv`")
+        A(f"| `{key}` | `{sid}` | {where} → {store} |")
     A("")
     A("## 2. 한국은행 ECOS — 한국 금리·환율")
     A("")

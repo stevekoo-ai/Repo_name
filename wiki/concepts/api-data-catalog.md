@@ -34,8 +34,15 @@ BLS 키는 주입되는데 쓰는 코드가 없었으며, KOSIS 실패 원인이
 
 ## 1. FRED — 미국·글로벌 거시
 
-키 없이 도는 CSV 엔드포인트가 기본 경로, `FRED_API_KEY`는 폴백. 코드:
-[collectors/fred.py](../../collectors/fred.py)
+키 없이 도는 CSV 엔드포인트가 기본 경로, `FRED_API_KEY`는 폴백.
+
+**⚠️ 이 저장소엔 FRED 시리즈 정의가 두 벌 있다**(2026-09-10 확인) —
+[collectors/fred.py](../../collectors/fred.py)는 `data/normalized/fred_*.csv`에,
+[scripts/macro_data.py](../../scripts/macro_data.py) PRESETS는
+`sources/macro-series.csv`에 쌓는다. 같은 지표가 이름만 다르게 양쪽에
+있고(`us_2y` vs `us_2y_treasury`) 이력 길이도 다르다(10년물은 전자가
+1962년부터, 원/달러는 후자가 2005년부터). 아래 표는 **양쪽을 합친 것**이며
+마지막 열이 출처를 밝힌다 — 새 지표를 넣기 전에 여기서 먼저 확인할 것.
 
 **⚠️ 신선도 함정**: 환율 시리즈(`DEX*`)는 관측 시점이 **뉴욕 정오**이고
 발표가 며칠 밀린다 — 2026-09-07 실측에서 최신값이 08-28이었다(10일 지연).
@@ -43,30 +50,50 @@ BLS 키는 주입되는데 쓰는 코드가 없었으며, KOSIS 실패 원인이
 상관계수를 내면 관측시각 차이 때문에 가짜 선후관계가 만들어진다 —
 [4개국 통화 상호영향 분석](fx-cross-currency-krw-usd-jpy-cny.md) 참고.
 
-| 지표 key | FRED series_id |
-|---|---|
-| `hy_oas` | `BAMLH0A0HYM2` |
-| `kr_cpi_oecd` | `KORCPIALLMINMEI` |
-| `kr_industrial_production_oecd` | `KORPROINDMISMEI` |
-| `kr_retail_sales_mom_oecd` | `KORSLRTTO01GPSAM` |
-| `kr_unemployment_oecd` | `LRHUTTTTKRM156S` |
-| `us_10y_treasury` | `DGS10` |
-| `us_2y_treasury` | `DGS2` |
-| `us_3m_treasury` | `DGS3MO` |
-| `us_core_cpi` | `CPILFESL` |
-| `us_cpi` | `CPIAUCSL` |
-| `us_dollar_index` | `DTWEXBGS` |
-| `us_fed_funds_rate` | `FEDFUNDS` |
-| `us_gdp_qoq` | `A191RL1Q225SBEA` |
-| `us_industrial_production` | `INDPRO` |
-| `us_nonfarm_payroll` | `PAYEMS` |
-| `us_oecd_cli` | `USALOLITOAASTSAM` |
-| `us_ppi` | `PPIACO` |
-| `us_retail_sales` | `RSAFS` |
-| `us_trade_balance` | `BOPGSTB` |
-| `us_treasury_3m` | `DGS3MO` |
-| `us_unemployment` | `UNRATE` |
-| `us_yield_curve_10y2y` | `T10Y2Y` |
+| 지표 key | FRED series_id | 정의 위치 → 저장 위치 |
+|---|---|---|
+| `hy_oas` | `BAMLH0A0HYM2` | collectors/fred.py → `data/normalized/` |
+| `kr_cpi_oecd` | `KORCPIALLMINMEI` | collectors/fred.py → `data/normalized/` |
+| `kr_industrial_production_oecd` | `KORPROINDMISMEI` | collectors/fred.py → `data/normalized/` |
+| `kr_retail_sales_mom_oecd` | `KORSLRTTO01GPSAM` | collectors/fred.py → `data/normalized/` |
+| `kr_unemployment_oecd` | `LRHUTTTTKRM156S` | collectors/fred.py → `data/normalized/` |
+| `us_10y` | `DGS10` | macro_data.py PRESETS → `sources/macro-series.csv` |
+| `us_10y_treasury` | `DGS10` | collectors/fred.py → `data/normalized/` |
+| `us_2y` | `DGS2` | macro_data.py PRESETS → `sources/macro-series.csv` |
+| `us_2y_treasury` | `DGS2` | collectors/fred.py → `data/normalized/` |
+| `us_3m` | `DGS3MO` | macro_data.py PRESETS → `sources/macro-series.csv` |
+| `us_3m_treasury` | `DGS3MO` | collectors/fred.py → `data/normalized/` |
+| `us_brent` | `DCOILBRENTEU` | macro_data.py PRESETS → `sources/macro-series.csv` |
+| `us_core_cpi` | `CPILFESL` | collectors/fred.py → `data/normalized/` |
+| `us_cpi` | `CPIAUCSL` | collectors/fred.py → `data/normalized/` |
+| `us_dollar_index` | `DTWEXBGS` | collectors/fred.py → `data/normalized/` |
+| `us_dollar_index_major` | `DTWEXM` | macro_data.py PRESETS → `sources/macro-series.csv` |
+| `us_fed_funds` | `FEDFUNDS` | macro_data.py PRESETS → `sources/macro-series.csv` |
+| `us_fed_funds_rate` | `FEDFUNDS` | collectors/fred.py → `data/normalized/` |
+| `us_gdp_nominal` | `GDP` | macro_data.py PRESETS → `sources/macro-series.csv` |
+| `us_gdp_qoq` | `A191RL1Q225SBEA` | collectors/fred.py → `data/normalized/` |
+| `us_gdp_real` | `GDPC1` | macro_data.py PRESETS → `sources/macro-series.csv` |
+| `us_hy_oas` | `BAMLH0A0HYM2` | macro_data.py PRESETS → `sources/macro-series.csv` |
+| `us_hy_tr` | `BAMLHYH0A0HYM2TRIV` | macro_data.py PRESETS → `sources/macro-series.csv` |
+| `us_ig_tr` | `BAMLCC0A0CMTRIV` | macro_data.py PRESETS → `sources/macro-series.csv` |
+| `us_industrial_production` | `INDPRO` | collectors/fred.py → `data/normalized/` |
+| `us_nasdaq` | `NASDAQCOM` | macro_data.py PRESETS → `sources/macro-series.csv` |
+| `us_nonfarm_payroll` | `PAYEMS` | collectors/fred.py → `data/normalized/` |
+| `us_oecd_cli` | `USALOLITOAASTSAM` | collectors/fred.py → `data/normalized/` |
+| `us_ppi` | `PPIACO` | collectors/fred.py → `data/normalized/` |
+| `us_retail_sales` | `RSAFS` | collectors/fred.py → `data/normalized/` |
+| `us_sp500` | `SP500` | macro_data.py PRESETS → `sources/macro-series.csv` |
+| `us_sp500_oecd` | `SPASTT01USM661N` | macro_data.py PRESETS → `sources/macro-series.csv` |
+| `us_trade_balance` | `BOPGSTB` | collectors/fred.py → `data/normalized/` |
+| `us_treasury_3m` | `DGS3MO` | collectors/fred.py → `data/normalized/` |
+| `us_unemployment` | `UNRATE` | collectors/fred.py → `data/normalized/` |
+| `us_vix` | `VIXCLS` | macro_data.py PRESETS → `sources/macro-series.csv` |
+| `us_wilshire` | `WILL5000PRFC` | macro_data.py PRESETS → `sources/macro-series.csv` |
+| `us_wti` | `DCOILWTICO` | macro_data.py PRESETS → `sources/macro-series.csv` |
+| `us_yield_curve_10y2y` | `T10Y2Y` | collectors/fred.py → `data/normalized/` |
+| `usd_cny` | `DEXCHUS` | macro_data.py PRESETS → `sources/macro-series.csv` |
+| `usd_jpy` | `DEXJPUS` | macro_data.py PRESETS → `sources/macro-series.csv` |
+| `usd_krw_fred` | `DEXKOUS` | macro_data.py PRESETS → `sources/macro-series.csv` |
 
 ## 2. 한국은행 ECOS — 한국 금리·환율
 
