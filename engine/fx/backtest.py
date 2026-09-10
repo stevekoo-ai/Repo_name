@@ -198,3 +198,85 @@ def separation_report(start: date, end: date, risk_events: dict | None = None) -
                 "평균": statistics.fmean(xs),
                 "양수비율": sum(1 for x in xs if x > 0) / len(xs) * 100}
     return {k: summarize(v) for k, v in buckets.items()}
+
+
+# ─────────────────────────────────────────────────────────────
+# 합격 기준 2·3 — 전환 경고가 실제 전환 이전에 켜졌는가 / 거짓경보율
+# ─────────────────────────────────────────────────────────────
+EPISODE_ENDS: list[tuple[str, str]] = [
+    ("①", "2012-04"), ("②", "2013-04"), ("③", "2014-10"),
+    ("④", "2018-09"), ("⑤", "2021-07"),
+]
+
+
+def warning_backtest(start: date, end: date, risk_events: dict | None = None,
+                     lead_window: int = 6) -> dict:
+    """경고가 국면 종료를 **미리** 잡았는지, 아닌 곳에서 얼마나 울렸는지.
+
+    lead_window — 종료 몇 개월 전까지를 "제때 경고"로 인정할지. 6개월로 둔
+    이유는 이 경고의 용도가 환전·헤지 판단이라 분기 단위 대응이 가능해야
+    하기 때문이다. 너무 짧으면 알아도 못 움직이고, 너무 길면 아무 때나
+    울려도 정답이 된다.
+
+    ⚠ 거짓경보의 분모에서 **하회 국면 밖은 제외**한다 — 이 경고는 "진행 중인
+    국면이 끝나려 하는가"를 묻는 것이라, 애초에 국면이 아닌 달에 켜지는 건
+    다른 종류의 문제다(그건 detect_duration이 '하회 국면 아님'으로 거른다).
+    """
+    from engine.fx import transition as T
+
+    rows = []
+    for as_of in iter_month_ends(start, end):
+        g = ma36_gap(as_of)
+        if g is None:
+            continue
+        report = T.evaluate(as_of, risk_events)
+        rows.append({
+            "month": f"{as_of.year:04d}-{as_of.month:02d}",
+            "below": g[2] < 0,
+            "count": report.count,
+            "level": report.level,
+            "kind": report.trigger_kind,
+            "fired": {w.key for w in report.fired},
+        })
+    by_month = {r["month"]: r for r in rows}
+
+    # 각 국면 종료를 몇 개월 전에 잡았나
+    detections = []
+    for tag, end_month in EPISODE_ENDS:
+        best = None
+        for lead in range(lead_window, 0, -1):
+            m = _shift_month(end_month, -lead)
+            r = by_month.get(m)
+            if r and r["count"] >= 1:
+                best = (lead, m, r)
+                break
+        detections.append((tag, end_month, best))
+
+    # 거짓경보 — 하회 국면 중이면서, 앞으로 lead_window 안에 종료가 없는데 켜진 달
+    end_months = {m for _, m in EPISODE_ENDS}
+    false_alarms, in_episode_months = 0, 0
+    for r in rows:
+        if not r["below"]:
+            continue
+        in_episode_months += 1
+        if r["count"] == 0:
+            continue
+        soon = any(_shift_month(r["month"], k) in end_months
+                   for k in range(0, lead_window + 1))
+        if not soon:
+            false_alarms += 1
+
+    return {
+        "detections": detections,
+        "in_episode_months": in_episode_months,
+        "false_alarms": false_alarms,
+        "false_alarm_rate": (false_alarms / in_episode_months * 100
+                             if in_episode_months else None),
+        "rows": rows,
+    }
+
+
+def _shift_month(month: str, delta: int) -> str:
+    y, m = int(month[:4]), int(month[5:7])
+    t = y * 12 + m - 1 + delta
+    return f"{t // 12:04d}-{t % 12 + 1:02d}"
