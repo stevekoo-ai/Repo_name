@@ -149,3 +149,55 @@ def test_regime_label_separates_gap_sign_from_score_sign():
     """이격 부호(지금 강한가) × 점수 부호(압력이 어디로) 조합이다 —
     둘을 헷갈리면 '강세 국면'과 '약세 진입 시도'가 뒤바뀐다."""
     assert R.regime_label(date(2026, 9, 9)) in R.REGIME_LABELS
+
+
+def test_a_single_extreme_risk_is_not_diluted_by_calm_axes():
+    """2026-09-10 실측으로 잡은 결함 — 중동 전쟁 격화 + 브렌트 100달러
+    상황인데 이 요인이 +0.35(원화에 유리)로 읽혔다. "팬데믹 없음(0.00)"이
+    평균을 끌어내린 탓. 팬데믹이 없는 건 정상 상태지 원화에 유리한
+    신호가 아니다. 역사도 최댓값 쪽 — 2011은 유럽위기 하나가, 2020은
+    팬데믹 하나가 국면을 끝냈다."""
+    one_crisis = R.score_geopolitical(date(2026, 9, 9), {
+        "as_of": "2026-09-09",
+        "signals": {"geopolitical_risk": 0.8, "pandemic_risk": 0.0,
+                    "trade_policy_risk": 0.4, "financial_stress": 0.1}})
+    assert one_crisis.normalized < 0, (
+        f"위기 하나가 극단인데 원화에 유리하게 읽혔다: {one_crisis.detail}")
+
+
+def test_simultaneous_risks_score_worse_than_a_single_one():
+    """최댓값만 쓰면 위험이 동시에 여러 개인 상황을 구분 못 한다 —
+    최댓값 0.7 : 평균 0.3 혼합이라 구분돼야 한다.
+
+    ⚠ 네 축을 **전부 명시**해서 비교한다. 키를 생략하면 그 축은 평균
+    계산에서 아예 빠지므로(R3 — 미수집은 0이 아니다) '나머지가 0'인
+    상황과 같지 않다. 처음 이 테스트를 쓸 때 키를 생략했다가 두 경우가
+    같은 값으로 나와 실패했다 — 코드가 아니라 테스트가 틀렸던 것.""" 
+    single = R.score_geopolitical(date(2026, 9, 9), {
+        "as_of": "2026-09-09",
+        "signals": {"geopolitical_risk": 0.8, "pandemic_risk": 0.0,
+                    "trade_policy_risk": 0.0, "financial_stress": 0.0}})
+    many = R.score_geopolitical(date(2026, 9, 9), {
+        "as_of": "2026-09-09",
+        "signals": {"geopolitical_risk": 0.8, "pandemic_risk": 0.8,
+                    "trade_policy_risk": 0.8, "financial_stress": 0.8}})
+    assert many.normalized < single.normalized
+
+
+def test_an_absent_axis_is_not_the_same_as_a_zero_axis():
+    """R3 — 미수집은 판정이 아니다. 키가 없으면 평균에서 빠지고,
+    0.0이면 '위험 없음'이라는 판정으로 평균에 들어간다."""
+    absent = R.score_geopolitical(date(2026, 9, 9), {
+        "as_of": "2026-09-09", "signals": {"geopolitical_risk": 0.8}})
+    explicit_zero = R.score_geopolitical(date(2026, 9, 9), {
+        "as_of": "2026-09-09",
+        "signals": {"geopolitical_risk": 0.8, "pandemic_risk": 0.0}})
+    assert absent.normalized != explicit_zero.normalized
+
+
+def test_the_detail_line_shows_the_peak_not_just_the_blend():
+    """혼합값만 보이면 '어느 축이 터졌는지'를 알 수 없다."""
+    f = R.score_geopolitical(date(2026, 9, 9), {
+        "as_of": "2026-09-09",
+        "signals": {"geopolitical_risk": 0.8, "pandemic_risk": 0.0}})
+    assert "최고 0.80" in f.detail

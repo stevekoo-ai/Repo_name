@@ -285,7 +285,21 @@ def score_geopolitical(as_of: date, risk_events: dict | None = None) -> FactorSc
     if not vals:
         return FactorScore("geopolitical", "지정학·위기", None, WEIGHTS["geopolitical"],
                            "미수집(인식 가능한 신호 없음)")
-    risk = statistics.mean(vals)  # 0~1
+    # ⚠ 평균이 아니라 **최댓값 우위**로 집계한다(2026-09-10 실측으로 수정).
+    #
+    # 처음엔 4개 축의 단순 평균을 썼는데, 중동 전쟁이 격화하고 브렌트가
+    # 100달러를 넘긴 날 이 요인이 **+0.35(원화에 유리)** 로 읽혔다.
+    # 원인은 "팬데믹 없음(0.00)"이 평균을 끌어내린 것 — 팬데믹이 없는 게
+    # 정상 상태인데 그걸 '원화에 유리한 신호'로 계산해버린 셈이다.
+    #
+    # 역사도 최댓값 쪽을 지지한다: ①2011 국면은 유럽 재정위기 **하나**가
+    # 끝냈고, 2020 충격도 팬데믹 **하나**였다. 국면을 끝내는 건 여러 위험의
+    # 평균이 아니라 하나의 큰 사건이다.
+    #
+    # 다만 순수 최댓값은 위험이 동시에 여러 개일 때를 반영 못 하므로
+    # 최댓값 0.7 : 평균 0.3으로 섞는다. 같은 이유로 아래 종료 트리거
+    # 감지기(_trigger_geopolitical_spike)는 처음부터 최댓값을 쓰고 있다.
+    risk = max(vals) * 0.7 + statistics.mean(vals) * 0.3  # 0~1
     stale = ""
     ev_as_of = risk_events.get("as_of")
     if ev_as_of:
@@ -297,7 +311,7 @@ def score_geopolitical(as_of: date, risk_events: dict | None = None) -> FactorSc
             pass
     return FactorScore("geopolitical", "지정학·위기", _clamp(-risk * 2 + 1),
                        WEIGHTS["geopolitical"],
-                       f"위험 {risk:.2f}/1.00 "
+                       f"위험 {risk:.2f}/1.00 (최고 {max(vals):.2f}) "
                        f"({', '.join(f'{k}={v:.2f}' for k, v in present)}{stale})")
 
 
