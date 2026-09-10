@@ -278,6 +278,27 @@ def _fetch_preset(name, start=None, end=None, raw=False):
     return provider, [(_normalize_ecos_date(d, cycle), v) for d, v in raw_rows]
 
 
+def _coerce_ecos_date(value, cycle):
+    """사용자가 준 날짜를 ECOS 표기로 바꾼다(D=YYYYMMDD, M=YYYYMM, Q=YYYYQn, Y=YYYY).
+
+    2026-09-10 발견 — `fetch --start 2005-01-01`이 ECOS 프리셋에서 조용히
+    실패했다. cmd_fetch가 --start를 **그대로** URL에 넣는데 ECOS는 ISO
+    형식(2005-01-01)을 안 받는다. FRED는 ISO를 받으므로 같은 명령이
+    FRED 계열에선 잘 되고 ECOS 계열에서만 실패해, "성공했는데 kr_base_rate·
+    kr_usdkrw만 안 늘어났다"로 나타났다. 이미 ECOS 표기인 값(20050101,
+    200501)은 그대로 통과시킨다."""
+    if value is None:
+        return None
+    v = str(value).strip()
+    if "-" not in v:
+        return v  # 이미 ECOS 표기로 준 경우
+    try:
+        d = date.fromisoformat(v)
+    except ValueError:
+        return v  # 해석 못 하면 손대지 않는다 — ECOS가 거부하면 그 오류를 보는 게 낫다
+    return _fmt_ecos(d, cycle)
+
+
 def cmd_fetch(args):
     if args.series not in PRESETS:
         sys.exit(
@@ -295,10 +316,14 @@ def cmd_fetch(args):
 
     start = args.start
     end = args.end
-    if provider == "ecos" and (start is None or end is None):
+    if provider == "ecos":
         stat_code, item_code, cycle = spec
-        start = start or _fmt_ecos(date.today() - timedelta(days=DEFAULT_LOOKBACK_DAYS), cycle)
-        end = end or _fmt_ecos(date.today(), cycle)
+        # 기본값 채우기와 **표기 변환**을 항상 함께 한다 — 예전엔 값이 없을
+        # 때만 _fmt_ecos를 태워서, 사용자가 --start를 주면 ISO 문자열이
+        # 그대로 ECOS URL에 들어가 조용히 실패했다(_coerce_ecos_date 참조).
+        start = _coerce_ecos_date(start, cycle) or _fmt_ecos(
+            date.today() - timedelta(days=DEFAULT_LOOKBACK_DAYS), cycle)
+        end = _coerce_ecos_date(end, cycle) or _fmt_ecos(date.today(), cycle)
 
     provider_used, rows = _fetch_preset(args.series, start, end, raw=False)
     for d, v in rows:

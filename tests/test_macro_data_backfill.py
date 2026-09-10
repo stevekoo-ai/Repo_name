@@ -57,3 +57,46 @@ def test_fetch_with_save_skips_write_on_empty_response(monkeypatch):
     mod.cmd_fetch(_args(save=True))
 
     assert called == [], "0건 응답으로 CSV를 건드리면 안 된다"
+
+
+# 2026-09-10 추가 — `fetch --start 2005-01-01`이 ECOS 프리셋에서 조용히
+# 실패했다. cmd_fetch가 --start를 그대로 ECOS URL에 넣는데 ECOS는 ISO
+# 형식을 안 받는다. FRED는 ISO를 받으므로 같은 명령이 FRED 계열에선
+# 성공하고 ECOS 계열에서만 실패해, 워크플로 결과가 "성공했는데 한국
+# 계열만 안 늘어남"으로 나타나 원인 파악이 늦어졌다.
+
+def _macro_data_module():
+    import importlib.util
+    from pathlib import Path
+
+    path = Path(__file__).resolve().parent.parent / "scripts" / "macro_data.py"
+    spec = importlib.util.spec_from_file_location("macro_data_under_test", path)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+def test_iso_start_is_converted_to_the_ecos_cycle_format():
+    md = _macro_data_module()
+    assert md._coerce_ecos_date("2005-01-01", "D") == "20050101"
+    assert md._coerce_ecos_date("2005-01-01", "M") == "200501"
+    assert md._coerce_ecos_date("2005-08-15", "Q") == "2005Q3"
+    assert md._coerce_ecos_date("2005-01-01", "Y") == "2005"
+
+
+def test_values_already_in_ecos_format_pass_through_untouched():
+    md = _macro_data_module()
+    assert md._coerce_ecos_date("20050101", "D") == "20050101"
+    assert md._coerce_ecos_date("200501", "M") == "200501"
+
+
+def test_none_stays_none_so_the_caller_can_apply_its_default():
+    md = _macro_data_module()
+    assert md._coerce_ecos_date(None, "D") is None
+
+
+def test_unparseable_input_is_left_alone_rather_than_guessed():
+    """해석 못 하는 값을 임의로 고치면 틀린 구간을 조용히 받아온다 —
+    그대로 넘겨 ECOS가 거부하게 두는 편이 안전하다."""
+    md = _macro_data_module()
+    assert md._coerce_ecos_date("2005-13-99", "D") == "2005-13-99"
