@@ -1,0 +1,12 @@
+concept_page: "wiki/concepts/sk-hynix-investment-thesis.md"
+monitoring_page: "wiki/monitoring/sk-hynix-decision-tracker.md"
+as_of: "2026-08-09"
+status_label: "⚪ 프레임만 초기화됨 — 판정 이력 없음(대신 daily_signals CSV가 실제 기록)"
+one_line_summary: >-
+  2026-08-09에 추적 프레임만 만들어지고 **일일 판정이 한 번도 기록되지
+  않았다**("Signal: Pending first run" 상태 그대로). 포지션 1,200주 HOLD만
+  적혀 있다.
+  ⚠️ **이 페이지를 하이닉스 판단 근거로 쓰지 말 것** — 실제 일일 신호는
+  `data/daily_signals/signal_YYYY-MM.csv`(파이프라인이 append-only로 기록)
+  에 있고 그쪽이 유일한 실측 원천이다. 이 digest는 "여기엔 없다"는 사실을
+  브리핑에 알려 잘못된 인용을 막기 위해 존재한다.

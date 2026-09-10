@@ -16,8 +16,17 @@ name: Daily PEOS Report
 
 on:
   schedule:
-    # 21:00 UTC = 06:00 KST (next day)
-    - cron: "0 21 * * *"
+    # 22:30 UTC = 07:30 KST (next day)
+    #
+    # 2026-09-11 변경 — 원래 06:00 KST였는데, 그러면 **그날의 수집이 끝나기
+    # 전에 리포트가 만들어진다**:
+    #   06:30 KST  core10-collect
+    #   07:00 KST  sk-hynix-daily-report (KIS 시세·수급)
+    #   07:10 KST  macro-data-sync (FRED·ECOS)
+    # 즉 06:00 리포트는 **전날 수집분**으로 만들어지고 있었다. 하루 낡은
+    # 거시 지표로 매일 판단하고 있었다는 뜻이라, 세 수집이 모두 끝난 뒤인
+    # 07:30으로 옮긴다.
+    - cron: "30 22 * * *"
   workflow_dispatch:
     inputs:
       month:

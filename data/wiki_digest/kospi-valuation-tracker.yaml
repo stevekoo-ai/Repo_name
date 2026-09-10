@@ -1,0 +1,13 @@
+concept_page: "wiki/concepts/kospi-valuation-tracker.md"
+monitoring_page: "wiki/monitoring/kospi-valuation-tracker-status.md"
+as_of: "2026-08-09"   # 위키 페이지 마지막 편집일. 안의 수치는 2026-08-08 기준
+status_label: "🔵 KOSPI forward PE 근사 5.36배 — -1SD 완전 이탈(역사적 저평가 구간)"
+one_line_summary: >-
+  2026-08-08 데이터 기준 근사 forward PE 5.36배로 -1SD(8.8배)를 완전히 이탈,
+  20년 평균(10.0배) 대비 -46.4%. 2026-07-02 Goldman Sachs가 "GFC 이후 최저"
+  라고 찍은 앵커(6.65배)보다도 -19.4% 더 낮다 — 그 사이 KOSPI가
+  7,769→6,259(-19%)로 추가 하락했기 때문.
+  ⚠️ **forward EPS 불변 가정에 의존한 근사치다.** 이 구간에 SK하이닉스 등
+  주요 기업 2Q 실적 발표(7/29)가 껴 있어 실제 컨센서스 EPS가 리비전됐을
+  가능성이 크고, 그러면 이 배수는 과장이다. 방향(저평가)의 근거로만 쓰고
+  절대 수준을 인용하지 말 것.

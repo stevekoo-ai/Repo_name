@@ -1,0 +1,15 @@
+concept_page: "wiki/concepts/market-cycles-leverage-risk.md"
+monitoring_page: "wiki/monitoring/situational-awareness-fund-liquidation-status.md"
+as_of: "2026-08-02"
+status_label: "✅ 종결(2026-07-30) — Citadel이 SA 공개포트폴리오 전량 인수, 매물부담 해소"
+one_line_summary: >-
+  AI 전문 헤지펀드 Situational Awareness(약 4배 레버리지, AUM $45B)의
+  강제청산 사건. **SK하이닉스 2Q 실적 컨센서스 미달(7/29)이 첫 도미노**가
+  돼 3개 프라임브로커(골드만·JP모건·BofA) 동시 마진콜 → 7/30 Citadel이
+  전체 공개주식 포트폴리오를 **$16B 블록딜**(월가 최대)로 인수하며 종결.
+  다음날 매물 공포 해소로 SOX +8.19%, 코스피 +17.91%, SK하이닉스 +29.95%
+  상한가.
+  **이 사건의 교훈이 브리핑에서 갖는 값어치**: 하이닉스 개별 악재가
+  레버리지 사슬을 타고 시장 전체로 번질 수 있고, 반대로 강제매도 공포의
+  제거만으로도 급반등이 나온다는 실제 사례. 종결 건이라 매일 인용할
+  대상은 아니고, 유사한 레버리지 신호가 잡힐 때 대조군으로 쓴다.
