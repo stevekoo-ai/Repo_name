@@ -268,6 +268,22 @@ def score_exports(as_of: date) -> FactorScore:
 # ─────────────────────────────────────────────────────────────
 # 요인 6 — 지정학 (가중 10, LLM 주입)
 # ─────────────────────────────────────────────────────────────
+def _events_are_from_the_future(risk_events: dict, as_of: date) -> bool:
+    """수동 입력 판단이 as_of 이후 것인가 — 백테스트 무결성의 마지막 구멍.
+
+    시계열은 series.py가 as_of로 잘라주지만, `data/manual_inputs/*.yaml`은
+    파일 하나에 "현재 판단"만 들어 있어서 그냥 읽으면 어느 시점을 계산하든
+    같은 값이 나온다. 과거를 계산할 때 오늘의 뉴스 판단을 쓰는 건 명백한
+    look-ahead다."""
+    stamp = risk_events.get("as_of")
+    if not stamp:
+        return False   # 날짜가 없으면 판단 불가 — 막지 않되 R2 표기는 아래에서 한다
+    try:
+        return date.fromisoformat(str(stamp)) > as_of
+    except ValueError:
+        return False
+
+
 def score_geopolitical(as_of: date, risk_events: dict | None = None) -> FactorScore:
     """전쟁·팬데믹·관세 같은 뉴스 의존 위험 — 코드가 계산할 수 없어 LLM이 채운다.
 
@@ -278,6 +294,13 @@ def score_geopolitical(as_of: date, risk_events: dict | None = None) -> FactorSc
     if not risk_events or not risk_events.get("signals"):
         return FactorScore("geopolitical", "지정학·위기", None, WEIGHTS["geopolitical"],
                            "미수집(fx_risk_events.yaml 없음 또는 비어있음)")
+    if _events_are_from_the_future(risk_events, as_of):
+        # 2026-09-11 발견 — 수동 입력 yaml만 as_of 필터를 안 거쳐 백테스트에
+        # 미래 판단이 샜다(1990년을 넣어도 오늘 지정학 위험이 켜졌다).
+        # 설계 §1의 "모든 데이터 접근은 as_of를 통과한다"가 시계열에만
+        # 적용되고 수동 입력엔 빠져 있었던 것.
+        return FactorScore("geopolitical", "지정학·위기", None, WEIGHTS["geopolitical"],
+                           f"미수집(판단 시점 {risk_events.get('as_of')}이 as_of 이후 — look-ahead 차단)")
     sig = risk_events["signals"]
     keys = ("geopolitical_risk", "pandemic_risk", "trade_policy_risk", "financial_stress")
     present = [(k, float(sig[k])) for k in keys if isinstance(sig.get(k), (int, float))]

@@ -248,9 +248,15 @@ def _trigger_geopolitical_spike(as_of: date, risk_events: dict | None) -> Warnin
     ①2010 국면을 끝낸 건 미국 신용등급 강등 + 유럽 재정위기였다.
     안전자산 선호는 미국 긴축과 정반대로 **금리를 끌어내리는** 충격이므로
     NON_US_SHOCK으로 분류한다 — ④2018-10과 같은 계열이다."""
+    from engine.fx.regime_score import _events_are_from_the_future
+
     if not risk_events or not risk_events.get("signals"):
         return Warning_("geopolitical_spike", "지정학 급등(2011형)", False,
                         TriggerKind.NON_US_SHOCK, "미판정(fx_risk_events.yaml 없음)")
+    if _events_are_from_the_future(risk_events, as_of):
+        return Warning_("geopolitical_spike", "지정학 급등(2011형)", False,
+                        TriggerKind.NON_US_SHOCK,
+                        f"미판정(판단 시점 {risk_events.get('as_of')}이 as_of 이후)")
     sig = risk_events["signals"]
     keys = ("geopolitical_risk", "pandemic_risk", "trade_policy_risk", "financial_stress")
     vals = [float(sig[k]) for k in keys if isinstance(sig.get(k), (int, float))]

@@ -26,3 +26,4 @@ data/raw/*/*.json
 # local pipeline/collectors (19.3: 사용자 개인 데이터는 별도 보호).
 data/manual_inputs/income.yaml
 data/manual_inputs/user_identity.yaml
+data/briefing/pack_*.md

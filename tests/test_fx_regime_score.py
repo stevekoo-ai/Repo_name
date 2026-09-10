@@ -201,3 +201,17 @@ def test_the_detail_line_shows_the_peak_not_just_the_blend():
         "as_of": "2026-09-09",
         "signals": {"geopolitical_risk": 0.8, "pandemic_risk": 0.0}})
     assert "최고 0.80" in f.detail
+
+
+def test_manual_risk_events_from_the_future_are_blocked():
+    """2026-09-11 발견 — 시계열은 series.py가 as_of로 자르는데 수동 입력
+    yaml만 그 필터를 안 거쳤다. 1990년을 계산해도 오늘의 지정학 판단이
+    켜졌다. 설계 §1("모든 데이터 접근은 as_of를 통과한다")이 시계열에만
+    적용되고 manual_inputs엔 빠져 있었던 것 — 백테스트 무결성의 구멍이다."""
+    today_events = {"as_of": "2026-09-10", "signals": {"geopolitical_risk": 0.9}}
+    past = R.score_geopolitical(date(1990, 1, 1), today_events)
+    assert not past.available
+    assert "look-ahead" in past.detail
+    # 같은 판단을 그 시점 이후에 쓰는 건 정상
+    now = R.score_geopolitical(date(2026, 9, 11), today_events)
+    assert now.available

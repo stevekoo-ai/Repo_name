@@ -116,3 +116,11 @@ def test_current_episode_months_counts_consecutive_below_ma36_months():
 def test_duration_warning_is_silent_outside_an_episode():
     w = T.detect_duration(date(2019, 6, 30))   # 국면 밖
     assert not w.fired and "하회 국면 아님" in w.detail
+
+
+def test_geopolitical_trigger_ignores_future_dated_manual_input():
+    """감지기 쪽에도 같은 구멍이 있었다 — 점수만 막고 경고를 안 막으면
+    백테스트에서 과거 국면에 오늘의 뉴스로 경고가 켜진다."""
+    future = {"as_of": "2026-09-10", "signals": {"geopolitical_risk": 0.95}}
+    w = T._trigger_geopolitical_spike(date(2011, 7, 31), future)
+    assert not w.fired and "as_of 이후" in w.detail
