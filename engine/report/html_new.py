@@ -1,6 +1,17 @@
 """Enhanced HTML renderer for PEOS report with CCI + Rate Analysis integrated display."""
 from __future__ import annotations
+
+import html as _html
 from datetime import datetime
+
+
+def _esc(value) -> str:
+    """HTML 이스케이프.
+
+    FX 섹션의 근거 문자열은 수동 입력(fx_risk_events.yaml)에서 오는 값이
+    섞여 있어 그대로 넣으면 안 된다 — 이 저장소는 개인용이지만, 수집
+    데이터가 리포트 HTML로 그대로 흘러드는 경로는 막아두는 게 맞다."""
+    return _html.escape(str(value), quote=True)
 
 
 def _hex_to_rgb(hex_color: str) -> str:
@@ -454,6 +465,124 @@ def _render_exposure_and_reconciliation(payload: dict) -> str:
     return "".join(out)
 
 
+def _render_fx_regime(payload: dict) -> str:
+    """§1.7 환율 국면 (FRS) — HTML 카드.
+
+    ⚠ 2026-09-10에 발견한 구멍을 막는 함수다. FRS §1.7을 markdown.py에만
+    연결해두고 "완료"라고 했는데, **사용자가 실제로 받아보는 건 HTML이다**
+    — daily-peos-report.yml이 report/<날짜>.html을 이메일로 보내고
+    docs/report.html로 게시한다. 마크다운은 저장소 안에만 있다.
+    렌더러가 둘인 구조에선 새 섹션을 양쪽에 다 붙여야 전달된다.
+
+    markdown 쪽(engine/report/fx_regime_section.py)과 **같은 payload**를
+    읽는다 — 두 렌더러가 서로 다른 계산을 하면 같은 날 리포트가 두 얘기를
+    하게 된다. 계산은 payload.py가 한 번만 하고 여기선 표기만 한다.
+
+    R4 준수: 국면·경고·사실만 낸다. 헤지/매매 지시, 종목·비중 추천,
+    목표 환율은 markdown 쪽과 동일하게 만들지 않는다.
+    """
+    fx = payload.get("fx_regime")
+    if not fx or fx.get("score") is None:
+        return ""
+
+    score = fx["score"]
+    # (+)=원화 강세. 부호에 색을 매핑하되 CCI의 GREEN/RED와 의미가 다르므로
+    # (여긴 좋고 나쁨이 아니라 방향이다) 파랑/주황을 쓴다.
+    color = "#38BDF8" if score > 0 else ("#FB923C" if score < 0 else "#94A3B8")
+    gap = fx.get("gap") or {}
+    months = fx.get("episode_months")
+
+    factor_rows = "".join(
+        f"<tr><td>{_esc(f['label'])}</td><td style='text-align:right'>{f['weight']}</td>"
+        f"<td style='text-align:right'>"
+        f"{('%+.2f' % f['normalized']) if f['available'] else '—'}</td>"
+        f"<td style='color:#94A3B8;font-size:0.9em'>{_esc(f['detail'])}</td></tr>"
+        for f in fx.get("factors", [])
+    )
+
+    warn_rows = "".join(
+        f"<tr><td>{_esc(w['label'])}</td>"
+        f"<td style='text-align:center'>{'🔥' if w['fired'] else '·'}</td>"
+        f"<td style='color:#94A3B8;font-size:0.9em'>{_esc(w['detail'])}</td>"
+        f"<td style='color:#94A3B8;font-size:0.85em'>"
+        f"{_esc((w.get('evidence') or {}).get('verdict', '미측정'))}</td></tr>"
+        for w in fx.get("warnings", [])
+    )
+
+    ctx = fx.get("dollar_context") or {}
+    facts = []
+    if ctx.get("cash_yield") is not None:
+        facts.append(
+            f"<li><b>달러 현금 기준선</b>: 미 3개월물 <b>{ctx['cash_yield']:.2f}%</b>. "
+            "과거 5개 국면 중 4개는 미국이 제로금리라 '환전 후 대기'가 무수익이었다.</li>")
+    if gap:
+        facts.append(
+            f"<li><b>환차익 구조</b>: 국면 전체를 보유하면 환차익은 구조적으로 0에 가깝다"
+            f"(양끝이 모두 36개월선 교차점). 현재 이격 {gap['pct']:+.1f}%. "
+            "<b>목표 환율은 제시하지 않는다.</b></li>")
+    if fx.get("warning_count"):
+        kind = fx.get("trigger_kind")
+        if kind == "US_TIGHTENING":
+            facts.append(
+                "<li><b>⚠ 장기채 함의</b>: 종료 경고 원인이 <b>미국 긴축 전환</b>이다. "
+                "과거 국면 종료 직후 10년물 12개월 수익 중앙값 −0.3%로 "
+                "무조건 진입(+3.9%) 대비 4.2%p 열위였다.</li>")
+        elif kind == "NON_US_SHOCK":
+            facts.append(
+                "<li><b>장기채 함의</b>: 원인이 <b>미국 외 충격</b>이다. 2018-10형처럼 "
+                "연준이 완화로 돌아서면 장기채가 최고 성적(+16.2%)을 낸 전례가 있다.</li>")
+        else:
+            facts.append(
+                "<li><b>장기채 함의</b>: 경고는 켜졌으나 원인이 특정되지 않아 판단을 보류한다.</li>")
+    bits = []
+    if ctx.get("hy_oas") is not None:
+        bits.append(f"하이일드 스프레드 {ctx['hy_oas']:.2f}%p")
+    if ctx.get("vix") is not None:
+        bits.append(f"VIX {ctx['vix']:.1f}")
+    if bits:
+        facts.append(f"<li><b>위험 보상 맥락</b>: {', '.join(bits)}. "
+                     "스프레드가 좁을수록 위험 대비 보상이 얇다.</li>")
+
+    dur = f" · {months}개월째" if months else ""
+    gap_line = (f"현물 {gap['spot']:,.1f}원 vs 36개월선 {gap['ma36']:,.1f}원 "
+                f"({gap['pct']:+.1f}%){dur}") if gap else ""
+
+    return f"""
+        <div class="card" style="margin-bottom:40px;">
+            <h2>💱 1.7 환율 국면 (FRS)
+                <span style="font-size:0.8rem; color:#94A3B8;">(근거 제공 · 포지션 지시 아님)</span></h2>
+            <div class="score-display">
+                <div class="score-number" style="color:{color}">{score:+.0f}</div>
+                <div class="score-text">{_esc(fx.get('label', ''))}</div>
+                <div style="color:#94A3B8; margin-top:8px; font-size:0.9em">
+                    −100~+100 · (+)=원화 강세 압력 · 커버리지 {fx.get('coverage', 0) * 100:.0f}%
+                </div>
+                <div style="color:#CBD5E1; margin-top:10px;">{gap_line}</div>
+            </div>
+
+            <table>
+                <tr><th>요인</th><th style="text-align:right">가중</th>
+                    <th style="text-align:right">점수</th><th>근거</th></tr>
+                {factor_rows}
+            </table>
+
+            <h3 style="margin-top:25px; color:#CBD5E1;">
+                국면 전환 경고 — {_esc(fx.get('warning_level', ''))} ({fx.get('warning_count', 0)}/4)</h3>
+            <table>
+                <tr><th>감지기</th><th style="text-align:center">상태</th>
+                    <th>근거</th><th>실측 예측력</th></tr>
+                {warn_rows}
+            </table>
+            <p style="color:#94A3B8; font-size:0.85em; margin-top:10px;">
+                예측력은 2008~2026 하회 국면 83개월 백테스트 리프트(1.0 = 정보 없음).
+                켜진 경고를 전부 같은 무게로 읽으면 안 된다.</p>
+
+            <h3 style="margin-top:25px; color:#CBD5E1;">달러 자산 맥락 (판단 재료 — 추천 아님)</h3>
+            <ul style="color:#CBD5E1; padding-left:20px; line-height:1.8;">{''.join(facts)}</ul>
+        </div>
+"""
+
+
 def render_html(payload: dict) -> str:
     """Render comprehensive PEOS report as beautiful, responsive HTML."""
     month = payload["report_month"]
@@ -618,6 +747,8 @@ def render_html(payload: dict) -> str:
         </div>
 
         {_render_exposure_and_reconciliation(payload)}
+
+        {_render_fx_regime(payload)}
 
         <div class="grid-2">
             <!-- CCI 카드 -->

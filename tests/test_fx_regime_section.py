@@ -142,3 +142,62 @@ def test_payload_is_json_serialisable(payload):
 
 def test_payload_carries_as_of_so_the_report_can_state_freshness(payload):
     assert payload["fx_regime"]["as_of"] == "2026-09-09"
+
+
+# ── 두 렌더러 동등성 ─────────────────────────────────────────
+#
+# 2026-09-10에 실제로 난 사고 — §1.7을 markdown.py에만 연결하고 "구현 완료"
+# 라고 보고했는데, **사용자가 매일 받아보는 건 HTML이다**(daily-peos-report.yml이
+# report/<날짜>.html을 이메일로 보내고 docs/report.html로 게시한다).
+# 마크다운은 저장소 안에만 있었다. 렌더러가 둘인 구조에선 한쪽만 붙이면
+# 전달이 안 된다 — 그걸 테스트로 고정한다.
+
+def test_the_html_renderer_also_emits_the_section():
+    from engine.report.html_new import _render_fx_regime
+
+    out = _render_fx_regime({"fx_regime": build_fx_regime_payload(date(2026, 9, 9))})
+    assert "1.7 환율 국면" in out
+    assert out.strip().startswith("<div class=\"card\"")
+
+
+def test_both_renderers_report_the_same_score_and_label(payload):
+    """두 렌더러가 각자 계산하면 같은 날 리포트가 두 얘기를 하게 된다.
+    계산은 payload.py가 한 번만 하고 렌더러는 표기만 해야 한다."""
+    from engine.report.html_new import _render_fx_regime
+
+    md = render_fx_regime_section(payload)
+    html = _render_fx_regime(payload)
+    score = payload["fx_regime"]["score"]
+    label = payload["fx_regime"]["label"]
+    assert f"{score:+.0f}" in md and f"{score:+.0f}" in html
+    assert label in md and label in html
+
+
+def test_both_renderers_skip_together_when_data_is_missing():
+    from engine.report.html_new import _render_fx_regime
+
+    for empty in ({}, {"fx_regime": None}, {"fx_regime": {"score": None}}):
+        assert render_fx_regime_section(empty) == ""
+        assert _render_fx_regime(empty) == ""
+
+
+def test_html_escapes_manually_entered_strings():
+    """근거 문자열엔 수동 입력(fx_risk_events.yaml)에서 온 값이 섞인다 —
+    그대로 HTML에 넣는 경로를 막아둔다."""
+    from engine.report.html_new import _render_fx_regime
+
+    base = build_fx_regime_payload(date(2026, 9, 9))
+    poisoned = {**base, "label": "<script>alert(1)</script>"}
+    out = _render_fx_regime({"fx_regime": poisoned})
+    assert "<script>" not in out
+    assert "&lt;script&gt;" in out
+
+
+def test_html_section_carries_the_same_r4_disclaimer(payload):
+    """R4 표기가 한쪽에만 있으면 HTML 독자는 이 섹션의 성격을 모른다."""
+    from engine.report.html_new import _render_fx_regime
+
+    html = _render_fx_regime(payload)
+    assert "포지션 지시 아님" in html
+    assert "추천 아님" in html
+    assert "목표 환율은 제시하지 않는다" in html
