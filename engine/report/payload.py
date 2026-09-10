@@ -492,6 +492,26 @@ def build_report_payload(month_key: str | None = None) -> dict:
         log_event("data_center_construction.failed", error=str(exc), level="warning")
         payload["data_center_construction"] = None
 
+    # 2026-09-10 — 환율 국면(FRS) §1.7. 설계
+    # wiki/architecture/fx-regime-score-design.md, 구현 engine/fx/.
+    # 지정학 요인만 수동 입력(7.3 예외)이고 나머지 7개는 기존 수집 데이터에서
+    # 계산한다. risk_events가 None이어도 그 요인만 "미수집"으로 빠지고
+    # 나머지 가중치로 재정규화되므로 섹션 자체는 정상 렌더된다(R3).
+    try:
+        from datetime import date as _date
+
+        from engine.report.fx_regime_section import build_fx_regime_payload
+
+        _fx_events = manual_collectors.fetch_fx_risk_events()
+        payload["fx_regime"] = build_fx_regime_payload(_date.today(), _fx_events)
+        log_event("fx_regime.built",
+                  score=payload["fx_regime"].get("score"),
+                  coverage=payload["fx_regime"].get("coverage"),
+                  warnings=payload["fx_regime"].get("warning_count"))
+    except Exception as exc:  # noqa: BLE001 — 한 섹션 실패가 리포트 전체를 막지 않는다
+        log_event("fx_regime.failed", error=str(exc), level="warning")
+        payload["fx_regime"] = None
+
     # 미국 노동시장(BLS) + IMF 전망 — 2026-09-07 신설.
     # 이 저장소의 판단 사슬 맨 앞단(미국 고용·임금 → 연준 → 미 10년물 →
     # 원/달러 → 하이닉스 수급 / 한국 기준금리 → 주담대)이 지금까지 CPI와

@@ -47,6 +47,15 @@ SOURCES: dict[str, tuple[str | None, str | None]] = {
     "us_10y":           ("fred_us_10y_treasury", "us_10y"),
     "us_dollar_index":  ("fred_us_dollar_index", "us_dollar_index"),
     "us_brent":         (None, "us_brent"),
+    # 2026-09-10 추가 — 리포트 §1.7-B "달러 자산 맥락"의 재료. 점수 계산엔
+    # 안 쓰이고 사실 표기 전용이다(설계 §6.5.3 — 자산배분 점수는 만들지 않는다).
+    # us_3m이 특히 중요하다: 과거 5개 국면 중 4개는 미국이 제로금리라
+    # "환전 후 대기"가 무수익이었는데 지금은 아니라는 게 시대 차이의 핵심.
+    "us_3m":            ("fred_us_3m_treasury", "us_3m"),
+    "us_2y":            ("fred_us_2y_treasury", "us_2y"),
+    "us_hy_oas":        ("fred_hy_oas", "us_hy_oas"),
+    "us_vix":           (None, "us_vix"),
+    "us_nasdaq":        (None, "us_nasdaq"),
 }
 
 

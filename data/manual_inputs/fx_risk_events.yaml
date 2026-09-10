@@ -1,0 +1,44 @@
+# 환율 국면 판단(FRS)의 지정학·위기 요인 입력 (Master Instruction 7.3 예외 정책).
+#
+# 전쟁·팬데믹·관세 같은 사건은 공개 API로 수치화할 수 없다. 코드가 계산할 수
+# 없는 유일한 요인이라 **Claude가 뉴스를 조사해 채운다**(/ingest 흐름).
+# semiconductor.yaml·data_center_construction.yaml과 동일한 스키마다 —
+# 새 파이프라인을 만들지 않는다는 게 이 저장소의 원칙이다.
+#
+# 왜 이 요인이 필요한가 (wiki/concepts/usdkrw-below-ma36-episodes.md):
+#   ① 2010 국면을 끝낸 건 미국 신용등급 강등 + 유럽 재정위기였다.
+#   ⑥ 2026 국면의 배경엔 미-이란 무력충돌과 미국 관세가 있다.
+# 둘 다 금리·환율 데이터엔 사후에야 나타난다.
+#
+# signals 값은 전부 0~1 위험도다(0 = 위험 없음, 1 = 극단).
+# ⚠ **부호에 주의** — 위험이 높을수록 안전자산(달러) 선호가 커져 **원화가
+# 약해진다**. engine/fx/regime_score.py의 score_geopolitical()이 부호를
+# 뒤집어 처리하므로 여기엔 "위험도"를 그대로 쓴다.
+#
+# 갱신 절차:
+#   1. 뉴스 조사(WebSearch) → 아래 4개 축을 0~1로 평가
+#   2. as_of를 조사한 날짜로 갱신 — 오래되면 리포트가 "N일 전 판단"이라고
+#      표기한다(R2). 30일 넘게 방치하지 말 것.
+#   3. notes에 근거를 남긴다. 숫자만 바꾸고 근거를 안 남기면 다음 세션이
+#      왜 그 값인지 알 수 없어 검증도 갱신도 못 한다.
+#   4. reliability_grade는 3을 넘기지 않는다(수동 입력 상한).
+
+as_of: "2026-09-10"
+reliability_grade: 3
+signals:
+  geopolitical_risk: 0.55   # 중동 정세 — 2026-06 유가 스파이크의 원인이 미해소.
+                            # 다만 브렌트가 6개월 +1.8%로 안정돼 급성 국면은 아님.
+  pandemic_risk: 0.00       # 진행 중인 팬데믹 없음
+  trade_policy_risk: 0.40   # 미국 관세·수출규제 지속. 반도체 대중 규제 유지.
+  financial_stress: 0.10    # 하이일드 스프레드 2.67%p로 역사적 저점권 =
+                            # 신용시장 스트레스 신호 없음
+notes: >
+  2026-09-10 최초 작성. 이 저장소가 보유한 실측(브렌트 $96.0 6개월 +1.8%,
+  하이일드 스프레드 2.67%p, VIX 15.7)과 기존 위키 기록을 근거로 평가했다.
+  ⚠ 이 세션은 주요 뉴스 도메인 egress가 차단돼 있어 원문 대조를 못 했다 —
+  WebSearch 기반 갱신은 다음 세션 과제로 남긴다. 값은 보수적으로(급성
+  위기가 아님) 잡았고, 실제 사건이 터지면 즉시 올려야 한다.
+sources:
+  - "sources/macro-series.csv — us_brent, us_vix, us_hy_oas (실측)"
+  - "wiki/concepts/usdkrw-below-ma36-episodes.md — ⑥국면 배경 서술"
+  - "wiki/architecture/fx-regime-score-design.md §4 — 이 파일의 스키마 근거"

@@ -10,6 +10,7 @@ from __future__ import annotations
 from core.config import portfolio_config
 from core.models import DataStatus
 from engine.report.economic_events import generate_event_section
+from engine.report.fx_regime_section import render_fx_regime_section
 from engine.report.reconciliation import render_reconciliation_section
 
 SK_HYNIX_TICKER = "000660.KS"
@@ -1634,6 +1635,7 @@ def render_markdown(payload: dict) -> str:
         render_reconciliation_section(payload.get("reconciliation")),
         _macro_dashboard_section(payload),
         _us_labor_outlook_section(payload),  # 미국 노동시장 + IMF 전망 (1.5)
+        render_fx_regime_section(payload),  # 환율 국면 FRS (1.7)
         _sk_hynix_decision_section(payload),
         _weekly_analysis_section(payload),  # Layer 0 supporting evidence
         _data_center_construction_section(payload),  # 고객재고 축 보조 참고자료 (2.6)

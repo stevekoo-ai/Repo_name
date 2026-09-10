@@ -120,3 +120,19 @@ def fetch_data_center_construction() -> dict | None:
         return None
     base.write_raw("data_center", "construction_vs_opposition", payload)
     return payload
+
+def fetch_fx_risk_events() -> dict | None:
+    """환율 국면 판단(FRS)의 지정학·위기 요인 (7.3 예외).
+
+    전쟁·팬데믹·관세는 공개 API로 수치화할 수 없어 Claude가 뉴스를 조사해
+    채운다 — FRS 8개 요인 중 코드가 계산할 수 없는 유일한 요인이다.
+    None이면 아직 파일이 없다는 뜻이고, 그 경우 score_geopolitical()이
+    "미수집"으로 처리해 **가중치를 총점에서 빼고 재정규화**한다(R3).
+    0점으로 채우지 않는다는 게 중요하다 — 모르는 걸 중립이라고 판단해
+    버리게 되기 때문.
+    """
+    payload = _load("fx_risk_events")
+    if not payload:
+        return None
+    base.write_raw("fx", "risk_events", payload)
+    return payload
