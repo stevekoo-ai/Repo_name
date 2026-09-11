@@ -117,12 +117,47 @@ P0001,2026-09-11,AM,"미 10년물이 4.5% 이상 유지",2026-09-25,us_10y,>=,4.
   `manual_inputs/*.yaml`만 그 필터를 안 거쳐, 1990년을 계산해도 오늘의
   지정학 판단이 켜졌다. 양쪽(점수·감지기) 모두 차단.
 
+## 8. 발송 경로 — 왜 Routine이 아니라 Actions가 보내는가
+
+처음엔 `scripts/publish_briefing.py`가 Routine 프롬프트 안에서 메일까지
+보내게 했다. **틀렸다 — 시크릿이 있는 곳이 다르다.**
+
+| | 시크릿 접근 |
+|---|---|
+| GitHub Actions | ✅ `${{ secrets.GMAIL_ADDRESS }}` |
+| Routine 세션(Claude 컨테이너) | ❌ `environment_variables: {}` |
+
+그대로 뒀으면 첫 저녁 루틴이 브리핑을 다 쓰고 마지막에 "채널 미설정"으로
+종료코드 1을 내며 실패했을 것이다. **브리핑을 썼는데 아무도 못 받는 건
+안 쓴 것보다 나쁘다** — 썼다고 착각하게 되기 때문이다.
+
+**현재 구조**:
+
+```
+Routine  →  마크다운 작성 → publish_briefing.py --no-email (HTML 생성)
+                                      → git push origin main
+                                              ↓ (경로 감지)
+GitHub Actions (briefing-email.yml)  →  HTML 변환 + 메일 발송 + 커밋
+```
+
+`push`가 곧 발송 트리거다. **push에 실패하면 메일도 안 나간다** — 루틴
+프롬프트가 그 경우 사용자에게 반드시 알리도록 못박았다.
+
+수동 발송도 된다: `workflow_dispatch`로 slot/date를 주거나, 비우면 가장
+최근 브리핑을 보낸다. 2026-09-11 첫 아침 브리핑을 이 경로로 실제 발송해
+`발송 완료: [PEOS 아침 브리핑] 2026-09-11` 로그까지 확인했다.
+
+발송 실패 시엔 기존 `send_report_email --failure-alert` 경로로 알린다 —
+조용한 실패를 막는 게 이 저장소의 일관된 방침이다.
+
 ## Sources
 
 - `engine/briefing/context.py` — 팩 생성·선별·게이트
 - `engine/briefing/ledger.py` — 예측 원장·자동채점
 - `scripts/build_briefing.py` — Routine이 호출하는 CLI (종료코드 0/10)
 - `tests/test_briefing_context.py` — 16건
+- `.github/workflows/briefing-email.yml` — 발송(시크릿이 있는 유일한 곳)
+- `engine/briefing/render_html.py` — 마크다운→HTML, LLM 미사용(토큰 0)
 - Routine: "PEOS 아침 브리핑"(`30 22 * * 1-5` UTC) / "PEOS 저녁 브리핑"(`40 10 * * 1-5` UTC)
 - [FRS 설계](fx-regime-score-design.md) — 예측 원장이 차용한 "측정해서 무게를 다르게 준다"
 - `data/wiki_digest/README.md` — digest 패턴 원본
