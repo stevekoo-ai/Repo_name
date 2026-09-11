@@ -1,6 +1,6 @@
 concept_page: "wiki/concepts/fx-regime-score-framework.md"
 monitoring_page: "wiki/monitoring/fx-regime-status.md"
-as_of: "2026-09-10"
+as_of: "2026-09-11"
 status_label: "🟢 원화 강세 국면 (FRS +22, 커버리지 100%) — 전환 경고 1/4, 원인 미국 외 충격"
 one_line_summary: >-
   국면 ⑥ 2개월째(과거 중앙값 11개월의 초입), 36개월선 대비 -4.5%.
@@ -12,3 +12,7 @@ one_line_summary: >-
   반영 중이었다) → 종료 트리거 '지정학 급등(2011형)' 발화, 원인은
   NON_US_SHOCK이라 장기채 함의가 미국 긴축형과 정반대다. 다만 종료
   트리거의 실측 리프트는 1.19x로 미약해 이 한 건으로 종료를 예단하지 않는다.
+  **2026-09-11 추가**: 파월 "인플레 진전 더딜 것"+PPI 쇼크로 US_TIGHTENING
+  신호가 섞이기 시작 — 어제의 NON_US_SHOCK 단일 분류가 흔들린다. 두 유형은
+  장기채 함의가 정반대라 구분이 중요하다. 브렌트 $109.51(5일 +12.2%)로
+  저장소 데이터가 뉴스를 따라잡았다.

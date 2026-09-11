@@ -1,0 +1,4 @@
+id,issued_at,slot,claim,check_date,check_key,check_op,check_value,status,result,resolved_at,note
+P0001,2026-09-11,AM,ADR 괴리(-5.63%)가 오늘 한국장 하락으로 이어진다,2026-09-12,hynix_chg_pct,<,0,OPEN,,,
+P0002,2026-09-11,AM,유가발 금리 상승이 이어져 미 10년물이 5.0%를 넘는다,2026-09-25,us_10y,>=,5.0,OPEN,,,
+P0003,2026-09-11,AM,브렌트가 100달러 아래로 되돌리지 못한다(중동 리스크 미해소),2026-09-18,us_brent,>=,100,OPEN,,,
