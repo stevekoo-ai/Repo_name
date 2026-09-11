@@ -1,0 +1,105 @@
+name: 브리핑 이메일 발송
+
+# 왜 Routine이 아니라 Actions가 보내는가 (2026-09-11)
+#
+# 처음엔 Routine 프롬프트 안에서 scripts/publish_briefing.py가 메일까지
+# 보내게 했는데, **시크릿이 있는 곳이 다르다**:
+#   GMAIL_ADDRESS 등은 GitHub Secrets에 있고 Actions만 읽을 수 있다.
+#   Routine 세션(Claude 컨테이너)은 그 값을 못 받는다.
+# 그래서 Routine은 마크다운+HTML을 만들어 push까지만 하고, 발송은 이
+# 워크플로가 맡는다 — 기존 daily-peos-report.yml의 이메일 스텝과 같은 구조다.
+#
+# 트랙 경계(CLAUDE.md 최우선 정책): 브리핑은 트랙 A(거시·SK하이닉스
+# 경제판단, 개인 자산 판단)라 email이 명시적으로 허용된 범위다. 정상
+# GitHub Actions 시크릿만 쓰고 회사망 우회 경로는 재사용하지 않는다.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "report/briefing/*.md"
+  workflow_dispatch:
+    inputs:
+      slot:
+        description: "AM 또는 PM (비우면 가장 최근 브리핑)"
+        required: false
+        default: ""
+      date:
+        description: "YYYY-MM-DD (비우면 가장 최근)"
+        required: false
+        default: ""
+
+permissions:
+  contents: write
+
+concurrency:
+  group: briefing-email
+  cancel-in-progress: false
+
+jobs:
+  send:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -r requirements.txt
+
+      - name: 발송 대상 결정
+        id: pick
+        run: |
+          SLOT="${{ github.event.inputs.slot }}"
+          DATE="${{ github.event.inputs.date }}"
+          if [ -z "$SLOT" ] || [ -z "$DATE" ]; then
+            # 가장 최근 브리핑 마크다운을 파일명에서 역산한다
+            LATEST=$(ls report/briefing/*.md 2>/dev/null | sort | tail -1)
+            if [ -z "$LATEST" ]; then
+              echo "::error::report/briefing/에 브리핑이 없습니다"
+              exit 1
+            fi
+            BASE=$(basename "$LATEST" .md)     # YYYY-MM-DD-SLOT
+            DATE="${BASE%-*}"
+            SLOT="${BASE##*-}"
+          fi
+          echo "slot=$SLOT" >> "$GITHUB_OUTPUT"
+          echo "date=$DATE" >> "$GITHUB_OUTPUT"
+          echo "발송 대상: $DATE $SLOT"
+
+      - name: HTML 변환 + 발송
+        env:
+          GMAIL_ADDRESS: ${{ secrets.GMAIL_ADDRESS }}
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+          NOTIFY_EMAIL_TO: ${{ secrets.GMAIL_ADDRESS }}
+        run: |
+          PYTHONPATH=. python3 scripts/publish_briefing.py \
+            --slot "${{ steps.pick.outputs.slot }}" \
+            --date "${{ steps.pick.outputs.date }}"
+
+      - name: 생성된 HTML 커밋
+        run: |
+          git config user.name "briefing-email-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add report/briefing/
+          if git diff --cached --quiet; then
+            echo "새로 커밋할 HTML 없음"
+          else
+            git commit -m "chore: 브리핑 HTML ${{ steps.pick.outputs.date }}-${{ steps.pick.outputs.slot }}"
+            for i in 1 2 3 4 5; do
+              git push && break
+              git fetch origin main && git rebase --autostash origin/main
+              sleep $((i * 3))
+            done
+          fi
+
+      # 발송이 조용히 실패하면 브리핑을 썼는데 아무도 못 받는다 —
+      # 그건 안 쓴 것보다 나쁘다(썼다고 착각하게 되므로).
+      - name: 실패 알림
+        if: failure()
+        env:
+          GMAIL_ADDRESS: ${{ secrets.GMAIL_ADDRESS }}
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+          NOTIFY_EMAIL_TO: ${{ secrets.GMAIL_ADDRESS }}
+        run: |
+          python3 -m scripts.send_report_email \
+            --failure-alert "브리핑 이메일 발송 실패 (${{ steps.pick.outputs.date }} ${{ steps.pick.outputs.slot }}) — report/briefing/에 파일은 있으나 메일이 나가지 않았습니다."
