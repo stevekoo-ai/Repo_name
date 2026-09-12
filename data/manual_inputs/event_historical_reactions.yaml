@@ -1,0 +1,53 @@
+# 캘린더 이벤트 유형별 과거 유사 사례 비교 노트 — 정성적 패턴, 정밀 예측 아님.
+#
+# 왜 이 파일이 필요한가: 사용자 요청 — "선거·정책 이벤트의 시장 영향
+# 히스토리(과거 유사 이벤트 때 KOSPI/하이닉스가 어떻게 반응했는지)를
+# 캘린더 항목에 연결해 '이번엔 과거 대비 어떨지' 비교 서술을 자동화."
+#
+# ⚠️ 이 저장소엔 "이번 FOMC 때 KOSPI가 몇 % 움직였다"는 회차별 정밀
+# 로그가 없다(그런 계열을 자동 수집한 적이 없다). 그래서 여기 적는 건
+# **회차별 정밀 수치가 아니라, 이미 위키에 기록된 실제 사건에서 뽑은
+# 정성적 패턴**이다 — R1(측정>추론) 위반을 피하려고 confirmed:false로
+# 명시하고, 매 이벤트 노트에 "패턴 참고용" 캐비엇을 강제로 붙인다
+# (engine/briefing/calendar.py의 historical_analog() 참고).
+
+patterns:
+  FOMC:
+    confirmed: false
+    note: >
+      이 저장소가 as_of로 재구성한 5개 원화강세 국면 종료 사례 중 5/6이
+      미국 긴축 전환(US_TIGHTENING)이 트리거였다(fx-regime-score-design.md
+      §6.5). 즉 FOMC 결과가 매파로 나오면 원화·반도체 양쪽에 즉시 반영될
+      가능성이 과거 패턴상 높다. 다만 이번 사례가 그 패턴을 따를지는
+      결과가 나와야 안다 — 사전 확정 아님.
+    ref: wiki/architecture/fx-regime-score-design.md
+
+  BOK:
+    confirmed: false
+    note: >
+      2026년 한은은 이미 2회(7월·8월) 선제 인상을 단행했고 그 사이
+      KOSPI·하이닉스 가격 흐름에 뚜렷한 충격은 기록되지 않았다(가계부채
+      대응 목적의 예고된 인상이라 서프라이즈가 작았던 것으로 보인다).
+      다음 인상이 있다면 "예고된 인상"인지 "서프라이즈"인지가 반응 크기를
+      가르는 변수일 가능성이 높다.
+    ref: wiki/monitoring/rate-outlook-scenario-status.md
+
+  ELECTION:
+    confirmed: false
+    note: >
+      이 저장소가 기록한 가장 극적인 레버리지 청산 사건(Situational
+      Awareness 펀드, 2026-07-30)은 선거가 아니라 실적 쇼크가 도미노의
+      첫 장이었다 — 선거 자체보다 "그 시점의 레버리지·포지셔닝 상태"가
+      충격의 증폭 여부를 결정했다는 게 이 저장소의 실제 관찰이다. 선거
+      결과 자체의 방향성 예단은 하지 않는다(정치적 판단 회피, CLAUDE.md
+      트랙 경계 원칙과 별개로 이 축은 순수 정보 목적).
+    ref: wiki/monitoring/situational-awareness-fund-liquidation-status.md
+
+  EARNINGS:
+    confirmed: false
+    note: >
+      SK하이닉스 실적 발표는 이 저장소에서 실제로 시장 전체를 흔든 전례가
+      있다 — 2026-07-29 2Q 컨센서스 미달이 레버리지 청산 도미노의 첫
+      단추였다(다음날 3개 프라임브로커 마진콜 → Citadel $16B 블록딜).
+      실적 발표일 전후는 그래서 다른 이벤트보다 변동성 경계가 필요하다.
+    ref: wiki/monitoring/situational-awareness-fund-liquidation-status.md

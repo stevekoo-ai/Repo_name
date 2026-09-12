@@ -72,11 +72,67 @@ jobs:
           done
           python3 scripts/log_automation_run.py portfolio-holdings-sync holdings_sync "$attempt" "$max_attempts" success
 
+      # 2026-09-12 추가 — 장내채권 잔고(CTSC8407R). 주식잔고 TR은 채권을
+      # 돌려주지 않아서, 사용자가 실제 보유 중인 ISA 채권이 수집 데이터에
+      # 아예 없었다. 별도 TR로만 조회된다.
+      - name: 계좌별 장내채권 잔고 동기화
+        env:
+          KIS_APP_KEY: ${{ secrets.KIS_APP_KEY }}
+          KIS_APP_SECRET: ${{ secrets.KIS_APP_SECRET }}
+          KIS_APP_KEY_ISP: ${{ secrets.KIS_APP_KEY_ISP }}
+          KIS_APP_SECRET_ISP: ${{ secrets.KIS_APP_SECRET_ISP }}
+          KIS_APP_KEY_IRP: ${{ secrets.KIS_APP_KEY_IRP }}
+          KIS_APP_SECRET_IRP: ${{ secrets.KIS_APP_SECRET_IRP }}
+          KIS_ACCOUNT_GEN: ${{ secrets.KIS_ACCOUNT_GEN }}
+          KIS_ACCOUNT_ISP: ${{ secrets.KIS_ACCOUNT_ISP }}
+          KIS_ACCOUNT_DC: ${{ secrets.KIS_ACCOUNT_DC }}
+          KIS_ACCOUNT_IRP: ${{ secrets.KIS_ACCOUNT_IRP }}
+        run: |
+          attempt=1; max_attempts=6
+          until python3 scripts/portfolio_holdings.py bonds; do
+            if [ "$attempt" -ge "$max_attempts" ]; then
+              echo "::error::${max_attempts}회 재시도했지만 채권 잔고 동기화 실패"
+              exit 1
+            fi
+            echo "[재시도 $attempt/$max_attempts] 채권 동기화 실패 — 5분 후 재시도"
+            attempt=$((attempt + 1))
+            sleep 300
+          done
+
+      # 2026-09-12 추가 — **조용한 실패 차단**. 스크립트가 0으로 끝나도
+      # 파일이 실제로 오늘 날짜로 갱신됐는지 되읽어 확인한다. 2026-09-11에
+      # "작업은 SUCCEEDED인데 산출물이 없던" 사고의 재발 방지 장치다.
+      - name: 수집 결과 검증 (되읽기)
+        run: |
+          TODAY=$(date -u +%Y-%m-%d)
+          fail=0
+          for f in sources/portfolio-holdings.csv sources/portfolio-bonds.csv; do
+            if [ ! -f "$f" ]; then
+              echo "::error::$f 가 생성되지 않았습니다"
+              fail=1
+              continue
+            fi
+            n=$(awk -F, -v d="$TODAY" 'NR>1 && $1==d' "$f" | wc -l)
+            echo "$f : 오늘($TODAY) 행 ${n}건"
+            if [ "$n" -eq 0 ]; then
+              echo "::error::$f 에 오늘 날짜 행이 0건입니다 — 수집이 실제로는 안 됐습니다"
+              fail=1
+            fi
+          done
+          # 채권은 0건이 '정상'일 수도 있으나(미보유), 사용자가 ISA 채권
+          # 보유를 명시했으므로 0건이면 경고를 남긴다.
+          nb=$(awk -F, -v d="$TODAY" 'NR>1 && $1==d' sources/portfolio-bonds.csv 2>/dev/null | wc -l)
+          if [ "$nb" -eq 0 ]; then
+            echo "::warning::채권 0건 — 사용자는 ISA 채권 보유를 명시했으므로 --raw로 응답 구조 확인 필요"
+          fi
+          exit $fail
+
       - name: 변경사항 커밋 & 푸시
         run: |
           git config user.name "portfolio-holdings-sync-bot"
           git config user.email "actions@users.noreply.github.com"
           git add sources/portfolio-holdings.csv
+          [ -f sources/portfolio-bonds.csv ] && git add sources/portfolio-bonds.csv
           [ -f sources/automation-run-log.csv ] && git add sources/automation-run-log.csv
           git diff --cached --quiet || git commit -m "포트폴리오 보유종목 자동 동기화: $(date -u +%Y-%m-%dT%H:%M:%SZ)"
           for i in 1 2 3 4 5; do

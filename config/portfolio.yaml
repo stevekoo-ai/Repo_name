@@ -156,7 +156,18 @@ retirement_accounts:
     account_type: "확정기여형 퇴직연금(DC)"
     broker: "한국투자증권"
     liquidity: locked_until_retirement
-    cash_like_balance_krw: 11617659
+    # 2026-09-12 사용자 실측 보고로 계좌 총계 갱신. 검산 통과:
+    #   total_contribution + total_gain = total_asset
+    #   28,479,150 + 2,545,331 = 31,024,481 ✓ (오차 0원)
+    # 납입금 대비 수익률 8.94%, 현금 비중 37.8%.
+    # ⚠️ 아래 holdings의 종목별 valuation_krw는 2026-07-14 기준이라
+    # 이제 총계와 맞지 않는다(보유평가액 20,419,785 → 19,310,525, -1,109,260).
+    # 종목별 내역은 재수집 전까지 참고용이며, 총액 판단에는 아래 total_* 필드를 쓸 것.
+    total_contribution_krw: 28479150   # REAL 2026-09-12
+    total_gain_krw: 2545331            # REAL 2026-09-12
+    total_asset_krw: 31024481          # REAL 2026-09-12 (= 납입금 + 수익)
+    as_of: "2026-09-12"
+    cash_like_balance_krw: 11713956    # REAL 2026-09-12 (이전 11,617,659에서 갱신)
     holdings:
       - name: "TIME 글로벌탑픽액티브"
         balance_units: 300

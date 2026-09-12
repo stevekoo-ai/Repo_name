@@ -262,6 +262,7 @@ TRIGGER_TO_DIGEST_ORDER = [
     "data-center-construction-vs-opposition",
     "situational-awareness-fund-liquidation",
     "sk-hynix-decision-tracker",
+    "rate-outlook-scenario",
 ]
 
 
@@ -323,6 +324,23 @@ def detect_triggers(as_of: date) -> tuple[set[str], list[str]]:
         if abs(chg) >= 20:
             fired |= {"market-cycles-leverage-risk", "panic-recovery-signals"}
             why.append(f"VIX 5일 {chg:+.0f}%")
+
+    # 금리 전망 3대 시나리오 — 한은 기준금리 변동(디커플링 축 직접 증거)
+    # 또는 FOMC/금통위가 임박했을 때(±3일) 켜진다. 2026-09-12
+    # rate-outlook-scenarios-2026 참고.
+    rb = rows("kr_base_rate")
+    if len(rb) >= 2 and rb[-1][1] != rb[-2][1]:
+        fired.add("rate-outlook-scenario")
+        why.append(f"한국 기준금리 변동 {rb[-2][1]:.2f}→{rb[-1][1]:.2f}")
+    try:
+        from engine.briefing import calendar as C
+        for ev in C.upcoming_events(as_of, horizon_days=3):
+            if ev.get("type") in ("FOMC", "BOK"):
+                fired.add("rate-outlook-scenario")
+                why.append(f"{ev['date']} {ev['name']} 임박")
+                break
+    except Exception:
+        pass
 
     return fired, why
 
@@ -437,9 +455,90 @@ def evaluate_gate(as_of: date, triggers: set[str], why: list[str]) -> Gate:
 # ─────────────────────────────────────────────────────────────
 # 조립
 # ─────────────────────────────────────────────────────────────
+def build_calendar_block(as_of: date, slot: str) -> Block:
+    """⑥ 거래 캘린더 — 휴장·시차를 코드가 판정해서 알려준다.
+
+    LLM이 "왜 숫자가 오래됐는지"를 추측하지 않게 한다(R1). WEEKEND
+    슬롯에서는 "다음주 예정 일정"이 이 블록을 대체한다(별도 함수)."""
+    from engine.briefing import calendar as C
+
+    gap = C.describe_trading_gap(as_of, slot)
+    lines = [gap.text]
+    events = C.upcoming_events(as_of, horizon_days=5)
+    if events:
+        lines.append("\n**5일 내 예정된 확정 일정**:")
+        for e in events:
+            lines.append(f"- {e['date']} {e.get('country', '')} {e['name']}")
+    return Block("calendar", "⑥ 거래 캘린더 (휴장·시차)", "\n".join(lines))
+
+
+def build_weekly_outlook_block(as_of: date) -> Block:
+    """⑦ 다음주 예정 일정 — 주말(WEEKEND) 슬롯 전용.
+
+    사용자 요청: "주말 보고서에는 다음주 어떤 일정들이 예정돼 있는지
+    미리 알려달라 — 지표 발표 주기, 실적발표, 주요 선거, 지난 보고서에서
+    확인된 이슈의 follow up." 이 함수가 그 네 가지를 조립한다."""
+    from engine.briefing import calendar as C
+    from engine.briefing import ledger as L
+
+    lines = []
+
+    confirmed = C.upcoming_events(as_of, horizon_days=9)
+    if confirmed:
+        lines.append("**확정 일정**")
+        for e in confirmed:
+            lines.append(f"- {e['date']} [{e.get('country','')}/{e.get('type','')}] {e['name']}")
+            analog = C.historical_analog(e.get("type", ""))
+            if analog:
+                lines.append(f"  - 📜 과거 유사 사례(패턴 참고용, 확정 아님): {analog['note'].strip()}")
+        lines.append("")
+
+    patterns = C.pattern_events()
+    if patterns:
+        lines.append("**반복 패턴(정확한 날짜는 재확인 필요, 근사치)**")
+        for e in patterns:
+            lines.append(f"- {e['date']} [{e.get('country','')}] {e['name']} (추정)")
+        lines.append("")
+
+    due_next_week = [r for r in L.open_predictions(as_of)
+                     if as_of.isoformat() < r.check_date <= (as_of + timedelta(days=9)).isoformat()]
+    if due_next_week:
+        lines.append("**다음주 검증일 도래 예측 (follow up 대상)**")
+        for r in due_next_week:
+            lines.append(f"- `{r.id}` ({r.check_date} 검증) {r.claim}")
+        lines.append("")
+
+    stale = sorted(
+        (d for d in _load_digests()),
+        key=lambda d: str(d.get("as_of", "")),
+    )[:5]
+    if stale:
+        lines.append("**가장 오래 안 갱신된 위키 추적 축 (follow up 후보)**")
+        for d in stale:
+            lines.append(f"- {d.get('status_label', d['slug'])} (판단일 {d.get('as_of', '?')}) "
+                        f"→ `{d.get('monitoring_page', '')}`")
+
+    if not lines:
+        lines = ["다음주 확정 일정 없음, follow up 대상 없음."]
+
+    return Block("weekly_outlook", "⑦ 다음주 예정 일정 (주간 전망)", "\n".join(lines))
+
+
 def build_pack(slot: str, as_of: date | None = None) -> tuple[BriefingPack, Gate]:
     now = datetime.now(KST)
     as_of = as_of or now.date()
+
+    if slot == "WEEKEND":
+        # 주말 전망은 "오늘 시장이 움직였나"로 게이트를 걸지 않는다 —
+        # 주간 캘린더는 시장이 안 움직여도 매주 유효한 정보다.
+        pack = BriefingPack(slot=slot, as_of=now, blocks=[
+            build_hynix_block(as_of),
+            build_digest_block(as_of, *detect_triggers(as_of)),
+            build_ledger_block(as_of),
+            build_weekly_outlook_block(as_of),
+        ])
+        return pack, Gate(publish=True, reasons=["주간 전망은 항상 발행"])
+
     triggers, why = detect_triggers(as_of)
     gate = evaluate_gate(as_of, triggers, why)
     pack = BriefingPack(slot=slot, as_of=now, blocks=[
@@ -448,5 +547,6 @@ def build_pack(slot: str, as_of: date | None = None) -> tuple[BriefingPack, Gate
         build_digest_block(as_of, triggers, why),
         build_previous_block(as_of, slot),
         build_ledger_block(as_of),
+        build_calendar_block(as_of, slot),
     ])
     return pack, gate

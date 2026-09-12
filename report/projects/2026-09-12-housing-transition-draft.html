@@ -1,0 +1,981 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>주거 전환·공공분양 자금 전략 (초안 v3)</title>
+<style>
+:root {
+  --bg: #f5f6f8; --surface: #ffffff; --surface-2: #f0f1f4; --border: #e2e4e9;
+  --text: #16181d; --text-muted: #5c6270; --accent: #2563eb;
+  --good: #157a3d; --good-bg: #e5f6ea; --warn: #92510c; --warn-bg: #fdf0dd;
+  --bad: #b3261e; --bad-bg: #fbe6e4; --neutral: #40465a; --neutral-bg: #eceef2;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #14161b; --surface: #1c1f26; --surface-2: #23262f; --border: #333846;
+    --text: #eceef2; --text-muted: #a0a6b5; --accent: #7fa8ff;
+    --good: #6cd48f; --good-bg: #113222; --warn: #f0b862; --warn-bg: #3a2a10;
+    --bad: #f28b82; --bad-bg: #3a1614; --neutral: #b7bccb; --neutral-bg: #262a35;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #14161b; --surface: #1c1f26; --surface-2: #23262f; --border: #333846;
+  --text: #eceef2; --text-muted: #a0a6b5; --accent: #7fa8ff;
+  --good: #6cd48f; --good-bg: #113222; --warn: #f0b862; --warn-bg: #3a2a10;
+  --bad: #f28b82; --bad-bg: #3a1614; --neutral: #b7bccb; --neutral-bg: #262a35;
+}
+:root[data-theme="light"] {
+  --bg: #f5f6f8; --surface: #ffffff; --surface-2: #f0f1f4; --border: #e2e4e9;
+  --text: #16181d; --text-muted: #5c6270; --accent: #2563eb;
+  --good: #157a3d; --good-bg: #e5f6ea; --warn: #92510c; --warn-bg: #fdf0dd;
+  --bad: #b3261e; --bad-bg: #fbe6e4; --neutral: #40465a; --neutral-bg: #eceef2;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0; background: var(--bg); color: var(--text);
+  font-family: -apple-system, "Segoe UI", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+  line-height: 1.6;
+}
+.page { max-width: 920px; margin: 0 auto; padding: 24px 16px 64px; }
+header.masthead { padding: 8px 0 20px; }
+header.masthead h1 { font-size: 1.5rem; margin: 0 0 4px; }
+header.masthead .sub { color: var(--text-muted); font-size: 0.9rem; }
+.tile-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin: 12px 0; }
+.tile { background: var(--surface-2); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; }
+.tile-label { font-size: 0.78rem; color: var(--text-muted); display: flex; align-items: center; gap: 6px; }
+.tile-value { font-size: 1.35rem; font-weight: 700; margin-top: 2px; }
+.tile-sub { font-size: 0.78rem; color: var(--text-muted); margin-top: 2px; }
+.dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+.dot-good { background: var(--good); } .dot-warn { background: var(--warn); }
+.dot-bad { background: var(--bad); } .dot-neutral { background: var(--neutral); }
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
+  padding: 20px 22px; margin-bottom: 16px; }
+.card.highlight { border-color: var(--accent); }
+.card h2 { font-size: 1.1rem; margin: 0 0 10px; }
+.card h3 { font-size: 0.95rem; margin: 16px 0 8px; color: var(--text-muted); }
+.kv-list { list-style: none; padding: 0; margin: 0; }
+.kv-list li { padding: 6px 0; border-bottom: 1px dashed var(--border); font-size: 0.92rem; }
+.kv-list li:last-child { border-bottom: none; }
+.kv-list b { display: inline-block; min-width: 130px; color: var(--text-muted); font-weight: 600; }
+.pending { color: var(--text-muted); font-style: italic; }
+.muted { color: var(--text-muted); }
+.badge { display: inline-block; padding: 3px 10px; border-radius: 999px; font-size: 0.78rem; font-weight: 600; }
+.badge-good { background: var(--good-bg); color: var(--good); }
+.badge-warn { background: var(--warn-bg); color: var(--warn); }
+.badge-bad { background: var(--bad-bg); color: var(--bad); }
+.badge-neutral { background: var(--neutral-bg); color: var(--neutral); }
+.table-wrap { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: 0.88rem; }
+th, td { text-align: left; padding: 7px 10px; border-bottom: 1px solid var(--border); white-space: nowrap; }
+th { color: var(--text-muted); font-weight: 600; font-size: 0.78rem; text-transform: uppercase; letter-spacing: .02em; }
+.spark-cell { white-space: normal; }
+.spark { display: block; }
+.spark-labels { display: flex; justify-content: space-between; font-size: 0.68rem; color: var(--text-muted);
+  width: 176px; }
+.spark-empty { font-size: 0.78rem; }
+.stale-mark { color: var(--warn); cursor: help; }
+.clock-row { display: flex; gap: 18px; align-items: center; flex-wrap: wrap; }
+.clock-img { width: 180px; height: 180px; border-radius: 10px; flex-shrink: 0;
+  background: #ffffff; padding: 6px; border: 1px solid var(--border); }
+.chart-img { width: 100%; height: auto; border-radius: 10px;
+  background: #ffffff; padding: 6px; border: 1px solid var(--border); }
+.discuss-card { background: var(--surface-2); border-left: 3px solid var(--accent); border-radius: 8px;
+  padding: 12px 16px; margin: 10px 0; }
+.discuss-topic { font-weight: 700; margin-bottom: 4px; }
+.discuss-context { color: var(--text-muted); font-size: 0.88rem; margin: 4px 0; }
+.discuss-question { margin: 6px 0 0; font-size: 0.94rem; }
+.discuss-input { width: 100%; margin-top: 10px; padding: 8px 10px; border-radius: 8px;
+  border: 1px solid var(--border); background: var(--surface); color: var(--text);
+  font-family: inherit; font-size: 0.88rem; resize: vertical; box-sizing: border-box; }
+.discuss-input:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+.discuss-actions { display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap; }
+.discuss-toolbar { display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+  padding: 10px 14px; background: var(--surface-2); border-radius: 10px; margin-bottom: 10px; }
+.btn-fb { font-family: inherit; font-size: 0.82rem; font-weight: 600; padding: 6px 12px;
+  border-radius: 8px; border: 1px solid var(--border); background: var(--surface);
+  color: var(--text); cursor: pointer; }
+.btn-fb:hover { border-color: var(--accent); }
+.btn-fb:disabled { opacity: 0.7; cursor: default; }
+.btn-fb-primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+.copy-output { margin-top: 10px; padding: 12px 14px; background: var(--surface-2);
+  border: 2px dashed var(--accent); border-radius: 10px; }
+.copy-output textarea { width: 100%; box-sizing: border-box; padding: 8px 10px; border-radius: 8px;
+  border: 1px solid var(--border); background: var(--surface); color: var(--text);
+  font-family: inherit; font-size: 0.82rem; resize: vertical; margin-top: 6px; }
+.copy-output a#peos-copy-output-link { display: none; margin-top: 8px; color: var(--accent);
+  font-size: 0.88rem; font-weight: 600; }
+.action-card { border-radius: 10px; border: 1px solid var(--border); padding: 12px 16px; margin: 8px 0 14px; }
+.action-good { border-left: 4px solid var(--good); }
+.action-warn { border-left: 4px solid var(--warn); }
+.action-bad { border-left: 4px solid var(--bad); }
+.action-neutral { border-left: 4px solid var(--neutral); }
+.action-title { font-weight: 700; margin-bottom: 6px; }
+.action-row { font-size: 0.86rem; margin: 3px 0; color: var(--text); }
+.action-row .k { display: inline-block; min-width: 68px; color: var(--text-muted); font-weight: 600; }
+.action-conflict { color: var(--warn); }
+.scenario-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; }
+.scenario-card { background: var(--surface-2); border-radius: 10px; padding: 14px 16px; font-size: 0.85rem; }
+.scenario-title { font-weight: 700; font-size: 1rem; margin-bottom: 8px; }
+.scenario-prob { color: var(--accent); }
+.scenario-card p { margin: 6px 0; }
+footer { color: var(--text-muted); font-size: 0.78rem; text-align: center; padding-top: 16px; }
+
+/* 브리핑 전용 최소 보강 — 나머지는 월간 리포트·대시보드와 같은 _CSS를 쓴다 */
+body { max-width: 860px; margin: 0 auto; padding: 24px 16px 48px; }
+h2 { margin-top: 32px; padding-top: 16px; border-top: 1px solid var(--border); }
+table { width: 100%; border-collapse: collapse; }
+th, td { padding: 6px 10px; border-bottom: 1px solid var(--border); }
+blockquote { margin: 12px 0; padding: 10px 14px; background: var(--surface-2);
+  border-left: 3px solid var(--accent); border-radius: 4px; }
+.table-wrap { overflow-x: auto; }
+</style>
+</head>
+<body>
+<h1>주거 전환 · 공공분양 자금 전략 보고서 (초안 v3)</h1>
+<blockquote>
+<p><strong>v2 → v3 변경 요약</strong></p>
+<div class='table-wrap'><table>
+<thead>
+<tr>
+<th>#</th>
+<th>v2</th>
+<th>v3 (정정·추가)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>5.2%의 세전/세후 해석 <strong>미확정</strong></td>
+<td><strong>세후로 확정</strong> — 목표는 연 세후 <strong>32,400,000원</strong></td>
+</tr>
+<tr>
+<td>2</td>
+<td>세금 미반영</td>
+<td><strong>절세 3층 구조 신설</strong> (ISA 우산 / 명의 분산 / 상품별 과세특례)</td>
+</tr>
+<tr>
+<td>3</td>
+<td>ISA 한도를 총액으로 오인</td>
+<td><strong>연 단위 납입한도 반영</strong> — ISA에 목돈을 한 번에 넣을 수 없다</td>
+</tr>
+<tr>
+<td>4</td>
+<td>"슈퍼 ISA" 단일 제도로 서술</td>
+<td><strong>생산적금융 ISA 신설 반영</strong> (2027-01-01~, 채권 편입 불가)</td>
+</tr>
+<tr>
+<td>5</td>
+<td>필요 전환 70~120주</td>
+<td><strong>31주</strong> — 절세 설계가 하이닉스 <strong>96주(1.74억)</strong>를 지켜준다</td>
+</tr>
+<tr>
+<td>6</td>
+<td>커버드콜 상품 미선정</td>
+<td><strong>국내주식형 타겟프리미엄형으로 확정</strong> (근거 아래)</td>
+</tr>
+</tbody>
+</table></div>
+</blockquote>
+<hr>
+<h2>0. 이번 판의 결론 한 줄</h2>
+<blockquote>
+<p><strong>세금 설계가 종목 선택보다 먼저다.</strong>
+같은 8억, 같은 5.5% 수익률인데 <strong>필요 하이닉스 매도량이 127주에서 31주로 줄었다.</strong>
+차액 <strong>96주 = 173,711,465원</strong>은 "더 잘 골라서" 번 게 아니라 <strong>안 뺏겨서</strong> 남은 돈이다.</p>
+</blockquote>
+<hr>
+<h2>1. 목표 재정의 — 세후 기준</h2>
+<p>사장님 확인: <strong>"세후로 월세가 마련되어야 한다."</strong></p>
+<div class='table-wrap'><table>
+<thead>
+<tr>
+<th>항목</th>
+<th style="text-align: right;">금액</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>월세</td>
+<td style="text-align: right;">2,700,000원 / 월</td>
+</tr>
+<tr>
+<td><strong>연간 필요 세후 현금흐름</strong></td>
+<td style="text-align: right;"><strong>32,400,000원</strong></td>
+</tr>
+</tbody>
+</table></div>
+<p>세전으로 얼마가 필요한지는 <strong>어느 과세 구간에 걸리느냐</strong>로 완전히 달라진다.</p>
+<div class='table-wrap'><table>
+<thead>
+<tr>
+<th>과세 방식</th>
+<th style="text-align: right;">실효세율</th>
+<th style="text-align: right;">필요 세전 수익</th>
+<th style="text-align: right;">차이</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>분리과세 유지</td>
+<td style="text-align: right;">15.4%</td>
+<td style="text-align: right;">38,297,872</td>
+<td style="text-align: right;">—</td>
+</tr>
+<tr>
+<td>금융소득종합과세 진입</td>
+<td style="text-align: right;">38.5%</td>
+<td style="text-align: right;">52,682,927</td>
+<td style="text-align: right;"><strong>+14,385,054</strong></td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>→ 절세 설계만으로 연 14,385,054원.</strong> 운용자산 8억 기준 <strong>연 1.8%p의 수익률</strong>에 해당한다.
+어떤 종목을 고르든 1.8%p를 더 내기는 어렵다. 그래서 설계가 먼저다.</p>
+<hr>
+<h2>2. 전제가 된 실측 — ISA 현황 (2026-09-12 사용자 확인)</h2>
+<div class='table-wrap'><table>
+<thead>
+<tr>
+<th>계좌</th>
+<th>상태</th>
+<th>유형</th>
+<th>의미</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>본인 ISA</td>
+<td><strong>1억원 규모 운영 중</strong></td>
+<td>일반형(추정)</td>
+<td>총한도 1억을 이미 소진했을 가능성</td>
+</tr>
+<tr>
+<td>아내 ISA</td>
+<td><strong>2026년 개설</strong></td>
+<td><strong>서민형</strong></td>
+<td>한도 대부분 미사용 + 비과세 한도 2배</td>
+</tr>
+</tbody>
+</table></div>
+<h3>⚠️ "서민형"이 알려주는 두 번째 정보</h3>
+<p>서민형 가입 요건은 <strong>총급여 5,000만원 이하 / 종합소득 3,800만원 이하</strong>다.
+즉 서민형이라는 사실 자체가 <strong>아내의 소득세 과세표준이 낮다</strong>는 뜻이고,
+이건 ISA 밖 과세계좌에서 훨씬 큰 의미를 갖는다.</p>
+<div class='table-wrap'><table>
+<thead>
+<tr>
+<th></th>
+<th style="text-align: right;">본인</th>
+<th style="text-align: right;">아내</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>한계세율(추정, 지방세 포함)</td>
+<td style="text-align: right;"><strong>38.5%</strong></td>
+<td style="text-align: right;"><strong>26.4%</strong></td>
+</tr>
+<tr>
+<td>금융소득 2,000만원까지</td>
+<td style="text-align: right;">15.4%</td>
+<td style="text-align: right;">15.4%</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>같은 이자·배당인데 명의만 바꾸면 12.1%p가 남는다.</strong>
+배우자 증여공제는 <strong>6억원 / 10년</strong>이라 증여세는 0원이다.</p>
+<blockquote>
+<p>⚠️ <strong>이월과세 주의</strong>: 증여받은 자산을 10년 이내 매도하면 취득가액이
+증여자의 원래 취득가로 소급된다(양도세 회피 방지).
+<strong>→ 하이닉스 주식을 그대로 넘기면 안 된다. 매도 후 현금으로 증여하고,
+아내 계좌에서 새로 매수할 것.</strong></p>
+</blockquote>
+<hr>
+<h2>3. ISA 제도가 두 갈래로 갈라졌다 (2026 세제개편)</h2>
+<div class='table-wrap'><table>
+<thead>
+<tr>
+<th></th>
+<th><strong>기존 ISA</strong></th>
+<th><strong>생산적금융 ISA</strong> (신설)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>채권 편입</strong></td>
+<td>✅ 가능</td>
+<td>❌ <strong>불가 — 투자대상 제외</strong></td>
+</tr>
+<tr>
+<td>투자대상</td>
+<td>주식·펀드·ETF·채권·예금 등</td>
+<td>국내 상장주식, 국내 주식형 펀드, 국민성장펀드, BDC</td>
+</tr>
+<tr>
+<td>이자·배당 과세</td>
+<td>비과세 한도 내 0%, <strong>초과분 9.9% 분리과세</strong></td>
+<td><strong>한도 없이 전액 비과세</strong></td>
+</tr>
+<tr>
+<td>국내상장주식 매매차익</td>
+<td>전액 비과세</td>
+<td>전액 비과세</td>
+</tr>
+<tr>
+<td>최소 의무기간</td>
+<td>3년</td>
+<td>3년</td>
+</tr>
+<tr>
+<td>시행</td>
+<td>현행</td>
+<td><strong>2027-01-01 이후 신규 가입분</strong></td>
+</tr>
+<tr>
+<td>중복 가입</td>
+<td>—</td>
+<td>✅ <strong>기존 ISA 보유해도 별도 가입 가능</strong></td>
+</tr>
+</tbody>
+</table></div>
+<h3>흔한 오해 하나를 바로잡는다</h3>
+<blockquote>
+<p>❌ "슈퍼 ISA에서 국내 채권을 사면 이자를 <strong>한도 없이 전액 비과세</strong> 받는다"</p>
+<p><strong>틀렸다.</strong> 두 제도를 섞은 설명이다.
+"한도 없는 전액 비과세"는 <strong>생산적금융 ISA</strong>의 혜택인데 <strong>거기엔 채권을 못 담는다</strong>.
+채권을 담을 수 있는 기존 ISA에서는 <strong>한도 내 비과세 + 초과분 9.9%</strong>다.</p>
+<p><strong>"채권 이자 + 무제한 비과세"라는 조합은 존재하지 않는다.</strong></p>
+</blockquote>
+<p>다만 9.9%도 충분히 강력하다 — 무엇보다 <strong>금융소득종합과세 합산에서 빠진다.</strong></p>
+<div class='table-wrap'><table>
+<thead>
+<tr>
+<th>계좌</th>
+<th>채권 이자 세율</th>
+<th>종합과세 합산</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>일반 과세계좌</td>
+<td>15.4% → 종합과세 시 최대 49.5%</td>
+<td><strong>합산됨</strong></td>
+</tr>
+<tr>
+<td>기존 ISA</td>
+<td>한도 내 0%, 초과분 <strong>9.9%</strong></td>
+<td><strong>합산 제외</strong></td>
+</tr>
+</tbody>
+</table></div>
+<h3>⚠️ 실행 순서를 못박는 제약</h3>
+<blockquote>
+<p><strong>금융소득종합과세 대상자로 통보되면 ISA 신규 가입이 막히고
+기존 계좌도 추가 납입이 중단된다.</strong></p>
+<p>8억을 5%로 굴리면 금융소득 4,000만원 — 기준선(2,000만원)의 2배다.
+<strong>명의 분산 없이는 거의 확실히 대상자가 된다.</strong>
+→ ISA 자리를 먼저 잡고, 그 다음 과세계좌를 설계해야 한다. 순서가 거꾸로면 문을 닫힌 뒤 두드리게 된다.</p>
+</blockquote>
+<hr>
+<h2>4. ISA에는 목돈을 한 번에 넣을 수 없다 (v2의 오류 정정)</h2>
+<p>ISA는 총한도가 있어도 <strong>납입은 연 단위</strong>이고, <strong>가입 시점부터</strong> 쌓인다.
+2027-02-20에 전세금 4.62억이 들어와도 그 돈을 ISA에 한꺼번에 넣지 못한다.</p>
+<p><strong>2027년 2월 시점 ISA 우산 규모:</strong></p>
+<div class='table-wrap'><table>
+<thead>
+<tr>
+<th>시나리오</th>
+<th style="text-align: right;">본인 추가여력</th>
+<th style="text-align: right;">아내</th>
+<th style="text-align: right;">생산적금융(부부)</th>
+<th style="text-align: right;"><strong>ISA 우산 총계</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>보수 (연 2,000만·총 1억)</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">40,000,000</td>
+<td style="text-align: right;">40,000,000</td>
+<td style="text-align: right;"><strong>180,000,000</strong></td>
+</tr>
+<tr>
+<td>확대 (연 4,000만·총 2억)</td>
+<td style="text-align: right;">80,000,000</td>
+<td style="text-align: right;">80,000,000</td>
+<td style="text-align: right;">40,000,000</td>
+<td style="text-align: right;"><strong>300,000,000</strong></td>
+</tr>
+</tbody>
+</table></div>
+<p><em>(기존 본인 ISA 1억 포함. 납입한도 확대 시행 여부는 보도가 엇갈려 보수 기준으로 설계한다.)</em></p>
+<p><strong>→ 8억 중 ISA에 담기는 건 1.8억~3.0억. 나머지 5억 이상은 과세계좌다.</strong>
+그래서 <strong>명의 분산이 ISA보다 더 큰 레버</strong>가 된다.</p>
+<hr>
+<h2>5. 절세 3층 구조 — 최종 설계</h2>
+<pre><code>1층 [ISA 우산 1.8억]        종합과세 합산 제외 · 초과분 9.9%
+     ├ 본인 기존 ISA 1.0억   커버드콜 ETF + 채권
+     ├ 아내 ISA 0.4억(서민형) 커버드콜 + 고배당 — 비과세 한도 2배
+     └ 생산적금융 ISA 0.4억   국내 고배당주 (채권 불가)
+
+2층 [아내 과세계좌 3.64억]   증여 6억 공제 · 금융소득 2,000만까지 15.4%
+     └ 고배당주 + 단기채 — 본인 명의였다면 38.5%
+
+3층 [본인 과세계좌 잔여]     상품 자체의 과세특성으로 방어
+     ├ 고배당 개별주          분리과세 특례 20% (2026~2028 한시)
+     └ 국내상장주식 매매차익형  세율 0% — 애초에 금융소득이 아님
+</code></pre>
+<h3>3층이 잘 안 알려진 두 가지</h3>
+<ol>
+<li>
+<p><strong>국내주식형 커버드콜의 옵션 프리미엄은 비과세다.</strong>
+   장내 파생상품 매매차익이라 과세 대상이 아니다.
+   해외형(미국 지수 기반)은 분배금 전액이 15.4% 배당소득세 대상이다.
+   <strong>같은 "월배당 12%"라도 세후가 다르다.</strong></p>
+</li>
+<li>
+<p><strong>고배당 분리과세 특례 (2026~2028 한시)</strong> — 종합과세 38.5%를 20%로 누른다.</p>
+</li>
+</ol>
+<div class='table-wrap'><table>
+<thead>
+<tr>
+<th>금융소득 구간</th>
+<th style="text-align: right;">세율</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>2,000만원 이하</td>
+<td style="text-align: right;">14%</td>
+</tr>
+<tr>
+<td>2,000만 ~ 3억</td>
+<td style="text-align: right;"><strong>20%</strong></td>
+</tr>
+<tr>
+<td>3억 ~ 50억</td>
+<td style="text-align: right;">25%</td>
+</tr>
+</tbody>
+</table></div>
+<p>요건: 배당성향 40% 이상, <strong>또는</strong> 25% 이상이면서 직전 3년 평균 대비 10% 이상 증가
+   ⚠️ <strong>공모·사모펀드·리츠·SPC 제외 → ETF는 해당 없음. 개별 고배당주만.</strong></p>
+<hr>
+<h2>6. 최종 배치와 필요 전환량</h2>
+<p><strong>보수 시나리오 (ISA 우산 1.8억) — 목표 세후 32,400,000원 달성 배치</strong></p>
+<div class='table-wrap'><table>
+<thead>
+<tr>
+<th>블록</th>
+<th style="text-align: right;">금액</th>
+<th style="text-align: right;">명목</th>
+<th style="text-align: right;">실효세율</th>
+<th style="text-align: right;">세후</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>본인 기존 ISA (커버드콜+채권)</td>
+<td style="text-align: right;">100,000,000</td>
+<td style="text-align: right;">6.5%</td>
+<td style="text-align: right;">6.9%</td>
+<td style="text-align: right;">6,054,750</td>
+</tr>
+<tr>
+<td>아내 ISA 서민형 (커버드콜+고배당)</td>
+<td style="text-align: right;">40,000,000</td>
+<td style="text-align: right;">6.5%</td>
+<td style="text-align: right;"><strong>0%</strong></td>
+<td style="text-align: right;">2,600,000</td>
+</tr>
+<tr>
+<td>생산적금융 ISA 부부 (국내고배당주)</td>
+<td style="text-align: right;">40,000,000</td>
+<td style="text-align: right;">5.5%</td>
+<td style="text-align: right;"><strong>0%</strong></td>
+<td style="text-align: right;">2,200,000</td>
+</tr>
+<tr>
+<td>아내 과세계좌 (증여·2천만 분리과세)</td>
+<td style="text-align: right;">363,636,364</td>
+<td style="text-align: right;">5.5%</td>
+<td style="text-align: right;">15.4%</td>
+<td style="text-align: right;">16,920,000</td>
+</tr>
+<tr>
+<td>본인 과세 — 고배당 특례</td>
+<td style="text-align: right;">51,969,101</td>
+<td style="text-align: right;">5.5%</td>
+<td style="text-align: right;">20.0%</td>
+<td style="text-align: right;">2,286,640</td>
+</tr>
+<tr>
+<td>본인 과세 — 국내주식 매매차익형</td>
+<td style="text-align: right;">51,969,101</td>
+<td style="text-align: right;">4.5%</td>
+<td style="text-align: right;"><strong>0%</strong></td>
+<td style="text-align: right;">2,338,610</td>
+</tr>
+<tr>
+<td><strong>합계</strong></td>
+<td style="text-align: right;"><strong>647,574,566</strong></td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;"><strong>32,400,000</strong></td>
+</tr>
+</tbody>
+</table></div>
+<blockquote>
+<p><strong>필요 하이닉스 전환: 56,161,368원 ≈ 31주</strong> (249주 중 12%)</p>
+</blockquote>
+<h3>절세 설계의 값어치</h3>
+<div class='table-wrap'><table>
+<thead>
+<tr>
+<th></th>
+<th style="text-align: right;">필요 전환액</th>
+<th style="text-align: right;">주수</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>절세 설계 없음 (전부 본인 명의 과세계좌)</td>
+<td style="text-align: right;">229,872,833</td>
+<td style="text-align: right;"><strong>127주</strong></td>
+</tr>
+<tr>
+<td><strong>절세 설계 적용</strong></td>
+<td style="text-align: right;">56,161,368</td>
+<td style="text-align: right;"><strong>31주</strong></td>
+</tr>
+<tr>
+<td><strong>차액 — 안 팔아도 되는 하이닉스</strong></td>
+<td style="text-align: right;"><strong>173,711,465</strong></td>
+<td style="text-align: right;"><strong>96주</strong></td>
+</tr>
+</tbody>
+</table></div>
+<h3>안전마진 선택지</h3>
+<div class='table-wrap'><table>
+<thead>
+<tr>
+<th>여유율</th>
+<th style="text-align: right;">목표 세후</th>
+<th style="text-align: right;">필요 전환</th>
+<th style="text-align: right;">주수</th>
+<th style="text-align: right;">잔여 하이닉스</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>100%</td>
+<td style="text-align: right;">32,400,000</td>
+<td style="text-align: right;">56,161,368</td>
+<td style="text-align: right;">31주</td>
+<td style="text-align: right;">218주</td>
+</tr>
+<tr>
+<td><strong>110%</strong></td>
+<td style="text-align: right;"><strong>35,640,000</strong></td>
+<td style="text-align: right;"><strong>128,970,357</strong></td>
+<td style="text-align: right;"><strong>71주</strong></td>
+<td style="text-align: right;"><strong>178주</strong></td>
+</tr>
+<tr>
+<td>120%</td>
+<td style="text-align: right;">38,880,000</td>
+<td style="text-align: right;">201,779,345</td>
+<td style="text-align: right;">111주</td>
+<td style="text-align: right;">138주</td>
+</tr>
+<tr>
+<td>130%</td>
+<td style="text-align: right;">42,120,000</td>
+<td style="text-align: right;">274,588,334</td>
+<td style="text-align: right;">152주</td>
+<td style="text-align: right;">97주</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>권고: 110% (71주 전환).</strong> 분배율 하락·NAV 침식·PS 미달 어느 하나가 빗나가도
+월세가 끊기지 않는 최소 완충이다. 하이닉스는 여전히 <strong>178주(71%)를 유지</strong>한다.</p>
+<hr>
+<h2>7. 커버드콜 — 무엇을 base로 잡을 것인가</h2>
+<p>사장님 지적: <em>"커버드콜은 어찌되었건 주식이고, base를 어떤 것으로 잡느냐에 따라
+원금이 녹아나는 경우를 맞이하게 될 것이다."</em> — 정확한 문제 제기다.</p>
+<h3>7-1. 구조적 약점을 먼저 인정한다</h3>
+<ul>
+<li><strong>하락장</strong>: 기초자산 손실을 <strong>100% 그대로</strong> 떠안는다. 프리미엄은 완충일 뿐 방어가 아니다.</li>
+<li><strong>상승장</strong>: 콜 매도로 상승분이 잘린다 → 기초자산은 회복하는데 ETF는 못 따라간다.</li>
+<li><strong>결과</strong>: 등락을 반복하면 NAV가 계단식으로 내려앉는다 = <strong>원금 침식</strong></li>
+</ul>
+<p><strong>따라서 판단 기준은 분배율이 아니라 총수익률(분배금 + NAV 변화)이다.</strong>
+연 15% 분배해도 NAV가 12% 빠지면 실질 3%다.</p>
+<h3>7-2. 현재 국면 (2026-09) 대입</h3>
+<div class='table-wrap'><table>
+<thead>
+<tr>
+<th>요인</th>
+<th>방향</th>
+<th>커버드콜 함의</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>원화 강세</td>
+<td>원화↑</td>
+<td>해외형은 <strong>환손실이 분배금을 깎는다</strong> → 불리</td>
+</tr>
+<tr>
+<td>한국 기준금리 2.50→2.75→3.00</td>
+<td>금리↑</td>
+<td>고배당·가치주 상대 우위</td>
+</tr>
+<tr>
+<td>코스피 저평가 + 밸류업</td>
+<td>반등 여지</td>
+<td><strong>상승 참여를 남겨둬야 한다</strong></td>
+</tr>
+<tr>
+<td>4Q 중간선거 변동성</td>
+<td>변동성↑</td>
+<td>옵션 프리미엄 자체는 커진다 (유리)</td>
+</tr>
+<tr>
+<td>세금</td>
+<td>—</td>
+<td>국내주식형 프리미엄 <strong>비과세</strong></td>
+</tr>
+</tbody>
+</table></div>
+<h3>7-3. 유형 선택</h3>
+<div class='table-wrap'><table>
+<thead>
+<tr>
+<th>유형</th>
+<th>프리미엄</th>
+<th>상승 참여</th>
+<th>평가</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ATM 전량매도</td>
+<td>가장 큼</td>
+<td><strong>0%</strong></td>
+<td>❌ 코스피 반등 여지를 통째로 포기</td>
+</tr>
+<tr>
+<td>OTM</td>
+<td>중간</td>
+<td>있음</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><strong>타겟프리미엄(부분매도)</strong></td>
+<td>목표 고정</td>
+<td><strong>일부 공유</strong></td>
+<td>✅✅ <strong>최적</strong></td>
+</tr>
+</tbody>
+</table></div>
+<p>타겟프리미엄형은 "연 15% 목표"를 정하고 <strong>그만큼만</strong> 콜을 매도한다.
+남은 비중은 기초자산 상승을 그대로 먹는다 — <strong>분배율을 고정하면서 NAV 침식을
+구조적으로 줄인</strong> 형태다.</p>
+<h3>7-4. 종목</h3>
+<div class='table-wrap'><table>
+<thead>
+<tr>
+<th>순위</th>
+<th>종목</th>
+<th>유형</th>
+<th>분배율(실측)</th>
+<th>세금</th>
+<th>역할</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>1</strong></td>
+<td><strong>KODEX 200타겟위클리커버드콜 (498400)</strong></td>
+<td>타겟프리미엄</td>
+<td>목표 연 15% / 12개월 롤링 약 <strong>14%</strong></td>
+<td>프리미엄 비과세</td>
+<td><strong>핵심 축</strong></td>
+</tr>
+<tr>
+<td>2</td>
+<td>PLUS 고배당주위클리커버드콜</td>
+<td>고배당주 기반</td>
+<td>약 <strong>14.9%</strong></td>
+<td>프리미엄 비과세</td>
+<td>금리상승 국면 보완</td>
+</tr>
+<tr>
+<td>3</td>
+<td>RISE 200위클리커버드콜</td>
+<td>코스피200</td>
+<td>—</td>
+<td>프리미엄 비과세</td>
+<td>분산</td>
+</tr>
+<tr>
+<td>참고</td>
+<td>RISE 코리아밸류업위클리고정커버드콜</td>
+<td>고정분배</td>
+<td>월 3%대</td>
+<td>프리미엄 비과세</td>
+<td>밸류업 테마</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>1번을 축으로 삼는 이유</strong> — 세 기준을 모두 통과하는 유일한 조합이다.
+① 기초자산이 코스피200 → 저평가 반등 여지 ② 타겟프리미엄 → 상승 일부 공유
+③ 국내주식형 → 프리미엄 비과세 ④ 위클리 롤링 → 변동성 국면에서 수취 효율</p>
+<p><strong>배치</strong>: 커버드콜은 <strong>기존 ISA와 과세계좌</strong>에서 운용한다.
+생산적금융 ISA는 커버드콜 ETF가 "국내 주식형 펀드"로 인정될지 불확실하므로 <strong>의존하지 않는다.</strong></p>
+<h3>7-5. 운용 규칙</h3>
+<ol>
+<li><strong>커버드콜 비중 상한 1.5억 (총 자산의 약 19%)</strong> — 월세의 30% 이내만 커버드콜에 의존.
+   나머지는 채권·발행어음·고배당이 받쳐 <strong>분배 중단 시에도 월세가 끊기지 않게</strong> 한다.</li>
+<li><strong>NAV 침식 모니터링 트리거</strong>: 12개월 누적 총수익률(분배금+NAV)이
+   단순 보유 대비 <strong>-5%p 이하</strong>로 벌어지면 축소.
+   → <code>FHPST02440200</code> (ETF NAV 일별추이)로 자동 실측한다.</li>
+<li><strong>해외형 편입 금지</strong> — 원화 강세 국면 + 분배금 15.4% 과세.</li>
+<li><strong>하이닉스 전환은 분할</strong> — 일시 전환 금지 (아래 §9).</li>
+</ol>
+<hr>
+<h2>8. 5.2% 앵커 — 검증 완료 (v2에서 유지)</h2>
+<p>하이브엘은 <strong>전세 8억 호가</strong>도 함께 나와 있고, 같은 물건을 월세(보증금 1억 + 270만원)로
+잡았을 때 전세환산액이 8억이 되는 수익률이 손익분기다.</p>
+<p>전세환산 = 보증금 + (월세 × 12 ÷ r) × 1.154 <em>(15.4% gross-up)</em></p>
+<div class='table-wrap'><table>
+<thead>
+<tr>
+<th style="text-align: right;">r</th>
+<th style="text-align: right;">전세환산액</th>
+<th>판정</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: right;">5.0%</td>
+<td style="text-align: right;">8.48억</td>
+<td>월세 불리</td>
+</tr>
+<tr>
+<td style="text-align: right;"><strong>5.2%</strong></td>
+<td style="text-align: right;"><strong>8.19억</strong></td>
+<td><strong>≈ 전세 호가 8억 — 손익분기</strong></td>
+</tr>
+<tr>
+<td style="text-align: right;">5.5%</td>
+<td style="text-align: right;">7.80억</td>
+<td>월세 유리</td>
+</tr>
+<tr>
+<td style="text-align: right;">6.0%</td>
+<td style="text-align: right;">7.23억</td>
+<td>월세 유리</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>5.2% 이상이면 월세가 유리하다는 판단이 정확하다.</strong> v3는 이 5.2%를 <strong>세후</strong>로 확정 적용했다.</p>
+<hr>
+<h2>9. 타임라인</h2>
+<pre><code>2026-09 (지금)  부부 ISA 납입 재개 — 2026년분 한도 확보
+                아내 명의 증여 계획 수립 (현금 기준)
+2026-10~11-03   하이닉스 1차 전환 (약 30~40주) — 중간선거 전 고점 구간
+2026-11-03      미 중간선거 → 판단 보류, 재평가
+2027-01-01      생산적금융 ISA 가입 가능
+2027-01-18      ISA 채권 만기        +29,999,728  (만기 상환, 매도 불필요)
+2027-02 초      SK하이닉스 PS        +100,000,000  (현금/주식, 추정)
+2027-02-11      하이닉스 락업 해제      +8,791,650  마크업 (+67주 매도 가능)
+2027-02-20      이사 — 전세금 회수   +462,000,000
+                동시  보증금 지급    -100,000,000
+2027-02-20~     포트폴리오 본격 구축
+2030            플랫폼시티 입주 (예정)
+</code></pre>
+<p><strong>이사일과 전세금 회수일이 같은 날(2/20)</strong>이라 브리지 자금은 필요 없다.
+이사 직전 가용현금이 <strong>1억 6,579만원</strong>이라 보증금 1억은 전세금 없이도 충당된다.
+<strong>→ 이사를 위해 하이닉스를 팔아야 할 필요는 0주다.</strong></p>
+<h3>리밸런싱 창 — 2026년 4분기</h3>
+<div class='table-wrap'><table>
+<thead>
+<tr>
+<th>축</th>
+<th>현재 판정</th>
+<th>함의</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>SK하이닉스 (09-04)</td>
+<td>"$1조 클럽" 진입</td>
+<td>고점 부근 — <strong>매도에 유리</strong></td>
+</tr>
+<tr>
+<td>찐반등 4대 신호 (09-11)</td>
+<td>0/4, 신용융자 역방향</td>
+<td>단기 변동성 경계</td>
+</tr>
+<tr>
+<td>금리 전망 (09-12)</td>
+<td>고금리 뉴노멀 근접</td>
+<td><strong>인컴 자산 수익률 높게 유지 → 전환 유리</strong></td>
+</tr>
+<tr>
+<td>FRS 환율 (09-11)</td>
+<td>원화 강세</td>
+<td>달러자산 편입 신중</td>
+</tr>
+<tr>
+<td>미 중간선거</td>
+<td>2026-11-03 (확정)</td>
+<td>결과에 따라 큰 변동</td>
+</tr>
+</tbody>
+</table></div>
+<p>지금은 ①하이닉스가 고점 부근이고 ②고금리로 인컴 자산 수익률이 좋다.
+이 둘이 동시에 성립하는 구간이 리밸런싱에 가장 유리하다.
+다만 <strong>선거 결과의 방향은 예단하지 않는다</strong> — 이 저장소가 기록한 실제 사례
+(2026-07-30 Situational Awareness 펀드 청산)의 교훈은 "이벤트 자체보다
+그 시점의 레버리지·포지셔닝 상태가 충격 크기를 결정한다"는 것이었다.</p>
+<hr>
+<h2>10. 자산 현황 (2026-09-12 실측)</h2>
+<div class='table-wrap'><table>
+<thead>
+<tr>
+<th>구분</th>
+<th style="text-align: right;">금액</th>
+<th>비고</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>일반계좌 주식</td>
+<td style="text-align: right;">219,281,600</td>
+<td>하이닉스 120주 포함</td>
+</tr>
+<tr>
+<td>ISA 주식·ETF</td>
+<td style="text-align: right;">96,208,220</td>
+<td>하이닉스 19주, 삼성 108주</td>
+</tr>
+<tr>
+<td>ISA 채권</td>
+<td style="text-align: right;">29,999,728</td>
+<td><code>KR6023532E16</code>, 만기 2027-01-18, 매수수익률 4.05%</td>
+</tr>
+<tr>
+<td>하나증권 하이닉스 110주</td>
+<td style="text-align: right;">199,320,000</td>
+<td>67주 락업(2027-02-11)</td>
+</tr>
+<tr>
+<td>현금</td>
+<td style="text-align: right;">27,000,000</td>
+<td></td>
+</tr>
+<tr>
+<td>전세보증금</td>
+<td style="text-align: right;">462,000,000</td>
+<td>2027-02-20 회수</td>
+</tr>
+<tr>
+<td>IRP</td>
+<td style="text-align: right;">21,966,368</td>
+<td>중도인출 시 16.5% 과세</td>
+</tr>
+<tr>
+<td><strong>DC</strong></td>
+<td style="text-align: right;"><strong>31,024,481</strong></td>
+<td><strong>2026-09-12 갱신</strong> (납입 28,479,150 + 수익 2,545,331, 현금 11,713,956)</td>
+</tr>
+<tr>
+<td><strong>총계</strong></td>
+<td style="text-align: right;"><strong>1,086,800,397</strong></td>
+<td></td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>SK하이닉스 249주 = 451,188,000원 (총자산의 41.5%)</strong></p>
+<blockquote>
+<p>채권은 주식잔고 TR이 반환하지 않아 그동안 누락돼 있었다.
+장내채권 전용 TR(<code>CTSC8407R</code>)을 신규 구현해 수집했고,
+3단계 조용한-실패 방지 가드(스크립트 exit code / 파서 하드페일 / 워크플로 되읽기)를 걸었다.</p>
+</blockquote>
+<hr>
+<h2>11. 미확정 — 숫자를 만들지 않은 것</h2>
+<div class='table-wrap'><table>
+<thead>
+<tr>
+<th>항목</th>
+<th>상태</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ISA 납입한도 확대(연 4,000만) 시행 여부</td>
+<td><strong>보도 엇갈림</strong> — 보수(연 2,000만) 기준으로 설계</td>
+</tr>
+<tr>
+<td>커버드콜 ETF의 생산적금융 ISA 편입 가능 여부</td>
+<td><strong>시행령 대기</strong> — 의존하지 않는 설계로 회피</td>
+</tr>
+<tr>
+<td>본인 ISA 잔여 납입한도 정확치</td>
+<td>증권사 조회 필요</td>
+</tr>
+<tr>
+<td>아내 소득 구간 (한계세율 26.4%는 추정)</td>
+<td>확인 시 절세액 정밀화</td>
+</tr>
+<tr>
+<td>PS 지급액·형태·시점</td>
+<td>추정치(1억, 2027-02 초)</td>
+</tr>
+<tr>
+<td>플랫폼시티 공고 시점</td>
+<td>미발표, 자동감시 중</td>
+</tr>
+<tr>
+<td>커버드콜 NAV 침식률</td>
+<td>미측정 (Phase 1)</td>
+</tr>
+<tr>
+<td>고배당 후보 실제 배당률</td>
+<td>미측정 (Phase 1)</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>위 미확정 항목은 모두 "확정되면 유리해지는" 방향이다.</strong> 보수 가정으로 설계했다.</p>
+<hr>
+<h2>12. 다음 단계</h2>
+<ol>
+<li><strong>즉시(9월 중)</strong> — 부부 ISA 2026년분 납입 한도 확보. 증권사에 본인 ISA 잔여한도 조회</li>
+<li><strong>아내 증여 설계</strong> — 현금 기준, 이월과세 회피. 6억 공제 범위 내 분할</li>
+<li>Phase 1 잔여 실측 — 배당률 상위(<code>HHKDB13470100</code>), 배당일정(<code>HHKDB669102C0</code>),
+   커버드콜 NAV(<code>FHPST02440200</code>), 채권 종목명(<code>search_bond_info</code>)</li>
+<li>실측 반영해 <strong>종목·비중 확정</strong></li>
+<li>리밸런싱 트리거를 브리핑 자동감시에 연결</li>
+</ol>
+<hr>
+<h2>Sources</h2>
+<p><strong>실측 데이터</strong>
+- <code>sources/portfolio-holdings.csv</code>, <code>sources/portfolio-bonds.csv</code> (2026-09-12 KIS API)
+- <code>config/portfolio.yaml</code>, <code>config/user.yaml</code>
+- <code>wiki/monitoring/</code> 추적 축 5종, <code>data/manual_inputs/economic_calendar_2026.yaml</code>
+- 사용자 제공: 이사계획 시트, 장내채권 시세표, ISA 현황, DC 계좌 총계, PS 지급 예상</p>
+<p><strong>세제</strong>
+- <a href="https://www.news1.kr/amp/economy/trend/6246654">국내투자 이자·배당 전액 비과세…'생산적 금융 ISA' 신설 (뉴스1)</a>
+- <a href="https://www.newspim.com/news/view/20260731001283">[2026 세제개편] 생산적금융 ISA 신설 (뉴스핌)</a>
+- <a href="https://www.tokenpost.kr/news/policy/402982">생산적금융 ISA, 2억원 한도로 이자·배당 비과세 (TokenPost)</a>
+- <a href="https://www.thepublic.kr/news/articleView.html?idxno=317252">정부, ISA 혜택 축소안 사실상 철회 (더퍼블릭)</a>
+- <a href="https://www.sejungilbo.com/news/articleView.html?idxno=59908">정부, 2026년 세제개편안 확정 (세정일보)</a>
+- <a href="https://obank.kbstar.com/quics?page=C041167">ISA 세제 혜택 — 비과세 한도, 절세 효과 (KB국민은행)</a>
+- <a href="https://www.pwc.com/kr/ko/insights/issue-brief/one-point-tax-11.html">금융소득종합과세 대상자 금융상품별 과세방식과 절세 전략 (삼일PwC)</a></p>
+</body>
+</html>

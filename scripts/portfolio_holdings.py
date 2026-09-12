@@ -74,6 +74,30 @@ HOLDING_FIELDS = {
 # — DC는 코드 문제가 아니라 KIS API 자체가 지원하지 않는 것으로 보임.
 PENSION_BALANCE_TR = "TTTC2202R"
 
+# KIS "장내채권 잔고조회" TR: CTSC8407R — 2026-09-12 stevekoo-ai/open-trading-api
+# examples_llm/domestic_bond/inquire_balance/ 에서 TR ID·파라미터·응답 필드명을
+# 전부 대조 확인(추측 아님). GET /uapi/domestic-bond/v1/trading/inquire-balance
+#
+# ⚠ 주식잔고 TR(TTTC8434R)은 채권을 돌려주지 않는다 — 2026-09-12에 사용자가
+# "ISA에 만기 2027-01-18 채권 3천만원이 있다"고 했는데 portfolio-holdings.csv
+# 어디에도 없던 이유가 이것이다. 채권은 이 별도 TR로만 조회된다.
+BOND_BALANCE_TR = "CTSC8407R"
+BOND_FIELDS = {
+    "ticker": "pdno",            # 상품번호(종목코드)
+    "buy_date": "buy_dt",        # 매수일자
+    "quantity": "cblc_qty",      # 잔고수량
+    "maturity": "exdt",          # 만기일  <- 만기 사다리 설계의 핵심
+    "buy_yield": "buy_erng_rt",  # 매수수익율
+    "buy_price": "buy_unpr",     # 매수단가
+    "buy_amount": "buy_amt",     # 매수금액
+    "orderable_qty": "ord_psbl_qty",  # 주문가능수량
+}
+BOND_CSV_PATH = Path(__file__).resolve().parent.parent / "sources" / "portfolio-bonds.csv"
+BOND_CSV_FIELDS = [
+    "date", "account_label", "ticker", "buy_date", "quantity", "maturity",
+    "buy_yield", "buy_price", "buy_amount", "orderable_qty", "source", "fetched_at",
+]
+
 # 계좌 슬롯: 환경변수 접미사 -> (표시 라벨, 퇴직연금 여부)
 ACCOUNT_SLOTS = {
     "GEN": ("일반", False),
@@ -264,6 +288,154 @@ def fetch_pension_balance(cano, prdt_cd, appkey, appsecret, account_type="real",
     return _parse_holdings(data)
 
 
+def fetch_bond_balance(cano, prdt_cd, appkey, appsecret, account_type="real", raw=False):
+    """장내채권 잔고조회(CTSC8407R). 주식잔고 TR이 안 주는 채권을 여기서 가져온다."""
+    token = kis_get_token(appkey, appsecret, account_type)
+    host = KIS_HOSTS[account_type]
+
+    params = (
+        f"CANO={cano}&ACNT_PRDT_CD={prdt_cd}&INQR_CNDT=00&PDNO=&BUY_DT="
+        f"&CTX_AREA_FK200=&CTX_AREA_NK200="
+    )
+    req = urllib.request.Request(
+        f"{host}/uapi/domestic-bond/v1/trading/inquire-balance?{params}",
+        headers={
+            "content-type": "application/json; charset=utf-8",
+            "authorization": f"Bearer {token}",
+            "appkey": appkey,
+            "appsecret": appsecret,
+            "tr_id": BOND_BALANCE_TR,
+        },
+    )
+    try:
+        with urllib.request.urlopen(req) as resp:
+            data = json.loads(resp.read())
+    except urllib.error.HTTPError as e:
+        sys.exit(f"KIS 장내채권 잔고조회 API 실패: {e.code} {e.read().decode(errors='replace')}")
+
+    if raw:
+        print(json.dumps(data, ensure_ascii=False, indent=2))
+        return []
+
+    return _parse_bonds(data)
+
+
+def _parse_bonds(data):
+    """채권 잔고 파싱. 필드가 없으면 조용히 빈 리스트를 돌려주지 않고 죽는다 —
+    '채권이 없다'와 '필드명이 틀려서 못 읽었다'를 구분 못 하면, 실제로는 보유
+    중인데 없다고 보고하는 사고가 난다(2026-09-12 재발방지 원칙)."""
+    rows = data.get("output")
+    if rows is None:
+        sys.exit(
+            "응답에서 output(채권 잔고 목록)을 찾지 못했습니다 — --raw로 원본을 "
+            "확인하고 BOND_FIELDS/추출 키를 실제 응답 구조에 맞게 고치세요."
+        )
+    if not isinstance(rows, list):
+        rows = [rows]
+    rows = [r for r in rows if r]
+    if not rows:
+        return []  # 채권 미보유 — 정상
+
+    missing = [v for v in BOND_FIELDS.values() if v not in rows[0]]
+    if missing:
+        sys.exit(
+            f"채권 응답에 예상 필드가 없습니다: {missing}. --raw로 원본을 확인해 "
+            "BOND_FIELDS를 실제 필드명으로 고치세요."
+        )
+
+    bonds = []
+    for r in rows:
+        try:
+            qty = float(r[BOND_FIELDS["quantity"]] or 0)
+        except ValueError:
+            qty = 0
+        if qty == 0:
+            continue
+        bonds.append({k: r[v] for k, v in BOND_FIELDS.items()})
+    return bonds
+
+
+def _read_bond_csv():
+    if not BOND_CSV_PATH.exists():
+        return {}
+    rows = {}
+    with BOND_CSV_PATH.open(newline="", encoding="utf-8") as f:
+        for row in csv.DictReader(f):
+            rows[(row["date"], row["account_label"], row["ticker"], row["buy_date"])] = row
+    return rows
+
+
+def upsert_bonds(account_label, bonds, source="kis_api"):
+    existing = _read_bond_csv()
+    today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    fetched_at = datetime.now(timezone.utc).isoformat(timespec="seconds")
+    existing = {k: v for k, v in existing.items() if not (k[0] == today and k[1] == account_label)}
+    for b in bonds:
+        key = (today, account_label, b["ticker"], b["buy_date"])
+        existing[key] = {
+            "date": today, "account_label": account_label, "source": source,
+            "fetched_at": fetched_at, **b,
+        }
+    BOND_CSV_PATH.parent.mkdir(parents=True, exist_ok=True)
+    ordered = sorted(existing.values(),
+                     key=lambda r: (r["date"], r["account_label"], r["maturity"], r["ticker"]))
+    with BOND_CSV_PATH.open("w", newline="", encoding="utf-8") as f:
+        w = csv.DictWriter(f, fieldnames=BOND_CSV_FIELDS)
+        w.writeheader()
+        for r in ordered:
+            w.writerow(r)
+    return len(bonds)
+
+
+def cmd_bonds(args):
+    """장내채권 잔고를 계좌별로 조회해 sources/portfolio-bonds.csv에 기록.
+
+    **수집 결과를 반드시 명시 집계하고, 하나라도 실패하면 0이 아닌 종료코드로
+    끝낸다** — 2026-09-11 브리핑 사고(작업은 됐는데 산출물이 유실됐는데도
+    SUCCEEDED로 보고됨)의 재발 방지. 워크플로는 이 종료코드를 보고 실패한다."""
+    accounts = _load_accounts()
+    if args.account:
+        accounts = [a for a in accounts if a["slot"] == args.account.upper()]
+        if not accounts:
+            sys.exit(f"'{args.account}' 슬롯은 등록되지 않았습니다(GEN/ISP/DC/IRP 중 하나).")
+
+    ok, failed, total = [], [], 0
+    for acc in accounts:
+        if acc["slot"] == "DC":
+            print(f"[{acc['label']}] DC는 KIS API 미지원 — 건너뜀", file=sys.stderr)
+            continue
+        try:
+            appkey, appsecret = _get_account_keys(acc["slot"])
+            bonds = fetch_bond_balance(acc["cano"], acc["prdt_cd"], appkey, appsecret,
+                                       args.account_type, raw=args.raw)
+        except SystemExit as e:
+            failed.append((acc["label"], str(e)))
+            print(f"[{acc['label']}] 채권 조회 실패: {e}", file=sys.stderr)
+            continue
+        if args.raw:
+            continue
+        n = upsert_bonds(acc["label"], bonds)
+        total += n
+        ok.append((acc["label"], n))
+        print(f"[{acc['label']}] 채권 {n}건 기록")
+
+    if args.raw:
+        return
+
+    print("")
+    print("=== 채권 수집 결과 ===")
+    for label, n in ok:
+        print(f"  [OK] {label}: {n}건")
+    for label, err in failed:
+        print(f"  [FAIL] {label}: {err}")
+    print(f"  합계 {total}건 -> {BOND_CSV_PATH}")
+
+    if failed:
+        sys.exit(f"{len(failed)}개 계좌 조회 실패 — 워크플로를 실패로 처리합니다.")
+    if not ok:
+        sys.exit("조회에 성공한 계좌가 하나도 없습니다 — 설정을 확인하세요.")
+
+
 def _read_csv():
     if not CSV_PATH.exists():
         return {}
@@ -344,6 +516,12 @@ def main():
     ps.add_argument("--account-type", default=os.environ.get("KIS_ACCOUNT_TYPE", "real"), choices=["real", "vts"])
     ps.add_argument("--raw", action="store_true", help="파싱하지 않고 원본 JSON만 출력(필드명 검증용)")
     ps.set_defaults(func=cmd_sync)
+
+    pb = sub.add_parser("bonds", help="장내채권 잔고 조회+CSV 기록(CTSC8407R)")
+    pb.add_argument("--account", help="GEN/ISP/DC/IRP 중 하나, 생략시 등록된 계좌 전체")
+    pb.add_argument("--account-type", default=os.environ.get("KIS_ACCOUNT_TYPE", "real"), choices=["real", "vts"])
+    pb.add_argument("--raw", action="store_true", help="파싱하지 않고 원본 JSON만 출력(필드명 검증용)")
+    pb.set_defaults(func=cmd_bonds)
 
     args = p.parse_args()
     args.func(args)
