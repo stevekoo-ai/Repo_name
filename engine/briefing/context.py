@@ -262,6 +262,7 @@ TRIGGER_TO_DIGEST_ORDER = [
     "data-center-construction-vs-opposition",
     "situational-awareness-fund-liquidation",
     "sk-hynix-decision-tracker",
+    "rate-outlook-scenario",
 ]
 
 
@@ -323,6 +324,23 @@ def detect_triggers(as_of: date) -> tuple[set[str], list[str]]:
         if abs(chg) >= 20:
             fired |= {"market-cycles-leverage-risk", "panic-recovery-signals"}
             why.append(f"VIX 5일 {chg:+.0f}%")
+
+    # 금리 전망 3대 시나리오 — 한은 기준금리 변동(디커플링 축 직접 증거)
+    # 또는 FOMC/금통위가 임박했을 때(±3일) 켜진다. 2026-09-12
+    # rate-outlook-scenarios-2026 참고.
+    rb = rows("kr_base_rate")
+    if len(rb) >= 2 and rb[-1][1] != rb[-2][1]:
+        fired.add("rate-outlook-scenario")
+        why.append(f"한국 기준금리 변동 {rb[-2][1]:.2f}→{rb[-1][1]:.2f}")
+    try:
+        from engine.briefing import calendar as C
+        for ev in C.upcoming_events(as_of, horizon_days=3):
+            if ev.get("type") in ("FOMC", "BOK"):
+                fired.add("rate-outlook-scenario")
+                why.append(f"{ev['date']} {ev['name']} 임박")
+                break
+    except Exception:
+        pass
 
     return fired, why
 
@@ -470,6 +488,9 @@ def build_weekly_outlook_block(as_of: date) -> Block:
         lines.append("**확정 일정**")
         for e in confirmed:
             lines.append(f"- {e['date']} [{e.get('country','')}/{e.get('type','')}] {e['name']}")
+            analog = C.historical_analog(e.get("type", ""))
+            if analog:
+                lines.append(f"  - 📜 과거 유사 사례(패턴 참고용, 확정 아님): {analog['note'].strip()}")
         lines.append("")
 
     patterns = C.pattern_events()

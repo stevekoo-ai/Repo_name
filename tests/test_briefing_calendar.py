@@ -134,3 +134,27 @@ def test_weekend_outlook_surfaces_predictions_due_next_week(tmp_path, monkeypatc
 def test_weekend_outlook_lists_stale_digests_for_followup():
     block = CTX.build_weekly_outlook_block(date(2026, 9, 12))
     assert "오래 안 갱신된" in block.body
+
+
+# ── 과거 유사 사례 비교 (사용자 요청: "선거·정책 이벤트 시장 영향 히스토리") ──
+
+def test_historical_analog_returns_fomc_pattern():
+    analog = C.historical_analog("FOMC")
+    assert analog is not None
+    assert analog["confirmed"] is False
+    assert "note" in analog
+
+
+def test_historical_analog_unknown_type_returns_none():
+    assert C.historical_analog("NOT_A_REAL_TYPE") is None
+
+
+def test_weekly_outlook_attaches_historical_note_to_fomc_event():
+    block = CTX.build_weekly_outlook_block(date(2026, 9, 12))
+    assert "과거 유사 사례" in block.body
+    assert "확정 아님" in block.body
+
+
+def test_rate_outlook_scenario_trigger_fires_on_kr_base_rate_change():
+    triggers, why = CTX.detect_triggers(date(2026, 8, 1))  # kr_base_rate 7월→8월 변동일
+    assert "rate-outlook-scenario" in triggers

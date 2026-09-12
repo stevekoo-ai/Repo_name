@@ -29,6 +29,7 @@ import yaml
 REPO = Path(__file__).resolve().parents[2]
 _HOLIDAY_FILE = REPO / "data" / "manual_inputs" / "market_holidays_2026.yaml"
 _CALENDAR_FILE = REPO / "data" / "manual_inputs" / "economic_calendar_2026.yaml"
+_HISTORY_FILE = REPO / "data" / "manual_inputs" / "event_historical_reactions.yaml"
 
 
 def _load_holidays() -> dict[str, set[str]]:
@@ -151,3 +152,16 @@ def upcoming_events(as_of: date, horizon_days: int = 7) -> list[dict]:
 def pattern_events() -> list[dict]:
     """날짜가 확정이 아니라 반복 패턴으로 적힌 항목(비농업고용 등)."""
     return [ev for ev in _load_events() if ev.get("type") == "INDICATOR_PATTERN"]
+
+
+def historical_analog(event_type: str) -> dict | None:
+    """이벤트 유형(FOMC/BOK/ELECTION/EARNINGS)의 과거 유사 사례 비교 노트.
+
+    ⚠️ 회차별 정밀 수치가 아니라 위키에 이미 기록된 실제 사건에서 뽑은
+    **정성적 패턴**이다(이 저장소는 "이번 FOMC 때 KOSPI가 몇 % 움직였다"는
+    회차별 로그를 자동 수집하지 않는다). `confirmed`는 항상 False로
+    고정돼 있고, 호출부가 이걸 확정 예측처럼 쓰면 안 된다(R1)."""
+    if not _HISTORY_FILE.exists():
+        return None
+    doc = yaml.safe_load(_HISTORY_FILE.read_text(encoding="utf-8")) or {}
+    return doc.get("patterns", {}).get(event_type)
