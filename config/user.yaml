@@ -64,6 +64,17 @@ housing:
   # (engine/exposure/model.py의 deployable_cash와는 별도로 housing_entry_funds_total에
   # 합산 — "지금 가용"과 "회수 시점 도래 시 가용"을 구분해서 보여준다).
   current_jeonse_deposit_krw: 462000000
+  # 2026-09-12 사용자 확인 — 실제 이사일과 전세금 회수일은 같은 날이다.
+  # 계약 만료일(moveout_deadline 2027-02-22)보다 이틀 앞당겨 동시 정산.
+  # 즉 보증금 지급과 전세금 회수가 동시에 일어나 브리지 자금이 필요 없다.
+  actual_move_date: "2027-02-20"
+  jeonse_return_date: "2027-02-20"
+  new_deposit_krw: 100000000        # 하이브엘 보증금
+  new_monthly_rent_krw: 2700000     # 월세(2년 계약, 갱신 시 5% 상한)
+  # 2027-02 초 SK하이닉스 PS(성과급) 지급 예상 — 현금 또는 주식 약 1억원.
+  # 사용자 추정치이며 확정 아님(금액·형태·지급일 전부 미확정).
+  expected_ps_krw: 100000000
+  expected_ps_timing: "2027-02-초(추정)"
 
 travel:
   business_trip_enabled: true
