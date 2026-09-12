@@ -42,7 +42,7 @@ def find_markdown(day: date, slot: str) -> Path | None:
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__,
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("--slot", choices=("AM", "PM"), required=True)
+    ap.add_argument("--slot", choices=("AM", "PM", "WEEKEND"), required=True)
     ap.add_argument("--date", default=None, help="YYYY-MM-DD (기본: 오늘)")
     ap.add_argument("--no-email", action="store_true", help="HTML만 만들고 발송은 건너뜀")
     ap.add_argument("--allow-unconfigured", action="store_true",
@@ -79,7 +79,7 @@ def main() -> int:
         print(f"[error] {msg}", file=sys.stderr)
         return 1
 
-    label = "아침" if args.slot == "AM" else "저녁"
+    label = {"AM": "아침", "PM": "저녁", "WEEKEND": "주간 전망"}[args.slot]
     subject = f"[PEOS {label} 브리핑] {day.isoformat()}"
     try:
         notify.build_channel().send_document(subject, html, attachments=[html_path])

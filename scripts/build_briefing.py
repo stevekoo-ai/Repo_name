@@ -26,7 +26,7 @@ QUIET_EXIT = 10
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__,
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("--slot", choices=("AM", "PM"), required=True)
+    ap.add_argument("--slot", choices=("AM", "PM", "WEEKEND"), required=True)
     ap.add_argument("--as-of", help="YYYY-MM-DD (기본: 오늘 KST)")
     ap.add_argument("--out", help="출력 경로 (기본: data/briefing/pack_<slot>.md)")
     args = ap.parse_args()

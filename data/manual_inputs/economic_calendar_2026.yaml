@@ -1,0 +1,62 @@
+# 2026년 반복 이벤트 캘린더 — 수동 관리 (FOMC·금통위·실적·선거).
+#
+# `confirmed: true`는 실제 발표된 일정(2026-09-12 웹서치로 확인, 출처 note).
+# `confirmed: false`는 과거 패턴에서 추정한 근사치 — 도래 임박 시 뉴스로
+# 재확인 필요. 두 등급을 섞어 쓰지 말 것 — 브리핑이 근사치를 확정처럼 쓰면
+# R1(측정>추론) 위반이다. calendar.py가 렌더링할 때 confirmed=false는
+# 반드시 "(추정)" 표기를 붙인다.
+
+events:
+  # ── FOMC (미국 연준 금리결정) ──
+  - { date: "2026-04-28", end_date: "2026-04-29", country: US, type: FOMC,
+      name: "FOMC 회의·금리결정", confirmed: true,
+      note: "SEP·점도표 동반 아님" }
+  - { date: "2026-06-16", end_date: "2026-06-17", country: US, type: FOMC,
+      name: "FOMC 회의·금리결정 (SEP·점도표)", confirmed: true }
+  - { date: "2026-07-28", end_date: "2026-07-29", country: US, type: FOMC,
+      name: "FOMC 회의·금리결정", confirmed: true }
+  - { date: "2026-09-15", end_date: "2026-09-16", country: US, type: FOMC,
+      name: "FOMC 회의·금리결정 (SEP·점도표)", confirmed: true }
+  - { date: "2026-10-27", end_date: "2026-10-28", country: US, type: FOMC,
+      name: "FOMC 회의·금리결정", confirmed: true }
+  - { date: "2026-12-08", end_date: "2026-12-09", country: US, type: FOMC,
+      name: "FOMC 회의·금리결정 (SEP·점도표)", confirmed: true }
+  # 1월·3월 FOMC 일정은 2026-09-12 조사 시점에 미확인 — 연준 캘린더 재확인 필요.
+
+  # ── 한국은행 금융통화위원회 (통화정책방향 결정회의) ──
+  - { date: "2026-01-15", country: KR, type: BOK, name: "금통위 기준금리 결정", confirmed: true }
+  - { date: "2026-02-26", country: KR, type: BOK, name: "금통위 기준금리 결정", confirmed: true }
+  - { date: "2026-04-10", country: KR, type: BOK, name: "금통위 기준금리 결정", confirmed: true }
+  - { date: "2026-05-28", country: KR, type: BOK, name: "금통위 기준금리 결정", confirmed: true }
+  - { date: "2026-07-16", country: KR, type: BOK, name: "금통위 기준금리 결정", confirmed: true }
+  - { date: "2026-08-27", country: KR, type: BOK, name: "금통위 기준금리 결정", confirmed: true }
+  - { date: "2026-10-22", country: KR, type: BOK, name: "금통위 기준금리 결정", confirmed: true }
+  - { date: "2026-11-26", country: KR, type: BOK, name: "금통위 기준금리 결정", confirmed: true }
+
+  # ── 선거 ──
+  - { date: "2026-06-03", country: KR, type: ELECTION,
+      name: "제9회 전국동시지방선거 (증시 휴장)", confirmed: true }
+  - { date: "2026-11-03", country: US, type: ELECTION,
+      name: "미국 중간선거", confirmed: true, note: "11월 첫째 월요일 다음 화요일 고정" }
+
+  # ── 실적발표 (근사 — 분기 말 발표 관행 기준) ──
+  - { date: "2026-01-27", country: KR, type: EARNINGS,
+      name: "SK하이닉스 4Q25 잠정실적 발표 (추정)", confirmed: false }
+  - { date: "2026-04-24", country: KR, type: EARNINGS,
+      name: "SK하이닉스 1Q26 잠정실적 발표 (추정)", confirmed: false }
+  - { date: "2026-07-24", country: KR, type: EARNINGS,
+      name: "SK하이닉스 2Q26 잠정실적 발표 (추정)", confirmed: false }
+  - { date: "2026-10-23", country: KR, type: EARNINGS,
+      name: "SK하이닉스 3Q26 잠정실적 발표 (추정)", confirmed: false }
+  - { date: "2026-11-25", country: US, type: EARNINGS,
+      name: "마이크론 FQ1'27 실적 발표 (추정 — 회계연도 기준)", confirmed: false }
+
+  # ── 지표 발표 주기 (근사 패턴 — 매월 정확한 날짜는 BLS/통계청이 매번 재공지) ──
+  - { date: "매월 첫째 금요일", country: US, type: INDICATOR_PATTERN,
+      name: "미 비농업 고용지표(Payrolls)", confirmed: false }
+  - { date: "매월 둘째~셋째 주 중반", country: US, type: INDICATOR_PATTERN,
+      name: "미 CPI 발표", confirmed: false }
+  - { date: "CPI 발표 익일", country: US, type: INDICATOR_PATTERN,
+      name: "미 PPI 발표", confirmed: false }
+  - { date: "매월 1일 (관세청 잠정치는 11·21일)", country: KR, type: INDICATOR_PATTERN,
+      name: "한국 수출입 통계", confirmed: false }

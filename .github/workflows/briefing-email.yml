@@ -21,7 +21,7 @@ on:
   workflow_dispatch:
     inputs:
       slot:
-        description: "AM 또는 PM (비우면 가장 최근 브리핑)"
+        description: "AM, PM 또는 WEEKEND (비우면 가장 최근 브리핑)"
         required: false
         default: ""
       date:
