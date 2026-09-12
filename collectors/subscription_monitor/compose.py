@@ -10,17 +10,24 @@ GitHub Issues, and the Date/Message-ID anti-silent-drop fix.
 Send-event taxonomy (in priority order):
   NEW_MATCH     — a listing matching an alert keyword we haven't notified yet. → email + issue, immediate
   PRIORITY_UP   — an already-known listing's priority rose (e.g. reception D-1 arrived). → email only, immediate
+  INCOME_REVIEW — a listing not otherwise covered above gets its 소득요건 자동분석
+                   opened for the first time (사용자 요청 2026-09-13: 앞으로 확인되는
+                   모든 공공분양을 15건까지 직접 열어서 60㎡ 초과 일반공급 소득 무관
+                   여부를 검증). → email only, immediate. Capped at
+                   income_review_tracker.REVIEW_CAP total distinct listings.
   OUTAGE        — API unhealthy for FAILURE_THRESHOLD consecutive runs. → email + issue, immediate (existing)
   RECOVERY      — API came back after an outage. → email only, immediate (existing)
   DAILY_DIGEST  — once per day, first healthy run at/after HEARTBEAT_HOUR_KST. → email only. The
                    "조사 결과를 꼭 email로 받는다" channel — always sends a summary even with no matches.
+                   Always includes the cumulative income-review progress (x회/15회).
 
 State files (migrated from alerts.py):
-  alerted_state.json  — was a bare list of ids. Now an object map {id: {"priority": "...", "keyword": ...}}
-                        for PRIORITY_UP tracking. Loader is backward-compatible (a bare list is read as
-                        {id: {}}). Writer always emits the new shape.
-  health_state.json   — structure unchanged; last_heartbeat_date renamed in spirit to last_digest_date
-                        (field kept as last_heartbeat_date for backward-compat with existing files).
+  alerted_state.json      — was a bare list of ids. Now an object map {id: {"priority": "...", "keyword": ...}}
+                            for PRIORITY_UP tracking. Loader is backward-compatible (a bare list is read as
+                            {id: {}}). Writer always emits the new shape.
+  health_state.json       — structure unchanged; last_heartbeat_date renamed in spirit to last_digest_date
+                            (field kept as last_heartbeat_date for backward-compat with existing files).
+  income_review_state.json — {"count": int, "reviews": [...]} — see income_review_tracker.py.
 """
 
 import json
@@ -29,6 +36,7 @@ from datetime import datetime
 
 import alerts
 import income_analysis
+import income_review_tracker
 from judge import judge_listings, summarize, ALERT_KEYWORDS, MY_ACCOUNT_SCORE
 
 FAILURE_THRESHOLD = 6  # 6 consecutive 5-min failures ≈ 30 min of no data (matches alerts.py)
@@ -94,48 +102,76 @@ def _listing_detail_lines(v: dict) -> list[str]:
     ]
 
 
-def _income_analysis_lines(income: dict | None) -> list[str]:
+def _income_analysis_lines(income: dict | None, review_state: dict | None = None) -> list[str]:
     """Render collectors/subscription_monitor/income_analysis.py's result for
     the alert email body. income is None when analysis wasn't attempted (e.g.
-    PRIORITY_UP re-notify), and a dict with status="failed"|"ok" when it was."""
+    PRIORITY_UP re-notify), and a dict with status="failed"|"ok" when it was.
+    review_state (income_review_tracker), when given, appends the cumulative
+    "x회/15회" progress line — 사용자 요청 2026-09-13."""
     if income is None:
         return []
     lines = ["", "── 소득요건 자동분석 (LH청약플러스 모집공고문 PDF) ──"]
     if income.get("status") != "ok":
         lines.append(f"⚠️ 자동분석 실패 ({income.get('stage', '?')} 단계) — {income.get('reason', '사유 미상')}")
         lines.append("LH청약플러스(apply.lh.or.kr)에서 단지명으로 직접 검색해 공고문을 확인해 주세요.")
-        return lines
-
-    lines.append(f"사업유형: {income['business_type']}")
-    scope_note = {
-        "전체검증": "전용면적 무관, 전원 소득검증 대상",
-        "60㎡이하만검증": "특별공급 전원 + 일반공급은 60㎡ 이하만 소득검증 (60㎡ 초과 일반공급은 소득 무관)",
-    }.get(income["income_scope"], "판별 실패 — 원문 직접 확인 필요")
-    lines.append(f"소득검증 범위: {income['income_scope']} ({scope_note})")
-    if income.get("percentages_found"):
-        pct = "~".join([str(min(income["percentages_found"])), str(max(income["percentages_found"]))])
-        lines.append(f"소득배율 범위: {pct}% (도시근로자 가구당 월평균소득 기준)")
-    if income.get("exceptions"):
-        lines.append("⚠️ 예외 발견 (프레임워크 규칙과 다름, 원문 확인 권장):")
-        for exc in income["exceptions"]:
-            lines.append(f"  - {exc}")
     else:
-        lines.append("✅ 기존 3건(성남복정·인천계양·양주회천) 패턴과 일치, 예외 없음")
-    if income.get("pdf_url"):
-        lines.append(f"공고문 상세페이지: {income['pdf_url']}")
-    lines.append(
-        "판별 근거: wiki/concepts/public-housing-income-requirement-framework.md "
-        "(새 예외는 그 페이지의 '예외 사례' 절에 수동 확인 후 기록할 것)"
-    )
+        lines.append(f"사업유형: {income['business_type']}")
+        scope_note = {
+            "전체검증": "전용면적 무관, 전원 소득검증 대상",
+            "60㎡이하만검증": "특별공급 전원 + 일반공급은 60㎡ 이하만 소득검증 (60㎡ 초과 일반공급은 소득 무관)",
+        }.get(income["income_scope"], "판별 실패 — 원문 직접 확인 필요")
+        lines.append(f"소득검증 범위: {income['income_scope']} ({scope_note})")
+        if income.get("percentages_found"):
+            pct = "~".join([str(min(income["percentages_found"])), str(max(income["percentages_found"]))])
+            lines.append(f"소득배율 범위: {pct}% (도시근로자 가구당 월평균소득 기준)")
+        if income.get("exceptions"):
+            lines.append("⚠️ 예외 발견 (프레임워크 규칙과 다름, 원문 확인 권장):")
+            for exc in income["exceptions"]:
+                lines.append(f"  - {exc}")
+        else:
+            lines.append("✅ 기존 검증 사례 패턴과 일치, 예외 없음")
+        if income.get("pdf_url"):
+            lines.append(f"공고문 상세페이지: {income['pdf_url']}")
+        lines.append(
+            "판별 근거: wiki/concepts/public-housing-income-requirement-framework.md "
+            "(새 예외는 그 페이지의 '예외 사례' 절에 수동 확인 후 기록할 것)"
+        )
+    if review_state is not None:
+        lines.append(f"누적 소득요건 검증 진행: {income_review_tracker.progress_label(review_state)}")
     return lines
 
 
-def compose_new_match(v: dict, is_test: bool, income: dict | None = None) -> tuple[str, str]:
+def compose_new_match(v: dict, is_test: bool, income: dict | None = None, review_state: dict | None = None) -> tuple[str, str]:
     prefix = "[테스트] " if is_test else ""
     title = f"{prefix}[청약 알림 · {v['match_keyword']}] {v['name']}"
     head = "테스트 알림입니다 (실제 매물이 아닙니다).\n" if is_test else ""
-    lines = [head, *_listing_detail_lines(v), *_income_analysis_lines(income)]
+    lines = [head, *_listing_detail_lines(v), *_income_analysis_lines(income, review_state)]
     return title, "\n".join(l for l in lines if l != "" or True)
+
+
+def compose_income_review(v: dict, income: dict, review_state: dict) -> tuple[str, str]:
+    """A listing reviewed purely for the 15건 소득요건 검증 goal — not a
+    personal-interest keyword match (those go through compose_new_match
+    instead, which also folds in the same _income_analysis_lines +
+    progress line so a listing is never reported twice)."""
+    progress = income_review_tracker.progress_label(review_state)
+    tag = "⚠️ 예외 발견" if income.get("exceptions") else ("✅ 정상" if income.get("status") == "ok" else "❌ 분석 실패")
+    title = f"[소득요건 자동검증 {progress}] {tag} — {v['name']}"
+    lines = [
+        f"60㎡ 초과 일반공급 소득요건 자동검증 파이프라인이 신규 국민주택 공고를 열람했습니다 "
+        f"(관심 키워드 매칭과 무관 — 전체 서울·경기 국민주택 대상, 최대 {income_review_tracker.REVIEW_CAP}건).",
+        "",
+        *_listing_detail_lines(v),
+        *_income_analysis_lines(income, review_state),
+    ]
+    if review_state["count"] >= income_review_tracker.REVIEW_CAP:
+        exc = income_review_tracker.exception_count(review_state)
+        lines += [
+            "",
+            f"🏁 목표 {income_review_tracker.REVIEW_CAP}건 검증 완료 — 누적 예외 발견 {exc}건.",
+            "이후로는 자동 검증을 추가로 수행하지 않습니다 (income_review_state.json count 고정).",
+        ]
+    return title, "\n".join(lines)
 
 
 def compose_priority_up(v: dict) -> tuple[str, str]:
@@ -165,7 +201,29 @@ def compose_recovery(now_str: str) -> tuple[str, str]:
     return title, body
 
 
-def compose_daily_digest(verdicts: list[dict], summary: dict, now_str: str, today_str: str) -> tuple[str, str]:
+def _income_review_progress_lines(review_state: dict) -> list[str]:
+    """Cumulative x회/15회 section for the daily digest — 사용자 요청
+    2026-09-13: 매 확인마다 회차를 알리고, 검토 결과가 보고서에 남아있을 것."""
+    progress = income_review_tracker.progress_label(review_state)
+    reviews = review_state.get("reviews", [])
+    lines = ["", f"── 60㎡ 초과 일반공급 소득요건 자동검증 ({progress}) ──"]
+    if not reviews:
+        lines.append("아직 검토된 공고 없음 — 신규 국민주택 공고 발견 시 자동으로 모집공고문을 열어 확인합니다.")
+        return lines
+    if review_state["count"] >= income_review_tracker.REVIEW_CAP:
+        exc = income_review_tracker.exception_count(review_state)
+        lines.append(f"🏁 목표 {income_review_tracker.REVIEW_CAP}건 검증 완료 — 누적 예외 {exc}건. 추가 검증은 수행하지 않습니다.")
+    recent = reviews[-5:]
+    for r in recent:
+        tag = "⚠️예외" if r.get("exceptions") else ("✅정상" if r.get("status") == "ok" else "❌실패")
+        scope = r.get("income_scope") or r.get("reason") or "-"
+        lines.append(f"  {tag} {r['name']} ({r['region']}) — {scope} [{r['reviewed_at']}]")
+    if len(reviews) > len(recent):
+        lines.append(f"  …외 {len(reviews) - len(recent)}건 (전체 내역: docs/subscription-monitor.html)")
+    return lines
+
+
+def compose_daily_digest(verdicts: list[dict], summary: dict, now_str: str, today_str: str, review_state: dict | None = None) -> tuple[str, str]:
     title = f"청약 모니터 일일 요약 ({today_str})"
     lines = [
         "매일 발송되는 조사 결과 요약입니다. 이 메일이 계속 온다면 시스템이 정상 작동 중이라는 뜻입니다.",
@@ -205,6 +263,8 @@ def compose_daily_digest(verdicts: list[dict], summary: dict, now_str: str, toda
         "신규 매칭(플랫폼시티/광교/원천동)이 있었다면 별도 즉시 알림을 이미 받으셨을 것입니다.",
         f"대시보드: {alerts.DASHBOARD_URL}",
     ]
+    if review_state is not None:
+        lines += _income_review_progress_lines(review_state)
     return title, "\n".join(lines)
 
 
@@ -234,7 +294,7 @@ def run_pipeline(verdicts: list[dict], healthy: bool, now_kst: datetime, seoul_g
     now_str = now_kst.strftime("%Y-%m-%d %H:%M KST")
     today_str = now_kst.strftime("%Y-%m-%d")
 
-    fired = {"new_match": 0, "priority_up": 0, "outage": False, "recovery": False, "digest": False}
+    fired = {"new_match": 0, "priority_up": 0, "income_review": 0, "outage": False, "recovery": False, "digest": False}
     extra_keyword = os.environ.get("EXTRA_TEST_KEYWORD") or None
     is_test = bool(extra_keyword)
 
@@ -257,8 +317,9 @@ def run_pipeline(verdicts: list[dict], healthy: bool, now_kst: datetime, seoul_g
     health["consecutive_failures"] = 0
     health["outage_alerted"] = False
 
-    # --- NEW_MATCH + PRIORITY_UP (API healthy) ---
+    # --- NEW_MATCH + PRIORITY_UP + INCOME_REVIEW (API healthy) ---
     state = load_alerted_state()
+    review_state = income_review_tracker.load_state()
     for v in verdicts:
         lid = v["id"]
         if not lid:
@@ -266,15 +327,20 @@ def run_pipeline(verdicts: list[dict], healthy: bool, now_kst: datetime, seoul_g
         prev = state.get(lid)
         # NEW_MATCH: keyword-matched listing we've never notified.
         if v["match_keyword"] and (prev is None or not prev.get("notified")):
-            # Only NEW_MATCH pays the PDF-download-and-parse cost (not every
-            # listing every run) — see income_analysis.py module docstring.
-            # Never let a bad PDF/site break the alert: analyze_listing()
-            # itself is exception-safe, but guard here too.
+            # Only NEW_MATCH pays the PDF-download-and-parse cost outside of
+            # the general INCOME_REVIEW pass below — see income_analysis.py
+            # module docstring. Never let a bad PDF/site break the alert:
+            # analyze_listing() itself is exception-safe, but guard here too.
             try:
                 income = income_analysis.analyze_listing(v["row"])
             except Exception as e:
                 income = {"status": "failed", "stage": "unexpected", "reason": str(e)}
-            title, body = compose_new_match(v, is_test, income)
+            # This attempt also counts toward the 15건 검증 목표 (사용자 요청
+            # 2026-09-13) — record it here so the same listing is never opened
+            # twice just because it's also a keyword match.
+            if not income_review_tracker.already_reviewed(review_state, lid) and not income_review_tracker.is_complete(review_state):
+                income_review_tracker.record(review_state, lid, v["name"], v["region"], v["match_keyword"], now_kst, income)
+            title, body = compose_new_match(v, is_test, income, review_state)
             _send(title, body, also_issue=True)
             state[lid] = {"priority": v["priority"], "keyword": v["match_keyword"], "notified": True}
             fired["new_match"] += 1
@@ -286,17 +352,31 @@ def run_pipeline(verdicts: list[dict], healthy: bool, now_kst: datetime, seoul_g
             state[lid] = {**prev, "priority": v["priority"], "keyword": v["match_keyword"]}
             fired["priority_up"] += 1
             continue
+        # INCOME_REVIEW: any other listing (no keyword match, no priority
+        # jump) we haven't opened yet, as long as the 15건 cap isn't reached.
+        # This is what makes the goal "앞으로 확인되는 *모든* 공공분양" true —
+        # not just the personally-interesting keyword matches.
+        if not income_review_tracker.already_reviewed(review_state, lid) and not income_review_tracker.is_complete(review_state):
+            try:
+                income = income_analysis.analyze_listing(v["row"])
+            except Exception as e:
+                income = {"status": "failed", "stage": "unexpected", "reason": str(e)}
+            income_review_tracker.record(review_state, lid, v["name"], v["region"], v["match_keyword"], now_kst, income)
+            title, body = compose_income_review(v, income, review_state)
+            _send(title, body, also_issue=False)
+            fired["income_review"] += 1
         # Otherwise just update our record of its current priority.
         if prev is not None:
             state[lid] = {**prev, "priority": v["priority"], "keyword": v["match_keyword"]}
         else:
             state[lid] = {"priority": v["priority"], "keyword": v["match_keyword"]}
     save_alerted_state(state)
+    income_review_tracker.save_state(review_state)
 
     # --- DAILY_DIGEST (heartbeat) ---
     if now_kst.hour >= HEARTBEAT_HOUR_KST and health.get("last_heartbeat_date") != today_str:
         summary = summarize(verdicts)
-        title, body = compose_daily_digest(verdicts, summary, now_str, today_str)
+        title, body = compose_daily_digest(verdicts, summary, now_str, today_str, review_state)
         _send(title, body, also_issue=False)
         health["last_heartbeat_date"] = today_str
         fired["digest"] = True
