@@ -150,6 +150,93 @@ GitHub Actions (briefing-email.yml)  →  HTML 변환 + 메일 발송 + 커밋
 발송 실패 시엔 기존 `send_report_email --failure-alert` 경로로 알린다 —
 조용한 실패를 막는 게 이 저장소의 일관된 방침이다.
 
+## 9. 첫 실전 실패 — Routine 세션에는 저장소가 붙지 않는다 (2026-09-12)
+
+시스템을 만든 다음 날, **자동 발행이 두 번 연속 실패했다.** 둘 다
+`SUCCEEDED`로 보고됐기 때문에 실패인 줄도 몰랐다. 이 절은 그 진단 기록이다.
+
+### 증상과 오답
+
+`report/briefing/`에 손으로 만든 09-11 AM 하나뿐인데, Routine은 두 번 다
+정상 종료(각 6분)였다.
+
+| 가설 | 검증 | 결과 |
+|---|---|---|
+| 조용한 날(종료코드 10) | 게이트 재실행 | ❌ `발행`(exit 0) — 기각 |
+| 보고서를 안 썼다 | 세션 `output_tokens` | ❌ 21,706 / 22,024 — **다 썼다** |
+| 저장·발송 경로 고장 | 수동 push로 재현 | ❌ Actions success, 메일 발송됨 |
+
+### 진짜 원인 ① — `sources`·`outcomes`가 비어 있었다
+
+`session_context`를 비교하니 답이 나왔다.
+
+| | 작업 세션 | Routine 세션 |
+|---|---|---|
+| `sources` | `[Repo_name, open-trading-api]` | **`[]`** |
+| `outcomes` | `{repo, branches:[main]}` | **`[]`** |
+| 종료 상태 | WORKING | **REVIEW_READY** |
+
+**`create_trigger`로 만든 Routine은 호출 세션의 저장소 연결을 상속하지
+않는다**(`created_via: meta_mcp`). 프롬프트에 넣어둔
+`cd ... || git clone ...` 폴백이 오히려 독이 됐다 — 읽기 전용 사본이 생겨
+"저장소는 있는데 push만 안 되는" 상태가 만들어졌고, 실패가 조용해졌다.
+세션은 `REVIEW_READY`로 끝나고 컨테이너 회수와 함께 산출물이 사라졌다.
+
+push가 없으니 `briefing-email.yml`도 안 돌았다(실행 이력 0건).
+**§8이 설계한 실패 알림조차 발동하지 않은 이유가 이것이다** — 그 알림은
+워크플로가 *돌았는데* 실패했을 때만 울린다. 워크플로 자체가 안 뜨는 경우는
+§8의 사각지대였다.
+
+### 진짜 원인 ② — UTC cron이 KST에서 요일을 하루 민다
+
+| Routine | 기존 (UTC) | 실제 (KST) | 교정 |
+|---|---|---|---|
+| 아침 07:30 | `30 22 * * 1-5` | **화~토** — 월요일 없음, 토요일 헛발 | `30 22 * * 0-4` |
+| 저녁 19:40 | `40 10 * * 1-5` | 월~금 ✅ | 변경 없음 |
+
+UTC 22:30은 KST로 **다음 날** 07:30이라 요일이 밀린다. 10:40은 같은 날이라
+안 밀린다. 첫 실전 실행이 두 결함을 동시에 밟았다 — **토요일 07:36에 떨어져
+휴장일 "오늘 한국장 전망"을 쓰고 있었다.**
+
+### 수정 — 상시 워커 바인딩
+
+저장소 연결을 만들어주는 경로는 `create_session(source_url, outcome_branch)`
+뿐이다. 그래서 워커 세션 2개를 만들고 Routine을 `persistent_session_id`로
+바인딩했다(`update_trigger`로는 저장소 연결을 바꿀 수 없어 삭제·재생성).
+
+```
+Routine (cron)  →  워커 세션 (sources + outcomes:main)  →  git push
+                                                              ↓
+                                            briefing-email.yml  →  메일
+```
+
+트레이드오프: 워커가 상시 세션이라 **실행 맥락이 누적된다.** 그래서 프롬프트
+0단계에 "매 실행은 독립이다 — 이전 대화의 기억을 쓰지 마라"를 박았다. 팩이
+매번 새로 생성되므로 숫자의 출처는 여전히 코드 하나다.
+
+### 프롬프트에 추가된 3가지 (전부 실측으로 얻음)
+
+1. **`git checkout main` 필수** — 워커는 detached HEAD로 시작한다.
+   그 상태로 커밋하면 push가 아무 데도 안 간다.
+2. **`pip install -r requirements.txt` 필수** — 컨테이너가 재활용되면
+   pandas가 사라져 테스트가 수집 단계에서 27건 통째로 실패한다.
+3. **push 성공을 눈으로 확인하라** — `main -> main` 출력과 `ahead 0`를
+   확인하고, 4회 실패 시 마크다운 전문을 채팅에 남겨 유실을 막는다.
+
+### 남은 문제 — 거래일 달력이 없다
+
+자동 수집이 UTC 기준이라 **주말에도 날짜를 찍는다.**
+`signal_2026-09.csv`가 9/10 다음 9/11(금)을 건너뛰고 9/12(토)를 기록했고,
+예측 `P0001`도 검증일이 토요일인데 금요일 종가로 채점됐다. 결론(적중)은
+바뀌지 않지만 근거가 흐려진다. 프롬프트에 "검증일은 거래일로 잡아라"를
+넣어 완화했을 뿐, **근본 해결은 거래일 달력 도입이다** — 미해결.
+
+### 교훈
+
+**"SUCCEEDED"는 산출물이 남았다는 뜻이 아니다.** 이 시스템은 발행 성공을
+Routine의 종료 상태로 판단하고 있었는데, 그 둘은 무관했다. 산출물의 존재를
+직접 확인하는 경로가 없으면 실패가 조용히 지나간다.
+
 ## Sources
 
 - `engine/briefing/context.py` — 팩 생성·선별·게이트
@@ -158,6 +245,6 @@ GitHub Actions (briefing-email.yml)  →  HTML 변환 + 메일 발송 + 커밋
 - `tests/test_briefing_context.py` — 16건
 - `.github/workflows/briefing-email.yml` — 발송(시크릿이 있는 유일한 곳)
 - `engine/briefing/render_html.py` — 마크다운→HTML, LLM 미사용(토큰 0)
-- Routine: "PEOS 아침 브리핑"(`30 22 * * 1-5` UTC) / "PEOS 저녁 브리핑"(`40 10 * * 1-5` UTC)
+- Routine: "PEOS 아침 브리핑"(`30 22 * * 0-4` UTC = KST 월~금 07:30) / "PEOS 저녁 브리핑"(`40 10 * * 1-5` UTC = KST 월~금 19:40) — 둘 다 상시 워커 세션에 바인딩(§9)
 - [FRS 설계](fx-regime-score-design.md) — 예측 원장이 차용한 "측정해서 무게를 다르게 준다"
 - `data/wiki_digest/README.md` — digest 패턴 원본
