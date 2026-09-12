@@ -1,0 +1,2 @@
+date,account_label,ticker,buy_date,quantity,maturity,buy_yield,buy_price,buy_amount,orderable_qty,source,fetched_at
+2026-09-12,ISA,KR6023532E16,20240311,29644,20270118,4.05000000,10120,29999728,29644,kis_api,2026-09-12T13:53:55+00:00
