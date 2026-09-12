@@ -524,6 +524,90 @@ def build_weekly_outlook_block(as_of: date) -> Block:
     return Block("weekly_outlook", "⑦ 다음주 예정 일정 (주간 전망)", "\n".join(lines))
 
 
+def _fmt_val(v: float | None) -> str:
+    """실측값 표기. 지수표기(1.812e+06)는 사람이 못 읽으므로 막는다."""
+    if v is None:
+        return "값 없음"
+    return f"{v:,.0f}" if abs(v) >= 1000 else f"{v:g}"
+
+
+def build_execution_block(as_of: date) -> Block:
+    """⑧ 자금 조달 실행 계획 — 매도 tranche·판단 포스트·CDP 일일 점검.
+
+    사용자 요청: "타임라인별로 어떻게 매도할지 전략을 세우고, 그 주장의
+    근거가 실제로 잘 맞아가는지 판단 포스트를 세우고, Critical decision
+    point가 발생하는지 계속 trace하는 daily 점검."
+
+    이 블록은 **판정만** 한다 — 자동으로 팔지 않는다. 발동한 CDP는 맨 위로
+    올려 LLM이 못 보고 지나치지 못하게 하고, 데이터를 못 구해 판정하지
+    못한 CDP도 숨기지 않고 드러낸다(R3: 미수집은 판정이 아니다)."""
+    from engine.execution import plan as EP
+
+    try:
+        st = EP.evaluate(as_of)
+    except FileNotFoundError:
+        return Block("execution", "⑧ 자금 조달 실행 계획", "계획 파일 없음 — 점검 생략")
+
+    px = f"{st.price:,.0f}원" if st.price else "가격 미확인"
+    lines = [
+        f"**진행률 {st.progress_pct:.0f}%** — 목표 {st.target_krw:,}원 중 "
+        f"{st.raised_krw:,}원 조달, 잔여 {st.remaining_krw:,}원"
+        + (f" (현재가 {px} 기준 **{st.shares_remaining}주**)" if st.shares_remaining else ""),
+    ]
+
+    # 발동한 CDP를 맨 위에 — 이걸 놓치면 이 블록의 존재 이유가 없다
+    fired = st.fired_cdps
+    if fired:
+        lines.append("\n🚨 **Critical Decision Point 발동**")
+        for c in fired:
+            mark = {"critical": "🔴", "warning": "🟠", "opportunity": "🟢"}.get(c.severity, "⚪")
+            lines.append(f"- {mark} **{c.id} {c.name}** — 실측 {_fmt_val(c.actual)} ({c.expected})")
+            lines.append(f"  → {c.action}")
+        lines.append("  ⚠️ 자동 실행하지 않는다. 사장님 판단이 필요한 지점이다.")
+    else:
+        lines.append("\nCDP: 발동 없음 " + ", ".join(
+            f"{c.id}({_fmt_val(c.actual)})" for c in st.cdps if c.actual is not None))
+
+    unknown = st.unknown_cdps
+    if unknown:
+        lines.append("⚠️ **판정 불가 CDP**(데이터 없음, 감시 사각지대): "
+                     + ", ".join(f"{c.id} {c.expected}" for c in unknown))
+
+    # 지금 행동이 필요한 tranche
+    active = [t for t in st.tranches if t.state in ("OPEN", "DUE", "ACCELERATED")]
+    if active:
+        lines.append("\n**실행 창이 열린 tranche**")
+        for t in active:
+            sh = f"{t.shares_needed}주" if t.shares_needed else "주수 미산출"
+            lines.append(f"- **{t.id} {t.name}** [{t.state}] {t.amount_krw:,}원 ≈ {sh} "
+                         f"({t.window[0]}~{t.window[1]})")
+            if t.note:
+                lines.append(f"  {t.note}")
+    else:
+        nxt = next((t for t in st.tranches if t.state == "PENDING"), None)
+        if nxt:
+            lines.append(f"\n실행 창 없음 — 다음: **{nxt.id} {nxt.name}** "
+                         f"({nxt.window[0]} 개시, {nxt.amount_krw:,}원)")
+
+    # 판단 포스트 — 채점된 것과 임박한 것
+    scored = [c for c in st.checkpoints if c.status in ("HIT", "MISS", "UNKNOWN")]
+    if scored:
+        lines.append("\n**판단 포스트 채점**")
+        for c in scored:
+            icon = {"HIT": "✅", "MISS": "❌", "UNKNOWN": "❓"}[c.status]
+            act = _fmt_val(c.actual)
+            lines.append(f"- {icon} {c.id} ({c.date}) {c.thesis} — 실측 {act} / 기준 {c.expected}")
+            if c.status == "MISS" and c.if_false:
+                lines.append(f"  → 전제 이탈: {c.if_false}")
+    pending = [c for c in st.checkpoints if c.status == "PENDING"]
+    if pending:
+        n = pending[0]
+        d = (date.fromisoformat(n.date) - as_of).days
+        lines.append(f"\n다음 판단 포스트: **{n.id}** D-{d} ({n.date}) — {n.thesis}")
+
+    return Block("execution", "⑧ 자금 조달 실행 계획", "\n".join(lines))
+
+
 def build_pack(slot: str, as_of: date | None = None) -> tuple[BriefingPack, Gate]:
     now = datetime.now(KST)
     as_of = as_of or now.date()
@@ -535,6 +619,7 @@ def build_pack(slot: str, as_of: date | None = None) -> tuple[BriefingPack, Gate
             build_hynix_block(as_of),
             build_digest_block(as_of, *detect_triggers(as_of)),
             build_ledger_block(as_of),
+            build_execution_block(as_of),
             build_weekly_outlook_block(as_of),
         ])
         return pack, Gate(publish=True, reasons=["주간 전망은 항상 발행"])
@@ -548,5 +633,6 @@ def build_pack(slot: str, as_of: date | None = None) -> tuple[BriefingPack, Gate
         build_previous_block(as_of, slot),
         build_ledger_block(as_of),
         build_calendar_block(as_of, slot),
+        build_execution_block(as_of),
     ])
     return pack, gate

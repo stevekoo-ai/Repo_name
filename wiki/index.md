@@ -39,6 +39,8 @@ Catalog of every page in the wiki. See `../CLAUDE.md` for conventions.
 
 ### monitoring (일일 추적 & 점수)
 
+- [housing-funding-execution-status.md](monitoring/housing-funding-execution-status.md) — 🆕 2026-09-12. 자금 조달 진행률·CDP 발동 여부·판단 포스트 채점을 매일 추적 (브리핑 팩 블록 ⑧이 자동 갱신)
+
 - [HBM Cycle Score — Daily Status & Tracking](monitoring/hbm-cycle-score-status.md) — 🆕 2026-08-08, 4-layer 구조화에 따라 concepts/hbm-cycle-score.md에서 분리된 일일 점수 및 체크 이력(append-only). 2026-07-24 이후 모든 체크 기록(70+ 항목), 거시 상황·시장심리·펀더멘털 분석 포함. Framework 정의는 concepts/hbm-cycle-score.md 참고
 - [반도체수출 정점-회복 관찰 — Daily/발표일 Status](monitoring/semiconductor-export-peak-recovery-status.md) — 🆕 2026-08-17, concepts/semiconductor-export-peak-recovery-watch.md의 일일/발표일 체크 이력(append-only). 첫 체크: 08월 1~10일 잠정치(+155.4%) — 판정 보류, 가설 A 우세하나 B 배제 안 됨. 다음 체크: 08-21 1~20일 잠정치.
 - [패닉 회복 신호 — 일일 체크 이력 및 현황](monitoring/panic-recovery-signals-status.md) — 🆕 2026-08-08, 4-layer 구조화에 따라 concepts/panic-recovery-signals.md에서 분리된 일일 체크 기록(append-only). 2026-08-01~08-06 종합판정 4단계 10개 체크 항목 + Tier1~3 신호 해석. Framework 정의는 concepts/panic-recovery-signals.md 참고
@@ -55,6 +57,8 @@ Catalog of every page in the wiki. See `../CLAUDE.md` for conventions.
 
 
 ### concepts
+
+- [housing-funding-execution-framework.md](concepts/housing-funding-execution-framework.md) — 🆕 2026-09-12. 주거 전환 자금 조달의 매도 tranche·판단 포스트·Critical Decision Point 프레임워크. 금액 기반 tranche(주가가 오르면 필요 주수가 준다) + 시간 하한선 + 가격 앞당김의 이중 구조. v2·v3의 "하이닉스 고점 부근" 판정이 실측(고점 대비 -39.3%)과 반대였던 것이 신설 계기
 
 #### Personal Investment Decisions (User-Centric Decision Engines — 2026-08-09)
 
