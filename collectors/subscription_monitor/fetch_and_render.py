@@ -17,6 +17,7 @@ from datetime import datetime, timedelta, timezone
 # My profile constants live in judge.py as the single source of truth.
 from judge import judge_listings, MY_SAVINGS_TOTAL, MY_SAVINGS_ROUNDS, MY_JOIN_DATE
 from compose import run_pipeline
+import income_review_tracker
 
 KST = timezone(timedelta(hours=9))
 BASE_URL = "https://api.odcloud.kr/api/ApplyhomeInfoDetailSvc/v1/getAPTLttotPblancDetail"
@@ -101,7 +102,65 @@ def row_html(r: dict) -> str:
         </tr>"""
 
 
-def render(rows: list[dict], now_kst: datetime) -> str:
+def income_review_row_html(r: dict) -> str:
+    name = html.escape(r.get("name") or "-")
+    region = html.escape(r.get("region") or "-")
+    exceptions = r.get("exceptions") or []
+    if exceptions:
+        tag = '<span class="tag warn">⚠️ 예외 발견</span>'
+    elif r.get("status") == "ok":
+        tag = '<span class="tag ok">✅ 정상 (예외 없음)</span>'
+    else:
+        tag = '<span class="tag warn">❌ 분석 실패</span>'
+    scope = html.escape(r.get("income_scope") or r.get("reason") or "-")
+    when = html.escape(r.get("reviewed_at") or "-")
+    return f"""
+        <tr>
+          <td>{name}</td>
+          <td class="num">{region}</td>
+          <td>{scope}</td>
+          <td>{tag}</td>
+          <td class="num">{when}</td>
+        </tr>"""
+
+
+def render_income_review_section(review_state: dict) -> str:
+    """60㎡ 초과 일반공급 소득요건 자동검증 진행상황 — 사용자 요청 2026-09-13
+    (앞으로 확인되는 모든 공공분양을 15건까지 직접 열어 확인, 매 확인마다
+    검토 결과와 x회/15회 진행률을 보고서에 남길 것)."""
+    count = review_state.get("count", 0)
+    cap = income_review_tracker.REVIEW_CAP
+    reviews = review_state.get("reviews", [])
+    progress_pct = round(min(count, cap) / cap * 100)
+    if not reviews:
+        body = '<p class="lead">아직 검토된 공고가 없습니다 — 신규 국민주택 공고가 뜨면 자동으로 모집공고문을 열어 확인합니다.</p>'
+    else:
+        rows_html = "\n".join(income_review_row_html(r) for r in reversed(reviews))
+        body = f"""
+    <div class="tablewrap">
+      <table>
+        <thead>
+          <tr><th>단지명</th><th>지역</th><th>소득검증 범위 / 사유</th><th>판정</th><th>검토 시각</th></tr>
+        </thead>
+        <tbody>{rows_html}
+        </tbody>
+      </table>
+    </div>"""
+    done_note = (
+        f'<p class="lead">🏁 목표 {cap}건 검증 완료 — 누적 예외 {income_review_tracker.exception_count(review_state)}건.</p>'
+        if count >= cap else ""
+    )
+    return f"""
+  <section>
+    <h2>60㎡ 초과 일반공급 소득요건 자동검증 ({min(count, cap)}회/{cap}회, {progress_pct}%)</h2>
+    <p class="lead">신규로 확인되는 공공분양(국민주택) 공고를 최대 {cap}건까지 직접 열어,
+    「60㎡ 초과 일반공급은 소득요건 무관」 규칙(wiki/concepts/public-housing-income-requirement-framework.md 기준)이
+    유지되는지 자동 검증합니다.</p>
+    {done_note}{body}
+  </section>"""
+
+
+def render(rows: list[dict], now_kst: datetime, review_state: dict | None = None) -> str:
     rows_sorted = sorted(rows, key=lambda r: (r.get("RCEPT_ENDDE") or "9999-99-99"))
     body_rows = "\n".join(row_html(r) for r in rows_sorted) or (
         '<tr><td colspan="7" style="text-align:center;color:var(--muted);padding:28px;">'
@@ -110,6 +169,7 @@ def render(rows: list[dict], now_kst: datetime) -> str:
     next_run = now_kst + timedelta(hours=4)
     updated_str = now_kst.strftime("%Y-%m-%d %H:%M KST")
     next_str = next_run.strftime("%m-%d %H:%M KST")
+    income_review_section = render_income_review_section(review_state) if review_state is not None else ""
 
     return f"""<!doctype html>
 <html lang="ko">
@@ -203,7 +263,7 @@ def render(rows: list[dict], now_kst: datetime) -> str:
       </table>
     </div>
   </section>
-
+{income_review_section}
   <section>
     <h2>직접 확인 채널</h2>
     <ul class="checklist">
@@ -253,7 +313,7 @@ def main() -> None:
     if fired and (fired.get("new_match") or fired.get("priority_up") or fired.get("outage") or fired.get("recovery")):
         print(f"pipeline fired: {fired}")
 
-    html_out = render(rows, now_kst)
+    html_out = render(rows, now_kst, income_review_tracker.load_state())
     out_path = os.path.normpath(OUTPUT_PATH)
     with open(out_path, "w", encoding="utf-8") as f:
         f.write(html_out)
