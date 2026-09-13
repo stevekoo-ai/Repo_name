@@ -211,3 +211,44 @@ def test_target_is_reachable_with_free_shares_at_current_price(plan):
     마크업 8,791,650원 포기를 전제로 깔고 있다는 뜻이다."""
     st = EP.evaluate(date(2026, 9, 12), plan=plan, log=[])
     assert st.shares_remaining <= plan["position"]["free_shares"]
+
+
+# ── 계약 6: 조용한 날에도 CDP는 사장님께 도달해야 한다 ───────────
+# CDP 중에는 몇 주에 걸쳐 서서히 이탈하는 것이 있다(us_10y 같은). 그런 날은
+# 시장이 조용해 게이트가 닫히는데, 그러면 블록 ⑧이 발행되지 않아 경고가
+# 도달하지 못한다 — "계속 trace한다"가 그 순간 깨진다.
+
+def test_fired_cdp_forces_publish_on_an_otherwise_quiet_day(monkeypatch):
+    from engine.briefing import context as CTX
+
+    monkeypatch.setattr(CTX, "detect_triggers", lambda d: (set(), []))
+    monkeypatch.setattr(CTX, "_series_map", lambda: {})      # 시장 조용
+    monkeypatch.setattr(L, "open_predictions", lambda d: [])  # 도래 예측 없음
+
+    base = EP.evaluate
+    monkeypatch.setattr(L, "_lookup",
+                        lambda k, on: 1_300_000.0 if k == "hynix_close" else None)
+    gate = CTX.evaluate_gate(date(2026, 9, 12), set(), [])
+    assert gate.publish is True, "CDP가 발동했는데 '조용한 날'로 닫히면 경고가 유실된다"
+    assert any("CDP" in r for r in gate.reasons)
+    assert base is EP.evaluate
+
+
+def test_due_tranche_forces_publish_on_a_quiet_day(monkeypatch):
+    from engine.briefing import context as CTX
+
+    monkeypatch.setattr(CTX, "detect_triggers", lambda d: (set(), []))
+    monkeypatch.setattr(CTX, "_series_map", lambda: {})
+    monkeypatch.setattr(L, "open_predictions", lambda d: [])
+    gate = CTX.evaluate_gate(date(2026, 10, 31), set(), [])   # T1 하한선 도래일
+    assert gate.publish is True
+    assert any("tranche" in r for r in gate.reasons)
+
+
+def test_gate_survives_a_broken_execution_plan(monkeypatch):
+    """부가 기능이 깨져도 브리핑 본체는 나가야 한다."""
+    from engine.briefing import context as CTX
+
+    monkeypatch.setattr(EP, "evaluate", lambda *a, **k: (_ for _ in ()).throw(RuntimeError("boom")))
+    gate = CTX.evaluate_gate(date(2026, 9, 12), {"x"}, ["시장 변동"])
+    assert gate.publish is True

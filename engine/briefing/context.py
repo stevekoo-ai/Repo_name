@@ -449,6 +449,31 @@ def evaluate_gate(as_of: date, triggers: set[str], why: list[str]) -> Gate:
             chg = (rows[-1][1] / rows[-2][1] - 1) * 100
             if abs(chg) >= 1.0:
                 reasons.append(f"{label} 1일 {chg:+.2f}%")
+
+    # 자금 조달 CDP 발동 / tranche 실행 기한 도래는 **무조건 발행**이다.
+    #
+    # 게이트의 원래 기준은 "오늘 시장이 움직였나"인데, CDP 중에는 몇 주에
+    # 걸쳐 서서히 이탈하는 것이 있다(예: CDP2 us_10y ≤ 4.0). 그런 날은
+    # 나스닥도 환율도 조용해서 게이트가 "조용한 날"로 닫히고, 그러면
+    # 블록 ⑧이 통째로 발행되지 않아 경고가 사장님께 도달하지 못한다 —
+    # "CDP를 계속 trace한다"가 그 순간 깨진다.
+    # 실행 기한(DUE)도 같다. 조용한 날이라고 매도 기한을 놓치면 안 된다.
+    try:
+        from engine.execution import plan as EP
+        est = EP.evaluate(as_of)
+        for c in est.fired_cdps:
+            reasons.append(f"CDP 발동: {c.id} {c.name}")
+        for t in est.tranches:
+            if t.state in ("DUE", "ACCELERATED"):
+                reasons.append(f"매도 tranche {t.id} {t.state}")
+        for c in est.checkpoints:
+            if c.status == "MISS":
+                reasons.append(f"판단 포스트 이탈: {c.id}")
+    except Exception:
+        # 실행 계획이 없거나 깨져도 브리핑 자체는 나가야 한다 —
+        # 부가 기능이 본체를 막으면 안 된다.
+        pass
+
     return Gate(publish=bool(reasons), reasons=reasons)
 
 
