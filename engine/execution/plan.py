@@ -163,6 +163,26 @@ def evaluate(as_of: date, plan: dict | None = None,
     )
 
     # ── tranche ──
+    #
+    # ## 앞당김은 한 번에 하나만 (2026-09-14 추가 — 사용자 지시)
+    #
+    # 이전 구현은 가격이 임계를 넘으면 **그 임계를 넘는 모든** 미래
+    # tranche를 동시에 ACCELERATED로 열었다. 주가가 2,500,000원이 되면
+    # T2(2,000,000)·T3(2,200,000)·T4(2,400,000)가 같은 날 전부 열려
+    # 사실상 "오늘 1.29억 전부 매도 가능"이 된다 — **분할 전환 원칙이
+    # 급등 하루에 스스로 무너지는 경로**였다. 그 가격이 고점이 아니라
+    # 통과점이었다면 나머지를 전부 싸게 판 셈이 된다.
+    #
+    # 임계를 벌리는 방법도 있지만 그건 동시 통과 "확률"을 낮출 뿐
+    # 보장이 못 된다. 대신 순서를 구조로 막는다:
+    #
+    #   앞선 tranche가 전부 누적 하한선을 채운(DONE) 뒤에야
+    #   뒤 tranche가 ACCELERATED로 열린다.
+    #
+    # ⚠️ **DUE에는 이 제약을 걸지 않는다.** 일정이 밀려 따라잡아야 하는
+    # 상황까지 막으면 데드라인을 놓친다 — 앞당김(기회 포착)은 순서대로,
+    # 만회(기한 방어)는 제한 없이.
+    prior_all_done = True
     for t in plan.get("tranches", []):
         ws, we = t["window_start"], t["window_end"]
         cum_floor = int(t.get("cumulative_floor_krw") or 0)
@@ -183,9 +203,19 @@ def evaluate(as_of: date, plan: dict | None = None,
             state = "DUE"
             note = f"창 종료({we}) 후 미실행 — 누적 {raised:,}원 / 하한 {cum_floor:,}원"
         elif acc and price and price >= float(acc):
-            state = "ACCELERATED"
-            note = (f"앞당김 조건 도달 (현재 {price:,.0f} ≥ {float(acc):,.0f}) — "
-                    f"창({ws}) 이전이지만 실행 가능")
+            if prior_all_done:
+                state = "ACCELERATED"
+                note = (f"앞당김 조건 도달 (현재 {price:,.0f} ≥ {float(acc):,.0f}) — "
+                        f"창({ws}) 이전이지만 실행 가능")
+            else:
+                # 가격 조건은 맞지만 차례가 아니다. 조건이 충족됐다는
+                # 사실 자체는 숨기지 않는다 — 숨기면 왜 안 열렸는지
+                # 사람이 알 수 없다.
+                note = (f"앞당김 조건은 충족(현재 {price:,.0f} ≥ {float(acc):,.0f})했으나 "
+                        f"앞선 tranche 미완료 — 분할 전환 유지를 위해 대기")
+
+        if state != "DONE":
+            prior_all_done = False
 
         st.tranches.append(TrancheStatus(
             id=t["id"], name=t["name"], state=state,

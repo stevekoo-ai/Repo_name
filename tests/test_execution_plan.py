@@ -93,20 +93,30 @@ def test_tranche_marked_done_once_cumulative_floor_met(plan):
     assert t1.state == "DONE"
 
 
+# T1 완료 상태 — 앞당김 테스트의 전제(2026-09-14 순차 제약 이후,
+# 앞선 tranche가 끝나야 뒤가 열린다)
+_T1_DONE = [{"date": "2026-10-05", "tranche_id": "T1", "shares": "20",
+             "price_krw": "1812000", "amount_krw": "36240000", "note": ""}]
+
+
 def test_price_accelerator_opens_tranche_before_its_window(plan, fake_price):
-    """T2는 11/4 시작이지만 2,000,000원을 넘으면 앞당길 수 있어야 한다."""
+    """T2는 11/4 시작이지만 2,000,000원을 넘으면 앞당길 수 있어야 한다.
+    단 순차 제약이 있으므로 T1이 끝나 있어야 한다."""
     fake_price(2_100_000)
-    st = EP.evaluate(date(2026, 10, 15), plan=plan, log=[])
+    st = EP.evaluate(date(2026, 10, 15), plan=plan, log=_T1_DONE)
     t2 = next(t for t in st.tranches if t.id == "T2")
     assert t2.state == "ACCELERATED"
     assert "앞당김" in t2.note
 
 
 def test_accelerator_does_not_fire_below_threshold(plan, fake_price):
+    """차례가 왔어도(T1 완료) 가격이 임계 아래면 열리지 않는다 —
+    순차 제약 때문에 우연히 통과하는 게 아니라 가격 조건 자체로 막혀야 한다."""
     fake_price(1_800_000)
-    st = EP.evaluate(date(2026, 10, 15), plan=plan, log=[])
+    st = EP.evaluate(date(2026, 10, 15), plan=plan, log=_T1_DONE)
     t2 = next(t for t in st.tranches if t.id == "T2")
     assert t2.state == "PENDING"
+    assert "앞당김 조건은 충족" not in t2.note, "가격 미달인데 '조건 충족'으로 적히면 안 된다"
 
 
 # ── 계약 3: CDP — 데이터 없음은 '안전'이 아니다 ──────────────────
@@ -252,3 +262,66 @@ def test_gate_survives_a_broken_execution_plan(monkeypatch):
     monkeypatch.setattr(EP, "evaluate", lambda *a, **k: (_ for _ in ()).throw(RuntimeError("boom")))
     gate = CTX.evaluate_gate(date(2026, 9, 12), {"x"}, ["시장 변동"])
     assert gate.publish is True
+
+
+# ── 계약 7: 앞당김은 한 번에 하나씩 (분할 전환 보호) ─────────────
+# 이전 구현은 가격이 임계를 넘으면 그 임계를 넘는 모든 미래 tranche를
+# 동시에 열었다 — 2,500,000원이면 T2·T3·T4가 같은 날 전부 열려 사실상
+# "오늘 전량 매도 가능"이 됐다. 급등 하루에 분할 전환 원칙이 무너지고,
+# 그 가격이 고점이 아니라 통과점이었다면 나머지를 전부 싸게 판 셈이 된다.
+
+def test_surge_does_not_open_every_future_tranche_at_once(plan, fake_price):
+    fake_price(2_500_000)          # T2(2.0M)·T3(2.2M)·T4(2.4M) 임계 전부 초과
+    st = EP.evaluate(date(2026, 10, 20), plan=plan, log=[])
+    accelerated = [t.id for t in st.tranches if t.state == "ACCELERATED"]
+    assert accelerated == [], \
+        f"앞선 T1이 미완료인데 뒤 tranche가 열렸다: {accelerated}"
+
+
+def test_acceleration_unlocks_one_at_a_time_as_earlier_tranches_complete(plan, fake_price):
+    fake_price(2_500_000)
+    log = [{"date": "2026-10-05", "tranche_id": "T1", "shares": "15",
+            "price_krw": "2500000", "amount_krw": "37500000", "note": ""}]
+    st = EP.evaluate(date(2026, 10, 20), plan=plan, log=log)
+    states = {t.id: t.state for t in st.tranches}
+    assert states["T1"] == "DONE"
+    assert states["T2"] == "ACCELERATED", "앞선 tranche가 끝나면 다음이 열려야 한다"
+    assert states["T3"] == "PENDING", "그 다음 것까지 같이 열리면 제약이 무의미하다"
+    assert states["T4"] == "PENDING"
+
+
+def test_blocked_acceleration_explains_itself(plan, fake_price):
+    """조건은 맞는데 안 열렸다는 사실을 숨기면 사람이 이유를 알 수 없다."""
+    fake_price(2_500_000)
+    st = EP.evaluate(date(2026, 10, 20), plan=plan, log=[])
+    t2 = next(t for t in st.tranches if t.id == "T2")
+    assert "앞당김 조건은 충족" in t2.note
+    assert "대기" in t2.note
+
+
+def test_due_is_never_blocked_by_the_sequential_rule(plan, fake_price):
+    """일정이 밀려 만회해야 하는 상황까지 막으면 데드라인을 놓친다.
+    앞당김(기회 포착)은 순서대로, 만회(기한 방어)는 제한 없이."""
+    fake_price(1_812_000)
+    st = EP.evaluate(date(2026, 12, 15), plan=plan, log=[])   # T1·T2 창 이미 종료
+    states = {t.id: t.state for t in st.tranches}
+    assert states["T1"] == "DUE"
+    assert states["T2"] == "DUE", "밀린 tranche는 순차 제약과 무관하게 DUE로 떠야 한다"
+    assert states["T3"] == "OPEN"     # 12/15는 T3 창 안 + floor_by(12/31) 이전 → OPEN
+
+
+def test_briefing_block_surfaces_waiting_tranches(fake_price):
+    """CDP5가 '급등 기회'라고 떴는데 열린 tranche가 없으면, 왜 그런지
+    브리핑에 나와야 한다."""
+    from engine.briefing import context as CTX
+    fake_price(2_500_000)
+    body = CTX.build_execution_block(date(2026, 10, 20)).body
+    assert "앞당김 대기" in body
+    assert "T2" in body and "T3" in body and "T4" in body
+
+
+def test_cdp5_action_text_matches_the_sequential_rule(plan):
+    """계획서 문구가 '일괄 실행'이면 코드와 모순된다 — 문서 드리프트 방지."""
+    cdp5 = next(c for c in plan["critical_decision_points"] if c["id"] == "CDP5")
+    assert "일괄" not in cdp5["action"]
+    assert "하나씩" in cdp5["action"]

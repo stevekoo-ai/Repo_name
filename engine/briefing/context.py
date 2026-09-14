@@ -614,6 +614,15 @@ def build_execution_block(as_of: date) -> Block:
             lines.append(f"\n실행 창 없음 — 다음: **{nxt.id} {nxt.name}** "
                          f"({nxt.window[0]} 개시, {nxt.amount_krw:,}원)")
 
+    # 가격 조건은 맞는데 차례가 아니라 대기 중인 tranche를 드러낸다.
+    # 안 보여주면 CDP5("급등 — 조기 완료 기회")가 떴는데 열린 tranche는
+    # 없는 상황에서 왜 그런지 사람이 알 수 없다.
+    waiting = [t for t in st.tranches if t.state == "PENDING" and "앞당김 조건은 충족" in t.note]
+    if waiting:
+        lines.append("\n**앞당김 대기**(가격 조건 충족, 순서 대기 — 분할 전환 유지)")
+        for t in waiting:
+            lines.append(f"- {t.id} {t.name} — {t.note}")
+
     # 판단 포스트 — 채점된 것과 임박한 것
     scored = [c for c in st.checkpoints if c.status in ("HIT", "MISS", "UNKNOWN")]
     if scored:
