@@ -44,6 +44,10 @@ MAX_PACK_CHARS = 24_000
 # digest 선별 개수. 늘리면 팩이 커지고 줄이면 맥락이 얇아진다.
 DIGEST_SLOTS = 5
 
+# 거시 수집이 이 시간(시간) 이상 전이면 "오늘 수집분 없음"으로 본다.
+# 수집은 하루 1회라 20시간을 넘으면 그날 치가 아직 안 들어온 것이다.
+STALE_COLLECTION_HOURS = 20
+
 
 @dataclass
 class Block:
@@ -127,6 +131,44 @@ FACT_SERIES = [
 ]
 
 
+def collection_freshness(now: datetime | None = None) -> tuple[str | None, float | None]:
+    """macro-series.csv를 **마지막으로 수집한 시각**과 그 경과 시간(시간 단위).
+
+    ## 왜 데이터 날짜가 아니라 수집 시각인가
+
+    팩 ①의 "⚠️N일 지연"은 **데이터 기준일**이 며칠 전인지를 잰다. 그건
+    FRED가 늦게 발표해서일 수도 있고(정상), 우리가 수집을 못 해서일 수도
+    있다(장애) — 둘이 구분되지 않는다.
+
+    2026-09-14에 실제로 후자였다. 거시 수집(cron 22:10 UTC)이 GitHub
+    Actions 큐 대기로 **매번 약 2시간씩 밀려** 00:00~00:15 UTC에 끝나는데,
+    AM 브리핑은 22:30 UTC에 돈다. 완충이 20분뿐이라 **브리핑이 항상 먼저
+    돌고 그날 수집분을 못 쓴다.** 9/14 브리핑이 쓴 데이터는 22시간 전
+    수집분이었고, 그날 수집은 브리핑 1시간 27분 뒤에 끝났다.
+
+    이걸 알면 LLM이 "숫자가 오래된 건 FRED 탓"이라고 오독하지 않고
+    "오늘 수집분이 아직 없으니 직전 세션은 뉴스로 확인해야 한다"고
+    행동할 수 있다(R1: 측정 > 추론).
+    """
+    p = REPO / "sources" / "macro-series.csv"
+    if not p.exists():
+        return None, None
+    latest = ""
+    with p.open(encoding="utf-8") as fh:
+        for r in csv.DictReader(fh):
+            f = r.get("fetched_at") or ""
+            if f > latest:
+                latest = f
+    if not latest:
+        return None, None
+    try:
+        t = datetime.fromisoformat(latest.replace("Z", "+00:00"))
+    except ValueError:
+        return latest, None
+    now = now or datetime.now(timezone.utc)
+    return latest, (now - t).total_seconds() / 3600
+
+
 def build_fact_sheet(as_of: date) -> Block:
     m = _series_map()
     lines = ["| 지표 | 최신 | 1일 | 5일 | 기준일 |", "|---|---:|---:|---:|---|"]
@@ -154,6 +196,18 @@ def build_fact_sheet(as_of: date) -> Block:
     body = "\n".join(lines)
     if missing:
         body += f"\n\n**미수집**: {', '.join(missing)} — 없는 것이므로 언급하지 말 것."
+
+    fetched, hours = collection_freshness()
+    if hours is not None:
+        if hours >= STALE_COLLECTION_HOURS:
+            body += (f"\n\n🔴 **오늘 수집분이 아직 없다.** 거시 데이터의 마지막 수집은 "
+                     f"`{fetched[:16]}` — **{hours:.0f}시간 전**이다.\n"
+                     f"위 표의 '지연'은 FRED 발표 지연이 아니라 **수집이 안 된 탓일 수 있다.** "
+                     f"직전 세션 수치는 표를 믿지 말고 **뉴스로 확인할 것.**\n"
+                     f"(원인: 거시 수집 cron과 이 브리핑의 간격이 GitHub Actions 큐 지연보다 "
+                     f"짧아 브리핑이 먼저 도는 경쟁 조건 — 2026-09-14 확인)")
+        else:
+            body += f"\n\n거시 수집: `{fetched[:16]}` ({hours:.0f}시간 전) — 최신."
     return Block("facts", "① 오늘의 실측 (macro-series.csv)", body)
 
 
