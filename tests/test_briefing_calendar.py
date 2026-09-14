@@ -57,12 +57,70 @@ def test_kr_and_us_holidays_are_independent():
 
 def test_am_notes_long_us_holiday_gap():
     """미국이 연휴로 이틀 이상 쉬었으면 AM 브리핑이 그 사실을 명시해야
-    한다 — 안 그러면 '어젯밤' 서술이 실제로는 며칠 치 뉴스를 하루로
-    뭉갠다."""
-    # 2026-09-08(화) 기준 직전 거래일은 노동절 연휴(9/7 월)를 건너뛴
-    # 9/4(금)이다 — 실제로는 주말+공휴일 결합으로 3일 갭.
+    한다 — 안 그러면 '어젯밤' 서술이 실제로는 며칠 치 뉴스를 하루로 뭉갠다.
+
+    ⚠️ 이 테스트는 원래 `assert "휴장" in note.text or note.lag_days_us >= 0`
+    이었다. `lag_days_us`는 `max(gap, 0)`이라 **항상 0 이상** — 즉 뒷조건이
+    무조건 참이라 **절대 실패할 수 없는 테스트**였다. 그래서 2026-09-14에
+    "gap이 평일엔 항상 -1로 계산돼 휴장 경고가 한 번도 뜰 수 없던" 버그를
+    통과시켰다. 이제 텍스트와 숫자를 둘 다 단정한다."""
+    # 2026-09-08(화) 기준 직전 세션은 노동절(9/7 월)을 건너뛴 9/4(금).
     note = C.describe_trading_gap(date(2026, 9, 8), "AM")
-    assert "휴장" in note.text or note.lag_days_us >= 0
+    assert note.us_last_trading == date(2026, 9, 4), "직전 미국 세션 판정이 틀렸다"
+    assert note.lag_days_us == 3, "주말(2일)+노동절(1일) = 3일 갭이어야 한다"
+    assert "휴장" in note.text
+
+
+def test_am_after_a_weekend_flags_the_two_day_gap():
+    """2026-09-14(월) 실제 사고 재현. 이날 AM은 '정상 시차' 판정을 받아
+    주말 이틀치 뉴스(AI 속도조절론)를 조사 대상에서 빠뜨렸고, 그날
+    코스피는 그 재료로 -3.26% 급락했다."""
+    note = C.describe_trading_gap(date(2026, 9, 14), "AM")
+    assert note.us_last_trading == date(2026, 9, 11), "월요일 아침의 직전 미국 세션은 금요일이다"
+    assert note.lag_days_us == 2
+    assert "정상 시차" not in note.text, "주말 뒤 월요일을 '정상 시차'로 부르면 안 된다"
+    assert "조사 대상 기간" in note.text
+
+
+def test_ordinary_weekday_am_is_normal_lag():
+    """갭 경고가 매일 뜨면 경고가 아니게 된다 — 평시엔 조용해야 한다."""
+    note = C.describe_trading_gap(date(2026, 9, 15), "AM")   # 화요일
+    assert note.lag_days_us == 0
+    assert "정상 시차" in note.text
+
+
+# ── 필수 검색 체크리스트 (2026-09-14 사고 대응) ──────────────────
+
+def test_required_searches_widen_the_window_after_a_gap():
+    qs = C.required_searches(date(2026, 9, 14), "AM")
+    assert any("2026-09-11" in q and "휴장 2일치" in q for q in qs), \
+        "갭이 있으면 조사 기간을 '어젯밤'이 아니라 갭 전체로 넓혀야 한다"
+
+
+def test_narrative_axis_is_always_searched():
+    """2026-09-14에 놓친 'AI 속도조절론'은 지수도 지표도 공시도 아닌
+    **업계 리더의 발언**이었다. 시장 반응만 훑으면 영영 못 잡는다."""
+    for slot in ("AM", "PM", "WEEKEND"):
+        qs = C.required_searches(date(2026, 9, 15), slot)
+        assert any("속도조절" in q for q in qs), f"{slot}에 서사 축이 없다"
+        assert any("데이터센터" in q for q in qs)
+
+
+def test_calendar_block_carries_the_checklist():
+    for slot in ("AM", "PM"):
+        body = CTX.build_calendar_block(date(2026, 9, 14), slot).body
+        assert "필수 검색 항목" in body
+        assert "검색함 → 해당 없음" in body, "미검색과 '찾았는데 없음'을 구분하게 해야 한다"
+
+
+def test_weekend_pack_sweeps_news_not_just_the_calendar():
+    """주말엔 AM·PM이 안 돈다. 여기서 안 훑으면 월요일 개장 때 가격으로
+    먼저 만나게 된다 — 2026-09-14가 정확히 그랬다."""
+    pack, _ = CTX.build_pack("WEEKEND", date(2026, 9, 12))
+    titles = [b.title for b in pack.blocks]
+    assert any("주말 뉴스 스윕" in t for t in titles)
+    body = next(b.body for b in pack.blocks if "주말 뉴스 스윕" in b.title)
+    assert "속도조절" in body
 
 
 def test_pm_flags_when_korea_is_closed_today():

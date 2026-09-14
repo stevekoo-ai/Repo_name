@@ -86,7 +86,17 @@ def describe_trading_gap(as_of: date, slot: str) -> TradingGapNote:
     PM 슬롯: "오늘 한국"을 다루므로 한국이 오늘 열렸는지가 핵심.
     """
     kr_open = is_trading_day("KR", as_of)
-    us_last = last_trading_day("US", as_of + timedelta(days=1))  # "어젯밤까지" 포함
+    # ⚠️ 2026-09-14 버그 수정. 이전 코드는 `as_of + 1일`을 기준으로 직전
+    # 미국 거래일을 찾았는데, 그러면 평일에는 **오늘**이 직전 거래일로
+    # 잡혀 gap이 항상 -1이 됐다 — 즉 **휴장 갭 경고가 단 한 번도 뜰 수
+    # 없었다.** 실제 피해: 2026-09-14(월) 아침 브리핑이 "정상 시차"를
+    # 받아 주말 이틀치 뉴스(AI 속도조절론)를 조사 대상에서 빠뜨렸고,
+    # 그날 코스피는 그 재료로 -3.26% 급락했다.
+    #
+    # AM 브리핑은 07:30 KST에 돈다. 그 시각 미국의 `as_of` 세션은 아직
+    # 열리지도 않았다(미국 월요일장은 그날 22:30 KST 시작). 따라서
+    # "밤사이 미국"은 **as_of 이전의 마지막 세션**이다.
+    us_last = last_trading_day("US", as_of)
     kr_last = last_trading_day("KR", as_of + timedelta(days=1)) if not kr_open else as_of
 
     us_gap = (as_of - us_last).days - 1  # 미국이 쉰 날 수(당일 제외 개념 보정)
@@ -99,12 +109,15 @@ def describe_trading_gap(as_of: date, slot: str) -> TradingGapNote:
     lines = []
     if slot == "AM":
         if us_gap >= 2:
-            lines.append(f"⚠️ **미국 시장이 {us_gap}일 연속 휴장 후 재개**됐다"
-                         f"(직전 거래일 {us_last.isoformat()}). "
-                         "그 기간 쌓인 뉴스·이벤트가 하루치처럼 한꺼번에 가격에 반영됐을 수 있다 — "
+            lines.append(f"⚠️ **미국 시장이 {us_gap}일 연속 휴장 후 재개**된다"
+                         f"(직전 세션 {us_last.isoformat()}). "
+                         "그 기간 쌓인 뉴스·이벤트가 하루치처럼 한꺼번에 가격에 반영된다 — "
                          "'하루 동안 무슨 일이'가 아니라 '휴장 동안 무슨 일이'로 조사할 것.")
+            lines.append(f"🔎 **조사 대상 기간: {us_last.isoformat()} 미국 종가 이후 ~ 지금"
+                         f"({as_of.isoformat()} 한국 개장 전)**. "
+                         f"이 기간은 금요일 가격에 **반영돼 있지 않다.**")
         else:
-            lines.append(f"미국 직전 거래일: {us_last.isoformat()} (정상 시차).")
+            lines.append(f"미국 직전 세션: {us_last.isoformat()} (정상 시차).")
         if not kr_open:
             lines.append(f"⚠️ **오늘(한국) 휴장이다.** 오늘 한국장 전망은 성립하지 않는다 — "
                          f"다음 개장일까지 누적해서 볼 것.")
@@ -165,3 +178,46 @@ def historical_analog(event_type: str) -> dict | None:
         return None
     doc = yaml.safe_load(_HISTORY_FILE.read_text(encoding="utf-8")) or {}
     return doc.get("patterns", {}).get(event_type)
+
+
+# ── 필수 검색 체크리스트 ─────────────────────────────────────────
+#
+# 2026-09-14 사고 이후 추가. 그날 AM 브리핑은 주말 갭을 스스로 알아채고
+# "주말 이틀치 뉴스가 얹힌다"고 서두에 쓰기까지 했는데, **실제 검색은
+# 금요일 재료만 훑었다** — 인지와 행동이 분리돼 있었다. 그리고 9체크포인트
+# ③빅테크 CapEx 칸에 "해당 뉴스 없음"이라고 적었는데, 같은 날 시장을
+# -3.26% 끌어내린 재료가 바로 그 칸에 들어갈 것이었다.
+#
+# 프롬프트 문장으로는 이걸 못 막는다(이미 "휴장 동안 무슨 일이"라고
+# 적혀 있었다). 그래서 **검색해야 할 항목을 코드가 목록으로 만들어**
+# 팩에 박는다. 프롬프트는 "이 목록을 전부 소화하라"만 하면 된다.
+
+# 시장 반응(지수·지표)이 아니라 **서사**를 잡는 축. 2026-09-14에 놓친
+# "AI 속도조절론"이 정확히 이 유형이었다 — 증시 마감 기사도, 지표
+# 발표도, 기업 공시도 아닌 **업계 리더의 발언**이었다.
+NARRATIVE_QUERIES = [
+    "AI 투자 속도조절·감속론, 빅테크 CapEx 가이던스 변화",
+    "AI 업계 리더(오픈AI·앤트로픽·엔비디아·빅테크 CEO) 발언과 정책 기조",
+    "데이터센터 건설 지연·전력 제약·인허가 이슈",
+]
+
+
+def required_searches(as_of: date, slot: str) -> list[str]:
+    """이번 실행에서 **반드시** 검색해야 할 항목. 팩에 그대로 실린다."""
+    out: list[str] = []
+    if slot == "AM":
+        us_last = last_trading_day("US", as_of)
+        gap = (as_of - us_last).days - 1
+        if gap >= 1:
+            out.append(f"**{us_last.isoformat()} 미국 종가 이후 지금까지** 나온 뉴스 전체"
+                       f"(휴장 {gap}일치 — '어젯밤'이 아니라 이 기간으로 검색할 것)")
+        else:
+            out.append(f"{us_last.isoformat()} 미국 세션 마감과 그 이유")
+    elif slot == "PM":
+        out.append("오늘 한국장 마감과 수급, 오늘 나온 국내 정책·공시")
+    else:  # WEEKEND
+        us_last = last_trading_day("US", as_of)
+        out.append(f"**{us_last.isoformat()} 이후 주말 사이** 새로 나온 뉴스"
+                   f"(주말은 AM·PM이 돌지 않아 이 슬롯이 유일한 포착 지점이다)")
+    out.extend(NARRATIVE_QUERIES)
+    return out

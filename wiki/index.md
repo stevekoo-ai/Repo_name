@@ -39,6 +39,8 @@ Catalog of every page in the wiki. See `../CLAUDE.md` for conventions.
 
 ### monitoring (일일 추적 & 점수)
 
+- [ai-capex-slowdown-status.md](monitoring/ai-capex-slowdown-status.md) — 🆕 2026-09-14. AI 투자 속도조절론 추적. 핵심 질문은 "서사인가 숫자인가" — 업계 리더 발언(밸류에이션 재평가 압력)과 빅테크 CapEx 가이던스 실제 하향(수요 축소 확정)은 하이닉스에 전혀 다르게 작용한다. 2026-09-14 코스피 -3.26%를 만든 재료를 아침 브리핑이 놓친 사고에서 축으로 승격
+
 - [housing-funding-execution-status.md](monitoring/housing-funding-execution-status.md) — 🆕 2026-09-12. 자금 조달 진행률·CDP 발동 여부·판단 포스트 채점을 매일 추적 (브리핑 팩 블록 ⑧이 자동 갱신)
 
 - [HBM Cycle Score — Daily Status & Tracking](monitoring/hbm-cycle-score-status.md) — 🆕 2026-08-08, 4-layer 구조화에 따라 concepts/hbm-cycle-score.md에서 분리된 일일 점수 및 체크 이력(append-only). 2026-07-24 이후 모든 체크 기록(70+ 항목), 거시 상황·시장심리·펀더멘털 분석 포함. Framework 정의는 concepts/hbm-cycle-score.md 참고

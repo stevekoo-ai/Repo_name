@@ -250,6 +250,7 @@ def select_digests(as_of: date, triggers: set[str], slots: int = DIGEST_SLOTS) -
 
 # 트리거 이름 = digest slug. 우선순위는 이 순서대로.
 TRIGGER_TO_DIGEST_ORDER = [
+    "ai-capex-slowdown",
     "fx-regime-score",
     "hbm-cycle-score",
     "sk-hynix-analyst-thesis-checkpoints",
@@ -489,12 +490,51 @@ def build_calendar_block(as_of: date, slot: str) -> Block:
 
     gap = C.describe_trading_gap(as_of, slot)
     lines = [gap.text]
+
+    # 필수 검색 체크리스트 — 2026-09-14 사고 이후 추가.
+    # 그날 AM은 주말 갭을 스스로 알아채고 서두에 쓰기까지 했는데 검색은
+    # 금요일 것만 했다. 인지와 행동이 따로 놀았다. 목록을 코드가 박아서
+    # 프롬프트가 "전부 소화하라"만 하면 되게 만든다.
+    lines.append("\n**🔎 이번 실행 필수 검색 항목** (하나도 빠뜨리지 말 것)")
+    for q in C.required_searches(as_of, slot):
+        lines.append(f"- {q}")
+    lines.append("")
+    lines.append("> ⚠️ **이 목록은 프롬프트의 '검색 3~5회면 충분, 과하게 돌지 말 것' "
+                 "권장보다 우선한다.** 목록을 전부 소화한 뒤에 횟수를 따져라 — "
+                 "8~12회까지는 정상이다.")
+    lines.append("> ⚠️ 검색 결과가 없으면 **'미검색'이 아니라 '검색함 → 해당 없음'**으로 "
+                 "구분해 적을 것. 안 찾은 것과 찾았는데 없는 것은 다르다.")
+    lines.append("> ⚠️ **9체크포인트의 각 칸도 마찬가지다.** 검색하지 않은 칸에 "
+                 "'해당 뉴스 없음'이라고 적지 마라 — 2026-09-14에 ③빅테크 CapEx 칸이 "
+                 "정확히 그렇게 비어 있었고, 같은 날 코스피를 -3.26% 끌어내린 재료가 "
+                 "바로 그 칸에 들어갈 것이었다.")
+
     events = C.upcoming_events(as_of, horizon_days=5)
     if events:
         lines.append("\n**5일 내 예정된 확정 일정**:")
         for e in events:
             lines.append(f"- {e['date']} {e.get('country', '')} {e['name']}")
     return Block("calendar", "⑥ 거래 캘린더 (휴장·시차)", "\n".join(lines))
+
+
+def build_weekend_news_block(as_of: date) -> Block:
+    """⑥ 주말 뉴스 스윕 — WEEKEND 슬롯 전용.
+
+    2026-09-14 사고의 구조적 원인 중 하나. 주말엔 AM·PM이 돌지 않고,
+    WEEKEND 슬롯은 설계상 "다음주 예정 일정" 안내라 **뉴스를 훑지 않았다.**
+    그래서 주말에 터진 재료는 월요일 AM이 유일한 포착 지점이었는데,
+    그 AM마저 휴장 갭 버그로 "정상 시차" 판정을 받았다 — 이중 공백.
+
+    이 블록이 주말에도 뉴스를 훑게 한다."""
+    from engine.briefing import calendar as C
+
+    lines = ["주말엔 AM·PM 브리핑이 돌지 않는다. **주말 사이 터진 재료를 잡는 "
+             "유일한 지점이 여기다** — 못 잡으면 월요일 개장 때 가격으로 먼저 만난다.",
+             "", "**🔎 필수 검색 항목**"]
+    for q in C.required_searches(as_of, "WEEKEND"):
+        lines.append(f"- {q}")
+    lines.append("- ⚠️ 없으면 **'검색함 → 해당 없음'**으로 적을 것(미검색과 구분).")
+    return Block("weekend_news", "⑥ 주말 뉴스 스윕", "\n".join(lines))
 
 
 def build_weekly_outlook_block(as_of: date) -> Block:
@@ -654,6 +694,7 @@ def build_pack(slot: str, as_of: date | None = None) -> tuple[BriefingPack, Gate
             build_digest_block(as_of, *detect_triggers(as_of)),
             build_ledger_block(as_of),
             build_execution_block(as_of),
+            build_weekend_news_block(as_of),
             build_weekly_outlook_block(as_of),
         ])
         return pack, Gate(publish=True, reasons=["주간 전망은 항상 발행"])
