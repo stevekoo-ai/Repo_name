@@ -239,3 +239,4 @@ timestamp_utc,workflow,step,attempts_used,max_attempts,result
 2026-09-10T20:15:03Z,real-estate-sync,officetel_sale,1,36,success
 2026-09-10T23:20:52Z,core10-collect,core10,1,4,success
 2026-09-15T05:31:50Z,macro-data-sync,macro_sync,1,36,success
+2026-09-15T12:58:15Z,macro-data-sync,macro_sync,1,36,success
