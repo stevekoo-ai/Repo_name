@@ -37,6 +37,13 @@ import yaml
 REPO = Path(__file__).resolve().parents[2]
 KST = timezone(timedelta(hours=9))
 
+# macro-series.csv는 매일 자라고 과거분도 소급 백필된다 — 테스트가 이
+# 실제 파일을 직접 읽으면 파일이 자랄 때마다 "특정 as_of 시점엔 지연이
+# 있었다/없었다" 같은 시간에 종속된 단언이 깨진다. 모듈 상수로 빼서
+# 테스트가 monkeypatch로 격리된 파일을 넣을 수 있게 한다(원장 격리와
+# 같은 이유 — tests/test_briefing_context.py의 _isolated_ledger 참고).
+MACRO_SERIES = REPO / "sources" / "macro-series.csv"
+
 # 팩의 크기 상한(문자). 넘으면 잘라내고 잘렸다고 표기한다 —
 # 조용히 넘치면 그날 리포트만 이상해지고 원인을 못 찾는다.
 MAX_PACK_CHARS = 24_000
@@ -89,7 +96,7 @@ class BriefingPack:
 # 블록 ① 오늘의 실측 팩트시트
 # ─────────────────────────────────────────────────────────────
 def _series_map() -> dict[str, list[tuple[str, float]]]:
-    path = REPO / "sources" / "macro-series.csv"
+    path = MACRO_SERIES
     out: dict[str, list[tuple[str, float]]] = {}
     if not path.exists():
         return out
@@ -154,7 +161,7 @@ def collection_freshness(now: datetime | None = None) -> tuple[str | None, float
     "오늘 수집분이 아직 없으니 직전 세션은 뉴스로 확인해야 한다"고
     행동할 수 있다(R1: 측정 > 추론).
     """
-    p = REPO / "sources" / "macro-series.csv"
+    p = MACRO_SERIES
     if not p.exists():
         return None, None
     latest = ""

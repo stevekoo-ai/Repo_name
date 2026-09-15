@@ -74,8 +74,20 @@ def test_missing_series_are_named_not_silently_dropped():
     assert "미수집" in block.body
 
 
-def test_stale_series_carry_a_delay_marker():
-    block = C.build_fact_sheet(AS_OF)
+def test_stale_series_carry_a_delay_marker(monkeypatch, tmp_path):
+    """macro-series.csv는 매일 자라고 과거분도 소급 백필된다 — 실제 파일을
+    읽으면 파일이 자랄수록 AS_OF 시점의 "지연 있었다" 전제가 깨진다(2026-09-15
+    실측: 이 테스트가 그렇게 깨졌었다). 원장 격리(_isolated_ledger)와 같은
+    이유로 macro-series.csv도 격리된 픽스처로 대체한다."""
+    p = tmp_path / "macro-series.csv"
+    p.write_text(
+        "series,date,value,provider,fetched_at\n"
+        "us_nasdaq,2026-09-01,26000.00,fred,2026-09-01T00:00:00+00:00\n"
+        "us_nasdaq,2026-09-05,26100.00,fred,2026-09-05T00:00:00+00:00\n",
+        encoding="utf-8",
+    )
+    monkeypatch.setattr(C, "MACRO_SERIES", p)
+    block = C.build_fact_sheet(AS_OF)  # AS_OF = 2026-09-11, 마지막 값은 09-05 → 6일 지연
     assert "지연" in block.body, "지연된 계열이 표시돼야 한다"
 
 
