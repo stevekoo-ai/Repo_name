@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>저녁 브리핑 2026-09-15 (한국→미국)</title>
+<style>
+:root {
+  --bg: #f5f6f8; --surface: #ffffff; --surface-2: #f0f1f4; --border: #e2e4e9;
+  --text: #16181d; --text-muted: #5c6270; --accent: #2563eb;
+  --good: #157a3d; --good-bg: #e5f6ea; --warn: #92510c; --warn-bg: #fdf0dd;
+  --bad: #b3261e; --bad-bg: #fbe6e4; --neutral: #40465a; --neutral-bg: #eceef2;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #14161b; --surface: #1c1f26; --surface-2: #23262f; --border: #333846;
+    --text: #eceef2; --text-muted: #a0a6b5; --accent: #7fa8ff;
+    --good: #6cd48f; --good-bg: #113222; --warn: #f0b862; --warn-bg: #3a2a10;
+    --bad: #f28b82; --bad-bg: #3a1614; --neutral: #b7bccb; --neutral-bg: #262a35;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #14161b; --surface: #1c1f26; --surface-2: #23262f; --border: #333846;
+  --text: #eceef2; --text-muted: #a0a6b5; --accent: #7fa8ff;
+  --good: #6cd48f; --good-bg: #113222; --warn: #f0b862; --warn-bg: #3a2a10;
+  --bad: #f28b82; --bad-bg: #3a1614; --neutral: #b7bccb; --neutral-bg: #262a35;
+}
+:root[data-theme="light"] {
+  --bg: #f5f6f8; --surface: #ffffff; --surface-2: #f0f1f4; --border: #e2e4e9;
+  --text: #16181d; --text-muted: #5c6270; --accent: #2563eb;
+  --good: #157a3d; --good-bg: #e5f6ea; --warn: #92510c; --warn-bg: #fdf0dd;
+  --bad: #b3261e; --bad-bg: #fbe6e4; --neutral: #40465a; --neutral-bg: #eceef2;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0; background: var(--bg); color: var(--text);
+  font-family: -apple-system, "Segoe UI", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+  line-height: 1.6;
+}
+.page { max-width: 920px; margin: 0 auto; padding: 24px 16px 64px; }
+header.masthead { padding: 8px 0 20px; }
+header.masthead h1 { font-size: 1.5rem; margin: 0 0 4px; }
+header.masthead .sub { color: var(--text-muted); font-size: 0.9rem; }
+.tile-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin: 12px 0; }
+.tile { background: var(--surface-2); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; }
+.tile-label { font-size: 0.78rem; color: var(--text-muted); display: flex; align-items: center; gap: 6px; }
+.tile-value { font-size: 1.35rem; font-weight: 700; margin-top: 2px; }
+.tile-sub { font-size: 0.78rem; color: var(--text-muted); margin-top: 2px; }
+.dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+.dot-good { background: var(--good); } .dot-warn { background: var(--warn); }
+.dot-bad { background: var(--bad); } .dot-neutral { background: var(--neutral); }
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
+  padding: 20px 22px; margin-bottom: 16px; }
+.card.highlight { border-color: var(--accent); }
+.card h2 { font-size: 1.1rem; margin: 0 0 10px; }
+.card h3 { font-size: 0.95rem; margin: 16px 0 8px; color: var(--text-muted); }
+.kv-list { list-style: none; padding: 0; margin: 0; }
+.kv-list li { padding: 6px 0; border-bottom: 1px dashed var(--border); font-size: 0.92rem; }
+.kv-list li:last-child { border-bottom: none; }
+.kv-list b { display: inline-block; min-width: 130px; color: var(--text-muted); font-weight: 600; }
+.pending { color: var(--text-muted); font-style: italic; }
+.muted { color: var(--text-muted); }
+.badge { display: inline-block; padding: 3px 10px; border-radius: 999px; font-size: 0.78rem; font-weight: 600; }
+.badge-good { background: var(--good-bg); color: var(--good); }
+.badge-warn { background: var(--warn-bg); color: var(--warn); }
+.badge-bad { background: var(--bad-bg); color: var(--bad); }
+.badge-neutral { background: var(--neutral-bg); color: var(--neutral); }
+.table-wrap { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: 0.88rem; }
+th, td { text-align: left; padding: 7px 10px; border-bottom: 1px solid var(--border); white-space: nowrap; }
+th { color: var(--text-muted); font-weight: 600; font-size: 0.78rem; text-transform: uppercase; letter-spacing: .02em; }
+.spark-cell { white-space: normal; }
+.spark { display: block; }
+.spark-labels { display: flex; justify-content: space-between; font-size: 0.68rem; color: var(--text-muted);
+  width: 176px; }
+.spark-empty { font-size: 0.78rem; }
+.stale-mark { color: var(--warn); cursor: help; }
+.clock-row { display: flex; gap: 18px; align-items: center; flex-wrap: wrap; }
+.clock-img { width: 180px; height: 180px; border-radius: 10px; flex-shrink: 0;
+  background: #ffffff; padding: 6px; border: 1px solid var(--border); }
+.chart-img { width: 100%; height: auto; border-radius: 10px;
+  background: #ffffff; padding: 6px; border: 1px solid var(--border); }
+.discuss-card { background: var(--surface-2); border-left: 3px solid var(--accent); border-radius: 8px;
+  padding: 12px 16px; margin: 10px 0; }
+.discuss-topic { font-weight: 700; margin-bottom: 4px; }
+.discuss-context { color: var(--text-muted); font-size: 0.88rem; margin: 4px 0; }
+.discuss-question { margin: 6px 0 0; font-size: 0.94rem; }
+.discuss-input { width: 100%; margin-top: 10px; padding: 8px 10px; border-radius: 8px;
+  border: 1px solid var(--border); background: var(--surface); color: var(--text);
+  font-family: inherit; font-size: 0.88rem; resize: vertical; box-sizing: border-box; }
+.discuss-input:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+.discuss-actions { display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap; }
+.discuss-toolbar { display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+  padding: 10px 14px; background: var(--surface-2); border-radius: 10px; margin-bottom: 10px; }
+.btn-fb { font-family: inherit; font-size: 0.82rem; font-weight: 600; padding: 6px 12px;
+  border-radius: 8px; border: 1px solid var(--border); background: var(--surface);
+  color: var(--text); cursor: pointer; }
+.btn-fb:hover { border-color: var(--accent); }
+.btn-fb:disabled { opacity: 0.7; cursor: default; }
+.btn-fb-primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+.copy-output { margin-top: 10px; padding: 12px 14px; background: var(--surface-2);
+  border: 2px dashed var(--accent); border-radius: 10px; }
+.copy-output textarea { width: 100%; box-sizing: border-box; padding: 8px 10px; border-radius: 8px;
+  border: 1px solid var(--border); background: var(--surface); color: var(--text);
+  font-family: inherit; font-size: 0.82rem; resize: vertical; margin-top: 6px; }
+.copy-output a#peos-copy-output-link { display: none; margin-top: 8px; color: var(--accent);
+  font-size: 0.88rem; font-weight: 600; }
+.action-card { border-radius: 10px; border: 1px solid var(--border); padding: 12px 16px; margin: 8px 0 14px; }
+.action-good { border-left: 4px solid var(--good); }
+.action-warn { border-left: 4px solid var(--warn); }
+.action-bad { border-left: 4px solid var(--bad); }
+.action-neutral { border-left: 4px solid var(--neutral); }
+.action-title { font-weight: 700; margin-bottom: 6px; }
+.action-row { font-size: 0.86rem; margin: 3px 0; color: var(--text); }
+.action-row .k { display: inline-block; min-width: 68px; color: var(--text-muted); font-weight: 600; }
+.action-conflict { color: var(--warn); }
+.scenario-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; }
+.scenario-card { background: var(--surface-2); border-radius: 10px; padding: 14px 16px; font-size: 0.85rem; }
+.scenario-title { font-weight: 700; font-size: 1rem; margin-bottom: 8px; }
+.scenario-prob { color: var(--accent); }
+.scenario-card p { margin: 6px 0; }
+footer { color: var(--text-muted); font-size: 0.78rem; text-align: center; padding-top: 16px; }
+
+/* 브리핑 전용 최소 보강 — 나머지는 월간 리포트·대시보드와 같은 _CSS를 쓴다 */
+body { max-width: 860px; margin: 0 auto; padding: 24px 16px 48px; }
+h2 { margin-top: 32px; padding-top: 16px; border-top: 1px solid var(--border); }
+table { width: 100%; border-collapse: collapse; }
+th, td { padding: 6px 10px; border-bottom: 1px solid var(--border); }
+blockquote { margin: 12px 0; padding: 10px 14px; background: var(--surface-2);
+  border-left: 3px solid var(--accent); border-radius: 4px; }
+.table-wrap { overflow-x: auto; }
+</style>
+</head>
+<body>
+<h1>저녁 브리핑 2026-09-15 — 한국→미국</h1>
+<p>오늘은 한국 정상 개장일이었다. 어제(-3.26%) 대비 낙폭이 크게 줄었고, 오늘은 KIS 실측이 정상 반영돼(어제 지적한 스테일 문제 해소) 숫자에 대한 확신도가 높다.</p>
+<h2>오늘 한국에서 무슨 일이 있었나</h2>
+<ol><li>**코스피 -0.85%(6,627.26), 코스닥 +0.70%(812.41)로 낙폭이 크게</li></ol>
+<p>줄었다.<strong> 코스피 외국인 -1조 5,711억 / 기관 -9,044억 순매도(어제 -3.9조/-1.7조 대비 축소). 반면 </strong>코스닥은 외국인·기관 동반 순매수 (+238억/+1,107억)로 지수를 밀어올렸다** — 대형 반도체주와 중소형주 사이 수급이 갈렸다. → 미국도 이런 "패닉의 정점은 지났다" 흐름을 따라가는지가 오늘 밤 관전 포인트.</p>
+<ol><li><strong>SK하이닉스·삼성전자는 장 초반 저가매수로 반등했다가 되밀렸다.</strong></li></ol>
+<p>개장 직후 하이닉스 +1.00%(1,714,000원)·삼성전자 +0.40%(250,000원)로 출발했으나("美 반도체 급락에도 매 먼저 맞아 반등"이라는 해석), KIS 종가는 하이닉스 <strong>1,688,000원(-0.53%)</strong>로 되밀렸다. → 저가매수 심리는 살아있지만 하루 만에 되돌림을 완전히 흡수하진 못했다는 뜻 — 미국이 오늘 밤 추가로 흔들리면 이 반등 시도가 무력화될 수 있다.</p>
+<ol><li>**미 10년물이 오늘 장중 5.03%(15시 5.02%)까지 치솟아 2007년 7월</li></ol>
+<p>이후 최고치를 찍었다.<strong> CME 페드워치 인상확률이 한때 </strong>92.3%<strong>까지 급등 — 어제 이 브리핑이 "ⓑ유가→금리 축은 서사가 아니라 사실"이라고 본 것이 오늘 숫자로 재확인됐다. 유가발 인플레·재정적자發 국채 공급 증가가 원인으로 지목된다. → 이건 미국 시장 전체(반도체 국한 아님)에 적용되는 축이라, 오늘 밤 미국장의 1순위 변수는 AI서사가 아니라 </strong>금리다.**</p>
+<ol><li><strong>"AI 속도조절론" CapEx 축은 오늘 조사에서 반박 증거가 나왔다.</strong></li></ol>
+<p>아마존은 이미 2분기에 2026년 CapEx 가이던스를 2,000억→2,200억달러로 <strong>상향</strong>했다(앤디 재시 CEO, 메모리 가격 상승·AI·클라우드 수요를 근거로 들었음). 빅4(아마존·알파벳·메타·MS) 합산 2026 CapEx 가이던스는 $7,350억~7,600억으로 오늘도 삭감 발표가 없다. 데이터센터 건설 지연도 원인이 전력기기(초고압 변압기) 공급 병목이지 <strong>수요 위축이 아니다</strong> (40~60%가 아직 착공 전). → 서사(AI속도조절)와 사실(CapEx 가이던스)의 괴리가 어제보다 더 벌어졌다.</p>
+<ol><li><strong>AI 리더 진영 내에서도 온도차가 났다.</strong> 앤트로픽 아모데이·오픈AI·</li></ol>
+<p>xAI·딥마인드 수장들은 "속도조절" 쪽이지만, <strong>젠슨 황(엔비디아 CEO)은 9/10 골드만삭스 콘퍼런스에서 사실상 회의적 반응</strong>을 보였다[해석 주의·미검증 뉘앙스]. 오픈AI 올트먼은 2026년 IPO를 안전성 이유로 연기했다 — 이건 CapEx 신호가 아니라 지배구조 신호다. → 시장이 "속도조절 서사"를 CapEx 삭감으로 오해하고 있을 가능성을 뒷받침한다.</p>
+<h2>실측이 말하는 것</h2>
+<p>⚠️ 오늘은 KIS 실측이 정상 반영됐다(2026-09-15 종가) — 어제 지적한 스테일 문제는 해소됐다.</p>
+<p><strong>① 거시 실측 (팩 원본)</strong></p>
+<div class='table-wrap'><table><thead><tr><th style='text-align:left'>지표</th><th style='text-align:right'>최신</th><th style='text-align:right'>1일</th><th style='text-align:right'>5일</th><th style='text-align:left'>기준일</th></tr></thead><tbody><tr><td style='text-align:left'>나스닥</td><td style='text-align:right'>26,333.04</td><td style='text-align:right'>+0.96%</td><td style='text-align:right'>-0.94%</td><td style='text-align:left'>09-11 ⚠️4일 지연</td></tr><tr><td style='text-align:left'>S&amp;P500</td><td style='text-align:right'>7,619.98</td><td style='text-align:right'>-0.48%</td><td style='text-align:right'>-1.28%</td><td style='text-align:left'>09-14</td></tr><tr><td style='text-align:left'>VIX</td><td style='text-align:right'>15.84</td><td style='text-align:right'>-11.2%</td><td style='text-align:right'>+9.0%</td><td style='text-align:left'>09-11 ⚠️4일 지연</td></tr><tr><td style='text-align:left'>미 10년물(팩)</td><td style='text-align:right'>4.96%</td><td style='text-align:right'>+1bp</td><td style='text-align:right'>+20bp</td><td style='text-align:left'>09-11 ⚠️4일 지연, <strong>오늘 장중 5.03% 별도 뉴스 확인</strong></td></tr><tr><td style='text-align:left'>브렌트유</td><td style='text-align:right'>109.51$</td><td style='text-align:right'>+3.19%</td><td style='text-align:right'>+12.21%</td><td style='text-align:left'>09-09 ⚠️6일 지연</td></tr><tr><td style='text-align:left'>원/달러(ECOS)</td><td style='text-align:right'>1,346.40원</td><td style='text-align:right'>+0.61%</td><td style='text-align:right'>-0.65%</td><td style='text-align:left'>09-14</td></tr><tr><td style='text-align:left'>달러지수</td><td style='text-align:right'>118.21</td><td style='text-align:right'>+0.11%</td><td style='text-align:right'>+0.07%</td><td style='text-align:left'>09-11 ⚠️4일 지연</td></tr></tbody></table></div>
+<p><strong>② SK하이닉스 실측 (KIS, 오늘자 정상 반영)</strong></p>
+<div class='table-wrap'><table><thead><tr><th style='text-align:left'>항목</th><th style='text-align:right'>값</th></tr></thead><tbody><tr><td style='text-align:left'>종가 (09-15)</td><td style='text-align:right'>1,688,000원 (-0.53%)</td></tr><tr><td style='text-align:left'>외국인 보유율</td><td style='text-align:right'>50.27%</td></tr><tr><td style='text-align:left'>5거래일 순매수(외국인/기관/개인)</td><td style='text-align:right'>-4.67조 / -0.30조 / -0.57조</td></tr><tr><td style='text-align:left'>ADR (09-14 미국 세션)</td><td style='text-align:right'>$175.63 (-7.60%)</td></tr><tr><td style='text-align:left'>신용융자잔고 (09-14)</td><td style='text-align:right'>503,988주 (<strong>+76,840</strong>)</td></tr></tbody></table></div>
+<p><strong>신용융자잔고가 어제 급락 와중에 오히려 7만 6,840주 늘었다</strong> — 09/11(427,148주) 대비 <strong>+18%</strong>. 이건 두 갈래로 읽힌다: (a) 저가매수가 레버리지를 동원할 만큼 강했다(긍정) 또는 (b) 추가 하락 시 반대매매 압력이 쌓였다(부정). 어제 아침 브리핑이 "다음 수집분이 이 판단의 시험대"라고 예고했던 게 바로 이 숫자다 — 아래 위키 신호 섹션에서 갱신한다.</p>
+<h2>아침 전망 채점</h2>
+<p>아침 브리핑(2026-09-15-AM)의 5개 결론 중 <strong>2번과 4번이 오늘 실측으로 검증됐다.</strong></p>
+<ul><li>**2번("두 축이고 성격이 다르다 — ⓑ유가→금리는 사실, ⓐAI속도조절은</li></ul>
+<p>서사")이 정확히 맞았다.<strong> 오늘 ⓑ축이 10년물 5.03% 터치·인상확률 92.3%로 실제로 강화됐고, ⓐ축은 아마존 CapEx 상향이라는 </strong>반박 증거**까지 나오며 서사 쪽으로 더 밀렸다.</p>
+<ul><li>**4번의 조건 ⓐ(빅테크 CapEx 공식 삭감 발표)는 오늘도 충족되지</li></ul>
+<p>않았다** — 오히려 정반대(아마존 상향) 방향의 정보가 나왔다. 조건 ⓑ(브렌트 100달러 이탈)도 미확인, 조건 ⓒ(FOMC 동결)는 내일 새벽(09-17 03:00 KST) 결과가 나와야 판정 가능.</p>
+<ul><li><strong>1번(어제의 "국내 과잉반응" 기대는 못 쓴다)</strong>은 이미 어제 아침에</li></ul>
+<p>확정된 전제라 오늘 새로 검증할 게 없다 — 단, P0013 예측(ADR 하락)이 자동 채점 결과 <strong>HIT</strong>로 확정됐다(engine 채점, <code>data/predictions/ledger.csv</code>). 참고로 어제 저녁 이 브리핑이 "과잉반응일 가능성"을 가설로 걸었던 것 자체는 오늘 아침 브리핑에서 틀린 것으로 확인됐다(ADR -7.58% &gt; 국내 -7.12%) — 방향성 예측(ADR 하락)은 맞혔지만 "국내만의 반응"이라는 해석은 틀렸다는 뜻으로, 둘을 구분해서 기록한다.</p>
+<ul><li>3번(FOMC 인상확률을 숫자로 논증하지 않는다)은 오늘도 유효한 태도다 —</li></ul>
+<p>CME 페드워치 92.3%라는 구체 수치가 나왔지만 이는 "한때" 찍힌 장중 피크치이고, 다른 소스는 여전히 이보다 낮은 값을 보일 수 있어 단일 수치로 확정하지 않는다.</p>
+<h2>위키 추적 신호</h2>
+<p>팩 ③에 오늘은 "찐반등 4대 신호" digest가 선별되지 않았다(대신 FX 전환경고·거시국면·금리전망·SA청산·KOSPI밸류 5건이 뽑힘). 그러나 KIS 실측(신용융자 +76,840주, +18%)은 그 프레임의 ①빚의청산 축과 직접 관련된 새 정보라 위키에 반영한다 — 상세는 <code>wiki/monitoring/market-cycles-leverage-risk-status.md</code> 2026-09-15 저녁 항목, digest 동시 갱신(아래 참고).</p>
+<p>🟢 FX 전환 경고는 오늘 2/4로 상승(팩 ③ "오늘 켜진 신호"), 미 10년물 20일 +0.33%p로 미국 긴축형 신호가 강화되는 중 — 원인이 NON_US_SHOCK인지 US_TIGHTENING인지의 구분은 09-11 이후 계속 흔들리고 있다. 오늘 10년물이 5%를 넘은 건 US_TIGHTENING 쪽에 힘을 싣는 실측이다. 이 파일은 어제 직접 갱신하지 않았고, 오늘도 팩에 상세 digest가 없어 다음 아침 브리핑에서 정식 재점검이 필요하다는 점만 남겨둔다.</p>
+<h2>SK하이닉스에 미칠 영향</h2>
+<p>오늘 사건이 걸리는 축은 <strong>①③⑥⑧</strong>이다.</p>
+<div class='table-wrap'><table><thead><tr><th style='text-align:left'>체크포인트</th><th style='text-align:left'>오늘 사건과의 연결</th><th style='text-align:left'>내 판단</th></tr></thead><tbody><tr><td style='text-align:left'>①빚의청산 관련 신용융자</td><td style='text-align:left'>09-14 신용융자 +76,840주(+18%), 급락 와중 증가</td><td style='text-align:left'>위 "실측이 말하는 것" 참고 — 반대매매 압력 축적 가능성, 다음 며칠 추가 증가 여부가 핵심</td></tr><tr><td style='text-align:left'>③빅테크 CapEx</td><td style='text-align:left'>아마존 2026 가이던스 2,000억→2,200억달러 <strong>상향</strong> 확인, 빅4 합산 $7,350~7,600억 유지</td><td style='text-align:left'><strong>AI속도조절론發 수요둔화 우려의 반박 근거.</strong> 실제 가이던스는 삭감이 아니라 오늘도 유지·상향 쪽 — 어제 시장이 가격에 반영한 우려와 오늘 확인된 사실 사이 괴리가 커지고 있다</td></tr><tr><td style='text-align:left'>⑥ADR 프리미엄</td><td style='text-align:left'>09-14 ADR -7.60%, 국내 -7.12%(어제 종가 기준)보다 더 빠짐</td><td style='text-align:left'>어제 아침 확정된 대로 "글로벌 동반 재평가" — 국내 단독 과잉반응 가설은 기각 상태 유지</td></tr><tr><td style='text-align:left'>⑧마이크론 대비 할인</td><td style='text-align:left'>오늘 미국 마이크론 -5.2%·엔비디아 -3.4%·SOX -5.9%(09-14 세션)</td><td style='text-align:left'>마이크론 낙폭(-5.2%)이 하이닉스 어제 낙폭(-7.12%)보다 작다 — 국내가 더 팔렸다는 뜻이라 할인폭이 더 벌어지는 방향. 다만 이게 "위기"라기보다 이미 9/14 결론대로 "저가 메리트" 쪽으로 다시 읽힐 여지도 있다</td></tr></tbody></table></div>
+<p><strong>종합 판단</strong>: 어제 걸어둔 "AI속도조절론發 급락은 서사만 있고 CapEx 근거가 없다"는 가설이 오늘 하루 더 강화됐다(아마존 상향 확인). 지금 시장을 실제로 누르는 건 반도체 수요 축이 아니라 <strong>금리 축</strong>이다 — 10년물 5% 돌파·FOMC 인상확률 급등이 국내외 전체 위험자산에 걸리는 압력이라서, SK하이닉스만의 문제가 아니라는 뜻이기도 하다.</p>
+<h2>결론 — 오늘 밤 미국장</h2>
+<p><strong>종합 판단</strong>: 오늘 밤(FOMC 첫째 날, 결과는 내일 새벽 3시 KST 발표)은 반도체 개별 서사보다 <strong>금리 축이 전체 방향을 정할 가능성이 높다고 본다.</strong> 10년물이 19년 만에 최고치(5.03%)를 찍은 날 저녁이라, FOMC 결과 발표 전까지도 국채금리·달러·위험자산이 그 여진 위에서 움직일 것이다.</p>
+<ol><li><strong>1순위 관찰</strong>: 10년물이 5% 위에서 안착하는지, 아니면 오늘 장중</li></ol>
+<p>피크였는지. 안착하면 위험자산 전반에 추가 압력, 되돌리면 오늘 급등이 FOMC 앞 노이즈였다는 쪽으로 기운다.</p>
+<ol><li><strong>2순위 관찰</strong>: 마이크론·엔비디아·하이닉스 ADR이 오늘도 낙폭을</li></ol>
+<p>키우는지, 아니면 오늘 국내처럼 낙폭이 줄어드는(패닉 정점 통과) 흐름을 보이는지 — 국내 코스닥의 순매수 전환이 그 전조일 수 있다.</p>
+<ol><li><strong>3순위 관찰</strong>: 빅테크 중 한 곳이라도 CapEx 관련 새 코멘트를</li></ol>
+<p>내는지 — 아마존의 상향 기조와 반대되는 코멘트가 나오면 어제·오늘의 "서사 vs 사실" 구도가 다시 흔들린다.</p>
+<ol><li><strong>판단을 바꿀 조건</strong>: ⓐ 10년물이 5.1% 이상으로 추가 급등하면</li></ol>
+<p>금리發 위험회피가 본격 국면으로 확정 ⓑ FOMC 첫날 코멘트나 유출 보도로 "동결 시사"가 나오면 오늘 금리 급등의 상당 부분이 되돌림 가능 ⓒ 빅테크가 실제로 CapEx 삭감을 발표하면(아직 없음) 그때 비로소 AI속도조절론이 서사에서 사실로 바뀐다.</p>
+<ol><li><strong>하지 않을 것</strong>: 오늘 코스피 낙폭이 줄었다고 "위기가 끝났다"고</li></ol>
+<p>단정하지 않는다 — 10년물이 19년 만의 최고치를 찍은 날이라 금리 축 리스크는 오히려 더 커졌다. 반대로 "메모리 슈퍼사이클이 끝났다"는 단정도 하지 않는다 — 오늘 나온 CapEx 데이터(아마존 상향)는 그 반대 방향을 가리킨다.</p>
+<h2>Sources</h2>
+<ul><li>브리핑 팩: <code>data/briefing/pack_PM.md</code> (6,327자 / 약 4,218토큰, 코드 생성)</li><li>⚠️ WebFetch 차단 — 아래는 WebSearch 스니펫 기반, 미검증·해석주의 표시 항목 포함</li><li><a href="https://www.ajunews.com/view/20260915153825175">아주경제 — 코스피, 외국인·기관 2조원 넘게 순매도…0.85% 하락 마감</a></li><li><a href="https://www.financialpost.co.kr/news/articleView.html?idxno=275737">파이낸셜포스트 — 코스피, 외국인·기관 매도에 6627.26 마감…코스닥은 812.41</a></li><li><a href="https://www.fnnews.com/news/202609150924135206">파이낸셜뉴스 — 미국 반도체 급락에도...삼전닉스 '보합세'</a></li><li><a href="https://www.edaily.co.kr/News/Read?newsId=02883126645580448">이데일리 — '매 먼저 맞았나' 美 반도체주 급락에도 SK하이닉스 1%대 반등</a></li><li><a href="https://www.econovill.com/news/articleView.html?idxno=723662">econovill — CAPEX 키우는 반도체 3사… 불 붙은 AI 수요</a></li><li><a href="https://www.newsspace.kr/news/article.html?no=15182">newsspace — 빅테크 4사, 2026년 AI투자 7600억달러 돌파·전년비 77% 급증</a></li><li><a href="https://www.huffingtonpost.kr/article/260438">huffingtonpost.kr — AI 빅테크 수장들 "AI 발전 속도 늦춰야", 앤트로픽 CEO 제안에 올트먼·머스크·허사비스 잇따라 동참</a></li><li><a href="https://www.fnnews.com/news/202609150739247177">파이낸셜뉴스 — 오픈AI는 IPO 미뤘는데...앤트로픽, 예정대로 연내 추진</a></li><li><a href="https://www.newspim.com/news/view/20260827000102">newspim — 美 데이터센터 최대 50% 지연·취소 위험…"현실 인프라 제약 직면"</a></li><li><a href="https://www.mt.co.kr/world/2026/09/15/2026091508563052127">머니투데이 — 美국채 10년물 5% 장중 돌파…시장선 "9월 금리인상 기정사실"</a></li><li><a href="https://www.seoul.co.kr/news/economy/finance/2026/09/16/20260916001001">서울신문 — 미국 국채금리 '마의 5%' 돌파</a></li></ul>
+<footer>PEOS 브리핑 · 코드 생성 HTML · 2026-09-15 19:41 KST</footer>
+</body>
+</html>
