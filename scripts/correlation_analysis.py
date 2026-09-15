@@ -1533,6 +1533,23 @@ def render_daily_focus_markdown(df: pd.DataFrame, daily_pair: dict | None) -> st
 
 
 def main() -> int:
+    # 2026-09-15 수정 — data/normalized/motie_*.csv를 아무도 안 채우고
+    # 있었다. _load_motie()는 이 파일들을 "이미 있는 것"으로 읽기만 하고,
+    # 실제로 exports.yaml → motie_*.csv 정규화를 하는 collectors.manual.
+    # fetch_exports()는 engine/macro/indicators.py(build_core10_readings)
+    # 에서만 불렸는데, 그 호출 경로의 유일한 스케줄 진입점이던
+    # daily-peos-report.yml이 2026-08-11 정책으로 제거되면서 고아가 됐다
+    # — Core-10 KOSIS/ECOS/FRED가 겪은 것과 같은 사고. exports.yaml은
+    # 이 스크립트가 이미 매일(exports-price-correlation.yml) 읽는 파일이니
+    # 그 정규화를 여기서 먼저 해두는 게 새 진입점을 또 만드는 것보다 낫다.
+    try:
+        from collectors import manual
+        manual.fetch_exports()
+    except Exception as exc:
+        # 정규화 실패해도 이 스크립트의 본업(상관관계 차트)은 계속돼야 한다
+        # — exports.yaml이 아직 없는 첫 실행이나 스키마 변경 중일 수 있다.
+        print(f"[경고] motie_*.csv 정규화 실패(무시하고 계속): {exc}", file=sys.stderr)
+
     df = build_dataset()
     if df.dropna(how="all").empty:
         print("입력 데이터가 전혀 없습니다 — motie exports.yaml과 "

@@ -159,7 +159,7 @@ KOSIS_SERIES: dict[str, dict] = {
 }
 
 
-def _fetch_table(spec: dict, api_key: str, start: str, end: str, timeout: int = 10) -> list[dict] | None:
+def _fetch_table(spec: dict, api_key: str, start: str, end: str, timeout: int = 20) -> list[dict] | None:
     base_url = api_config()["sources"]["kosis"]["base_url"]
     url = f"{base_url}/Param/statisticsParameterData.do"
     params = {
@@ -230,8 +230,15 @@ def fetch_series(series_key: str) -> DataPoint:
         today = datetime.utcnow()
         start = today.replace(year=today.year - _HISTORY_YEARS).strftime("%Y%m")
         end = today.strftime("%Y%m")
+        # 2026-09-15: GitHub Actions 실제 실행 로그에서 core10-collect.yml의
+        # KOSIS 4개 시리즈가 매번 connect timeout(10초)으로 죽는 걸 확인했다
+        # — 좌표 문제가 아니라(이 파일 상단 2026-09-07 정정 참고) kosis.kr
+        # 자체가 느리다는 이미 문서화된 관찰과 일치. attempts 2→4,
+        # backoff_seconds 1.5→3, timeout(위 _fetch_table 기본값) 10→20초로
+        # 늘렸다 — 이 파일 docstring이 이미 "검색 엔드포인트가 connect
+        # timeout=20으로 죽었다"고 적어뒀던 것과 맞춘 것이다.
         rows = base.retry(lambda: _fetch_table(spec, api_key, start, end), label=f"kosis:{series_key}",
-                           attempts=2, backoff_seconds=1.5)
+                           attempts=4, backoff_seconds=3.0)
         if rows:
             cache_mod.set(f"kosis:{series_key}", rows)
 

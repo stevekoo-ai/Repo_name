@@ -55,14 +55,6 @@
     "alerted": false,
     "consecutive_bad": 1
   },
-  "normalized:fred_kr_cpi_oecd": {
-    "alerted": false,
-    "consecutive_bad": 1
-  },
-  "normalized:fred_kr_industrial_production_oecd": {
-    "alerted": false,
-    "consecutive_bad": 1
-  },
   "normalized:fred_kr_retail_sales_mom_oecd": {
     "alerted": false,
     "consecutive_bad": 1
@@ -184,18 +176,6 @@
     "consecutive_bad": 1
   },
   "normalized:kosis_semiconductor_shipment_index": {
-    "alerted": false,
-    "consecutive_bad": 1
-  },
-  "normalized:motie_semiconductor_exports_usd_100m": {
-    "alerted": false,
-    "consecutive_bad": 1
-  },
-  "normalized:motie_semiconductor_exports_yoy": {
-    "alerted": false,
-    "consecutive_bad": 1
-  },
-  "normalized:motie_total_exports_yoy": {
     "alerted": false,
     "consecutive_bad": 1
   },

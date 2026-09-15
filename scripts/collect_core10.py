@@ -36,7 +36,17 @@ from core.models import DataStatus
 
 # KOSIS keys used by engine/macro/indicators.py (build_core10_readings).
 KOSIS_KEYS = ["industrial_production_index", "retail_sales_index",
-              "cpi_index", "unemployment_rate"]
+              "cpi_index", "unemployment_rate",
+              # 2026-09-15 추가. 원래 collectors/kosis.py 자체 docstring이
+              # "Core-10 4개 지표 전용이라 얹지 않기로" 했던 것들이다 —
+              # 대신 engine/crisis_analysis/scoring.py::score_semiconductor_cycle()
+              # 안에서 직접 fetch_series()를 부르는 방식으로 설계됐는데, 그
+              # 함수를 실제로 호출하는 유일한 경로였던 daily-peos-report.yml이
+              # 2026-08-11 정책으로 main에서 제거되면서 이 두 시리즈는 아무
+              # 스케줄에도 안 걸리는 고아가 됐다 — Core-10 4개 지표가 겪었던
+              # 것과 정확히 같은 "collateral damage" 패턴. 그때 수집이
+              # 이 파일로 옮겨온 것과 같은 이유로 여기 재사용한다.
+              "semiconductor_shipment_index", "semiconductor_inventory_index"]
 
 # ECOS keys backing Core-10. base_rate/usdkrw/yields are already covered by
 # macro-data-sync, but re-fetching is cheap and keeps this entry point complete.

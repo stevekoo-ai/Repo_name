@@ -82,7 +82,16 @@ def apply_control(report: HealthReport, state: dict | None = None,
             continue
 
         entry["consecutive_bad"] += 1
-        if entry["consecutive_bad"] >= CONSECUTIVE_THRESHOLD and not entry["alerted"]:
+        # 2026-09-15: warning은 상태는 계속 추적하되(대시보드에 보이게)
+        # 이메일은 안 보낸다. 정규화 스윕을 붙이고 나서 발견했다 — IMF
+        # 연간 시리즈(다음 발표까지 몇 달이고 "이상"인 게 정상), OECD
+        # CLI처럼 원래 100일+ 지연이 정상인 시리즈가 warning으로 영구히
+        # 깔리는데, 예전 기준대로면 이런 것들이 6시간마다 알림을 계속
+        # 쏜다 — "경고가 계속 오면 소음이 되어 무시당한다"는 이 저장소
+        # 전체가 반복해서 배운 원칙과 정면충돌한다. critical만 사람을
+        # 부른다; warning은 데이터가 죽은 게 아니라 그냥 오래된 것이다.
+        if (entry["consecutive_bad"] >= CONSECUTIVE_THRESHOLD and not entry["alerted"]
+                and s.severity == "critical"):
             entry["alerted"] = True
             fired.append({"slug": s.slug, "kind": "alert", "state": s.state,
                          "severity": s.severity, "detail": s.detail,

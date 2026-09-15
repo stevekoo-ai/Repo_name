@@ -98,7 +98,12 @@ def check_normalized_series() -> list[SourceStatus]:
     from scripts.data_freshness_audit import audit
 
     rows = audit()
-    bad = [r for r in rows if r["status"] != "ok"]
+    # dead_by_design(예: fred_kr_cpi_oecd — 수집은 매번 성공하지만 상류가
+    # 발행을 중단한, us_dollar_index_major/DTWEXM과 같은 계열)는 실행 가능한
+    # 이상이 아니다 — 매일 반복 알림을 만들지 않는다. 다만 조용히 숨기지
+    # 않고 요약에 개수를 남긴다(그 자체가 "알고 있다"는 기록이다).
+    known = [r for r in rows if r["status"] == "dead_by_design"]
+    bad = [r for r in rows if r["status"] not in ("ok", "dead_by_design")]
     out: list[SourceStatus] = []
     for r in bad:
         state = STALE  # dead도 "이 시리즈에 대한 최신값이 없다"는 점에서 STALE로 통일
@@ -117,7 +122,8 @@ def check_normalized_series() -> list[SourceStatus]:
         workflow="scripts/data_freshness_audit.py",
         severity="warning",
         state=OK if not bad else ANOMALY,
-        detail=f"ok {len(rows)-len(bad)} / 이상 {len(bad)}"
+        detail=f"ok {len(rows)-len(bad)-len(known)} / 이상 {len(bad)}"
+               + (f" / 알려진 설계상 이상(비알림) {len(known)}" if known else "")
                + (f" — 상세는 개별 {NORMALIZED_AUDIT_PREFIX}* 항목 참고" if bad else ""),
         age_hours=None,
     ))

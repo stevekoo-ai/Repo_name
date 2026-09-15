@@ -271,11 +271,35 @@ def test_alert_fires_exactly_once_at_threshold(monkeypatch):
     state = {}
     from engine.health.check import HealthReport
     for i in range(control.CONSECUTIVE_THRESHOLD + 2):
-        report = HealthReport(checked_at="t", statuses=[_status("x", STALE)])
+        report = HealthReport(checked_at="t", statuses=[_status("x", STALE, "critical")])
         result = control.apply_control(report, state=state)
         state = result["state"]
     assert len(sent) == 1, "임계 돌파 후에도 매번 다시 알리면 소음이다"
     assert state["x"]["alerted"] is True
+
+
+def test_warning_severity_never_alerts_no_matter_how_long_bad(monkeypatch):
+    """2026-09-15 추가. 정규화 스윕을 붙이고 나서 발견한 문제: IMF 연간
+    시리즈(다음 발표까지 몇 달이고 'stale'인 게 정상)·OECD CLI(100일+
+    지연이 정상)처럼 warning이 영구히 깔리는 시리즈가 있다. severity
+    구분 없이 3회 연속이면 알렸을 때는 이런 것들이 6시간마다 알림을
+    영원히 쏜다 — '경고가 계속 오면 소음이 되어 무시당한다'는 이
+    저장소 전체의 반복 원칙과 충돌한다. warning은 대시보드에서 계속
+    보이되(상태는 추적), 이메일은 절대 안 나가야 한다."""
+    sent = []
+    monkeypatch.setattr(control.notify, "is_configured", lambda: True)
+    monkeypatch.setattr(control.notify, "build_channel",
+                        lambda: type("C", (), {"send": lambda self, s, b: sent.append(1)})())
+    from engine.health.check import HealthReport
+
+    state = {}
+    for _ in range(control.CONSECUTIVE_THRESHOLD * 20):  # 훨씬 오래 지속돼도
+        report = HealthReport(checked_at="t", statuses=[_status("x", STALE, "warning")])
+        state = control.apply_control(report, state=state)["state"]
+    assert not sent, "warning 등급은 아무리 오래 지속돼도 이메일을 보내면 안 된다"
+    assert state["x"]["consecutive_bad"] == control.CONSECUTIVE_THRESHOLD * 20, \
+        "알림은 안 나가도 상태 추적(대시보드용)은 계속돼야 한다"
+    assert state["x"]["alerted"] is False
 
 
 def test_recovery_resets_and_reports_fired(monkeypatch):
@@ -300,7 +324,7 @@ def test_no_alert_below_threshold(monkeypatch):
 
     state = {}
     for _ in range(control.CONSECUTIVE_THRESHOLD - 1):
-        report = HealthReport(checked_at="t", statuses=[_status("x", STALE)])
+        report = HealthReport(checked_at="t", statuses=[_status("x", STALE, "critical")])
         state = control.apply_control(report, state=state)["state"]
     assert not sent
 
@@ -325,7 +349,7 @@ def test_send_alerts_false_never_calls_notify(monkeypatch):
 
     state = {}
     for _ in range(control.CONSECUTIVE_THRESHOLD + 1):
-        report = HealthReport(checked_at="t", statuses=[_status("x", STALE)])
+        report = HealthReport(checked_at="t", statuses=[_status("x", STALE, "critical")])
         state = control.apply_control(report, state=state, send_alerts=False)["state"]
     assert called == []
 

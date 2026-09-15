@@ -162,20 +162,41 @@ data/health/
   `workflow_dispatch` API 호출 권한(`actions: write`)이 추가로 필요한데,
   그건 "판정을 사람에게 정확히 전달하는 것"이라는 이번 요청의 핵심에서
   벗어난 별도 결정이라 포함하지 않았다.
-- **22개 DEAD·18개 stale 시리즈를 지금 고치지 않았다** — 이번 작업은
-  "발견되면 알리는 시스템을 만드는 것"이고, 발견된 40건을 개별로 고치는
-  건 별도 작업이다(원인마다 다르다 — API 스펙 변경, 페이지네이션 절단,
-  워크플로 자체 소실 등. `data_freshness_audit.py`가 이미 그 진단
-  순서를 문서화해뒀다).
+- ~~22개 DEAD·18개 stale 시리즈를 지금 고치지 않았다~~ **→ 2026-09-15
+  같은 날 사용자 지시("모두 다, 순서를 생각해보고 다 고쳐")로 전수
+  수리했다.** 자세한 원인·조치는
+  [monitoring/data-health-status.md](../monitoring/data-health-status.md)
+  참고 — **critical 22건이 전부 오진 또는 재분류였다**(진짜 죽은
+  수집기는 0개). GitHub Actions 실제 job 로그로 하나하나 대조했다:
+  - **16개**: 감사 도구가 "annual"(연 1회 발표) 빈도 버킷이 없어서
+    IMF WEO 연간 시리즈가 전부 오판정됐다 — 버킷 신설로 해결
+  - **2개**: `fred_kr_cpi_oecd`·`fred_kr_industrial_production_oecd` —
+    수집은 매번 성공하지만 OECD 미러 자체가 상류에서 단종
+    (`us_dollar_index_major`/DTWEXM과 같은 계열) — 숨기지 않고
+    `KNOWN_DEAD_BY_DESIGN`으로 이유와 함께 재분류
+  - **5개**: `daily-peos-report.yml` 삭제(2026-08-11)로 호출 경로를
+    잃은 고아 시리즈(motie_* 3개, kosis_semiconductor_* 2개) — 이미
+    매일 도는 워크플로(correlation_analysis.py, collect_core10.py)에
+    재연결
+  - **KOSIS 타임아웃**: 실제 connect timeout(10초, 2회 재시도)을
+    실측 확인, 20초·4회로 증가
+  - **나머지**: 진짜 "정상 발표 지연"이었다 — 손대지 않고 "stale"
+    (경고, 비알림)로 정확하게 남겼다
+  이 과정에서 제어 루프 자체의 설계 결함도 발견해 고쳤다: severity
+  구분 없이 3회 연속이면 알리던 걸 **critical만 알리게** 바꿨다 —
+  안 그러면 "영구적으로 약간 오래된 게 정상"인 시리즈가 6시간마다
+  이메일을 영원히 쏘게 된다.
 
 ---
 
 ## 검증
 
-`tests/test_data_health.py` 22건 — 판정 불가/이상 구분, 거래일 예외
-양방향, 레지스트리 자기 검증(RUN_LOG 존재 여부, 경로 실존, 중복 slug
-없음), 제어 루프(임계 1회 알림, 회복 리셋, 미설정 채널 무해 처리),
-정규화 스윕 중복 미등록.
+`tests/test_data_health.py` 24건, `tests/test_data_freshness_audit.py`
+10건(annual 버킷, dead_by_design 재분류, 저장소 회귀), `tests/
+test_kosis_retry_config.py` 4건(타임아웃·재시도·고아 키 재연결·좌표
+존재) — 판정 불가/이상 구분, 거래일 예외 양방향, 레지스트리 자기 검증,
+제어 루프(critical만 알림·회복 리셋·미설정 채널 무해 처리·warning은
+아무리 오래 지속돼도 비알림), 정규화 스윕 중복 미등록.
 
 ## 관련
 
