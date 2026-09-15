@@ -299,3 +299,6 @@ timestamp_utc,workflow,step,attempts_used,max_attempts,result
 2026-09-14T21:11:05Z,real-estate-sync,villa_sale,1,36,success
 2026-09-14T21:11:33Z,real-estate-sync,officetel_sale,1,36,success
 2026-09-14T23:41:32Z,sec-edgar-capex,capex_fetch,1,36,success
+2026-09-15T00:11:55Z,sk-hynix-daily-report,investor_flow_fetch,1,36,success
+2026-09-15T00:11:56Z,sk-hynix-daily-report,price_snapshot,1,36,success
+2026-09-15T00:12:03Z,sk-hynix-daily-report,report_generation,1,36,success
