@@ -1,0 +1,234 @@
+{
+  "ai-periphery-fundamentals": {
+    "alerted": false,
+    "consecutive_bad": 0
+  },
+  "hynix-adr-quote": {
+    "alerted": false,
+    "consecutive_bad": 0
+  },
+  "hynix-credit-balance": {
+    "alerted": false,
+    "consecutive_bad": 0
+  },
+  "hynix-investor-flow": {
+    "alerted": false,
+    "consecutive_bad": 0
+  },
+  "hynix-price-snapshot": {
+    "alerted": false,
+    "consecutive_bad": 0
+  },
+  "hynix-short-sale": {
+    "alerted": false,
+    "consecutive_bad": 0
+  },
+  "hyperscaler-capex": {
+    "alerted": false,
+    "consecutive_bad": 0
+  },
+  "kr-index-quote": {
+    "alerted": false,
+    "consecutive_bad": 0
+  },
+  "macro-series": {
+    "alerted": false,
+    "consecutive_bad": 0
+  },
+  "normalized-series-sweep": {
+    "alerted": false,
+    "consecutive_bad": 1
+  },
+  "normalized:bls_us_job_openings": {
+    "alerted": false,
+    "consecutive_bad": 1
+  },
+  "normalized:ecos_current_account": {
+    "alerted": false,
+    "consecutive_bad": 1
+  },
+  "normalized:ecos_gdp_growth_qoq": {
+    "alerted": false,
+    "consecutive_bad": 1
+  },
+  "normalized:ecos_ppi_yoy_level": {
+    "alerted": false,
+    "consecutive_bad": 1
+  },
+  "normalized:fred_kr_cpi_oecd": {
+    "alerted": false,
+    "consecutive_bad": 1
+  },
+  "normalized:fred_kr_industrial_production_oecd": {
+    "alerted": false,
+    "consecutive_bad": 1
+  },
+  "normalized:fred_kr_retail_sales_mom_oecd": {
+    "alerted": false,
+    "consecutive_bad": 1
+  },
+  "normalized:fred_kr_unemployment_oecd": {
+    "alerted": false,
+    "consecutive_bad": 1
+  },
+  "normalized:fred_us_gdp_qoq": {
+    "alerted": false,
+    "consecutive_bad": 1
+  },
+  "normalized:fred_us_industrial_production": {
+    "alerted": false,
+    "consecutive_bad": 1
+  },
+  "normalized:fred_us_oecd_cli": {
+    "alerted": false,
+    "consecutive_bad": 1
+  },
+  "normalized:fred_us_retail_sales": {
+    "alerted": false,
+    "consecutive_bad": 1
+  },
+  "normalized:fred_us_trade_balance": {
+    "alerted": false,
+    "consecutive_bad": 1
+  },
+  "normalized:imf_current_account_chn": {
+    "alerted": false,
+    "consecutive_bad": 1
+  },
+  "normalized:imf_current_account_jpn": {
+    "alerted": false,
+    "consecutive_bad": 1
+  },
+  "normalized:imf_current_account_kor": {
+    "alerted": false,
+    "consecutive_bad": 1
+  },
+  "normalized:imf_current_account_usa": {
+    "alerted": false,
+    "consecutive_bad": 1
+  },
+  "normalized:imf_gdp_growth_chn": {
+    "alerted": false,
+    "consecutive_bad": 1
+  },
+  "normalized:imf_gdp_growth_jpn": {
+    "alerted": false,
+    "consecutive_bad": 1
+  },
+  "normalized:imf_gdp_growth_kor": {
+    "alerted": false,
+    "consecutive_bad": 1
+  },
+  "normalized:imf_gdp_growth_usa": {
+    "alerted": false,
+    "consecutive_bad": 1
+  },
+  "normalized:imf_govt_debt_chn": {
+    "alerted": false,
+    "consecutive_bad": 1
+  },
+  "normalized:imf_govt_debt_jpn": {
+    "alerted": false,
+    "consecutive_bad": 1
+  },
+  "normalized:imf_govt_debt_kor": {
+    "alerted": false,
+    "consecutive_bad": 1
+  },
+  "normalized:imf_govt_debt_usa": {
+    "alerted": false,
+    "consecutive_bad": 1
+  },
+  "normalized:imf_inflation_chn": {
+    "alerted": false,
+    "consecutive_bad": 1
+  },
+  "normalized:imf_inflation_jpn": {
+    "alerted": false,
+    "consecutive_bad": 1
+  },
+  "normalized:imf_inflation_kor": {
+    "alerted": false,
+    "consecutive_bad": 1
+  },
+  "normalized:imf_inflation_usa": {
+    "alerted": false,
+    "consecutive_bad": 1
+  },
+  "normalized:imf_unemployment_chn": {
+    "alerted": false,
+    "consecutive_bad": 1
+  },
+  "normalized:imf_unemployment_jpn": {
+    "alerted": false,
+    "consecutive_bad": 1
+  },
+  "normalized:imf_unemployment_kor": {
+    "alerted": false,
+    "consecutive_bad": 1
+  },
+  "normalized:imf_unemployment_usa": {
+    "alerted": false,
+    "consecutive_bad": 1
+  },
+  "normalized:kosis_industrial_production_index": {
+    "alerted": false,
+    "consecutive_bad": 1
+  },
+  "normalized:kosis_retail_sales_index": {
+    "alerted": false,
+    "consecutive_bad": 1
+  },
+  "normalized:kosis_semiconductor_inventory_index": {
+    "alerted": false,
+    "consecutive_bad": 1
+  },
+  "normalized:kosis_semiconductor_shipment_index": {
+    "alerted": false,
+    "consecutive_bad": 1
+  },
+  "normalized:motie_semiconductor_exports_usd_100m": {
+    "alerted": false,
+    "consecutive_bad": 1
+  },
+  "normalized:motie_semiconductor_exports_yoy": {
+    "alerted": false,
+    "consecutive_bad": 1
+  },
+  "normalized:motie_total_exports_yoy": {
+    "alerted": false,
+    "consecutive_bad": 1
+  },
+  "peos-daily-report": {
+    "alerted": false,
+    "consecutive_bad": 0
+  },
+  "portfolio-bonds": {
+    "alerted": false,
+    "consecutive_bad": 0
+  },
+  "portfolio-etf-nav": {
+    "alerted": false,
+    "consecutive_bad": 0
+  },
+  "portfolio-holdings": {
+    "alerted": false,
+    "consecutive_bad": 0
+  },
+  "real-estate-apartment-rent": {
+    "alerted": false,
+    "consecutive_bad": 0
+  },
+  "real-estate-apartment-sale": {
+    "alerted": false,
+    "consecutive_bad": 0
+  },
+  "subscription-daily-report": {
+    "alerted": false,
+    "consecutive_bad": 0
+  },
+  "subscription-monitor": {
+    "alerted": false,
+    "consecutive_bad": 0
+  }
+}

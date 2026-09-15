@@ -533,6 +533,31 @@ def evaluate_gate(as_of: date, triggers: set[str], why: list[str]) -> Gate:
         # 부가 기능이 본체를 막으면 안 된다.
         pass
 
+    # 데이터 헬스 critical 이상도 같은 이유로 무조건 발행이다 — 조용한 날에
+    # 하필 macro-series나 하이닉스 시세 수집이 죽으면, 그 사실 자체가
+    # "오늘 브리핑에서 가장 중요한 내용"이다. 2026-09-15 사용자 요청
+    # ("보고서가 항상 마음에 안들어!")에 대한 직접 대응.
+    #
+    # ⚠️ 단 `normalized:*`(data_freshness_audit 232개 시리즈 스윕)는
+    # 제외한다 — 2026-09-15 최초 점검에서 이미 DEAD 22개가 발견됐는데,
+    # 이건 오래전부터 죽어있던 장기 시리즈들이라(예: imf_* 622일 경과)
+    # 매일 강제 발행하면 "조용한 날" 개념 자체가 영구히 사라진다. 브리핑이
+    # 실제로 의존하는 핵심 소스(macro-series·하이닉스 시세·포트폴리오 등,
+    # registry.SOURCES에 개별 등록된 것)만 이 게이트를 강제로 연다 — 그
+    # 소스들은 매일 갱신이 정상이라 critical이 뜨는 것 자체가 진짜 이상이다.
+    try:
+        from engine.health import control
+        if control.REPORT_JSON_PATH.exists():
+            import json
+            snap = json.loads(control.REPORT_JSON_PATH.read_text(encoding="utf-8"))
+            crit = [s for s in snap.get("statuses", []) if s["state"] != "OK"
+                   and s["severity"] == "critical" and not s["slug"].startswith("normalized:")]
+            if crit:
+                reasons.append(f"데이터 헬스 critical {len(crit)}건: "
+                               + ", ".join(s["slug"] for s in crit[:3]))
+    except Exception:
+        pass
+
     return Gate(publish=bool(reasons), reasons=reasons)
 
 
@@ -654,6 +679,48 @@ def _fmt_val(v: float | None) -> str:
     return f"{v:,.0f}" if abs(v) >= 1000 else f"{v:g}"
 
 
+def build_data_health_block() -> Block:
+    """⓪ 데이터 헬스 — 이 브리핑이 딛고 선 데이터 자체가 멀쩡한지.
+
+    사용자 요청(2026-09-15): "데이터 수집 블럭 정상 작동 중인지 센싱하고
+    ... feedback이 있는 close-loop system을 만들자. 보고서가 항상 마음에
+    안들어!" — 다른 블록이 아무리 정확해도 밑에 깔린 데이터가 죽어있으면
+    전부 무의미하다. 그래서 이 블록이 **첫 번째**다.
+
+    engine/health/control.py가 이미 만들어둔 스냅샷(`data/health/
+    latest_report.json`)만 읽는다 — 브리핑이 열릴 때마다 58개+232개
+    소스를 재검사하면 느리고, 헬스체크는 이미 2시간마다 별도로 돈다."""
+    from engine.health import control
+
+    if not control.REPORT_JSON_PATH.exists():
+        return Block("data_health", "⓪ 데이터 헬스",
+                     "헬스체크 스냅샷 없음 — data-health-check.yml이 아직 한 번도 안 돌았다.")
+
+    import json
+    data = json.loads(control.REPORT_JSON_PATH.read_text(encoding="utf-8"))
+    statuses = data.get("statuses", [])
+    bad = [s for s in statuses if s["state"] != "OK"]
+    critical = [s for s in bad if s["severity"] == "critical"]
+
+    lines = [f"점검 시각: {data.get('checked_at', '?')[:16]} "
+             f"({len(statuses)}개 소스 중 {len(bad)}개 이상, critical {len(critical)}개)"]
+    if critical:
+        lines.append("\n🔴 **critical 등급 이상 — 아래 소스에 의존하는 판단은 신뢰하지 말 것**")
+        for s in critical[:8]:
+            lines.append(f"- **{s['slug']}** — {s['detail']}")
+        if len(critical) > 8:
+            lines.append(f"- ...외 {len(critical)-8}건, 전체는 data/health/latest_report.md 참고")
+    elif bad:
+        warn = [s for s in bad if s["severity"] != "critical"]
+        lines.append(f"\n🟠 warning 등급 {len(warn)}건 (critical 없음) — "
+                     f"{', '.join(s['slug'] for s in warn[:5])}"
+                     + (f" 외 {len(warn)-5}건" if len(warn) > 5 else ""))
+    else:
+        lines.append("✅ 전 소스 정상")
+
+    return Block("data_health", "⓪ 데이터 헬스", "\n".join(lines))
+
+
 def build_execution_block(as_of: date) -> Block:
     """⑧ 자금 조달 실행 계획 — 매도 tranche·판단 포스트·CDP 일일 점검.
 
@@ -748,6 +815,7 @@ def build_pack(slot: str, as_of: date | None = None) -> tuple[BriefingPack, Gate
         # 주말 전망은 "오늘 시장이 움직였나"로 게이트를 걸지 않는다 —
         # 주간 캘린더는 시장이 안 움직여도 매주 유효한 정보다.
         pack = BriefingPack(slot=slot, as_of=now, blocks=[
+            build_data_health_block(),
             build_hynix_block(as_of),
             build_digest_block(as_of, *detect_triggers(as_of)),
             build_ledger_block(as_of),
@@ -760,6 +828,7 @@ def build_pack(slot: str, as_of: date | None = None) -> tuple[BriefingPack, Gate
     triggers, why = detect_triggers(as_of)
     gate = evaluate_gate(as_of, triggers, why)
     pack = BriefingPack(slot=slot, as_of=now, blocks=[
+        build_data_health_block(),
         build_fact_sheet(as_of),
         build_hynix_block(as_of),
         build_digest_block(as_of, triggers, why),

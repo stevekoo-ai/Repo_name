@@ -38,6 +38,55 @@ def _fmt(value, suffix: str = "") -> str:
     return f"{value}{suffix}"
 
 
+def _data_health_banner(payload: dict) -> str:
+    """Section -1 — 이 리포트가 딛고 선 데이터 자체가 멀쩡한지, 본문보다 먼저.
+
+    2026-09-15 사용자 요청: "데이터 수집 블럭 API 자동 수집 포함 정상
+    작동 중인지 센싱하고... feedback이 있는 close-loop system을 만들자.
+    보고서가 항상 마음에 안들어!" — `_exposure_section`이 "Section 0,
+    매크로가 다 죽어도 유효한 유일한 섹션"이라고 이미 자기 자리를 설명하고
+    있는데, 정작 "매크로가 죽었는지 아닌지"를 알려주는 섹션 자체가 없었다.
+    이 배너가 그 빈자리다 — 본문의 숫자를 믿어도 되는지를 숫자보다 먼저
+    말한다.
+
+    engine/health/control.py가 2시간마다 만들어두는 스냅샷만 읽는다 —
+    리포트 렌더링 때마다 전체 소스를 재검사하지 않는다(비용, 그리고 이미
+    별도 워크플로가 그 일을 한다)."""
+    from pathlib import Path
+    import json
+
+    snap_path = Path(__file__).resolve().parents[2] / "data" / "health" / "latest_report.json"
+    if not snap_path.exists():
+        return ("# 0. 데이터 헬스\n\n"
+                "⚪ 헬스체크 스냅샷 없음 — data-health-check.yml이 이 환경에서 "
+                "아직 한 번도 안 돌았습니다(로컬 실행 시 정상).")
+
+    try:
+        data = json.loads(snap_path.read_text(encoding="utf-8"))
+    except (json.JSONDecodeError, OSError):
+        return "# 0. 데이터 헬스\n\n⚪ 스냅샷 파일이 깨져 있습니다 — data/health/latest_report.json 확인 필요."
+
+    statuses = data.get("statuses", [])
+    critical = [s for s in statuses if s["state"] != "OK" and s["severity"] == "critical"]
+    warn = [s for s in statuses if s["state"] != "OK" and s["severity"] != "critical"]
+
+    lines = ["# 0. 데이터 헬스\n"]
+    checked = data.get("checked_at", "?")[:16]
+    if critical:
+        lines.append(f"🔴 **critical 등급 데이터 소스 {len(critical)}건 이상 — "
+                     f"아래 항목에 의존하는 판단은 이 리포트에서도 신뢰하지 마십시오.**\n")
+        for s in critical:
+            lines.append(f"- **{s['slug']}** ({s['description']}) — {s['detail']}")
+        lines.append("")
+    elif warn:
+        lines.append(f"🟠 warning 등급 {len(warn)}건 (critical 없음, 점검 {checked}) — "
+                     + ", ".join(s["slug"] for s in warn[:6])
+                     + (f" 외 {len(warn)-6}건" if len(warn) > 6 else ""))
+    else:
+        lines.append(f"✅ 데이터 소스 전체 정상 (점검 {checked}, {len(statuses)}개 소스)")
+    return "\n".join(lines)
+
+
 def _exposure_section(payload: dict) -> str:
     """Section 0 — the decision layer that does not depend on any collector.
 
@@ -1631,6 +1680,7 @@ def render_markdown(payload: dict) -> str:
 
     # NEW 5-SECTION STRUCTURE + ECONOMIC EVENTS + ROLLING WINDOWS (Primary Report)
     main_sections = [
+        _data_health_banner(payload),
         _exposure_section(payload),
         render_reconciliation_section(payload.get("reconciliation")),
         _macro_dashboard_section(payload),

@@ -1,0 +1,79 @@
+name: 데이터 헬스 close-loop
+
+# 사용자 요청(2026-09-15): "데이터 수집 블럭 API 자동 수집 포함, 정상
+# 작동 중인지 센싱하고, 신선도와 내용에 비정상이 확인되면 이것을 제어하는
+# 기능을 추가해서 feedback이 있는 close-loop system을 만들자."
+#
+# engine/health/*가 판정(sensing)하고, 이 워크플로가 판정을 정기적으로
+# 돌려 상태를 커밋하고(기억), 3회 연속 이상이면 engine/health/control.py가
+# 직접 이메일을 보낸다(acting) — subscription_monitor의 검증된
+# outage/recovery 패턴을 재사용했다.
+#
+# 조사 중 발견: scripts/data_freshness_audit.py가 이미 존재해 data/normalized/
+# 232개 시리즈의 정교한(주기별) 신선도 판정을 하고 있었는데, core10-collect.yml
+# 안에서 GitHub Actions 로그 `::warning::` 한 줄로만 남고 그 다음(알림·기록)이
+# 없었다 — DEAD 22개·stale 18개가 그렇게 조용히 쌓여 있었다. 이 워크플로가
+# engine/health/check.py를 통해 그 결과를 흡수해 나머지 절반을 채운다.
+
+on:
+  schedule:
+    - cron: "20 */2 * * *"   # 2시간마다 — 센싱은 조회 원가가 사실상 0(로컬
+                              # CSV·git 이력만 읽는다, 외부 API를 새로 두드리지 않는다)
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: data-health-check
+  cancel-in-progress: false
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -r requirements.txt
+
+      - name: 헬스 판정 + 제어(알림 포함)
+        id: health
+        env:
+          GMAIL_ADDRESS: ${{ secrets.GMAIL_ADDRESS }}
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+          NOTIFY_EMAIL_TO: ${{ secrets.NOTIFY_EMAIL_TO }}
+        run: |
+          PYTHONPATH=. python -m scripts.data_health_check
+          echo "exit_code=$?" >> "$GITHUB_OUTPUT"
+        continue-on-error: true
+
+      - name: 상태 커밋
+        run: |
+          git config user.name "data-health-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add data/health/
+          if git diff --cached --quiet; then
+            echo "상태 변화 없음"
+          else
+            git commit -m "chore: 데이터 헬스 상태 갱신 $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+            for i in 1 2 3 4 5; do
+              git push && break
+              git fetch origin main
+              git rebase origin/main
+              sleep $((i * 3))
+            done
+          fi
+
+      # critical 소스가 나쁘면 이 스텝이 잡 자체를 빨갛게 만든다 — 로그에만
+      # 남고 아무도 안 여는 `::warning::`의 재발을 막는다(정확히 이 사고를
+      # 이 워크플로가 고치려는 것이므로, 판정 스텝을 continue-on-error로
+      # 감싸 상태 커밋은 항상 되게 하고 여기서 최종 성패를 결정한다).
+      - name: 결과 반영
+        if: steps.health.outputs.exit_code != '0'
+        run: |
+          echo "::warning::critical 등급 데이터 소스에 이상이 있습니다 — data/health/latest_report.md 확인"
+          cat data/health/latest_report.md
+          exit 1

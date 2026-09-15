@@ -1,0 +1,44 @@
+# 데이터 헬스 — 2026-09-15T03:46:27.086566+00:00
+
+⚠️ 41/58개 소스 이상
+- 🔴 **normalized:fred_kr_cpi_oecd** [STALE] 정규화 시리즈: fred_kr_cpi_oecd (monthly) — DEAD — 최신 2023-11-01, 1049일 경과
+- 🔴 **normalized:fred_kr_industrial_production_oecd** [STALE] 정규화 시리즈: fred_kr_industrial_production_oecd (monthly) — DEAD — 최신 2024-03-01, 928일 경과
+- 🔴 **normalized:imf_current_account_chn** [STALE] 정규화 시리즈: imf_current_account_chn (unknown) — DEAD — 최신 2025-01-01, 622일 경과
+- 🔴 **normalized:imf_current_account_jpn** [STALE] 정규화 시리즈: imf_current_account_jpn (unknown) — DEAD — 최신 2025-01-01, 622일 경과
+- 🔴 **normalized:imf_current_account_kor** [STALE] 정규화 시리즈: imf_current_account_kor (unknown) — DEAD — 최신 2025-01-01, 622일 경과
+- 🔴 **normalized:imf_current_account_usa** [STALE] 정규화 시리즈: imf_current_account_usa (unknown) — DEAD — 최신 2025-01-01, 622일 경과
+- 🔴 **normalized:imf_gdp_growth_chn** [STALE] 정규화 시리즈: imf_gdp_growth_chn (unknown) — DEAD — 최신 2025-01-01, 622일 경과
+- 🔴 **normalized:imf_gdp_growth_jpn** [STALE] 정규화 시리즈: imf_gdp_growth_jpn (unknown) — DEAD — 최신 2025-01-01, 622일 경과
+- 🔴 **normalized:imf_gdp_growth_kor** [STALE] 정규화 시리즈: imf_gdp_growth_kor (unknown) — DEAD — 최신 2025-01-01, 622일 경과
+- 🔴 **normalized:imf_gdp_growth_usa** [STALE] 정규화 시리즈: imf_gdp_growth_usa (unknown) — DEAD — 최신 2025-01-01, 622일 경과
+- 🔴 **normalized:imf_govt_debt_chn** [STALE] 정규화 시리즈: imf_govt_debt_chn (unknown) — DEAD — 최신 2025-01-01, 622일 경과
+- 🔴 **normalized:imf_govt_debt_jpn** [STALE] 정규화 시리즈: imf_govt_debt_jpn (unknown) — DEAD — 최신 2025-01-01, 622일 경과
+- 🔴 **normalized:imf_govt_debt_kor** [STALE] 정규화 시리즈: imf_govt_debt_kor (unknown) — DEAD — 최신 2025-01-01, 622일 경과
+- 🔴 **normalized:imf_govt_debt_usa** [STALE] 정규화 시리즈: imf_govt_debt_usa (unknown) — DEAD — 최신 2025-01-01, 622일 경과
+- 🔴 **normalized:imf_inflation_chn** [STALE] 정규화 시리즈: imf_inflation_chn (unknown) — DEAD — 최신 2025-01-01, 622일 경과
+- 🔴 **normalized:imf_inflation_jpn** [STALE] 정규화 시리즈: imf_inflation_jpn (unknown) — DEAD — 최신 2025-01-01, 622일 경과
+- 🔴 **normalized:imf_inflation_kor** [STALE] 정규화 시리즈: imf_inflation_kor (unknown) — DEAD — 최신 2025-01-01, 622일 경과
+- 🔴 **normalized:imf_inflation_usa** [STALE] 정규화 시리즈: imf_inflation_usa (unknown) — DEAD — 최신 2025-01-01, 622일 경과
+- 🔴 **normalized:imf_unemployment_chn** [STALE] 정규화 시리즈: imf_unemployment_chn (unknown) — DEAD — 최신 2025-01-01, 622일 경과
+- 🔴 **normalized:imf_unemployment_jpn** [STALE] 정규화 시리즈: imf_unemployment_jpn (unknown) — DEAD — 최신 2025-01-01, 622일 경과
+- 🔴 **normalized:imf_unemployment_kor** [STALE] 정규화 시리즈: imf_unemployment_kor (unknown) — DEAD — 최신 2025-01-01, 622일 경과
+- 🔴 **normalized:imf_unemployment_usa** [STALE] 정규화 시리즈: imf_unemployment_usa (unknown) — DEAD — 최신 2025-01-01, 622일 경과
+- 🟠 **normalized-series-sweep** [ANOMALY] data/normalized/*.csv 전수 스윕 (232개 시리즈) — ok 192 / 이상 40 — 상세는 개별 normalized:* 항목 참고
+- 🟠 **normalized:bls_us_job_openings** [STALE] 정규화 시리즈: bls_us_job_openings (monthly) — STALE — 최신 2026-07-01, 76일 경과
+- 🟠 **normalized:ecos_current_account** [STALE] 정규화 시리즈: ecos_current_account (monthly) — STALE — 최신 2026-07-01, 76일 경과
+- 🟠 **normalized:ecos_gdp_growth_qoq** [STALE] 정규화 시리즈: ecos_gdp_growth_qoq (quarterly) — STALE — 최신 2026-04-01, 167일 경과
+- 🟠 **normalized:ecos_ppi_yoy_level** [STALE] 정규화 시리즈: ecos_ppi_yoy_level (monthly) — STALE — 최신 2026-07-01, 76일 경과
+- 🟠 **normalized:fred_kr_retail_sales_mom_oecd** [STALE] 정규화 시리즈: fred_kr_retail_sales_mom_oecd (monthly) — STALE — 최신 2026-05-01, 137일 경과
+- 🟠 **normalized:fred_kr_unemployment_oecd** [STALE] 정규화 시리즈: fred_kr_unemployment_oecd (monthly) — STALE — 최신 2026-07-01, 76일 경과
+- 🟠 **normalized:fred_us_gdp_qoq** [STALE] 정규화 시리즈: fred_us_gdp_qoq (quarterly) — STALE — 최신 2026-04-01, 167일 경과
+- 🟠 **normalized:fred_us_industrial_production** [STALE] 정규화 시리즈: fred_us_industrial_production (monthly) — STALE — 최신 2026-07-01, 76일 경과
+- 🟠 **normalized:fred_us_oecd_cli** [STALE] 정규화 시리즈: fred_us_oecd_cli (monthly) — STALE — 최신 2026-06-01, 106일 경과
+- 🟠 **normalized:fred_us_retail_sales** [STALE] 정규화 시리즈: fred_us_retail_sales (monthly) — STALE — 최신 2026-07-01, 76일 경과
+- 🟠 **normalized:fred_us_trade_balance** [STALE] 정규화 시리즈: fred_us_trade_balance (monthly) — STALE — 최신 2026-07-01, 76일 경과
+- 🟠 **normalized:kosis_industrial_production_index** [STALE] 정규화 시리즈: kosis_industrial_production_index (monthly) — STALE — 최신 2026-07-01, 76일 경과
+- 🟠 **normalized:kosis_retail_sales_index** [STALE] 정규화 시리즈: kosis_retail_sales_index (monthly) — STALE — 최신 2026-07-01, 76일 경과
+- 🟠 **normalized:kosis_semiconductor_inventory_index** [STALE] 정규화 시리즈: kosis_semiconductor_inventory_index (monthly) — STALE — 최신 2026-07-01, 76일 경과
+- 🟠 **normalized:kosis_semiconductor_shipment_index** [STALE] 정규화 시리즈: kosis_semiconductor_shipment_index (monthly) — STALE — 최신 2026-07-01, 76일 경과
+- 🟠 **normalized:motie_semiconductor_exports_usd_100m** [STALE] 정규화 시리즈: motie_semiconductor_exports_usd_100m (monthly) — STALE — 최신 2026-07-01, 76일 경과
+- 🟠 **normalized:motie_semiconductor_exports_yoy** [STALE] 정규화 시리즈: motie_semiconductor_exports_yoy (monthly) — STALE — 최신 2026-07-01, 76일 경과
+- 🟠 **normalized:motie_total_exports_yoy** [STALE] 정규화 시리즈: motie_total_exports_yoy (monthly) — STALE — 최신 2026-07-01, 76일 경과
