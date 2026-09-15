@@ -9,19 +9,41 @@
 # monthly 산업통상부 "n월 수출입동향" press releases (source: WebSearch,
 # 산업통상부 공식 발표 인용 보도 교차확인 — 파이낸셜뉴스/머니투데이/한국세정신문/
 # 부산합스/정책브리핑 등). No EXAMPLE rows remain in this file.
+#
+# 2026-09-15: 2026-08-01 row added from 관세청(Korea Customs Service)
+# "2026년 8월 수출입 현황 확정치" (2026-09-15 발표) — a different agency
+# than the 산업통상부 releases above, but the same underlying settled trade
+# statistics (관세청 통관 기준 확정치 vs 산업통상부의 통관 기준 월간 동향은
+# 사실상 같은 숫자를 다른 기관이 발표). Cross-checked against the
+# auto-collected data/normalized/customs_export_dlr.csv August row
+# ($98,282,430,140) — matches the 983억 달러 total within rounding.
+# ⚠️ Source text read "반도체 수출이 ... 468억만달러" — almost certainly a
+# typo for 468억 달러 ($46.8B); treated as $46.8B here since that's the only
+# reading consistent with "3개월 연속 400억달러 돌파" and the June/July
+# levels already in this file ($44.8B/$41.0B). Flagged, not silently fixed
+# in the source (sources/ is immutable).
+#
+# This also means exports_preliminary.yaml's stale "08월 1~10일 잠정치"
+# stub (target_month 2026-08-01, +45.3%/+155.4%) is now superseded by this
+# real row — the pipeline already prefers real data over the preliminary
+# proxy (correlation_analysis.py combine_first), so no code change needed,
+# but the preliminary file itself was NOT updated/cleaned as part of this
+# ingest (out of scope — see wiki ingest report).
 
-updated_at: "2026-08-17"
+updated_at: "2026-09-15"
 series:
   total_exports_yoy:               # 총수출 증가율 (%, YoY)
     - { date: "2026-04-01", value: 48.0 }  # REAL — 858.9억 달러, 4월 기준 역대 최대. 산업통상부 2026-05월초 발표
     - { date: "2026-05-01", value: 53.2 }  # REAL — 877.5억 달러, 월 기준 역대 최대, 3개월 연속 800억+. 산업통상부 발표
     - { date: "2026-06-01", value: 70.9 }  # REAL — 1,022.5억 달러, 사상 최초 월 1,000억 달러 돌파. 산업통상부 발표
     - { date: "2026-07-01", value: 62.8 }  # REAL — 988.9억 달러, 역대 2위. 산업통상부 2026-08-01 발표
+    - { date: "2026-08-01", value: 68.7 }  # REAL — 983억 달러, 8월 기준 역대 최대, 3개월 연속 900억+. 관세청 2026-09-15 확정치 발표
   semiconductor_exports_yoy:       # 반도체 수출 증가율 (%, YoY)
     - { date: "2026-04-01", value: 173.5 } # REAL — 319.0억 달러. 산업통상부 발표
     - { date: "2026-05-01", value: 169.4 } # REAL — 371.6억 달러, 3개월 연속 300억+, 월간 최고 기록. 산업통상부 발표
     - { date: "2026-06-01", value: 199.5 } # REAL — 448.2억 달러, AI서버 수요+고정가 상승. 산업통상부 발표
     - { date: "2026-07-01", value: 178.8 } # REAL — 410.1억 달러, 2개월 연속 400억 달러 상회. 산업통상부 2026-08-01 발표
+    - { date: "2026-08-01", value: 206.1 } # REAL — 468억 달러(추정 해석, 원문 "468억만달러"), 6월 정점(448.2억) 재돌파 — 신기록. 3개월 연속 400억+. 관세청 2026-09-15 확정치 발표
   semiconductor_exports_usd_100m:  # 반도체 수출 금액 (억 달러, 레벨) — 2026-08-17 사용자 요청
     # ("YoY를 거꾸로 역산해서 RAW level로 그려줄 수 있어?"). 실제로는 %YoY를
     # 역산할 필요가 없었다 — 바로 위 semiconductor_exports_yoy 각 행의 주석에
@@ -36,3 +58,4 @@ series:
     - { date: "2026-05-01", value: 371.6 }
     - { date: "2026-06-01", value: 448.2 }
     - { date: "2026-07-01", value: 410.1 }
+    - { date: "2026-08-01", value: 468.0 }  # 관세청 2026-09-15 확정치 (원문 표기 불명확 — 위 참고)
