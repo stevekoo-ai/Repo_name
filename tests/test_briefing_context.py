@@ -31,6 +31,18 @@ def test_pack_stays_far_under_the_hard_cap():
     assert pack.chars < 12_000, f"팩이 예상보다 크다: {pack.chars:,}자"
 
 
+def test_pack_carries_the_conviction_tone_directive():
+    """2026-09-16 사용자 피드백: 확신에 찬 판단이 결론까지 안 나온다.
+    프롬프트 직접 수정이 막혀 있어(2026-08 확인) 팩 콘텐츠로 강제한다 —
+    이 블록이 조용히 빠지면 지침 없이 예전 방식으로 되돌아간다."""
+    pack, _ = C.build_pack("AM", AS_OF)
+    keys = [b.key for b in pack.blocks]
+    assert "style_directive" in keys
+    directive = next(b for b in pack.blocks if b.key == "style_directive")
+    assert "오늘의 판단" in directive.body
+    assert "결론" in directive.body
+
+
 def test_render_truncates_instead_of_silently_overflowing():
     pack = C.BriefingPack(slot="AM", as_of=C.datetime.now(C.KST),
                           blocks=[C.Block("x", "거대 블록", "가" * (C.MAX_PACK_CHARS + 500))])

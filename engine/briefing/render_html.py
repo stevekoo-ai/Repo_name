@@ -31,6 +31,26 @@ _LINK = re.compile(r"\[([^\]]+)\]\(([^)\s]+)\)")
 _BOLD = re.compile(r"\*\*([^*]+)\*\*")
 _CODE = re.compile(r"`([^`]+)`")
 
+# 상태 이모지 → 색상 등급. 브리핑 본문이 이미 이 이모지들로 심각도를
+# 표시해왔는데(🔴 위험/✅ 적중 등), 지금까지는 렌더러가 이걸 그냥 평문으로
+# 찍어서 md와 html이 시각적으로 구분이 안 됐다 — 이모지 자체는 색이
+# 있어 보이지만 주변 텍스트·배경은 다른 문단과 완전히 동일했다.
+_SEVERITY_EMOJI = {
+    "🔴": "bad", "❌": "bad",
+    "🟠": "warn", "🟡": "warn", "⚠️": "warn",
+    "🟢": "good", "✅": "good",
+    "🔵": "neutral",
+}
+
+
+def _leading_severity(text: str) -> str | None:
+    t = text.lstrip()
+    t = re.sub(r"^\d+\.\s*", "", t)  # "1. 🟢 원화..." 처럼 번호 접두어가 붙는 경우
+    for emo, sev in _SEVERITY_EMOJI.items():
+        if t.startswith(emo):
+            return sev
+    return None
+
 
 def _inline(text: str) -> str:
     """인라인 마크다운. **이스케이프가 먼저다**(모듈 docstring 참조)."""
@@ -89,6 +109,32 @@ def _table(rows: list[str]) -> str:
     return "".join(out)
 
 
+def _wrap_sections(fragments: list[str]) -> str:
+    """`##` 경계로 카드를 나눈다. 지금까지는 h2/p/table이 전부 같은 높이의
+    평문으로 흘러나와 "제목과 내용의 구분이 안 된다"는 지적을 받았다 —
+    `_CSS`엔 `.card`가 이미 있었는데 이 변환기가 한 번도 안 썼다."""
+    sections: list[list[str]] = [[]]
+    titles: list[str | None] = [None]
+    for frag in fragments:
+        m = re.match(r"^<h2>(.*)</h2>$", frag)
+        if m:
+            sections.append([frag])
+            titles.append(re.sub(r"<[^>]+>", "", m.group(1)).strip())
+        else:
+            sections[-1].append(frag)
+    out = []
+    for idx, sec in enumerate(sections):
+        if not sec:
+            continue
+        content = "\n".join(sec)
+        if idx == 0:
+            out.append(f"<header class='masthead'>{content}</header>")
+        else:
+            cls = "card highlight" if titles[idx] == "결론" else "card"
+            out.append(f"<section class='{cls}'>{content}</section>")
+    return "\n".join(out)
+
+
 def markdown_to_body(md: str) -> str:
     """브리핑 마크다운의 본문만 HTML로. <html> 골격은 render_briefing_html이 씌운다."""
     _, md = _strip_frontmatter(md)
@@ -116,7 +162,11 @@ def markdown_to_body(md: str) -> str:
 
         if stripped.startswith("#"):
             level = len(stripped) - len(stripped.lstrip("#"))
-            out.append(f"<h{min(level, 4)}>{_inline(stripped[level:].strip())}</h{min(level, 4)}>")
+            text = stripped[level:].strip()
+            sev = _leading_severity(text) if level == 3 else None
+            cls = f" class='hx-{sev}'" if sev else ""
+            tag = min(level, 4)
+            out.append(f"<h{tag}{cls}>{_inline(text)}</h{tag}>")
             i += 1
             continue
 
@@ -130,25 +180,42 @@ def markdown_to_body(md: str) -> str:
             while i < len(lines) and lines[i].strip().startswith(">"):
                 block.append(lines[i].strip().lstrip(">").strip())
                 i += 1
-            out.append(f"<blockquote>{_inline(' '.join(block))}</blockquote>")
+            text = " ".join(block)
+            sev = _leading_severity(text)
+            cls = f" class='bq-{sev}'" if sev else ""
+            out.append(f"<blockquote{cls}>{_inline(text)}</blockquote>")
             continue
 
-        if stripped.startswith("- "):
-            block = []
-            while i < len(lines) and lines[i].strip().startswith("- "):
-                block.append(f"<li>{_inline(lines[i].strip()[2:])}</li>")
-                i += 1
-            out.append(f"<ul>{''.join(block)}</ul>")
-            continue
-
-        if re.match(r"^\d+\.\s", stripped):
-            block = []
-            while i < len(lines) and re.match(r"^\d+\.\s", lines[i].strip()):
-                # f-string 안에 백슬래시를 못 넣는 파이썬 버전이 있어 분리한다
-                item = re.sub(r"^\d+\.\s", "", lines[i].strip())
-                block.append("<li>" + _inline(item) + "</li>")
-                i += 1
-            out.append(f"<ol>{''.join(block)}</ol>")
+        # 순서/비순서 목록 — 마크다운 소프트 줄바꿈으로 한 항목이 여러
+        # 줄에 걸치는 경우가 실제 브리핑에 항상 있다(들여쓴 계속줄).
+        # 예전 구현은 계속줄을 못 알아채고 별도 <p>로 떼어내
+        # 문장이 <ol>과 <p> 사이에서 잘렸다 — "줄이 안 맞는다"는
+        # 지적의 실체가 이거였다.
+        if stripped.startswith("- ") or re.match(r"^\d+\.\s", stripped):
+            ordered = bool(re.match(r"^\d+\.\s", stripped))
+            items: list[str] = []
+            current: list[str] | None = None
+            while i < len(lines):
+                raw = lines[i]
+                s = raw.strip()
+                if not s:
+                    break
+                starts_new = bool(re.match(r"^\d+\.\s", s)) if ordered else s.startswith("- ")
+                if starts_new:
+                    if current is not None:
+                        items.append(" ".join(current))
+                    current = [re.sub(r"^\d+\.\s", "", s) if ordered else s[2:]]
+                    i += 1
+                elif (current is not None and raw[:1].isspace()
+                        and not re.match(r"^(#|>|\||-{3,}$)", s)):
+                    current.append(s)
+                    i += 1
+                else:
+                    break
+            if current is not None:
+                items.append(" ".join(current))
+            tag = "ol" if ordered else "ul"
+            out.append(f"<{tag}>" + "".join(f"<li>{_inline(x)}</li>" for x in items) + f"</{tag}>")
             continue
 
         # 문단 — 빈 줄까지 이어붙인다(마크다운의 소프트 줄바꿈)
@@ -159,7 +226,7 @@ def markdown_to_body(md: str) -> str:
             i += 1
         if block:
             out.append(f"<p>{_inline(' '.join(block))}</p>")
-    return "\n".join(out)
+    return _wrap_sections(out)
 
 
 def render_briefing_html(md: str, title: str | None = None) -> str:
@@ -176,12 +243,25 @@ def render_briefing_html(md: str, title: str | None = None) -> str:
 <style>{_CSS}
 /* 브리핑 전용 최소 보강 — 나머지는 월간 리포트·대시보드와 같은 _CSS를 쓴다 */
 body {{ max-width: 860px; margin: 0 auto; padding: 24px 16px 48px; }}
-h2 {{ margin-top: 32px; padding-top: 16px; border-top: 1px solid var(--border); }}
 table {{ width: 100%; border-collapse: collapse; }}
 th, td {{ padding: 6px 10px; border-bottom: 1px solid var(--border); }}
 blockquote {{ margin: 12px 0; padding: 10px 14px; background: var(--surface-2);
   border-left: 3px solid var(--accent); border-radius: 4px; }}
 .table-wrap {{ overflow-x: auto; }}
+header.masthead {{ padding-top: 0; }}
+/* 심각도 이모지(🔴🟠🟡✅❌ 등)로 시작하는 인용/소제목은 그 등급 색으로
+   강조한다 — "뭘 강조해야 할지 모르겠다"는 지적에 대한 답: 지금까지
+   이모지는 색이 있는데 주변은 다른 문단과 똑같았다. */
+blockquote.bq-bad {{ background: var(--bad-bg); border-left-color: var(--bad); }}
+blockquote.bq-warn {{ background: var(--warn-bg); border-left-color: var(--warn); }}
+blockquote.bq-good {{ background: var(--good-bg); border-left-color: var(--good); }}
+blockquote.bq-neutral {{ background: var(--neutral-bg); border-left-color: var(--neutral); }}
+h3.hx-bad, h3.hx-warn, h3.hx-good, h3.hx-neutral {{
+  padding-left: 10px; border-left: 4px solid; margin-left: -12px; }}
+h3.hx-bad {{ border-color: var(--bad); }}
+h3.hx-warn {{ border-color: var(--warn); }}
+h3.hx-good {{ border-color: var(--good); }}
+h3.hx-neutral {{ border-color: var(--neutral); }}
 </style>
 </head>
 <body>

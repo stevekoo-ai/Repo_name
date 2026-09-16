@@ -32,6 +32,22 @@ def test_bullets_and_numbered_lists():
     assert "<ol><li>하나</li><li>둘</li></ol>" in markdown_to_body("1. 하나\n2. 둘")
 
 
+def test_numbered_list_item_keeps_its_wrapped_continuation_lines():
+    """2026-09-16 사용자 지적("줄이 안 맞는다")의 실체 — 실제 브리핑은 번호
+    항목 하나가 들여쓴 계속줄로 여러 줄에 걸친다(마크다운 소프트 줄바꿈).
+    옛 구현은 계속줄을 별도 <p>로 떼어내 문장이 <ol>과 <p> 사이에서 잘렸다."""
+    md = "1. **첫 문장.** 둘째 절,\n   셋째 절까지 한 항목이다.\n2. 둘째 항목."
+    out = markdown_to_body(md)
+    assert "<ol><li><strong>첫 문장.</strong> 둘째 절, 셋째 절까지 한 항목이다.</li><li>둘째 항목.</li></ol>" in out
+    assert "<p>" not in out, "계속줄이 별도 문단으로 떨어져 나가면 안 된다"
+
+
+def test_bullet_list_item_keeps_its_wrapped_continuation_lines():
+    md = "- 첫 줄,\n  이어지는 줄.\n- 둘째 항목."
+    out = markdown_to_body(md)
+    assert "<ul><li>첫 줄, 이어지는 줄.</li><li>둘째 항목.</li></ul>" in out
+
+
 def test_blockquote_and_hr():
     assert "<blockquote>" in markdown_to_body("> 주의")
     assert "<hr>" in markdown_to_body("---\n")
@@ -91,6 +107,34 @@ def test_document_is_well_formed_enough_to_open():
     assert out.startswith("<!doctype html>")
     assert out.rstrip().endswith("</html>")
     assert out.count("<body>") == out.count("</body>") == 1
+
+
+# ── 시각적 구분: 카드·심각도 색 (2026-09-16 "md와 html이 차이 없다" 지적) ──
+
+def test_h2_sections_are_wrapped_in_cards():
+    out = markdown_to_body("# 제목\n\n## 절1\n\n본문1\n\n## 절2\n\n본문2")
+    assert out.count("<section class='card'>") == 2
+    assert "<header class='masthead'><h1>제목</h1></header>" in out
+
+
+def test_conclusion_section_gets_the_highlight_card():
+    out = markdown_to_body("# 제목\n\n## 결론\n\n요약")
+    assert "<section class='card highlight'>" in out
+
+
+def test_severity_emoji_blockquote_gets_a_color_class():
+    assert "<blockquote class='bq-bad'>" in markdown_to_body("> 🔴 위험 신호")
+    assert "<blockquote class='bq-warn'>" in markdown_to_body("> ⚠️ 주의")
+    assert "<blockquote class='bq-good'>" in markdown_to_body("> ✅ 적중")
+
+
+def test_plain_blockquote_gets_no_severity_class():
+    assert "<blockquote>평범한 인용</blockquote>" in markdown_to_body("> 평범한 인용")
+
+
+def test_severity_emoji_h3_gets_a_color_class_even_after_a_number_prefix():
+    out = markdown_to_body("### 1. 🟢 원화 강세")
+    assert "<h3 class='hx-good'>" in out
 
 
 def test_the_real_briefing_converts_without_losing_sections():

@@ -728,6 +728,44 @@ def build_data_health_block() -> Block:
     return Block("data_health", "⓪ 데이터 헬스", "\n".join(lines))
 
 
+def build_style_directive_block() -> Block:
+    """톤 지침 — "사실을 정확히 나열하는 글"과 "전문가 판단을 내리는 글"은
+    다른 글이다.
+
+    사용자 피드백(2026-09-16): "경제 전문가의 날카로운 분석이나 전망이
+    전혀 없다." 실측해보니 자료·인용·자기검산은 이미 풍부한데, 확신에 찬
+    스탠스는 문서 맨 끝 `## 결론`에서만, 그것도 헤지된 관찰 나열로
+    나온다 — 8개 섹션을 다 읽어야 판단이 뭔지 나온다.
+
+    Routine 프롬프트는 영구 세션에 묶여 있어 이 세션에서 직접 고칠 수
+    없다(2026-08 `update_trigger` 확인 — persistent_session_id 바인딩된
+    Routine의 프롬프트 수정은 거부됨). 그래서 다른 블록들과 같은 방식으로
+    판 콘텐츠에 지침을 박는다 — 프롬프트가 이미 "여기 없는 숫자는 없는
+    것"이라고 팩의 우선권을 인정하고 있으므로, 톤 지침도 같은 자리에서
+    작동한다.
+    """
+    lines = [
+        "**이 블록은 프롬프트의 일반적 톤 안내보다 우선한다.**",
+        "",
+        "1. **H1 제목 바로 다음, 첫 뉴스 섹션 이전에 `## 오늘의 판단` 절을 "
+        "새로 쓸 것.** 3~5문장, **1인칭 확신 어조** — \"~일 수 있다/"
+        "~로 보인다\" 대신 **\"~다/~로 본다/~로 판단한다\"**로 끝낸다.",
+        "2. 이 절은 **문서 맨 끝 `## 결론`의 예고편이 아니라 그 자체로 "
+        "완결된 판단**이어야 한다. 오늘 팩의 숫자 2~3개를 근거로 "
+        "SK하이닉스·코스피 방향에 대해 **명시적 스탠스**(강세/약세/중립 "
+        "중 하나, 며칠 지평인지 명시)를 밝히고, 그 스탠스를 뒤집을 조건 "
+        "1개를 바로 다음 문장에 붙인다.",
+        "3. **금지어**: 문장을 \"엇갈린다\", \"지켜봐야 한다\", "
+        "\"단정하기 이르다\"로 끝내지 말 것. 근거가 얇으면 얇다고 쓰되, "
+        "그래도 **오늘 시점 최선의 판단을 숫자로** 먼저 제시하고 헤지는 "
+        "그 뒤에 조건절로 붙인다 — 헤지가 문장의 끝이 되면 안 된다.",
+        "4. 나머지 섹션(사실관계·표·검산·예측 채점)은 지금처럼 "
+        "정확성 우선으로 그대로 쓴다. 이 지침은 **추가**이지 대체가 아니다 "
+        "— 사실을 왜곡하거나 확신을 지어내라는 뜻이 아니다.",
+    ]
+    return Block("style_directive", "톤 지침 (오늘의 판단 요구 — 2026-09-16)", "\n".join(lines))
+
+
 def build_execution_block(as_of: date) -> Block:
     """⑧ 자금 조달 실행 계획 — 매도 tranche·판단 포스트·CDP 일일 점검.
 
@@ -836,6 +874,7 @@ def build_pack(slot: str, as_of: date | None = None) -> tuple[BriefingPack, Gate
     gate = evaluate_gate(as_of, triggers, why)
     pack = BriefingPack(slot=slot, as_of=now, blocks=[
         build_data_health_block(),
+        build_style_directive_block(),
         build_fact_sheet(as_of),
         build_hynix_block(as_of),
         build_digest_block(as_of, triggers, why),
