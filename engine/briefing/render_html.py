@@ -188,9 +188,8 @@ def markdown_to_body(md: str) -> str:
 
         # 순서/비순서 목록 — 마크다운 소프트 줄바꿈으로 한 항목이 여러
         # 줄에 걸치는 경우가 실제 브리핑에 항상 있다(들여쓴 계속줄).
-        # 예전 구현은 계속줄을 못 알아채고 별도 <p>로 떼어내
-        # 문장이 <ol>과 <p> 사이에서 잘렸다 — "줄이 안 맞는다"는
-        # 지적의 실체가 이거였다.
+        # 예전 구현은 계속줄을 못 알아채고 별도 <p>로 떼어내 문장이
+        # <ol>과 <p> 사이에서 잘렸다 — "줄이 안 맞는다"는 지적의 실체.
         if stripped.startswith("- ") or re.match(r"^\d+\.\s", stripped):
             ordered = bool(re.match(r"^\d+\.\s", stripped))
             items: list[str] = []
@@ -199,6 +198,19 @@ def markdown_to_body(md: str) -> str:
                 raw = lines[i]
                 s = raw.strip()
                 if not s:
+                    # 항목 사이 빈 줄(loose list)이다 — 그다음 첫 비어있지
+                    # 않은 줄이 새 항목이면 목록을 계속 잇는다. 안 그러면
+                    # 여기서 끝. 실제 브리핑은 항목마다 빈 줄로 나뉘어 있어,
+                    # 이 처리가 없으면 항목마다 별도 <ol>이 생겨 브라우저가
+                    # 번호를 매번 1로 재시작한다("1. 1. 1."로 보이던 원인).
+                    j = i + 1
+                    while j < len(lines) and not lines[j].strip():
+                        j += 1
+                    nxt = lines[j].strip() if j < len(lines) else ""
+                    nxt_is_new = bool(re.match(r"^\d+\.\s", nxt)) if ordered else nxt.startswith("- ")
+                    if nxt_is_new:
+                        i = j
+                        continue
                     break
                 starts_new = bool(re.match(r"^\d+\.\s", s)) if ordered else s.startswith("- ")
                 if starts_new:

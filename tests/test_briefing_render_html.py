@@ -48,6 +48,24 @@ def test_bullet_list_item_keeps_its_wrapped_continuation_lines():
     assert "<ul><li>첫 줄, 이어지는 줄.</li><li>둘째 항목.</li></ul>" in out
 
 
+def test_numbered_items_separated_by_blank_lines_stay_one_ordered_list():
+    """실제 브리핑은 loose list다 — 번호 항목 사이마다 빈 줄이 있다.
+    한 번 고쳤다가 다시 만든 회귀: 빈 줄에서 목록 스캔을 그냥 끝내버리면
+    항목마다 별도 <ol>이 생기고, 브라우저는 <ol> 하나마다 번호를 새로
+    1부터 매겨 화면엔 "1. 1. 1."로 보인다."""
+    md = "1. 첫 항목,\n   계속줄.\n\n2. 둘째 항목.\n\n3. 셋째 항목."
+    out = markdown_to_body(md)
+    assert out.count("<ol>") == 1, "빈 줄마다 새 <ol>이 열리면 번호가 매번 1로 재시작한다"
+    assert ("<ol><li>첫 항목, 계속줄.</li><li>둘째 항목.</li>"
+            "<li>셋째 항목.</li></ol>") in out
+
+
+def test_bullets_separated_by_blank_lines_stay_one_unordered_list():
+    md = "- 하나\n\n- 둘\n\n- 셋"
+    out = markdown_to_body(md)
+    assert out.count("<ul>") == 1
+
+
 def test_blockquote_and_hr():
     assert "<blockquote>" in markdown_to_body("> 주의")
     assert "<hr>" in markdown_to_body("---\n")
