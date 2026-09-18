@@ -42,11 +42,15 @@ import json
 import argparse
 import urllib.request
 import urllib.error
+import urllib.parse
 from pathlib import Path
 from datetime import date, datetime, timedelta, timezone
 
 FRED_BASE = "https://api.stlouisfed.org/fred/series/observations"
 ECOS_BASE = "https://ecos.bok.or.kr/api/StatisticSearch"
+YAHOO_CHART_BASE = "https://query1.finance.yahoo.com/v8/finance/chart"
+# 기본 파이썬 UA로는 야후가 거절한 전례가 흔하다 — 프로브가 성공한 헤더 그대로 쓴다.
+YAHOO_HEADERS = {"User-Agent": "Mozilla/5.0 (compatible; peos-agent/1.0; +https://github.com)"}
 
 SERIES_CSV_PATH = Path(__file__).resolve().parent.parent / "sources" / "macro-series.csv"
 SERIES_CSV_FIELDS = ["series", "date", "value", "provider", "fetched_at"]
@@ -114,6 +118,24 @@ PRESETS = {
     # DTWEXM(1973~2020)을 이어붙여 쓴다.
     "us_dollar_index": ("fred", "DTWEXBGS", "달러지수 광의(일별, 2006~)", "검증됨(2026-09-10 백필)"),
     "us_dollar_index_major": ("fred", "DTWEXM", "달러지수 주요통화(1973~2020 폐지, 2006년 이전 대용)", "검증됨(2026-09-10 백필)"),
+    # ── ICE 달러지수(DXY) — DTWEXBGS의 **대체가 아니라 참고용 병기** ──
+    #
+    # 2026-09-18 신설. 사용자 지적("API가 안 주면 다른 데서라도 가져와서
+    # 신선도를 유지해야 할 거 아냐")에서 출발했는데, 조사 결과 "같은 지표를
+    # 주는 다른 API"는 존재하지 않는다:
+    #   - DTWEXBGS = 연준 H.10, **26개국 무역가중**. 원천 발표가 며칠 늦다
+    #     (2026-09-18 실측 7일 지연 — 수집 실패가 아니라 미발표).
+    #   - DXY      = ICE, **6개 통화만**(유로 57.6%). 매일 나온다.
+    # 같은 날 값이 118.21 vs 100.44로 아예 다르다 — 서로 바꿔치기하면
+    # 이 저장소가 반복해서 겪은 "다른 정의를 같은 값으로 쓴 사고"가 된다.
+    # 그래서 별도 계열로 쌓고, 리포트에도 "(DXY·참고)"로 나란히 표기한다.
+    #
+    # 소스 선정은 추측이 아니라 실측이다 — 개발 샌드박스가 stooq·yahoo를
+    # 둘 다 egress 차단해서 GitHub Actions에 프로브(run 35338679955)를
+    # 띄워 확인했다: stooq는 5개 심볼 전부 자바스크립트 봇 차단 챌린지를
+    # 돌려줬고(HTTP 200이라 순진하게 파싱하면 조용히 깨진다), yahoo
+    # DX-Y.NYB만 정상 응답했다. DX=F는 404.
+    "us_dollar_index_dxy": ("yahoo", "DX-Y.NYB", "ICE 달러지수 DXY(일별, 참고용·다른 바스켓)", "검증됨(2026-09-18 Actions 프로브)"),
 }
 
 DEFAULT_LOOKBACK_DAYS = 3652  # 최초 백필 시 과거 10년치
@@ -179,6 +201,64 @@ def fred_fetch(series_id, start=None, end=None, raw=False):
     if obs is None:
         sys.exit(f"응답에 observations가 없습니다 — --raw로 원본 확인: {json.dumps(data)[:300]}")
     return [(o["date"], o["value"]) for o in obs if o["value"] != "."]
+
+
+def yahoo_fetch(symbol, start=None, end=None, raw=False):
+    """Yahoo Finance chart API(무인증) — ICE 달러지수(DXY)용.
+
+    ## 왜 이 소스인가
+
+    2026-09-18 GitHub Actions 프로브(run 35338679955) 실측 결과다. stooq는
+    5개 심볼 전부 **HTTP 200을 주면서 본문은 자바스크립트 봇 차단 챌린지**를
+    돌려줬다 — status만 보고 파싱하면 조용히 깨지는 종류라, 여기선 본문
+    구조(chart.result)를 직접 확인해 실패를 드러낸다.
+
+    ## 주의
+
+    무인증 공개 엔드포인트라 예고 없이 막힐 수 있다. 그때는 이 계열만
+    갱신이 멈추고 ⚠️N일 지연으로 표면화된다(브리핑 팩의 "뉴스 교차검증
+    필수 목록"이 자동으로 집어낸다) — 조용히 사라지지 않는다.
+    """
+    period2 = int(datetime.now(timezone.utc).timestamp())
+    if end:
+        period2 = int(datetime.fromisoformat(f"{end}T23:59:59+00:00").timestamp())
+    if start:
+        period1 = int(datetime.fromisoformat(f"{start}T00:00:00+00:00").timestamp())
+    else:
+        period1 = period2 - DEFAULT_LOOKBACK_DAYS * 86400
+
+    url = (f"{YAHOO_CHART_BASE}/{urllib.parse.quote(symbol)}"
+           f"?period1={period1}&period2={period2}&interval=1d")
+    req = urllib.request.Request(url, headers=YAHOO_HEADERS)
+    try:
+        with urllib.request.urlopen(req, timeout=20) as resp:
+            data = json.loads(resp.read())
+    except urllib.error.HTTPError as e:
+        sys.exit(f"Yahoo API 호출 실패: {e.code} {e.read()[:300].decode(errors='replace')}")
+    except Exception as e:  # noqa: BLE001 — 네트워크 실패도 이 계열만 건너뛰게 한다
+        sys.exit(f"Yahoo API 호출 실패: {type(e).__name__}: {e}")
+
+    if raw:
+        print(json.dumps(data, ensure_ascii=False, indent=2))
+        return []
+
+    result = (data.get("chart") or {}).get("result") or []
+    if not result:
+        err = (data.get("chart") or {}).get("error")
+        sys.exit(f"응답에 chart.result가 없습니다(봇 차단/심볼 오류 의심) — error={err}")
+
+    stamps = result[0].get("timestamp") or []
+    quote = (result[0].get("indicators") or {}).get("quote") or [{}]
+    closes = quote[0].get("close") or []
+    rows = []
+    for ts, close in zip(stamps, closes):
+        if close is None:  # 휴장일 등 — 값이 없는 날은 넣지 않는다(R3)
+            continue
+        d = datetime.fromtimestamp(ts, tz=timezone.utc).date().isoformat()
+        rows.append((d, f"{close:.4f}"))
+    if not rows:
+        sys.exit(f"'{symbol}' 응답에 유효한 종가가 하나도 없습니다")
+    return rows
 
 
 def _ecos_fetch_page(key, stat_code, item_code, cycle, start, end, row_from, row_to):
@@ -271,6 +351,8 @@ def _fetch_preset(name, start=None, end=None, raw=False):
     if provider == "fred":
         rows = fred_fetch(spec, start, end, raw=raw)
         return provider, rows
+    if provider == "yahoo":
+        return provider, yahoo_fetch(spec, start, end, raw=raw)
     stat_code, item_code, cycle = spec
     raw_rows = ecos_fetch(stat_code, item_code, cycle, start, end, raw=raw)
     if raw:
@@ -309,6 +391,8 @@ def cmd_fetch(args):
     if args.raw:
         if provider == "fred":
             fred_fetch(spec, args.start, args.end, raw=True)
+        elif provider == "yahoo":
+            yahoo_fetch(spec, args.start, args.end, raw=True)
         else:
             stat_code, item_code, cycle = spec
             ecos_fetch(stat_code, item_code, cycle, args.start or _fmt_ecos(date.today() - timedelta(days=DEFAULT_LOOKBACK_DAYS), cycle), args.end or _fmt_ecos(date.today(), cycle), raw=True)
@@ -366,7 +450,8 @@ def cmd_sync(args):
             start_date = date.today() - timedelta(days=DEFAULT_LOOKBACK_DAYS)
         end_date = date.today()
 
-        if provider == "fred":
+        if provider in ("fred", "yahoo"):
+            # yahoo는 ISO 날짜를 받아 내부에서 epoch로 바꾼다(fred와 같은 표기)
             start_str, end_str = _fmt_fred(start_date), _fmt_fred(end_date)
         else:
             _, _, cycle = spec
