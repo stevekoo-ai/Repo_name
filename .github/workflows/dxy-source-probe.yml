@@ -1,0 +1,28 @@
+name: DXY 소스 프로브 (일회성 조사)
+
+# 2026-09-18 신설 — **일회성 조사용, 소스 확정 후 삭제한다.**
+#
+# FRED DTWEXBGS(달러지수)가 원천 발표 지연(실측 7일)이라 매일 나오는
+# ICE DXY를 참고 지표로 병기하려는데, 개발 샌드박스의 egress 프록시가
+# stooq.com·finance.yahoo.com을 둘 다 막아 로컬에서 후보 소스의
+# 가용 여부를 확인할 수 없다. 실제 운영 환경(Actions)에서 실측하려고
+# 만든 워크플로다 — 추측으로 수집기를 쓰지 않는다는 원칙(R1) 때문.
+#
+# 스케줄 없음(workflow_dispatch 전용). 저장소를 건드리지 않고 로그만 남긴다.
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: DXY 후보 소스 프로브
+        run: python3 scripts/probe_dxy_sources.py
