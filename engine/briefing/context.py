@@ -184,6 +184,7 @@ def build_fact_sheet(as_of: date) -> Block:
     m = _series_map()
     lines = ["| 지표 | 최신 | 1일 | 5일 | 기준일 |", "|---|---:|---:|---:|---|"]
     missing = []
+    stale: list[tuple[str, int, str]] = []  # (label, age_days, last_date) — age>=3
     for key, label, unit, mode in FACT_SERIES:
         rows = [(d, v) for d, v in m.get(key, []) if d <= as_of.isoformat()]
         if len(rows) < 2:
@@ -192,7 +193,9 @@ def build_fact_sheet(as_of: date) -> Block:
         last_v, d1, last_d = _change(rows, 1) or (None, None, None)
         _, d5, _ = _change(rows, 5) or (None, None, None)
         age = (as_of - date.fromisoformat(last_d)).days
-        stale = f" ⚠️{age}일 지연" if age >= 3 else ""
+        stale_mark = f" ⚠️{age}일 지연" if age >= 3 else ""
+        if age >= 3:
+            stale.append((label, age, last_d))
 
         def fmt(pct):
             if pct is None:
@@ -203,10 +206,26 @@ def build_fact_sheet(as_of: date) -> Block:
                 return f"{pct:+.1f}%"
             return f"{pct:+.2f}%"
 
-        lines.append(f"| {label} | {last_v:,.2f}{unit} | {fmt(d1)} | {fmt(d5)} | {last_d}{stale} |")
+        lines.append(f"| {label} | {last_v:,.2f}{unit} | {fmt(d1)} | {fmt(d5)} | {last_d}{stale_mark} |")
     body = "\n".join(lines)
     if missing:
         body += f"\n\n**미수집**: {', '.join(missing)} — 없는 것이므로 언급하지 말 것."
+
+    if stale:
+        # 2026-09-18 신설 — 사용자 지적: 지연된 지표를 뉴스 검색으로
+        # 보정하는 "뉴스로 보정되는 칸"이 과거엔 사고가 났던 몇 개
+        # 지표(10년물·브렌트유·원달러)에만 우연히 붙어 있었다. 그날그날
+        # 실제로 지연된 지표가 다를 수 있으므로, ⚠️ 마크와 같은 나이
+        # 기준(3일 이상)으로 매번 다시 계산해 빠짐없이 강제한다 —
+        # 특정 지표를 하드코딩하지 않는다.
+        body += ("\n\n**🔎 뉴스 교차검증 필수 목록** (하나도 빠짐없이 웹검색해서 "
+                 "아래 '뉴스로 보정되는 칸' 표에 병기할 것 — 이 목록은 프롬프트의 "
+                 "일반 검색 횟수 권장보다 우선한다. 오늘 지연된 지표가 몇 개든 "
+                 "전부 확인한다):\n")
+        for label, age, last_d in stale:
+            body += f"- {label} ({last_d} 기준, {age}일 지연)\n"
+        body += ("> ⚠️ 웹검색으로도 최신값을 못 찾으면 '검색함 → 최신값 확인 안 "
+                 "됨(팩 값 유지)'으로 명시할 것 — 조용히 생략하지 말 것.")
 
     fetched, hours = collection_freshness()
     if hours is not None:

@@ -103,6 +103,43 @@ def test_stale_series_carry_a_delay_marker(monkeypatch, tmp_path):
     assert "지연" in block.body, "지연된 계열이 표시돼야 한다"
 
 
+def test_stale_series_are_all_listed_for_mandatory_news_cross_check(monkeypatch, tmp_path):
+    """2026-09-18 사용자 지적: '달러지수'가 7일 지연인데 뉴스 교차검증 대상
+    목록엔 빠져 있었다 — 과거 사고가 났던 3개 지표에만 우연히 이 처리가
+    붙어 있었기 때문. 오늘 지연된 지표가 몇 개든, 무엇이든 빠짐없이
+    나열되는지 고정한다(특정 지표 이름을 하드코딩하지 않는다)."""
+    p = tmp_path / "macro-series.csv"
+    p.write_text(
+        "series,date,value,provider,fetched_at\n"
+        "us_nasdaq,2026-09-01,26000.00,fred,2026-09-01T00:00:00+00:00\n"
+        "us_nasdaq,2026-09-05,26100.00,fred,2026-09-05T00:00:00+00:00\n"
+        "us_dollar_index,2026-09-01,118.00,fred,2026-09-01T00:00:00+00:00\n"
+        "us_dollar_index,2026-09-04,118.10,fred,2026-09-04T00:00:00+00:00\n",
+        encoding="utf-8",
+    )
+    monkeypatch.setattr(C, "MACRO_SERIES", p)
+    block = C.build_fact_sheet(AS_OF)  # AS_OF = 2026-09-11
+    assert "뉴스 교차검증 필수 목록" in block.body
+    assert "나스닥" in block.body.split("뉴스 교차검증 필수 목록")[1]
+    assert "달러지수" in block.body.split("뉴스 교차검증 필수 목록")[1]
+
+
+def test_no_stale_series_means_no_cross_check_checklist(monkeypatch, tmp_path):
+    """전부 신선하면 체크리스트 자체가 안 붙어야 한다 — 매일 무조건
+    나오면 LLM이 무시하게 된다(이 저장소가 반복 학습한 "경고 남발=소음"
+    원칙)."""
+    p = tmp_path / "macro-series.csv"
+    p.write_text(
+        "series,date,value,provider,fetched_at\n"
+        "us_nasdaq,2026-09-10,26000.00,fred,2026-09-10T00:00:00+00:00\n"
+        "us_nasdaq,2026-09-11,26100.00,fred,2026-09-11T00:00:00+00:00\n",
+        encoding="utf-8",
+    )
+    monkeypatch.setattr(C, "MACRO_SERIES", p)
+    block = C.build_fact_sheet(AS_OF)
+    assert "뉴스 교차검증 필수 목록" not in block.body
+
+
 # ── 게이트 ───────────────────────────────────────────────────
 
 def test_gate_publishes_when_something_actually_moved():
