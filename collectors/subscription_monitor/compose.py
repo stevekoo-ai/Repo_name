@@ -102,6 +102,67 @@ def _listing_detail_lines(v: dict) -> list[str]:
     ]
 
 
+_PATTERN_DESCRIPTIONS = {
+    "전체검증": "신혼희망타운형 — 전용면적 무관, 전원 소득검증 대상",
+    "60㎡이하만검증": "국민주택형 — 특별공급 전원 + 일반공급은 60㎡ 이하만 소득검증(60㎡ 초과 일반공급은 소득 무관)",
+    "특별공급만해당(일반공급무관)": "국민주택형 — 전 세대 60㎡ 초과(공급대상 문구로 실측 확인) → 일반공급 전체 소득 무관",
+}
+
+
+def _pattern_checklist_lines(income: dict) -> list[str]:
+    """Render the framework's decision criteria (wiki/concepts/public-housing-
+    income-requirement-framework.md) as an explicit, itemized checklist —
+    사용자 요청 2026-09-19: "'기존 패턴과 일치'라고만 하지 말고, 기존 패턴이
+    뭔지 체크리스트로 적고 일치 여부를 항목별로 체크하는 형태로" 표현할 것
+    (보는 사람이 판정 근거를 스스로 검증할 수 있어야 함 — 시스템만 아는 상태로
+    두지 않는다).
+
+    Each row states the actual rule being checked, then ✅/❌ against this
+    listing — pulled from analyze_text()'s own exceptions list (그 문구
+    자체가 이미 실패 사유를 담고 있으므로 중복 판정 로직을 새로 만들지 않고
+    거기서 매칭)."""
+    exceptions = income.get("exceptions") or []
+
+    def _hit(keyword: str) -> str | None:
+        return next((e for e in exceptions if keyword in e), None)
+
+    business_type = income.get("business_type")
+    income_scope = income.get("income_scope")
+    lines = ["", "── 판별 체크리스트 (wiki/concepts/public-housing-income-requirement-framework.md 기준) ──"]
+
+    fail = _hit("적용대상")
+    lines.append(f"[{'❌' if fail else '✅'}] ① 소득기준 챕터에서 '적용대상:' 문구를 인식함")
+    if fail:
+        lines.append(f"      └ {fail}")
+
+    fail = _hit("판별 못함")
+    lines.append(f"[{'❌' if fail else '✅'}] ② 축1의 3개 패턴(신혼희망타운=전체검증 / 국민주택+60㎡이하 언급=60㎡이하만검증 / 국민주택+특별공급만 언급=특별공급만해당) 중 하나로 분류됨 — 결과: {income_scope}")
+    if fail:
+        lines.append(f"      └ {fail}")
+    elif income_scope in _PATTERN_DESCRIPTIONS:
+        lines.append(f"      └ {_PATTERN_DESCRIPTIONS[income_scope]}")
+
+    if business_type == "국민주택형":
+        fail = _hit("60㎡ 초과까지 적용되는")
+        lines.append(f"[{'❌' if fail else '✅'}] ③ 국민주택형은 일반공급 60㎡ 초과분에 소득검증이 없음(신혼희망타운형처럼 전체검증으로 새지 않았는지)")
+        if fail:
+            lines.append(f"      └ {fail}")
+
+    if income_scope == "특별공급만해당(일반공급무관)":
+        fail = _hit("공급대상") or _hit("60㎡ 이하로 보이는")
+        lines.append(f"[{'❌' if fail else '✅'}] ④ 문서의 '공급대상' 문구를 대조해 전 세대가 실제로 60㎡ 초과인지 실측 확인함")
+        if fail:
+            lines.append(f"      └ {fail}")
+
+    fail = _hit("배율값 발견")
+    pct_display = income.get("percentages_found") or "-"
+    lines.append(f"[{'❌' if fail else '✅'}] ⑤ 소득배율(%)이 「공공주택 특별법 시행규칙」별표6의3 전국 공통 표준표 범위 내(발견값: {pct_display})")
+    if fail:
+        lines.append(f"      └ {fail}")
+
+    return lines
+
+
 def _income_analysis_lines(income: dict | None, review_state: dict | None = None) -> list[str]:
     """Render collectors/subscription_monitor/income_analysis.py's result for
     the alert email body. income is None when analysis wasn't attempted (e.g.
@@ -116,21 +177,15 @@ def _income_analysis_lines(income: dict | None, review_state: dict | None = None
         lines.append("LH청약플러스(apply.lh.or.kr)에서 단지명으로 직접 검색해 공고문을 확인해 주세요.")
     else:
         lines.append(f"사업유형: {income['business_type']}")
-        scope_note = {
-            "전체검증": "전용면적 무관, 전원 소득검증 대상",
-            "60㎡이하만검증": "특별공급 전원 + 일반공급은 60㎡ 이하만 소득검증 (60㎡ 초과 일반공급은 소득 무관)",
-            "특별공급만해당(일반공급무관)": "전 세대가 60㎡ 초과라 일반공급 자체에 소득요건이 없음 — 특별공급 신청자만 소득검증 대상",
-        }.get(income["income_scope"], "판별 실패 — 원문 직접 확인 필요")
+        scope_note = _PATTERN_DESCRIPTIONS.get(income["income_scope"], "판별 실패 — 원문 직접 확인 필요")
         lines.append(f"소득검증 범위: {income['income_scope']} ({scope_note})")
         if income.get("percentages_found"):
             pct = "~".join([str(min(income["percentages_found"])), str(max(income["percentages_found"]))])
             lines.append(f"소득배율 범위: {pct}% (도시근로자 가구당 월평균소득 기준)")
+        lines += _pattern_checklist_lines(income)
         if income.get("exceptions"):
-            lines.append("⚠️ 예외 발견 (프레임워크 규칙과 다름, 원문 확인 권장):")
-            for exc in income["exceptions"]:
-                lines.append(f"  - {exc}")
-        else:
-            lines.append("✅ 기존 검증 사례 패턴과 일치, 예외 없음")
+            lines.append("")
+            lines.append("⚠️ 위 체크리스트에서 ❌ 항목이 있음 — 원문 확인 권장")
         if income.get("pdf_url"):
             lines.append(f"공고문 상세페이지: {income['pdf_url']}")
         lines.append(
