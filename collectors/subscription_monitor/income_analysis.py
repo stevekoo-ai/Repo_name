@@ -106,18 +106,30 @@ def find_applyhome_pdf(page, pblanc_url: str, download_dir: str) -> str | None:
     Returns the local PDF path, or None if this page has no such button —
     the documented common case for the 3 original reference listings, not an
     error. Only unexpected Playwright failures propagate (caller decides
-    whether to treat those as "no button either" or a hard failure)."""
+    whether to treat those as "no button either" or a hard failure).
+
+    2026-09-18 실전검증(income-pattern-trace.yml run 35315885320): 힐스테이트
+    고덕엘리스트 A65BL은 이 stage로 성공했지만 **같은 사업의 A12BL은
+    타임아웃으로 실패**했다 — 버튼을 찾아 클릭까지는 갔지만(전체 30초 타임
+    아웃을 다 채운 실행시간으로 확인) `page.expect_download()`가 끝내
+    이벤트를 못 받았다. 가장 유력한 원인은 그 버튼이 **새 탭/창을 열고 그
+    안에서 다운로드가 발생**하는 경우 — Playwright의 `page.expect_download()`
+    는 그 특정 page 객체에만 걸린 이벤트만 잡으므로 새 탭에서 일어난 다운
+    로드는 놓친다. `page.context.expect_event("download", ...)`는 같은
+    브라우저 컨텍스트 내 **어느 탭에서 발생한 다운로드든** 잡으므로 이
+    문제를 구조적으로 해결한다."""
     page.goto(pblanc_url, wait_until="networkidle", timeout=LH_NAV_TIMEOUT_MS)
     btn = page.get_by_text(APPLYHOME_PDF_BUTTON_TEXT)
     if btn.count() == 0:
         return None
     try:
-        with page.expect_download(timeout=LH_DOWNLOAD_TIMEOUT_MS) as download_info:
+        with page.context.expect_event("download", timeout=LH_DOWNLOAD_TIMEOUT_MS) as download_info:
             btn.first.click()
     except Exception:
         # Button exists but didn't yield a download (e.g. opens a viewer tab
-        # instead) — treat as "this path doesn't apply here", not a hard
-        # failure; the caller falls back to LH청약플러스.
+        # that renders inline with no browser download event at all) —
+        # treat as "this path doesn't apply here", not a hard failure; the
+        # caller falls back to LH청약플러스.
         return None
     download = download_info.value
     local_path = os.path.join(download_dir, "notice_applyhome.pdf")

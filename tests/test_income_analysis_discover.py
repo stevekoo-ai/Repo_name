@@ -69,6 +69,23 @@ class _FakeLocator:
             self._on_click()
 
 
+class _FakeContext:
+    """Mimics page.context.expect_event("download", ...) — the fix for the
+    real 2026-09-18 failure (힐스테이트 고덕엘리스트 A12BL): the button opens
+    a new tab, so the download event lands on the *context*, not the
+    original page. See find_applyhome_pdf()'s docstring."""
+
+    def __init__(self, download, downloads_ok):
+        self._download = download
+        self.downloads_ok = downloads_ok
+
+    def expect_event(self, event_name, timeout=None):
+        assert event_name == "download"
+        if not self.downloads_ok:
+            raise TimeoutError("expect_event('download') timed out")
+        return _FakeDownloadContext(self._download)
+
+
 class _FakePage:
     """button_count=0 simulates "no 모집공고문 보기 button on this page"
     (the original 3 reference listings). button_count>0 + downloads_ok=True
@@ -79,6 +96,7 @@ class _FakePage:
         self.downloads_ok = downloads_ok
         self.goto_calls = []
         self._download = _FakeDownload(saved_to=[])
+        self.context = _FakeContext(self._download, downloads_ok)
 
     def goto(self, url, **kwargs):
         self.goto_calls.append(url)
@@ -87,13 +105,10 @@ class _FakePage:
         return _FakeLocator(self.button_count, on_click=self._click)
 
     def _click(self):
-        if not self.downloads_ok:
-            raise TimeoutError("no download event fired")
-
-    def expect_download(self, timeout=None):
-        if not self.downloads_ok:
-            raise TimeoutError("expect_download timed out")
-        return _FakeDownloadContext(self._download)
+        pass  # the click itself always "succeeds"; whether a download
+        # follows is decided by _FakeContext.expect_event above, matching
+        # how the real bug manifested (click succeeded, download event was
+        # what went missing).
 
 
 def test_no_button_returns_none_without_raising(tmp_path):
