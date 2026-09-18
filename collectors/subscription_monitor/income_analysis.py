@@ -7,21 +7,32 @@ not for every listing fetched every run — because it drives a headless
 browser to search+download a PDF, which is too expensive to do for the
 hundreds of unrelated 국민주택 listings nationwide.
 
-Pipeline (discovered empirically 2026-09-01, see wiki/log.md for the trace):
-  1. 청약Home API's PBLANC_URL only points to a SUMMARY page — it explicitly
-     says "기타 자세한 모집공고문 내용은 사업주체 홈페이지... 참고" (no PDF
-     lives there at all).
-  2. The 시행사(사업주체) for 국민주택 is almost always LH — so the actual
-     PDF lives on LH청약플러스(apply.lh.or.kr), which is a JS SPA (urllib
-     gets only an 87-byte redirect shell). Playwright (headless Chromium) is
-     required to render it.
-  3. On apply.lh.or.kr: 메인 페이지 통합검색(#mainSrch) 검색 -> 결과의
+Pipeline (discovered empirically 2026-09-01, revised 2026-09-18 — see
+wiki/log.md for both traces):
+  0. **Try 청약Home's own detail page (PBLANC_URL) first.** The original
+     2026-09-01 assumption — "PBLANC_URL only points to a SUMMARY page, no
+     PDF lives there at all, 기타 자세한 모집공고문 내용은 사업주체
+     홈페이지... 참고" — was true for the 3 reference LH samples but turned
+     out FALSE in general: 힐스테이트 고덕엘리스트 A12BL(평택고덕국제화계획
+     지구, 사용자가 직접 발견 2026-09-18)의 청약Home 상세페이지에는
+     "모집공고문 보기" 버튼이 있어 PDF가 바로 다운로드된다. This is cheaper
+     (no site search needed) AND works regardless of 사업주체 — so it's tried
+     first for every listing now. Returning None here (no such button) is the
+     documented common case for the original 3 samples, not a bug.
+  1. If step 0 finds no such button, fall back to LH청약플러스
+     (apply.lh.or.kr) by house-name search — the 시행사(사업주체) for
+     국민주택 is usually LH. It's a JS SPA (urllib gets only an 87-byte
+     redirect shell), so Playwright (headless Chromium) is required for both
+     steps.
+  2. On apply.lh.or.kr: 메인 페이지 통합검색(#mainSrch) 검색 -> 결과의
      a[href*="selectWrtancInfo.do"] 상세페이지 링크 -> 그 페이지의
      "...모집공고...pdf" 텍스트를 가진 a[href^="javascript:fileDownLoad"]
      클릭 -> Playwright download event로 실제 PDF 파일 캡처.
 
-Only LH is supported for now (GH/SH/기타 지방공사는 이번 4건 표본에 없었음—
-확장 필요시 이 파일에 사업주체별 검색 함수를 추가).
+If BOTH step 0 and the LH청약플러스 fallback fail, the listing is reported as
+a discover failure (사업주체가 LH가 아니고 청약Home에도 버튼이 없는 경우 —
+GH/SH/기타 지방공사·민간건설사 컨소시엄 등, 확장 필요시 이 파일에 사업주체별
+검색 함수를 추가).
 
 Every stage degrades gracefully: if search/discovery/download fails, we
 return a status="failed" dict with a reason instead of raising, so a bad
@@ -80,6 +91,41 @@ class IncomeAnalysis:
 
 
 # ---------------------------------------------------------------------------
+# Stage 0: try 청약Home's own detail page for a direct PDF button first
+# ---------------------------------------------------------------------------
+
+APPLYHOME_PDF_BUTTON_TEXT = re.compile(r"모집공고문\s*보기")
+
+
+def find_applyhome_pdf(page, pblanc_url: str, download_dir: str) -> str | None:
+    """Look for a "모집공고문 보기" button on 청약Home's own listing detail
+    page (PBLANC_URL) and download the PDF it triggers, using an
+    already-open Playwright `page` (shared with the LH청약플러스 fallback so
+    callers don't pay for two separate browser launches).
+
+    Returns the local PDF path, or None if this page has no such button —
+    the documented common case for the 3 original reference listings, not an
+    error. Only unexpected Playwright failures propagate (caller decides
+    whether to treat those as "no button either" or a hard failure)."""
+    page.goto(pblanc_url, wait_until="networkidle", timeout=LH_NAV_TIMEOUT_MS)
+    btn = page.get_by_text(APPLYHOME_PDF_BUTTON_TEXT)
+    if btn.count() == 0:
+        return None
+    try:
+        with page.expect_download(timeout=LH_DOWNLOAD_TIMEOUT_MS) as download_info:
+            btn.first.click()
+    except Exception:
+        # Button exists but didn't yield a download (e.g. opens a viewer tab
+        # instead) — treat as "this path doesn't apply here", not a hard
+        # failure; the caller falls back to LH청약플러스.
+        return None
+    download = download_info.value
+    local_path = os.path.join(download_dir, "notice_applyhome.pdf")
+    download.save_as(local_path)
+    return local_path
+
+
+# ---------------------------------------------------------------------------
 # Stage 1+2: search apply.lh.or.kr, find the detail page, download the PDF
 # ---------------------------------------------------------------------------
 
@@ -100,68 +146,106 @@ def _search_keyword(house_name: str) -> str:
     return first
 
 
-def search_and_download_lh_pdf(house_name: str, download_dir: str) -> tuple[str, str]:
+def search_and_download_lh_pdf(page, house_name: str, download_dir: str) -> tuple[str, str]:
     """Search LH청약플러스 for house_name, open the listing detail page, and
-    download its 모집공고문 PDF (not the .hwpx or 팸플릿 attachments).
+    download its 모집공고문 PDF (not the .hwpx or 팸플릿 attachments), using
+    an already-open Playwright `page` (shared with the 청약Home stage-0
+    attempt in discover_pdf() so a listing only pays for one browser launch).
 
     Returns (local_pdf_path, detail_page_url). Raises RuntimeError/LookupError
-    with a specific message on any failure — analyze_listing() catches and
+    with a specific message on any failure — discover_pdf() catches and
     wraps these.
     """
-    from playwright.sync_api import sync_playwright  # imported lazily: only NEW_MATCH pays this cost
-
     keyword = _search_keyword(house_name)
     if not keyword:
         raise ValueError(f"검색어를 추출할 수 없음 (house_name={house_name!r})")
 
+    page.goto(LH_MAIN_URL, wait_until="networkidle", timeout=LH_NAV_TIMEOUT_MS)
+    # A promotional popup (#gnrlPop) covers the page and intercepts clicks on
+    # load — remove outright rather than hunting its close button (banner
+    # content rotates unpredictably).
+    page.evaluate("""() => { const el = document.querySelector('#gnrlPop'); if (el) el.remove(); }""")
+
+    # #mainSrch is the visible main-page search box — a second hidden input
+    # shares name="totalSearch" with it, so select by id.
+    search_box = page.locator("#mainSrch")
+    search_box.click()
+    search_box.fill(keyword)
+    search_box.press("Enter")
+    page.wait_for_load_state("networkidle", timeout=LH_NAV_TIMEOUT_MS)
+
+    detail_link = page.locator('a[href*="selectWrtancInfo.do"]').first
+    if detail_link.count() == 0:
+        raise LookupError(
+            f"LH청약플러스에서 '{keyword}' 검색결과에 공고 상세 링크 없음 "
+            "(아직 미등록이거나 검색어가 실제 공고명과 다를 수 있음)"
+        )
+    # NOTE: get_attribute("href") returns the raw (often relative) DOM
+    # attribute, which page.goto() cannot navigate to directly — .href via
+    # evaluate() returns the browser-resolved absolute URL.
+    detail_url = detail_link.evaluate("el => el.href")
+
+    page.goto(detail_url, wait_until="networkidle", timeout=LH_NAV_TIMEOUT_MS)
+
+    # The detail page lists several attachments (.hwpx forms, 팸플릿, 위임장
+    # etc.) as javascript:fileDownLoad('id') links — the main notice is the
+    # one whose text contains both "모집공고" and ".pdf".
+    pdf_link = page.locator("a").filter(has_text=re.compile(r"모집공고.*\.pdf$"))
+    if pdf_link.count() == 0:
+        raise LookupError(
+            "상세페이지에서 '...모집공고...pdf' 링크를 찾지 못함 "
+            "(첨부파일 구성이 기존 사례와 다를 수 있음)"
+        )
+
+    with page.expect_download(timeout=LH_DOWNLOAD_TIMEOUT_MS) as download_info:
+        pdf_link.first.click()
+    download = download_info.value
+    local_path = os.path.join(download_dir, "notice.pdf")
+    download.save_as(local_path)
+
+    return local_path, page.url
+
+
+def _discover_pdf_with_browser(browser, house_name: str, pblanc_url: str | None, download_dir: str) -> tuple[str, str]:
+    page = browser.new_page()
+
+    if pblanc_url:
+        try:
+            pdf_path = find_applyhome_pdf(page, pblanc_url, download_dir)
+        except Exception:
+            # Any hiccup on 청약Home's own page (nav timeout, layout change,
+            # etc.) — not fatal, just means this stage doesn't apply; fall
+            # through to the LH청약플러스 search.
+            pdf_path = None
+        if pdf_path is not None:
+            return pdf_path, pblanc_url
+
+    return search_and_download_lh_pdf(page, house_name, download_dir)
+
+
+def discover_pdf(row: dict, download_dir: str, browser=None) -> tuple[str, str]:
+    """Stage 0+1+2 combined: one Playwright browser session tries 청약Home's
+    own PDF button first (find_applyhome_pdf), falling back to LH청약플러스
+    search (search_and_download_lh_pdf) only if that returns None. Raises
+    LookupError/ValueError describing whichever stage(s) failed —
+    analyze_listing() catches and wraps this.
+
+    `browser` is normally left None (a real Playwright browser is launched
+    here) — tests pass a fake browser/page directly instead, since the
+    `playwright` package itself isn't installed in every environment this
+    runs in (only in CI, via `pip install playwright` + `playwright install
+    chromium`)."""
+    house_name = row.get("HOUSE_NM") or ""
+    pblanc_url = row.get("PBLANC_URL")
+
+    if browser is not None:
+        return _discover_pdf_with_browser(browser, house_name, pblanc_url, download_dir)
+
+    from playwright.sync_api import sync_playwright  # imported lazily: only paid when actually discovering
     with sync_playwright() as p:
         browser = p.chromium.launch()
         try:
-            page = browser.new_page()
-            page.goto(LH_MAIN_URL, wait_until="networkidle", timeout=LH_NAV_TIMEOUT_MS)
-            # A promotional popup (#gnrlPop) covers the page and intercepts
-            # clicks on load — remove outright rather than hunting its close
-            # button (banner content rotates unpredictably).
-            page.evaluate("""() => { const el = document.querySelector('#gnrlPop'); if (el) el.remove(); }""")
-
-            # #mainSrch is the visible main-page search box — a second hidden
-            # input shares name="totalSearch" with it, so select by id.
-            search_box = page.locator("#mainSrch")
-            search_box.click()
-            search_box.fill(keyword)
-            search_box.press("Enter")
-            page.wait_for_load_state("networkidle", timeout=LH_NAV_TIMEOUT_MS)
-
-            detail_link = page.locator('a[href*="selectWrtancInfo.do"]').first
-            if detail_link.count() == 0:
-                raise LookupError(
-                    f"LH청약플러스에서 '{keyword}' 검색결과에 공고 상세 링크 없음 "
-                    "(아직 미등록이거나 검색어가 실제 공고명과 다를 수 있음)"
-                )
-            # NOTE: get_attribute("href") returns the raw (often relative)
-            # DOM attribute, which page.goto() cannot navigate to directly —
-            # .href via evaluate() returns the browser-resolved absolute URL.
-            detail_url = detail_link.evaluate("el => el.href")
-
-            page.goto(detail_url, wait_until="networkidle", timeout=LH_NAV_TIMEOUT_MS)
-
-            # The detail page lists several attachments (.hwpx forms, 팸플릿,
-            # 위임장 etc.) as javascript:fileDownLoad('id') links — the main
-            # notice is the one whose text contains both "모집공고" and ".pdf".
-            pdf_link = page.locator("a").filter(has_text=re.compile(r"모집공고.*\.pdf$"))
-            if pdf_link.count() == 0:
-                raise LookupError(
-                    "상세페이지에서 '...모집공고...pdf' 링크를 찾지 못함 "
-                    "(첨부파일 구성이 기존 사례와 다를 수 있음)"
-                )
-
-            with page.expect_download(timeout=LH_DOWNLOAD_TIMEOUT_MS) as download_info:
-                pdf_link.first.click()
-            download = download_info.value
-            local_path = os.path.join(download_dir, "notice.pdf")
-            download.save_as(local_path)
-
-            return local_path, page.url
+            return _discover_pdf_with_browser(browser, house_name, pblanc_url, download_dir)
         finally:
             browser.close()
 
@@ -286,9 +370,9 @@ def analyze_listing(row: dict) -> dict:
     try:
         with tempfile.TemporaryDirectory() as tmpdir:
             try:
-                pdf_path, detail_url = search_and_download_lh_pdf(house_name, tmpdir)
+                pdf_path, detail_url = discover_pdf(row, tmpdir)
             except Exception as e:
-                return IncomeAnalysis(status="failed", stage="discover", reason=f"LH청약플러스 검색/다운로드 실패: {e}").to_dict()
+                return IncomeAnalysis(status="failed", stage="discover", reason=f"청약Home/LH청약플러스 모두 PDF 탐색 실패: {e}").to_dict()
 
             try:
                 text = extract_text_from_file(pdf_path)
