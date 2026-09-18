@@ -427,7 +427,43 @@ report/run.py`)는 `python -m engine.report.run`으로 실행되는 **순수
 가시화하는 것이 현재로선 유일한 방어선이고, 별도 처리가 필요하면
 아키텍처 자체를 바꿔야 한다(범위 밖, 미착수).
 
-### 12.4 검증
+### 12.4 2단계 — ICE DXY 병기 (같은 날 실행)
+
+사용자 승인 후 진행. **소스 선정을 추측으로 하지 않은 것이 이 작업의
+핵심**이다 — 개발 샌드박스가 stooq·finance.yahoo를 둘 다
+`connect_rejected`로 막아 로컬에선 후보의 생사조차 알 수 없었다.
+일회성 프로브(`scripts/probe_dxy_sources.py` + 전용 workflow_dispatch
+워크플로)를 만들어 **GitHub Actions에서 실측**했다(run 35338679955):
+
+| 소스 | 심볼 | 결과 |
+|---|---|---|
+| stooq | dx.f, ^dxy, dxy, dx_f, usdidx | ❌ 전부 **HTTP 200 + 자바스크립트 봇 차단 챌린지** |
+| yahoo | DX-Y.NYB | ✅ rows=10, 최신 종가 100.439 (당일치) |
+| yahoo | DX=F | ❌ 404 |
+
+**stooq가 특히 위험한 실패 방식이었다** — status만 보면 200이라
+"성공"으로 보이고, CSV 파서에 그대로 물리면 조용히 빈 결과가 된다.
+추측으로 stooq를 골랐으면 "수집은 성공하는데 데이터는 안 느는" 유령
+버그를 만들 뻔했다. 프로브가 정확히 이걸 막았다.
+
+**구현**: `scripts/macro_data.py`에 `yahoo` 프로바이더 신설
+(`yahoo_fetch()`, urllib 기반으로 기존 파일 관례 유지) + 프리셋
+`us_dollar_index_dxy`. `engine/briefing/context.py::FACT_SERIES`에
+**"달러지수(DXY·참고)"** 라벨로 추가 — 기존 `us_dollar_index`(FRED)는
+그대로 두고 **나란히** 표기한다.
+
+**왜 대체하지 않았나(중요)**: DTWEXBGS는 연준 26개국 무역가중,
+DXY는 ICE 6개 통화(유로 57.6%). 같은 날 값이 **118.21 vs 100.44**로
+아예 다르다. 같은 계열에 섞으면 시계열이 조용히 불연속이 된다 —
+이 저장소가 반복해서 겪은 "다른 정의를 같은 값으로 쓴 사고"(체결/결제,
+WTI/Brent, 잠정치/확정치)와 정확히 같은 계열의 실수가 된다.
+
+**이 소스가 언젠가 막히면**: 무인증 공개 엔드포인트라 예고 없이 차단될
+수 있다. 그때는 이 계열만 갱신이 멈추고 §12.3에서 일반화한 "뉴스
+교차검증 필수 목록"이 자동으로 집어낸다 — 조용히 사라지지 않는다.
+두 작업이 서로를 받쳐주는 구조다.
+
+### 12.5 검증
 
 `tests/test_briefing_context.py` 2건 추가 —
 `test_stale_series_are_all_listed_for_mandatory_news_cross_check`(지연된
@@ -435,8 +471,27 @@ report/run.py`)는 `python -m engine.report.run`으로 실행되는 **순수
 고정), `test_no_stale_series_means_no_cross_check_checklist`(신선하면
 체크리스트가 안 붙는지). 오늘 실제 팩(`build_pack("AM", 2026-09-18)`)으로
 확인: 달러지수(7일 지연)·브렌트유(3일 지연) 둘 다 자동으로 목록에 올랐고
-팩 크기는 7,203자(상한 24,000·회귀선 12,000 모두 여유). 전체 회귀
-**582건 통과**.
+팩 크기는 7,203자(상한 24,000·회귀선 12,000 모두 여유).
+
+DXY 쪽은 `tests/test_macro_data_yahoo.py` 7건 신설 — 타임스탬프→UTC
+거래일 변환, `close=null`(휴장일) 건너뛰기, **봇 차단 본문이 왔을 때
+조용히 넘어가지 않고 죽는지**(stooq가 정확히 그렇게 실패했다),
+프리셋이 FRED 계열을 덮어쓰지 않고 별도로 등록됐는지, 팩트시트 라벨에
+"참고"가 있는지. 전체 회귀 **589건 통과**.
+
+**운영 검증(코드 리뷰가 아니라 실제 실행)**: `macro-data-sync.yml`을
+workflow_dispatch로 돌려(run 35339084289) 실제 수집 확인 —
+`us_dollar_index_dxy`가 2026-09-11~09-18까지 6행 upsert됐고 커밋
+`52ba4a8`로 푸시됐다. 그 데이터로 팩을 렌더링한 결과:
+
+```
+| 달러지수            | 118.21 | ... | 2026-09-11 ⚠️7일 지연 |
+| 달러지수(DXY·참고)  | 100.42 | ... | 2026-09-18            |
+```
+
+**지연 경고는 그대로 유지하면서(숨기지 않는다) 당일 달러 방향은 볼 수
+있는** 상태가 됐다. 두 값이 118.21 vs 100.42로 나란히 찍히는 것 자체가
+"이 둘은 다른 지수"라는 걸 읽는 사람에게 계속 상기시킨다.
 
 ## Sources
 
@@ -451,4 +506,6 @@ report/run.py`)는 `python -m engine.report.run`으로 실행되는 **순수
 - `data/wiki_digest/README.md` — digest 패턴 원본
 - `report/briefing/2026-09-16-AM.md` / `.html` — §11 진단·수정의 실측 대상
 - `tests/test_briefing_render_html.py` — 카드/심각도색/목록 계속줄 회귀 21건
+- `scripts/macro_data.py` — 거시 수집기(fred·ecos·**yahoo**). DXY 프리셋 `us_dollar_index_dxy`
+- `tests/test_macro_data_yahoo.py` — DXY 수집 계약 7건(봇 차단 본문 시 실패 포함)
 - `tests/test_briefing_context.py` — 톤 지침 블록 존재 고정 포함 회귀 건
