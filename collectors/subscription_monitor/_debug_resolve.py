@@ -47,4 +47,19 @@ for row in ROWS:
                 start = m.start()
                 print(f"  offset {start}: ...{text[idx+max(0,start-20):idx+start+120]!r}...")
 
+            print("\n=== '일반공급' 등장 위치 전체 (챕터 전체에서, 소득기준과 무관한 문맥 포함) ===")
+            for m in re.finditer("일반공급", text[idx:idx + 8000]):
+                start = m.start()
+                print(f"  offset {start}: ...{text[idx+max(0,start-30):idx+start+60]!r}...")
+
+    print("\n=== 공급대상/공급규모 문구 (전용면적 구성 확인용 — 60㎡ 이하 세대가 있는지) ===")
+    idx2 = text.find("공급대상")
+    if idx2 != -1:
+        print(text[idx2:idx2 + 2000])
+    else:
+        print("'공급대상' 텍스트를 못 찾음 — '전용면적' 등장 위치:")
+        for m in re.finditer("전용면적", text[:5000]):
+            start = m.start()
+            print(f"  offset {start}: ...{text[max(0,start-30):start+100]!r}...")
+
     print()
