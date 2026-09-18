@@ -119,6 +119,7 @@ def _income_analysis_lines(income: dict | None, review_state: dict | None = None
         scope_note = {
             "전체검증": "전용면적 무관, 전원 소득검증 대상",
             "60㎡이하만검증": "특별공급 전원 + 일반공급은 60㎡ 이하만 소득검증 (60㎡ 초과 일반공급은 소득 무관)",
+            "특별공급만해당(일반공급무관)": "전 세대가 60㎡ 초과라 일반공급 자체에 소득요건이 없음 — 특별공급 신청자만 소득검증 대상",
         }.get(income["income_scope"], "판별 실패 — 원문 직접 확인 필요")
         lines.append(f"소득검증 범위: {income['income_scope']} ({scope_note})")
         if income.get("percentages_found"):

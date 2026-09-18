@@ -49,6 +49,25 @@ NATIONAL_HOUSING_EXCERPT = """
 
 NO_INCOME_CHAPTER_TEXT = "이 문서에는 소득기준 챕터가 아예 없다 (형식이 완전히 다른 공고)."
 
+# 실제 사례(2026-09-18, 힐스테이트 고덕엘리스트 A12BL/A65BL — 사용자가 직접
+# 발견한 discover 실패를 계기로 소득요건 자동검증 15건 확대 중 확인) 기반.
+# 공급대상(전용면적 구성)이 "4. 소득기준" 챕터보다 앞쪽에 나오는 실제 문서
+# 순서를 그대로 재현 — _extract_unit_sizes_sqm()이 전체 text에서 '공급대상'을
+# 찾으므로 순서가 맞아야 한다.
+SPECIAL_SUPPLY_ONLY_OVER_60_EXCERPT = """
+공급대상 : 공공분양주택 837세대 (전용면적 84㎡A 500세대, 84㎡A1 155세대, 84㎡B 155세대, 84㎡B1 27세대)
+
+(본문 생략)
+
+4. 소득기준
+■ 적용대상 : 다자녀가구ㆍ 신혼부부ㆍ생애최초ㆍ노부모부양ㆍ신생아 특별공급 신청자
+
+<표4> 전년도 도시근로자 가구당 월평균소득 기준
+                    도시근로자 가구당 월평균소득액의 100%
+                    도시근로자 가구당 월평균소득액의 140%
+                    도시근로자 가구당 월평균소득액의 200%
+"""
+
 
 def test_newlywed_town_classified_as_full_verification():
     result = analyze_text(NEWLYWED_EXCERPT)
@@ -98,3 +117,36 @@ def test_missing_applicable_target_line_is_flagged():
     assert result.status == "ok"
     assert result.applicable_target_line is None
     assert any("적용대상" in exc for exc in result.exceptions)
+
+
+def test_special_supply_only_pattern_when_all_units_over_60sqm():
+    """No '60㎡ 이하' AND no '일반공급' mention, but the document's own
+    '공급대상' confirms every unit is >60㎡ — this is a legitimate third
+    pattern (일반공급 자체에 소득요건이 없음), not an unclassified exception."""
+    result = analyze_text(SPECIAL_SUPPLY_ONLY_OVER_60_EXCERPT)
+    assert result.status == "ok"
+    assert result.business_type == "국민주택형"
+    assert result.income_scope == "특별공급만해당(일반공급무관)"
+    assert result.exceptions == []
+
+
+def test_special_supply_only_pattern_flagged_if_60sqm_unit_actually_exists():
+    """Same 적용대상 wording, but 공급대상 reveals a unit ≤60㎡ mixed in —
+    this would mean the notice forgot to mention 일반공급 60㎡ 이하 income
+    requirements, a real discrepancy that must NOT be silently accepted."""
+    text = SPECIAL_SUPPLY_ONLY_OVER_60_EXCERPT.replace("84㎡B1 27세대", "59㎡C 27세대")
+    result = analyze_text(text)
+    assert result.status == "ok"
+    assert result.income_scope == "특별공급만해당(일반공급무관)"
+    assert any("60㎡ 이하" in exc for exc in result.exceptions)
+
+
+def test_special_supply_only_pattern_flagged_if_unit_composition_unknown():
+    """No '공급대상' text found at all to cross-check against — can't confirm
+    the "all >60㎡" assumption, so it must stay flagged for manual review."""
+    text = SPECIAL_SUPPLY_ONLY_OVER_60_EXCERPT.split("4. 소득기준", 1)[1]
+    text = "4. 소득기준" + text  # drop everything before the chapter, incl. 공급대상
+    result = analyze_text(text)
+    assert result.status == "ok"
+    assert result.income_scope == "특별공급만해당(일반공급무관)"
+    assert any("공급대상" in exc for exc in result.exceptions)

@@ -41,7 +41,11 @@ listing never breaks the alert pipeline (compose.py just notes "자동분석
 
 📚 Framework reference (single source of truth for the classification rules):
    wiki/concepts/public-housing-income-requirement-framework.md
-   - Axis 1: 사업유형 (신혼희망타운=전 평형 검증 vs 국민주택=특별공급+60㎡이하만)
+   - Axis 1: 사업유형 (신혼희망타운=전 평형 검증 vs 국민주택=특별공급+60㎡이하만
+     vs 국민주택+전용면적 전체가 60㎡ 초과=특별공급만 해당, 일반공급 전체 무관
+     — 2026-09-18 힐스테이트 고덕엘리스트 A12BL/A65BL에서 확인: 두 블록 모두
+     전 세대 84㎡ 단일평형이라 "적용대상" 줄이 "일반공급"을 아예 언급하지 않음
+     — 60㎡ 이하 세대가 0채이니 검증할 일반공급 소득기준 자체가 없는 것)
    - Axis 2: 국민주택형끼리는 배율표(%)가 「공공주택 특별법 시행규칙」
      별표6의3 전국 공통 — STANDARD_PERCENTAGES가 그 표준 집합.
    - "예외 사례" 절: 여기서 감지된 예외는 사람이 확인 후 그 페이지에 기록.
@@ -71,6 +75,8 @@ STANDARD_PERCENTAGES = {
 INCOME_SECTION_HEADERS = ["4. 소득기준", "4. 소득 판정 기준"]
 NEWLYWED_MARKER = "신혼희망타운"
 SIXTY_SQM_MARKER = "60㎡ 이하"
+SPECIAL_SUPPLY_MARKER = "특별공급"
+GENERAL_SUPPLY_MARKER = "일반공급"
 
 
 @dataclass
@@ -313,7 +319,32 @@ def _classify_income_scope(applicable_line: str | None, business_type: str) -> s
         return "60㎡이하만검증"
     if business_type == "신혼희망타운형":
         return "전체검증"
+    if (
+        business_type == "국민주택형"
+        and SPECIAL_SUPPLY_MARKER in applicable_line
+        and GENERAL_SUPPLY_MARKER not in applicable_line
+    ):
+        # 2026-09-18 힐스테이트 고덕엘리스트 A12BL/A65BL에서 실전 확인: 적용대상
+        # 줄이 "...특별공급 신청자"로 끝나고 "일반공급"이 아예 안 나오는 경우 —
+        # "공급대상" 문구 원문 대조 결과 두 블록 모두 전 세대가 84㎡ 단일평형
+        # (60㎡ 이하 세대 0채)이었다. 60㎡ 이하 물량이 없으니 검증할 일반공급
+        # 소득기준 자체가 존재하지 않는 것 — "60㎡이하만검증"(60㎡ 이하 물량이
+        # 있고 그 부분만 검증)과는 다른, 그 극단(60㎡ 이하 물량 0채)의 케이스.
+        return "특별공급만해당(일반공급무관)"
     return "미분류"
+
+
+def _extract_unit_sizes_sqm(text: str) -> list[float]:
+    """Parse the '공급대상' 문구(전용면적 구성) near the start of the PDF —
+    e.g. '공급대상 : 공공분양주택 837세대 (전용면적 84㎡A 500세대, 84㎡A1
+    155세대, ...)' -> [84.0, 84.0, ...]. Returns [] if '공급대상' isn't found
+    or no sizes parse — callers must treat that as "unknown composition",
+    NOT as "confirmed all >60㎡"."""
+    idx = text.find("공급대상")
+    if idx == -1:
+        return []
+    window = text[idx:idx + 500]
+    return [float(n) for n in re.findall(r"(\d{2,3}(?:\.\d+)?)\s*㎡", window)]
 
 
 def _extract_percentages(income_section: str) -> list[int]:
@@ -350,6 +381,24 @@ def analyze_text(text: str) -> IncomeAnalysis:
         )
     if business_type == "국민주택형" and income_scope == "전체검증":
         exceptions.append("국민주택형인데 소득검증이 60㎡ 초과까지 적용되는 것으로 보임 — 기존 3건 패턴과 다른 예외")
+    if income_scope == "특별공급만해당(일반공급무관)":
+        # '일반공급'이 적용대상 줄에 없다는 것만으로는 "60㎡ 이하 물량이 0채"
+        # 라고 확신할 수 없다 — 같은 문서의 '공급대상' 문구(실제 전용면적
+        # 구성)를 대조해 정말 전부 60㎡ 초과인지 확인한다(2026-09-18 힐스테이트
+        # 고덕엘리스트 A12BL/A65BL 실전검증에서 이 상관관계를 확인했지만, 매
+        # 건마다 재검증). 대조 실패/60㎡ 이하 혼재 시 예외로 남겨 사람이 원문을
+        # 보게 한다 — 추측으로 규칙을 단정하지 않는다.
+        unit_sizes = _extract_unit_sizes_sqm(text)
+        if not unit_sizes:
+            exceptions.append(
+                "'특별공급만해당(일반공급무관)'으로 분류됐으나 '공급대상' 문구에서 전용면적을 못 찾아 "
+                "60㎡ 이하 물량이 정말 0채인지 대조 못함 — 원문 확인 필요"
+            )
+        elif any(s <= 60 for s in unit_sizes):
+            exceptions.append(
+                f"'특별공급만해당(일반공급무관)'으로 분류됐으나 '공급대상'에 60㎡ 이하로 보이는 면적이 있음 "
+                f"(parsed: {unit_sizes}) — 적용대상 줄이 일반공급 60㎡ 이하 소득요건 언급을 빠뜨린 진짜 예외일 수 있음, 원문 확인 필요"
+            )
     if unknown:
         exceptions.append(
             f"기존 3건(성남복정·인천계양·양주회천)에 없던 배율값 발견: {unknown}% — "
