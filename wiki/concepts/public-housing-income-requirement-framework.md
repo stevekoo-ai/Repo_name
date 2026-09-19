@@ -350,6 +350,34 @@ a12-a65` 브랜치)로 두 블록의 "4. 소득기준" 챕터 전문과 "적용�
 사람이 원문 대조 후 기록한다 — 자동화는 판별과 카운팅만 하고, 규칙 자체의
 갱신은 여전히 사람이 확정한다.
 
+### CRITICAL 버그 — 상태 파일 미커밋으로 인한 무한 중복 발송 (2026-09-19)
+
+사용자 "왜 같은 분양건의 검토 메일이 계속 오지? 중복 보고 되지 않도록해줘."
+— 원인 확인: `.github/workflows/subscription-monitor.yml`의 "Commit and push
+if changed" 스텝이 `git add`에 `docs/subscription-monitor.html`,
+`alerted_state.json`, `health_state.json`만 넣고 **`income_review_state.json`을
+빠뜨렸다**. 매 30분 실행마다 `income_review_tracker.save_state()`가 이 파일을
+로컬에 정상적으로 갱신했지만, 그 갱신분이 한 번도 커밋되지 않아 러너
+컨테이너가 종료되면 그대로 유실 — 다음 실행은 항상 최초 상태
+(`{"count": 0, "reviews": []}`, 이 파일을 처음 만든 09-13 커밋 그대로)에서
+다시 시작했다. `already_reviewed()`가 늘 False를 반환하니 같은 매물을 30분
+마다 무한히 재검토·재발송한 것 — INCOME_REVIEW 이메일도, NEW_MATCH 이메일의
+누적 진행률 갱신도 전부 이 버그의 영향을 받았다(단, `alerted_state.json`
+기반 NEW_MATCH의 "이미 알림 보냈는지" 자체는 정상 커밋되던 파일이라
+중복 발송까지는 안 갔음 — INCOME_REVIEW 경로만 순수하게 중복이었다).
+
+**수정**: `git add` 목록에 `collectors/subscription_monitor/income_review_state.json`
+추가. 겸사겸사 이 워크플로엔 push 실패 시 재시도 로직이 아예 없었던 것도
+발견 — `real-estate-sync.yml` 등 기존 워크플로에 이미 있던 rebase-재시도
+루프(5회, `git fetch` + `git rebase --autostash origin/main`)를 그대로 이식해,
+main에 자주 커밋하는 다른 워크플로와의 push 경합으로 상태가 조용히 유실되는
+경로도 함께 차단(발생 여부는 미확인이지만 잠재 위험이라 선제 조치).
+
+**주의**: 이 수정이 반영된 직후 첫 실행은 상태가 진짜로 비어있는 상태(count=0)
+에서 시작하므로, 현재 열려 있는 공고들에 대해 검토 메일이 **한 번 더** 갈 수
+있다 — 이건 "여전히 버그"가 아니라 "이번이 실제 첫 정상 저장"이라는 뜻이며,
+그 이후로는 정상적으로 중복 없이 진행된다.
+
 ## Sources
 
 - 성남복정2 A1블록 신혼희망타운(공공분양) 입주자모집공고 (2026.08.10, LH)

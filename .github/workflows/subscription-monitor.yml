@@ -50,10 +50,27 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add docs/subscription-monitor.html collectors/subscription_monitor/alerted_state.json collectors/subscription_monitor/health_state.json
+          git add docs/subscription-monitor.html collectors/subscription_monitor/alerted_state.json collectors/subscription_monitor/health_state.json collectors/subscription_monitor/income_review_state.json
           if git diff --cached --quiet; then
             echo "no changes"
           else
             git commit -m "chore: subscription monitor update $(date -u -d '+9 hours' '+%Y-%m-%d %H:%M KST')"
-            git push origin HEAD:main
+            # 2026-09-19 추가 — 이전엔 재시도 없는 단발 push라, 이 워크플로와
+            # 무관한 다른 워크플로(daily-peos-report 등, main에 수십분마다
+            # 커밋)가 그사이 먼저 push하면 여기 push가 non-fast-forward로
+            # 조용히 실패했다. 실패해도 잡 자체는 안 죽고(마지막 줄에 ||
+            # true가 없어 exit code가 그대로 새지만, 스텝 실패가 뒤 스텝을
+            # 안 막진 않음) 다음 스텝으로 넘어가 버려서, 이번 run이 갱신한
+            # income_review_state.json(15건 카운터)이 그대로 유실 → 다음
+            # run이 다시 count=0 기준으로 시작해 같은 매물을 계속 재검토하고
+            # 재발송하는 무한 중복 메일의 진짜 원인이었다(사용자 신고
+            # "같은 분양건의 검토 메일이 계속 오지?"). real-estate-sync.yml
+            # 등 기존 워크플로에 이미 있는 rebase-재시도 루프를 그대로 이식.
+            for i in 1 2 3 4 5; do
+              git push origin HEAD:main && break
+              echo "push rejected, rebasing onto latest (attempt $i)"
+              git fetch origin main
+              git rebase --autostash origin/main
+              sleep $((i * 3))
+            done
           fi
