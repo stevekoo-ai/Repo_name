@@ -413,3 +413,4 @@ timestamp_utc,workflow,step,attempts_used,max_attempts,result
 2026-09-21T21:23:32Z,real-estate-sync,villa_sale,1,36,success
 2026-09-21T21:24:26Z,real-estate-sync,officetel_sale,1,36,success
 2026-09-21T23:15:41Z,macro-data-sync,macro_sync,1,36,success
+2026-09-21T23:50:15Z,sec-edgar-capex,capex_fetch,1,36,success
