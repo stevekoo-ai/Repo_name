@@ -3,21 +3,21 @@
     "regime": "Late Expansion",
     "previous_regime": "Expansion",
     "transition": "downgrade",
-    "score_band": "early_slowdown",
-    "score_band_label": "초기 둔화",
+    "score_band": "unbalanced_expansion",
+    "score_band_label": "불균형 확장",
     "scores": {
-      "raw_score": 0,
-      "weighted_score": 0.5,
-      "scored_count": 10,
+      "raw_score": 2,
+      "weighted_score": 2.3,
+      "scored_count": 9,
       "total_count": 10,
-      "coverage_pct": 100.0
+      "coverage_pct": 90.0
     },
     "confidence": {
-      "confidence": 96.0,
+      "confidence": 89.7,
       "components": {
         "data_freshness": 100.0,
-        "source_quality": 92.0,
-        "indicator_consistency": 100.0,
+        "source_quality": 100.0,
+        "indicator_consistency": 66.7,
         "trend_stability": 90
       }
     },
@@ -39,6 +39,12 @@
         "message": "수출 증가율 +5.9%p 개선 (강화)",
         "direction": "improve",
         "delta": 5.9
+      },
+      {
+        "indicator": "cpi",
+        "message": "CPI YoY -0.2%p 하락 (개선)",
+        "direction": "improve",
+        "delta": -0.24
       }
     ],
     "readings": {
@@ -53,33 +59,33 @@
           "qoq": 0.634
         },
         "note": null,
-        "last_fresh_at": "2026-09-19T00:26:20.827757+00:00"
+        "last_fresh_at": "2026-09-21T00:20:01.105580+00:00"
       },
       "industrial_production": {
-        "value": 114.912,
+        "value": 120.4,
         "score": -1,
         "weight": 1.0,
         "status": "ok",
         "label": "전산업생산지수",
-        "source": "OECD (FRED 경유) — KOSIS 대체",
+        "source": "통계청 KOSIS",
         "fields": {
-          "mom": -3.2258064516129012
+          "mom": -2.351987023519863
         },
-        "note": "KOSIS 접속 불가로 OECD 대체 데이터 사용 (FRED 경유, kr_industrial_production_oecd)",
-        "last_fresh_at": "2026-09-19T00:26:20.827757+00:00"
+        "note": null,
+        "last_fresh_at": "2026-09-21T00:20:01.105580+00:00"
       },
       "retail_sales": {
-        "value": -2.3607176581681,
+        "value": 56185164.0,
         "score": -1,
         "weight": 0.8,
         "status": "ok",
         "label": "소매판매",
-        "source": "OECD (FRED 경유) — KOSIS 대체",
+        "source": "통계청 KOSIS",
         "fields": {
-          "mom": -2.3607176581681
+          "mom": -2.5607247733600467
         },
-        "note": "KOSIS 접속 불가로 OECD 대체 데이터 사용 (FRED 경유, kr_retail_sales_mom_oecd — 이미 계산된 전월비 값)",
-        "last_fresh_at": "2026-09-19T00:26:20.827757+00:00"
+        "note": null,
+        "last_fresh_at": "2026-09-21T00:20:01.105580+00:00"
       },
       "exports": {
         "value": 68.7,
@@ -92,7 +98,7 @@
           "yoy": 68.7
         },
         "note": null,
-        "last_fresh_at": "2026-09-19T00:26:20.827757+00:00"
+        "last_fresh_at": "2026-09-21T00:20:01.105580+00:00"
       },
       "semiconductor_exports": {
         "value": 206.1,
@@ -105,7 +111,7 @@
           "yoy": 206.1
         },
         "note": null,
-        "last_fresh_at": "2026-09-19T00:26:20.827757+00:00"
+        "last_fresh_at": "2026-09-21T00:20:01.105580+00:00"
       },
       "current_account": {
         "value": 42078.0,
@@ -118,20 +124,20 @@
           "avg_3m": 43471.933333333334
         },
         "note": null,
-        "last_fresh_at": "2026-09-19T00:26:20.827757+00:00"
+        "last_fresh_at": "2026-09-21T00:20:01.105580+00:00"
       },
       "cpi": {
-        "value": 118.84768138617,
-        "score": -1,
+        "value": 120.05,
+        "score": null,
         "weight": 1.0,
         "status": "ok",
         "label": "CPI",
-        "source": "OECD (FRED 경유) — KOSIS 대체",
+        "source": "통계청 KOSIS",
         "fields": {
-          "yoy": 3.336388634281018
+          "yoy": 3.0914555603263154
         },
-        "note": "KOSIS 접속 불가로 OECD 대체 데이터 사용 (FRED 경유, kr_cpi_oecd)",
-        "last_fresh_at": "2026-09-19T00:26:20.827757+00:00"
+        "note": null,
+        "last_fresh_at": "2026-09-21T00:20:01.105580+00:00"
       },
       "ppi": {
         "value": 129.64,
@@ -144,20 +150,20 @@
           "yoy": 7.9343934726500605
         },
         "note": null,
-        "last_fresh_at": "2026-09-19T00:26:20.827757+00:00"
+        "last_fresh_at": "2026-09-21T00:20:01.105580+00:00"
       },
       "unemployment": {
-        "value": 2.8,
-        "score": 0,
+        "value": 2.0,
+        "score": 1,
         "weight": 0.8,
         "status": "ok",
         "label": "한국 실업률 (3개월 평균 변화, %p)",
-        "source": "OECD (FRED 경유) — KOSIS 대체",
+        "source": "통계청 KOSIS",
         "fields": {
-          "avg_3m_change": -0.033333333333333215
+          "avg_3m_change": -0.4666666666666668
         },
-        "note": "KOSIS 접속 불가로 OECD 대체 데이터 사용 (FRED 경유, kr_unemployment_oecd)",
-        "last_fresh_at": "2026-09-19T00:26:20.827757+00:00"
+        "note": null,
+        "last_fresh_at": "2026-09-21T00:20:01.105580+00:00"
       },
       "us_global": {
         "value": 1.0,
@@ -168,7 +174,7 @@
         "source": "FRED",
         "fields": {},
         "note": null,
-        "last_fresh_at": "2026-09-19T00:26:20.827757+00:00"
+        "last_fresh_at": "2026-09-21T00:20:01.105580+00:00"
       }
     },
     "us_investment_clock": {
@@ -234,7 +240,7 @@
           "qoq": 1.5
         },
         "note": null,
-        "last_fresh_at": "2026-09-19T00:26:20.827757+00:00"
+        "last_fresh_at": "2026-09-21T00:20:01.105580+00:00"
       },
       "industrial_production": {
         "value": 103.0682,
@@ -247,7 +253,7 @@
           "mom": 0.02212616963008898
         },
         "note": null,
-        "last_fresh_at": "2026-09-19T00:26:20.827757+00:00"
+        "last_fresh_at": "2026-09-21T00:20:01.105580+00:00"
       },
       "retail_sales": {
         "value": 773947.0,
@@ -260,7 +266,7 @@
           "mom": 1.2407418550562357
         },
         "note": null,
-        "last_fresh_at": "2026-09-19T00:26:20.827757+00:00"
+        "last_fresh_at": "2026-09-21T00:20:01.105580+00:00"
       },
       "cpi": {
         "value": 334.131,
@@ -273,7 +279,7 @@
           "yoy": 3.712958105838858
         },
         "note": null,
-        "last_fresh_at": "2026-09-19T00:26:20.827757+00:00"
+        "last_fresh_at": "2026-09-21T00:20:01.105580+00:00"
       },
       "ppi": {
         "value": 287.928,
@@ -286,7 +292,7 @@
           "yoy": 9.85006295066956
         },
         "note": null,
-        "last_fresh_at": "2026-09-19T00:26:20.827757+00:00"
+        "last_fresh_at": "2026-09-21T00:20:01.105580+00:00"
       },
       "unemployment": {
         "value": 4.1,
@@ -299,7 +305,7 @@
           "avg_3m_change": -0.16666666666666696
         },
         "note": null,
-        "last_fresh_at": "2026-09-19T00:26:20.827757+00:00"
+        "last_fresh_at": "2026-09-21T00:20:01.105580+00:00"
       },
       "trade_balance": {
         "value": -88576.0,
@@ -312,7 +318,7 @@
           "avg_3m": -78503.33333333333
         },
         "note": null,
-        "last_fresh_at": "2026-09-19T00:26:20.827757+00:00"
+        "last_fresh_at": "2026-09-21T00:20:01.105580+00:00"
       },
       "yield_curve": {
         "value": 0.25,
@@ -325,14 +331,14 @@
           "spread": 0.25
         },
         "note": null,
-        "last_fresh_at": "2026-09-19T00:26:20.827757+00:00"
+        "last_fresh_at": "2026-09-21T00:20:01.105580+00:00"
       }
     }
   },
   "kr_us_comparison": {
     "kr_regime": "Late Expansion",
     "us_regime": "Recession",
-    "kr_score_band": "early_slowdown",
+    "kr_score_band": "unbalanced_expansion",
     "us_score_band": "early_slowdown",
     "cycle_gap": -2,
     "alignment": "kr_behind",
@@ -351,7 +357,7 @@
         "label": "산업생산",
         "kr_score": -1,
         "us_score": 0,
-        "kr_value": 114.912,
+        "kr_value": 120.4,
         "us_value": 103.0682,
         "relationship": "diverge"
       },
@@ -360,18 +366,18 @@
         "label": "소매판매",
         "kr_score": -1,
         "us_score": 1,
-        "kr_value": -2.3607176581681,
+        "kr_value": 56185164.0,
         "us_value": 773947.0,
         "relationship": "diverge"
       },
       {
         "key": "cpi",
         "label": "CPI",
-        "kr_score": -1,
+        "kr_score": null,
         "us_score": -1,
-        "kr_value": 118.84768138617,
+        "kr_value": 120.05,
         "us_value": 334.131,
-        "relationship": "sync"
+        "relationship": "data_unavailable"
       },
       {
         "key": "ppi",
@@ -385,11 +391,11 @@
       {
         "key": "unemployment",
         "label": "고용(실업률)",
-        "kr_score": 0,
+        "kr_score": 1,
         "us_score": 1,
-        "kr_value": 2.8,
+        "kr_value": 2.0,
         "us_value": 4.1,
-        "relationship": "diverge"
+        "relationship": "sync"
       },
       {
         "key": "current_account",
@@ -401,8 +407,8 @@
         "relationship": "diverge"
       }
     ],
-    "narrative": "미국은 현재 Recession 국면, 한국은 Late Expansion 국면입니다. 한국이 사이클상 미국보다 뒤처져 있어, 미국에서 먼저 나타난 흐름이 시차를 두고 한국에 파급될 가능성을 주시할 필요가 있습니다. 비교 가능한 6개 핵심 지표 중 50%가 미국과 같은 방향으로 움직이고 있습니다. 미국과 한국 모두 뚜렷한 경고 신호는 없는 상태입니다. 방향이 엇갈린 지표: 산업생산, 소매판매, 고용(실업률) — 이 부분이 한국이 미국과 다르게 가는 지점입니다."
+    "narrative": "미국은 현재 Recession 국면, 한국은 Late Expansion 국면입니다. 한국이 사이클상 미국보다 뒤처져 있어, 미국에서 먼저 나타난 흐름이 시차를 두고 한국에 파급될 가능성을 주시할 필요가 있습니다. 비교 가능한 6개 핵심 지표 중 60%가 미국과 같은 방향으로 움직이고 있습니다. 미국과 한국 모두 뚜렷한 경고 신호는 없는 상태입니다. 방향이 엇갈린 지표: 산업생산, 소매판매 — 이 부분이 한국이 미국과 다르게 가는 지점입니다."
   },
   "month": "2026-09",
-  "saved_at": "2026-09-19T00:33:17.536665+00:00"
+  "saved_at": "2026-09-21T00:20:24.111441+00:00"
 }
