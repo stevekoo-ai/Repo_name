@@ -431,3 +431,6 @@ timestamp_utc,workflow,step,attempts_used,max_attempts,result
 2026-09-22T20:41:12Z,real-estate-sync,officetel_sale,1,36,success
 2026-09-22T22:55:48Z,macro-data-sync,macro_sync,1,36,success
 2026-09-22T23:42:53Z,core10-collect,core10,1,4,success
+2026-09-22T23:58:02Z,sk-hynix-daily-report,investor_flow_fetch,1,36,success
+2026-09-22T23:58:03Z,sk-hynix-daily-report,price_snapshot,1,36,success
+2026-09-22T23:58:08Z,sk-hynix-daily-report,report_generation,1,36,success
