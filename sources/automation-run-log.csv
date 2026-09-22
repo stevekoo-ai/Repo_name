@@ -429,3 +429,4 @@ timestamp_utc,workflow,step,attempts_used,max_attempts,result
 2026-09-22T20:39:37Z,real-estate-sync,apartment_rent,1,36,success
 2026-09-22T20:40:16Z,real-estate-sync,villa_sale,1,36,success
 2026-09-22T20:41:12Z,real-estate-sync,officetel_sale,1,36,success
+2026-09-22T22:55:48Z,macro-data-sync,macro_sync,1,36,success
