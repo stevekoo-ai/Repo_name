@@ -1,7 +1,7 @@
 ---
 title: 엔캐리 트레이드 청산 — 추적 상태
 created: 2026-09-18
-updated: 2026-09-18
+updated: 2026-09-22
 tags: [yen-carry-trade, jpy, cftc, monitoring, daily-tracking]
 ---
 
@@ -93,6 +93,23 @@ CFTC(포지션 청산 확인)와 USD/JPY(오히려 엔화 약세 지속)가 **�
 | 날짜 | CFTC Net(JPY Lev.Funds) | 1주 변화 | USD/JPY | 판정 |
 |---|---:|---:|---:|---|
 | 2026-09-18 | -49,098 [사용자 제공, 9/8 발표분] | +103,023계약(Non-Commercial 전체) | 157.28 | 🟡 1차 경고, 확정 아님 |
+
+---
+
+## 주거자금 실행계획과의 연결 (2026-09-22 신설)
+
+이 축은 [주거 전환 자금 조달 실행 프레임워크](../concepts/housing-funding-execution-framework.md)의
+**사전 경보 EW1(원화 마지노선 접근)의 `companion_axis`로 코드에 연결돼 있다.**
+
+- 이 페이지의 digest(`data/wiki_digest/yen-carry-trade-unwind.yaml`)
+  `status_label`이 **🔴**로 바뀌면, EW1의 등급이 `warning → critical`로
+  **자동 승격**되고 브리핑 블록 ⑧에 `⬆️승격` 표시와 함께 뜬다.
+- 이유: 엔캐리가 시나리오 B(포지션 청산 + 엔화 강세 지속)로 넘어가면
+  아시아 통화 전반의 리스크오프로 번져 **원화를 같이 민다.** 2026-09-22
+  기준 원/달러는 1,383.8원으로 CP5 마지노선(1,400)까지 **16원**밖에
+  안 남은 상태라, 두 경로가 동시에 오면 속도가 빨라진다.
+- 따라서 이 페이지를 🔴로 갱신할 때는 **실행계획의 CP5·CDP4도 같이
+  재점검**해야 한다(EW1의 action 항목에 명시돼 있다).
 
 ---
 

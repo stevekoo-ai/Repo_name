@@ -113,6 +113,24 @@ class CDPResult:
 
 
 @dataclass
+class EarlyWarningResult:
+    """임계가 **깨지기 전에** 뜨는 경보. CDP와 역할이 다르다 — CDP는 넘은
+    순간 발동하고, 이건 접근·이탈 중일 때 미리 뜬다(2026-09-22 신설)."""
+    id: str
+    name: str
+    kind: str                  # "approach" | "premise_drift"
+    severity: str              # companion_axis가 🔴이면 승격된 값이 들어온다
+    fired: bool | None         # None = 데이터 없음(R3: 판정 불가는 이상이 아니다)
+    actual: float | None
+    distance: float | None     # 임계까지 남은 거리(approach) / 전제와의 격차(drift)
+    detail: str
+    action: str
+    plan_b: str
+    linked: list[str] = field(default_factory=list)
+    escalated_by: str = ""     # 승격시킨 companion_axis slug
+
+
+@dataclass
 class ExecutionStatus:
     as_of: date
     price: float | None
@@ -123,6 +141,7 @@ class ExecutionStatus:
     tranches: list[TrancheStatus] = field(default_factory=list)
     checkpoints: list[CheckpointResult] = field(default_factory=list)
     cdps: list[CDPResult] = field(default_factory=list)
+    early_warnings: list[EarlyWarningResult] = field(default_factory=list)
 
     @property
     def progress_pct(self) -> float:
@@ -137,6 +156,10 @@ class ExecutionStatus:
         """데이터를 못 구해 판정하지 못한 CDP. 조용히 숨기면 안 된다."""
         return [c for c in self.cdps if c.fired is None]
 
+    @property
+    def fired_early_warnings(self) -> list[EarlyWarningResult]:
+        return [w for w in self.early_warnings if w.fired]
+
 
 def _compare(key: str, op: str, value, as_of: date) -> tuple[bool | None, float | None]:
     actual = L._lookup(key, as_of)
@@ -146,6 +169,73 @@ def _compare(key: str, op: str, value, as_of: date) -> tuple[bool | None, float 
         return OPS[op](actual, float(value)), actual
     except (KeyError, ValueError, TypeError):
         return None, actual
+
+
+_SEVERITY_LADDER = ["opportunity", "warning", "critical"]
+
+
+def _axis_is_red(slug: str) -> bool:
+    """companion_axis(위키 digest)가 🔴 상태인지. 파일이 없거나 못 읽으면
+    False — 없는 걸 위험으로 치면 매일 헛경보가 뜬다(R3)."""
+    p = REPO / "data" / "wiki_digest" / f"{slug}.yaml"
+    if not p.exists():
+        return False
+    try:
+        d = yaml.safe_load(p.read_text(encoding="utf-8")) or {}
+    except Exception:  # noqa: BLE001 — digest가 깨져도 실행계획 판정은 계속돼야 한다
+        return False
+    return "🔴" in str(d.get("status_label", ""))
+
+
+def _evaluate_early_warning(w: dict, as_of: date) -> EarlyWarningResult:
+    kind = w.get("type", "approach")
+    severity = w.get("severity", "warning")
+    escalated_by = ""
+
+    companion = w.get("companion_axis")
+    if companion and _axis_is_red(companion):
+        idx = min(_SEVERITY_LADDER.index(severity) + 1, len(_SEVERITY_LADDER) - 1) \
+            if severity in _SEVERITY_LADDER else len(_SEVERITY_LADDER) - 1
+        severity = _SEVERITY_LADDER[idx]
+        escalated_by = companion
+
+    actual = L._lookup(w["watch_key"], as_of)
+    if actual is None:
+        return EarlyWarningResult(
+            id=w["id"], name=w["name"], kind=kind, severity=severity,
+            fired=None, actual=None, distance=None,
+            detail=f"{w['watch_key']} 값을 구하지 못해 판정 불가",
+            action=w.get("action", "").strip(), plan_b=w.get("plan_b", "").strip(),
+            linked=list(w.get("linked", [])), escalated_by=escalated_by)
+
+    if kind == "premise_drift":
+        # 계획이 기대하는 전제에서 얼마나 벌어졌는지. 확인일이 지났으면
+        # 그건 사전 경보가 아니라 CP 본판정의 몫이라 여기서는 끈다.
+        target = float(w["premise_value"])
+        op = w.get("premise_op", ">=")
+        gap = (target - actual) if op in (">=", ">") else (actual - target)
+        before_check = str(as_of) < str(w.get("check_date", "9999-12-31"))
+        fired = bool(gap >= float(w["drift_margin"]) and before_check)
+        detail = (f"{w['watch_key']} 실측 {actual:g} vs 전제 {op} {target:g} — "
+                  f"{gap:+.2f} 벌어짐"
+                  + (f" (확인일 {w['check_date']} 전)" if before_check
+                     else f" (확인일 {w.get('check_date')} 경과 — CP 본판정으로 이관)"))
+        return EarlyWarningResult(
+            id=w["id"], name=w["name"], kind=kind, severity=severity,
+            fired=fired, actual=actual, distance=gap, detail=detail,
+            action=w.get("action", "").strip(), plan_b=w.get("plan_b", "").strip(),
+            linked=list(w.get("linked", [])), escalated_by=escalated_by)
+
+    threshold = float(w["threshold"])
+    distance = (threshold - actual) if w.get("direction", "up") == "up" else (actual - threshold)
+    fired = bool(distance <= float(w["warn_margin"]))
+    detail = (f"{w['watch_key']} 실측 {actual:g}, 임계 {threshold:g}까지 "
+              f"{distance:+.2f} 남음 (경보선 {w['warn_margin']})")
+    return EarlyWarningResult(
+        id=w["id"], name=w["name"], kind=kind, severity=severity,
+        fired=fired, actual=actual, distance=distance, detail=detail,
+        action=w.get("action", "").strip(), plan_b=w.get("plan_b", "").strip(),
+        linked=list(w.get("linked", [])), escalated_by=escalated_by)
 
 
 def evaluate(as_of: date, plan: dict | None = None,
@@ -247,5 +337,9 @@ def evaluate(as_of: date, plan: dict | None = None,
             fired=fired, actual=actual,
             expected=f"{d['check_key']} {d['check_op']} {d['check_value']}",
             action=d.get("action", "").strip()))
+
+    # ── 사전 경보 ── 임계가 깨지기 전에 미리 뜬다(2026-09-22 신설)
+    for w in plan.get("early_warnings", []):
+        st.early_warnings.append(_evaluate_early_warning(w, as_of))
 
     return st

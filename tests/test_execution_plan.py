@@ -325,3 +325,93 @@ def test_cdp5_action_text_matches_the_sequential_rule(plan):
     cdp5 = next(c for c in plan["critical_decision_points"] if c["id"] == "CDP5")
     assert "일괄" not in cdp5["action"]
     assert "하나씩" in cdp5["action"]
+
+
+# ── 사전 경보(Early Warning) — 2026-09-22 신설 ────────────────────
+#
+# 사용자 요청: "점검 포인트가 나타나면 내가 알 수 있도록 알람을 줘야지!
+# 그리고 다음 판단 블록이 검토해서 액션 아이템과 플랜B가 가동되어야지!"
+#
+# CDP는 임계를 **넘은 뒤** 발동한다. 그것만으로는 "깨진 날 처음 아는" 구조라
+# 손 쓸 시간이 없다. 이 경보는 접근·이탈 중일 때 미리 뜬다.
+
+def _fake_macro(monkeypatch, **vals):
+    """특정 거시 키만 갈아끼운다(실제 CSV가 자라도 테스트가 안 깨지게)."""
+    real = L._lookup
+    monkeypatch.setattr(
+        L, "_lookup",
+        lambda k, on: float(vals[k]) if k in vals else real(k, on))
+
+
+def test_approach_warning_fires_before_the_threshold_breaks(monkeypatch):
+    """EW1의 존재 이유 — 원/달러 1,383.8원일 때 CDP4(1,500)는 '발동 없음'인데
+    CP5 마지노선(1,400)까지는 16원뿐이었다. CDP만 보면 안전해 보인다."""
+    _fake_macro(monkeypatch, kr_usdkrw=1383.8)
+    st = EP.evaluate(date(2026, 9, 22))
+    ew1 = next(w for w in st.early_warnings if w.id == "EW1")
+    assert ew1.fired is True
+    assert ew1.distance == pytest.approx(16.2, abs=0.01)
+    cdp4 = next(c for c in st.cdps if c.id == "CDP4")
+    assert cdp4.fired is False, "CDP는 아직 조용한데 사전경보만 떠야 이 기능이 의미가 있다"
+
+
+def test_approach_warning_stays_quiet_when_there_is_real_room(monkeypatch):
+    """여유가 충분하면 안 떠야 한다 — 매일 뜨는 경고는 소음이 되어 무시된다
+    (데이터 헬스 제어 루프에서 이미 배운 원칙)."""
+    _fake_macro(monkeypatch, kr_usdkrw=1200.0)
+    st = EP.evaluate(date(2026, 9, 22))
+    assert next(w for w in st.early_warnings if w.id == "EW1").fired is False
+
+
+def test_premise_drift_warning_fires_before_the_checkpoint_date(monkeypatch):
+    """EW2 — CP2 확인일(11/3) 전인데 VIX가 전제(≥22)에서 크게 벌어진 상태."""
+    _fake_macro(monkeypatch, us_vix=14.81)
+    st = EP.evaluate(date(2026, 9, 22))
+    ew2 = next(w for w in st.early_warnings if w.id == "EW2")
+    assert ew2.fired is True
+    assert ew2.distance == pytest.approx(7.19, abs=0.01)
+
+
+def test_premise_drift_stops_once_the_checkpoint_date_has_passed(monkeypatch):
+    """확인일이 지나면 CP 본판정의 몫이다 — 사전경보가 계속 뜨면 중복이다."""
+    _fake_macro(monkeypatch, us_vix=14.81)
+    st = EP.evaluate(date(2026, 12, 1))
+    assert next(w for w in st.early_warnings if w.id == "EW2").fired is False
+
+
+def test_companion_axis_escalates_severity_when_the_linked_digest_turns_red(monkeypatch, tmp_path):
+    """복합 조건 — 원화(EW1)와 엔캐리 청산은 같은 축이다. 엔캐리가 시나리오 B로
+    넘어가면 원화 압력이 빨라지므로 등급을 올린다."""
+    _fake_macro(monkeypatch, kr_usdkrw=1383.8)
+    digest_dir = tmp_path / "data" / "wiki_digest"
+    digest_dir.mkdir(parents=True)
+    (digest_dir / "yen-carry-trade-unwind.yaml").write_text(
+        'slug: yen-carry-trade-unwind\nstatus_label: "🔴 시나리오 B 진입"\n',
+        encoding="utf-8")
+    monkeypatch.setattr(EP, "REPO", tmp_path)
+    st = EP.evaluate(date(2026, 9, 22))
+    ew1 = next(w for w in st.early_warnings if w.id == "EW1")
+    assert ew1.severity == "critical", "🟠 warning → 🔴 critical로 승격돼야 한다"
+    assert ew1.escalated_by == "yen-carry-trade-unwind"
+
+
+def test_missing_data_is_unjudged_not_safe(monkeypatch):
+    """R3 — 값을 못 구하면 '안전'이 아니라 '판정 불가'다."""
+    real = L._lookup
+    monkeypatch.setattr(L, "_lookup",
+                        lambda k, on: None if k == "kr_usdkrw" else real(k, on))
+    st = EP.evaluate(date(2026, 9, 22))
+    ew1 = next(w for w in st.early_warnings if w.id == "EW1")
+    assert ew1.fired is None
+    assert ew1 not in st.fired_early_warnings
+
+
+def test_every_early_warning_carries_an_action_and_a_plan_b(plan):
+    """경보만 뜨고 할 일이 없으면 다음 판단 블록이 움직일 수 없다 —
+    '경보가 뜬 날 급하게 생각하는' 상황 자체를 막는 게 목적이다."""
+    warnings = plan.get("early_warnings", [])
+    assert warnings, "사전 경보가 하나도 없으면 이 기능이 죽은 것이다"
+    for w in warnings:
+        assert w.get("action", "").strip(), f"{w['id']}에 액션 아이템이 없다"
+        assert w.get("plan_b", "").strip(), f"{w['id']}에 플랜B가 없다"
+        assert w.get("linked"), f"{w['id']}가 어떤 CP/CDP와 연결되는지 없다"

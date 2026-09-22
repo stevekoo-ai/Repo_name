@@ -815,6 +815,31 @@ def build_execution_block(as_of: date) -> Block:
         + (f" (현재가 {px} 기준 **{st.shares_remaining}주**)" if st.shares_remaining else ""),
     ]
 
+    # 사전 경보를 CDP보다도 먼저 — CDP는 "이미 깨진 것", 이건 "곧 깨질 것"이라
+    # 아직 손 쓸 시간이 있는 쪽이다. 사장님 요청(2026-09-22): "점검 포인트가
+    # 나타나면 알 수 있도록 알람을 주고, 다음 판단 블록이 액션 아이템과
+    # 플랜B를 가동해야 한다."
+    ew_fired = st.fired_early_warnings
+    if ew_fired:
+        lines.append("\n🔔 **사전 경보 — 임계가 깨지기 전에 대응할 구간**")
+        for w in ew_fired:
+            mark = {"critical": "🔴", "warning": "🟠"}.get(w.severity, "⚪")
+            esc = f" ⬆️승격({w.escalated_by} 🔴)" if w.escalated_by else ""
+            lines.append(f"- {mark} **{w.id} {w.name}**{esc}")
+            lines.append(f"  - 실측: {w.detail}")
+            if w.linked:
+                lines.append(f"  - 연결된 판정: {', '.join(w.linked)}")
+            lines.append(f"  - **액션**: {w.action}")
+            lines.append(f"  - **플랜B**: {w.plan_b}")
+        lines.append("> ⚠️ 이 경보는 **오늘의 판단/결론 섹션에 반드시 반영할 것** — "
+                     "블록 안에만 적고 넘어가면 사장님이 못 본다. 액션과 플랜B를 "
+                     "그대로 옮기지 말고, 오늘 실측에 비춰 지금 해야 할 일로 "
+                     "구체화해서 쓸 것.")
+    unknown_ew = [w for w in st.early_warnings if w.fired is None]
+    if unknown_ew:
+        lines.append("⚠️ **판정 불가 사전경보**(데이터 없음): "
+                     + ", ".join(f"{w.id}({w.detail})" for w in unknown_ew))
+
     # 발동한 CDP를 맨 위에 — 이걸 놓치면 이 블록의 존재 이유가 없다
     fired = st.fired_cdps
     if fired:

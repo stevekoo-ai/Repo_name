@@ -1,6 +1,6 @@
 slug: yen-carry-trade-unwind
 status_label: "🟡 엔캐리 1차 경고 — CFTC 청산 확인, 그러나 USD/JPY는 오히려 반등해 2차 확정 아님"
-as_of: "2026-09-18"
+as_of: "2026-09-22"
 one_line_summary: >
   CFTC(2026-09-08 발표분, [사용자 제공]): JPY Leveraged Funds Net -49,098
   (전주 대비 Short -29,859·Long +23,231, Non-Commercial 전체는 -92,227→
@@ -16,4 +16,9 @@ one_line_summary: >
   1개(미 장기금리)만 충족 — 실질 경고 단계 아님. ⚠️ CFTC·일본10년물은
   이 저장소 자동 수집 미구현, 사용자 제공치에 의존 중(다음 CFTC
   발표는 9/15분, 통상 익주 금요일).
+  🆕 2026-09-22: 이 축이 **주거자금 실행계획에 코드로 연결됐다** — 사전 경보
+  EW1(원화 마지노선 접근)의 `companion_axis`라서, 이 digest의 status_label이
+  🔴로 바뀌면 EW1이 warning→critical로 자동 승격되고 브리핑 블록 ⑧에 뜬다.
+  원/달러가 1,383.8원으로 CP5 마지노선(1,400)까지 16원뿐이라, 엔캐리가
+  시나리오 B로 넘어가면 두 경로가 원화를 동시에 민다.
 monitoring_page: wiki/monitoring/yen-carry-trade-unwind-status.md

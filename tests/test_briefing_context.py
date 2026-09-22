@@ -192,3 +192,15 @@ def test_ids_do_not_collide():
     a = L.add("A", "2099-01-01", "us_10y", ">=", "1", "AM", "2026-09-11")
     b = L.add("B", "2099-01-01", "us_10y", ">=", "1", "AM", "2026-09-11")
     assert a.id != b.id
+
+
+def test_execution_block_surfaces_early_warnings_with_action_and_plan_b():
+    """2026-09-22 사용자 요청: "점검 포인트가 나타나면 알람을 주고, 다음 판단
+    블록이 액션 아이템과 플랜B를 가동해야 한다." 경보가 블록 안에만 조용히
+    적히면 사장님이 못 본다 — CDP보다 위에, 액션·플랜B까지 함께 떠야 한다."""
+    block = C.build_execution_block(date(2026, 9, 22))
+    assert "사전 경보" in block.body
+    assert "**액션**" in block.body and "**플랜B**" in block.body
+    assert block.body.index("사전 경보") < block.body.index("CDP"), \
+        "아직 손 쓸 시간이 있는 경보가 이미 깨진 CDP보다 아래 있으면 안 된다"
+    assert "오늘의 판단" in block.body, "브리핑 상단으로 끌어올리라는 지시가 있어야 한다"
