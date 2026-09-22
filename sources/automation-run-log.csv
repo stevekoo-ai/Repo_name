@@ -418,3 +418,6 @@ timestamp_utc,workflow,step,attempts_used,max_attempts,result
 2026-09-22T00:31:58Z,sk-hynix-daily-report,price_snapshot,1,36,success
 2026-09-22T00:32:05Z,sk-hynix-daily-report,report_generation,1,36,success
 2026-09-22T00:48:28Z,macro-data-sync,macro_sync,1,36,success
+2026-09-22T05:36:57Z,sk-hynix-daily-report,investor_flow_fetch,1,36,success
+2026-09-22T05:36:58Z,sk-hynix-daily-report,price_snapshot,1,36,success
+2026-09-22T05:37:03Z,sk-hynix-daily-report,report_generation,1,36,success
