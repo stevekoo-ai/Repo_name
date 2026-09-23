@@ -1,7 +1,6 @@
-# 데이터 헬스 — 2026-09-23T00:42:47.173690+00:00
+# 데이터 헬스 — 2026-09-23T07:50:34.915259+00:00
 
-⚠️ 33/49개 소스 이상
-- 🔴 **peos-daily-report** [STALE] PEOS 일일 경제판단 리포트 — report/2026-09-21.md 존재 (2일 전 날짜)
+⚠️ 32/49개 소스 이상
 - 🟠 **normalized-series-sweep** [ANOMALY] data/normalized/*.csv 전수 스윕 (232개 시리즈) — ok 199 / 이상 31 / 알려진 설계상 이상(비알림) 2 — 상세는 개별 normalized:* 항목 참고
 - 🟠 **normalized:bls_us_job_openings** [STALE] 정규화 시리즈: bls_us_job_openings (monthly) — STALE — 최신 2026-07-01, 84일 경과
 - 🟠 **normalized:ecos_current_account** [STALE] 정규화 시리즈: ecos_current_account (monthly) — STALE — 최신 2026-07-01, 84일 경과
