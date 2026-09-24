@@ -46,45 +46,40 @@ jobs:
           python-version: "3.12"
       - run: pip install -r requirements.txt
 
-      - name: 발송 대상 결정
-        id: pick
+      # 2026-09-24 교체 — "가장 최근 파일 1개만" 보내던 구조를 발송 장부
+      # (report/briefing/sent.log) 기반으로 바꿨다. 9/22 아침 브리핑이 9/23분과
+      # 한 push로 올라와 영영 안 나갔고, 9/23 저녁 브리핑은 같은 push에 워크플로가
+      # 두 번 떠서 2통 나갔다. 최신 main을 받아 장부를 읽고 미발송분만 보낸다
+      # (concurrency 대기열이 두 실행을 직렬화하므로 두 번째 실행은 장부를 보고 건너뛴다).
+      - name: 최신 main 동기화 (장부 최신화)
         run: |
-          SLOT="${{ github.event.inputs.slot }}"
-          DATE="${{ github.event.inputs.date }}"
-          if [ -z "$SLOT" ] || [ -z "$DATE" ]; then
-            # 가장 최근 브리핑 마크다운을 파일명에서 역산한다
-            LATEST=$(ls report/briefing/*.md 2>/dev/null | sort | tail -1)
-            if [ -z "$LATEST" ]; then
-              echo "::error::report/briefing/에 브리핑이 없습니다"
-              exit 1
-            fi
-            BASE=$(basename "$LATEST" .md)     # YYYY-MM-DD-SLOT
-            DATE="${BASE%-*}"
-            SLOT="${BASE##*-}"
-          fi
-          echo "slot=$SLOT" >> "$GITHUB_OUTPUT"
-          echo "date=$DATE" >> "$GITHUB_OUTPUT"
-          echo "발송 대상: $DATE $SLOT"
+          git fetch origin main
+          git checkout -B main origin/main
 
-      - name: HTML 변환 + 발송
+      - name: 미발송 브리핑 전부 HTML 변환 + 발송
         env:
           GMAIL_ADDRESS: ${{ secrets.GMAIL_ADDRESS }}
           GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
           NOTIFY_EMAIL_TO: ${{ secrets.GMAIL_ADDRESS }}
         run: |
-          PYTHONPATH=. python3 scripts/publish_briefing.py \
-            --slot "${{ steps.pick.outputs.slot }}" \
-            --date "${{ steps.pick.outputs.date }}"
+          if [ -n "${{ github.event.inputs.slot }}" ] && [ -n "${{ github.event.inputs.date }}" ]; then
+            # 수동 재발송: 장부와 무관하게 지정한 한 편만
+            PYTHONPATH=. python3 scripts/publish_briefing.py \
+              --slot "${{ github.event.inputs.slot }}" --date "${{ github.event.inputs.date }}"
+          else
+            PYTHONPATH=. python3 scripts/send_pending_briefings.py
+          fi
 
-      - name: 생성된 HTML 커밋
+      - name: 생성된 HTML·발송 장부 커밋
+        if: always()
         run: |
           git config user.name "briefing-email-bot"
           git config user.email "actions@users.noreply.github.com"
           git add report/briefing/
           if git diff --cached --quiet; then
-            echo "새로 커밋할 HTML 없음"
+            echo "새로 커밋할 것 없음"
           else
-            git commit -m "chore: 브리핑 HTML ${{ steps.pick.outputs.date }}-${{ steps.pick.outputs.slot }}"
+            git commit -m "chore: 브리핑 발송 기록 $(date -u +%Y-%m-%dT%H:%M:%SZ)"
             for i in 1 2 3 4 5; do
               git push && break
               git fetch origin main && git rebase --autostash origin/main
@@ -102,4 +97,4 @@ jobs:
           NOTIFY_EMAIL_TO: ${{ secrets.GMAIL_ADDRESS }}
         run: |
           python3 -m scripts.send_report_email \
-            --failure-alert "브리핑 이메일 발송 실패 (${{ steps.pick.outputs.date }} ${{ steps.pick.outputs.slot }}) — report/briefing/에 파일은 있으나 메일이 나가지 않았습니다."
+            --failure-alert "브리핑 이메일 발송 실패 — report/briefing/에 파일은 있으나 메일이 나가지 않았습니다. Actions 로그에서 어떤 편이 실패했는지 확인하세요(sent.log에 없는 편이 미발송분)."

@@ -35,21 +35,21 @@ def run(history_path: Path = DEFAULT_HISTORY_PATH, docs_dir: Path = DEFAULT_DOCS
     draw_trend_charts(history, docs_dir)
     report.render_report(reading, history, run_date, docs_dir / "index.html")
 
+    # 2026-09-24 — 텍스트 4줄 요약 대신 방금 그린 HTML 대시보드를 본문으로,
+    # 차트 PNG를 첨부로 보낸다(사용자: "모든 보고서가 html로 발송되는지 확인").
     try:
-        notify.build_channel().send(
-            subject=f"[Investment Clock] {reading.phase['name']} phase — favor {reading.phase['asset']}",
-            body_text=(
-                f"Data as of {max(reading.growth.as_of, reading.inflation.as_of).date()}\n"
-                f"Growth: {reading.growth.label} ({reading.growth.change:+.2f})\n"
-                f"Inflation (CPI YoY): {reading.inflation.label} ({reading.inflation.change:+.2f}pp), "
-                f"level {reading.inflation.value:.2f}%\n"
-                f"Phase: {reading.phase['name']} ({reading.phase['name_kr']}) -> {reading.phase['asset']}"
-            ),
+        pngs = sorted(p for p in docs_dir.glob("*.png"))
+        notify.build_channel().send_document(
+            subject=f"[Investment Clock] {reading.phase['name']} ({reading.phase['name_kr']}) — favor {reading.phase['asset']}",
+            html_body=(docs_dir / "index.html").read_text(encoding="utf-8"),
+            attachments=pngs,
         )
     except Exception as exc:
-        # The dashboard (docs/index.html, committed above) is the reliable delivery
-        # path; a bad SMTP login or transient network block must not fail the whole run.
-        print(f"[warn] notification send failed: {exc}")
+        # The dashboard (docs/index.html, committed afterwards) is still produced, so the
+        # run must not die here — but the failure must not be silent either: the
+        # workflow's alert step looks for this marker and mails the user.
+        print(f"::error::investment clock email failed: {exc}")
+        Path("/tmp/clock_notify_failed").write_text(str(exc), encoding="utf-8")
 
     print(f"Phase: {reading.phase['name']} -> {reading.phase['asset']}")
     print(f"History rows: {len(history)} (from {history['data_asof'].min()} to {history['data_asof'].max()})")

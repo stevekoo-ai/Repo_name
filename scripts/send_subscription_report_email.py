@@ -100,13 +100,18 @@ def main() -> int:
     headline_line = next((l for l in content.splitlines() if l.startswith("**")), "").strip("*")
     subject = f"[청약 리포트] {day.isoformat()}" + (f" — {headline_line}" if headline_line else "")
 
+    # 2026-09-24 — 마크다운 원문을 텍스트로 보내던 것을 HTML로 바꿨다(사용자:
+    # "모든 보고서들이 정확히 html로 변환되어 발송되고 있는지 확인하라").
+    # 브리핑에서 검증된 렌더러를 그대로 쓴다.
+    from engine.briefing.render_html import render_briefing_html
+    html = render_briefing_html(content, title=subject)
     try:
-        notify.build_channel().send(subject, content)
+        notify.build_channel().send_document(subject, html, attachments=[])
     except Exception as exc:
         print(f"[error] 발송 실패: {exc}", file=sys.stderr)
         return 1
 
-    print(f"[ok] {report.name} 발송 완료 ({len(content):,}자)")
+    print(f"[ok] {report.name} HTML 발송 완료 ({len(html):,}자)")
     return 0
 
 

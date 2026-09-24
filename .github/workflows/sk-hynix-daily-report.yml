@@ -223,22 +223,22 @@ jobs:
             sleep $((i * 3))
           done
 
-      - name: 이메일 발송
+      # 2026-09-24 교체 — dawidd6/action-send-mail이 보낸사람 주소 없이
+      # ("SK하이닉스 자동 리포트 봇") 마크다운 원문을 보내고 있었고, 사용자가
+      # "Gmail로 전달이 안 된다"고 보고했다. Gmail은 헤더가 부실한 자기→자기
+      # 메일을 250 OK로 받고 조용히 버린다(core/notify.py에 기록된 기존 교훈).
+      # From·Date·Message-ID를 붙이는 core.notify + HTML 렌더링으로 통일한다.
+      - name: 이메일 발송 (HTML)
         if: ${{ github.event.inputs.debug_raw != 'true' }}
-        uses: dawidd6/action-send-mail@v3
-        with:
-          server_address: smtp.gmail.com
-          server_port: 465
-          username: ${{ secrets.GMAIL_ADDRESS }}
-          password: ${{ secrets.GMAIL_APP_PASSWORD }}
-          subject: "[SK하이닉스 자동 리포트] ${{ github.event.repository.name }}"
-          # 2026-09-01: daily-peos-report.yml과 동일하게 gmail 자신 +
-          # COMPANY_EMAIL(회사 메일) 둘 다로 발송 — dawidd6/action-send-mail은
-          # to에 콤마로 구분된 여러 수신자를 그대로 받는다(core/notify.py의
-          # EmailChannel과는 별개 코드경로라 이쪽은 이 action 자체가 분리 처리).
-          to: ${{ secrets.GMAIL_ADDRESS }},${{ secrets.COMPANY_EMAIL }}
-          from: SK하이닉스 자동 리포트 봇
-          body: file:///tmp/report.md
+        env:
+          GMAIL_ADDRESS: ${{ secrets.GMAIL_ADDRESS }}
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+          NOTIFY_EMAIL_TO: ${{ secrets.GMAIL_ADDRESS }},${{ secrets.COMPANY_EMAIL }}
+        run: |
+          pip install --quiet requests
+          python3 -m scripts.send_markdown_report \
+            --file /tmp/report.md \
+            --subject "[SK하이닉스 자동 리포트] $(TZ=Asia/Seoul date +'%Y-%m-%d %H:%M') KST"
 
       # 2026-08-27 추가 — 위 "변경사항 커밋 & 푸시"는 재시도 소진으로 잡이
       # 실패하면 아예 실행되지 않아 automation-run-log.csv의 "exhausted"
@@ -283,5 +283,6 @@ jobs:
           GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
           NOTIFY_EMAIL_TO: ${{ secrets.GMAIL_ADDRESS }},${{ secrets.COMPANY_EMAIL }}
         run: |
+          pip install --quiet requests
           python3 -m scripts.send_report_email \
             --failure-alert "sk-hynix-daily-report 워크플로가 실패했습니다 (KIS 시세·수급 수집~리포트 생성 중 한 단계) — 이 실행 시간대(07:00/10:00/19:00 KST)의 SK하이닉스 자동 데이터는 없는 것으로 취급하세요."

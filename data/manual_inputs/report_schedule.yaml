@@ -1,0 +1,83 @@
+# 보고서 발송 일정 — 워치독(scripts/report_watchdog.py)이 "와야 할 보고서가 왔는가"를
+# 판정하는 단일 출처. 원칙: wiki/concepts/report-delivery-policy.md
+#
+# 2026-09-24 사용자: "모든 보고서는 조용히 발행하지 않는 게 아니라!! 내게 상황을
+# 알려야지! 어떤 문제인지, 그리고 그 문제 외에 보고할 수 있는 내용으로 메일을 쓰는
+# 것으로 하라."
+#
+# due는 예정 시각(KST), grace_min은 경보까지 기다리는 분.
+# ⚠ GitHub Actions 예약(schedule) 실행은 실측 2~4.7시간 늦게 시작한다(2026-09-24
+# 조사). 그래서 Actions 보고서의 grace는 5시간이다 — 이보다 짧으면 "지연"을 매일
+# "미도착"으로 오경보한다. 지연 자체의 해결은 별도 과제(위키 페이지 참고).
+# days: 0=월 … 6=일 (KST 기준)
+
+reports:
+  - id: briefing_am
+    name: PEOS 아침 브리핑
+    kind: briefing
+    slot: AM
+    days: [0, 1, 2, 3, 4]
+    due: "08:00"
+    grace_min: 150
+  - id: briefing_pm
+    name: PEOS 저녁 브리핑
+    kind: briefing
+    slot: PM
+    days: [0, 1, 2, 3, 4]
+    due: "19:40"
+    grace_min: 140
+  - id: briefing_weekend
+    name: PEOS 주간 전망
+    kind: briefing
+    slot: WEEKEND
+    days: [5]
+    due: "07:30"
+    grace_min: 150
+  - id: hynix_0700
+    name: SK하이닉스 자동 리포트 (07:00)
+    kind: workflow
+    workflow: sk-hynix-daily-report.yml
+    nth: 1
+    days: [0, 1, 2, 3, 4, 5, 6]
+    due: "07:00"
+    grace_min: 300
+  - id: hynix_1000
+    name: SK하이닉스 자동 리포트 (10:00)
+    kind: workflow
+    workflow: sk-hynix-daily-report.yml
+    nth: 2
+    days: [0, 1, 2, 3, 4, 5, 6]
+    due: "10:00"
+    grace_min: 300
+  - id: hynix_1900
+    name: SK하이닉스 자동 리포트 (19:00)
+    kind: workflow
+    workflow: sk-hynix-daily-report.yml
+    nth: 3
+    days: [0, 1, 2, 3, 4, 5, 6]
+    due: "19:00"
+    grace_min: 290
+  - id: peos_daily
+    name: PEOS 일일 리포트
+    kind: workflow
+    workflow: daily-peos-report.yml
+    nth: 1
+    days: [0, 1, 2, 3, 4, 5, 6]
+    due: "07:30"
+    grace_min: 300
+  - id: subscription_daily
+    name: 청약 일일 리포트
+    kind: workflow
+    workflow: subscription-daily-report.yml
+    nth: 1
+    days: [0, 1, 2, 3, 4, 5, 6]
+    due: "07:10"
+    grace_min: 300
+  - id: investment_clock
+    name: 투자시계 리포트
+    kind: workflow
+    workflow: daily-clock-report.yml
+    nth: 1
+    days: [0, 1, 2, 3, 4, 5, 6]
+    due: "08:00"
+    grace_min: 300

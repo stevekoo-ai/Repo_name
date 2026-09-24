@@ -54,3 +54,21 @@ jobs:
             git commit -m "chore: daily investment clock update $(date -u +%Y-%m-%d)"
             git push
           fi
+
+      # 2026-09-24 추가 — 발송 실패가 경고 한 줄로 묻히던 것을 메일로 드러낸다.
+      # 파이프라인(src/clock/main.py)은 대시보드를 지키려고 발송 실패로 죽지
+      # 않는 대신 /tmp/clock_notify_failed 표식을 남긴다. 잡 자체가 실패해도
+      # 알린다(보고서 미도착이 조용히 지나가면 안 된다 — 보고서 발행 원칙).
+      - name: 발송 실패·잡 실패 시 알림
+        if: always()
+        env:
+          GMAIL_ADDRESS: ${{ secrets.GMAIL_ADDRESS }}
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+          NOTIFY_EMAIL_TO: ${{ secrets.NOTIFY_EMAIL_TO }}
+          JOB_STATUS: ${{ job.status }}
+        run: |
+          if [ -f /tmp/clock_notify_failed ] || [ "$JOB_STATUS" != "success" ]; then
+            reason="$(cat /tmp/clock_notify_failed 2>/dev/null || echo "잡 상태: $JOB_STATUS")"
+            python -m scripts.send_report_email \
+              --failure-alert "투자시계(Investment Clock) 리포트가 오늘 메일로 도착하지 못했습니다 — ${reason}. 대시보드: docs/index.html"
+          fi

@@ -81,6 +81,10 @@ def main() -> int:
 
     label = {"AM": "아침", "PM": "저녁", "WEEKEND": "주간 전망"}[args.slot]
     subject = f"[PEOS {label} 브리핑] {day.isoformat()}"
+    # 상황 보고(engine/briefing/notice.py)는 제목에서 바로 구분되게 — 정규
+    # 브리핑이 없는 이유가 받은편지함 목록에서 보이도록.
+    if "\nnotice: true" in md_path.read_text(encoding="utf-8")[:400]:
+        subject = f"[PEOS 상황 보고] {day.isoformat()} {label} 브리핑 대체 — 정규 브리핑 미발행 사유 포함"
     try:
         notify.build_channel().send_document(subject, html, attachments=[html_path])
     except Exception as exc:  # noqa: BLE001 — 발송 실패는 조용히 넘기면 안 된다

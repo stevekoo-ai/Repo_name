@@ -1,0 +1,50 @@
+name: 보고서 도착 워치독
+
+# 2026-09-24 — 와야 할 보고서가 기한까지 안 오면 원인과 그 외 보고 내용을
+# 메일로 알린다(조용한 미발행 금지 — wiki/concepts/report-delivery-policy.md).
+# 일정: data/manual_inputs/report_schedule.yaml
+
+on:
+  schedule:
+    - cron: "23 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  actions: read
+
+concurrency:
+  group: report-watchdog
+  cancel-in-progress: false
+
+jobs:
+  watch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -q -r requirements.txt
+      - name: 도착 점검 + 미도착 알림
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GMAIL_ADDRESS: ${{ secrets.GMAIL_ADDRESS }}
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+          NOTIFY_EMAIL_TO: ${{ secrets.GMAIL_ADDRESS }}
+          PYTHONPATH: .
+        run: python3 scripts/report_watchdog.py
+      - name: 기록 커밋
+        if: always()
+        run: |
+          git config user.name "report-watchdog-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add data/report_watchdog/ report/briefing/ 2>/dev/null || true
+          if ! git diff --cached --quiet; then
+            git commit -m "chore: 보고서 워치독 기록 $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+            for i in 1 2 3 4 5; do
+              git push && break
+              git fetch origin main && git rebase --autostash origin/main
+              sleep $((i * 3))
+            done
+          fi

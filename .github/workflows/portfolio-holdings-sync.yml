@@ -177,5 +177,6 @@ jobs:
           GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
           NOTIFY_EMAIL_TO: ${{ secrets.NOTIFY_EMAIL_TO }}
         run: |
+          pip install --quiet requests  # core/notify가 requests를 import — 없으면 알림이 죽는다(2026-09-24 발견)
           python3 -m scripts.send_report_email \
             --failure-alert "portfolio-holdings-sync 워크플로가 실패했습니다 (6시간 재시도 소진) — 오늘의 보유종목 데이터는 갱신되지 않았습니다."
