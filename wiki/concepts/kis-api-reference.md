@@ -174,6 +174,33 @@ merge 3개 서브커맨드)로 정리.
 - **`etfetn.inquire_component_stock_price()`** — TR `FHKST121600C0` — ETF 구성종목 상세시세(보유 ETF가 실제 뭘 담고 있는지 확인)
 - **`etfetn.nav_comparison_daily_trend()`** — TR `FHPST02440200` — NAV 대비 시장가 일별 추이(최대 100일)
 
+#### ✅ 2026-09-24 실계정 실측 (Actions run 36026975556, `scripts/probe_kis_etf_pdf.py`)
+
+병목 이동 추적([ai-bottleneck-rotation-map.md](ai-bottleneck-rotation-map.md))용
+"ETF PDF 대장주" 조사로 실제 호출해 확인했다.
+
+- **`FHKST121600C0` 동작 확인.** `GET /uapi/etfetn/v1/quotations/inquire-component-stock-price`,
+  파라미터 `FID_COND_MRKT_DIV_CODE=J`, `FID_INPUT_ISCD=<ETF코드>`,
+  `FID_COND_SCR_DIV_CODE=11216`. `output2`가 구성종목 배열이고
+  **`etf_cnfg_issu_rlim` = 구성종목 비중(%)**이다(국내 ETF 합계 100.00 확인).
+  `etf_vltn_amt`는 구성종목 평가금액이다. ⚠ 예제 저장소
+  `chk_inquire_component_stock_price.py`의 한글 컬럼 매핑은 복붙 오류투성이라
+  믿으면 안 된다.
+- **한계 ① 해외 구성종목은 안 온다.** 미국 테마 ETF(KODEX 미국AI광통신네트워크 등)는
+  `etf_cnfg_issu_cnt=11`인데 `output2` 0행이다. 글로벌 ETF는 **국내 종목만** 오고,
+  비중이 국내분끼리 합 100으로 재정규화된다(RISE 글로벌AI낸드: 11종목 중
+  삼성전자 51.26·SK하이닉스 48.74 두 행만 반환). → 국내 주식형 ETF만 비중이 유효하다.
+- **한계 ② 최대 30행.** 55종목 ETF가 30행(비중 합 94.95)으로 잘렸다. 대장주(상위)
+  판정에는 충분하다.
+- **한계 ③ 현재 스냅샷만.** HTS [0245] 화면 기능이라 과거 PDF를 주지 않는다.
+  순위 변화를 보려면 **매일 저장해 쌓아야** 한다.
+- **종목 마스터**(`kospi_code.mst.zip`, 러너에서만 접근 가능): splitlines 후 끝 227자
+  (코스닥 221자)가 part2, 그 첫 2자가 그룹코드다. `EF`=ETF(1,175개), `EN`=ETN,
+  `ST`=주식. ⚠ KIS 예제는 줄바꿈 포함 행 기준 228/222라 그대로 쓰면 1자 밀린다.
+- **테마 마스터**(`theme_code.mst.zip`): 302개 테마. 병목 관련 테마로
+  `[489] 전력기기`(6), `[270] 전선업체`(6), `[045] 광통신`(16), `[231] HBM`(15),
+  `[262] SSD`(8), `[629] 3D낸드`(20)가 있다. 상장폐지 코드가 섞여 있다(종목명 조회 실패로 식별 가능).
+
 ## 3. 우선순위 판단 메모
 
 다음에 API 확장이 또 필요해지면 이 순서로 검토:
