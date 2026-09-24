@@ -111,11 +111,34 @@ jobs:
           done
           python3 scripts/log_automation_run.py macro-data-sync macro_sync "$attempt" "$max_attempts" success
 
+      # 2026-09-24 추가 — 병목 이동 추적(engine/bottleneck/rotation.py)용 주가.
+      # 대상 티커는 data/manual_inputs/bottleneck_rotation.yaml에서만 정한다.
+      # 거시지표와 별개 데이터라 여기서 실패해도 잡을 실패시키지 않는다(실패시
+      # 키면 "거시지표 갱신 안 됨" 오경보 메일이 나간다) — 대신 실행 로그에
+      # exhausted로 남고, 데이터 헬스(engine/health/registry.py
+      # bottleneck-prices)가 fetched_at 신선도로 잡아낸다(조용히 죽지 않음).
+      - name: 병목 이동 추적 주가 수집
+        run: |
+          pip install --quiet pyyaml
+          attempt=1; max_attempts=3; failed=0
+          until python3 scripts/bottleneck_prices.py; do
+            if [ "$attempt" -ge "$max_attempts" ]; then
+              echo "::warning::병목 추적 주가 수집 재시도 소진 — 이번 회차는 건너뜀"
+              failed=1
+              break
+            fi
+            echo "[재시도 $attempt/$max_attempts] 병목 추적 주가 수집 실패 — 5분 후 재시도"
+            attempt=$((attempt + 1))
+            sleep 300
+          done
+          python3 scripts/log_automation_run.py macro-data-sync bottleneck_prices "$attempt" "$max_attempts" $([ "$failed" -eq 1 ] && echo exhausted || echo success)
+
       - name: 변경사항 커밋 & 푸시
         run: |
           git config user.name "macro-data-sync-bot"
           git config user.email "actions@users.noreply.github.com"
           git add sources/macro-series.csv
+          [ -f sources/bottleneck-prices.csv ] && git add sources/bottleneck-prices.csv
           [ -f sources/automation-run-log.csv ] && git add sources/automation-run-log.csv
           git diff --cached --quiet || git commit -m "거시지표 자동 동기화: $(date -u +%Y-%m-%dT%H:%M:%SZ)"
           for i in 1 2 3 4 5; do

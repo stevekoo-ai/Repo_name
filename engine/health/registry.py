@@ -233,6 +233,19 @@ SOURCES: tuple[SourceSpec, ...] = (
         required_columns=("company", "ticker", "value_usd", "fetched_at"),
         severity="warning",
     ),
+    # 2026-09-24 추가 — 병목 이동 추적(engine/bottleneck/rotation.py) 주가.
+    # macro-data-sync.yml 안에서 매일 두 번 돌지만 실패해도 잡을 죽이지 않게
+    # 설계했으므로, 조용한 실패는 여기 fetched_at 신선도로만 잡힌다.
+    SourceSpec(
+        slug="bottleneck-prices",
+        description="병목 이동 추적 주가 (Yahoo — 전력·광통신·NAND·하이닉스)",
+        workflow="macro-data-sync.yml",
+        mode=FreshnessMode.CSV_FETCHED_AT,
+        path="sources/bottleneck-prices.csv",
+        max_age_hours=50,
+        required_columns=("ticker", "date", "close", "fetched_at"),
+        severity="warning",
+    ),
     # ── 부동산 실거래가 (국토부, 매일 03:00 KST) ──
     SourceSpec(
         slug="real-estate-apartment-sale",

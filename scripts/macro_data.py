@@ -219,6 +219,17 @@ def yahoo_fetch(symbol, start=None, end=None, raw=False):
     갱신이 멈추고 ⚠️N일 지연으로 표면화된다(브리핑 팩의 "뉴스 교차검증
     필수 목록"이 자동으로 집어낸다) — 조용히 사라지지 않는다.
     """
+    if raw:
+        print(json.dumps(_yahoo_request(symbol, start, end), ensure_ascii=False, indent=2))
+        return []
+    try:
+        rows, _meta = yahoo_chart(symbol, start, end)
+    except RuntimeError as e:
+        sys.exit(str(e))
+    return rows
+
+
+def _yahoo_request(symbol, start=None, end=None):
     period2 = int(datetime.now(timezone.utc).timestamp())
     if end:
         period2 = int(datetime.fromisoformat(f"{end}T23:59:59+00:00").timestamp())
@@ -232,20 +243,23 @@ def yahoo_fetch(symbol, start=None, end=None, raw=False):
     req = urllib.request.Request(url, headers=YAHOO_HEADERS)
     try:
         with urllib.request.urlopen(req, timeout=20) as resp:
-            data = json.loads(resp.read())
+            return json.loads(resp.read())
     except urllib.error.HTTPError as e:
-        sys.exit(f"Yahoo API 호출 실패: {e.code} {e.read()[:300].decode(errors='replace')}")
-    except Exception as e:  # noqa: BLE001 — 네트워크 실패도 이 계열만 건너뛰게 한다
-        sys.exit(f"Yahoo API 호출 실패: {type(e).__name__}: {e}")
+        raise RuntimeError(f"Yahoo API 호출 실패: {e.code} {e.read()[:300].decode(errors='replace')}") from e
+    except Exception as e:  # noqa: BLE001 — 네트워크 실패도 호출자가 이 심볼만 건너뛰게 한다
+        raise RuntimeError(f"Yahoo API 호출 실패: {type(e).__name__}: {e}") from e
 
-    if raw:
-        print(json.dumps(data, ensure_ascii=False, indent=2))
-        return []
 
+def yahoo_chart(symbol, start=None, end=None):
+    """(rows, meta) 반환, 실패 시 RuntimeError. 여러 심볼을 도는 호출자
+    (scripts/bottleneck_prices.py)가 한 심볼 실패로 전체가 죽지 않게 하려고
+    yahoo_fetch의 sys.exit 대신 예외를 쓴다. meta의 longName/shortName은
+    티커가 의도한 종목인지 실측 검증하는 데 쓴다."""
+    data = _yahoo_request(symbol, start, end)
     result = (data.get("chart") or {}).get("result") or []
     if not result:
         err = (data.get("chart") or {}).get("error")
-        sys.exit(f"응답에 chart.result가 없습니다(봇 차단/심볼 오류 의심) — error={err}")
+        raise RuntimeError(f"응답에 chart.result가 없습니다(봇 차단/심볼 오류 의심) — error={err}")
 
     stamps = result[0].get("timestamp") or []
     quote = (result[0].get("indicators") or {}).get("quote") or [{}]
@@ -257,8 +271,8 @@ def yahoo_fetch(symbol, start=None, end=None, raw=False):
         d = datetime.fromtimestamp(ts, tz=timezone.utc).date().isoformat()
         rows.append((d, f"{close:.4f}"))
     if not rows:
-        sys.exit(f"'{symbol}' 응답에 유효한 종가가 하나도 없습니다")
-    return rows
+        raise RuntimeError(f"'{symbol}' 응답에 유효한 종가가 하나도 없습니다")
+    return rows, result[0].get("meta") or {}
 
 
 def _ecos_fetch_page(key, stat_code, item_code, cycle, start, end, row_from, row_to):

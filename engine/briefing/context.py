@@ -902,6 +902,28 @@ def build_execution_block(as_of: date) -> Block:
     return Block("execution", "⑧ 자금 조달 실행 계획", "\n".join(lines))
 
 
+def build_bottleneck_block(as_of: date) -> Block:
+    """⑨ 병목 이동 추적 — 다음 병목 섹터 선제 매수 단계 판정.
+
+    사용자 요청(2026-09-24): "다음 병목이 확정되기 전에 해당 섹터의
+    대장주나 ETF를 매수하는 전략을 단계별로 구성하여 트레이스를 통해
+    전망되는 방향에 따라 단계별 전략이 리포트에서 제안될 수 있도록."
+    판정은 engine/bottleneck/rotation.py가 하고 여기선 그대로 싣는다."""
+    from engine.bottleneck import rotation as BR
+
+    title = "⑨ 병목 이동 추적 (다음 병목 선제 매수)"
+    try:
+        st = BR.evaluate(as_of)
+    except FileNotFoundError:
+        return Block("bottleneck", title, "설정 파일 없음 — 점검 생략")
+    body = BR.render_markdown(st)
+    if any(c.stage != c.stage_week_ago for c in st.candidates) or any(c.gap_krw > 0 or c.unwind for c in st.candidates):
+        body += ("\n> ⚠️ 단계 변화·매수 제안·철회 검토가 있다 — **오늘의 판단/결론 섹션에 "
+                 "반드시 반영할 것.** 제안 금액과 수단을 그대로 옮기지 말고, 오늘 시장 "
+                 "움직임에 비춰 지금 실행할지(분할 여부 포함)를 판단해서 쓸 것.")
+    return Block("bottleneck", title, body)
+
+
 def build_pack(slot: str, as_of: date | None = None) -> tuple[BriefingPack, Gate]:
     now = datetime.now(KST)
     as_of = as_of or now.date()
@@ -915,6 +937,7 @@ def build_pack(slot: str, as_of: date | None = None) -> tuple[BriefingPack, Gate
             build_digest_block(as_of, *detect_triggers(as_of)),
             build_ledger_block(as_of),
             build_execution_block(as_of),
+            build_bottleneck_block(as_of),
             build_weekend_news_block(as_of),
             build_weekly_outlook_block(as_of),
         ])
@@ -932,5 +955,6 @@ def build_pack(slot: str, as_of: date | None = None) -> tuple[BriefingPack, Gate
         build_ledger_block(as_of),
         build_calendar_block(as_of, slot),
         build_execution_block(as_of),
+        build_bottleneck_block(as_of),
     ])
     return pack, gate

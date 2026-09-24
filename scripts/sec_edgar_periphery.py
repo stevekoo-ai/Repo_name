@@ -68,6 +68,10 @@ PERIPHERY = {
     "COHR": {"name": "Coherent",      "layer": "광통신"},
     "LITE": {"name": "Lumentum",      "layer": "광통신"},
     "SMCI": {"name": "Supermicro",    "layer": "AI서버"},
+    # 2026-09-24 추가 — 병목 이동 추적(bottleneck_rotation.yaml B2)의 "메모리
+    # 용량 계층" 펀더멘털 대표. 2025-02 WDC에서 분사해 10-Q를 낸다(CIK는
+    # 위 원칙대로 런타임 해석).
+    "SNDK": {"name": "Sandisk",       "layer": "메모리 용량(NAND·eSSD)"},
 }
 
 # ASC 606 도입 이후 표준 매출 태그. 단 이 태그가 전체 매출 공시의 약 20%만

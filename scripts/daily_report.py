@@ -374,6 +374,20 @@ def build_report(ticker: str) -> str:
             lines.append("- ✅ 감소 전환 없음 — 변두리 백로그·매출 전부 증가 또는 유지")
         lines.append("- 한미반도체·HD현대일렉트릭(한국)·이비덴(일본)·ASE(대만)는 SEC 미제출이라 자동수집 대상 밖 — wiki/concepts/ai-value-chain-periphery-monitor.md에서 수동 추적")
 
+    # --- 병목 이동 추적 (2026-09-24 신설) — 다음 병목 선제 매수 단계 ---
+    # 이 섹션이 실패해도 리포트 전체가 죽으면 안 된다(워크플로가 6시간
+    # 재시도 루프로 감싸고 있다) — 실패는 판정 불가로 드러내고 넘어간다.
+    lines.append("\n## 병목 이동 추적 (다음 병목 선제 매수 단계 — wiki/concepts/ai-bottleneck-rotation-map.md)")
+    try:
+        import sys as _sys
+        _root = str(Path(__file__).resolve().parent.parent)
+        if _root not in _sys.path:
+            _sys.path.insert(0, _root)
+        from engine.bottleneck import rotation as _br
+        lines.append(_br.render_markdown(_br.evaluate(datetime.now(KST).date()), compact=True))
+    except Exception as e:  # noqa: BLE001
+        lines.append(f"- ⚠️ 판정 불가 — {type(e).__name__}: {e}")
+
     # --- 포트폴리오 (2026-08-05 신설, 데이터 없으면 섹션 생략) ---
     port = read_latest_portfolio_summary()
     if port is not None:
