@@ -20,4 +20,6 @@ jobs:
         env:
           KIS_APP_KEY: ${{ secrets.KIS_APP_KEY }}
           KIS_APP_SECRET: ${{ secrets.KIS_APP_SECRET }}
-        run: python3 scripts/probe_kis_etf_pdf.py | tee -a "$GITHUB_STEP_SUMMARY"
+        run: |
+          set -o pipefail
+          python3 scripts/probe_kis_etf_pdf.py | tee -a "$GITHUB_STEP_SUMMARY"

@@ -66,8 +66,9 @@ def kis_pdf(code: str) -> dict:
 
 def main() -> None:
     print("## 1. 종목 마스터 — ETF 식별·섹터 ETF 목록")
-    kospi = parse_equity_master(_download("kospi_code"), 228)
-    kosdaq = parse_equity_master(_download("kosdaq_code"), 222)
+    # KIS 원본 코드는 줄바꿈 포함 행에서 끝 228/222자를 자른다 — splitlines 뒤엔 227/221
+    kospi = parse_equity_master(_download("kospi_code"), 227)
+    kosdaq = parse_equity_master(_download("kosdaq_code"), 221)
     names = {r["code"]: r["name"] for r in kospi + kosdaq}
     groups: dict[str, int] = {}
     for r in kospi:
