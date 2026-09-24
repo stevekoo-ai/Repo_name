@@ -116,6 +116,28 @@ def test_executed_purchases_reduce_the_proposed_gap():
     assert _b1(st).gap_krw == 6_000_000 - 2_500_000
 
 
+def test_falling_less_than_hynix_is_not_rotation():
+    """2026-09-24 첫 실데이터 오탐 재현 — AI 섹터 전체가 빠지는데 전력이
+    하이닉스보다 '덜 빠졌다'고 매수(2단계 900만원)를 제안했다. min_abs가 있으면
+    후보 바스켓 자체가 플러스여야 순환매로 인정한다."""
+    cfg = _cfg()
+    cfg["candidates"][0]["signals"][2]["min_abs"] = 0
+    prices = {"PW": _series(AS_OF, 200, 200, 150),   # -25%
+              "HX": _series(AS_OF, 200, 200, 100)}   # -50%
+    st = R.evaluate(AS_OF, cfg, prices=prices, fundamentals=_fund("PW", "backlog", ACCEL), log=[])
+    m1 = next(s for s in _b1(st).signals if s.id == "M1")
+    assert m1.ok is False and "동반 하락" in m1.detail
+    assert _b1(st).stage == 0 and _b1(st).gap_krw == 0
+
+
+def test_real_config_guards_every_candidate_relative_strength_with_min_abs():
+    cfg = R.load_config()
+    for c in cfg["candidates"]:
+        for s in c["signals"]:
+            if s["type"] == "rel_return":
+                assert "min_abs" in s, f"{c['id']} {s['id']}: 동반 하락을 순환매로 오판할 수 있다"
+
+
 # ── 지속성·R3 ──────────────────────────────────────────────────
 
 def test_one_week_old_reversal_counts_as_forming_not_confirmed():

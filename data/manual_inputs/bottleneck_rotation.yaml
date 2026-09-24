@@ -17,7 +17,8 @@
 meta:
   anchor_date: "2027-04-01"   # 사용자 표현 "내년 4월" — 정확한 지급일 확인되면 교체
   anchor_label: "하이닉스 자사주(PS) 추가 수령 — 5천만원+"
-  # ⚠ 초안 — 사용자 확정 필요. 4월 추가 수령분(5천만원+)의 약 절반을 상한으로
+  # 잠정값 — 2026-09-24 사용자: "예산과 매수 비율은 진행되면서 정하기로".
+  # 4월 추가 수령분(5천만원+)의 약 절반을 상한으로
   # 잡았다. 헤지는 "하이닉스가 떨어지는 시나리오"의 보험이지 주력 베팅이
   # 아니므로 신규 노출 전액(1:1)까지 가지 않는다.
   hedge_budget_krw: 25000000
@@ -93,13 +94,14 @@ candidates:
         tickers: ["GEV"]
       - id: P-M1
         kind: market
-        desc: "전력 바스켓 3개월 수익률이 SK하이닉스를 앞섬(1주 지속)"
+        desc: "전력 바스켓이 3개월 상승 + SK하이닉스를 앞섬(1주 지속)"
         type: rel_return
         basket: ["GEV", "VRT", "267260.KS"]
         vs: "000660.KS"
         days: 63
         op: ">"
         value: 0
+        min_abs: 0   # 바스켓 자체도 3개월 플러스여야 순환매로 인정(동반 하락 오탐 방지)
       - id: P-M2
         kind: market
         desc: "전력 바스켓 과반이 120일선 위(1주 지속)"
@@ -139,13 +141,14 @@ candidates:
         tickers: ["SNDK"]
       - id: M-M1
         kind: market
-        desc: "NAND 바스켓 3개월 수익률이 반도체 ETF(SMH)를 앞섬(1주 지속)"
+        desc: "NAND 바스켓이 3개월 상승 + 반도체 ETF(SMH)를 앞섬(1주 지속)"
         type: rel_return
         basket: ["SNDK", "285A.T"]
         vs: "SMH"
         days: 63
         op: ">"
         value: 0
+        min_abs: 0   # 바스켓 자체도 3개월 플러스여야 순환매로 인정(동반 하락 오탐 방지)
       - id: M-M2
         kind: market
         desc: "NAND 바스켓 과반이 120일선 위(1주 지속)"
@@ -185,13 +188,14 @@ candidates:
         tickers: ["LITE", "COHR", "CRDO", "ALAB"]
       - id: O-M1
         kind: market
-        desc: "광 바스켓 3개월 수익률이 SK하이닉스를 앞섬(1주 지속)"
+        desc: "광 바스켓이 3개월 상승 + SK하이닉스를 앞섬(1주 지속)"
         type: rel_return
         basket: ["LITE", "COHR", "CRDO", "ALAB"]
         vs: "000660.KS"
         days: 63
         op: ">"
         value: 0
+        min_abs: 0   # 바스켓 자체도 3개월 플러스여야 순환매로 인정(동반 하락 오탐 방지)
       - id: O-M2
         kind: market
         desc: "광 바스켓 과반이 120일선 위(1주 지속)"

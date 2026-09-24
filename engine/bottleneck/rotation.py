@@ -250,7 +250,14 @@ def _market_once(sig: dict, prices: dict, as_of: date, stale: int) -> tuple[bool
         if a is None or b is None:
             return None, "주가 데이터 부족"
         diff = a - b
-        return _OPS[sig["op"]](diff, sig["value"]), f"{a:+.1f}% vs {sig['vs']} {b:+.1f}% (차 {diff:+.1f}%p)"
+        detail = f"{a:+.1f}% vs {sig['vs']} {b:+.1f}% (차 {diff:+.1f}%p)"
+        ok = _OPS[sig["op"]](diff, sig["value"])
+        # 덜 빠진 건 순환매가 아니다 — 2026-09-24 첫 실데이터에서 AI 섹터 전체가
+        # 하락하는 중에 "전력이 하이닉스보다 덜 빠졌다"가 매수 신호로 켜지는
+        # 오탐이 났다. min_abs가 있으면 후보 바스켓 자체 수익률도 그 이상이어야 한다.
+        if ok and "min_abs" in sig and a < sig["min_abs"]:
+            return False, detail + f" · 바스켓 자체가 {a:+.1f}%라 순환매 아님(동반 하락)"
+        return ok, detail
     if sig["type"] == "ma_position":
         return _ma_majority(prices, sig["basket"], as_of, sig["window"], sig["position"], stale)
     raise ValueError(f"알 수 없는 주가 신호 type: {sig['type']}")
@@ -441,7 +448,7 @@ def render_markdown(st: RotationStatus, compact: bool = False) -> str:
         lines.append(f"**가장 앞선 다음 병목 후보: {lead.id} {lead.name} — "
                      f"{lead.stage}단계({lead.stage_name}), 신호 {lead.score}/{len(lead.signals)}**")
     lines.append(f"기준 이벤트: {st.anchor_label} (D-{d_day}, {st.anchor_date}) · "
-                 f"헤지 예산 {st.budget_krw:,}원" + ("" if st.budget_confirmed else " ⚠초안(사용자 확정 필요)"))
+                 f"헤지 예산 {st.budget_krw:,}원" + ("" if st.budget_confirmed else " (잠정 — 예산·배분은 진행하며 결정)"))
 
     # 단계 변화 알림을 맨 위에
     changes = [c for c in st.candidates if c.stage != c.stage_week_ago]
