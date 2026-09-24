@@ -1,5 +1,5 @@
 {
-  "checked_at": "2026-09-24T11:58:24.273172+00:00",
+  "checked_at": "2026-09-24T17:20:51.504364+00:00",
   "statuses": [
     {
       "slug": "macro-series",
@@ -7,8 +7,8 @@
       "workflow": "macro-data-sync.yml",
       "severity": "critical",
       "state": "OK",
-      "detail": "fetched_at=2026-09-23T22:56:09+00:00",
-      "age_hours": 13.037606571666666
+      "detail": "fetched_at=2026-09-24T16:22:25+00:00",
+      "age_hours": 0.97407686
     },
     {
       "slug": "hynix-price-snapshot",
@@ -16,8 +16,8 @@
       "workflow": "sk-hynix-daily-report.yml",
       "severity": "critical",
       "state": "OK",
-      "detail": "fetched_at=2026-09-24T05:38:40+00:00",
-      "age_hours": 6.329010593333334
+      "detail": "fetched_at=2026-09-24T16:47:42+00:00",
+      "age_hours": 0.5527102952777778
     },
     {
       "slug": "hynix-investor-flow",
@@ -25,8 +25,8 @@
       "workflow": "sk-hynix-daily-report.yml",
       "severity": "warning",
       "state": "OK",
-      "detail": "마지막 성공=2026-09-24T05:38:39+00:00",
-      "age_hours": 6.329293691111111
+      "detail": "마지막 성공=2026-09-24T16:47:40+00:00",
+      "age_hours": 0.5532747466666667
     },
     {
       "slug": "hynix-adr-quote",
@@ -34,8 +34,8 @@
       "workflow": "sk-hynix-daily-report.yml",
       "severity": "warning",
       "state": "OK",
-      "detail": "fetched_at=2026-09-24T05:38:40+00:00",
-      "age_hours": 6.329018308333333
+      "detail": "fetched_at=2026-09-24T16:47:41+00:00",
+      "age_hours": 0.5530012677777778
     },
     {
       "slug": "hynix-credit-balance",
@@ -43,8 +43,8 @@
       "workflow": "sk-hynix-daily-report.yml",
       "severity": "warning",
       "state": "OK",
-      "detail": "fetched_at=2026-09-24T05:38:41+00:00",
-      "age_hours": 6.328741384722222
+      "detail": "fetched_at=2026-09-24T16:47:43+00:00",
+      "age_hours": 0.5524472969444445
     },
     {
       "slug": "hynix-short-sale",
@@ -52,8 +52,8 @@
       "workflow": "sk-hynix-daily-report.yml",
       "severity": "warning",
       "state": "OK",
-      "detail": "fetched_at=2026-09-24T05:38:44+00:00",
-      "age_hours": 6.327910493888889
+      "detail": "fetched_at=2026-09-24T16:47:45+00:00",
+      "age_hours": 0.5518961533333333
     },
     {
       "slug": "kr-index-quote",
@@ -61,8 +61,8 @@
       "workflow": "sk-hynix-daily-report.yml",
       "severity": "warning",
       "state": "OK",
-      "detail": "fetched_at=2026-09-24T05:38:42+00:00",
-      "age_hours": 6.328468626944444
+      "detail": "fetched_at=2026-09-24T16:47:44+00:00",
+      "age_hours": 0.5521784791666666
     },
     {
       "slug": "portfolio-etf-nav",
@@ -70,8 +70,8 @@
       "workflow": "sk-hynix-daily-report.yml",
       "severity": "warning",
       "state": "OK",
-      "detail": "fetched_at=2026-09-24T05:38:45+00:00",
-      "age_hours": 6.327637780277778
+      "detail": "fetched_at=2026-09-24T16:47:47+00:00",
+      "age_hours": 0.5513495516666667
     },
     {
       "slug": "portfolio-holdings",
@@ -79,8 +79,8 @@
       "workflow": "portfolio-holdings-sync.yml",
       "severity": "critical",
       "state": "OK",
-      "detail": "fetched_at=2026-09-23T14:54:39+00:00",
-      "age_hours": 21.062641035277778
+      "detail": "fetched_at=2026-09-24T14:55:51+00:00",
+      "age_hours": 2.4169107733333335
     },
     {
       "slug": "portfolio-bonds",
@@ -88,8 +88,8 @@
       "workflow": "portfolio-holdings-sync.yml",
       "severity": "critical",
       "state": "OK",
-      "detail": "fetched_at=2026-09-23T14:54:40+00:00",
-      "age_hours": 21.062366125555556
+      "detail": "fetched_at=2026-09-24T14:55:52+00:00",
+      "age_hours": 2.416637966111111
     },
     {
       "slug": "hyperscaler-capex",
@@ -97,8 +97,8 @@
       "workflow": "sec-edgar-capex.yml",
       "severity": "warning",
       "state": "OK",
-      "detail": "마지막 성공=2026-09-21T23:50:15+00:00",
-      "age_hours": 60.1359797525
+      "detail": "마지막 성공=2026-09-24T16:05:05+00:00",
+      "age_hours": 1.2630313522222223
     },
     {
       "slug": "ai-periphery-fundamentals",
@@ -106,8 +106,17 @@
       "workflow": "sec-edgar-capex.yml",
       "severity": "warning",
       "state": "OK",
-      "detail": "fetched_at=2026-09-21T23:50:18+00:00",
-      "age_hours": 60.13514650333333
+      "detail": "fetched_at=2026-09-24T16:05:11+00:00",
+      "age_hours": 1.2613648444444445
+    },
+    {
+      "slug": "bottleneck-prices",
+      "description": "병목 이동 추적 주가 (Yahoo — 전력·광통신·NAND·하이닉스)",
+      "workflow": "macro-data-sync.yml",
+      "severity": "warning",
+      "state": "OK",
+      "detail": "fetched_at=2026-09-24T16:22:28+00:00",
+      "age_hours": 0.9733120616666666
     },
     {
       "slug": "real-estate-apartment-sale",
@@ -116,7 +125,7 @@
       "severity": "warning",
       "state": "OK",
       "detail": "마지막 성공=2026-09-24T03:31:45+00:00",
-      "age_hours": 8.444313408888888
+      "age_hours": 13.818591394722223
     },
     {
       "slug": "real-estate-apartment-rent",
@@ -125,7 +134,7 @@
       "severity": "warning",
       "state": "OK",
       "detail": "마지막 성공=2026-09-24T03:33:25+00:00",
-      "age_hours": 8.416535811111112
+      "age_hours": 13.790813925
     },
     {
       "slug": "subscription-monitor",

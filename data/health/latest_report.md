@@ -1,6 +1,6 @@
-# 데이터 헬스 — 2026-09-24T11:58:24.273172+00:00
+# 데이터 헬스 — 2026-09-24T17:20:51.504364+00:00
 
-⚠️ 32/49개 소스 이상
+⚠️ 32/50개 소스 이상
 - 🟠 **normalized-series-sweep** [ANOMALY] data/normalized/*.csv 전수 스윕 (237개 시리즈) — ok 204 / 이상 31 / 알려진 설계상 이상(비알림) 2 — 상세는 개별 normalized:* 항목 참고
 - 🟠 **normalized:bls_us_job_openings** [STALE] 정규화 시리즈: bls_us_job_openings (monthly) — STALE — 최신 2026-07-01, 85일 경과
 - 🟠 **normalized:ecos_current_account** [STALE] 정규화 시리즈: ecos_current_account (monthly) — STALE — 최신 2026-07-01, 85일 경과
