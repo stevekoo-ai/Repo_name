@@ -182,6 +182,10 @@ jobs:
           GMAIL_ADDRESS: ${{ secrets.GMAIL_ADDRESS }}
           GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
           NOTIFY_EMAIL_TO: ${{ secrets.NOTIFY_EMAIL_TO }}
+        # 2026-09-24 수정 — 이 워크플로엔 의존성 설치 스텝이 없어 core/notify.py의
+        # `import requests`가 ModuleNotFoundError로 죽었고, 알림 메일이 한 번도 안
+        # 나갔다(run 36024827041에서 실측). 알림 스텝 자체에서 설치한다.
         run: |
+          pip install --quiet requests
           python3 -m scripts.send_report_email \
-            --failure-alert "macro-data-sync 워크플로가 실패했습니다 (6시간 재시도 소진) — 오늘의 거시지표(금리·GDP·환율)는 갱신되지 않았습니다."
+            --failure-alert "macro-data-sync 워크플로가 실패했습니다 — 오늘의 거시지표(금리·GDP·환율)가 갱신되지 않았을 수 있습니다. Actions 로그에서 실패 스텝을 확인하세요."
