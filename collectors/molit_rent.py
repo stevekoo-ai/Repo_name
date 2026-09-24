@@ -114,23 +114,49 @@ def _split_prices(rows: list[dict[str, Any]]) -> dict[str, list[float]]:
     }
 
 
-def fetch_and_store() -> dict[str, Any]:
+def fetch_and_store(months: int | None = None,
+                     region_codes: list[str] | None = None) -> dict[str, Any]:
     """Fetch every configured region for the needed trailing months, persist per-district
     (전세만), per-tier, and highlight normalized series for both 전세/월세, and return a
-    coverage summary."""
+    coverage summary.
+
+    ## `months`/`region_codes` — 일회성 장기 백필용 (2026-09-24 신설)
+
+    기본 호출(둘 다 None, 매일 자동 수집)은 지금까지의 동작 그대로다:
+    티어 series가 이미 2개월 이상 쌓여 있으면 최근 1개월만, 아니면
+    `_HISTORY_MONTHS_BACKFILL`(4개월)만 받는다 — **새로 추가된 개별
+    지역**(예: RESIDENCE_REGION)은 티어 자체는 이미 두꺼우므로 항상
+    1개월만 받는다. "왜 새 지역은 한 달치만 오냐"는 지적이 정확히 이
+    로직 때문이었다.
+
+    `months`를 명시하면(예: 120=10년) 그 개월수를 강제한다. `region_codes`를
+    주면 그 지역만 조회한다 — **이때 티어 집계(seoul/capital_area/
+    nationwide)는 쓰지 않는다.** 티어는 그 안의 55개 지역 **전부**를 풀링한
+    중앙값이라, 2개 지역만 조회해서 티어를 갱신하면 그 달의 티어값이
+    "전체 대비 2개 지역만 반영된" 값으로 조용히 오염된다 — 서울 개별 구·
+    highlight·residence처럼 **지역 하나가 series 하나**인 경우만 이 방식이
+    안전하다.
+    """
     api_key = get_api_key(SOURCE)
     if not api_key:
         note = "DATA_GO_KR_KEY not set — register a free key at data.go.kr (아파트 전월세 실거래가 자료)"
         log_event("collector.molit_rent_skipped", level="warning", note=note)
         return {"status": "pending", "note": note, "regions_total": len(all_regions())}
 
-    regions = all_regions()
-    thinnest_history = min(
-        (len(base.read_normalized(f"{SERIES_PREFIX}_jeonse_{tier}_price_pyeong")) for tier in REGION_TIERS),
-        default=0,
-    )
-    months_needed = _HISTORY_MONTHS_BACKFILL if thinnest_history < 2 else 1
-    target_months = _trailing_deal_months(months_needed)
+    scoped = region_codes is not None
+    regions = [r for r in all_regions() if r["code"] in set(region_codes)] if scoped else all_regions()
+    if scoped and not regions:
+        return {"status": "error", "note": f"region_codes에 해당하는 지역 없음: {region_codes}"}
+
+    if months is not None:
+        target_months = _trailing_deal_months(months)
+    else:
+        thinnest_history = min(
+            (len(base.read_normalized(f"{SERIES_PREFIX}_jeonse_{tier}_price_pyeong")) for tier in REGION_TIERS),
+            default=0,
+        )
+        months_needed = _HISTORY_MONTHS_BACKFILL if thinnest_history < 2 else 1
+        target_months = _trailing_deal_months(months_needed)
 
     # 2026-09-07: 예전엔 all_regions[0](종로구) 한 곳만 찔러보고 실패하면 55개
     # 지역을 통째로 포기했다. 한 지역의 일시적 connect timeout이 그날 수집
@@ -226,7 +252,10 @@ def fetch_and_store() -> dict[str, Any]:
                                     [{"date": month_date, "value": float(len(split["wolse_deposit_pyeong"]))}])
 
     # Tier aggregates — pooled (not median-of-medians) across every region in the tier.
-    for tier, tier_regions in REGION_TIERS.items():
+    # scoped(region_codes 지정) 호출에서는 건너뛴다 — 55개 지역 중 일부만
+    # 조회해놓고 티어값을 쓰면 그 달의 티어가 "전체 대비 일부만 반영된"
+    # 값으로 조용히 오염된다(위 함수 docstring 참조).
+    for tier, tier_regions in ({} if scoped else REGION_TIERS).items():
         codes = {r["code"] for r in tier_regions}
         for deal_ymd in target_months:
             region_splits = month_region_splits.get(deal_ymd, {})
