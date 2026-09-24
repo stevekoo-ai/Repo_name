@@ -41,7 +41,8 @@ from core.logger import log_event
 from . import base
 from .kr_regions import (
     CAPITAL_AREA_EXTRA, HIGHLIGHT_REGION, NATIONWIDE_EXTRA, REGION_TIERS,
-    SEOUL_DISTRICTS, TIER_LABELS, all_regions as _all_regions, probe_regions,
+    RESIDENCE_REGION, SEOUL_DISTRICTS, TIER_LABELS, all_regions as _all_regions,
+    probe_regions,
 )
 
 _HISTORY_MONTHS_BACKFILL = 4  # first-run backfill depth once normalized history exists it's just 1

@@ -27,6 +27,18 @@ def test_highlight_region_is_yongin_giheung():
     assert molit.HIGHLIGHT_REGION["code"] == "41463"
 
 
+def test_residence_region_is_yongin_suji_and_distinct_from_highlight():
+    """2026-09-24 사용자 요청 — 현재 거주지(수지구)는 청약 타겟(기흥구)과
+    다른 구다. 하나로 합치면 '관심 지역'과 '지금 사는 곳' 신호가 섞인다."""
+    assert molit.RESIDENCE_REGION["name"] == "용인 수지구"
+    assert molit.RESIDENCE_REGION["code"] == "41465"
+    assert molit.RESIDENCE_REGION["code"] != molit.HIGHLIGHT_REGION["code"]
+    # 둘 다 실제 조회 대상(capital_area 이상 티어)에 포함돼야 수집된다
+    capital_codes = {r["code"] for r in molit.REGION_TIERS["capital_area"]}
+    assert molit.RESIDENCE_REGION["code"] in capital_codes
+    assert molit.HIGHLIGHT_REGION["code"] in capital_codes
+
+
 def test_price_per_pyeong_parses_comma_formatted_amount():
     row = {"dealAmount": "85,000", "excluUseAr": "84.96"}
     price = molit._price_per_pyeong(row)

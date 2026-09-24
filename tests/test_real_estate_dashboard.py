@@ -60,6 +60,23 @@ def test_render_with_accumulated_data_shows_all_six_groups(monkeypatch):
     # 청약 타겟 인근(kr_regions.HIGHLIGHT_REGION) 라벨이 매 그룹의 차트 카드마다 붙는다
     # (+ 상단 설명 문단에서 1회 더 언급).
     assert html_doc.count("청약 타겟 인근") == 7
+    # 현재 거주지(kr_regions.RESIDENCE_REGION, 수지구) — 2026-09-24 신설.
+    # 데이터가 없어도(이 테스트엔 residence series를 안 줬다) 카드 자체는
+    # 매 그룹마다 "데이터 없음"으로 떠야 한다(7.9 — 값을 지어내지 않음).
+    assert html_doc.count("현재 거주지") == 7
+
+
+def test_residence_region_card_shows_real_data_when_present(monkeypatch):
+    """수지구 series가 실제로 있으면 '데이터 없음'이 아니라 값이 떠야 한다."""
+    rows = {
+        "molit_rent_jeonse_residence_price_pyeong": [("2026-09-01", 500_000_000.0)],
+    }
+    monkeypatch.setattr(red.collector_base, "read_normalized", _fake_normalized(rows))
+
+    html_doc = render_real_estate_dashboard()
+
+    data = _extract_data_json(html_doc)
+    assert data["series"]["molit_rent_jeonse_price_residence"]["values"] == [50_000.0]
 
 
 def _extract_data_json(html_doc: str) -> dict:

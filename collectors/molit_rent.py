@@ -22,7 +22,8 @@ import requests
 from core.config import api_config, get_api_key
 from core.logger import log_event
 from . import base
-from .kr_regions import HIGHLIGHT_REGION, REGION_TIERS, SEOUL_DISTRICTS, all_regions, probe_regions
+from .kr_regions import (HIGHLIGHT_REGION, REGION_TIERS, RESIDENCE_REGION,
+                         SEOUL_DISTRICTS, all_regions, probe_regions)
 from .molit import _trailing_deal_months
 
 _HISTORY_MONTHS_BACKFILL = 4
@@ -198,6 +199,30 @@ def fetch_and_store() -> dict[str, Any]:
             base.append_normalized(f"{SERIES_PREFIX}_wolse_highlight_rent_pyeong",
                                     [{"date": month_date, "value": median(split["wolse_rent_pyeong"])}])
             base.append_normalized(f"{SERIES_PREFIX}_wolse_highlight_volume",
+                                    [{"date": month_date, "value": float(len(split["wolse_deposit_pyeong"]))}])
+
+    # Residence region series (용인 수지구) — 사용자의 **현재 거주지**다. 전세
+    # 만료(2027-02-22)가 갱신청구권 소진으로 재연장 불가라, 이 지역의 전월세
+    # 변화는 청약 타겟(HIGHLIGHT_REGION, 기흥구)과는 별개로 그 자체가 "다음
+    # 거처를 못 구하면 얼마가 드는가"에 직결되는 1차 데이터다(2026-09-24
+    # 사용자 요청 — 별도로 기록해 판단에 반영). 같은 이유로 highlight와
+    # 이름을 공유하면 두 지역이 섞여 어느 쪽 신호인지 알 수 없게 된다.
+    for deal_ymd, region_splits in month_region_splits.items():
+        split = region_splits.get(RESIDENCE_REGION["code"])
+        if not split:
+            continue
+        month_date = f"{deal_ymd[0:4]}-{deal_ymd[4:6]}-01"
+        if split["jeonse_deposit_pyeong"]:
+            base.append_normalized(f"{SERIES_PREFIX}_jeonse_residence_price_pyeong",
+                                    [{"date": month_date, "value": median(split["jeonse_deposit_pyeong"])}])
+            base.append_normalized(f"{SERIES_PREFIX}_jeonse_residence_volume",
+                                    [{"date": month_date, "value": float(len(split["jeonse_deposit_pyeong"]))}])
+        if split["wolse_deposit_pyeong"]:
+            base.append_normalized(f"{SERIES_PREFIX}_wolse_residence_deposit_pyeong",
+                                    [{"date": month_date, "value": median(split["wolse_deposit_pyeong"])}])
+            base.append_normalized(f"{SERIES_PREFIX}_wolse_residence_rent_pyeong",
+                                    [{"date": month_date, "value": median(split["wolse_rent_pyeong"])}])
+            base.append_normalized(f"{SERIES_PREFIX}_wolse_residence_volume",
                                     [{"date": month_date, "value": float(len(split["wolse_deposit_pyeong"]))}])
 
     # Tier aggregates — pooled (not median-of-medians) across every region in the tier.

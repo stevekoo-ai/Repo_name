@@ -93,3 +93,25 @@ def test_compute_rent_trend_pending_when_no_key(monkeypatch):
     result = rent_trend.compute_rent_trend()
     assert result["fetch_status"] == "pending"
     assert result["fetch_note"] is not None
+
+
+# ── 거주지(수지구) 전월세 series — 2026-09-24 신설 ──────────────────
+#
+# 사용자: "용인시 수지구의 전월세 변화는 내게 아주 중요한 데이터이니
+# 따로 잘 기록해놓고 판단에 반영하도록 하자." 청약 타겟(기흥구, highlight)과
+# 이름이 섞이면 어느 지역 신호인지 알 수 없게 되므로, series 이름 자체가
+# 분리돼 있는지 소스 검사로 고정한다(fetch_and_store는 실제 API 키가
+# 있어야 끝까지 돌아가므로 여기서는 로직이 있는지만 고정).
+
+def test_fetch_and_store_writes_dedicated_residence_series_not_reusing_highlight():
+    import inspect
+    src = inspect.getsource(molit_rent.fetch_and_store)
+    assert "RESIDENCE_REGION" in src
+    for suffix in ("jeonse_residence_price_pyeong", "jeonse_residence_volume",
+                   "wolse_residence_deposit_pyeong", "wolse_residence_rent_pyeong",
+                   "wolse_residence_volume"):
+        assert suffix in src, f"거주지 전용 series '{suffix}'가 없다"
+    # highlight(기흥구) 기존 series 이름은 그대로 남아 있어야 한다 — 이미
+    # 5개월치가 쌓여 있어 이름이 바뀌면 그 이력이 끊긴다.
+    for suffix in ("jeonse_highlight_price_pyeong", "wolse_highlight_deposit_pyeong"):
+        assert suffix in src, f"기존 하이라이트 series '{suffix}'가 사라지면 안 된다"

@@ -1,7 +1,7 @@
 ---
 title: API 데이터 카탈로그 — 무엇을 어느 API로 가져오는가
 created: 2026-09-07
-updated: 2026-09-10
+updated: 2026-09-24
 tags: [api, data-source, lookup-table, automation, reference]
 ---
 
@@ -185,10 +185,10 @@ StatisticItemList) — ecos-lookup.yml 워크플로로 실행.
 
 | 상품 | 모듈 | 수집 지역 |
 |---|---|---|
-| 아파트 매매 | `collectors/molit.py` | 55개 시군구 |
-| 아파트 전월세 | `collectors/molit_rent.py` | 55개 |
-| 연립다세대 매매 | `collectors/molit_villa.py` | 55개 |
-| 오피스텔 매매 | `collectors/molit_officetel.py` | 55개 |
+| 아파트 매매 | `collectors/molit.py` | 56개 시군구 |
+| 아파트 전월세 | `collectors/molit_rent.py` | 56개 |
+| 연립다세대 매매 | `collectors/molit_villa.py` | 56개 |
+| 오피스텔 매매 | `collectors/molit_officetel.py` | 56개 |
 
 **응답 형식 주의**: `type=json`을 요청해도 **XML로 온다**. 2026-09-07
 이전 코드는 `resp.json()`만 부르다 깨졌고, 그 실패를 인증 오류로 오진해

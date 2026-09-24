@@ -35,6 +35,9 @@ CAPITAL_AREA_EXTRA: list[dict[str, str]] = [
     {"name": "남양주시", "code": "41360"}, {"name": "시흥시", "code": "41390"},
     {"name": "하남시", "code": "41450"},
     {"name": "용인 기흥구", "code": "41463", "highlight": "용인 플랫폼시티 인근 — 청약 타겟 지역"},
+    {"name": "용인 수지구", "code": "41465",
+     "residence": "현재 거주지(진산마을푸르지오, 전세) — 만료 2027-02-22, "
+                   "갱신청구권 이미 소진해 재연장 불가. 2026-09-24 사용자 요청으로 지정."},
     {"name": "화성시", "code": "41590"}, {"name": "김포시", "code": "41570"},
 ]
 
@@ -59,6 +62,10 @@ REGION_TIERS: dict[str, list[dict[str, str]]] = {
 TIER_LABELS = {"seoul": "서울", "capital_area": "수도권", "nationwide": "전국(대표표본)"}
 
 HIGHLIGHT_REGION = next(r for r in CAPITAL_AREA_EXTRA if r.get("highlight"))
+
+# 청약 타겟(HIGHLIGHT_REGION, 기흥구)과 현재 거주지는 다른 구다 — 하나로
+# 합치면 "관심 지역"과 "지금 사는 곳"이 구분 안 된다(2026-09-24 신설).
+RESIDENCE_REGION = next(r for r in CAPITAL_AREA_EXTRA if r.get("residence"))
 
 
 def all_regions() -> list[dict[str, str]]:

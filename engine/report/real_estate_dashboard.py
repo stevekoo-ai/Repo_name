@@ -30,6 +30,7 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 
 _TIERS = [("seoul", "서울"), ("capital_area", "수도권"), ("nationwide", "전국(대표표본)")]
 _HIGHLIGHT_NAME = kr_regions.HIGHLIGHT_REGION["name"]  # 용인 기흥구 — 청약 타겟(플랫폼시티) 인근
+_RESIDENCE_NAME = kr_regions.RESIDENCE_REGION["name"]  # 용인 수지구 — 현재 거주지(전세, 2026-09-24 신설)
 
 # (그룹 제목, 정규화 series 접두어, 값 필드 suffix, 단위 라벨)
 # 접두어+"_"+tier+"_"+suffix+"_pyeong" / 접두어+"_highlight_"+suffix+"_pyeong" 규칙은
@@ -164,6 +165,15 @@ def render_real_estate_dashboard() -> str:
         hl_note = f"{unit} · {hl_entry['dates'][0]}부터 누적" if hl_entry["dates"] else "데이터 없음"
         blocks.append(_chart_block(hl_chart_id, f"청약 타겟 인근 — {_HIGHLIGHT_NAME}", hl_note))
 
+        # 거주지(수지구) — 2026-09-24 신설. 지금은 molit_rent_jeonse/wolse
+        # 두 접두어만 실제 series가 있다(매매·빌라·오피스텔은 미구현) —
+        # 없는 조합은 _read_series가 빈 값을 주고 "데이터 없음"으로 뜬다.
+        res_chart_id = f"{prefix}_{suffix}_residence"
+        res_entry = _read_series(f"{prefix}_residence_{suffix}_pyeong")
+        series[res_chart_id] = res_entry
+        res_note = f"{unit} · {res_entry['dates'][0]}부터 누적" if res_entry["dates"] else "데이터 없음"
+        blocks.append(_chart_block(res_chart_id, f"현재 거주지 — {_RESIDENCE_NAME}", res_note))
+
         group_sections.append(f"""
   <section class="card">
     <h2>{_esc(group['title'])} <span class="tile-sub">({_esc(unit)})</span></h2>
@@ -171,7 +181,8 @@ def render_real_estate_dashboard() -> str:
   </section>""")
 
     chart_ids = [f"{g['prefix']}_{g['suffix']}_{tier}" for g in _METRIC_GROUPS for tier, _ in _TIERS] + \
-        [f"{g['prefix']}_{g['suffix']}_highlight" for g in _METRIC_GROUPS]
+        [f"{g['prefix']}_{g['suffix']}_highlight" for g in _METRIC_GROUPS] + \
+        [f"{g['prefix']}_{g['suffix']}_residence" for g in _METRIC_GROUPS]
 
     period_buttons = "".join(
         f'<button type="button" class="{"active" if days is None else ""}" '
@@ -225,8 +236,8 @@ def render_real_estate_dashboard() -> str:
     포인트가 찍히지는 않습니다 — 매일 재수집을 시도해 그 달 신고분이 갱신되면 그 달 포인트 값이
     바뀌고, 새 달이 되면 포인트가 하나 늘어납니다. 이 페이지는 <b>매일 갱신</b>되어 쌓인 데이터를
     그때그때 보여줍니다(포인트 밀도를 지어내지 않습니다). 아파트/연립다세대(빌라)/오피스텔
-    매매와 아파트 전세·월세를 서울/수도권/전국(대표표본) + 청약 타겟 인근({_esc(_HIGHLIGHT_NAME)})
-    기준으로 나눠 보여줍니다.</p>
+    매매와 아파트 전세·월세를 서울/수도권/전국(대표표본) + 청약 타겟 인근({_esc(_HIGHLIGHT_NAME)}) +
+    현재 거주지({_esc(_RESIDENCE_NAME)}) 기준으로 나눠 보여줍니다.</p>
     <div class="period-toggle">{period_buttons}</div>
   </section>
 {empty_notice}

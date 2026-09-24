@@ -16,6 +16,11 @@ This page defines the decision framework for real estate market entry timing, sp
 
 The framework bridges macro economic cycles, interest rate environment, 전세가 market trends, and personal constraints to generate WAIT/ENTER signals with event-based triggers.
 
+**🆕 2026-09-24**: 전세가 트렌드는 이제 두 개별 지역 실측으로 구체화됐다 —
+[경기도 전월세 트렌드](gyeonggi-rent-trend.md)(기흥구=청약 타겟, 방법론+실측)와
+[monitoring/yongin-suji-rent-status.md](../monitoring/yongin-suji-rent-status.md)
+(수지구=**현재 거주지**, 전세 만료 2027-02-22 재연장 불가 — 판단에 직결).
+
 **Why this matters (philosophical grounding, 2026-09-03 추가)**: 이 프레임은
 "언제 진입하는가"에 답하지만, "왜 SK하이닉스를 실물자산으로 전환하는가"의
 답은 [주식시장의 본질 §13 — 최종 목표: 실물 자산으로의 전환](stock-market-essence.md#13-최종-목표--실물-자산으로의-전환-2026-09-03-ingest)에
