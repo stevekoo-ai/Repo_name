@@ -39,6 +39,32 @@ def find_markdown(day: date, slot: str) -> Path | None:
     return p if p.exists() else None
 
 
+def _appendix(md: str, day: date) -> str:
+    """코드가 판정한 체크포인트를 메일 끝에 원문 그대로 붙인다(토큰 0).
+
+    2026-09-25 사용자: "어떤 보고서 경로로 내가 이 내용을 확인하게 되지?" —
+    팩 블록은 브리핑 작성자가 본문에 옮겨야만 보였고, 신호가 꺼진 날은 생략될
+    수 있었다. 부록은 작성자와 무관하게 항상 실린다. 상황 보고(notice)는 이미
+    블록을 담고 있으므로 ⑩만 없을 때 붙인다."""
+    from engine.briefing import context as X
+
+    parts = []
+    is_notice = "\nnotice: true" in md[:400]
+    builders = [] if is_notice else [X.build_bottleneck_block]
+    builders.append(X.build_midterm_block)
+    for b in builders:
+        try:
+            blk = b(day)
+            if is_notice and blk.title in md:
+                continue
+            parts.append(f"### {blk.title}\n\n{blk.body.strip()}\n")
+        except Exception as exc:  # noqa: BLE001 — 부록 실패로 발송이 막히면 안 된다
+            parts.append(f"### 부록 생성 실패\n\n({type(exc).__name__}: {exc})\n")
+    if not parts:
+        return ""
+    return "\n\n---\n\n## 부록 — 자동 체크포인트 (코드 판정 원문)\n\n" + "\n".join(parts)
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__,
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
@@ -56,7 +82,8 @@ def main() -> int:
               file=sys.stderr)
         return 1
 
-    html = render_briefing_html(md_path.read_text(encoding="utf-8"))
+    md = md_path.read_text(encoding="utf-8")
+    html = render_briefing_html(md + _appendix(md, day))
     html_path = md_path.with_suffix(".html")
     html_path.write_text(html, encoding="utf-8")
     print(f"HTML: {html_path} ({len(html.encode()):,} bytes)")
