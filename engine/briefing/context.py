@@ -924,6 +924,16 @@ def build_bottleneck_block(as_of: date) -> Block:
     return Block("bottleneck", title, body)
 
 
+def build_midterm_block(as_of: date) -> Block:
+    """⑩ 중간선거 레버 체크포인트 — FRED로 잡히는 L1(지갑)·L3(청구서) 자동 판정."""
+    from engine.briefing import midterm_levers as ML
+
+    title = "⑩ 중간선거 레버 체크포인트 (L1 지갑·L3 청구서)"
+    if as_of > ML.ACTIVE_UNTIL:
+        return Block("midterm", title, "선거·CR 만료(12/11) 이후 — 점검 종료")
+    return Block("midterm", title, ML.render_markdown(ML.evaluate(as_of, _series_map()), as_of))
+
+
 def build_pack(slot: str, as_of: date | None = None) -> tuple[BriefingPack, Gate]:
     now = datetime.now(KST)
     as_of = as_of or now.date()
@@ -938,6 +948,7 @@ def build_pack(slot: str, as_of: date | None = None) -> tuple[BriefingPack, Gate
             build_ledger_block(as_of),
             build_execution_block(as_of),
             build_bottleneck_block(as_of),
+            build_midterm_block(as_of),
             build_weekend_news_block(as_of),
             build_weekly_outlook_block(as_of),
         ])
@@ -956,5 +967,6 @@ def build_pack(slot: str, as_of: date | None = None) -> tuple[BriefingPack, Gate
         build_calendar_block(as_of, slot),
         build_execution_block(as_of),
         build_bottleneck_block(as_of),
+        build_midterm_block(as_of),
     ])
     return pack, gate

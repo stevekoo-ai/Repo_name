@@ -136,6 +136,14 @@ PRESETS = {
     # 돌려줬고(HTTP 200이라 순진하게 파싱하면 조용히 깨진다), yahoo
     # DX-Y.NYB만 정상 응답했다. DX=F는 404.
     "us_dollar_index_dxy": ("yahoo", "DX-Y.NYB", "ICE 달러지수 DXY(일별, 참고용·다른 바스켓)", "검증됨(2026-09-18 Actions 프로브)"),
+    # 2026-09-25 — 중간선거 "대통령 레버" 전달경로(L1)·청구서(L3) 체크포인트
+    # (wiki/concepts/trump-midterm-tracker.md). 판정은 engine/briefing/midterm_levers.py.
+    "us_gasoline": ("fred", "GASREGW", "미국 휘발유 전국 평균(정규, 주간, $/gal)", "⚠ 미검증 — 첫 Actions 실행으로 확인"),
+    "us_mortgage_30y": ("fred", "MORTGAGE30US", "미국 30년 고정 모기지 금리(프레디맥, 주간)", "⚠ 미검증 — 첫 Actions 실행으로 확인"),
+    "us_mich_infl_1y": ("fred", "MICH", "미시간대 1년 기대인플레이션(월간)", "⚠ 미검증 — 첫 Actions 실행으로 확인"),
+    "us_5y5y_infl": ("fred", "T5YIFR", "5년 뒤 5년 기대인플레이션(일별)", "⚠ 미검증 — 첫 Actions 실행으로 확인"),
+    "us_tga": ("fred", "WTREGEN", "재무부 일반계정(TGA) 잔고(주간, 십억달러)", "⚠ 미검증 — 첫 Actions 실행으로 확인"),
+    "us_30y": ("fred", "DGS30", "미국 30년물 국채금리(일별)", "⚠ 미검증 — 첫 Actions 실행으로 확인"),
 }
 
 DEFAULT_LOOKBACK_DAYS = 3652  # 최초 백필 시 과거 10년치

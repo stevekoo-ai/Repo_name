@@ -1,7 +1,7 @@
 ---
 title: API 데이터 카탈로그 — 무엇을 어느 API로 가져오는가
 created: 2026-09-07
-updated: 2026-09-24
+updated: 2026-09-25
 tags: [api, data-source, lookup-table, automation, reference]
 ---
 
@@ -61,8 +61,10 @@ BLS 키는 주입되는데 쓰는 코드가 없었으며, KOSIS 실패 원인이
 | `us_10y_treasury` | `DGS10` | collectors/fred.py → `data/normalized/` |
 | `us_2y` | `DGS2` | macro_data.py PRESETS → `sources/macro-series.csv` |
 | `us_2y_treasury` | `DGS2` | collectors/fred.py → `data/normalized/` |
+| `us_30y` | `DGS30` | macro_data.py PRESETS → `sources/macro-series.csv` |
 | `us_3m` | `DGS3MO` | macro_data.py PRESETS → `sources/macro-series.csv` |
 | `us_3m_treasury` | `DGS3MO` | collectors/fred.py → `data/normalized/` |
+| `us_5y5y_infl` | `T5YIFR` | macro_data.py PRESETS → `sources/macro-series.csv` |
 | `us_brent` | `DCOILBRENTEU` | macro_data.py PRESETS → `sources/macro-series.csv` |
 | `us_core_cpi` | `CPILFESL` | collectors/fred.py → `data/normalized/` |
 | `us_cpi` | `CPIAUCSL` | collectors/fred.py → `data/normalized/` |
@@ -70,6 +72,7 @@ BLS 키는 주입되는데 쓰는 코드가 없었으며, KOSIS 실패 원인이
 | `us_dollar_index_major` | `DTWEXM` | macro_data.py PRESETS → `sources/macro-series.csv` |
 | `us_fed_funds` | `FEDFUNDS` | macro_data.py PRESETS → `sources/macro-series.csv` |
 | `us_fed_funds_rate` | `FEDFUNDS` | collectors/fred.py → `data/normalized/` |
+| `us_gasoline` | `GASREGW` | macro_data.py PRESETS → `sources/macro-series.csv` |
 | `us_gdp_nominal` | `GDP` | macro_data.py PRESETS → `sources/macro-series.csv` |
 | `us_gdp_qoq` | `A191RL1Q225SBEA` | collectors/fred.py → `data/normalized/` |
 | `us_gdp_real` | `GDPC1` | macro_data.py PRESETS → `sources/macro-series.csv` |
@@ -77,6 +80,8 @@ BLS 키는 주입되는데 쓰는 코드가 없었으며, KOSIS 실패 원인이
 | `us_hy_tr` | `BAMLHYH0A0HYM2TRIV` | macro_data.py PRESETS → `sources/macro-series.csv` |
 | `us_ig_tr` | `BAMLCC0A0CMTRIV` | macro_data.py PRESETS → `sources/macro-series.csv` |
 | `us_industrial_production` | `INDPRO` | collectors/fred.py → `data/normalized/` |
+| `us_mich_infl_1y` | `MICH` | macro_data.py PRESETS → `sources/macro-series.csv` |
+| `us_mortgage_30y` | `MORTGAGE30US` | macro_data.py PRESETS → `sources/macro-series.csv` |
 | `us_nasdaq` | `NASDAQCOM` | macro_data.py PRESETS → `sources/macro-series.csv` |
 | `us_nonfarm_payroll` | `PAYEMS` | collectors/fred.py → `data/normalized/` |
 | `us_oecd_cli` | `USALOLITOAASTSAM` | collectors/fred.py → `data/normalized/` |
@@ -84,6 +89,7 @@ BLS 키는 주입되는데 쓰는 코드가 없었으며, KOSIS 실패 원인이
 | `us_retail_sales` | `RSAFS` | collectors/fred.py → `data/normalized/` |
 | `us_sp500` | `SP500` | macro_data.py PRESETS → `sources/macro-series.csv` |
 | `us_sp500_oecd` | `SPASTT01USM661N` | macro_data.py PRESETS → `sources/macro-series.csv` |
+| `us_tga` | `WTREGEN` | macro_data.py PRESETS → `sources/macro-series.csv` |
 | `us_trade_balance` | `BOPGSTB` | collectors/fred.py → `data/normalized/` |
 | `us_treasury_3m` | `DGS3MO` | collectors/fred.py → `data/normalized/` |
 | `us_unemployment` | `UNRATE` | collectors/fred.py → `data/normalized/` |
