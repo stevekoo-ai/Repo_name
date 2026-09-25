@@ -87,8 +87,21 @@ def evaluate(as_of: date, series_map: dict) -> list[LeverCheck]:
 _ICON = {True: "🔔", False: "·", None: "❓"}
 
 
-def render_markdown(checks: list[LeverCheck], as_of: date) -> str:
+def render_markdown(checks: list[LeverCheck], as_of: date, compact: bool = False) -> str:
     d = (date(2026, 11, 3) - as_of).days
+    if compact:
+        on = [c for c in checks if c.ok]
+        unk = [c for c in checks if c.ok is None]
+        head = f"선거 D-{d}. 점등 {len(on)}/{len(checks)}"
+        body = [f"- 🔔 {c.label}: {c.detail} — {c.meaning}" for c in on]
+        key = {c.id: c for c in checks}
+        near = [key[i] for i in ("L1-gas", "L3-30y") if i in key and key[i].ok is False]
+        body += [f"- 주시: {c.label} {c.detail.split(',')[0]}" for c in near]
+        if unk:
+            body.append("- 판정 불가: " + ", ".join(c.label for c in unk))
+        body.append("- (전체 수치는 메일 부록에 코드가 싣는다)")
+        tail = ["> ⚠️ 점등 신호를 오늘의 판단/결론에 반영할 것"] if on else []
+        return "\n".join([head] + body + tail)
     lines = [f"선거까지 D-{d} (11/3). 🔔 = 신호 켜짐, · = 아직, ❓ = 판정 불가. "
              "레버 전체 판단은 wiki/concepts/trump-midterm-tracker.md 참고."]
     for c in checks:

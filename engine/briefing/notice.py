@@ -43,14 +43,30 @@ def kr_holiday_name(d: date) -> str | None:
     return "휴장일"
 
 
+def edition(slot: str, as_of: date) -> str:
+    """오늘의 판형. regular / holiday_am(휴장일 아침 휴장판) / eve_pm(연휴 마지막 날 저녁
+    재개장 전야판) / holiday_pm(그 외 휴장일 저녁 — 코드 상황 보고).
+
+    2026-09-25 사용자: 휴장일일수록 신선한 뉴스가 필요하다(한국은 닫혀도 미국은 거래해
+    갭이 쌓인다). 단 토큰은 아침 1회와 재개장 전야 1회에만 쓴다."""
+    from engine.briefing import calendar as C
+
+    if slot not in ("AM", "PM") or kr_holiday_name(as_of) is None:
+        return "regular"
+    if slot == "AM":
+        return "holiday_am"
+    return "eve_pm" if C.is_trading_day("KR", as_of + timedelta(days=1)) else "holiday_pm"
+
+
 def skip_reason(slot: str, as_of: date, gate) -> str | None:
-    """정규 브리핑을 쓰지 않을 이유. 없으면 None(= 정규 발행)."""
-    if slot in ("AM", "PM"):
+    """정규 브리핑을 쓰지 않을 이유. 없으면 None(= 발행: 정규판·휴장판·전야판)."""
+    ed = edition(slot, as_of)
+    if ed in ("holiday_am", "eve_pm"):
+        return None
+    if ed == "holiday_pm":
         hol = kr_holiday_name(as_of)
-        if hol:
-            what = "오늘 한국장 전망" if slot == "AM" else "오늘 한국장 정리"
-            return (f"오늘({as_of.isoformat()})은 한국 증시 휴장({hol})이라 "
-                    f"정규 브리핑의 '{what}'은 의미가 없습니다.")
+        return (f"오늘({as_of.isoformat()})은 한국 증시 휴장({hol})이고 내일도 휴장이라 "
+                "저녁엔 새로 쓸 뉴스가 적습니다 — 휴장판은 아침에, 재개장 전야판은 연휴 마지막 날 저녁에 냅니다.")
     if gate is not None and not gate.publish:
         return ("오늘은 발행 기준에 해당하는 움직임이 없었습니다 — 나스닥·원/달러 1일 ±1% 이상, "
                 "검증일이 도래한 예측, 자금계획 CDP·매도 기한, 데이터 헬스 critical 중 "

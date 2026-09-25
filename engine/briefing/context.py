@@ -449,9 +449,11 @@ def build_digest_block(as_of: date, triggers: set[str], why: list[str]) -> Block
                 age = f" ⚠️{days}일 전 판단"
         except (ValueError, TypeError):
             age = " ⚠️날짜 불명"
-        lines.append(f"### {d.get('status_label', d['slug'])}{age}\n"
-                     f"{str(d['one_line_summary']).strip()}\n"
-                     f"→ `{d.get('monitoring_page', '')}`\n")
+        # 2026-09-25 팩 다이어트 — 한 축당 요약 180자. 전문은 위키에 있고,
+        # 나침반(compass)이 추적 질문의 맥락을 이미 압축해 싣는다.
+        summ = " ".join(str(d['one_line_summary']).split())
+        summ = summ if len(summ) <= 180 else summ[:180] + "…"
+        lines.append(f"- **{d.get('status_label', d['slug'])}**{age} — {summ}")
     return Block("digests", f"③ 위키 추적 신호 (선별 {len(chosen)}건)", "\n".join(lines))
 
 
@@ -902,7 +904,7 @@ def build_execution_block(as_of: date) -> Block:
     return Block("execution", "⑧ 자금 조달 실행 계획", "\n".join(lines))
 
 
-def build_bottleneck_block(as_of: date) -> Block:
+def build_bottleneck_block(as_of: date, compact: bool = False) -> Block:
     """⑨ 병목 이동 추적 — 다음 병목 섹터 선제 매수 단계 판정.
 
     사용자 요청(2026-09-24): "다음 병목이 확정되기 전에 해당 섹터의
@@ -916,7 +918,7 @@ def build_bottleneck_block(as_of: date) -> Block:
         st = BR.evaluate(as_of)
     except FileNotFoundError:
         return Block("bottleneck", title, "설정 파일 없음 — 점검 생략")
-    body = BR.render_markdown(st)
+    body = BR.render_markdown(st, compact=compact)
     if any(c.stage != c.stage_week_ago for c in st.candidates) or any(c.gap_krw > 0 or c.unwind for c in st.candidates):
         body += ("\n> ⚠️ 단계 변화·매수 제안·철회 검토가 있다 — **오늘의 판단/결론 섹션에 "
                  "반드시 반영할 것.** 제안 금액과 수단을 그대로 옮기지 말고, 오늘 시장 "
@@ -924,14 +926,73 @@ def build_bottleneck_block(as_of: date) -> Block:
     return Block("bottleneck", title, body)
 
 
-def build_midterm_block(as_of: date) -> Block:
+def build_midterm_block(as_of: date, compact: bool = False) -> Block:
     """⑩ 중간선거 레버 체크포인트 — FRED로 잡히는 L1(지갑)·L3(청구서) 자동 판정."""
     from engine.briefing import midterm_levers as ML
 
     title = "⑩ 중간선거 레버 체크포인트 (L1 지갑·L3 청구서)"
     if as_of > ML.ACTIVE_UNTIL:
         return Block("midterm", title, "선거·CR 만료(12/11) 이후 — 점검 종료")
-    return Block("midterm", title, ML.render_markdown(ML.evaluate(as_of, _series_map()), as_of))
+    return Block("midterm", title, ML.render_markdown(ML.evaluate(as_of, _series_map()), as_of, compact=compact))
+
+
+def build_compass_block() -> Block:
+    """🧭 나침반 — 새 세션이어도 이어지는 압축 누적 맥락(의도·추적 질문·쳐낸 곁가지·최근 결론).
+    wiki/concepts/briefing-compass.md"""
+    from engine.briefing import compass as CP
+    try:
+        body = CP.render(CP.load())
+    except Exception as exc:  # noqa: BLE001
+        body = f"(나침반 로드 실패: {exc})"
+    return Block("compass", "🧭 나침반 — 이 보고서가 이어가는 맥락 (먼저 읽을 것)", body)
+
+
+EDITION_RULES = {
+    "regular": ("정규판", "뉴스 검색 3축(①선거 레버·지정학 ②반도체·AI ③거시지표) 각 1회, 점등 신호가 있을 때만 +2회"),
+    "holiday_am": ("휴장판", "한국 휴장 — 휴장 중 미국장·반도체·선거 레버·미국 지표를 3축 검색(각 1회). "
+                   "재개장 갭 블록을 서두에, 재개장 시나리오(강세·기본·약세)를 결론에"),
+    "eve_pm": ("재개장 전야판", "내일 재개장 — 누적 갭, 재개장일 체크리스트(경보·CDP·병목 단계), "
+               "직후 일정만. 검색은 최근 24시간 변화 1~2회"),
+}
+
+
+def build_edition_block(slot: str, as_of: date) -> Block:
+    from engine.briefing import notice as N
+    ed = N.edition(slot, as_of) if slot in ("AM", "PM") else "regular"
+    name, rule = EDITION_RULES.get(ed, EDITION_RULES["regular"])
+    body = (f"**오늘의 판형: {name}** — {rule}\n"
+            "- 본문 4,000자 이내. 판단의 변화 위주, 수치 나열 금지(수치 원문은 메일 부록에 코드가 붙인다)\n"
+            "- 나침반의 추적 질문 중 오늘 답이 바뀐 것만 다룬다. 쳐낸 곁가지는 다시 쓰지 않는다\n"
+            "- 작성 후 반드시 나침반 피드백(conclude 1회 + 바뀐 스레드 update, 필요 시 add/prune)")
+    return Block("edition", "📰 판형·분량 지침", body)
+
+
+def build_gap_block(as_of: date) -> Block | None:
+    """재개장 갭 — 마지막 한국 종가 이후 ADR·나스닥 누적 변화(휴장 중·재개장 당일만)."""
+    from engine.briefing import calendar as CAL
+    kr_open = CAL.is_trading_day("KR", as_of)
+    last = CAL.last_trading_day("KR", as_of)
+    # 휴장 중이거나, 재개장 당일인데 직전 공백이 평범한 주말(3일)보다 길 때만
+    if kr_open and (as_of - last).days <= 3:
+        return None
+    rows = []
+    p = REPO / "sources" / "sk-hynix-adr-quote.csv"
+    if p.exists():
+        with p.open(encoding="utf-8") as fh:
+            rows = [r for r in csv.DictReader(fh) if r.get("date", "") >= last.isoformat()
+                    and r.get("change_pct") not in ("", None)]
+    cum = 1.0
+    for r in rows:
+        cum *= 1 + float(r["change_pct"]) / 100
+    m = _series_map().get("us_nasdaq", [])
+    base = [v for d, v in m if d < last.isoformat() or d == last.isoformat()]
+    after = [v for d, v in m if d > last.isoformat()]
+    nas = f"{(after[-1] / base[-1] - 1) * 100:+.2f}%" if base and after else "데이터 없음"
+    lines = [f"마지막 한국 종가일 {last} 이후 {(as_of - last).days}일 (오늘 한국 {'재개장' if kr_open else '휴장'})",
+             f"- 하이닉스 ADR 누적 {(cum - 1) * 100:+.2f}% ({len(rows)}거래일) — **재개장 예상 갭의 1차 추정치**"
+             if rows else "- 하이닉스 ADR: 휴장 후 데이터 없음",
+             f"- 나스닥 누적 {nas}"]
+    return Block("gap", "⏩ 재개장 갭 계산기", "\n".join(lines))
 
 
 def build_pack(slot: str, as_of: date | None = None) -> tuple[BriefingPack, Gate]:
@@ -943,12 +1004,14 @@ def build_pack(slot: str, as_of: date | None = None) -> tuple[BriefingPack, Gate
         # 주간 캘린더는 시장이 안 움직여도 매주 유효한 정보다.
         pack = BriefingPack(slot=slot, as_of=now, blocks=[
             build_data_health_block(),
+            build_compass_block(),
+            build_edition_block(slot, as_of),
             build_hynix_block(as_of),
             build_digest_block(as_of, *detect_triggers(as_of)),
             build_ledger_block(as_of),
             build_execution_block(as_of),
-            build_bottleneck_block(as_of),
-            build_midterm_block(as_of),
+            build_bottleneck_block(as_of, compact=True),
+            build_midterm_block(as_of, compact=True),
             build_weekend_news_block(as_of),
             build_weekly_outlook_block(as_of),
         ])
@@ -956,17 +1019,23 @@ def build_pack(slot: str, as_of: date | None = None) -> tuple[BriefingPack, Gate
 
     triggers, why = detect_triggers(as_of)
     gate = evaluate_gate(as_of, triggers, why)
-    pack = BriefingPack(slot=slot, as_of=now, blocks=[
+    # 2026-09-25 팩 개편 — 나침반을 맨 위에, ④ 직전 브리핑은 나침반 '최근 결론'으로 대체,
+    # ⑨·⑩은 요약판(원문은 메일 부록). 새 세션 루틴이 의도를 잃지 않으면서 토큰을 줄인다.
+    gap = build_gap_block(as_of)
+    blocks = [
         build_data_health_block(),
+        build_compass_block(),
+        build_edition_block(slot, as_of),
         build_style_directive_block(),
+    ] + ([gap] if gap else []) + [
         build_fact_sheet(as_of),
         build_hynix_block(as_of),
         build_digest_block(as_of, triggers, why),
-        build_previous_block(as_of, slot),
         build_ledger_block(as_of),
         build_calendar_block(as_of, slot),
         build_execution_block(as_of),
-        build_bottleneck_block(as_of),
-        build_midterm_block(as_of),
-    ])
+        build_bottleneck_block(as_of, compact=True),
+        build_midterm_block(as_of, compact=True),
+    ]
+    pack = BriefingPack(slot=slot, as_of=now, blocks=blocks)
     return pack, gate

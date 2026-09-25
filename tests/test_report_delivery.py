@@ -13,8 +13,14 @@ import send_pending_briefings as S  # noqa: E402
 from engine.briefing import notice as N  # noqa: E402
 
 
-def test_holiday_yields_a_notice_reason_not_silence():
-    assert "추석" in N.skip_reason("AM", date(2026, 9, 24), None)
+def test_holiday_editions_and_notice():
+    # 휴장일 아침 = 휴장판(발행), 연휴 마지막 날 저녁 = 재개장 전야판(발행),
+    # 그 외 휴장일 저녁 = 코드 상황 보고(사유 명시)
+    assert N.edition("AM", date(2026, 9, 25)) == "holiday_am"
+    assert N.skip_reason("AM", date(2026, 9, 25), None) is None
+    assert N.edition("PM", date(2026, 9, 28)) == "eve_pm"
+    assert N.skip_reason("PM", date(2026, 9, 28), None) is None
+    assert "추석" in N.skip_reason("PM", date(2026, 9, 25), None)
 
 
 def test_quiet_gate_yields_a_notice_reason():
