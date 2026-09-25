@@ -9,7 +9,7 @@ LLM 없음. 순수 Python stdlib. CLAUDE.md "코드 작성 품질 프로토콜" 
   - 매일 00:20 KST(15:20 UTC) 실행
   - 어제(KST) 날짜 로그 항목을 log.md에서 잘라 log-archive/YYYY-MM/YYYY-MM-DD.md로 이관
   - 월말(1일) 분기: 전월 일일 아카이브 폴더 → 전월 월 아카이브 1파일로 병합 + 일일 파일 삭제
-  - idempotent: 어제 아카이브가 이미 존재하면 cut skip (안전 재실행)
+  - 어제 이하 모든 항목을 날짜별 아카이브로 이관, 기존 아카이브엔 없는 항목만 덧붙임(재실행 안전, 2026-09-25)
   - runner가 GitHub 인프라에 있어 git push 한계 없음 (회사망 73KB 제약 해당 없음)
 
 요약(LLM 서술)은 Windows 측(claude -p → GLM 게이트웨이)이 담당.
@@ -147,22 +147,32 @@ def do_cut(repo_root, target_date, dry_run):
 
     header, entries = parse_log_entries(content)
 
-    # idempotent: 아카이브 이미 존재하면 cut skip (재실행 안전)
-    a_path = archive_path(repo_root, target_date)
-    if os.path.exists(a_path):
-        print(f"[skip] archive already exists: wiki/log-archive/{target_date[:7]}/{target_date}.md — cut idempotent, nothing to do")
-        return False  # 변경 없음
-
-    target_entries = [e for e in entries if e[0] == target_date]
+    # 2026-09-25 수정 — 예전엔 "대상 날짜 아카이브가 이미 있으면 skip"이라,
+    # 회전 뒤에 늦게 append된 항목과 회전이 빠진 날의 항목이 log.md에 영구히
+    # 쌓였다(9/25 점검 시 396KB, 과거 항목 162개). 이제 대상 날짜 **이하**의
+    # 모든 항목을 날짜별 아카이브로 옮기고, 아카이브가 있으면 아직 없는 항목만
+    # 덧붙인다(첫 줄 기준 중복 제거 — 재실행해도 안전).
+    target_entries = [e for e in entries if e[0] <= target_date]
     if not target_entries:
-        print(f"[noop] no log entries for {target_date} in log.md — nothing to cut")
+        print(f"[noop] no log entries on/before {target_date} in log.md — nothing to cut")
         return False
 
-    remaining = [e for e in entries if e[0] != target_date]
-
-    # 아카이브 파일 생성
+    remaining = [e for e in entries if e[0] > target_date]
+    by_date = {}
+    for d, b in target_entries:
+        by_date.setdefault(d, []).append(b)
     body = "".join(b for _, b in target_entries)
-    archive_content = ARCHIVE_FM.format(date=target_date, body=body)
+    writes = {}
+    for d, blocks in sorted(by_date.items()):
+        path = archive_path(repo_root, d)
+        if os.path.exists(path):
+            with open(path, "r", encoding="utf-8") as f:
+                existing = f.read()
+            fresh = [b for b in blocks if b.splitlines()[0].strip() not in existing]
+            if fresh:
+                writes[path] = existing.rstrip("\n") + "\n\n" + "".join(fresh)
+        else:
+            writes[path] = ARCHIVE_FM.format(date=d, body="".join(blocks))
 
     # 남은 log.md 재조립: 헤더 + 남은 항목
     new_log = header + "".join(b for _, b in remaining)
@@ -171,17 +181,19 @@ def do_cut(repo_root, target_date, dry_run):
         new_log += "\n"
 
     if dry_run:
-        print(f"[dry-run] would create: {os.path.relpath(a_path, repo_root)} ({len(target_entries)} entries, {len(body)} bytes)")
+        for path in writes:
+            print(f"[dry-run] would write: {os.path.relpath(path, repo_root)}")
         print(f"[dry-run] would rewrite: wiki/log.md ({len(remaining)} entries remain, was {len(entries)})")
         return False
 
-    os.makedirs(os.path.dirname(a_path), exist_ok=True)
-    with open(a_path, "w", encoding="utf-8") as f:
-        f.write(archive_content)
+    for path, text in writes.items():
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+        with open(path, "w", encoding="utf-8") as f:
+            f.write(text)
     with open(log_path, "w", encoding="utf-8") as f:
         f.write(new_log)
 
-    print(f"[cut] {len(target_entries)} entries ({len(body)} bytes) → {os.path.relpath(a_path, repo_root)}")
+    print(f"[cut] {len(target_entries)} entries ({len(body)} bytes) → {len(by_date)}개 날짜 아카이브")
     print(f"[cut] log.md: {len(entries)} → {len(remaining)} entries")
     return True
 
