@@ -1,7 +1,7 @@
 ---
 title: 브리핑 나침반 — 새 세션에서도 이어지는 압축 누적 맥락
 created: 2026-09-25
-updated: 2026-09-25
+updated: 2026-09-26
 tags: [briefing, context, token, compass, routine, policy]
 ---
 
@@ -67,11 +67,17 @@ tags: [briefing, context, token, compass, routine, policy]
 현재는 **v2 지시문을 기존 상시 세션에 붙여** 돌린다. 옛 트리거 3개는 비활성화했다.
 기존 루틴의 지시문은 그 루틴 자신의 대화에서만 고칠 수 있어서 트리거를 새로 만들었다.
 
-| 슬롯 | v2 트리거 | 세션 | cron (UTC) |
+| 슬롯 | 현재 트리거 | 세션 | cron (UTC) |
 | --- | --- | --- | --- |
-| 아침 | `trig_01ACP1p5fBRmrD9dmoCTAU4k` | session_0136R… | `0 23 * * 0-4` |
-| 저녁 | `trig_01PoospBbdsQpBfBYqEvtLAc` | session_01QVyn… | `40 10 * * 1-5` |
-| 주간 전망 | `trig_01WbrXbENwxyWxAeDzZp2G8R` | session_0136R… | `30 22 * * 5` |
+| 아침 | v2 `trig_01ACP1p5fBRmrD9dmoCTAU4k` | session_0136R… (옛 대화 누적) | `0 23 * * 0-4` |
+| 저녁 | **v3** `trig_01G6PpUT1wme7GUBerHhuyhn` | **session_01EMuczk…** (9/26 새로, 저장소 부착) | `40 10 * * 1-5` |
+| 주간 전망 | **v3** `trig_01J44WoNfvrG26MjvuKG2LjL` | **session_01HdQR5f…** (9/26 새로, 저장소 부착) | `30 22 * * 5` |
+
+**v3 전환 (2026-09-26)**: v2 첫 실행을 검증했다. 9/25 저녁 추석 상황 보고가 발행됐다. 9/26 주간 전망은
+본문 2,560자로 발행됐고, 나침반도 갱신했다(결론 1줄, T1~T5 update). 둘 다 발송 기록이 남았다.
+검증을 통과해 `create_session(source_url=저장소)`로 **저장소가 붙은 깨끗한 세션**을 만들고
+저녁·주간 트리거를 옮겼다. 옛 v2 트리거는 비활성화했다. 아침은 9/28 첫 v2 실행을 확인한 뒤 같은 방식으로 옮긴다.
+이 세션들도 실행할수록 대화가 쌓인다. 비용이 다시 커지면 같은 방식으로 새 세션을 만들어 교체한다.
 
 - v2 지시문은 "이전 대화 기억을 쓰지 말고 팩만 읽어라"로 시작한다. 종료코드 10이면 상황 보고를
   발행하고, 휴장판에서는 조용히 끝내지 않는다. 본문은 4,000자 이내이며 나침반 피드백은 필수다.
