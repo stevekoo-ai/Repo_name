@@ -18,8 +18,9 @@ def test_holiday_editions_and_notice():
     # 그 외 휴장일 저녁 = 코드 상황 보고(사유 명시)
     assert N.edition("AM", date(2026, 9, 25)) == "holiday_am"
     assert N.skip_reason("AM", date(2026, 9, 25), None) is None
-    assert N.edition("PM", date(2026, 9, 28)) == "eve_pm"
-    assert N.skip_reason("PM", date(2026, 9, 28), None) is None
+    assert N.edition("PM", date(2026, 10, 5)) == "eve_pm"      # 개천절 대체공휴일 → 10/6 재개장
+    assert N.skip_reason("PM", date(2026, 10, 5), None) is None
+    assert N.edition("PM", date(2026, 9, 28)) == "regular"     # 추석 토요일 겹침은 대체휴일 아님
     assert "추석" in N.skip_reason("PM", date(2026, 9, 25), None)
 
 
