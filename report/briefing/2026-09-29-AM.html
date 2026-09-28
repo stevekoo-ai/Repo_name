@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>아침 브리핑 2026-09-29 (미국→한국)</title>
+<style>
+:root {
+  --bg: #f5f6f8; --surface: #ffffff; --surface-2: #f0f1f4; --border: #e2e4e9;
+  --text: #16181d; --text-muted: #5c6270; --accent: #2563eb;
+  --good: #157a3d; --good-bg: #e5f6ea; --warn: #92510c; --warn-bg: #fdf0dd;
+  --bad: #b3261e; --bad-bg: #fbe6e4; --neutral: #40465a; --neutral-bg: #eceef2;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #14161b; --surface: #1c1f26; --surface-2: #23262f; --border: #333846;
+    --text: #eceef2; --text-muted: #a0a6b5; --accent: #7fa8ff;
+    --good: #6cd48f; --good-bg: #113222; --warn: #f0b862; --warn-bg: #3a2a10;
+    --bad: #f28b82; --bad-bg: #3a1614; --neutral: #b7bccb; --neutral-bg: #262a35;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #14161b; --surface: #1c1f26; --surface-2: #23262f; --border: #333846;
+  --text: #eceef2; --text-muted: #a0a6b5; --accent: #7fa8ff;
+  --good: #6cd48f; --good-bg: #113222; --warn: #f0b862; --warn-bg: #3a2a10;
+  --bad: #f28b82; --bad-bg: #3a1614; --neutral: #b7bccb; --neutral-bg: #262a35;
+}
+:root[data-theme="light"] {
+  --bg: #f5f6f8; --surface: #ffffff; --surface-2: #f0f1f4; --border: #e2e4e9;
+  --text: #16181d; --text-muted: #5c6270; --accent: #2563eb;
+  --good: #157a3d; --good-bg: #e5f6ea; --warn: #92510c; --warn-bg: #fdf0dd;
+  --bad: #b3261e; --bad-bg: #fbe6e4; --neutral: #40465a; --neutral-bg: #eceef2;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0; background: var(--bg); color: var(--text);
+  font-family: -apple-system, "Segoe UI", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+  line-height: 1.6;
+}
+.page { max-width: 920px; margin: 0 auto; padding: 24px 16px 64px; }
+header.masthead { padding: 8px 0 20px; }
+header.masthead h1 { font-size: 1.5rem; margin: 0 0 4px; }
+header.masthead .sub { color: var(--text-muted); font-size: 0.9rem; }
+.tile-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin: 12px 0; }
+.tile { background: var(--surface-2); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; }
+.tile-label { font-size: 0.78rem; color: var(--text-muted); display: flex; align-items: center; gap: 6px; }
+.tile-value { font-size: 1.35rem; font-weight: 700; margin-top: 2px; }
+.tile-sub { font-size: 0.78rem; color: var(--text-muted); margin-top: 2px; }
+.dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+.dot-good { background: var(--good); } .dot-warn { background: var(--warn); }
+.dot-bad { background: var(--bad); } .dot-neutral { background: var(--neutral); }
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
+  padding: 20px 22px; margin-bottom: 16px; }
+.card.highlight { border-color: var(--accent); }
+.card h2 { font-size: 1.1rem; margin: 0 0 10px; }
+.card h3 { font-size: 0.95rem; margin: 16px 0 8px; color: var(--text-muted); }
+.kv-list { list-style: none; padding: 0; margin: 0; }
+.kv-list li { padding: 6px 0; border-bottom: 1px dashed var(--border); font-size: 0.92rem; }
+.kv-list li:last-child { border-bottom: none; }
+.kv-list b { display: inline-block; min-width: 130px; color: var(--text-muted); font-weight: 600; }
+.pending { color: var(--text-muted); font-style: italic; }
+.muted { color: var(--text-muted); }
+.badge { display: inline-block; padding: 3px 10px; border-radius: 999px; font-size: 0.78rem; font-weight: 600; }
+.badge-good { background: var(--good-bg); color: var(--good); }
+.badge-warn { background: var(--warn-bg); color: var(--warn); }
+.badge-bad { background: var(--bad-bg); color: var(--bad); }
+.badge-neutral { background: var(--neutral-bg); color: var(--neutral); }
+.table-wrap { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: 0.88rem; }
+th, td { text-align: left; padding: 7px 10px; border-bottom: 1px solid var(--border); white-space: nowrap; }
+th { color: var(--text-muted); font-weight: 600; font-size: 0.78rem; text-transform: uppercase; letter-spacing: .02em; }
+.spark-cell { white-space: normal; }
+.spark { display: block; }
+.spark-labels { display: flex; justify-content: space-between; font-size: 0.68rem; color: var(--text-muted);
+  width: 176px; }
+.spark-empty { font-size: 0.78rem; }
+.stale-mark { color: var(--warn); cursor: help; }
+.clock-row { display: flex; gap: 18px; align-items: center; flex-wrap: wrap; }
+.clock-img { width: 180px; height: 180px; border-radius: 10px; flex-shrink: 0;
+  background: #ffffff; padding: 6px; border: 1px solid var(--border); }
+.chart-img { width: 100%; height: auto; border-radius: 10px;
+  background: #ffffff; padding: 6px; border: 1px solid var(--border); }
+.discuss-card { background: var(--surface-2); border-left: 3px solid var(--accent); border-radius: 8px;
+  padding: 12px 16px; margin: 10px 0; }
+.discuss-topic { font-weight: 700; margin-bottom: 4px; }
+.discuss-context { color: var(--text-muted); font-size: 0.88rem; margin: 4px 0; }
+.discuss-question { margin: 6px 0 0; font-size: 0.94rem; }
+.discuss-input { width: 100%; margin-top: 10px; padding: 8px 10px; border-radius: 8px;
+  border: 1px solid var(--border); background: var(--surface); color: var(--text);
+  font-family: inherit; font-size: 0.88rem; resize: vertical; box-sizing: border-box; }
+.discuss-input:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+.discuss-actions { display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap; }
+.discuss-toolbar { display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+  padding: 10px 14px; background: var(--surface-2); border-radius: 10px; margin-bottom: 10px; }
+.btn-fb { font-family: inherit; font-size: 0.82rem; font-weight: 600; padding: 6px 12px;
+  border-radius: 8px; border: 1px solid var(--border); background: var(--surface);
+  color: var(--text); cursor: pointer; }
+.btn-fb:hover { border-color: var(--accent); }
+.btn-fb:disabled { opacity: 0.7; cursor: default; }
+.btn-fb-primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+.copy-output { margin-top: 10px; padding: 12px 14px; background: var(--surface-2);
+  border: 2px dashed var(--accent); border-radius: 10px; }
+.copy-output textarea { width: 100%; box-sizing: border-box; padding: 8px 10px; border-radius: 8px;
+  border: 1px solid var(--border); background: var(--surface); color: var(--text);
+  font-family: inherit; font-size: 0.82rem; resize: vertical; margin-top: 6px; }
+.copy-output a#peos-copy-output-link { display: none; margin-top: 8px; color: var(--accent);
+  font-size: 0.88rem; font-weight: 600; }
+.action-card { border-radius: 10px; border: 1px solid var(--border); padding: 12px 16px; margin: 8px 0 14px; }
+.action-good { border-left: 4px solid var(--good); }
+.action-warn { border-left: 4px solid var(--warn); }
+.action-bad { border-left: 4px solid var(--bad); }
+.action-neutral { border-left: 4px solid var(--neutral); }
+.action-title { font-weight: 700; margin-bottom: 6px; }
+.action-row { font-size: 0.86rem; margin: 3px 0; color: var(--text); }
+.action-row .k { display: inline-block; min-width: 68px; color: var(--text-muted); font-weight: 600; }
+.action-conflict { color: var(--warn); }
+.scenario-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; }
+.scenario-card { background: var(--surface-2); border-radius: 10px; padding: 14px 16px; font-size: 0.85rem; }
+.scenario-title { font-weight: 700; font-size: 1rem; margin-bottom: 8px; }
+.scenario-prob { color: var(--accent); }
+.scenario-card p { margin: 6px 0; }
+footer { color: var(--text-muted); font-size: 0.78rem; text-align: center; padding-top: 16px; }
+
+/* 브리핑 전용 최소 보강 — 나머지는 월간 리포트·대시보드와 같은 _CSS를 쓴다 */
+body { max-width: 860px; margin: 0 auto; padding: 24px 16px 48px; }
+table { width: 100%; border-collapse: collapse; }
+th, td { padding: 6px 10px; border-bottom: 1px solid var(--border); }
+blockquote { margin: 12px 0; padding: 10px 14px; background: var(--surface-2);
+  border-left: 3px solid var(--accent); border-radius: 4px; }
+.table-wrap { overflow-x: auto; }
+header.masthead { padding-top: 0; }
+/* 심각도 이모지(🔴🟠🟡✅❌ 등)로 시작하는 인용/소제목은 그 등급 색으로
+   강조한다 — "뭘 강조해야 할지 모르겠다"는 지적에 대한 답: 지금까지
+   이모지는 색이 있는데 주변은 다른 문단과 똑같았다. */
+blockquote.bq-bad { background: var(--bad-bg); border-left-color: var(--bad); }
+blockquote.bq-warn { background: var(--warn-bg); border-left-color: var(--warn); }
+blockquote.bq-good { background: var(--good-bg); border-left-color: var(--good); }
+blockquote.bq-neutral { background: var(--neutral-bg); border-left-color: var(--neutral); }
+h3.hx-bad, h3.hx-warn, h3.hx-good, h3.hx-neutral {
+  padding-left: 10px; border-left: 4px solid; margin-left: -12px; }
+h3.hx-bad { border-color: var(--bad); }
+h3.hx-warn { border-color: var(--warn); }
+h3.hx-good { border-color: var(--good); }
+h3.hx-neutral { border-color: var(--neutral); }
+</style>
+</head>
+<body>
+<header class='masthead'><h1>아침 브리핑 2026-09-29 — 미국→한국</h1></header>
+<section class='card'><h2>밤사이 무엇이 바뀌었나</h2>
+<ol><li><strong>미 10년물이 5.25%로 2007년 이래 최고를 다시 갈아치웠다.</strong> 30년물도 5.5% 위에 머물렀다. 이 금리가 9/28 미국장을 끌어내렸다 — S&amp;P 7,683.69(-0.8%), 나스닥 26,820.38(-0.9%), 다우 -347p.</li><li><strong>반도체가 하락을 주도했고 마이크론이 -2.6%였다.</strong> 다만 <strong>엔비디아는 상승</strong>했다(AI 안전 플랫폼 출시 + 자사주 매입 확대). 반도체 안에서도 메모리와 로직이 갈렸다.</li><li><strong>하이닉스 ADR이 -4.60%로 국내 급락 뒤에 한 번 더 빠졌다.</strong> 국내가 이미 -5%대로 떨어진 다음 세션에서 미국이 추가로 팔았다는 뜻이다.</li><li><strong>유가가 되올랐다 — 트럼프가 이란의 7일안을 거부했다.</strong> 브렌트 $107.04~107.34(+2.6~2.9%). 이란 조건(침략 중단·해상 봉쇄 해제·자산 반환)에 대해 트럼프는 "1년 전이면 동의했겠지만 이란이 과했다"고 했고, <strong>이번주 협상 재개는 기대한다</strong>고 밝혔다.</li><li><strong>검색함 → AI CapEx 가이던스·데이터센터 전력 신규 없음.</strong></li></ol>
+<blockquote class='bq-warn'>⚠️ <strong>어제 브리핑의 전제가 틀렸다.</strong> 9/28 팩과 캘린더가 한국을 <strong>휴장</strong>으로 판정해 나는 휴장판을 썼는데, <strong>한국은 실제로 개장해 코스피 -2.70%(6,889.74), 하이닉스 -5.05%(뉴스)로 마감</strong>했다. 원인은 휴장 파일의 대체공휴일 규칙 오류이고, <strong>지금은 수정됐다</strong>(대체공휴일은 일요일과 겹칠 때만 생긴다). 즉 <strong>재개장은 9/29가 아니라 9/28이었고, 오늘은 그 다음날</strong>이다.</blockquote></section>
+<section class='card'><h2>판단 — 추적 질문별 변화</h2>
+<p><strong>하이닉스는 약세, 코스피는 약세로 본다 — 10/1 새벽 마이크론 가이던스까지.</strong> 근거는 셋이다: <strong>외국인 보유율이 49.94%로 50% 아래를 처음 이탈</strong>했고, <strong>ADR이 -4.60%로 국내 급락 뒤에 더 빠졌고</strong>, <strong>10년물 5.25%가 2007년 이래 최고</strong>다. <strong>뒤집을 조건</strong>: 마이크론 <strong>FY1Q27 가이던스가 $55B 이상</strong>이면 약세 판단을 철회한다.</p>
+<p><strong>T3 하이닉스 — 답이 더 나빠졌다.</strong> 나침반은 어제 갭 -4.51%를 기록했는데, 오늘 새 실측은 <strong>외국인 보유율 49.94%</strong>다. 50%는 이 종목에서 여러 달 지켜온 선이고, 그 이탈이 5거래일 -2.70조 순매도와 함께 왔다. → 판정 기준은 그대로 <strong>마이크론 FY1Q27 가이던스</strong>다(10/1 새벽).</p>
+<p><strong>T6 선거 후 청구서 — 경보선 위 체류가 굳어졌다.</strong> 10년물이 5.20% → <strong>5.25%</strong> 로 하루 더 올랐고 30년물은 5.5% 위다. "선거 전 청구" 해석이 이틀 연속 확인됐다. → 바뀌는 조건: 5.5% 아래 되돌림.</p>
+<p><strong>T1 이란 — 어제 기록한 후퇴가 유지됐다.</strong> 거부는 확정, 다만 트럼프가 <strong>이번주 협상 재개</strong>를 언급해 완전 결렬은 아니다. 유가는 $107대로 되올랐다.</p>
+<p><strong>T2·T4·T5 — 오늘 답이 바뀌지 않았다.</strong> 원/달러는 1,363~1,365원으로 1,400원과 35원 이상 거리를 유지한다.</p></section>
+<section class='card'><h2>SK하이닉스·자금계획에 대한 함의</h2>
+<ul><li><strong>어제 검증 4건: 적중 2 / 빗나감 2.</strong> <code>P0045</code>(VIX&lt;18)·<code>P0046</code>(원/달러&lt;1,400) 적중. <code>P0044</code>(&gt;1,880,000)·<code>P0048</code>(&gt;1,845,000)은 <strong>빗나갔다</strong> — 둘 다 ADR 누적 -1.95%를 갭 추정치로 썼는데 <strong>실제 갭은 그 2배 이상</strong>이었다. <strong>ADR 누적을 갭의 1차 추정치로 쓰면 하방에서 과소추정한다</strong>는 게 이번 교훈이다.</li><li><strong>CDP는 아직 발동 없다.</strong> 주가 하락으로 목표 70주 → <strong>74주</strong>가 됐다 — 같은 금액을 모으려면 더 많은 주식을 팔아야 하는 방향이다.</li><li><strong>EW2는 그대로 벌어져 있다.</strong> VIX 14.21로 CP2 전제(≥22)와 7.79 차다. 금리는 사상 최고권인데 변동성은 바닥이라 <strong>"선거 전 변동성 확대를 기다린다"는 보류 논거가 이번 국면에서도 성립하지 않았다.</strong> 11/3을 기다리지 말고 <strong>10/2 고용을 보고 T2를 11/04 창 시작일에 기계적으로 실행할지 결정</strong>해야 한다.</li></ul></section>
+<section class='card highlight'><h2>결론</h2>
+<p>오늘 볼 것은 <strong>외국인이 49.94%에서 더 이탈하는지</strong> 하나다. 50% 이탈이 하루로 끝나는지, 추세인지가 마이크론 전 마지막 단서다. 금리(10년물 5.25%)는 오늘 한국장에 계속 역풍이고, 유가 반등($107대)은 그 역풍을 더한다.</p>
+<p><strong>판단을 바꿀 조건</strong>: ⓐ 마이크론 <strong>FY1Q27 가이던스 $55B 이상</strong> → 약세 철회 ⓑ 외국인이 오늘 <strong>순매수 전환</strong> → 50% 이탈을 일시적 과매도로 재분류 ⓒ <strong>10년물 5.0% 아래 복귀</strong> → 금리 역풍 해소 ⓓ 이란 협상이 이번주 실제 재개되고 브렌트가 $100 아래로 → T1 반전.</p></section>
+<section class='card'><h2>Sources</h2>
+<ul><li>팩 <code>data/briefing/pack_AM.md</code> · 나침반 <code>data/briefing/compass.yaml</code></li><li>휴장 캘린더 <code>data/manual_inputs/market_holidays_2026.yaml</code>(9/28 판정 수정 확인)</li><li><a href="https://finance.yahoo.com/markets/live/stock-market-today-monday-september-28-dow-sp-500-nasdaq-080420627.html">Yahoo Finance — Dow, S&amp;P 500, Nasdaq fall as Treasury yields continue to climb (9/28)</a></li><li><a href="https://www.aljazeera.com/economy/2026/9/28/oil-prices-surge-after-trump-rejects-irans-plan-to-reopen-strait-of-hormuz">Al Jazeera — Oil prices surge after Trump rejects Iran's plan to reopen Strait of Hormuz</a></li><li><a href="https://www.seoul.co.kr/news/economy/securities/2026/09/28/20260928500195">서울신문 — 코스피 2.70% 급락 6889… 외국인·기관 4조원 넘게 팔았다</a></li><li><a href="https://www.seoul.co.kr/news/economy/securities/2026/09/28/20260928500197">서울신문 — 삼성전자·SK하이닉스 5%대 하락</a></li></ul>
+<blockquote class='bq-warn'>⚠️ WebFetch 차단 — 스니펫 기반. <strong>[미검증]</strong>: 9/28 하이닉스 종가가 팩 1,761,000원(-5.42%)과 뉴스 1,768,000원(-5.05%)으로 갈림 · 브렌트 $107.04와 $107.34 병존 · 달러지수 주계열(119.51, 11일 지연)은 <strong>검색함 → 최신값 확인 안 됨(팩 값 유지)</strong>.</blockquote>
+<hr></section>
+<section class='card'><h2>부록 — 자동 체크포인트 (코드 판정 원문)</h2>
+<h3>⑨ 병목 이동 추적 (다음 병목 선제 매수)</h3>
+<p><strong>가장 앞선 다음 병목 후보: B1 전력·전력망 — 0단계(관찰), 신호 2/4</strong> 기준 이벤트: 하이닉스 자사주(PS) 추가 수령 — 5천만원+ (D-184, 2027-04-01) · 헤지 예산 25,000,000원 (잠정 — 예산·배분은 진행하며 결정)</p>
+<p><strong>현재 병목(HBM — 메모리 대역폭) 약화 신호 1/3</strong> — 켜질수록 '병목 해소 → 하이닉스 하락' 시나리오가 가까워진다</p>
+<ul><li>❌ I1 HBM Cycle Score 붕괴조건 2/5 이상 — 붕괴조건 1/5 (2026-09-21)</li><li>❌ I2 SK하이닉스 120일선 하회(1주 지속) — 0/1종목</li><li>✅ I3 SK하이닉스가 반도체 ETF(SMH)보다 3개월 부진(1주 지속) — -37.7% vs SMH -0.8% (차 -36.9%p)</li></ul>
+<p><strong>B1 전력·전력망</strong> [헤지 후보] — 0단계(관찰), 신호 2/4</p>
+<ul><li>✅ P-F1 GE Vernova 백로그 YoY 20% 이상 — GEV +37%</li><li>✅ P-F2 GE Vernova 백로그 YoY 가속(전분기보다 높음) — GEV +32%→+37%</li><li>❌ P-M1 전력 바스켓이 3개월 상승 + SK하이닉스를 앞섬(1주 지속) — -16.9% vs 000660.KS -37.7% (차 +20.8%p) · 바스켓 자체가 -16.9%라 순환매 아님(동반 하락)</li><li>❌ P-M2 전력 바스켓 과반이 120일선 위(1주 지속) — 0/3종목</li><li>목표 누적 0원 / 실행 0원</li><li>관찰 — 매수 없음</li><li>다음: 1단계(정찰)까지: 주가 신호 1개 이상</li></ul>
+<p><strong>B2 메모리 용량 계층 (eSSD·HBF·CXL)</strong> [현재 병목의 연장(하이닉스가 이어받음)] — 0단계(관찰), 신호 2/4</p>
+<ul><li>✅ M-F1 Sandisk 매출 YoY 40% 이상 — SNDK +251%</li><li>✅ M-F2 Sandisk 매출 YoY 가속 — SNDK +61%→+251%</li><li>❌ M-M1 NAND 바스켓이 3개월 상승 + 반도체 ETF(SMH)를 앞섬(1주 지속) — -27.3% vs SMH -0.8% (차 -26.5%p)</li><li>❌ M-M2 NAND 바스켓 과반이 120일선 위(1주 지속) — 1/2종목</li><li>다음: 1단계(정찰)까지: 주가 신호 1개 이상</li></ul>
+<p><strong>B3 광 인터커넥트</strong> [헤지 후보] — 0단계(관찰), 신호 2/4</p>
+<ul><li>✅ O-F1 광·인터커넥트 4사 과반이 매출 YoY 40% 이상 — LITE +90%, COHR +21%, CRDO +115%, ALAB +104%</li><li>✅ O-F2 광·인터커넥트 4사 과반이 매출 YoY 가속 — LITE +65%→+90%, COHR +17%→+21%, CRDO +201%→+115%, ALAB +93%→+104%</li><li>❌ O-M1 광 바스켓이 3개월 상승 + SK하이닉스를 앞섬(1주 지속) — -6.3% vs 000660.KS -37.7% (차 +31.4%p) · 바스켓 자체가 -6.3%라 순환매 아님(동반 하락)</li><li>⏳ O-M2 광 바스켓 과반이 120일선 위(1주 지속) — 3/4종목 · 형성 중(지속성 미확인)</li><li>목표 누적 0원 / 실행 0원</li><li>관찰 — 매수 없음</li><li>다음: 1단계(정찰)까지: 주가 신호 1개 이상</li></ul>
+<blockquote>판정만 한다 — 자동 매수·매도 없음. 하이닉스 자체의 매도 지시는 sk_hynix_decision(R4) 단일 출처를 따른다. 실제 매수 시 <code>data/manual_inputs/bottleneck_hedge_log.csv</code>에 기록해야 목표 대비 진척이 반영된다.</blockquote>
+<h3>⑩ 중간선거 레버 체크포인트 (L1 지갑·L3 청구서)</h3>
+<p>선거까지 D-35 (11/3). 🔔 = 신호 켜짐, · = 아직, ❓ = 판정 불가. 레버 전체 판단은 wiki/concepts/trump-midterm-tracker.md 참고.</p>
+<ul><li>· <strong>L1 지갑 · 휘발유 전국 평균</strong> — 4.48 (2026-09-21), 기준 &lt; 4.0 × 최근 2회 ↳ $4.00 아래 2주 = 종전·유가 레버가 주유소까지 전달</li><li>· <strong>L1 지갑 · 30년 모기지</strong> — 7.03 (2026-09-24), 기준 &lt; 6.5 × 최근 2회 ↳ 6.5% 아래 2주 = 금리 레버 부활</li><li>· <strong>L1 지갑 · 브렌트유</strong> — 114.89 (2026-09-22), 기준 &lt; 85.0 × 최근 5회 ↳ $85 아래 1주 안착 = 종전 레버 1차 반응</li><li>· <strong>L3 청구서 · 30년물 국채금리</strong> — 5.47 (2026-09-24), 기준 &gt; 5.5 × 최근 3회 ↳ 5.5% 돌파 3일 = 채권 자경단(재정 신뢰 이탈)</li><li>· <strong>L3 청구서 · 하이일드 스프레드</strong> — 2.80 (2026-09-24), 기준 &gt; 5.0 × 최근 3회 ↳ 5%p 돌파 = 위험회피 확산</li><li>🔔 <strong>L1 지갑 · 미시간대 1년 기대인플레</strong> — 4.00 (2026-08-01), 1관측 전 대비 -0.20 ↳ 하락 = 체감물가 개선 / 상승 = 악화 (FRED 공개가 약 2개월 늦다)</li><li>· <strong>L3 청구서 · 5년 뒤 5년 기대인플레</strong> — 2.34 (2026-09-25), 20관측 전 대비 -0.01 ↳ 20일 +0.25%p 이상 급등 = 연준 신뢰 훼손 경고</li><li>· <strong>L1 지갑 · 재무부 현금잔고(TGA, 백만달러)</strong> — 977,084.00 (2026-09-23), 4관측 전 대비 +26348.00 ↳ 4주 감소 = 재정 지출이 풀리는 중(집행 앞당김 단서)</li></ul>
+<blockquote class='bq-warn'>⚠️ 켜진 신호가 있다 — 오늘의 판단/결론에 반영할 것: 미시간대 1년 기대인플레</blockquote></section>
+<footer>PEOS 브리핑 · 코드 생성 HTML · 2026-09-29 08:35 KST</footer>
+</body>
+</html>
