@@ -1,10 +1,10 @@
 concept_page: "wiki/concepts/sk-hynix-analyst-thesis-checkpoints.md"
 monitoring_page: "wiki/monitoring/sk-hynix-analyst-thesis-checkpoints-status.md"
 as_of: "2026-09-30"
-status_label: "🟡 목표가 340만 유지, 3Q는 환율로 컨센 하회 전망"
+status_label: "🟡 증권사 2곳 모두 3Q 환율 하향, 방향은 긍정 유지"
 one_line_summary: >-
-  증권사(미상) Buy·목표가 340만원 유지(9/30 종가 178.3만 대비 +91%) [FACT].
-  3Q 매출 93.2조·영업익 72.7조(q/q +17.5%/+20.1%) 추정, 환율로 시장 예상 하회
-  [OPINION]. 실측: 원/달러 3Q 평균 −5.2%, 현 1,358원이면 4Q −4.6% 추가 역풍.
-  주요 고객사 HBM 계약·품질 논란 언급(증권사는 해결 가능 판단) [미검증].
-  3Q 발표 때 추가 주주환원 예상. 목표가 스펙트럼 280만~470만.
+  9/30 증권사 리포트 2건(미상). 3Q 영업익 72.7조/73.8조로 둘 다 환율 반영 하향,
+  컨센 하회 전망 [OPINION]. NAND ASP 추정이 +7% vs +19%로 크게 갈려 3Q 발표에서
+  판가름. 실측: 원/달러 3Q 평균 −5.2%, 현 1,358원이면 4Q −4.6% 추가 역풍.
+  OpenAI·Anthropic 2027년 메모리 직접 구매 보도 교차확인 [FACT]. HBM 품질 논란은
+  두 곳 모두 부정, 구체 보도 없음 [미검증]. TP 340만(A), 스펙트럼 280만~470만.
