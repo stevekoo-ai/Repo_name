@@ -141,6 +141,9 @@ FACT_SERIES = [
     ("us_dollar_index_dxy", "달러지수(DXY·참고)", "", "pct"),
     ("us_brent", "브렌트유", "$", "pct"),
     ("kr_usdkrw", "원/달러(ECOS)", "원", "pct"),
+    # 2026-09-30 나침반 T7(인도 분할매수 조건) 판단용
+    ("in_nifty50", "인도 Nifty50", "", "pct"),
+    ("in_usdinr", "달러/루피", "₹", "pct"),
 ]
 
 
