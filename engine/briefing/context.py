@@ -140,11 +140,48 @@ FACT_SERIES = [
     # "참고"를 박아 둘을 섞어 읽지 않게 한다.
     ("us_dollar_index_dxy", "달러지수(DXY·참고)", "", "pct"),
     ("us_brent", "브렌트유", "$", "pct"),
+    # 2026-09-30 현물(FRED)이 약 1주 늦어 매일 나오는 선물을 나란히 — 대체 아님(정의가 다름)
+    ("us_brent_futures", "브렌트(선물·참고)", "$", "pct"),
     ("kr_usdkrw", "원/달러(ECOS)", "원", "pct"),
     # 2026-09-30 나침반 T7(인도 분할매수 조건) 판단용
     ("in_nifty50", "인도 Nifty50", "", "pct"),
     ("in_usdinr", "달러/루피", "₹", "pct"),
 ]
+
+
+# 2026-09-30 신선도 쌍둥이 — 같은 정의의 지표를 더 빨리 주는 원천이 있으면 그 계열을
+# 나란히 쌓고(scripts/macro_data.py *_yf), 팩 ①은 **더 최신인 쪽 계열을 한 줄 통째로**
+# 쓴다. 한 줄 안에서 원천을 섞지 않으므로 1일·5일 변화에 원천 차이가 끼지 않는다.
+# 이유: FRED는 미국 세션 종가를 다음 날 ET 오전에 올려 아침 브리핑엔 전날 밤 마감이
+# 없다(9/30 실측 FRED 9/28 vs yahoo 9/29). 최근 250일 실측 차이: S&P·나스닥 0.000%,
+# VIX ≈0, 10년물 평균 -0.4bp·최대 4.8bp. 브렌트 현물↔선물은 평균 -$3.3·최대 $28.9로
+# 정의가 달라 쌍둥이가 아니다(별도 '참고' 줄).
+FRESH_TWINS = {
+    "us_sp500": ("us_sp500_yf", "yahoo"),
+    "us_nasdaq": ("us_nasdaq_yf", "yahoo"),
+    "us_vix": ("us_vix_yf", "yahoo"),
+    "us_10y": ("us_10y_yf", "yahoo ^TNX"),
+}
+
+
+# 정의가 달라 쌍둥이는 아니지만 **방향**은 매일 보여주는 참고 줄. 원 지표가 지연돼도
+# 참고 줄이 최신이면 뉴스 교차검증 의무 목록에서 뺀다(검색 토큰 절약) — 대신 참고 줄로
+# 방향을 읽으라고 적는다. 값 자체를 바꿔 쓰지는 않는다.
+REF_COMPANIONS = {
+    "us_brent": ("us_brent_futures", "브렌트(선물·참고)"),
+    "us_dollar_index": ("us_dollar_index_dxy", "달러지수(DXY·참고)"),
+}
+
+
+def _freshest(m: dict, key: str, as_of: date) -> tuple[list, str]:
+    """(rows, 원천 표기). 쌍둥이가 더 최신이면 쌍둥이 계열 전체를 쓴다."""
+    rows = [(d, v) for d, v in m.get(key, []) if d <= as_of.isoformat()]
+    twin = FRESH_TWINS.get(key)
+    if twin:
+        trows = [(d, v) for d, v in m.get(twin[0], []) if d <= as_of.isoformat()]
+        if len(trows) >= 2 and (not rows or trows[-1][0] > rows[-1][0]):
+            return trows, twin[1]
+    return rows, ""
 
 
 def collection_freshness(now: datetime | None = None) -> tuple[str | None, float | None]:
@@ -194,8 +231,9 @@ def build_fact_sheet(as_of: date) -> Block:
     lines = ["| 지표 | 최신 | 1일 | 5일 | 기준일 |", "|---|---:|---:|---:|---|"]
     missing = []
     stale: list[tuple[str, int, str]] = []  # (label, age_days, last_date) — age>=3
+    covered: list[tuple[str, int, str]] = []  # 지연됐지만 최신 참고 줄이 방향을 보여주는 지표
     for key, label, unit, mode in FACT_SERIES:
-        rows = [(d, v) for d, v in m.get(key, []) if d <= as_of.isoformat()]
+        rows, src = _freshest(m, key, as_of)
         if len(rows) < 2:
             missing.append(label)
             continue
@@ -204,7 +242,12 @@ def build_fact_sheet(as_of: date) -> Block:
         age = (as_of - date.fromisoformat(last_d)).days
         stale_mark = f" ⚠️{age}일 지연" if age >= 3 else ""
         if age >= 3:
-            stale.append((label, age, last_d))
+            comp = REF_COMPANIONS.get(key)
+            crows = [d for d, _ in m.get(comp[0], []) if d <= as_of.isoformat()] if comp else []
+            if comp and crows and (as_of - date.fromisoformat(crows[-1])).days < 3:
+                covered.append((label, age, comp[1]))
+            else:
+                stale.append((label, age, last_d))
 
         def fmt(pct):
             if pct is None:
@@ -215,7 +258,8 @@ def build_fact_sheet(as_of: date) -> Block:
                 return f"{pct:+.1f}%"
             return f"{pct:+.2f}%"
 
-        lines.append(f"| {label} | {last_v:,.2f}{unit} | {fmt(d1)} | {fmt(d5)} | {last_d}{stale_mark} |")
+        src_mark = f" ({src})" if src else ""
+        lines.append(f"| {label} | {last_v:,.2f}{unit} | {fmt(d1)} | {fmt(d5)} | {last_d}{src_mark}{stale_mark} |")
     body = "\n".join(lines)
     if missing:
         body += f"\n\n**미수집**: {', '.join(missing)} — 없는 것이므로 언급하지 말 것."
@@ -235,6 +279,10 @@ def build_fact_sheet(as_of: date) -> Block:
             body += f"- {label} ({last_d} 기준, {age}일 지연)\n"
         body += ("> ⚠️ 웹검색으로도 최신값을 못 찾으면 '검색함 → 최신값 확인 안 "
                  "됨(팩 값 유지)'으로 명시할 것 — 조용히 생략하지 말 것.")
+
+    if covered:
+        body += "\n\n**지연됐지만 참고 줄로 방향 확인 가능** (검색 불필요, 값은 섞지 말 것): " + ", ".join(
+            f"{l}({a}일 지연) → {c}" for l, a, c in covered)
 
     fetched, hours = collection_freshness()
     if hours is not None:
