@@ -1,0 +1,14 @@
+# KIS 자동 동기화(sources/portfolio-holdings.csv)에 잡히지 않는 계좌의 보유 — 수동 관리.
+# 사용자 제공값이다. 바뀌면 사용자에게 받아 갱신하고 as_of를 고친다.
+# 한투 계좌(일반 120주·ISA 19주)는 여기 적지 않는다 — KIS 동기화가 원천.
+as_of: "2026-09-30"
+source: "사용자 제공(채팅, 2026-09-30)"
+holdings:
+  - broker: 하나증권
+    ticker: "000660"
+    name: SK하이닉스
+    quantity: 110
+    avg_price: 613558
+    locked_quantity: 67          # 2027-02-11까지 매도 시 마크업 8,791,650원 소멸(execution_plan.yaml)
+    free_quantity: 43
+# 합계 검산(2026-09-30): 한투 139주 + 하나 110주 = 249주 = execution_plan.yaml total_shares
