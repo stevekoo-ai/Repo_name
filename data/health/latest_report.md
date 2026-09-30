@@ -1,6 +1,6 @@
-# 데이터 헬스 — 2026-09-30T19:29:32.386116+00:00
+# 데이터 헬스 — 2026-09-30T23:58:08.135353+00:00
 
-⚠️ 30/46개 소스 이상
+⚠️ 28/46개 소스 이상
 - 🟠 **normalized-series-sweep** [ANOMALY] data/normalized/*.csv 전수 스윕 (237개 시리즈) — ok 208 / 이상 27 / 알려진 설계상 이상(비알림) 2 — 상세는 개별 normalized:* 항목 참고
 - 🟠 **normalized:bls_us_job_openings** [STALE] 정규화 시리즈: bls_us_job_openings (monthly) — STALE — 최신 2026-07-01, 91일 경과
 - 🟠 **normalized:ecos_current_account** [STALE] 정규화 시리즈: ecos_current_account (monthly) — STALE — 최신 2026-07-01, 91일 경과
@@ -29,5 +29,3 @@
 - 🟠 **normalized:imf_unemployment_jpn** [STALE] 정규화 시리즈: imf_unemployment_jpn (annual) — STALE — 최신 2025-01-01, 637일 경과
 - 🟠 **normalized:imf_unemployment_kor** [STALE] 정규화 시리즈: imf_unemployment_kor (annual) — STALE — 최신 2025-01-01, 637일 경과
 - 🟠 **normalized:imf_unemployment_usa** [STALE] 정규화 시리즈: imf_unemployment_usa (annual) — STALE — 최신 2025-01-01, 637일 경과
-- 🟠 **real-estate-apartment-rent** [STALE] 아파트 전월세 실거래가 (국토부) — 마지막 성공=2026-09-28T22:45:03+00:00
-- 🟠 **real-estate-apartment-sale** [STALE] 아파트 매매 실거래가 (국토부) — 마지막 성공=2026-09-28T22:44:03+00:00

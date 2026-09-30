@@ -1,5 +1,5 @@
 {
-  "checked_at": "2026-09-30T19:29:32.386116+00:00",
+  "checked_at": "2026-09-30T23:58:08.135353+00:00",
   "statuses": [
     {
       "slug": "macro-series",
@@ -7,8 +7,8 @@
       "workflow": "macro-data-sync.yml",
       "severity": "critical",
       "state": "OK",
-      "detail": "fetched_at=2026-09-30T01:59:33+00:00",
-      "age_hours": 17.499885993611112
+      "detail": "fetched_at=2026-09-30T23:46:46+00:00",
+      "age_hours": 0.18953801388888888
     },
     {
       "slug": "hynix-price-snapshot",
@@ -17,7 +17,7 @@
       "severity": "critical",
       "state": "OK",
       "detail": "fetched_at=2026-09-30T16:17:31+00:00",
-      "age_hours": 3.2004709105555555
+      "age_hours": 7.677067995
     },
     {
       "slug": "hynix-investor-flow",
@@ -26,7 +26,7 @@
       "severity": "warning",
       "state": "OK",
       "detail": "마지막 성공=2026-09-30T16:17:29+00:00",
-      "age_hours": 3.201032634722222
+      "age_hours": 7.677629806666667
     },
     {
       "slug": "hynix-adr-quote",
@@ -35,7 +35,7 @@
       "severity": "warning",
       "state": "OK",
       "detail": "fetched_at=2026-09-30T16:17:30+00:00",
-      "age_hours": 3.200756382222222
+      "age_hours": 7.677353558055556
     },
     {
       "slug": "hynix-credit-balance",
@@ -44,7 +44,7 @@
       "severity": "warning",
       "state": "OK",
       "detail": "fetched_at=2026-09-30T16:17:32+00:00",
-      "age_hours": 3.2002024005555554
+      "age_hours": 7.676799583888889
     },
     {
       "slug": "hynix-short-sale",
@@ -53,7 +53,7 @@
       "severity": "warning",
       "state": "OK",
       "detail": "fetched_at=2026-09-30T16:17:35+00:00",
-      "age_hours": 3.1993707025
+      "age_hours": 7.675967863055555
     },
     {
       "slug": "kr-index-quote",
@@ -62,7 +62,7 @@
       "severity": "warning",
       "state": "OK",
       "detail": "fetched_at=2026-09-30T16:17:33+00:00",
-      "age_hours": 3.1999278869444443
+      "age_hours": 7.676525041944445
     },
     {
       "slug": "portfolio-etf-nav",
@@ -71,7 +71,7 @@
       "severity": "warning",
       "state": "OK",
       "detail": "fetched_at=2026-09-30T16:17:36+00:00",
-      "age_hours": 3.199096171111111
+      "age_hours": 7.6756933230555555
     },
     {
       "slug": "portfolio-holdings",
@@ -80,7 +80,7 @@
       "severity": "critical",
       "state": "OK",
       "detail": "fetched_at=2026-09-30T16:22:18+00:00",
-      "age_hours": 3.1207657372222224
+      "age_hours": 7.597362911944445
     },
     {
       "slug": "portfolio-bonds",
@@ -89,7 +89,7 @@
       "severity": "critical",
       "state": "OK",
       "detail": "fetched_at=2026-09-30T16:22:20+00:00",
-      "age_hours": 3.1202124763888888
+      "age_hours": 7.596809640277778
     },
     {
       "slug": "hyperscaler-capex",
@@ -98,7 +98,7 @@
       "severity": "warning",
       "state": "OK",
       "detail": "마지막 성공=2026-09-29T00:49:44+00:00",
-      "age_hours": 42.66354764361111
+      "age_hours": 47.14014483388889
     },
     {
       "slug": "ai-periphery-fundamentals",
@@ -107,7 +107,7 @@
       "severity": "warning",
       "state": "OK",
       "detail": "fetched_at=2026-09-29T00:49:50+00:00",
-      "age_hours": 42.661881135277774
+      "age_hours": 47.138478319722225
     },
     {
       "slug": "bottleneck-prices",
@@ -115,26 +115,26 @@
       "workflow": "macro-data-sync.yml",
       "severity": "warning",
       "state": "OK",
-      "detail": "fetched_at=2026-09-30T01:17:02+00:00",
-      "age_hours": 18.2085506875
+      "detail": "fetched_at=2026-09-30T23:46:48+00:00",
+      "age_hours": 0.18903684222222222
     },
     {
       "slug": "real-estate-apartment-sale",
       "description": "아파트 매매 실거래가 (국토부)",
       "workflow": "real-estate-sync.yml",
       "severity": "warning",
-      "state": "STALE",
-      "detail": "마지막 성공=2026-09-28T22:44:03+00:00",
-      "age_hours": 44.758274615833336
+      "state": "OK",
+      "detail": "마지막 성공=2026-09-30T21:38:47+00:00",
+      "age_hours": 2.3226495386111115
     },
     {
       "slug": "real-estate-apartment-rent",
       "description": "아파트 전월세 실거래가 (국토부)",
       "workflow": "real-estate-sync.yml",
       "severity": "warning",
-      "state": "STALE",
-      "detail": "마지막 성공=2026-09-28T22:45:03+00:00",
-      "age_hours": 44.741608333611104
+      "state": "OK",
+      "detail": "마지막 성공=2026-09-30T21:40:11+00:00",
+      "age_hours": 2.2993165841666667
     },
     {
       "slug": "subscription-monitor",
