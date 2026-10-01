@@ -149,7 +149,14 @@ def test_gate_publishes_when_something_actually_moved():
         assert gate.publish and gate.reasons
 
 
-def test_gate_stays_quiet_when_nothing_moved_and_nothing_is_due():
+def test_gate_stays_quiet_when_nothing_moved_and_nothing_is_due(tmp_path, monkeypatch):
+    # 실제 운영 헬스(data/health/latest_report.json)와 분리 — 2026-10-01 PEOS 리포트
+    # 장애로 critical이 뜨자 이 테스트가 운영 상태에 따라 실패했다. 헬스 경로는
+    # 별도 테스트가 다루고, 여기서는 "아무 일도 없을 때 조용하다"만 검사한다.
+    from engine.health import control
+    empty = tmp_path / "latest_report.json"
+    empty.write_text('{"statuses": []}', encoding="utf-8")
+    monkeypatch.setattr(control, "REPORT_JSON_PATH", empty)
     gate = C.evaluate_gate(date(1990, 1, 1), set(), [])
     assert not gate.publish
     assert gate.verdict == "조용한 날"
