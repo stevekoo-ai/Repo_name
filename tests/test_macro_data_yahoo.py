@@ -96,7 +96,10 @@ def test_sync_formats_yahoo_dates_like_fred_not_like_ecos():
     분기로 새면 `_, _, cycle = spec`에서 ValueError로 죽는다."""
     import inspect
     src = inspect.getsource(M.cmd_sync)
-    assert 'provider in ("fred", "yahoo")' in src
+    # 2026-10-01 cnn(공포·탐욕)도 같은 분기를 탄다 — 튜플에 yahoo·cnn이 함께 있으면 된다
+    import re
+    m = re.search(r'provider in \(([^)]*)\)', src)
+    assert m and '"fred"' in m.group(1) and '"yahoo"' in m.group(1) and '"cnn"' in m.group(1)
 
 
 def test_dxy_is_shown_in_the_briefing_fact_sheet_with_a_reference_label():

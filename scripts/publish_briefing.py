@@ -26,6 +26,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from core import notify  # noqa: E402
 from engine.briefing.render_html import render_briefing_html  # noqa: E402
+from engine.briefing import sentiment  # noqa: E402
 
 BRIEF_DIR = Path(__file__).resolve().parents[1] / "report" / "briefing"
 
@@ -65,6 +66,27 @@ def _appendix(md: str, day: date) -> str:
     return "\n\n---\n\n## 부록 — 자동 체크포인트 (코드 판정 원문)\n\n" + "\n".join(parts)
 
 
+def _after_h1(html: str, snippet: str) -> str:
+    """첫 </h1> 뒤에 끼운다(제목 바로 아래). 제목이 없으면 <body> 뒤."""
+    if not snippet:
+        return html
+    for tag in ("</h1>", "<body>"):
+        i = html.find(tag)
+        if i >= 0:
+            return html[: i + len(tag)] + "\n" + snippet + html[i + len(tag):]
+    return html
+
+
+def _line_after_h1(md: str, line: str) -> str:
+    out, done = [], False
+    for ln in md.splitlines():
+        out.append(ln)
+        if not done and ln.startswith("# "):
+            out += ["", line, ""]
+            done = True
+    return "\n".join(out) if done else md
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__,
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
@@ -83,7 +105,16 @@ def main() -> int:
         return 1
 
     md = md_path.read_text(encoding="utf-8")
-    html = render_briefing_html(md + _appendix(md, day))
+    # 2026-10-01 시장 심리 — 첨부 HTML엔 VIX 카드·공포탐욕 게이지(SVG),
+    # 메일 본문엔 수치 한 줄만(Gmail은 SVG를 못 그린다). 실패해도 발행은 계속.
+    try:
+        senti = sentiment.collect(day)
+        widget, line = sentiment.widget_html(senti), sentiment.text_line(senti)
+    except Exception as exc:  # noqa: BLE001
+        print(f"[warn] 시장 심리 위젯 생략: {exc}", file=sys.stderr)
+        widget, line = "", ""
+    html = _after_h1(render_briefing_html(md + _appendix(md, day)), widget)
+    mail_html = render_briefing_html(_line_after_h1(md, line) + _appendix(md, day)) if line else html
     html_path = md_path.with_suffix(".html")
     html_path.write_text(html, encoding="utf-8")
     print(f"HTML: {html_path} ({len(html.encode()):,} bytes)")
@@ -113,7 +144,7 @@ def main() -> int:
     if "\nnotice: true" in md_path.read_text(encoding="utf-8")[:400]:
         subject = f"[PEOS 상황 보고] {day.isoformat()} {label} 브리핑 대체 — 정규 브리핑 미발행 사유 포함"
     try:
-        notify.build_channel().send_document(subject, html, attachments=[html_path])
+        notify.build_channel().send_document(subject, mail_html, attachments=[html_path])
     except Exception as exc:  # noqa: BLE001 — 발송 실패는 조용히 넘기면 안 된다
         print(f"[error] 발송 실패: {exc}", file=sys.stderr)
         return 1

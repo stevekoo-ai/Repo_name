@@ -162,6 +162,10 @@ PRESETS = {
     "us_vix_yf": ("yahoo", "^VIX", "VIX(일별, yahoo — FRED VIXCLS의 신선도 쌍둥이)", "검증됨(2026-09-30 샌드박스 yahoo 조회)"),
     "us_10y_yf": ("yahoo", "^TNX", "미 10년물(CBOE ^TNX, %, yahoo — FRED DGS10과 산출 시점이 달라 소폭 차이)", "검증됨(2026-09-30 샌드박스 yahoo 조회)"),
     "us_brent_futures": ("yahoo", "BZ=F", "ICE 브렌트 선물 근월물(일별, 참고용·현물과 다른 정의)", "검증됨(2026-09-30 샌드박스 yahoo 조회)"),
+    # 2026-10-01 — CNN Fear & Greed(0~100, 7개 지표 합성). 공식 API가 없고
+    # production.dataviz.cnn.io의 차트용 JSON을 쓴다 — 브라우저형 헤더가 없으면
+    # 418(봇 차단)을 준다(9/30 실측). 끊겨도 보고서는 R3대로 "수집 실패"로 표시.
+    "us_fear_greed": ("cnn", "fearandgreed", "CNN 공포·탐욕 지수(0=극단 공포, 100=극단 탐욕, 일별)", "검증됨(2026-10-01 샌드박스 조회, 브라우저 헤더 필요)"),
     "in_nifty50": ("yahoo", "^NSEI", "인도 NIFTY 50 지수(일별)", "검증됨(2026-09-30 샌드박스 yahoo 조회)"),
     "in_usdinr": ("yahoo", "INR=X", "달러/루피 환율(일별, 오르면 루피 약세)", "검증됨(2026-09-30 샌드박스 yahoo 조회)"),
     "us_30y": ("fred", "DGS30", "미국 30년물 국채금리(일별)", "검증됨(2026-09-25 Actions 백필)"),
@@ -388,6 +392,44 @@ def cmd_list_presets(args):
         print(f"{name:<18}{provider:<6}{desc:<28}{verified}")
 
 
+CNN_FG_URL = "https://production.dataviz.cnn.io/index/fearandgreed/graphdata/{start}"
+CNN_HEADERS = {
+    "User-Agent": ("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
+                   "(KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36"),
+    "Accept": "application/json, text/plain, */*",
+    "Origin": "https://edition.cnn.com",
+    "Referer": "https://edition.cnn.com/markets/fear-and-greed",
+}
+
+
+def cnn_fear_greed(start=None):
+    """CNN 공포·탐욕 원본 JSON. 실패 시 SystemExit(동기화 루프는 그 계열만 건너뛴다)."""
+    start = start or (date.today() - timedelta(days=30)).isoformat()
+    req = urllib.request.Request(CNN_FG_URL.format(start=start[:10]), headers=CNN_HEADERS)
+    try:
+        with urllib.request.urlopen(req, timeout=20) as resp:
+            return json.loads(resp.read().decode("utf-8"))
+    except Exception as e:  # noqa: BLE001
+        sys.exit(f"CNN 공포·탐욕 조회 실패: {e}")
+
+
+def cnn_fetch(start=None, end=None, raw=False):
+    data = cnn_fear_greed(start)
+    if raw:
+        print(json.dumps(data, ensure_ascii=False, indent=2)[:4000])
+        return []
+    rows = {}
+    for pt in (data.get("fear_and_greed_historical") or {}).get("data") or []:
+        d = datetime.fromtimestamp(pt["x"] / 1000, tz=timezone.utc).date().isoformat()
+        rows[d] = f"{float(pt['y']):.2f}"
+    cur = data.get("fear_and_greed") or {}
+    if cur.get("score") is not None and cur.get("timestamp"):
+        rows[cur["timestamp"][:10]] = f"{float(cur['score']):.2f}"
+    if end:
+        rows = {d: v for d, v in rows.items() if d <= end}
+    return sorted(rows.items())
+
+
 def _fetch_preset(name, start=None, end=None, raw=False):
     provider, spec, desc, verified = PRESETS[name]
     print(f"# {desc} [{verified}]", file=sys.stderr)
@@ -396,6 +438,8 @@ def _fetch_preset(name, start=None, end=None, raw=False):
         return provider, rows
     if provider == "yahoo":
         return provider, yahoo_fetch(spec, start, end, raw=raw)
+    if provider == "cnn":
+        return provider, cnn_fetch(start, end, raw=raw)
     stat_code, item_code, cycle = spec
     raw_rows = ecos_fetch(stat_code, item_code, cycle, start, end, raw=raw)
     if raw:
@@ -493,7 +537,7 @@ def cmd_sync(args):
             start_date = date.today() - timedelta(days=DEFAULT_LOOKBACK_DAYS)
         end_date = date.today()
 
-        if provider in ("fred", "yahoo"):
+        if provider in ("fred", "yahoo", "cnn"):
             # yahoo는 ISO 날짜를 받아 내부에서 epoch로 바꾼다(fred와 같은 표기)
             start_str, end_str = _fmt_fred(start_date), _fmt_fred(end_date)
         else:
