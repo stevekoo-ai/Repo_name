@@ -74,14 +74,8 @@ jobs:
             git commit -m "chore: 청약 리포트 $(date -u +%Y-%m-%d)"
             # daily-peos-report.yml의 실측 사례(2026-08-08~10, 3일치 리포트가
             # push 거부로 통째로 폐기)와 동일한 재시도+rebase 루프.
-            BRANCH="${GITHUB_REF_NAME:-main}"
-            for i in 1 2 3 4 5; do
-              git push && break
-              echo "push rejected, rebasing onto latest $BRANCH (attempt $i)"
-              git fetch origin "$BRANCH"
-              git rebase "origin/$BRANCH"
-              sleep $((i * 3))
-            done
+            # 2026-10-01 공통 스크립트(재생성 가능 파일 충돌 자동 해결)
+            bash scripts/push_with_retry.sh || echo "::error::청약 리포트 push 실패"
           fi
 
       - name: Fail loudly if the report never reached the repo

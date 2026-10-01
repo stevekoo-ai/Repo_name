@@ -244,15 +244,8 @@ jobs:
             echo "No changes to commit"
           else
             git commit -m "chore: real estate data auto-sync $(date -u +%Y-%m-%dT%H:%M:%SZ)"
-            for i in 1 2 3 4 5; do
-              git push && break
-              echo "push rejected, rebasing onto latest (attempt $i)"
-              git fetch origin main
-              # --autostash: 커밋 대상이 아닌 잔여 변경(캐시 등)이 남아 있어도
-              # rebase가 죽지 않게 한다. 위 add 수정과 별개의 안전장치.
-              git rebase --autostash origin/main
-              sleep $((i * 3))
-            done
+            # 2026-10-01 공통 스크립트(--autostash 포함, 재생성 가능 파일 충돌 자동 해결)
+            bash scripts/push_with_retry.sh main || echo "::error::부동산 데이터 push 실패"
           fi
 
       # 2026-08-21 추가 — 잡 자체는 실패하지 않는 설계(하나 실패해도 나머지

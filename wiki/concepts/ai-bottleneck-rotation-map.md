@@ -37,6 +37,9 @@ tags: [ai-value-chain, bottleneck, sk-hynix, hedge, power, optical, nand, strate
 GPU(CUDA + TSMC 독점)와 HBM(3사 과점 + 긴 고객 인증)이 세 조건을 다
 충족했다.
 
+> 업종이 세 조건을 갖춰도, 그 안에서 **어느 기업이 주도주가 되는지**는 따로 가린다 —
+> [주도주 5단계 검증](leader-stock-5-step-validation.md)(추정치·현금흐름·이익 실현·가격결정력·자본수익률, 2026-10-01).
+
 ```
 2024~25  연산 병목      → GPU (엔비디아)
 2025~26  대역폭 병목    → HBM (SK하이닉스·마이크론·삼성)

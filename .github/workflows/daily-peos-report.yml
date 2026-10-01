@@ -121,14 +121,8 @@ jobs:
             # main had advanced since checkout, and the job exited 1 with the work
             # thrown away. Same rebase-and-retry loop real-estate-sync.yml already
             # uses — generation was never the problem, delivery was.
-            BRANCH="${GITHUB_REF_NAME:-main}"
-            for i in 1 2 3 4 5; do
-              git push && break
-              echo "push rejected, rebasing onto latest $BRANCH (attempt $i)"
-              git fetch origin "$BRANCH"
-              git rebase "origin/$BRANCH"
-              sleep $((i * 3))
-            done
+            # 2026-10-01 — reports-index.html 충돌로 9/30·10/1 연속 실패 → 공통 스크립트
+            bash scripts/push_with_retry.sh
           fi
 
       - name: Fail loudly if the report never reached the repo
