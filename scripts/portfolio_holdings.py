@@ -475,6 +475,72 @@ def upsert_holdings(account_label, holdings, source="kis_api"):
     return len(holdings)
 
 
+EXTERNAL_YAML = Path(__file__).resolve().parents[1] / "data" / "manual_inputs" / "external_holdings.yaml"
+PRICE_SNAPSHOT = Path(__file__).resolve().parents[1] / "sources" / "sk-hynix-price-snapshot.csv"
+EXTERNAL_STALE_DAYS = 90
+
+
+def _latest_price(ticker, today_rows):
+    """현재가: 오늘 KIS 동기화 행 → sk-hynix-price-snapshot.csv 최신 종가 순."""
+    for r in today_rows:
+        if r["ticker"] == ticker and r["source"] == "kis_api" and float(r["current_price"] or 0) > 0:
+            return float(r["current_price"]), "kis_holdings"
+    if ticker == "000660" and PRICE_SNAPSHOT.exists():
+        with PRICE_SNAPSHOT.open(newline="", encoding="utf-8") as f:
+            rows = list(csv.reader(f))
+        for r in reversed(rows):
+            try:
+                return float(r[2]), f"price_snapshot {r[0]}"
+            except (ValueError, IndexError):
+                continue
+    return None, None
+
+
+def sync_external():
+    """API가 없는 증권사(하나증권 등) 보유를 수동 파일 + 자동 가격으로 기록.
+
+    2026-10-01 신설 — 하나증권은 개인용 Open API가 없다(2026-08 증권사 오픈API
+    현황 기사에 미포함, 하나금융 API 마켓은 은행·기업 제휴용). 매일 바뀌는 건
+    가격뿐이고 수량·평단은 매도 때만 바뀌므로, 수량·평단은
+    data/manual_inputs/external_holdings.yaml에서, 가격은 KIS 시세에서 가져와
+    한투 계좌와 같은 CSV에 같은 날짜로 남긴다(리포트 합계에 자동 포함).
+    수동값이 오래되면(90일) 경고한다 — 조용히 낡은 수량을 쓰지 않게."""
+    if not EXTERNAL_YAML.exists():
+        return 0
+    try:
+        import yaml
+    except ImportError:
+        # 외부 계좌 실패가 한투 동기화(재시도 루프)를 실패로 만들면 안 된다 — 경고만
+        print("⚠ PyYAML 없음 — 외부 계좌(하나증권 등) 기록 건너뜀", file=sys.stderr)
+        return 0
+    cfg = yaml.safe_load(EXTERNAL_YAML.read_text(encoding="utf-8")) or {}
+    as_of = cfg.get("as_of")
+    if as_of:
+        age = (datetime.now(timezone.utc).date() - datetime.fromisoformat(str(as_of)).date()).days
+        if age > EXTERNAL_STALE_DAYS:
+            print(f"⚠ 외부 계좌 수동값이 {age}일 전({as_of}) 기준 — 수량·평단 확인 필요", file=sys.stderr)
+    today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    today_rows = [r for k, r in _read_csv().items() if k[0] == today]
+    by_label = {}
+    for h in cfg.get("holdings") or []:
+        price, src = _latest_price(str(h["ticker"]), today_rows)
+        if price is None:
+            print(f"[{h['broker']}] {h['name']} 현재가를 못 찾음 — 건너뜀", file=sys.stderr)
+            continue
+        qty, avg = int(h["quantity"]), float(h["avg_price"])
+        cost, ev = qty * avg, qty * price
+        by_label.setdefault(f"{h['broker']}(수동)", []).append({
+            "ticker": str(h["ticker"]), "name": h["name"], "quantity": qty, "avg_price": avg,
+            "current_price": price, "eval_amount": round(ev), "profit_loss": round(ev - cost),
+            "profit_loss_pct": round((ev - cost) / cost * 100, 2) if cost else 0,
+        })
+        print(f"[{h['broker']}(수동)] {h['name']} {qty}주 @ {price:,.0f}원({src})")
+    n = 0
+    for label, holdings in by_label.items():
+        n += upsert_holdings(label, holdings, source="manual_qty+kis_price")
+    return n
+
+
 def cmd_sync(args):
     accounts = _load_accounts()
     if args.account:
@@ -503,6 +569,8 @@ def cmd_sync(args):
         total += n
         print(f"[{acc['label']}] {n}개 보유종목 기록")
 
+    if not args.raw and not args.account:
+        total += sync_external()
     if not args.raw:
         print(f"\n총 {total}개 종목 → {CSV_PATH}")
 

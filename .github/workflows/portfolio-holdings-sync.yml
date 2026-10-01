@@ -59,6 +59,8 @@ jobs:
           KIS_ACCOUNT_DC: ${{ secrets.KIS_ACCOUNT_DC }}
           KIS_ACCOUNT_IRP: ${{ secrets.KIS_ACCOUNT_IRP }}
         run: |
+          # 2026-10-01 — 외부 계좌(하나증권) 수동 파일을 읽느라 PyYAML 필요
+          pip install --quiet PyYAML
           attempt=1; max_attempts=36
           until python3 scripts/portfolio_holdings.py sync; do
             if [ "$attempt" -ge "$max_attempts" ]; then
