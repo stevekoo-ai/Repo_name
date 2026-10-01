@@ -603,3 +603,7 @@ timestamp_utc,workflow,step,attempts_used,max_attempts,result
 2026-10-01T16:54:54Z,sk-hynix-daily-report,price_snapshot,1,36,success
 2026-10-01T16:55:01Z,sk-hynix-daily-report,report_generation,1,36,success
 2026-10-01T16:59:51Z,portfolio-holdings-sync,holdings_sync,1,36,success
+2026-10-01T22:06:47Z,real-estate-sync,apartment_sale,1,36,success
+2026-10-01T22:08:03Z,real-estate-sync,apartment_rent,1,36,success
+2026-10-01T22:08:38Z,real-estate-sync,villa_sale,1,36,success
+2026-10-01T22:09:11Z,real-estate-sync,officetel_sale,1,36,success
