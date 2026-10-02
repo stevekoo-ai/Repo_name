@@ -11,9 +11,11 @@ import publish_briefing as P  # noqa: E402
 from engine.briefing import sentiment as S  # noqa: E402
 from engine.briefing.render_html import render_briefing_html  # noqa: E402
 
-DATA = {"vix": {"value": 16.39, "chg_pct": 0.31, "date": "2026-10-01", "src": "yahoo"},
-        "fg": {"value": 28.0, "date": "2026-10-01", "zone": "공포", "cls": "f",
-               "prev": 30.0, "w1": 36.0, "m1": 45.0, "y1": 52.0}}
+SPARK = [("2026-07-01", 15.0), ("2026-08-01", 18.0), ("2026-09-01", 21.0), ("2026-10-01", 16.39)]
+_BASE = {"prev": 16.34, "chg_pct": 0.31, "w1": 15.67, "m1": 16.34, "m3": 16.15,
+         "pctile_1y": 35.0, "spark": SPARK, "date": "2026-10-01"}
+DATA = {"vix": {**_BASE, "value": 16.39, "src": "yahoo"},
+        "fg": {**_BASE, "value": 28.0, "prev": 30.0, "zone": "공포", "cls": "f"}}
 MD = "---\ntitle: t\n---\n\n# 저녁 브리핑\n\n본문\n"
 
 
@@ -32,11 +34,27 @@ def test_html_file_gets_graphic_and_mail_body_gets_numbers_only():
 
 
 def test_missing_data_says_cannot_judge_not_silent():
-    assert S.text_line({}).count("판단 불가") == 2
+    assert S.text_line({}).count("판단 불가") == 3
     w = S.widget_html({})
-    assert w.count("판단 불가") == 2 and "<svg" not in w
+    assert w.count("판단 불가") == 3 and "<svg" not in w
 
 
 def test_fear_greed_is_a_collected_preset():
     import macro_data as M
     assert M.PRESETS["us_fear_greed"][0] == "cnn"
+
+
+def test_cards_name_their_market_and_show_history():
+    w = S.widget_html(DATA)
+    assert "(미국 S&P500)" in w and "(한국 코스피200)" in w and "(미국 주식시장)" in w
+    assert w.count('class="spark"') == 2          # VIX·공포탐욕 추이선
+    assert "1년 백분위" in w and "3달 전" in w
+    assert "VKOSPI" in w and "수집 실패 — 판단 불가" in w   # VKOSPI 미수집은 숨기지 않는다
+
+
+def test_summarize_reads_history_correctly():
+    rows = [(f"2026-0{m}-01", float(m)) for m in range(1, 10)] + [("2026-10-01", 5.0)]
+    s = S._summarize(rows, __import__("datetime").date(2026, 10, 2))
+    assert s["value"] == 5.0 and s["prev"] == 9.0 and s["m1"] == 9.0
+    assert s["pctile_1y"] == 60.0                  # 10개(1~9, 5) 중 5 이하가 6개(1,2,3,4,5,5)
+    assert s["spark"][0][0] >= "2026-07-02"        # 최근 약 3개월만

@@ -180,6 +180,23 @@ jobs:
               --days 10 || echo "::warning::코스피 일봉 수집 실패 — 위 에러 로그 확인"
           fi
 
+      # 2026-10-02 추가 — 브리핑 시장 심리 위젯의 VKOSPI(한국판 VIX) 카드용.
+      # KIS 업종 마스터(idxcode.mst)의 "00503VKOSPI" 행 → 업종코드 0503.
+      # Yahoo엔 없고(404), KRX 정보데이터는 로그인 필요라 KIS가 유일한 출처다.
+      # 이력이 없으면(첫 실행) 2025-01부터 자동 백필, 이후엔 최근 10일만 upsert.
+      - name: VKOSPI 일봉 수집
+        env:
+          KIS_APP_KEY: ${{ secrets.KIS_APP_KEY }}
+          KIS_APP_SECRET: ${{ secrets.KIS_APP_SECRET }}
+        run: |
+          if ! grep -q ",0503," sources/daily-price-history.csv 2>/dev/null; then
+            python3 scripts/investor_flow.py daily-history --code 0503 --is-index \
+              --label "VKOSPI" --start 2025-01-01 || echo "::warning::VKOSPI 일봉 backfill 실패 — 위 에러 로그 확인"
+          else
+            python3 scripts/investor_flow.py daily-history --code 0503 --is-index \
+              --label "VKOSPI" --days 10 || echo "::warning::VKOSPI 일봉 수집 실패 — 위 에러 로그 확인"
+          fi
+
       - name: 상관관계 재계산
         run: python -m scripts.correlation_analysis
 

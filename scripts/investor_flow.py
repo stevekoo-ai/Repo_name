@@ -202,7 +202,7 @@ INDEX_CSV_FIELDS = [
     "advancers", "decliners", "unchanged", "limit_up", "limit_down",
     "source", "fetched_at",
 ]
-INDEX_NAMES = {"0001": "KOSPI", "1001": "KOSDAQ", "2001": "KOSPI200"}
+INDEX_NAMES = {"0001": "KOSPI", "1001": "KOSDAQ", "2001": "KOSPI200", "0503": "VKOSPI"}  # 0503: idxcode.mst "00503VKOSPI"(2026-10-02)
 
 # 월봉 이력 저장 — code별로 한 파일에 섞어 쓴다(종목·지수 구분은 code 컬럼).
 MONTHLY_PRICE_CSV_PATH = Path(__file__).resolve().parent.parent / "sources" / "monthly-price-history.csv"
