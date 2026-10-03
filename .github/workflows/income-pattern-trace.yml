@@ -34,8 +34,7 @@ jobs:
           pip install playwright
           playwright install --with-deps chromium
 
-      - name: Trace income requirement pattern
+      - name: DEBUG 최근 45일 전국/서울경기 공공분양 공고 실측 확인
         env:
           DATA_GO_KR_KEY: ${{ secrets.DATA_GO_KR_KEY }}
-          SCOPE: ${{ github.event.inputs.scope }}
-        run: python3 collectors/subscription_monitor/income_pattern_trace.py
+        run: python3 collectors/subscription_monitor/_debug_monthly_check.py
