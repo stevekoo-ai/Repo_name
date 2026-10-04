@@ -34,5 +34,7 @@ jobs:
           pip install playwright
           playwright install --with-deps chromium
 
-      - name: DEBUG resolve 남양주진접2지구 A-4블록 파싱 실패
+      - name: DEBUG resolve 남양주진접2지구 A-4블록 파싱 실패 (step2 — API로 PBLANC_URL 조회 후 Stage0 재시도)
+        env:
+          DATA_GO_KR_KEY: ${{ secrets.DATA_GO_KR_KEY }}
         run: python3 collectors/subscription_monitor/_debug_resolve.py
