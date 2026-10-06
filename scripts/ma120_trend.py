@@ -43,6 +43,14 @@ from __future__ import annotations
 import csv
 from datetime import date as date_cls, timedelta
 from pathlib import Path
+import sys
+
+# scripts/daily_report.py는 scripts/ 기준으로 실행돼 저장소 루트가 sys.path에 없다
+# (2026-10-06 휴장 필터 추가 때 이 import가 하이닉스 리포트를 죽일 뻔했다).
+_REPO_ROOT = Path(__file__).resolve().parents[1]
+if str(_REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(_REPO_ROOT))
+from engine.briefing.calendar import is_trading_day  # noqa: E402
 
 try:
     from scripts.investor_flow import read_price_snapshot_rows, DAILY_PRICE_CSV_PATH
@@ -76,6 +84,12 @@ def _load_close_series(ticker: str) -> list[dict]:
     for d, close in sorted(rows_by_date.items()):
         dt = date_cls.fromisoformat(d)
         if dt.weekday() >= 5:  # 토(5)·일(6) — 비거래일 캐리포워드 제외
+            continue
+        # 2026-10-06 — 공휴일도 제외. 시세 스냅샷이 휴장일에도 돌며 전일 종가를
+        # 그날 날짜로 남겨(9/24·9/25 추석, 10/5 개천절 대체) 거래 없는 날이
+        # MA120에 섞이고 선을 평평하게 만들었다. 휴장 캘린더(market_holidays_*.yaml)에
+        # 등록된 날만 거른다 — 미등록 연도는 기존처럼 주말만 거른다.
+        if not is_trading_day("KR", dt):
             continue
         out.append({"date": dt, "close": close})
     return out

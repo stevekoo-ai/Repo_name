@@ -7,6 +7,9 @@
 from __future__ import annotations
 
 from datetime import date, timedelta
+from pathlib import Path
+
+REPO = Path(__file__).resolve().parents[1]
 
 import scripts.ma120_trend as mod
 from scripts.ma120_trend import _linear_slope, compute_ma120_trend
@@ -126,3 +129,25 @@ def test_real_repo_data_smoke():
         assert result["current_ma120"] > 0
         assert 0 <= result["tracking_above_days"] <= mod.TRACKING_WINDOW_TRADING_DAYS
         assert result["tracking_above_days"] + result["tracking_below_days"] == mod.TRACKING_WINDOW_TRADING_DAYS
+
+
+def test_holiday_carry_forward_rows_are_excluded(tmp_path, monkeypatch):
+    # 2026-10-06 — 휴장일(9/24·9/25 추석, 10/5 개천절 대체)에 전일 종가가 복사된
+    # 스냅샷 행이 MA120에 섞이던 문제. 휴장 캘린더에 있는 날은 빠져야 한다.
+    p = tmp_path / "daily.csv"
+    p.write_text("date,code,label,close,source,fetched_at\n"
+                 "2026-09-23,000660,x,100,kis,\n2026-09-24,000660,x,100,kis,\n"
+                 "2026-09-25,000660,x,100,kis,\n2026-09-28,000660,x,90,kis,\n"
+                 "2026-10-05,000660,x,90,kis,\n2026-10-06,000660,x,95,kis,\n", encoding="utf-8")
+    monkeypatch.setattr(mod, "DAILY_PRICE_CSV_PATH", p)
+    monkeypatch.setattr(mod, "read_price_snapshot_rows", lambda t: [])
+    days = [str(r["date"]) for r in mod._load_close_series("000660")]
+    assert days == ["2026-09-23", "2026-09-28", "2026-10-06"]
+
+
+def test_importable_the_way_daily_report_runs_it():
+    # scripts/daily_report.py는 scripts/ 기준으로 실행된다 — 저장소 루트가 path에 없어도 import돼야 한다
+    import subprocess, sys as _sys
+    r = subprocess.run([_sys.executable, "-c", "import ma120_trend"], cwd=str(REPO / "scripts"),
+                       capture_output=True, text=True, env={"PATH": ""})
+    assert r.returncode == 0, r.stderr
