@@ -1,5 +1,5 @@
 {
-  "checked_at": "2026-10-07T17:28:02.093731+00:00",
+  "checked_at": "2026-10-07T23:11:42.008158+00:00",
   "statuses": [
     {
       "slug": "macro-series",
@@ -8,7 +8,7 @@
       "severity": "critical",
       "state": "OK",
       "detail": "fetched_at=2026-10-07T01:30:57+00:00",
-      "age_hours": 15.951465189722223
+      "age_hours": 21.679218014444444
     },
     {
       "slug": "hynix-price-snapshot",
@@ -17,7 +17,7 @@
       "severity": "critical",
       "state": "OK",
       "detail": "fetched_at=2026-10-07T17:18:57+00:00",
-      "age_hours": 0.1514946925
+      "age_hours": 5.879246709166667
     },
     {
       "slug": "hynix-investor-flow",
@@ -26,7 +26,7 @@
       "severity": "warning",
       "state": "OK",
       "detail": "마지막 성공=2026-10-07T17:18:55+00:00",
-      "age_hours": 0.1520557125
+      "age_hours": 5.879807538333333
     },
     {
       "slug": "hynix-adr-quote",
@@ -35,7 +35,7 @@
       "severity": "warning",
       "state": "OK",
       "detail": "fetched_at=2026-10-07T17:18:56+00:00",
-      "age_hours": 0.15177918472222224
+      "age_hours": 5.879530958888889
     },
     {
       "slug": "hynix-credit-balance",
@@ -44,7 +44,7 @@
       "severity": "warning",
       "state": "OK",
       "detail": "fetched_at=2026-10-07T17:18:57+00:00",
-      "age_hours": 0.15150270666666668
+      "age_hours": 5.879254408055555
     },
     {
       "slug": "hynix-short-sale",
@@ -53,7 +53,7 @@
       "severity": "warning",
       "state": "OK",
       "detail": "fetched_at=2026-10-07T17:19:00+00:00",
-      "age_hours": 0.1506708463888889
+      "age_hours": 5.878422354444445
     },
     {
       "slug": "kr-index-quote",
@@ -62,7 +62,7 @@
       "severity": "warning",
       "state": "OK",
       "detail": "fetched_at=2026-10-07T17:18:59+00:00",
-      "age_hours": 0.15094998916666666
+      "age_hours": 5.878701444444444
     },
     {
       "slug": "portfolio-etf-nav",
@@ -71,7 +71,7 @@
       "severity": "warning",
       "state": "OK",
       "detail": "fetched_at=2026-10-07T17:19:01+00:00",
-      "age_hours": 0.15039574416666665
+      "age_hours": 5.878147185277778
     },
     {
       "slug": "portfolio-holdings",
@@ -80,7 +80,7 @@
       "severity": "critical",
       "state": "OK",
       "detail": "fetched_at=2026-10-07T17:23:20+00:00",
-      "age_hours": 0.07845414611111112
+      "age_hours": 5.80620545861111
     },
     {
       "slug": "portfolio-bonds",
@@ -89,7 +89,7 @@
       "severity": "critical",
       "state": "OK",
       "detail": "fetched_at=2026-10-07T17:23:21+00:00",
-      "age_hours": 0.07817845944444445
+      "age_hours": 5.805929893055556
     },
     {
       "slug": "hyperscaler-capex",
@@ -98,7 +98,7 @@
       "severity": "warning",
       "state": "OK",
       "detail": "마지막 성공=2026-10-06T01:40:07+00:00",
-      "age_hours": 39.798735588611116
+      "age_hours": 45.52648701166667
     },
     {
       "slug": "ai-periphery-fundamentals",
@@ -107,7 +107,7 @@
       "severity": "warning",
       "state": "OK",
       "detail": "fetched_at=2026-10-06T01:40:14+00:00",
-      "age_hours": 39.796791289999994
+      "age_hours": 45.524542705555554
     },
     {
       "slug": "bottleneck-prices",
@@ -116,7 +116,7 @@
       "severity": "warning",
       "state": "OK",
       "detail": "fetched_at=2026-10-07T01:30:59+00:00",
-      "age_hours": 15.950960439166668
+      "age_hours": 21.678711809444444
     },
     {
       "slug": "real-estate-apartment-sale",
@@ -124,8 +124,8 @@
       "workflow": "real-estate-sync.yml",
       "severity": "warning",
       "state": "OK",
-      "detail": "마지막 성공=2026-10-06T21:59:50+00:00",
-      "age_hours": 19.47012870972222
+      "detail": "마지막 성공=2026-10-07T22:24:24+00:00",
+      "age_hours": 0.7884355966666666
     },
     {
       "slug": "real-estate-apartment-rent",
@@ -133,8 +133,8 @@
       "workflow": "real-estate-sync.yml",
       "severity": "warning",
       "state": "OK",
-      "detail": "마지막 성공=2026-10-06T22:00:50+00:00",
-      "age_hours": 19.45346245388889
+      "detail": "마지막 성공=2026-10-07T22:25:20+00:00",
+      "age_hours": 0.7728804258333334
     },
     {
       "slug": "subscription-monitor",
