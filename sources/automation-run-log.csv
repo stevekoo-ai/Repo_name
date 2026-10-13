@@ -808,3 +808,6 @@ timestamp_utc,workflow,step,attempts_used,max_attempts,result
 2026-10-13T02:01:09Z,macro-data-sync,bottleneck_prices,1,3,success
 2026-10-13T02:25:26Z,sec-edgar-capex,capex_fetch,1,36,success
 2026-10-13T02:40:46Z,core10-collect,core10,1,4,success
+2026-10-13T02:48:46Z,sk-hynix-daily-report,investor_flow_fetch,1,36,success
+2026-10-13T02:48:47Z,sk-hynix-daily-report,price_snapshot,1,36,success
+2026-10-13T02:48:52Z,sk-hynix-daily-report,report_generation,1,36,success
