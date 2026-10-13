@@ -1,5 +1,5 @@
 {
-  "checked_at": "2026-10-12T23:04:50.897530+00:00",
+  "checked_at": "2026-10-13T06:54:09.753351+00:00",
   "statuses": [
     {
       "slug": "macro-series",
@@ -7,8 +7,8 @@
       "workflow": "macro-data-sync.yml",
       "severity": "critical",
       "state": "OK",
-      "detail": "fetched_at=2026-10-12T01:18:33+00:00",
-      "age_hours": 21.771696385
+      "detail": "fetched_at=2026-10-13T03:02:07+00:00",
+      "age_hours": 3.8674886333333336
     },
     {
       "slug": "hynix-price-snapshot",
@@ -16,8 +16,8 @@
       "workflow": "sk-hynix-daily-report.yml",
       "severity": "critical",
       "state": "OK",
-      "detail": "fetched_at=2026-10-12T19:39:53+00:00",
-      "age_hours": 3.4161727991666666
+      "detail": "fetched_at=2026-10-13T02:48:47+00:00",
+      "age_hours": 4.08974316
     },
     {
       "slug": "hynix-investor-flow",
@@ -25,8 +25,8 @@
       "workflow": "sk-hynix-daily-report.yml",
       "severity": "warning",
       "state": "OK",
-      "detail": "마지막 성공=2026-10-12T19:39:52+00:00",
-      "age_hours": 3.416457136388889
+      "detail": "마지막 성공=2026-10-13T02:48:46+00:00",
+      "age_hours": 4.090027780833333
     },
     {
       "slug": "hynix-adr-quote",
@@ -34,8 +34,8 @@
       "workflow": "sk-hynix-daily-report.yml",
       "severity": "warning",
       "state": "OK",
-      "detail": "fetched_at=2026-10-12T19:39:52+00:00",
-      "age_hours": 3.416458681388889
+      "detail": "fetched_at=2026-10-13T02:48:47+00:00",
+      "age_hours": 4.089751595
     },
     {
       "slug": "hynix-credit-balance",
@@ -43,8 +43,8 @@
       "workflow": "sk-hynix-daily-report.yml",
       "severity": "warning",
       "state": "OK",
-      "detail": "fetched_at=2026-10-12T19:39:54+00:00",
-      "age_hours": 3.4159047333333334
+      "detail": "fetched_at=2026-10-13T02:48:48+00:00",
+      "age_hours": 4.089475432777778
     },
     {
       "slug": "hynix-short-sale",
@@ -52,8 +52,8 @@
       "workflow": "sk-hynix-daily-report.yml",
       "severity": "warning",
       "state": "OK",
-      "detail": "fetched_at=2026-10-12T19:39:56+00:00",
-      "age_hours": 3.4153508094444445
+      "detail": "fetched_at=2026-10-13T02:48:51+00:00",
+      "age_hours": 4.088643770833333
     },
     {
       "slug": "kr-index-quote",
@@ -61,8 +61,8 @@
       "workflow": "sk-hynix-daily-report.yml",
       "severity": "warning",
       "state": "OK",
-      "detail": "fetched_at=2026-10-12T19:39:55+00:00",
-      "age_hours": 3.4156302722222223
+      "detail": "fetched_at=2026-10-13T02:48:49+00:00",
+      "age_hours": 4.089201006388889
     },
     {
       "slug": "portfolio-etf-nav",
@@ -70,8 +70,8 @@
       "workflow": "sk-hynix-daily-report.yml",
       "severity": "warning",
       "state": "OK",
-      "detail": "fetched_at=2026-10-12T19:39:57+00:00",
-      "age_hours": 3.41507637
+      "detail": "fetched_at=2026-10-13T02:48:52+00:00",
+      "age_hours": 4.088369384444444
     },
     {
       "slug": "portfolio-holdings",
@@ -80,7 +80,7 @@
       "severity": "critical",
       "state": "OK",
       "detail": "fetched_at=2026-10-12T19:45:43+00:00",
-      "age_hours": 3.3189686869444444
+      "age_hours": 11.140872901666667
     },
     {
       "slug": "portfolio-bonds",
@@ -89,7 +89,7 @@
       "severity": "critical",
       "state": "OK",
       "detail": "fetched_at=2026-10-12T19:45:44+00:00",
-      "age_hours": 3.3186934822222223
+      "age_hours": 11.140597797777778
     },
     {
       "slug": "hyperscaler-capex",
@@ -97,8 +97,8 @@
       "workflow": "sec-edgar-capex.yml",
       "severity": "warning",
       "state": "OK",
-      "detail": "마지막 성공=2026-10-06T01:40:07+00:00",
-      "age_hours": 165.4123065863889
+      "detail": "마지막 성공=2026-10-13T02:25:26+00:00",
+      "age_hours": 4.478933138888888
     },
     {
       "slug": "ai-periphery-fundamentals",
@@ -106,8 +106,8 @@
       "workflow": "sec-edgar-capex.yml",
       "severity": "warning",
       "state": "OK",
-      "detail": "fetched_at=2026-10-06T01:40:14+00:00",
-      "age_hours": 165.41036229666665
+      "detail": "fetched_at=2026-10-13T02:25:35+00:00",
+      "age_hours": 4.476433313333333
     },
     {
       "slug": "bottleneck-prices",
@@ -115,26 +115,26 @@
       "workflow": "macro-data-sync.yml",
       "severity": "warning",
       "state": "OK",
-      "detail": "fetched_at=2026-10-12T01:18:35+00:00",
-      "age_hours": 21.77119842861111
+      "detail": "fetched_at=2026-10-13T03:02:09+00:00",
+      "age_hours": 3.866991781111111
     },
     {
       "slug": "real-estate-apartment-sale",
       "description": "아파트 매매 실거래가 (국토부)",
       "workflow": "real-estate-sync.yml",
       "severity": "warning",
-      "state": "STALE",
-      "detail": "마지막 성공=2026-10-09T21:59:14+00:00",
-      "age_hours": 73.09370026083333
+      "state": "OK",
+      "detail": "마지막 성공=2026-10-12T23:55:42+00:00",
+      "age_hours": 6.974493745277778
     },
     {
       "slug": "real-estate-apartment-rent",
       "description": "아파트 전월세 실거래가 (국토부)",
       "workflow": "real-estate-sync.yml",
       "severity": "warning",
-      "state": "STALE",
-      "detail": "마지막 성공=2026-10-09T22:00:45+00:00",
-      "age_hours": 73.068422995
+      "state": "OK",
+      "detail": "마지막 성공=2026-10-12T23:56:50+00:00",
+      "age_hours": 6.9556053902777775
     },
     {
       "slug": "subscription-monitor",
@@ -142,7 +142,7 @@
       "workflow": "subscription-monitor.yml",
       "severity": "warning",
       "state": "OK",
-      "detail": "자체 감시 정상 (연속실패 0, 최근 심박 2026-10-12)",
+      "detail": "자체 감시 정상 (연속실패 0, 최근 심박 2026-10-13)",
       "age_hours": null
     },
     {
@@ -151,7 +151,7 @@
       "workflow": "daily-peos-report.yml",
       "severity": "critical",
       "state": "OK",
-      "detail": "report/2026-10-12.md 존재 (0일 전 날짜)",
+      "detail": "report/2026-10-13.md 존재 (0일 전 날짜)",
       "age_hours": 0.0
     },
     {
@@ -160,7 +160,7 @@
       "workflow": "subscription-daily-report.yml",
       "severity": "warning",
       "state": "OK",
-      "detail": "report/subscription-report-2026-10-12.md 존재 (0일 전 날짜)",
+      "detail": "report/subscription-report-2026-10-13.md 존재 (0일 전 날짜)",
       "age_hours": 0.0
     },
     {
@@ -169,8 +169,8 @@
       "workflow": "scripts/data_freshness_audit.py (core10-collect.yml 등)",
       "severity": "warning",
       "state": "STALE",
-      "detail": "STALE — 최신 2026-04-01, 194일 경과",
-      "age_hours": 4656.0
+      "detail": "STALE — 최신 2026-04-01, 195일 경과",
+      "age_hours": 4680.0
     },
     {
       "slug": "normalized:fred_kr_retail_sales_mom_oecd",
@@ -178,8 +178,8 @@
       "workflow": "scripts/data_freshness_audit.py (core10-collect.yml 등)",
       "severity": "warning",
       "state": "STALE",
-      "detail": "STALE — 최신 2026-07-01, 103일 경과",
-      "age_hours": 2472.0
+      "detail": "STALE — 최신 2026-07-01, 104일 경과",
+      "age_hours": 2496.0
     },
     {
       "slug": "normalized:fred_kr_unemployment_oecd",
@@ -187,8 +187,17 @@
       "workflow": "scripts/data_freshness_audit.py (core10-collect.yml 등)",
       "severity": "warning",
       "state": "STALE",
-      "detail": "STALE — 최신 2026-07-01, 103일 경과",
-      "age_hours": 2472.0
+      "detail": "STALE — 최신 2026-07-01, 104일 경과",
+      "age_hours": 2496.0
+    },
+    {
+      "slug": "normalized:fred_us_dollar_index",
+      "description": "정규화 시리즈: fred_us_dollar_index (daily)",
+      "workflow": "scripts/data_freshness_audit.py (core10-collect.yml 등)",
+      "severity": "warning",
+      "state": "STALE",
+      "detail": "STALE — 최신 2026-10-02, 11일 경과",
+      "age_hours": 264.0
     },
     {
       "slug": "normalized:fred_us_gdp_qoq",
@@ -196,8 +205,8 @@
       "workflow": "scripts/data_freshness_audit.py (core10-collect.yml 등)",
       "severity": "warning",
       "state": "STALE",
-      "detail": "STALE — 최신 2026-04-01, 194일 경과",
-      "age_hours": 4656.0
+      "detail": "STALE — 최신 2026-04-01, 195일 경과",
+      "age_hours": 4680.0
     },
     {
       "slug": "normalized:imf_current_account_chn",
@@ -205,8 +214,8 @@
       "workflow": "scripts/data_freshness_audit.py (core10-collect.yml 등)",
       "severity": "warning",
       "state": "STALE",
-      "detail": "STALE — 최신 2025-01-01, 649일 경과",
-      "age_hours": 15576.0
+      "detail": "STALE — 최신 2025-01-01, 650일 경과",
+      "age_hours": 15600.0
     },
     {
       "slug": "normalized:imf_current_account_jpn",
@@ -214,8 +223,8 @@
       "workflow": "scripts/data_freshness_audit.py (core10-collect.yml 등)",
       "severity": "warning",
       "state": "STALE",
-      "detail": "STALE — 최신 2025-01-01, 649일 경과",
-      "age_hours": 15576.0
+      "detail": "STALE — 최신 2025-01-01, 650일 경과",
+      "age_hours": 15600.0
     },
     {
       "slug": "normalized:imf_current_account_kor",
@@ -223,8 +232,8 @@
       "workflow": "scripts/data_freshness_audit.py (core10-collect.yml 등)",
       "severity": "warning",
       "state": "STALE",
-      "detail": "STALE — 최신 2025-01-01, 649일 경과",
-      "age_hours": 15576.0
+      "detail": "STALE — 최신 2025-01-01, 650일 경과",
+      "age_hours": 15600.0
     },
     {
       "slug": "normalized:imf_current_account_usa",
@@ -232,8 +241,8 @@
       "workflow": "scripts/data_freshness_audit.py (core10-collect.yml 등)",
       "severity": "warning",
       "state": "STALE",
-      "detail": "STALE — 최신 2025-01-01, 649일 경과",
-      "age_hours": 15576.0
+      "detail": "STALE — 최신 2025-01-01, 650일 경과",
+      "age_hours": 15600.0
     },
     {
       "slug": "normalized:imf_gdp_growth_chn",
@@ -241,8 +250,8 @@
       "workflow": "scripts/data_freshness_audit.py (core10-collect.yml 등)",
       "severity": "warning",
       "state": "STALE",
-      "detail": "STALE — 최신 2025-01-01, 649일 경과",
-      "age_hours": 15576.0
+      "detail": "STALE — 최신 2025-01-01, 650일 경과",
+      "age_hours": 15600.0
     },
     {
       "slug": "normalized:imf_gdp_growth_jpn",
@@ -250,8 +259,8 @@
       "workflow": "scripts/data_freshness_audit.py (core10-collect.yml 등)",
       "severity": "warning",
       "state": "STALE",
-      "detail": "STALE — 최신 2025-01-01, 649일 경과",
-      "age_hours": 15576.0
+      "detail": "STALE — 최신 2025-01-01, 650일 경과",
+      "age_hours": 15600.0
     },
     {
       "slug": "normalized:imf_gdp_growth_kor",
@@ -259,8 +268,8 @@
       "workflow": "scripts/data_freshness_audit.py (core10-collect.yml 등)",
       "severity": "warning",
       "state": "STALE",
-      "detail": "STALE — 최신 2025-01-01, 649일 경과",
-      "age_hours": 15576.0
+      "detail": "STALE — 최신 2025-01-01, 650일 경과",
+      "age_hours": 15600.0
     },
     {
       "slug": "normalized:imf_gdp_growth_usa",
@@ -268,8 +277,8 @@
       "workflow": "scripts/data_freshness_audit.py (core10-collect.yml 등)",
       "severity": "warning",
       "state": "STALE",
-      "detail": "STALE — 최신 2025-01-01, 649일 경과",
-      "age_hours": 15576.0
+      "detail": "STALE — 최신 2025-01-01, 650일 경과",
+      "age_hours": 15600.0
     },
     {
       "slug": "normalized:imf_govt_debt_chn",
@@ -277,8 +286,8 @@
       "workflow": "scripts/data_freshness_audit.py (core10-collect.yml 등)",
       "severity": "warning",
       "state": "STALE",
-      "detail": "STALE — 최신 2025-01-01, 649일 경과",
-      "age_hours": 15576.0
+      "detail": "STALE — 최신 2025-01-01, 650일 경과",
+      "age_hours": 15600.0
     },
     {
       "slug": "normalized:imf_govt_debt_jpn",
@@ -286,8 +295,8 @@
       "workflow": "scripts/data_freshness_audit.py (core10-collect.yml 등)",
       "severity": "warning",
       "state": "STALE",
-      "detail": "STALE — 최신 2025-01-01, 649일 경과",
-      "age_hours": 15576.0
+      "detail": "STALE — 최신 2025-01-01, 650일 경과",
+      "age_hours": 15600.0
     },
     {
       "slug": "normalized:imf_govt_debt_kor",
@@ -295,8 +304,8 @@
       "workflow": "scripts/data_freshness_audit.py (core10-collect.yml 등)",
       "severity": "warning",
       "state": "STALE",
-      "detail": "STALE — 최신 2025-01-01, 649일 경과",
-      "age_hours": 15576.0
+      "detail": "STALE — 최신 2025-01-01, 650일 경과",
+      "age_hours": 15600.0
     },
     {
       "slug": "normalized:imf_govt_debt_usa",
@@ -304,8 +313,8 @@
       "workflow": "scripts/data_freshness_audit.py (core10-collect.yml 등)",
       "severity": "warning",
       "state": "STALE",
-      "detail": "STALE — 최신 2025-01-01, 649일 경과",
-      "age_hours": 15576.0
+      "detail": "STALE — 최신 2025-01-01, 650일 경과",
+      "age_hours": 15600.0
     },
     {
       "slug": "normalized:imf_inflation_chn",
@@ -313,8 +322,8 @@
       "workflow": "scripts/data_freshness_audit.py (core10-collect.yml 등)",
       "severity": "warning",
       "state": "STALE",
-      "detail": "STALE — 최신 2025-01-01, 649일 경과",
-      "age_hours": 15576.0
+      "detail": "STALE — 최신 2025-01-01, 650일 경과",
+      "age_hours": 15600.0
     },
     {
       "slug": "normalized:imf_inflation_jpn",
@@ -322,8 +331,8 @@
       "workflow": "scripts/data_freshness_audit.py (core10-collect.yml 등)",
       "severity": "warning",
       "state": "STALE",
-      "detail": "STALE — 최신 2025-01-01, 649일 경과",
-      "age_hours": 15576.0
+      "detail": "STALE — 최신 2025-01-01, 650일 경과",
+      "age_hours": 15600.0
     },
     {
       "slug": "normalized:imf_inflation_kor",
@@ -331,8 +340,8 @@
       "workflow": "scripts/data_freshness_audit.py (core10-collect.yml 등)",
       "severity": "warning",
       "state": "STALE",
-      "detail": "STALE — 최신 2025-01-01, 649일 경과",
-      "age_hours": 15576.0
+      "detail": "STALE — 최신 2025-01-01, 650일 경과",
+      "age_hours": 15600.0
     },
     {
       "slug": "normalized:imf_inflation_usa",
@@ -340,8 +349,8 @@
       "workflow": "scripts/data_freshness_audit.py (core10-collect.yml 등)",
       "severity": "warning",
       "state": "STALE",
-      "detail": "STALE — 최신 2025-01-01, 649일 경과",
-      "age_hours": 15576.0
+      "detail": "STALE — 최신 2025-01-01, 650일 경과",
+      "age_hours": 15600.0
     },
     {
       "slug": "normalized:imf_unemployment_chn",
@@ -349,8 +358,8 @@
       "workflow": "scripts/data_freshness_audit.py (core10-collect.yml 등)",
       "severity": "warning",
       "state": "STALE",
-      "detail": "STALE — 최신 2025-01-01, 649일 경과",
-      "age_hours": 15576.0
+      "detail": "STALE — 최신 2025-01-01, 650일 경과",
+      "age_hours": 15600.0
     },
     {
       "slug": "normalized:imf_unemployment_jpn",
@@ -358,8 +367,8 @@
       "workflow": "scripts/data_freshness_audit.py (core10-collect.yml 등)",
       "severity": "warning",
       "state": "STALE",
-      "detail": "STALE — 최신 2025-01-01, 649일 경과",
-      "age_hours": 15576.0
+      "detail": "STALE — 최신 2025-01-01, 650일 경과",
+      "age_hours": 15600.0
     },
     {
       "slug": "normalized:imf_unemployment_kor",
@@ -367,8 +376,8 @@
       "workflow": "scripts/data_freshness_audit.py (core10-collect.yml 등)",
       "severity": "warning",
       "state": "STALE",
-      "detail": "STALE — 최신 2025-01-01, 649일 경과",
-      "age_hours": 15576.0
+      "detail": "STALE — 최신 2025-01-01, 650일 경과",
+      "age_hours": 15600.0
     },
     {
       "slug": "normalized:imf_unemployment_usa",
@@ -376,8 +385,8 @@
       "workflow": "scripts/data_freshness_audit.py (core10-collect.yml 등)",
       "severity": "warning",
       "state": "STALE",
-      "detail": "STALE — 최신 2025-01-01, 649일 경과",
-      "age_hours": 15576.0
+      "detail": "STALE — 최신 2025-01-01, 650일 경과",
+      "age_hours": 15600.0
     },
     {
       "slug": "normalized-series-sweep",
@@ -385,7 +394,7 @@
       "workflow": "scripts/data_freshness_audit.py",
       "severity": "warning",
       "state": "ANOMALY",
-      "detail": "ok 211 / 이상 24 / 알려진 설계상 이상(비알림) 2 — 상세는 개별 normalized:* 항목 참고",
+      "detail": "ok 210 / 이상 25 / 알려진 설계상 이상(비알림) 2 — 상세는 개별 normalized:* 항목 참고",
       "age_hours": null
     }
   ]
