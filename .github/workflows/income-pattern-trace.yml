@@ -26,7 +26,15 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: DEBUG 소득요건 자동검증 재조사 (90일 전국 분포 + 추적누락 교차검증)
+      - name: Install poppler-utils (pdftotext)
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends poppler-utils
+
+      - name: Install Playwright + Chromium
+        run: |
+          pip install playwright
+          playwright install --with-deps chromium
+
+      - name: DEBUG resolve 수원당수지구 A5블록 (추적누락 발견분)
         env:
           DATA_GO_KR_KEY: ${{ secrets.DATA_GO_KR_KEY }}
-        run: python3 collectors/subscription_monitor/_debug_reverify.py
+        run: python3 collectors/subscription_monitor/_debug_resolve.py
