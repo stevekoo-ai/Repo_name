@@ -52,6 +52,55 @@ def fetch_all(service_key: str, today: str) -> list[dict]:
     return rows
 
 
+RECENT_CATCHUP_DAYS = 14
+
+
+def fetch_recent_announcements(service_key: str, since: str) -> list[dict]:
+    """Fetch 국민주택 rows announced (RCRIT_PBLANC_DE) since `since`,
+    REGARDLESS of whether their reception window is still open —
+    complements fetch_all()'s RCEPT_ENDDE>=today filter.
+
+    2026-10-14 발견(사용자 "재조사해봐" 요청으로 90일 전수조회 중 확인):
+    수원당수지구 A5블록(접수기간이 단 하루, 08-03~08-04)이
+    alerted_state.json에 전혀 없었다 — 추적 누락. RCEPT_ENDDE>=today 필터만
+    쓰면, 접수창이 극히 짧은 공고(무순위·잔여세대 추가모집 등 하루짜리가
+    드물지 않음)는 30분 폴링 사이클이 "열려있는" 그 하루를 못 맞추면
+    전체 창이 통째로 지나가 영원히 안 보인다. 이 함수는 "공고일" 기준으로
+    최근 N일(RECENT_CATCHUP_DAYS)을 따로 훑어, 이미 닫혔어도 놓쳤을 수 있는
+    건을 잡아 judge/소득검증 파이프라인에 합류시킨다(HTML "접수중" 표에는
+    안 올라감 — main()에서 표는 여전히 fetch_all() 결과만 사용)."""
+    rows: list[dict] = []
+    page = 1
+    while True:
+        params = {
+            "page": page,
+            "perPage": 200,
+            "cond[HOUSE_DTL_SECD_NM::EQ]": "국민",
+            "cond[RCRIT_PBLANC_DE::GTE]": since,
+        }
+        url = BASE_URL + "?" + urllib.parse.urlencode(params)
+        req = urllib.request.Request(url, headers={"Authorization": f"Infuser {service_key}"})
+        with urllib.request.urlopen(req, timeout=20) as resp:
+            data = json.load(resp)
+        rows.extend(data.get("data", []))
+        match_count = data.get("matchCount", 0)
+        per_page = data.get("perPage", 200)
+        if page * per_page >= match_count or page > 10:
+            break
+        page += 1
+    return rows
+
+
+def merge_catchup_rows(open_rows: list[dict], recent_rows: list[dict]) -> list[dict]:
+    """open_rows ∪ recent_rows, deduped by HOUSE_MANAGE_NO/PBLANC_NO, both
+    already filtered to TARGET_REGIONS by the caller. open_rows take
+    precedence on duplicate ids (freshest fetch wins, though fields rarely
+    differ)."""
+    known_ids = {r.get("HOUSE_MANAGE_NO") or r.get("PBLANC_NO") for r in open_rows}
+    extra = [r for r in recent_rows if (r.get("HOUSE_MANAGE_NO") or r.get("PBLANC_NO")) not in known_ids]
+    return open_rows + extra
+
+
 def api_looks_healthy(service_key: str) -> bool:
     """A bare, unfiltered query against this dataset should always return a large
     totalCount (thousands, nationwide, all history). If it comes back ~0, the API
@@ -305,10 +354,26 @@ def main() -> None:
 
     rows = [r for r in all_rows if r.get("SUBSCRPT_AREA_CODE_NM") in TARGET_REGIONS]
 
+    # Catch-up pass (2026-10-14) — narrow-window notices (접수 1일짜리 등)
+    # can close entirely between two 30-min polls and never once appear in
+    # `rows` above; pull recent announcements by RCRIT_PBLANC_DE too so the
+    # judge/alert/income-review pipeline still sees them even after they've
+    # closed. The HTML "접수중" table below intentionally still renders only
+    # `rows` (currently-open) — catch-up entries don't belong on that table.
+    since = (now_kst - timedelta(days=RECENT_CATCHUP_DAYS)).strftime("%Y-%m-%d")
+    try:
+        recent_rows = fetch_recent_announcements(service_key, since)
+        recent_rows_sg = [r for r in recent_rows if r.get("SUBSCRPT_AREA_CODE_NM") in TARGET_REGIONS]
+    except Exception as e:
+        # Never let the catch-up pass itself take down the main cycle.
+        print(f"catch-up fetch failed (non-fatal, skipping this round): {e}")
+        recent_rows_sg = []
+    review_rows = merge_catchup_rows(rows, recent_rows_sg)
+
     # Step 2 — judge every fetched row (deterministic verdicts), then Steps 3-5
     # (compose policy + send) in one call. EXTRA_TEST_KEYWORD flows through to
     # judge via env var.
-    verdicts = judge_listings(rows, now_kst)
+    verdicts = judge_listings(review_rows, now_kst)
     fired = run_pipeline(verdicts, healthy=True, now_kst=now_kst, seoul_gyeonggi_count=len(rows))
     if fired and (fired.get("new_match") or fired.get("priority_up") or fired.get("outage") or fired.get("recovery")):
         print(f"pipeline fired: {fired}")
@@ -317,7 +382,8 @@ def main() -> None:
     out_path = os.path.normpath(OUTPUT_PATH)
     with open(out_path, "w", encoding="utf-8") as f:
         f.write(html_out)
-    print(f"wrote {out_path} with {len(rows)} matching listings (of {len(all_rows)} nationwide 국민주택 open)")
+    print(f"wrote {out_path} with {len(rows)} matching listings (of {len(all_rows)} nationwide 국민주택 open, "
+          f"+{len(review_rows) - len(rows)} catch-up)")
 
 
 if __name__ == "__main__":
