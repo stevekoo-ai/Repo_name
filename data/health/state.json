@@ -41,43 +41,43 @@
   },
   "normalized-series-sweep": {
     "alerted": false,
-    "consecutive_bad": 132
+    "consecutive_bad": 133
   },
   "normalized:bls_us_cpi_all": {
     "alerted": false,
-    "consecutive_bad": 4
+    "consecutive_bad": 5
   },
   "normalized:bls_us_cpi_core": {
     "alerted": false,
-    "consecutive_bad": 4
+    "consecutive_bad": 5
   },
   "normalized:bls_us_job_openings": {
     "alerted": false,
-    "consecutive_bad": 92
+    "consecutive_bad": 93
   },
   "normalized:bls_us_ppi_final_demand": {
     "alerted": false,
-    "consecutive_bad": 4
+    "consecutive_bad": 5
   },
   "normalized:ecos_current_account": {
     "alerted": false,
-    "consecutive_bad": 102
+    "consecutive_bad": 103
   },
   "normalized:ecos_gdp_growth_qoq": {
     "alerted": false,
-    "consecutive_bad": 132
+    "consecutive_bad": 133
   },
   "normalized:ecos_ppi_yoy_level": {
     "alerted": false,
-    "consecutive_bad": 18
+    "consecutive_bad": 19
   },
   "normalized:fred_kr_retail_sales_mom_oecd": {
     "alerted": false,
-    "consecutive_bad": 132
+    "consecutive_bad": 133
   },
   "normalized:fred_kr_unemployment_oecd": {
     "alerted": false,
-    "consecutive_bad": 132
+    "consecutive_bad": 133
   },
   "normalized:fred_us_dollar_index": {
     "alerted": false,
@@ -85,11 +85,11 @@
   },
   "normalized:fred_us_gdp_qoq": {
     "alerted": false,
-    "consecutive_bad": 132
+    "consecutive_bad": 133
   },
   "normalized:fred_us_industrial_production": {
     "alerted": false,
-    "consecutive_bad": 22
+    "consecutive_bad": 23
   },
   "normalized:fred_us_oecd_cli": {
     "alerted": false,
@@ -97,7 +97,7 @@
   },
   "normalized:fred_us_ppi": {
     "alerted": false,
-    "consecutive_bad": 4
+    "consecutive_bad": 5
   },
   "normalized:fred_us_retail_sales": {
     "alerted": false,
@@ -105,115 +105,115 @@
   },
   "normalized:fred_us_trade_balance": {
     "alerted": false,
-    "consecutive_bad": 98
+    "consecutive_bad": 99
   },
   "normalized:imf_current_account_chn": {
     "alerted": false,
-    "consecutive_bad": 132
+    "consecutive_bad": 133
   },
   "normalized:imf_current_account_jpn": {
     "alerted": false,
-    "consecutive_bad": 132
+    "consecutive_bad": 133
   },
   "normalized:imf_current_account_kor": {
     "alerted": false,
-    "consecutive_bad": 132
+    "consecutive_bad": 133
   },
   "normalized:imf_current_account_usa": {
     "alerted": false,
-    "consecutive_bad": 132
+    "consecutive_bad": 133
   },
   "normalized:imf_gdp_growth_chn": {
     "alerted": false,
-    "consecutive_bad": 132
+    "consecutive_bad": 133
   },
   "normalized:imf_gdp_growth_jpn": {
     "alerted": false,
-    "consecutive_bad": 132
+    "consecutive_bad": 133
   },
   "normalized:imf_gdp_growth_kor": {
     "alerted": false,
-    "consecutive_bad": 132
+    "consecutive_bad": 133
   },
   "normalized:imf_gdp_growth_usa": {
     "alerted": false,
-    "consecutive_bad": 132
+    "consecutive_bad": 133
   },
   "normalized:imf_govt_debt_chn": {
     "alerted": false,
-    "consecutive_bad": 132
+    "consecutive_bad": 133
   },
   "normalized:imf_govt_debt_jpn": {
     "alerted": false,
-    "consecutive_bad": 132
+    "consecutive_bad": 133
   },
   "normalized:imf_govt_debt_kor": {
     "alerted": false,
-    "consecutive_bad": 132
+    "consecutive_bad": 133
   },
   "normalized:imf_govt_debt_usa": {
     "alerted": false,
-    "consecutive_bad": 132
+    "consecutive_bad": 133
   },
   "normalized:imf_inflation_chn": {
     "alerted": false,
-    "consecutive_bad": 132
+    "consecutive_bad": 133
   },
   "normalized:imf_inflation_jpn": {
     "alerted": false,
-    "consecutive_bad": 132
+    "consecutive_bad": 133
   },
   "normalized:imf_inflation_kor": {
     "alerted": false,
-    "consecutive_bad": 132
+    "consecutive_bad": 133
   },
   "normalized:imf_inflation_usa": {
     "alerted": false,
-    "consecutive_bad": 132
+    "consecutive_bad": 133
   },
   "normalized:imf_unemployment_chn": {
     "alerted": false,
-    "consecutive_bad": 132
+    "consecutive_bad": 133
   },
   "normalized:imf_unemployment_jpn": {
     "alerted": false,
-    "consecutive_bad": 132
+    "consecutive_bad": 133
   },
   "normalized:imf_unemployment_kor": {
     "alerted": false,
-    "consecutive_bad": 132
+    "consecutive_bad": 133
   },
   "normalized:imf_unemployment_usa": {
     "alerted": false,
-    "consecutive_bad": 132
+    "consecutive_bad": 133
   },
   "normalized:kosis_industrial_production_index": {
     "alerted": false,
-    "consecutive_bad": 71
+    "consecutive_bad": 72
   },
   "normalized:kosis_retail_sales_index": {
     "alerted": false,
-    "consecutive_bad": 71
+    "consecutive_bad": 72
   },
   "normalized:kosis_semiconductor_inventory_index": {
     "alerted": false,
-    "consecutive_bad": 71
+    "consecutive_bad": 72
   },
   "normalized:kosis_semiconductor_shipment_index": {
     "alerted": false,
-    "consecutive_bad": 71
+    "consecutive_bad": 72
   },
   "normalized:motie_semiconductor_exports_usd_100m": {
     "alerted": false,
-    "consecutive_bad": 4
+    "consecutive_bad": 5
   },
   "normalized:motie_semiconductor_exports_yoy": {
     "alerted": false,
-    "consecutive_bad": 4
+    "consecutive_bad": 5
   },
   "normalized:motie_total_exports_yoy": {
     "alerted": false,
-    "consecutive_bad": 4
+    "consecutive_bad": 5
   },
   "peos-daily-report": {
     "alerted": false,
