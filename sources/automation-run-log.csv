@@ -893,3 +893,7 @@ timestamp_utc,workflow,step,attempts_used,max_attempts,result
 2026-10-17T13:29:41Z,sk-hynix-daily-report,price_snapshot,1,36,success
 2026-10-17T13:29:46Z,sk-hynix-daily-report,report_generation,1,36,success
 2026-10-17T13:38:03Z,portfolio-holdings-sync,holdings_sync,1,36,success
+2026-10-17T19:48:55Z,real-estate-sync,apartment_sale,1,36,success
+2026-10-17T19:50:18Z,real-estate-sync,apartment_rent,1,36,success
+2026-10-17T19:51:00Z,real-estate-sync,villa_sale,1,36,success
+2026-10-17T19:51:56Z,real-estate-sync,officetel_sale,1,36,success
