@@ -1,5 +1,5 @@
 {
-  "count": 3,
+  "count": 4,
   "reviews": [
     {
       "id": "2026000438",
@@ -39,6 +39,22 @@
       "exceptions": [],
       "reason": null,
       "pdf_url": "https://apply.lh.or.kr/lhapply/apply/wt/wrtanc/selectWrtancInfo.do?panId=0000061175&ccrCnntSysDsCd=02&uppAisTpCd=39&aisTpCd=39&mi=1027"
+    },
+    {
+      "id": "2026000373",
+      "name": "고덕강일지구 3단지 토지임대부(본청약)",
+      "region": "서울",
+      "keyword": null,
+      "reviewed_at": "2026-10-20 02:44 KST",
+      "status": "ok",
+      "business_type": "국민주택형",
+      "income_scope": "미분류",
+      "exceptions": [
+        "'적용대상' 줄을 찾지 못함 — 소득기준 챕터 형식이 기존 3건과 다름",
+        "소득검증 범위를 판별 못함 (business_type=국민주택형, applicable_line=None) — 프레임워크의 축1 규칙(신혼희망타운=전체 / 국민주택=60㎡이하만)에 안 맞는 새 패턴일 수 있음"
+      ],
+      "reason": null,
+      "pdf_url": "https://www.applyhome.co.kr/ai/aia/selectAPTLttotPblancDetail.do?houseManageNo=2026000373&pblancNo=2026000373"
     }
   ]
 }
