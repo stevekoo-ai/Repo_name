@@ -1,0 +1,227 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>아침 브리핑 2026-10-20 (미국→한국)</title>
+<style>
+:root {
+  --bg: #f5f6f8; --surface: #ffffff; --surface-2: #f0f1f4; --border: #e2e4e9;
+  --text: #16181d; --text-muted: #5c6270; --accent: #2563eb;
+  --good: #157a3d; --good-bg: #e5f6ea; --warn: #92510c; --warn-bg: #fdf0dd;
+  --bad: #b3261e; --bad-bg: #fbe6e4; --neutral: #40465a; --neutral-bg: #eceef2;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #14161b; --surface: #1c1f26; --surface-2: #23262f; --border: #333846;
+    --text: #eceef2; --text-muted: #a0a6b5; --accent: #7fa8ff;
+    --good: #6cd48f; --good-bg: #113222; --warn: #f0b862; --warn-bg: #3a2a10;
+    --bad: #f28b82; --bad-bg: #3a1614; --neutral: #b7bccb; --neutral-bg: #262a35;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #14161b; --surface: #1c1f26; --surface-2: #23262f; --border: #333846;
+  --text: #eceef2; --text-muted: #a0a6b5; --accent: #7fa8ff;
+  --good: #6cd48f; --good-bg: #113222; --warn: #f0b862; --warn-bg: #3a2a10;
+  --bad: #f28b82; --bad-bg: #3a1614; --neutral: #b7bccb; --neutral-bg: #262a35;
+}
+:root[data-theme="light"] {
+  --bg: #f5f6f8; --surface: #ffffff; --surface-2: #f0f1f4; --border: #e2e4e9;
+  --text: #16181d; --text-muted: #5c6270; --accent: #2563eb;
+  --good: #157a3d; --good-bg: #e5f6ea; --warn: #92510c; --warn-bg: #fdf0dd;
+  --bad: #b3261e; --bad-bg: #fbe6e4; --neutral: #40465a; --neutral-bg: #eceef2;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0; background: var(--bg); color: var(--text);
+  font-family: -apple-system, "Segoe UI", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+  line-height: 1.6;
+}
+.page { max-width: 920px; margin: 0 auto; padding: 24px 16px 64px; }
+header.masthead { padding: 8px 0 20px; }
+header.masthead h1 { font-size: 1.5rem; margin: 0 0 4px; }
+header.masthead .sub { color: var(--text-muted); font-size: 0.9rem; }
+.tile-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin: 12px 0; }
+.tile { background: var(--surface-2); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; }
+.tile-label { font-size: 0.78rem; color: var(--text-muted); display: flex; align-items: center; gap: 6px; }
+.tile-value { font-size: 1.35rem; font-weight: 700; margin-top: 2px; }
+.tile-sub { font-size: 0.78rem; color: var(--text-muted); margin-top: 2px; }
+.dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+.dot-good { background: var(--good); } .dot-warn { background: var(--warn); }
+.dot-bad { background: var(--bad); } .dot-neutral { background: var(--neutral); }
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
+  padding: 20px 22px; margin-bottom: 16px; }
+.card.highlight { border-color: var(--accent); }
+.card h2 { font-size: 1.1rem; margin: 0 0 10px; }
+.card h3 { font-size: 0.95rem; margin: 16px 0 8px; color: var(--text-muted); }
+.kv-list { list-style: none; padding: 0; margin: 0; }
+.kv-list li { padding: 6px 0; border-bottom: 1px dashed var(--border); font-size: 0.92rem; }
+.kv-list li:last-child { border-bottom: none; }
+.kv-list b { display: inline-block; min-width: 130px; color: var(--text-muted); font-weight: 600; }
+.pending { color: var(--text-muted); font-style: italic; }
+.muted { color: var(--text-muted); }
+.badge { display: inline-block; padding: 3px 10px; border-radius: 999px; font-size: 0.78rem; font-weight: 600; }
+.badge-good { background: var(--good-bg); color: var(--good); }
+.badge-warn { background: var(--warn-bg); color: var(--warn); }
+.badge-bad { background: var(--bad-bg); color: var(--bad); }
+.badge-neutral { background: var(--neutral-bg); color: var(--neutral); }
+.table-wrap { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: 0.88rem; }
+th, td { text-align: left; padding: 7px 10px; border-bottom: 1px solid var(--border); white-space: nowrap; }
+th { color: var(--text-muted); font-weight: 600; font-size: 0.78rem; text-transform: uppercase; letter-spacing: .02em; }
+.spark-cell { white-space: normal; }
+.spark { display: block; }
+.spark-labels { display: flex; justify-content: space-between; font-size: 0.68rem; color: var(--text-muted);
+  width: 176px; }
+.spark-empty { font-size: 0.78rem; }
+.stale-mark { color: var(--warn); cursor: help; }
+.clock-row { display: flex; gap: 18px; align-items: center; flex-wrap: wrap; }
+.clock-img { width: 180px; height: 180px; border-radius: 10px; flex-shrink: 0;
+  background: #ffffff; padding: 6px; border: 1px solid var(--border); }
+.chart-img { width: 100%; height: auto; border-radius: 10px;
+  background: #ffffff; padding: 6px; border: 1px solid var(--border); }
+.discuss-card { background: var(--surface-2); border-left: 3px solid var(--accent); border-radius: 8px;
+  padding: 12px 16px; margin: 10px 0; }
+.discuss-topic { font-weight: 700; margin-bottom: 4px; }
+.discuss-context { color: var(--text-muted); font-size: 0.88rem; margin: 4px 0; }
+.discuss-question { margin: 6px 0 0; font-size: 0.94rem; }
+.discuss-input { width: 100%; margin-top: 10px; padding: 8px 10px; border-radius: 8px;
+  border: 1px solid var(--border); background: var(--surface); color: var(--text);
+  font-family: inherit; font-size: 0.88rem; resize: vertical; box-sizing: border-box; }
+.discuss-input:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+.discuss-actions { display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap; }
+.discuss-toolbar { display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+  padding: 10px 14px; background: var(--surface-2); border-radius: 10px; margin-bottom: 10px; }
+.btn-fb { font-family: inherit; font-size: 0.82rem; font-weight: 600; padding: 6px 12px;
+  border-radius: 8px; border: 1px solid var(--border); background: var(--surface);
+  color: var(--text); cursor: pointer; }
+.btn-fb:hover { border-color: var(--accent); }
+.btn-fb:disabled { opacity: 0.7; cursor: default; }
+.btn-fb-primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+.copy-output { margin-top: 10px; padding: 12px 14px; background: var(--surface-2);
+  border: 2px dashed var(--accent); border-radius: 10px; }
+.copy-output textarea { width: 100%; box-sizing: border-box; padding: 8px 10px; border-radius: 8px;
+  border: 1px solid var(--border); background: var(--surface); color: var(--text);
+  font-family: inherit; font-size: 0.82rem; resize: vertical; margin-top: 6px; }
+.copy-output a#peos-copy-output-link { display: none; margin-top: 8px; color: var(--accent);
+  font-size: 0.88rem; font-weight: 600; }
+.action-card { border-radius: 10px; border: 1px solid var(--border); padding: 12px 16px; margin: 8px 0 14px; }
+.action-good { border-left: 4px solid var(--good); }
+.action-warn { border-left: 4px solid var(--warn); }
+.action-bad { border-left: 4px solid var(--bad); }
+.action-neutral { border-left: 4px solid var(--neutral); }
+.action-title { font-weight: 700; margin-bottom: 6px; }
+.action-row { font-size: 0.86rem; margin: 3px 0; color: var(--text); }
+.action-row .k { display: inline-block; min-width: 68px; color: var(--text-muted); font-weight: 600; }
+.action-conflict { color: var(--warn); }
+.scenario-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; }
+.scenario-card { background: var(--surface-2); border-radius: 10px; padding: 14px 16px; font-size: 0.85rem; }
+.scenario-title { font-weight: 700; font-size: 1rem; margin-bottom: 8px; }
+.scenario-prob { color: var(--accent); }
+.scenario-card p { margin: 6px 0; }
+footer { color: var(--text-muted); font-size: 0.78rem; text-align: center; padding-top: 16px; }
+
+/* 브리핑 전용 최소 보강 — 나머지는 월간 리포트·대시보드와 같은 _CSS를 쓴다 */
+body { max-width: 860px; margin: 0 auto; padding: 24px 16px 48px; }
+table { width: 100%; border-collapse: collapse; }
+th, td { padding: 6px 10px; border-bottom: 1px solid var(--border); }
+blockquote { margin: 12px 0; padding: 10px 14px; background: var(--surface-2);
+  border-left: 3px solid var(--accent); border-radius: 4px; }
+.table-wrap { overflow-x: auto; }
+header.masthead { padding-top: 0; }
+/* 심각도 이모지(🔴🟠🟡✅❌ 등)로 시작하는 인용/소제목은 그 등급 색으로
+   강조한다 — "뭘 강조해야 할지 모르겠다"는 지적에 대한 답: 지금까지
+   이모지는 색이 있는데 주변은 다른 문단과 똑같았다. */
+blockquote.bq-bad { background: var(--bad-bg); border-left-color: var(--bad); }
+blockquote.bq-warn { background: var(--warn-bg); border-left-color: var(--warn); }
+blockquote.bq-good { background: var(--good-bg); border-left-color: var(--good); }
+blockquote.bq-neutral { background: var(--neutral-bg); border-left-color: var(--neutral); }
+h3.hx-bad, h3.hx-warn, h3.hx-good, h3.hx-neutral {
+  padding-left: 10px; border-left: 4px solid; margin-left: -12px; }
+h3.hx-bad { border-color: var(--bad); }
+h3.hx-warn { border-color: var(--warn); }
+h3.hx-good { border-color: var(--good); }
+h3.hx-neutral { border-color: var(--neutral); }
+</style>
+</head>
+<body>
+<header class='masthead'><h1>아침 브리핑 2026-10-20 (미국→한국)</h1>
+<style>
+.senti { --xf:#b8312f; --f:#ec8682; --n:#f0efec; --g:#6fa6ea; --xg:#1f5fae; --line:#2a78d6;
+  display:flex; flex-wrap:wrap; gap:12px; margin:16px 0 20px; }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .senti { --xf:#e65f5a; --f:#a2342f; --n:#383835; --g:#2e5fa8; --xg:#4e91e4; --line:#3987e5; } }
+:root[data-theme="dark"] .senti { --xf:#e65f5a; --f:#a2342f; --n:#383835; --g:#2e5fa8; --xg:#4e91e4; --line:#3987e5; }
+.senti .card { flex:1 1 250px; background:var(--surface); border:1px solid var(--border);
+  border-radius:10px; padding:12px 14px; min-width:0; }
+.senti .card.wide { flex:2 1 340px; }
+.senti .card h4 { margin:0 0 6px; font-size:.95rem; color:var(--text); }
+.senti .card h4 .mk { font-weight:400; color:var(--text-muted); font-size:.82rem; }
+.senti .hero { font-size:2.3rem; font-weight:700; line-height:1.1; color:var(--text);
+  font-variant-numeric: tabular-nums; }
+.senti .chg { font-size:.95rem; color:var(--text); margin-top:2px; }
+.senti .sub { font-size:.78rem; color:var(--text-muted); margin-top:6px; }
+.senti svg { width:100%; height:auto; display:block; }
+.senti svg.gauge { max-width:340px; margin:0 auto; }
+.senti svg.spark { max-width:420px; }
+.senti .fgbody { display:flex; flex-wrap:wrap; gap:8px 16px; align-items:center; }
+.senti .fgbody > svg.gauge { flex:1 1 240px; }
+.senti .fgbody .fgside { flex:1 1 260px; min-width:0; }
+.senti svg text { fill:var(--text); font-family:inherit; }
+.senti svg .muted { fill:var(--text-muted); }
+.senti .z { stroke:var(--surface); stroke-width:2; opacity:.5; }
+.senti .z.on { opacity:1; stroke:var(--text); stroke-width:1.5; }
+.senti .z.xf{fill:var(--xf)} .senti .z.f{fill:var(--f)} .senti .z.n{fill:var(--n)}
+.senti .z.g{fill:var(--g)} .senti .z.xg{fill:var(--xg)}
+.senti .needle { stroke:var(--text); stroke-width:3; stroke-linecap:round; }
+.senti .hub { fill:var(--text); }
+.senti .sp-line { fill:none; stroke:var(--line); stroke-width:2; stroke-linejoin:round; }
+.senti .sp-ref { stroke:var(--border); stroke-width:1; stroke-dasharray:3 3; }
+.senti .sp-last { fill:var(--line); stroke:var(--surface); stroke-width:2; }
+.senti .sp-hit { fill:transparent; }
+.senti .sp-hit:hover { fill:var(--line); opacity:.35; }
+.senti table { width:100%; font-size:.78rem; margin-top:6px; border-collapse:collapse; }
+.senti th, .senti td { padding:3px 4px; text-align:right; border-bottom:1px solid var(--border); }
+.senti th { color:var(--text-muted); font-weight:500; }
+.senti th:first-child, .senti td:first-child { text-align:left; }
+</style><section class="senti" aria-label="시장 심리"><div class="card"><h4>VIX <span class="mk">(미국 S&P500)</span></h4><div class="hero">19.99</div><div class="chg">▲ 21.45% <span class="sub">전일 대비</span></div><svg class="spark" viewBox="0 0 300 84" role="img" aria-label="VIX 최근 3개월 추이"><line class="sp-ref" x1="30" x2="292" y1="18.4" y2="18.4"/><text class="muted" x="26" y="21.4" font-size="9" text-anchor="end">20</text><polyline class="sp-line" points="30.0,27.3 34.0,28.2 38.1,39.8 42.1,42.8 46.1,27.8 50.2,28.7 54.2,28.0 58.2,31.4 62.2,13.6 66.3,39.5 70.3,47.5 74.3,48.4 78.4,43.8 82.4,48.8 86.4,53.6 90.5,55.4 94.5,51.3 98.5,52.6 102.6,57.9 106.6,57.3 110.6,60.1 114.6,53.3 118.7,48.6 122.7,55.5 126.7,47.3 130.8,53.7 134.8,48.5 138.8,51.4 142.9,53.1 146.9,58.2 150.9,58.8 155.0,55.2 159.0,44.9 163.0,53.2 167.0,59.6 171.1,58.1 175.1,52.5 179.1,49.4 183.2,44.1 187.2,34.1 191.2,48.6 195.3,39.4 199.3,38.7 203.3,35.0 207.4,51.5 211.4,56.0 215.4,55.6 219.4,60.4 223.5,53.4 227.5,49.8 231.5,55.6 235.6,46.9 239.6,47.1 243.6,44.9 247.7,44.6 251.7,52.4 255.7,50.9 259.8,54.6 263.8,54.1 267.8,51.7 271.8,55.8 275.9,53.1 279.9,52.7 283.9,41.1 288.0,44.1 292.0,18.5"/><circle class="sp-hit" cx="30.0" cy="27.3" r="6"><title>2026-07-17  18.77</title></circle><circle class="sp-hit" cx="34.0" cy="28.2" r="6"><title>2026-07-20  18.65</title></circle><circle class="sp-hit" cx="38.1" cy="39.8" r="6"><title>2026-07-21  17.05</title></circle><circle class="sp-hit" cx="42.1" cy="42.8" r="6"><title>2026-07-22  16.64</title></circle><circle class="sp-hit" cx="46.1" cy="27.8" r="6"><title>2026-07-23  18.70</title></circle><circle class="sp-hit" cx="50.2" cy="28.7" r="6"><title>2026-07-24  18.58</title></circle><circle class="sp-hit" cx="54.2" cy="28.0" r="6"><title>2026-07-27  18.67</title></circle><circle class="sp-hit" cx="58.2" cy="31.4" r="6"><title>2026-07-28  18.21</title></circle><circle class="sp-hit" cx="62.2" cy="13.6" r="6"><title>2026-07-29  20.66</title></circle><circle class="sp-hit" cx="66.3" cy="39.5" r="6"><title>2026-07-30  17.09</title></circle><circle class="sp-hit" cx="70.3" cy="47.5" r="6"><title>2026-07-31  15.99</title></circle><circle class="sp-hit" cx="74.3" cy="48.4" r="6"><title>2026-08-03  15.86</title></circle><circle class="sp-hit" cx="78.4" cy="43.8" r="6"><title>2026-08-04  16.50</title></circle><circle class="sp-hit" cx="82.4" cy="48.8" r="6"><title>2026-08-05  15.81</title></circle><circle class="sp-hit" cx="86.4" cy="53.6" r="6"><title>2026-08-06  15.15</title></circle><circle class="sp-hit" cx="90.5" cy="55.4" r="6"><title>2026-08-07  14.90</title></circle><circle class="sp-hit" cx="94.5" cy="51.3" r="6"><title>2026-08-10  15.46</title></circle><circle class="sp-hit" cx="98.5" cy="52.6" r="6"><title>2026-08-11  15.28</title></circle><circle class="sp-hit" cx="102.6" cy="57.9" r="6"><title>2026-08-12  14.55</title></circle><circle class="sp-hit" cx="106.6" cy="57.3" r="6"><title>2026-08-13  14.63</title></circle><circle class="sp-hit" cx="110.6" cy="60.1" r="6"><title>2026-08-14  14.25</title></circle><circle class="sp-hit" cx="114.6" cy="53.3" r="6"><title>2026-08-17  15.19</title></circle><circle class="sp-hit" cx="118.7" cy="48.6" r="6"><title>2026-08-18  15.84</title></circle><circle class="sp-hit" cx="122.7" cy="55.5" r="6"><title>2026-08-19  14.89</title></circle><circle class="sp-hit" cx="126.7" cy="47.3" r="6"><title>2026-08-20  16.01</title></circle><circle class="sp-hit" cx="130.8" cy="53.7" r="6"><title>2026-08-21  15.13</title></circle><circle class="sp-hit" cx="134.8" cy="48.5" r="6"><title>2026-08-24  15.85</title></circle><circle class="sp-hit" cx="138.8" cy="51.4" r="6"><title>2026-08-25  15.45</title></circle><circle class="sp-hit" cx="142.9" cy="53.1" r="6"><title>2026-08-26  15.21</title></circle><circle class="sp-hit" cx="146.9" cy="58.2" r="6"><title>2026-08-27  14.51</title></circle><circle class="sp-hit" cx="150.9" cy="58.8" r="6"><title>2026-08-28  14.43</title></circle><circle class="sp-hit" cx="155.0" cy="55.2" r="6"><title>2026-08-31  14.92</title></circle><circle class="sp-hit" cx="159.0" cy="44.9" r="6"><title>2026-09-01  16.34</title></circle><circle class="sp-hit" cx="163.0" cy="53.2" r="6"><title>2026-09-02  15.20</title></circle><circle class="sp-hit" cx="167.0" cy="59.6" r="6"><title>2026-09-03  14.32</title></circle><circle class="sp-hit" cx="171.1" cy="58.1" r="6"><title>2026-09-04  14.53</title></circle><circle class="sp-hit" cx="175.1" cy="52.5" r="6"><title>2026-09-07  15.30</title></circle><circle class="sp-hit" cx="179.1" cy="49.4" r="6"><title>2026-09-08  15.72</title></circle><circle class="sp-hit" cx="183.2" cy="44.1" r="6"><title>2026-09-09  16.46</title></circle><circle class="sp-hit" cx="187.2" cy="34.1" r="6"><title>2026-09-10  17.84</title></circle><circle class="sp-hit" cx="191.2" cy="48.6" r="6"><title>2026-09-11  15.84</title></circle><circle class="sp-hit" cx="195.3" cy="39.4" r="6"><title>2026-09-14  17.10</title></circle><circle class="sp-hit" cx="199.3" cy="38.7" r="6"><title>2026-09-15  17.20</title></circle><circle class="sp-hit" cx="203.3" cy="35.0" r="6"><title>2026-09-16  17.71</title></circle><circle class="sp-hit" cx="207.4" cy="51.5" r="6"><title>2026-09-17  15.44</title></circle><circle class="sp-hit" cx="211.4" cy="56.0" r="6"><title>2026-09-18  14.81</title></circle><circle class="sp-hit" cx="215.4" cy="55.6" r="6"><title>2026-09-21  14.87</title></circle><circle class="sp-hit" cx="219.4" cy="60.4" r="6"><title>2026-09-22  14.21</title></circle><circle class="sp-hit" cx="223.5" cy="53.4" r="6"><title>2026-09-23  15.18</title></circle><circle class="sp-hit" cx="227.5" cy="49.8" r="6"><title>2026-09-24  15.67</title></circle><circle class="sp-hit" cx="231.5" cy="55.6" r="6"><title>2026-09-25  14.87</title></circle><circle class="sp-hit" cx="235.6" cy="46.9" r="6"><title>2026-09-28  16.07</title></circle><circle class="sp-hit" cx="239.6" cy="47.1" r="6"><title>2026-09-29  16.04</title></circle><circle class="sp-hit" cx="243.6" cy="44.9" r="6"><title>2026-09-30  16.34</title></circle><circle class="sp-hit" cx="247.7" cy="44.6" r="6"><title>2026-10-01  16.39</title></circle><circle class="sp-hit" cx="251.7" cy="52.4" r="6"><title>2026-10-02  15.31</title></circle><circle class="sp-hit" cx="255.7" cy="50.9" r="6"><title>2026-10-05  15.52</title></circle><circle class="sp-hit" cx="259.8" cy="54.6" r="6"><title>2026-10-06  15.01</title></circle><circle class="sp-hit" cx="263.8" cy="54.1" r="6"><title>2026-10-07  15.08</title></circle><circle class="sp-hit" cx="267.8" cy="51.7" r="6"><title>2026-10-08  15.41</title></circle><circle class="sp-hit" cx="271.8" cy="55.8" r="6"><title>2026-10-09  14.84</title></circle><circle class="sp-hit" cx="275.9" cy="53.1" r="6"><title>2026-10-12  15.21</title></circle><circle class="sp-hit" cx="279.9" cy="52.7" r="6"><title>2026-10-13  15.27</title></circle><circle class="sp-hit" cx="283.9" cy="41.1" r="6"><title>2026-10-14  16.87</title></circle><circle class="sp-hit" cx="288.0" cy="44.1" r="6"><title>2026-10-15  16.46</title></circle><circle class="sp-hit" cx="292.0" cy="18.5" r="6"><title>2026-10-16  19.99</title></circle><circle class="sp-last" cx="292.0" cy="18.5" r="4"/><text class="muted" x="30" y="80" font-size="9">07-17</text><text class="muted" x="292" y="80" font-size="9" text-anchor="end">10-16</text></svg><table><tr><th></th><th>전일</th><th>1주 전</th><th>1달 전</th><th>3달 전</th><th title='최근 1년 값 중 지금보다 낮거나 같은 날의 비율'>1년 백분위</th></tr><tr><td>값</td><td>16.46</td><td>14.84</td><td>17.71</td><td>18.77</td><td>82%</td></tr></table><div class="sub">안정(20 미만) · 2026-10-16 종가 (yahoo)</div></div><div class="card"><h4>VKOSPI <span class="mk">(한국 코스피200)</span></h4><div class="hero">48.57</div><div class="chg">▼ 0.65% <span class="sub">전일 대비</span></div><svg class="spark" viewBox="0 0 300 84" role="img" aria-label="VKOSPI 최근 3개월 추이"><line class="sp-ref" x1="30" x2="292" y1="49.0" y2="49.0"/><text class="muted" x="26" y="52.0" font-size="9" text-anchor="end">중앙</text><polyline class="sp-line" points="30.0,14.5 34.4,16.3 38.7,18.2 43.1,20.3 47.5,22.0 51.8,23.0 56.2,17.6 60.6,13.6 64.9,15.1 69.3,16.8 73.7,20.0 78.0,18.9 82.4,22.1 86.8,23.4 91.1,24.8 95.5,30.3 99.9,37.6 104.2,42.3 108.6,43.4 113.0,43.4 117.3,41.9 121.7,38.5 126.1,41.6 130.4,40.9 134.8,42.1 139.2,42.5 143.5,43.2 147.9,45.5 152.3,48.2 156.6,51.9 161.0,53.8 165.4,54.4 169.7,55.2 174.1,58.1 178.5,55.0 182.8,50.7 187.2,49.0 191.6,50.8 195.9,51.7 200.3,51.2 204.7,52.3 209.0,53.4 213.4,54.7 217.8,54.2 222.1,54.7 226.5,55.2 230.9,54.7 235.2,53.1 239.6,53.9 244.0,54.7 248.3,56.0 252.7,56.6 257.1,57.2 261.4,59.2 265.8,60.4 270.2,56.8 274.5,49.6 278.9,53.0 283.3,43.3 287.6,49.3 292.0,49.6"/><circle class="sp-hit" cx="30.0" cy="14.5" r="6"><title>2026-07-20  86.87</title></circle><circle class="sp-hit" cx="34.4" cy="16.3" r="6"><title>2026-07-21  84.89</title></circle><circle class="sp-hit" cx="38.7" cy="18.2" r="6"><title>2026-07-22  82.79</title></circle><circle class="sp-hit" cx="43.1" cy="20.3" r="6"><title>2026-07-23  80.46</title></circle><circle class="sp-hit" cx="47.5" cy="22.0" r="6"><title>2026-07-24  78.65</title></circle><circle class="sp-hit" cx="51.8" cy="23.0" r="6"><title>2026-07-27  77.55</title></circle><circle class="sp-hit" cx="56.2" cy="17.6" r="6"><title>2026-07-28  83.43</title></circle><circle class="sp-hit" cx="60.6" cy="13.6" r="6"><title>2026-07-29  87.79</title></circle><circle class="sp-hit" cx="64.9" cy="15.1" r="6"><title>2026-07-30  86.18</title></circle><circle class="sp-hit" cx="69.3" cy="16.8" r="6"><title>2026-07-31  84.35</title></circle><circle class="sp-hit" cx="73.7" cy="20.0" r="6"><title>2026-08-03  80.78</title></circle><circle class="sp-hit" cx="78.0" cy="18.9" r="6"><title>2026-08-04  82.05</title></circle><circle class="sp-hit" cx="82.4" cy="22.1" r="6"><title>2026-08-05  78.55</title></circle><circle class="sp-hit" cx="86.8" cy="23.4" r="6"><title>2026-08-06  77.17</title></circle><circle class="sp-hit" cx="91.1" cy="24.8" r="6"><title>2026-08-07  75.59</title></circle><circle class="sp-hit" cx="95.5" cy="30.3" r="6"><title>2026-08-10  69.55</title></circle><circle class="sp-hit" cx="99.9" cy="37.6" r="6"><title>2026-08-11  61.68</title></circle><circle class="sp-hit" cx="104.2" cy="42.3" r="6"><title>2026-08-12  56.48</title></circle><circle class="sp-hit" cx="108.6" cy="43.4" r="6"><title>2026-08-13  55.28</title></circle><circle class="sp-hit" cx="113.0" cy="43.4" r="6"><title>2026-08-14  55.31</title></circle><circle class="sp-hit" cx="117.3" cy="41.9" r="6"><title>2026-08-18  56.97</title></circle><circle class="sp-hit" cx="121.7" cy="38.5" r="6"><title>2026-08-19  60.63</title></circle><circle class="sp-hit" cx="126.1" cy="41.6" r="6"><title>2026-08-20  57.26</title></circle><circle class="sp-hit" cx="130.4" cy="40.9" r="6"><title>2026-08-21  58.03</title></circle><circle class="sp-hit" cx="134.8" cy="42.1" r="6"><title>2026-08-24  56.76</title></circle><circle class="sp-hit" cx="139.2" cy="42.5" r="6"><title>2026-08-25  56.29</title></circle><circle class="sp-hit" cx="143.5" cy="43.2" r="6"><title>2026-08-26  55.59</title></circle><circle class="sp-hit" cx="147.9" cy="45.5" r="6"><title>2026-08-27  53.01</title></circle><circle class="sp-hit" cx="152.3" cy="48.2" r="6"><title>2026-08-28  50.08</title></circle><circle class="sp-hit" cx="156.6" cy="51.9" r="6"><title>2026-08-31  46.05</title></circle><circle class="sp-hit" cx="161.0" cy="53.8" r="6"><title>2026-09-01  44.03</title></circle><circle class="sp-hit" cx="165.4" cy="54.4" r="6"><title>2026-09-02  43.37</title></circle><circle class="sp-hit" cx="169.7" cy="55.2" r="6"><title>2026-09-03  42.42</title></circle><circle class="sp-hit" cx="174.1" cy="58.1" r="6"><title>2026-09-04  39.33</title></circle><circle class="sp-hit" cx="178.5" cy="55.0" r="6"><title>2026-09-07  42.67</title></circle><circle class="sp-hit" cx="182.8" cy="50.7" r="6"><title>2026-09-08  47.34</title></circle><circle class="sp-hit" cx="187.2" cy="49.0" r="6"><title>2026-09-09  49.23</title></circle><circle class="sp-hit" cx="191.6" cy="50.8" r="6"><title>2026-09-10  47.28</title></circle><circle class="sp-hit" cx="195.9" cy="51.7" r="6"><title>2026-09-11  46.28</title></circle><circle class="sp-hit" cx="200.3" cy="51.2" r="6"><title>2026-09-14  46.85</title></circle><circle class="sp-hit" cx="204.7" cy="52.3" r="6"><title>2026-09-15  45.63</title></circle><circle class="sp-hit" cx="209.0" cy="53.4" r="6"><title>2026-09-16  44.40</title></circle><circle class="sp-hit" cx="213.4" cy="54.7" r="6"><title>2026-09-17  43.02</title></circle><circle class="sp-hit" cx="217.8" cy="54.2" r="6"><title>2026-09-18  43.56</title></circle><circle class="sp-hit" cx="222.1" cy="54.7" r="6"><title>2026-09-21  42.99</title></circle><circle class="sp-hit" cx="226.5" cy="55.2" r="6"><title>2026-09-22  42.42</title></circle><circle class="sp-hit" cx="230.9" cy="54.7" r="6"><title>2026-09-23  42.98</title></circle><circle class="sp-hit" cx="235.2" cy="53.1" r="6"><title>2026-09-28  44.73</title></circle><circle class="sp-hit" cx="239.6" cy="53.9" r="6"><title>2026-09-29  43.85</title></circle><circle class="sp-hit" cx="244.0" cy="54.7" r="6"><title>2026-09-30  43.03</title></circle><circle class="sp-hit" cx="248.3" cy="56.0" r="6"><title>2026-10-01  41.59</title></circle><circle class="sp-hit" cx="252.7" cy="56.6" r="6"><title>2026-10-02  40.96</title></circle><circle class="sp-hit" cx="257.1" cy="57.2" r="6"><title>2026-10-06  40.26</title></circle><circle class="sp-hit" cx="261.4" cy="59.2" r="6"><title>2026-10-07  38.11</title></circle><circle class="sp-hit" cx="265.8" cy="60.4" r="6"><title>2026-10-08  36.81</title></circle><circle class="sp-hit" cx="270.2" cy="56.8" r="6"><title>2026-10-12  40.73</title></circle><circle class="sp-hit" cx="274.5" cy="49.6" r="6"><title>2026-10-13  48.53</title></circle><circle class="sp-hit" cx="278.9" cy="53.0" r="6"><title>2026-10-14  44.91</title></circle><circle class="sp-hit" cx="283.3" cy="43.3" r="6"><title>2026-10-15  55.38</title></circle><circle class="sp-hit" cx="287.6" cy="49.3" r="6"><title>2026-10-16  48.89</title></circle><circle class="sp-hit" cx="292.0" cy="49.6" r="6"><title>2026-10-19  48.57</title></circle><circle class="sp-last" cx="292.0" cy="49.6" r="4"/><text class="muted" x="30" y="80" font-size="9">07-20</text><text class="muted" x="292" y="80" font-size="9" text-anchor="end">10-19</text></svg><table><tr><th></th><th>전일</th><th>1주 전</th><th>1달 전</th><th>3달 전</th><th title='최근 1년 값 중 지금보다 낮거나 같은 날의 비율'>1년 백분위</th></tr><tr><td>값</td><td>48.89</td><td>40.73</td><td>43.56</td><td>86.87</td><td>46%</td></tr></table><div class="sub">1년 중 보통 · 2026-10-19 종가 (KIS)</div></div><div class="card wide"><h4>CNN 공포·탐욕 <span class="mk">(미국 주식시장)</span> — 극단 공포</h4><div class="fgbody"><svg class="gauge" viewBox="0 0 380 200" role="img" aria-label="CNN 공포·탐욕 지수 18, 극단 공포"><path class="z xf on" d="M70.0,150.0 A120,120 0 0 1 105.1,65.1 L133.4,93.4 A80,80 0 0 0 110.0,150.0 Z"><title>극단 공포 0~25</title></path><text x="64.4" y="98.0" font-size="11" text-anchor="end" font-weight="700">극단 공포</text><path class="z f" d="M105.1,65.1 A120,120 0 0 1 171.2,31.5 L177.5,71.0 A80,80 0 0 0 133.4,93.4 Z"><title>공포 25~45</title></path><text x="128.3" y="28.8" font-size="11" text-anchor="end">공포</text><path class="z n" d="M171.2,31.5 A120,120 0 0 1 208.8,31.5 L202.5,71.0 A80,80 0 0 0 177.5,71.0 Z"><title>중립 45~55</title></path><text x="190.0" y="14.0" font-size="11" text-anchor="middle">중립</text><path class="z g" d="M208.8,31.5 A120,120 0 0 1 274.9,65.1 L246.6,93.4 A80,80 0 0 0 202.5,71.0 Z"><title>탐욕 55~75</title></path><text x="251.7" y="28.8" font-size="11" text-anchor="start">탐욕</text><path class="z xg" d="M274.9,65.1 A120,120 0 0 1 310.0,150.0 L270.0,150.0 A80,80 0 0 0 246.6,93.4 Z"><title>극단 탐욕 75~100</title></path><text x="315.6" y="98.0" font-size="11" text-anchor="start">극단 탐욕</text><text class="muted" x="122.0" y="154.0" font-size="9" text-anchor="middle">0</text><text class="muted" x="141.9" y="105.9" font-size="9" text-anchor="middle">25</text><text class="muted" x="190.0" y="86.0" font-size="9" text-anchor="middle">50</text><text class="muted" x="238.1" y="105.9" font-size="9" text-anchor="middle">75</text><text class="muted" x="258.0" y="154.0" font-size="9" text-anchor="middle">100</text><line class="needle" x1="190" y1="150" x2="93.6" y2="89.1"><title>현재 17.9</title></line><circle class="hub" cx="190" cy="150" r="6"/><text x="190" y="186" font-size="28" font-weight="700" text-anchor="middle">18</text></svg><div class="fgside"><svg class="spark" viewBox="0 0 300 84" role="img" aria-label="공포·탐욕 최근 3개월 추이"><line class="sp-ref" x1="30" x2="292" y1="53.5" y2="53.5"/><text class="muted" x="26" y="56.5" font-size="9" text-anchor="end">25</text><line class="sp-ref" x1="30" x2="292" y1="29.3" y2="29.3"/><text class="muted" x="26" y="32.3" font-size="9" text-anchor="end">50</text><polyline class="sp-line" points="30.0,41.9 34.1,42.9 38.2,36.3 42.3,34.7 46.4,38.1 50.5,38.2 54.6,40.7 58.7,41.7 62.8,53.0 66.8,40.8 70.9,39.4 75.0,33.0 79.1,20.5 83.2,19.3 87.3,19.8 91.4,14.6 95.5,15.3 99.6,19.5 103.7,17.9 107.8,13.6 111.9,15.4 116.0,20.4 120.1,24.8 124.2,22.8 128.2,27.9 132.3,24.7 136.4,24.4 140.5,19.9 144.6,25.4 148.7,22.2 152.8,25.6 156.9,30.0 161.0,34.2 165.1,33.1 169.2,31.7 173.3,33.9 177.4,39.8 181.5,40.7 185.6,46.5 189.7,46.1 193.8,47.7 197.8,50.6 201.9,51.3 206.0,50.3 210.1,48.3 214.2,44.6 218.3,43.8 222.4,46.2 226.5,43.1 230.6,41.9 234.7,44.4 238.8,49.8 242.9,48.4 247.0,49.7 251.1,39.0 255.2,35.4 259.2,32.4 263.3,36.9 267.4,39.2 271.5,32.7 275.6,32.8 279.7,35.0 283.8,51.9 287.9,48.3 292.0,60.4"/><circle class="sp-hit" cx="30.0" cy="41.9" r="6"><title>2026-07-17  37</title></circle><circle class="sp-hit" cx="34.1" cy="42.9" r="6"><title>2026-07-20  36</title></circle><circle class="sp-hit" cx="38.2" cy="36.3" r="6"><title>2026-07-21  43</title></circle><circle class="sp-hit" cx="42.3" cy="34.7" r="6"><title>2026-07-22  44</title></circle><circle class="sp-hit" cx="46.4" cy="38.1" r="6"><title>2026-07-23  41</title></circle><circle class="sp-hit" cx="50.5" cy="38.2" r="6"><title>2026-07-24  41</title></circle><circle class="sp-hit" cx="54.6" cy="40.7" r="6"><title>2026-07-27  38</title></circle><circle class="sp-hit" cx="58.7" cy="41.7" r="6"><title>2026-07-28  37</title></circle><circle class="sp-hit" cx="62.8" cy="53.0" r="6"><title>2026-07-29  26</title></circle><circle class="sp-hit" cx="66.8" cy="40.8" r="6"><title>2026-07-30  38</title></circle><circle class="sp-hit" cx="70.9" cy="39.4" r="6"><title>2026-07-31  40</title></circle><circle class="sp-hit" cx="75.0" cy="33.0" r="6"><title>2026-08-03  46</title></circle><circle class="sp-hit" cx="79.1" cy="20.5" r="6"><title>2026-08-04  59</title></circle><circle class="sp-hit" cx="83.2" cy="19.3" r="6"><title>2026-08-05  60</title></circle><circle class="sp-hit" cx="87.3" cy="19.8" r="6"><title>2026-08-06  60</title></circle><circle class="sp-hit" cx="91.4" cy="14.6" r="6"><title>2026-08-07  65</title></circle><circle class="sp-hit" cx="95.5" cy="15.3" r="6"><title>2026-08-10  64</title></circle><circle class="sp-hit" cx="99.6" cy="19.5" r="6"><title>2026-08-11  60</title></circle><circle class="sp-hit" cx="103.7" cy="17.9" r="6"><title>2026-08-12  62</title></circle><circle class="sp-hit" cx="107.8" cy="13.6" r="6"><title>2026-08-13  66</title></circle><circle class="sp-hit" cx="111.9" cy="15.4" r="6"><title>2026-08-14  64</title></circle><circle class="sp-hit" cx="116.0" cy="20.4" r="6"><title>2026-08-17  59</title></circle><circle class="sp-hit" cx="120.1" cy="24.8" r="6"><title>2026-08-18  55</title></circle><circle class="sp-hit" cx="124.2" cy="22.8" r="6"><title>2026-08-19  57</title></circle><circle class="sp-hit" cx="128.2" cy="27.9" r="6"><title>2026-08-20  51</title></circle><circle class="sp-hit" cx="132.3" cy="24.7" r="6"><title>2026-08-21  55</title></circle><circle class="sp-hit" cx="136.4" cy="24.4" r="6"><title>2026-08-24  55</title></circle><circle class="sp-hit" cx="140.5" cy="19.9" r="6"><title>2026-08-25  60</title></circle><circle class="sp-hit" cx="144.6" cy="25.4" r="6"><title>2026-08-26  54</title></circle><circle class="sp-hit" cx="148.7" cy="22.2" r="6"><title>2026-08-27  57</title></circle><circle class="sp-hit" cx="152.8" cy="25.6" r="6"><title>2026-08-28  54</title></circle><circle class="sp-hit" cx="156.9" cy="30.0" r="6"><title>2026-08-31  49</title></circle><circle class="sp-hit" cx="161.0" cy="34.2" r="6"><title>2026-09-01  45</title></circle><circle class="sp-hit" cx="165.1" cy="33.1" r="6"><title>2026-09-02  46</title></circle><circle class="sp-hit" cx="169.2" cy="31.7" r="6"><title>2026-09-03  48</title></circle><circle class="sp-hit" cx="173.3" cy="33.9" r="6"><title>2026-09-04  45</title></circle><circle class="sp-hit" cx="177.4" cy="39.8" r="6"><title>2026-09-08  39</title></circle><circle class="sp-hit" cx="181.5" cy="40.7" r="6"><title>2026-09-09  38</title></circle><circle class="sp-hit" cx="185.6" cy="46.5" r="6"><title>2026-09-10  32</title></circle><circle class="sp-hit" cx="189.7" cy="46.1" r="6"><title>2026-09-11  33</title></circle><circle class="sp-hit" cx="193.8" cy="47.7" r="6"><title>2026-09-14  31</title></circle><circle class="sp-hit" cx="197.8" cy="50.6" r="6"><title>2026-09-15  28</title></circle><circle class="sp-hit" cx="201.9" cy="51.3" r="6"><title>2026-09-16  27</title></circle><circle class="sp-hit" cx="206.0" cy="50.3" r="6"><title>2026-09-17  28</title></circle><circle class="sp-hit" cx="210.1" cy="48.3" r="6"><title>2026-09-18  30</title></circle><circle class="sp-hit" cx="214.2" cy="44.6" r="6"><title>2026-09-21  34</title></circle><circle class="sp-hit" cx="218.3" cy="43.8" r="6"><title>2026-09-22  35</title></circle><circle class="sp-hit" cx="222.4" cy="46.2" r="6"><title>2026-09-23  33</title></circle><circle class="sp-hit" cx="226.5" cy="43.1" r="6"><title>2026-09-24  36</title></circle><circle class="sp-hit" cx="230.6" cy="41.9" r="6"><title>2026-09-25  37</title></circle><circle class="sp-hit" cx="234.7" cy="44.4" r="6"><title>2026-09-28  34</title></circle><circle class="sp-hit" cx="238.8" cy="49.8" r="6"><title>2026-09-29  29</title></circle><circle class="sp-hit" cx="242.9" cy="48.4" r="6"><title>2026-09-30  30</title></circle><circle class="sp-hit" cx="247.0" cy="49.7" r="6"><title>2026-10-01  29</title></circle><circle class="sp-hit" cx="251.1" cy="39.0" r="6"><title>2026-10-02  40</title></circle><circle class="sp-hit" cx="255.2" cy="35.4" r="6"><title>2026-10-05  44</title></circle><circle class="sp-hit" cx="259.2" cy="32.4" r="6"><title>2026-10-06  47</title></circle><circle class="sp-hit" cx="263.3" cy="36.9" r="6"><title>2026-10-07  42</title></circle><circle class="sp-hit" cx="267.4" cy="39.2" r="6"><title>2026-10-08  40</title></circle><circle class="sp-hit" cx="271.5" cy="32.7" r="6"><title>2026-10-09  46</title></circle><circle class="sp-hit" cx="275.6" cy="32.8" r="6"><title>2026-10-12  46</title></circle><circle class="sp-hit" cx="279.7" cy="35.0" r="6"><title>2026-10-13  44</title></circle><circle class="sp-hit" cx="283.8" cy="51.9" r="6"><title>2026-10-14  27</title></circle><circle class="sp-hit" cx="287.9" cy="48.3" r="6"><title>2026-10-15  30</title></circle><circle class="sp-hit" cx="292.0" cy="60.4" r="6"><title>2026-10-16  18</title></circle><circle class="sp-last" cx="292.0" cy="60.4" r="4"/><text class="muted" x="30" y="80" font-size="9">07-17</text><text class="muted" x="292" y="80" font-size="9" text-anchor="end">10-16</text></svg><table><tr><th></th><th>전일</th><th>1주 전</th><th>1달 전</th><th>3달 전</th><th title='최근 1년 값 중 지금보다 낮거나 같은 날의 비율'>1년 백분위</th></tr><tr><td>값</td><td>30</td><td>46</td><td>27</td><td>37</td><td>8%</td></tr></table></div></div><div class="sub">2026-10-16 기준 · 0 극단 공포 ~ 100 극단 탐욕 (CNN Business, 미국 지표 7개 합성)</div></div></section>
+<blockquote>데이터 불일치: 팩의 KIS 종가는 10/19 1,304,000원(+2.52%)이지만, 다수 보도의 정규장 종가는 <strong>1,277,000원(+0.39%)</strong>이다. 보도 종가를 따른다. 필요 주식 수(팩 99주)도 1,277,000원 기준으로는 약 101주다.</blockquote></header>
+<section class='card'><h2>오늘의 판단</h2>
+<p>하이닉스는 <strong>10/28 실적까지 약세에서 중립(120만~135만원 박스)으로 한 단계 올린다</strong>. ADR +5.38%로 오늘 갭 +3~+5%(약 1,315,000~1,340,000원) — 박스 상단 1,300,000원을 시가부터 시험한다. 외국인 순매도도 코스피 전체 약 379억원으로 전주 하루 평균 약 2.24조원에서 급감했다. 다만 반등은 낙폭 되돌림(마이크론 +4%)이지 새 호재가 아니다. <strong>오늘 1,300,000원 위에서 마감하지 못하고 외국인 매도가 다시 1조원대로 늘면 약세로 되돌린다.</strong></p></section>
+<section class='card'><h2>밤사이 무엇이 바뀌었나</h2>
+<ul><li><strong>미국 기술주 반등(10/19)</strong>: S&amp;P500 +0.4%, 나스닥 약 +1%, 반도체 8일 연속 하락 뒤 반등(마이크론 +4%).</li><li><strong>VIX 진정</strong>: 19.99에서 약 18.1~18.4로 하락 — EW2 재검토 조건 미점등.</li><li><strong>10년물</strong>: 약 5.11~5.15%로 소폭 반등.</li><li><strong>어제 한국장</strong>: 코스피 -3%→+1.76%(5,768) 반전에도 하이닉스는 +0.39%로 소외. 개인 약 1.9조원 순매도.</li><li><strong>잠재 부담 — 솔리다임 상장</strong>: 미국 상장 추진 보도(골드만·모건스탠리 주관설)에 회사는 "결정된 것 없다". 금융위는 주주보호 미흡 시 제재를 경고했다.</li></ul>
+<p><strong>뉴스로 보정되는 칸</strong></p>
+<div class='table-wrap'><table><thead><tr><th style='text-align:left'>지표</th><th style='text-align:right'>팩 값(기준일)</th><th style='text-align:right'>뉴스 보정(10/19)</th></tr></thead><tbody><tr><td style='text-align:left'>나스닥</td><td style='text-align:right'>26,140.03 (10/16)</td><td style='text-align:right'>약 26,363~26,431</td></tr><tr><td style='text-align:left'>S&amp;P500</td><td style='text-align:right'>7,659.44 (10/16)</td><td style='text-align:right'>약 7,689~7,691</td></tr><tr><td style='text-align:left'>VIX</td><td style='text-align:right'>19.99 (10/16)</td><td style='text-align:right'>약 18.1~18.4</td></tr><tr><td style='text-align:left'>미 10년물</td><td style='text-align:right'>5.10% (10/16)</td><td style='text-align:right'>약 5.11~5.15%</td></tr><tr><td style='text-align:left'>2년물·3개월물·하이일드·원/달러·Nifty</td><td style='text-align:right'>팩 값</td><td style='text-align:right'>검색함, 최신값 확인 안 됨(팩 값 유지)</td></tr></tbody></table></div></section>
+<section class='card'><h2>판단 — 추적 질문별 변화</h2>
+<ul><li><strong>T3 하이닉스</strong>: 외국인 순매도 급감으로 '박스 안 약세'를 '중립'으로 조정한다. 다만 하이닉스만 소외된 것은 HBM4 리스크가 따로 반영되고 있다는 뜻이라, 박스 돌파에는 10/28 실적이 필요하다.</li><li><strong>T8 실적(10/28)</strong>: 확인 항목에 솔리다임(중복상장 할인)을 더해 네 가지(HBM4 일정·4Q 가이던스·대금 조건·솔리다임).</li></ul></section>
+<section class='card'><h2>SK하이닉스·자금계획에 대한 함의</h2>
+<ul><li><strong>CDP1(사장님 판단 대기)</strong>: 1,277,000원 기준 약 101주(오늘 갭대로면 약 96~98주). 선택지(①조달액 하향 ②보유 포기 ③전세 재계약)와 T1(약 28주, ~10/31) 유지 여부 미결정 — 실적 뒤 T1 창은 사흘.</li><li><strong>EW2</strong>: VIX가 18대로 내려와 T2 11/04 기본안 유지.</li><li><strong>B3 광 인터커넥트</strong>: 0단계(신호 1/4)로 매수 제안 없음, 관찰.</li><li><strong>금통위(10/22)</strong>: 동결 우세 — 원/달러 1,370원 상회 여부(T4).</li></ul></section>
+<section class='card'><h2>예측 채점 — 왜 틀렸나</h2>
+<ul><li><strong>P0086 ❌</strong>(10년물 &gt; 5.2%): P0082와 같은 오류 — 위험회피 국면에서는 물가보다 기술주→채권 자금 이동이 금리를 결정한다.</li></ul></section>
+<section class='card highlight'><h2>결론</h2>
+<p><strong>오늘 볼 것</strong></p>
+<ol><li>시가 갭 +3~+5%와 1,300,000원 위 마감 여부</li><li>외국인 하이닉스 순매수 전환(2일 연속이면 박스 상향 근거)</li><li>10/22 금통위 앞 원/달러 흐름</li></ol>
+<p><strong>판단을 바꿀 조건</strong></p>
+<ul><li>1,300,000원 위 마감 + 외국인 순매수 2일 → 박스 상단 돌파, 강세 쪽 재검토</li><li>1,238,000원 종가 이탈 또는 외국인 매도 1조원대 복귀 → 약세 복귀</li><li>솔리다임 상장 확정 공시 → 중복상장 할인을 반영해 판단 재조정</li></ul></section>
+<section class='card'><h2>Sources</h2>
+<ul><li><a href="https://en.fnnews.com/news/202610191602135334">fn News — KOSPI rebounds, closing market Oct 19</a></li><li><a href="https://www.koreatimes.co.kr/economy/20261019/kospi-edges-higher-as-battery-auto-gains-power-market">Korea Times — KOSPI edges higher Oct 19</a></li><li><a href="https://finance.biggo.com/news/2ad25bd5-b6ec-4c6c-b946-027710352cd6">BigGo — KOSPI rebounds 1.76%</a></li><li><a href="https://247wallst.com/investing/2026/10/19/memory-stocks-rally-as-tech-selloff-unwinds-micron-climbs-4-sandisk-jumps-7-sk-hynix-rises-5">24/7 Wall St. — Memory stocks rally, SK Hynix rises 5%</a></li><li><a href="https://www.cnbc.com/2026/10/18/stock-market-today-live-updates.html">CNBC — Stock market news Oct 19, 2026</a></li><li><a href="https://cappnotes.substack.com/p/closing-look-monday-october-19-2026">Capp Notes — Closing Look Oct 19</a></li><li><a href="https://www.koreatimes.co.kr/business/companies/20261008/controversy-resurfaces-over-sk-hynixs-solidigm-ipo-effort">Korea Times — Solidigm IPO controversy</a></li><li><a href="https://view.asiae.co.kr/en/article/2026090417282397113">Asia Business Daily — SK hynix "no decisions made" on Solidigm</a></li></ul>
+<hr></section>
+<section class='card'><h2>부록 — 자동 체크포인트 (코드 판정 원문)</h2>
+<h3>⑨ 병목 이동 추적 (다음 병목 선제 매수)</h3>
+<p><strong>가장 앞선 다음 병목 후보: B1 전력·전력망 — 0단계(관찰), 신호 2/4</strong> 기준 이벤트: 하이닉스 자사주(PS) 추가 수령 — 5천만원+ (D-163, 2027-04-01) · 헤지 예산 25,000,000원 (잠정 — 예산·배분은 진행하며 결정) ⬇️ 하락: B3 광 인터커넥트 2단계 → <strong>0단계(관찰)</strong> (1주 전 대비)</p>
+<p><strong>현재 병목(HBM — 메모리 대역폭) 약화 신호 2/3</strong> — 켜질수록 '병목 해소 → 하이닉스 하락' 시나리오가 가까워진다</p>
+<ul><li>❌ I1 HBM Cycle Score 붕괴조건 2/5 이상 — 붕괴조건 1/5 (2026-09-21)</li><li>✅ I2 SK하이닉스 120일선 하회(1주 지속) — 1/1종목</li><li>✅ I3 SK하이닉스가 반도체 ETF(SMH)보다 3개월 부진(1주 지속) — -31.1% vs SMH -3.4% (차 -27.6%p)</li></ul>
+<p><strong>B1 전력·전력망</strong> [헤지 후보] — 0단계(관찰), 신호 2/4</p>
+<ul><li>✅ P-F1 GE Vernova 백로그 YoY 20% 이상 — GEV +37%</li><li>✅ P-F2 GE Vernova 백로그 YoY 가속(전분기보다 높음) — GEV +32%→+37%</li><li>❌ P-M1 전력 바스켓이 3개월 상승 + SK하이닉스를 앞섬(1주 지속) — -26.1% vs 000660.KS -31.1% (차 +4.9%p) · 바스켓 자체가 -26.1%라 순환매 아님(동반 하락)</li><li>❌ P-M2 전력 바스켓 과반이 120일선 위(1주 지속) — 0/3종목</li><li>목표 누적 0원 / 실행 0원</li><li>관찰 — 매수 없음</li><li>다음: 1단계(정찰)까지: 주가 신호 1개 이상</li></ul>
+<p><strong>B2 메모리 용량 계층 (eSSD·HBF·CXL)</strong> [현재 병목의 연장(하이닉스가 이어받음)] — 0단계(관찰), 신호 2/4</p>
+<ul><li>✅ M-F1 Sandisk 매출 YoY 40% 이상 — SNDK +251%</li><li>✅ M-F2 Sandisk 매출 YoY 가속 — SNDK +61%→+251%</li><li>❌ M-M1 NAND 바스켓이 3개월 상승 + 반도체 ETF(SMH)를 앞섬(1주 지속) — -23.4% vs SMH -3.4% (차 -20.0%p)</li><li>❌ M-M2 NAND 바스켓 과반이 120일선 위(1주 지속) — 0/2종목</li><li>다음: 1단계(정찰)까지: 주가 신호 1개 이상</li></ul>
+<p><strong>B3 광 인터커넥트</strong> [헤지 후보] — 0단계(관찰), 신호 1/4</p>
+<ul><li>✅ O-F1 광·인터커넥트 4사 과반이 매출 YoY 40% 이상 — LITE 데이터 없음/스테일, COHR 데이터 없음/스테일, CRDO +115%, ALAB +104%</li><li>❌ O-F2 광·인터커넥트 4사 과반이 매출 YoY 가속 — LITE 데이터 없음/스테일, COHR 데이터 없음/스테일, CRDO +201%→+115%, ALAB +93%→+104%</li><li>❌ O-M1 광 바스켓이 3개월 상승 + SK하이닉스를 앞섬(1주 지속) — -9.6% vs 000660.KS -31.1% (차 +21.5%p) · 바스켓 자체가 -9.6%라 순환매 아님(동반 하락)</li><li>❌ O-M2 광 바스켓 과반이 120일선 위(1주 지속) — 0/4종목</li><li>목표 누적 0원 / 실행 0원</li><li>관찰 — 매수 없음</li><li>다음: 1단계(정찰)까지: 신호 1개 더, 주가 신호 1개 이상</li></ul>
+<blockquote>판정만 한다 — 자동 매수·매도 없음. 하이닉스 자체의 매도 지시는 sk_hynix_decision(R4) 단일 출처를 따른다. 실제 매수 시 <code>data/manual_inputs/bottleneck_hedge_log.csv</code>에 기록해야 목표 대비 진척이 반영된다. ⚠️ 단계 변화·매수 제안·철회 검토가 있다 — <strong>오늘의 판단/결론 섹션에 반드시 반영할 것.</strong> 제안 금액과 수단을 그대로 옮기지 말고, 오늘 시장 움직임에 비춰 지금 실행할지(분할 여부 포함)를 판단해서 쓸 것.</blockquote>
+<h3>⑩ 중간선거 레버 체크포인트 (L1 지갑·L3 청구서)</h3>
+<p>선거까지 D-14 (11/3). 🔔 = 신호 켜짐, · = 아직, ❓ = 판정 불가. 레버 전체 판단은 wiki/concepts/trump-midterm-tracker.md 참고.</p>
+<ul><li>· <strong>L1 지갑 · 휘발유 전국 평균</strong> — 4.33 (2026-10-12), 기준 &lt; 4.0 × 최근 2회 ↳ $4.00 아래 2주 = 종전·유가 레버가 주유소까지 전달</li><li>· <strong>L1 지갑 · 30년 모기지</strong> — 7.40 (2026-10-15), 기준 &lt; 6.5 × 최근 2회 ↳ 6.5% 아래 2주 = 금리 레버 부활</li><li>· <strong>L1 지갑 · 브렌트유</strong> — 126.55 (2026-10-14), 기준 &lt; 85.0 × 최근 5회 ↳ $85 아래 1주 안착 = 종전 레버 1차 반응</li><li>· <strong>L3 청구서 · 30년물 국채금리</strong> — 5.43 (2026-10-15), 기준 &gt; 5.5 × 최근 3회 ↳ 5.5% 돌파 3일 = 채권 자경단(재정 신뢰 이탈)</li><li>· <strong>L3 청구서 · 하이일드 스프레드</strong> — 3.23 (2026-10-15), 기준 &gt; 5.0 × 최근 3회 ↳ 5%p 돌파 = 위험회피 확산</li><li>🔔 <strong>L1 지갑 · 미시간대 1년 기대인플레</strong> — 4.00 (2026-08-01), 1관측 전 대비 -0.20 ↳ 하락 = 체감물가 개선 / 상승 = 악화 (FRED 공개가 약 2개월 늦다)</li><li>· <strong>L3 청구서 · 5년 뒤 5년 기대인플레</strong> — 2.33 (2026-10-16), 20관측 전 대비 -0.01 ↳ 20일 +0.25%p 이상 급등 = 연준 신뢰 훼손 경고</li><li>· <strong>L1 지갑 · 재무부 현금잔고(TGA, 백만달러)</strong> — 883,373.00 (2026-10-14), 4관측 전 대비 +6345.00 ↳ 4주 감소 = 재정 지출이 풀리는 중(집행 앞당김 단서)</li></ul>
+<blockquote class='bq-warn'>⚠️ 켜진 신호가 있다 — 오늘의 판단/결론에 반영할 것: 미시간대 1년 기대인플레</blockquote></section>
+<footer>PEOS 브리핑 · 코드 생성 HTML · 2026-10-20T08:40:00+09:00</footer>
+</body>
+</html>
