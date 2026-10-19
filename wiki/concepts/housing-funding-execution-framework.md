@@ -37,6 +37,8 @@ Critical decision point가 발생하는지 여부를 계속 trace하는 daily �
 
 ---
 
+> 큰 결정(tranche 변경·CDP 대응) 전에는 [돈의 심리학 체크 질문](psychology-of-money-principles.md)도 함께 본다 — 특히 "쓸 날짜가 정해진 돈인가", "이미 충분한가"(2026-10-19).
+
 ## 설계 원칙 3
 
 ### 1. 금액 기반이지 주수 기반이 아니다
