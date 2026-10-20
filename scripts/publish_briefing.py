@@ -53,6 +53,7 @@ def _appendix(md: str, day: date) -> str:
     is_notice = "\nnotice: true" in md[:400]
     builders = [] if is_notice else [X.build_bottleneck_block]
     builders.append(X.build_midterm_block)
+    builders.append(X.build_macro_watch_block)  # ⑪ 2026-10-20
     for b in builders:
         try:
             blk = b(day)

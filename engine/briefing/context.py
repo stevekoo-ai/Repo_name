@@ -987,6 +987,14 @@ def build_midterm_block(as_of: date, compact: bool = False) -> Block:
     return Block("midterm", title, ML.render_markdown(ML.evaluate(as_of, _series_map()), as_of, compact=compact))
 
 
+def build_macro_watch_block(as_of: date) -> Block:
+    """⑪ 경기·신용 경보 — 선행지수 2개월 연속 하락, HY 스프레드 3.5%p 초과(2026-10-20)."""
+    from engine.briefing import macro_watch as MW
+
+    return Block("macro_watch", "⑪ 경기·신용 경보 (선행지수·하이일드 스프레드)",
+                 MW.render_markdown(MW.evaluate(as_of, _series_map())))
+
+
 def build_compass_block() -> Block:
     """🧭 나침반 — 새 세션이어도 이어지는 압축 누적 맥락(의도·추적 질문·쳐낸 곁가지·최근 결론).
     wiki/concepts/briefing-compass.md"""
@@ -1063,6 +1071,7 @@ def build_pack(slot: str, as_of: date | None = None) -> tuple[BriefingPack, Gate
             build_execution_block(as_of),
             build_bottleneck_block(as_of, compact=True),
             build_midterm_block(as_of, compact=True),
+            build_macro_watch_block(as_of),
             build_weekend_news_block(as_of),
             build_weekly_outlook_block(as_of),
         ])
@@ -1087,6 +1096,7 @@ def build_pack(slot: str, as_of: date | None = None) -> tuple[BriefingPack, Gate
         build_execution_block(as_of),
         build_bottleneck_block(as_of, compact=True),
         build_midterm_block(as_of, compact=True),
+        build_macro_watch_block(as_of),
     ]
     pack = BriefingPack(slot=slot, as_of=now, blocks=blocks)
     return pack, gate

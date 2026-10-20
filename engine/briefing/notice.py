@@ -115,6 +115,7 @@ def build_status_markdown(title: str, heading: str, problem_lines: list[str],
         (X.build_execution_block, as_of),
         (X.build_bottleneck_block, as_of),
         (X.build_midterm_block, as_of),
+        (X.build_macro_watch_block, as_of),
         (X.build_calendar_block, as_of, calendar_slot),
         (X.build_ledger_block, as_of),
     ]
