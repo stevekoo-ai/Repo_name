@@ -991,7 +991,7 @@ def build_macro_watch_block(as_of: date) -> Block:
     """⑪ 경기·신용 경보 — 선행지수 2개월 연속 하락, HY 스프레드 3.5%p 초과(2026-10-20)."""
     from engine.briefing import macro_watch as MW
 
-    return Block("macro_watch", "⑪ 경기·신용 경보 (선행지수·하이일드 스프레드)",
+    return Block("macro_watch", "⑪ 경기·신용 경보 (선행지수·하이일드 스프레드·트리플 약세)",
                  MW.render_markdown(MW.evaluate(as_of, _series_map())))
 
 

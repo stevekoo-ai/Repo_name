@@ -544,16 +544,28 @@ def cmd_cash(args):
             appkey, appsecret = _get_account_keys(acc["slot"])
             rows.append(_cash_row(acc["label"], _inquire_balance_json(acc["cano"], acc["prdt_cd"], appkey, appsecret, args.account_type)))
             if acc["slot"] == "GEN" and args.probe_cma:
-                # 2026-10-21: 잔고조회(TTTC8434R)는 CMA(21)를 "위탁계좌인 경우만 조회가능"으로 거부.
-                # 투자계좌자산현황(CTRP6548R)의 자산 구성에 CMA가 잡히는지 시험한다(금액만 기록, 계좌번호 미기록).
-                for prdt in ("01", "21"):
-                    d = _account_asset_json(acc["cano"], prdt, appkey, appsecret)
-                    print(f"[자산현황 {prdt}] rt_cd={d.get('rt_cd')} msg={str(d.get('msg1',''))[:60]}")
-                    o1 = d.get("output1") or []
-                    for i, it in enumerate(o1 if isinstance(o1, list) else [o1]):
-                        amts = {k: v for k, v in it.items() if v not in ("", "0", "0.00", "0.000000")}
-                        print(f"  output1[{i}] {amts}")
-                    print(f"  output2 {d.get('output2')}")
+                # CMA(같은 CANO, 상품코드 21): 잔고조회(TTTC8434R)는 "위탁계좌인 경우만"으로 거부하지만
+                # 투자계좌자산현황(CTRP6548R)은 조회된다(2026-10-21 실측: 예수금 41,695,478원).
+                d = _account_asset_json(acc["cano"], "21", appkey, appsecret)
+                o2 = d.get("output2") or {}
+                o2 = o2[0] if isinstance(o2, list) and o2 else o2
+                row = _cash_row("CMA", {"rt_cd": d.get("rt_cd"), "msg1": d.get("msg1"), "output2": None})
+                if d.get("rt_cd") == "0" and o2:
+                    row.update(deposit_krw=o2.get("tot_dncl_amt", ""), d2_cash_krw=o2.get("dncl_amt", ""),
+                               stock_eval_krw=o2.get("evlu_amt_smtl", ""), total_eval_krw=o2.get("tot_asst_amt", ""),
+                               net_asset_krw=o2.get("tot_asst_amt", ""), status="ok(CTRP6548R)")
+                rows.append(row)
+                # 일반 계좌의 해외주식·외화 예수금 — 보유종목 동기화(국내 잔고조회)에 안 잡히는 자산
+                d1 = _account_asset_json(acc["cano"], acc["prdt_cd"], appkey, appsecret)
+                g2 = d1.get("output2") or {}
+                g2 = g2[0] if isinstance(g2, list) and g2 else g2
+                if d1.get("rt_cd") == "0" and g2:
+                    r2 = _cash_row("일반-해외·외화", {"rt_cd": "x"})
+                    r2.update(deposit_krw=g2.get("frcr_evlu_tota", ""), d2_cash_krw="",
+                              stock_eval_krw=str(int(float(g2.get("ovrs_stck_evlu_amt1", "0") or 0))),
+                              total_eval_krw=g2.get("tot_asst_amt", ""), net_asset_krw=g2.get("nass_tot_amt", ""),
+                              status="ok(CTRP6548R: deposit=외화평가, stock=해외주식, total=계좌 전체)")
+                    rows.append(r2)
         except SystemExit as e:
             rows.append(_cash_row(acc["label"], {"rt_cd": "EXIT", "msg1": str(e)}))
     for r in rows:
