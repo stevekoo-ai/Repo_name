@@ -501,6 +501,21 @@ def _inquire_balance_json(cano, prdt_cd, appkey, appsecret, account_type="real")
         return {"rt_cd": "HTTP", "msg1": f"{e.code} {e.read().decode(errors='replace')[:200]}"}
 
 
+def _account_asset_json(cano, prdt_cd, appkey, appsecret):
+    """투자계좌자산현황조회(CTRP6548R) — 계좌 전체 자산 구성(주식·채권·CMA 등) 시험용."""
+    token = kis_get_token(appkey, appsecret, "real")
+    params = f"CANO={cano}&ACNT_PRDT_CD={prdt_cd}&INQR_DVSN_1=&BSPR_BF_DT_APLY_YN="
+    req = urllib.request.Request(
+        f"{KIS_HOSTS['real']}/uapi/domestic-stock/v1/trading/inquire-account-balance?{params}",
+        headers={"content-type": "application/json; charset=utf-8", "authorization": f"Bearer {token}",
+                 "appkey": appkey, "appsecret": appsecret, "tr_id": "CTRP6548R", "custtype": "P"})
+    try:
+        with urllib.request.urlopen(req) as resp:
+            return json.loads(resp.read())
+    except urllib.error.HTTPError as e:
+        return {"rt_cd": "HTTP", "msg1": f"{e.code} {e.read().decode(errors='replace')[:200]}"}
+
+
 def _cash_row(label, data):
     today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
     row = {"date": today, "account_label": label, "source": "kis_api",
@@ -529,7 +544,16 @@ def cmd_cash(args):
             appkey, appsecret = _get_account_keys(acc["slot"])
             rows.append(_cash_row(acc["label"], _inquire_balance_json(acc["cano"], acc["prdt_cd"], appkey, appsecret, args.account_type)))
             if acc["slot"] == "GEN" and args.probe_cma:
-                rows.append(_cash_row("CMA(시험)", _inquire_balance_json(acc["cano"], "21", appkey, appsecret, args.account_type)))
+                # 2026-10-21: 잔고조회(TTTC8434R)는 CMA(21)를 "위탁계좌인 경우만 조회가능"으로 거부.
+                # 투자계좌자산현황(CTRP6548R)의 자산 구성에 CMA가 잡히는지 시험한다(금액만 기록, 계좌번호 미기록).
+                for prdt in ("01", "21"):
+                    d = _account_asset_json(acc["cano"], prdt, appkey, appsecret)
+                    print(f"[자산현황 {prdt}] rt_cd={d.get('rt_cd')} msg={str(d.get('msg1',''))[:60]}")
+                    o1 = d.get("output1") or []
+                    for i, it in enumerate(o1 if isinstance(o1, list) else [o1]):
+                        amts = {k: v for k, v in it.items() if v not in ("", "0", "0.00", "0.000000")}
+                        print(f"  output1[{i}] {amts}")
+                    print(f"  output2 {d.get('output2')}")
         except SystemExit as e:
             rows.append(_cash_row(acc["label"], {"rt_cd": "EXIT", "msg1": str(e)}))
     for r in rows:
