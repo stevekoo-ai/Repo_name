@@ -1,0 +1,4 @@
+date,account_label,deposit_krw,d2_cash_krw,stock_eval_krw,total_eval_krw,net_asset_krw,status,source,fetched_at
+2026-10-20,일반,339880,339880,149352800,149692680,149692680,ok,kis_api,2026-10-20T23:14:35+00:00
+2026-10-20,CMA(시험),,,,,,fail rt_cd=7 위탁계좌인 경우만 조회가능합니다.                                               ,kis_api,2026-10-20T23:14:36+00:00
+2026-10-20,ISA,415805,415805,76866265,77282070,77282070,ok,kis_api,2026-10-20T23:14:36+00:00
