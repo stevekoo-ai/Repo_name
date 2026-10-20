@@ -55,3 +55,12 @@ def test_real_external_file_is_consistent_with_lock():
         if "locked_quantity" in h:
             assert h["locked_quantity"] + h["free_quantity"] == h["quantity"]
             assert h["locked_quantity"] == locked     # 락업은 하나증권 67주(execution_plan)
+
+
+def test_cash_row_reads_output2_and_records_failures():
+    ok = P._cash_row("일반", {"rt_cd": "0", "output2": [{"dnca_tot_amt": "43133106", "prvs_rcdl_excc_amt": "43133106",
+                                                       "scts_evlu_amt": "146760000", "tot_evlu_amt": "189893106",
+                                                       "nass_amt": "189893106"}]})
+    assert ok["status"] == "ok" and ok["deposit_krw"] == "43133106" and ok["total_eval_krw"] == "189893106"
+    bad = P._cash_row("CMA(시험)", {"rt_cd": "1", "msg1": "상품코드 오류"})
+    assert bad["status"].startswith("fail") and bad["deposit_krw"] == ""

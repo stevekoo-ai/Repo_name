@@ -475,6 +475,79 @@ def upsert_holdings(account_label, holdings, source="kis_api"):
     return len(holdings)
 
 
+CASH_CSV_PATH = Path(__file__).resolve().parents[1] / "sources" / "portfolio-cash.csv"
+CASH_CSV_FIELDS = ["date", "account_label", "deposit_krw", "d2_cash_krw", "stock_eval_krw",
+                   "total_eval_krw", "net_asset_krw", "status", "source", "fetched_at"]
+# KIS 주식잔고조회(TTTC8434R) output2 요약 필드 — 공식 문서 기준.
+CASH_FIELDS = {"deposit_krw": "dnca_tot_amt", "d2_cash_krw": "prvs_rcdl_excc_amt",
+               "stock_eval_krw": "scts_evlu_amt", "total_eval_krw": "tot_evlu_amt",
+               "net_asset_krw": "nass_amt"}
+
+
+def _inquire_balance_json(cano, prdt_cd, appkey, appsecret, account_type="real"):
+    """잔고조회 원본 JSON. 실패는 예외 대신 {'rt_cd': 'HTTP', 'msg1': ...}로 돌려준다."""
+    token = kis_get_token(appkey, appsecret, account_type)
+    params = (f"CANO={cano}&ACNT_PRDT_CD={prdt_cd}&AFHR_FLPR_YN=N&OFL_YN=&INQR_DVSN=02"
+              f"&UNPR_DVSN=01&FUND_STTL_ICLD_YN=N&FNCG_AMT_AUTO_RDPT_YN=N&PRCS_DVSN=00"
+              f"&CTX_AREA_FK100=&CTX_AREA_NK100=")
+    req = urllib.request.Request(
+        f"{KIS_HOSTS[account_type]}/uapi/domestic-stock/v1/trading/inquire-balance?{params}",
+        headers={"content-type": "application/json; charset=utf-8", "authorization": f"Bearer {token}",
+                 "appkey": appkey, "appsecret": appsecret, "tr_id": GENERAL_BALANCE_TR[account_type]})
+    try:
+        with urllib.request.urlopen(req) as resp:
+            return json.loads(resp.read())
+    except urllib.error.HTTPError as e:
+        return {"rt_cd": "HTTP", "msg1": f"{e.code} {e.read().decode(errors='replace')[:200]}"}
+
+
+def _cash_row(label, data):
+    today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    row = {"date": today, "account_label": label, "source": "kis_api",
+           "fetched_at": datetime.now(timezone.utc).isoformat(timespec="seconds")}
+    o2 = data.get("output2")
+    if data.get("rt_cd") == "0" and o2:
+        o2 = o2[0] if isinstance(o2, list) else o2
+        row.update({k: o2.get(v, "") for k, v in CASH_FIELDS.items()}, status="ok")
+    else:
+        row.update({k: "" for k in CASH_FIELDS}, status=f"fail rt_cd={data.get('rt_cd')} {str(data.get('msg1', ''))[:80]}")
+    return row
+
+
+def cmd_cash(args):
+    """계좌별 예수금·D+2 정산금·평가 합계(output2)를 sources/portfolio-cash.csv에 기록.
+
+    2026-10-20 사용자: "내 채권과 현금이 얼마나 되지? … 실시간으로 확인해봐".
+    보유종목 동기화(output1)는 현금을 안 남겼다. CMA(같은 CANO, 상품코드 21)는
+    일반 계좌 키로 조회되는지 시험한다 — 안 되면 status에 사유만 남기고 실패로
+    보지 않는다(다른 계좌 기록을 막지 않는다)."""
+    rows = []
+    for acc in _load_accounts():
+        if acc["slot"] not in ("GEN", "ISP"):
+            continue
+        try:
+            appkey, appsecret = _get_account_keys(acc["slot"])
+            rows.append(_cash_row(acc["label"], _inquire_balance_json(acc["cano"], acc["prdt_cd"], appkey, appsecret, args.account_type)))
+            if acc["slot"] == "GEN" and args.probe_cma:
+                rows.append(_cash_row("CMA(시험)", _inquire_balance_json(acc["cano"], "21", appkey, appsecret, args.account_type)))
+        except SystemExit as e:
+            rows.append(_cash_row(acc["label"], {"rt_cd": "EXIT", "msg1": str(e)}))
+    for r in rows:
+        print(f"[{r['account_label']}] {r['status']} 예수금={r['deposit_krw']} D+2={r['d2_cash_krw']} "
+              f"주식평가={r['stock_eval_krw']} 총평가={r['total_eval_krw']}")
+    existing = []
+    if CASH_CSV_PATH.exists():
+        with CASH_CSV_PATH.open(newline="", encoding="utf-8") as f:
+            existing = list(csv.DictReader(f))
+    today = rows[0]["date"] if rows else None
+    keep = [r for r in existing if not (r["date"] == today and r["account_label"] in {x["account_label"] for x in rows})]
+    with CASH_CSV_PATH.open("w", newline="", encoding="utf-8") as f:
+        w = csv.DictWriter(f, fieldnames=CASH_CSV_FIELDS)
+        w.writeheader()
+        for r in keep + rows:
+            w.writerow(r)
+
+
 EXTERNAL_YAML = Path(__file__).resolve().parents[1] / "data" / "manual_inputs" / "external_holdings.yaml"
 PRICE_SNAPSHOT = Path(__file__).resolve().parents[1] / "sources" / "sk-hynix-price-snapshot.csv"
 EXTERNAL_STALE_DAYS = 90
@@ -584,6 +657,11 @@ def main():
     ps.add_argument("--account-type", default=os.environ.get("KIS_ACCOUNT_TYPE", "real"), choices=["real", "vts"])
     ps.add_argument("--raw", action="store_true", help="파싱하지 않고 원본 JSON만 출력(필드명 검증용)")
     ps.set_defaults(func=cmd_sync)
+
+    pc = sub.add_parser("cash", help="계좌별 예수금·D+2·평가 합계 기록(output2), CMA 조회 시험")
+    pc.add_argument("--account-type", default=os.environ.get("KIS_ACCOUNT_TYPE", "real"), choices=["real", "vts"])
+    pc.add_argument("--no-probe-cma", dest="probe_cma", action="store_false", help="CMA(상품코드 21) 시험 조회 생략")
+    pc.set_defaults(func=cmd_cash)
 
     pb = sub.add_parser("bonds", help="장내채권 잔고 조회+CSV 기록(CTSC8407R)")
     pb.add_argument("--account", help="GEN/ISP/DC/IRP 중 하나, 생략시 등록된 계좌 전체")
