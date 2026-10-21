@@ -17,10 +17,32 @@ from pathlib import Path
 REPO_ROOT = Path(__file__).resolve().parent
 sys.path.insert(0, str(REPO_ROOT))
 
+import shutil
+import tempfile
+
 from engine.report import payload as payload_mod
 from engine.report.markdown import render_markdown
 from engine.exporters.sk_hynix_decision import compute_sk_hynix_decision
 from engine.exporters.real_estate_decision import compute_real_estate_decision
+
+
+def _sandbox() -> Path:
+    """실제 데이터 파일을 건드리지 않도록 쓰기 경로를 임시 폴더로 돌린다.
+
+    2026-10-21: 이 스크립트가 build_report_payload()를 부르면서 data/snapshots/
+    YYYY-MM.json을 컨테이너의 오래된 데이터로 덮어썼다(신뢰도 94.0→84.1).
+    읽기 결과가 같도록 기존 스냅샷·signal CSV를 복사해 두고 그 사본에만 쓴다."""
+    from engine.macro import snapshot
+    from engine.report import signal_recorder
+
+    tmp = Path(tempfile.mkdtemp(prefix="phase2_"))
+    for mod, attr in ((snapshot, "SNAPSHOT_DIR"), (signal_recorder, "DATA_DIR")):
+        src = getattr(mod, attr)
+        dst = tmp / src.name
+        if src.exists():
+            shutil.copytree(src, dst)
+        setattr(mod, attr, dst)
+    return tmp
 
 
 def test_imports():
@@ -108,9 +130,9 @@ def test_markdown_rendering(payload: dict):
                 print(f"  ✗ {name} MISSING")
 
         # Save sample output
-        test_output_path = REPO_ROOT / "test_phase2_output.md"
+        test_output_path = SANDBOX / "test_phase2_output.md"
         test_output_path.write_text(markdown_content, encoding="utf-8")
-        print(f"\n✓ Sample output saved to: test_phase2_output.md")
+        print(f"\n✓ Sample output saved to: {test_output_path}")
 
         return markdown_content
     except Exception as e:
@@ -193,6 +215,10 @@ def main():
     print("█" + " " * 68 + "█")
     print("█" * 70)
 
+    global SANDBOX
+    SANDBOX = _sandbox()
+    print(f"(쓰기 경로 격리: {SANDBOX})")
+
     # Run tests
     test1 = test_imports()
     if not test1:
@@ -225,7 +251,7 @@ def main():
 
     print("\n📊 PHASE 2 INTEGRATION STATUS: ✅ READY FOR NEXT PHASE")
     print("\nNext steps:")
-    print("  1. Review test_phase2_output.md for report structure")
+    print(f"  1. Review {SANDBOX / 'test_phase2_output.md'} for report structure")
     print("  2. Verify decision signals align with expectations")
     print("  3. Proceed to Phase 3: Monthly aggregation")
     print("=" * 70 + "\n")

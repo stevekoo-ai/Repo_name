@@ -32,8 +32,19 @@
   여러 테스트가 실제 수집 데이터를 읽어 검증하므로 여기를 tmp로 돌리면
   테스트가 검증하는 대상 자체가 사라진다. 실측 확인 결과 테스트 실행이
   이 디렉터리를 더럽히지도 않았다.
+
+## 위치 (2026-10-21 tests/ → 저장소 루트로 이동)
+
+루트의 수동 점검 스크립트(test_phase*.py)도 이름이 test_로 시작해 루트에서
+pytest를 돌리면 수집되는데, tests/ 밖이라 이 격리가 적용되지 않아
+data/snapshots/2026-10.json을 컨테이너의 오래된 데이터로 덮어썼다(신뢰도
+94.0→84.1). 루트에 두면 tests/와 루트 스크립트 모두에 적용된다.
+test_phase2_integration.py는 함수가 payload 인자를 받는 스크립트라 pytest
+수집에서 뺀다(`python test_phase2_integration.py`로 실행, 자체 격리 있음).
 """
 from __future__ import annotations
+
+collect_ignore = ["test_phase2_integration.py"]
 
 import pytest
 
