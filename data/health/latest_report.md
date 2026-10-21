@@ -1,11 +1,10 @@
-# 데이터 헬스 — 2026-10-21T00:41:27.048537+00:00
+# 데이터 헬스 — 2026-10-21T07:48:41.279467+00:00
 
-⚠️ 36/54개 소스 이상
-- 🟠 **normalized-series-sweep** [ANOMALY] data/normalized/*.csv 전수 스윕 (237개 시리즈) — ok 200 / 이상 35 / 알려진 설계상 이상(비알림) 2 — 상세는 개별 normalized:* 항목 참고
+⚠️ 35/53개 소스 이상
+- 🟠 **normalized-series-sweep** [ANOMALY] data/normalized/*.csv 전수 스윕 (237개 시리즈) — ok 201 / 이상 34 / 알려진 설계상 이상(비알림) 2 — 상세는 개별 normalized:* 항목 참고
 - 🟠 **normalized:bls_us_job_openings** [STALE] 정규화 시리즈: bls_us_job_openings (monthly) — STALE — 최신 2026-08-01, 81일 경과
 - 🟠 **normalized:ecos_current_account** [STALE] 정규화 시리즈: ecos_current_account (monthly) — STALE — 최신 2026-08-01, 81일 경과
 - 🟠 **normalized:ecos_gdp_growth_qoq** [STALE] 정규화 시리즈: ecos_gdp_growth_qoq (quarterly) — STALE — 최신 2026-04-01, 203일 경과
-- 🟠 **normalized:ecos_ppi_yoy_level** [STALE] 정규화 시리즈: ecos_ppi_yoy_level (monthly) — STALE — 최신 2026-08-01, 81일 경과
 - 🟠 **normalized:fred_kr_retail_sales_mom_oecd** [STALE] 정규화 시리즈: fred_kr_retail_sales_mom_oecd (monthly) — STALE — 최신 2026-08-01, 81일 경과
 - 🟠 **normalized:fred_kr_unemployment_oecd** [STALE] 정규화 시리즈: fred_kr_unemployment_oecd (monthly) — STALE — 최신 2026-08-01, 81일 경과
 - 🟠 **normalized:fred_us_gdp_qoq** [STALE] 정규화 시리즈: fred_us_gdp_qoq (quarterly) — STALE — 최신 2026-04-01, 203일 경과

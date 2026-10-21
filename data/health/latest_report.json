@@ -1,5 +1,5 @@
 {
-  "checked_at": "2026-10-21T00:41:27.048537+00:00",
+  "checked_at": "2026-10-21T07:48:41.279467+00:00",
   "statuses": [
     {
       "slug": "macro-series",
@@ -8,7 +8,7 @@
       "severity": "critical",
       "state": "OK",
       "detail": "fetched_at=2026-10-21T00:35:53+00:00",
-      "age_hours": 0.09285103888888889
+      "age_hours": 7.213444130277778
     },
     {
       "slug": "hynix-price-snapshot",
@@ -16,8 +16,8 @@
       "workflow": "sk-hynix-daily-report.yml",
       "severity": "critical",
       "state": "OK",
-      "detail": "fetched_at=2026-10-21T00:20:57+00:00",
-      "age_hours": 0.3417737911111111
+      "detail": "fetched_at=2026-10-21T05:32:35+00:00",
+      "age_hours": 2.2684675275
     },
     {
       "slug": "hynix-investor-flow",
@@ -25,8 +25,8 @@
       "workflow": "sk-hynix-daily-report.yml",
       "severity": "warning",
       "state": "OK",
-      "detail": "마지막 성공=2026-10-21T00:20:56+00:00",
-      "age_hours": 0.34205830722222225
+      "detail": "마지막 성공=2026-10-21T05:32:34+00:00",
+      "age_hours": 2.268750700277778
     },
     {
       "slug": "hynix-adr-quote",
@@ -34,8 +34,8 @@
       "workflow": "sk-hynix-daily-report.yml",
       "severity": "warning",
       "state": "OK",
-      "detail": "fetched_at=2026-10-21T00:20:57+00:00",
-      "age_hours": 0.34178208638888885
+      "detail": "fetched_at=2026-10-21T05:32:35+00:00",
+      "age_hours": 2.268473786388889
     },
     {
       "slug": "hynix-credit-balance",
@@ -43,8 +43,8 @@
       "workflow": "sk-hynix-daily-report.yml",
       "severity": "warning",
       "state": "OK",
-      "detail": "fetched_at=2026-10-21T00:20:58+00:00",
-      "age_hours": 0.34150590805555553
+      "detail": "fetched_at=2026-10-21T05:32:36+00:00",
+      "age_hours": 2.2681968425
     },
     {
       "slug": "hynix-short-sale",
@@ -52,8 +52,8 @@
       "workflow": "sk-hynix-daily-report.yml",
       "severity": "warning",
       "state": "OK",
-      "detail": "fetched_at=2026-10-21T00:21:01+00:00",
-      "age_hours": 0.3406742294444445
+      "detail": "fetched_at=2026-10-21T05:32:38+00:00",
+      "age_hours": 2.26764214
     },
     {
       "slug": "kr-index-quote",
@@ -61,8 +61,8 @@
       "workflow": "sk-hynix-daily-report.yml",
       "severity": "warning",
       "state": "OK",
-      "detail": "fetched_at=2026-10-21T00:21:00+00:00",
-      "age_hours": 0.3409536863888889
+      "detail": "fetched_at=2026-10-21T05:32:37+00:00",
+      "age_hours": 2.2679207933333334
     },
     {
       "slug": "portfolio-etf-nav",
@@ -70,8 +70,8 @@
       "workflow": "sk-hynix-daily-report.yml",
       "severity": "warning",
       "state": "OK",
-      "detail": "fetched_at=2026-10-21T00:21:02+00:00",
-      "age_hours": 0.3403998386111111
+      "detail": "fetched_at=2026-10-21T05:32:39+00:00",
+      "age_hours": 2.2673661319444443
     },
     {
       "slug": "portfolio-holdings",
@@ -80,7 +80,7 @@
       "severity": "critical",
       "state": "OK",
       "detail": "fetched_at=2026-10-20T23:29:45+00:00",
-      "age_hours": 1.1951256427777779
+      "age_hours": 8.315701415277777
     },
     {
       "slug": "portfolio-bonds",
@@ -89,7 +89,7 @@
       "severity": "critical",
       "state": "OK",
       "detail": "fetched_at=2026-10-20T23:29:46+00:00",
-      "age_hours": 1.1948505380555556
+      "age_hours": 8.3154251375
     },
     {
       "slug": "hyperscaler-capex",
@@ -98,7 +98,7 @@
       "severity": "warning",
       "state": "OK",
       "detail": "마지막 성공=2026-10-20T00:06:50+00:00",
-      "age_hours": 24.577074814444444
+      "age_hours": 31.6976484725
     },
     {
       "slug": "ai-periphery-fundamentals",
@@ -107,7 +107,7 @@
       "severity": "warning",
       "state": "OK",
       "detail": "fetched_at=2026-10-20T00:06:55+00:00",
-      "age_hours": 24.575686082777775
+      "age_hours": 31.696259675
     },
     {
       "slug": "bottleneck-prices",
@@ -116,7 +116,7 @@
       "severity": "warning",
       "state": "OK",
       "detail": "fetched_at=2026-10-21T00:35:54+00:00",
-      "age_hours": 0.09263341222222221
+      "age_hours": 7.213205781388889
     },
     {
       "slug": "real-estate-apartment-sale",
@@ -125,7 +125,7 @@
       "severity": "warning",
       "state": "OK",
       "detail": "마지막 성공=2026-10-20T21:00:01+00:00",
-      "age_hours": 3.690690956388889
+      "age_hours": 10.811262550833334
     },
     {
       "slug": "real-estate-apartment-rent",
@@ -134,7 +134,7 @@
       "severity": "warning",
       "state": "OK",
       "detail": "마지막 성공=2026-10-20T21:01:14+00:00",
-      "age_hours": 3.6704137858333334
+      "age_hours": 10.790985136388889
     },
     {
       "slug": "subscription-monitor",
@@ -142,7 +142,7 @@
       "workflow": "subscription-monitor.yml",
       "severity": "warning",
       "state": "OK",
-      "detail": "자체 감시 정상 (연속실패 0, 최근 심박 2026-10-20)",
+      "detail": "자체 감시 정상 (연속실패 0, 최근 심박 2026-10-21)",
       "age_hours": null
     },
     {
@@ -151,8 +151,8 @@
       "workflow": "daily-peos-report.yml",
       "severity": "critical",
       "state": "OK",
-      "detail": "report/2026-10-20.md 존재 (1일 전 날짜)",
-      "age_hours": 24.0
+      "detail": "report/2026-10-21.md 존재 (0일 전 날짜)",
+      "age_hours": 0.0
     },
     {
       "slug": "subscription-daily-report",
@@ -189,15 +189,6 @@
       "state": "STALE",
       "detail": "STALE — 최신 2026-04-01, 203일 경과",
       "age_hours": 4872.0
-    },
-    {
-      "slug": "normalized:ecos_ppi_yoy_level",
-      "description": "정규화 시리즈: ecos_ppi_yoy_level (monthly)",
-      "workflow": "scripts/data_freshness_audit.py (core10-collect.yml 등)",
-      "severity": "warning",
-      "state": "STALE",
-      "detail": "STALE — 최신 2026-08-01, 81일 경과",
-      "age_hours": 1944.0
     },
     {
       "slug": "normalized:fred_kr_retail_sales_mom_oecd",
@@ -484,7 +475,7 @@
       "workflow": "scripts/data_freshness_audit.py",
       "severity": "warning",
       "state": "ANOMALY",
-      "detail": "ok 200 / 이상 35 / 알려진 설계상 이상(비알림) 2 — 상세는 개별 normalized:* 항목 참고",
+      "detail": "ok 201 / 이상 34 / 알려진 설계상 이상(비알림) 2 — 상세는 개별 normalized:* 항목 참고",
       "age_hours": null
     }
   ]
