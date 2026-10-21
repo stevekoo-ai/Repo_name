@@ -64,3 +64,20 @@ def test_every_scheduled_report_has_required_fields():
         assert r["kind"] in ("briefing", "workflow")
         if r["kind"] == "workflow":
             assert (REPO / ".github" / "workflows" / r["workflow"]).exists()
+
+
+def test_special_report_is_picked_up_by_pending_sender(tmp_path, monkeypatch):
+    # 2026-10-21 사용자 "메일로도 보내줘" — 특별 보고(SPECIAL)도 같은 장부로 발송
+    monkeypatch.setattr(S, "BRIEF_DIR", tmp_path)
+    monkeypatch.setattr(S, "SENT_LOG", tmp_path / "sent.log")
+    (tmp_path / "2026-10-28-SPECIAL.md").write_text("# 하이닉스 3Q 실적\n", encoding="utf-8")
+    (tmp_path / "2026-10-28-OTHER.md").write_text("# x\n", encoding="utf-8")
+    assert S.pending(date(2026, 10, 28), 3) == [("2026-10-28", "SPECIAL", "2026-10-28-SPECIAL")]
+    S.mark_sent("2026-10-28-SPECIAL")
+    assert S.pending(date(2026, 10, 28), 3) == []
+
+
+def test_special_report_subject_uses_first_heading():
+    import publish_briefing as P
+    assert P.special_title("---\nx: 1\n---\n# 하이닉스 3Q 실적·4Q 가이던스\n본문") == "하이닉스 3Q 실적·4Q 가이던스"
+    assert P.special_title("본문만") == "특별 보고"

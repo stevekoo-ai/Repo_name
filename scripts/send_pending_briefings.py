@@ -26,7 +26,7 @@ REPO = Path(__file__).resolve().parents[1]
 BRIEF_DIR = REPO / "report" / "briefing"
 SENT_LOG = BRIEF_DIR / "sent.log"
 KST = timezone(timedelta(hours=9))
-_NAME = re.compile(r"^(\d{4}-\d{2}-\d{2})-(AM|PM|WEEKEND)\.md$")
+_NAME = re.compile(r"^(\d{4}-\d{2}-\d{2})-(AM|PM|WEEKEND|SPECIAL)\.md$")
 
 
 def sent_keys() -> set[str]:

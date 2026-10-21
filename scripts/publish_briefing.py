@@ -67,6 +67,14 @@ def _appendix(md: str, day: date) -> str:
     return "\n\n---\n\n## 부록 — 자동 체크포인트 (코드 판정 원문)\n\n" + "\n".join(parts)
 
 
+def special_title(md: str) -> str:
+    """특별 보고 메일 제목 — 마크다운 첫 '# ' 제목. 없으면 '특별 보고'."""
+    for ln in md.splitlines():
+        if ln.startswith("# "):
+            return ln[2:].strip()
+    return "특별 보고"
+
+
 def _after_h1(html: str, snippet: str) -> str:
     """첫 </h1> 뒤에 끼운다(제목 바로 아래). 제목이 없으면 <body> 뒤."""
     if not snippet:
@@ -91,7 +99,9 @@ def _line_after_h1(md: str, line: str) -> str:
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__,
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("--slot", choices=("AM", "PM", "WEEKEND"), required=True)
+    # SPECIAL(2026-10-21): 정기 브리핑이 아닌 특별 보고(예: 하이닉스 실적 발표 보고).
+    # 같은 발송 장부·워크플로를 재사용한다 — report/briefing/<날짜>-SPECIAL.md를 push하면 나간다.
+    ap.add_argument("--slot", choices=("AM", "PM", "WEEKEND", "SPECIAL"), required=True)
     ap.add_argument("--date", default=None, help="YYYY-MM-DD (기본: 오늘)")
     ap.add_argument("--no-email", action="store_true", help="HTML만 만들고 발송은 건너뜀")
     ap.add_argument("--allow-unconfigured", action="store_true",
@@ -114,8 +124,10 @@ def main() -> int:
     except Exception as exc:  # noqa: BLE001
         print(f"[warn] 시장 심리 위젯 생략: {exc}", file=sys.stderr)
         widget, line = "", ""
-    html = _after_h1(render_briefing_html(md + _appendix(md, day)), widget)
-    mail_html = render_briefing_html(_line_after_h1(md, line) + _appendix(md, day)) if line else html
+    # 특별 보고엔 브리핑 부록(병목·중간선거·⑪)을 붙이지 않는다 — 주제와 무관한 잡음.
+    appendix = "" if args.slot == "SPECIAL" else _appendix(md, day)
+    html = _after_h1(render_briefing_html(md + appendix), widget)
+    mail_html = render_briefing_html(_line_after_h1(md, line) + appendix) if line else html
     html_path = md_path.with_suffix(".html")
     html_path.write_text(html, encoding="utf-8")
     print(f"HTML: {html_path} ({len(html.encode()):,} bytes)")
@@ -138,8 +150,10 @@ def main() -> int:
         print(f"[error] {msg}", file=sys.stderr)
         return 1
 
-    label = {"AM": "아침", "PM": "저녁", "WEEKEND": "주간 전망"}[args.slot]
+    label = {"AM": "아침", "PM": "저녁", "WEEKEND": "주간 전망", "SPECIAL": "특별 보고"}[args.slot]
     subject = f"[PEOS {label} 브리핑] {day.isoformat()}"
+    if args.slot == "SPECIAL":
+        subject = f"[PEOS 특별 보고] {day.isoformat()} — {special_title(md)}"
     # 상황 보고(engine/briefing/notice.py)는 제목에서 바로 구분되게 — 정규
     # 브리핑이 없는 이유가 받은편지함 목록에서 보이도록.
     if "\nnotice: true" in md_path.read_text(encoding="utf-8")[:400]:
