@@ -1,5 +1,5 @@
 {
-  "count": 4,
+  "count": 6,
   "reviews": [
     {
       "id": "2026000438",
@@ -55,6 +55,35 @@
       ],
       "reason": null,
       "pdf_url": "https://www.applyhome.co.kr/ai/aia/selectAPTLttotPblancDetail.do?houseManageNo=2026000373&pblancNo=2026000373"
+    },
+    {
+      "id": "2026000531",
+      "name": "시흥거모지구 S-1블록 공공분양(본청약)",
+      "region": "경기",
+      "keyword": null,
+      "reviewed_at": "2026-10-24 02:59 KST",
+      "status": "failed",
+      "business_type": null,
+      "income_scope": null,
+      "exceptions": [],
+      "reason": "청약Home/LH청약플러스 모두 PDF 탐색 실패: 상세페이지에서 '...모집공고...pdf' 링크를 찾지 못함 (첨부파일 구성이 기존 사례와 다를 수 있음)",
+      "pdf_url": null
+    },
+    {
+      "id": "2026820012",
+      "name": "시흥하중지구 A1블록 신혼희망타운(공공분양) 추가입주자모집공고",
+      "region": "경기",
+      "keyword": null,
+      "reviewed_at": "2026-10-24 02:59 KST",
+      "status": "ok",
+      "business_type": "신혼희망타운형",
+      "income_scope": "미분류",
+      "exceptions": [
+        "'적용대상' 줄을 찾지 못함 — 소득기준 챕터 형식이 기존 3건과 다름",
+        "소득검증 범위를 판별 못함 (business_type=신혼희망타운형, applicable_line=None) — 프레임워크의 축1 규칙(신혼희망타운=전체 / 국민주택=60㎡이하만)에 안 맞는 새 패턴일 수 있음"
+      ],
+      "reason": null,
+      "pdf_url": "https://apply.lh.or.kr/lhapply/apply/wt/wrtanc/selectWrtancInfo.do?panId=0000061165&ccrCnntSysDsCd=02&uppAisTpCd=39&aisTpCd=39&mi=1027"
     }
   ]
 }
