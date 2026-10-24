@@ -13120,6 +13120,10 @@
         {
           "date": "2026-10-22",
           "value": 0.31
+        },
+        {
+          "date": "2026-10-23",
+          "value": 0.31
         }
       ],
       "history_years": 10
@@ -16261,7 +16265,7 @@
     }
   ],
   "personal": {
-    "investment_environment_score": 70.2,
+    "investment_environment_score": 70.3,
     "investment_biases": {
       "stock_bias": "확대",
       "etf_bias": "확대",
@@ -16270,7 +16274,7 @@
     },
     "semiconductor_score": 83.8,
     "semiconductor_band": "강한 긍정",
-    "bond_score": 53.4,
+    "bond_score": 53.5,
     "fx_score": 61.9,
     "housing_readiness_score": 65.4,
     "etf_fit": [
@@ -16299,14 +16303,14 @@
         "ticker": "455850.KS",
         "name": "SOL AI반도체소부장",
         "bucket": "semiconductor",
-        "fit_score": 69.7,
+        "fit_score": 69.8,
         "data_status": "ok"
       },
       {
         "ticker": "469150.KS",
         "name": "ACE AI반도체TOP3+",
         "bucket": "semiconductor",
-        "fit_score": 69.7,
+        "fit_score": 69.8,
         "data_status": "ok"
       },
       {
@@ -16327,7 +16331,7 @@
   },
   "assets": {
     "stocks": {
-      "score": 73.1,
+      "score": 73.2,
       "stars": "★★★★☆",
       "data_status": "ok",
       "detail": [
@@ -16370,14 +16374,14 @@
           "ticker": "455850.KS",
           "name": "SOL AI반도체소부장",
           "bucket": "semiconductor",
-          "fit_score": 69.7,
+          "fit_score": 69.8,
           "data_status": "ok"
         },
         {
           "ticker": "469150.KS",
           "name": "ACE AI반도체TOP3+",
           "bucket": "semiconductor",
-          "fit_score": 69.7,
+          "fit_score": 69.8,
           "data_status": "ok"
         },
         {
@@ -16397,7 +16401,7 @@
       ]
     },
     "bond": {
-      "score": 53.4,
+      "score": 53.5,
       "stars": "★★☆☆☆",
       "data_status": "ok",
       "detail": [
@@ -16447,7 +16451,7 @@
       "stars": "★★★☆☆",
       "data_status": "ok",
       "detail": {
-        "usdkrw_change_pct_3m": -10.7,
+        "usdkrw_change_pct_3m": -10.62,
         "dollar_index_change_pct_3m": 0.72,
         "kr_us_rate_differential_pct": -0.75,
         "us_fed_funds_change_bp_3m": 12.0
@@ -16513,7 +16517,7 @@
       "probability": 35,
       "premise": "현재 국면(Slowdown)과 반도체 업황(강한 긍정)의 추세가 유지된다.",
       "expected_change": "지표가 현재 범위 내에서 등락하며 국면 전환 신호는 제한적.",
-      "user_impact": "Investment Environment Score 70.2점 수준의 배분 유지가 합리적."
+      "user_impact": "Investment Environment Score 70.3점 수준의 배분 유지가 합리적."
     },
     "bull": {
       "probability": 35,
@@ -16575,7 +16579,7 @@
       "priority_label": "★★★☆☆ 관찰 필요",
       "priority_score": 58.8,
       "title": "주식/ETF 비중 확대 검토",
-      "reason": "Investment Environment Score 70.2점 — 거시/반도체 환경이 우호적.",
+      "reason": "Investment Environment Score 70.3점 — 거시/반도체 환경이 우호적.",
       "invalid_condition": "Investment Environment Score가 20점 이상 하락하면 보류.",
       "recheck": "다음 정기 리포트.",
       "category": "investment_opportunity",
@@ -16658,23 +16662,23 @@
     },
     "previous_month_regime": "Late Expansion"
   },
-  "exposure": "ExposureModel(as_of='2026-10-23', holdings=[Holding(name='SK하이닉스', ticker='000660.KS', quantity=248, avg_price=477365.0, cost=118386520.0, market_value=296112000, price_as_of='2026-10-23', is_semi=True, locked_qty=67, lock_until='2027-02-11'), Holding(name='삼성전자', ticker='005930.KS', quantity=108, avg_price=187911.0, cost=20294388.0, market_value=None, price_as_of=None, is_semi=True, locked_qty=0, lock_until=None), Holding(name='제주반도체', ticker='080220.KQ', quantity=20, avg_price=91725.0, cost=1834500.0, market_value=None, price_as_of=None, is_semi=True, locked_qty=0, lock_until=None), Holding(name='롯데렌탈', ticker='089860.KS', quantity=4, avg_price=59000.0, cost=236000.0, market_value=None, price_as_of=None, is_semi=False, locked_qty=0, lock_until=None), Holding(name='우리금융지주', ticker='316140.KS', quantity=4, avg_price=26100.0, cost=104400.0, market_value=None, price_as_of=None, is_semi=False, locked_qty=0, lock_until=None), Holding(name='이노진', ticker='344860', quantity=615, avg_price=1613.0, cost=991995.0, market_value=None, price_as_of=None, is_semi=False, locked_qty=0, lock_until=None), Holding(name='나노팀', ticker='417010', quantity=166, avg_price=6820.0, cost=1132120.0, market_value=None, price_as_of=None, is_semi=False, locked_qty=0, lock_until=None), Holding(name='TIGER 미국우주테크', ticker='0183J0.KS', quantity=225, avg_price=14064.0, cost=3164400.0, market_value=None, price_as_of=None, is_semi=False, locked_qty=0, lock_until=None), Holding(name='TIGER 차이나전기차SOLACTIVE', ticker='371460.KS', quantity=202, avg_price=10443.0, cost=2109486.0, market_value=None, price_as_of=None, is_semi=False, locked_qty=0, lock_until=None), Holding(name='ACE KRX금현물', ticker='411060.KS', quantity=113, avg_price=28916.0, cost=3267508.0, market_value=None, price_as_of=None, is_semi=False, locked_qty=0, lock_until=None), Holding(name='SOL AI반도체소부장', ticker='455850.KS', quantity=100, avg_price=27321.0, cost=2732100.0, market_value=None, price_as_of=None, is_semi=True, locked_qty=0, lock_until=None), Holding(name='ACE AI반도체TOP3+', ticker='469150.KS', quantity=297, avg_price=17793.0, cost=5284521.0, market_value=None, price_as_of=None, is_semi=True, locked_qty=0, lock_until=None), Holding(name='RISE 글로벌리얼티인컴', ticker='475380.KS', quantity=70, avg_price=9978.0, cost=698460.0, market_value=None, price_as_of=None, is_semi=False, locked_qty=0, lock_until=None), Holding(name='KODEX 글로벌비만치료제TOP2 Plus', ticker='476070.KS', quantity=440, avg_price=9341.0, cost=4110040.0, market_value=None, price_as_of=None, is_semi=False, locked_qty=0, lock_until=None)], cash_krw=27000000.0, retirement_krw=19113149.0, retirement_total_krw=56217779.0, total_cost=164346438.0, total_valued=342071918.0, priced_coverage_pct=86.56425284229266, semi_valued=326257509.0, semi_pct=95.37687598196821, employer_valued=296112000, employer_pct=86.56425284229266, locked_valued=79998000.0, liquid_valued=262073918.0, deployable_cash=289073918.0, jeonse_deposit_krw=462000000.0, jeonse_deposit_available_from='2027-02-22', housing_entry_funds_total=807291697.0, notes=['검증된 시세가 있는 자산은 평가액의 87%뿐 — 나머지는 매수원가 기준입니다. 시세 연동(KIS API) 전까지 비중(%)은 근사치입니다.', 'SK하이닉스 기준가 1,194,000원은 2026-10-23 KIS API 실시간 스냅샷 (sk-hynix-daily-report.yml).', '급여·성과급(PS)과 퇴직연금이 같은 회사·같은 메모리 사이클에 연동됩니다. 실질 집중도는 아래 지분율보다 높습니다.', '주택 진입 총 가용(807,291,697원)에는 현재 거주지 전세보증금 462,000,000원이 포함돼 있습니다 — 2027-02-22에 계약이 끝나야 실제로 회수되는 돈이라 지금 당장 쓸 수 있는 현금은 아닙니다.', '주택 진입 총 가용에는 IRP·DC 퇴직연금 전체 평가액 56,217,779원도 포함돼 있습니다 — 무주택자의 주택구입·전세자금 목적 중도인출 사유에 해당하지만, 일반 주식 매도와 달리 사유 증빙·신청 절차가 필요한 특별 인출이라 즉시 현금화되지 않습니다.'])",
+  "exposure": "ExposureModel(as_of='2026-10-24', holdings=[Holding(name='SK하이닉스', ticker='000660.KS', quantity=248, avg_price=477365.0, cost=118386520.0, market_value=313224000, price_as_of='2026-10-24', is_semi=True, locked_qty=67, lock_until='2027-02-11'), Holding(name='삼성전자', ticker='005930.KS', quantity=108, avg_price=187911.0, cost=20294388.0, market_value=None, price_as_of=None, is_semi=True, locked_qty=0, lock_until=None), Holding(name='제주반도체', ticker='080220.KQ', quantity=20, avg_price=91725.0, cost=1834500.0, market_value=None, price_as_of=None, is_semi=True, locked_qty=0, lock_until=None), Holding(name='롯데렌탈', ticker='089860.KS', quantity=4, avg_price=59000.0, cost=236000.0, market_value=None, price_as_of=None, is_semi=False, locked_qty=0, lock_until=None), Holding(name='우리금융지주', ticker='316140.KS', quantity=4, avg_price=26100.0, cost=104400.0, market_value=None, price_as_of=None, is_semi=False, locked_qty=0, lock_until=None), Holding(name='이노진', ticker='344860', quantity=615, avg_price=1613.0, cost=991995.0, market_value=None, price_as_of=None, is_semi=False, locked_qty=0, lock_until=None), Holding(name='나노팀', ticker='417010', quantity=166, avg_price=6820.0, cost=1132120.0, market_value=None, price_as_of=None, is_semi=False, locked_qty=0, lock_until=None), Holding(name='TIGER 미국우주테크', ticker='0183J0.KS', quantity=225, avg_price=14064.0, cost=3164400.0, market_value=None, price_as_of=None, is_semi=False, locked_qty=0, lock_until=None), Holding(name='TIGER 차이나전기차SOLACTIVE', ticker='371460.KS', quantity=202, avg_price=10443.0, cost=2109486.0, market_value=None, price_as_of=None, is_semi=False, locked_qty=0, lock_until=None), Holding(name='ACE KRX금현물', ticker='411060.KS', quantity=113, avg_price=28916.0, cost=3267508.0, market_value=None, price_as_of=None, is_semi=False, locked_qty=0, lock_until=None), Holding(name='SOL AI반도체소부장', ticker='455850.KS', quantity=100, avg_price=27321.0, cost=2732100.0, market_value=None, price_as_of=None, is_semi=True, locked_qty=0, lock_until=None), Holding(name='ACE AI반도체TOP3+', ticker='469150.KS', quantity=297, avg_price=17793.0, cost=5284521.0, market_value=None, price_as_of=None, is_semi=True, locked_qty=0, lock_until=None), Holding(name='RISE 글로벌리얼티인컴', ticker='475380.KS', quantity=70, avg_price=9978.0, cost=698460.0, market_value=None, price_as_of=None, is_semi=False, locked_qty=0, lock_until=None), Holding(name='KODEX 글로벌비만치료제TOP2 Plus', ticker='476070.KS', quantity=440, avg_price=9341.0, cost=4110040.0, market_value=None, price_as_of=None, is_semi=False, locked_qty=0, lock_until=None)], cash_krw=27000000.0, retirement_krw=19113149.0, retirement_total_krw=56217779.0, total_cost=164346438.0, total_valued=359183918.0, priced_coverage_pct=87.20434972258418, semi_valued=343369509.0, semi_pct=95.59712776450085, employer_valued=313224000, employer_pct=87.20434972258418, locked_valued=84621000.0, liquid_valued=274562918.0, deployable_cash=301562918.0, jeonse_deposit_krw=462000000.0, jeonse_deposit_available_from='2027-02-22', housing_entry_funds_total=819780697.0, notes=['검증된 시세가 있는 자산은 평가액의 87%뿐 — 나머지는 매수원가 기준입니다. 시세 연동(KIS API) 전까지 비중(%)은 근사치입니다.', 'SK하이닉스 기준가 1,263,000원은 2026-10-24 KIS API 실시간 스냅샷 (sk-hynix-daily-report.yml).', '급여·성과급(PS)과 퇴직연금이 같은 회사·같은 메모리 사이클에 연동됩니다. 실질 집중도는 아래 지분율보다 높습니다.', '주택 진입 총 가용(819,780,697원)에는 현재 거주지 전세보증금 462,000,000원이 포함돼 있습니다 — 2027-02-22에 계약이 끝나야 실제로 회수되는 돈이라 지금 당장 쓸 수 있는 현금은 아닙니다.', '주택 진입 총 가용에는 IRP·DC 퇴직연금 전체 평가액 56,217,779원도 포함돼 있습니다 — 무주택자의 주택구입·전세자금 목적 중도인출 사유에 해당하지만, 일반 주식 매도와 달리 사유 증빙·신청 절차가 필요한 특별 인출이라 즉시 현금화되지 않습니다.'])",
   "rate_analysis": {
-    "total_score": 70,
+    "total_score": 65,
     "score_components": {
       "absolute_rates": 27,
-      "trend_analysis": 15,
+      "trend_analysis": 10,
       "spread": 13,
       "market_signals": 15
     },
     "current_rates": {
-      "us_10y": 5.13,
+      "us_10y": 4.96,
       "kr_10y": 3.17,
-      "spread_bp": 196.0
+      "spread_bp": 180.0
     },
     "stale_series": [],
     "trends": {
-      "us_10y_1m_change_bp": 17.0,
+      "us_10y_1m_change_bp": null,
       "us_10y_3m_trend": "up"
     },
     "market_signal": {
@@ -16682,11 +16686,11 @@
       "yield_curve_status": "normal"
     },
     "portfolio_recommendation": {
-      "stocks": 60,
-      "bonds": 25,
-      "cash": 15,
-      "condition": "완화 국면 — 성장주 중심",
-      "rebalance_trigger": 50
+      "stocks": 50,
+      "bonds": 30,
+      "cash": 20,
+      "condition": "중립~다소 완화적 — 균형 배분",
+      "rebalance_trigger": 40
     },
     "sk_hynix_outlook": {
       "3m_upside_probability": 60,
@@ -16712,9 +16716,9 @@
     "raw_values": {
       "ur_ma3": null,
       "ur_min_12m": 4.1,
-      "spread_10y2y": 0.32,
-      "spread_10y3m": 0.88,
-      "hy_oas": 3.27,
+      "spread_10y2y": 0.31,
+      "spread_10y3m": 0.74,
+      "hy_oas": 3.4,
       "copper_gold_ratio": null,
       "k_emp_yoy": 3.0,
       "semi_cycle_index": null
@@ -16724,30 +16728,30 @@
         "quality": "PRIMARY",
         "series": "fred_us_unemployment",
         "as_of": "2026-09-01",
-        "days_stale": 52
+        "days_stale": 53
       },
       "yield_curve": {
         "quality": "PRIMARY",
         "series": "fred_us_10y_treasury",
-        "as_of": "2026-10-21",
+        "as_of": "2026-10-22",
         "days_stale": 2
       },
       "harvey": {
         "quality": "PRIMARY",
         "series": "fred_us_yield_curve_10y2y",
-        "as_of": "2026-10-22",
+        "as_of": "2026-10-23",
         "days_stale": 1
       },
       "copper_gold": {
         "quality": "PRIMARY",
         "series": "fred_us_industrial_production",
         "as_of": "2026-09-01",
-        "days_stale": 52
+        "days_stale": 53
       },
       "credit_oas": {
         "quality": "PRIMARY",
         "series": "fred_hy_oas",
-        "as_of": "2026-10-21",
+        "as_of": "2026-10-22",
         "days_stale": 2
       },
       "buffett": {
@@ -16766,13 +16770,13 @@
         "quality": "FALLBACK",
         "series": "fred_kr_unemployment_oecd",
         "as_of": "2026-08-01",
-        "days_stale": 83
+        "days_stale": 84
       },
       "semiconductor": {
         "quality": "PRIMARY",
         "series": "kosis_semiconductor_shipment_index",
         "as_of": "2026-08-01",
-        "days_stale": 83
+        "days_stale": 84
       }
     },
     "sk_hynix_action": {
@@ -16797,11 +16801,11 @@
       "seoul": {
         "data_status": "ok",
         "reference_month": "2026-09",
-        "price_per_pyeong_manwon": 4472.0,
-        "mom_change_pct": 5.74,
-        "trend_3m_pct": 3.94,
-        "transaction_count": 3391,
-        "volume_mom_change_pct": -6.4,
+        "price_per_pyeong_manwon": 4471.0,
+        "mom_change_pct": 5.72,
+        "trend_3m_pct": 3.91,
+        "transaction_count": 3422,
+        "volume_mom_change_pct": -5.5,
         "market_heat": "보합",
         "tier": "seoul",
         "label": "서울"
@@ -16809,11 +16813,11 @@
       "capital_area": {
         "data_status": "ok",
         "reference_month": "2026-09",
-        "price_per_pyeong_manwon": 2925.0,
-        "mom_change_pct": 0.04,
-        "trend_3m_pct": -6.28,
-        "transaction_count": 8458,
-        "volume_mom_change_pct": -5.9,
+        "price_per_pyeong_manwon": 2928.0,
+        "mom_change_pct": 0.14,
+        "trend_3m_pct": -6.19,
+        "transaction_count": 8497,
+        "volume_mom_change_pct": -5.5,
         "market_heat": "보합",
         "tier": "capital_area",
         "label": "수도권"
@@ -16821,11 +16825,11 @@
       "nationwide": {
         "data_status": "ok",
         "reference_month": "2026-09",
-        "price_per_pyeong_manwon": 2524.0,
-        "mom_change_pct": -0.02,
-        "trend_3m_pct": -5.3,
-        "transaction_count": 11481,
-        "volume_mom_change_pct": -2.3,
+        "price_per_pyeong_manwon": 2528.0,
+        "mom_change_pct": 0.14,
+        "trend_3m_pct": -5.15,
+        "transaction_count": 11523,
+        "volume_mom_change_pct": -2.0,
         "market_heat": "보합",
         "tier": "nationwide",
         "label": "전국(대표표본)"
@@ -16848,18 +16852,18 @@
       "gainers": [
         {
           "name": "서초구",
-          "price_per_pyeong_manwon": 9555.0,
-          "mom_change_pct": 21.43
-        },
-        {
-          "name": "강남구",
-          "price_per_pyeong_manwon": 12377.0,
-          "mom_change_pct": 15.05
+          "price_per_pyeong_manwon": 9547.0,
+          "mom_change_pct": 21.32
         },
         {
           "name": "강서구",
           "price_per_pyeong_manwon": 5051.0,
           "mom_change_pct": 15.03
+        },
+        {
+          "name": "강남구",
+          "price_per_pyeong_manwon": 12170.0,
+          "mom_change_pct": 13.12
         }
       ],
       "decliners": [
@@ -16890,11 +16894,11 @@
       "seoul": {
         "data_status": "ok",
         "reference_month": "2026-09",
-        "price_per_pyeong_manwon": 2662.0,
-        "mom_change_pct": 2.14,
-        "trend_3m_pct": 0.3,
-        "transaction_count": 6519,
-        "volume_mom_change_pct": -9.9,
+        "price_per_pyeong_manwon": 2663.0,
+        "mom_change_pct": 2.19,
+        "trend_3m_pct": 0.35,
+        "transaction_count": 6543,
+        "volume_mom_change_pct": -9.6,
         "market_heat": "보합",
         "tier": "seoul",
         "label": "서울"
@@ -16905,8 +16909,8 @@
         "price_per_pyeong_manwon": 2183.0,
         "mom_change_pct": 3.46,
         "trend_3m_pct": 2.02,
-        "transaction_count": 11701,
-        "volume_mom_change_pct": -8.9,
+        "transaction_count": 11745,
+        "volume_mom_change_pct": -8.5,
         "market_heat": "보합",
         "tier": "capital_area",
         "label": "수도권"
@@ -16915,10 +16919,10 @@
         "data_status": "ok",
         "reference_month": "2026-09",
         "price_per_pyeong_manwon": 1995.0,
-        "mom_change_pct": 4.65,
-        "trend_3m_pct": 3.33,
-        "transaction_count": 13495,
-        "volume_mom_change_pct": -10.5,
+        "mom_change_pct": 4.68,
+        "trend_3m_pct": 3.36,
+        "transaction_count": 13549,
+        "volume_mom_change_pct": -10.2,
         "market_heat": "보합",
         "tier": "nationwide",
         "label": "전국(대표표본)"
@@ -16930,22 +16934,22 @@
         "tier": "seoul",
         "label": "서울",
         "reference_month": "2026-09",
-        "deposit_per_pyeong_manwon": 934.0,
-        "deposit_mom_change_pct": 12.76,
-        "rent_per_pyeong_manwon": 5.1,
-        "rent_mom_change_pct": -13.62,
-        "transaction_count": 7903
+        "deposit_per_pyeong_manwon": 936.0,
+        "deposit_mom_change_pct": 13.01,
+        "rent_per_pyeong_manwon": 5.2,
+        "rent_mom_change_pct": -13.32,
+        "transaction_count": 7948
       },
       "capital_area": {
         "data_status": "ok",
         "tier": "capital_area",
         "label": "수도권",
         "reference_month": "2026-09",
-        "deposit_per_pyeong_manwon": 639.0,
-        "deposit_mom_change_pct": 15.04,
+        "deposit_per_pyeong_manwon": 640.0,
+        "deposit_mom_change_pct": 15.27,
         "rent_per_pyeong_manwon": 4.3,
-        "rent_mom_change_pct": -11.41,
-        "transaction_count": 13138
+        "rent_mom_change_pct": -11.26,
+        "transaction_count": 13204
       },
       "nationwide": {
         "data_status": "ok",
@@ -16955,8 +16959,8 @@
         "deposit_per_pyeong_manwon": 505.0,
         "deposit_mom_change_pct": 26.41,
         "rent_per_pyeong_manwon": 4.0,
-        "rent_mom_change_pct": -11.95,
-        "transaction_count": 15759
+        "rent_mom_change_pct": -11.81,
+        "transaction_count": 15849
       }
     },
     "jeonse_highlight": {
@@ -16965,8 +16969,8 @@
       "price_per_pyeong_manwon": 1638.0,
       "mom_change_pct": 2.64,
       "trend_3m_pct": 4.9,
-      "transaction_count": 379,
-      "volume_mom_change_pct": 12.1,
+      "transaction_count": 381,
+      "volume_mom_change_pct": 12.7,
       "market_heat": "과열",
       "region_name": "용인 기흥구",
       "note": "용인 플랫폼시티 인근 — 청약 타겟 지역"
@@ -16976,13 +16980,13 @@
       "gainers": [
         {
           "name": "중랑구",
-          "price_per_pyeong_manwon": 1994.0,
-          "mom_change_pct": 115.69
+          "price_per_pyeong_manwon": 1993.0,
+          "mom_change_pct": 115.54
         },
         {
           "name": "서초구",
-          "price_per_pyeong_manwon": 3704.0,
-          "mom_change_pct": 25.07
+          "price_per_pyeong_manwon": 3706.0,
+          "mom_change_pct": 25.14
         },
         {
           "name": "강서구",
@@ -16993,13 +16997,13 @@
       "decliners": [
         {
           "name": "은평구",
-          "price_per_pyeong_manwon": 1619.0,
-          "mom_change_pct": -28.39
+          "price_per_pyeong_manwon": 1648.0,
+          "mom_change_pct": -27.14
         },
         {
           "name": "마포구",
-          "price_per_pyeong_manwon": 2864.0,
-          "mom_change_pct": -7.89
+          "price_per_pyeong_manwon": 2867.0,
+          "mom_change_pct": -7.79
         },
         {
           "name": "중구",
@@ -17013,18 +17017,6 @@
     "status": "ok",
     "month": "2026-10",
     "daily_records": [
-      {
-        "date": "2026-10-18",
-        "kr_regime": "Slowdown",
-        "kr_score": 2.0,
-        "kr_confidence": 92.5,
-        "us_regime": "Recession",
-        "us_score": 1.0,
-        "us_confidence": 91.8,
-        "investment_env_score": 69.5,
-        "semiconductor_score": 83.8,
-        "bond_score": 51.4
-      },
       {
         "date": "2026-10-19",
         "kr_regime": "Slowdown",
@@ -17072,27 +17064,39 @@
         "investment_env_score": 70.0,
         "semiconductor_score": 83.8,
         "bond_score": 52.8
+      },
+      {
+        "date": "2026-10-23",
+        "kr_regime": "Slowdown",
+        "kr_score": 2.0,
+        "kr_confidence": 92.5,
+        "us_regime": "Recession",
+        "us_score": 1.0,
+        "us_confidence": 91.8,
+        "investment_env_score": 70.2,
+        "semiconductor_score": 83.8,
+        "bond_score": 53.4
       }
     ],
     "trend_summary": {
       "kr_regime_stable": true,
       "kr_confidence_change": 0.0,
       "us_regime_stable": true,
-      "us_confidence_change": -55.0,
-      "investment_env_trend": 0.5,
+      "us_confidence_change": 0.0,
+      "investment_env_trend": 0.7000000000000028,
       "semiconductor_trend": 0.0
     }
   },
-  "sk_hynix_decision": "SKHynixDecision(signal='HOLD', confidence=50, rationale='거시 Slowdown + 신뢰도 92% → 현 포지션 유지, 매수기 대기', triggers=[], macro_linkage='거시-반도체 연결고리 미확인', risk_flags=[], next_check='1-2주 후 거시 신뢰도 변화', valuation_band={'pe_zscore': 1.059687739499737, 'band_label': '중립', 'latest_quarter': '26Q2', 'latest_divergence': -0.10807339902222202, 'erp_pct': 9.468540145985404, 'erp_note': 'Earnings Yield 14.60%(선행PER 6.85배 앵커) - 미국10Y 5.13% = ERP 9.47%p. ⚠ 원화자산에 달러 무위험금리를 쓰는 방법론적 한계 있음(사용자 스펙 원안 그대로 채택 — 글로벌 반도체 밸류에이션 비교 관행).', 'caveats': ['P/E Z-score는 실제 P/E가 아니라 이격도(divergence = log 주가지수 - log 영업이익지수) 기반 근사 — 발행주식수 시계열 미검증으로 EPS 직접 계산 안 함(자사주 소각·ADR 신주발행으로 최근 2년간 주식수 변동 있었음).', '샘플 10개 분기뿐 — 표준 밸류에이션 밴드(5~10년, 20~40분기) 대비 부족, 방향성 참고용.']})",
+  "sk_hynix_decision": "SKHynixDecision(signal='HOLD', confidence=50, rationale='거시 Slowdown + 신뢰도 92% → 현 포지션 유지, 매수기 대기', triggers=[], macro_linkage='거시-반도체 연결고리 미확인', risk_flags=[], next_check='1-2주 후 거시 신뢰도 변화', valuation_band={'pe_zscore': 1.059687739499737, 'band_label': '중립', 'latest_quarter': '26Q2', 'latest_divergence': -0.10807339902222202, 'erp_pct': 9.638540145985402, 'erp_note': 'Earnings Yield 14.60%(선행PER 6.85배 앵커) - 미국10Y 4.96% = ERP 9.64%p. ⚠ 원화자산에 달러 무위험금리를 쓰는 방법론적 한계 있음(사용자 스펙 원안 그대로 채택 — 글로벌 반도체 밸류에이션 비교 관행).', 'caveats': ['P/E Z-score는 실제 P/E가 아니라 이격도(divergence = log 주가지수 - log 영업이익지수) 기반 근사 — 발행주식수 시계열 미검증으로 EPS 직접 계산 안 함(자사주 소각·ADR 신주발행으로 최근 2년간 주식수 변동 있었음).', '샘플 10개 분기뿐 — 표준 밸류에이션 밴드(5~10년, 20~40분기) 대비 부족, 방향성 참고용.']})",
   "hbm_cycle_score": {
     "ticker": "000660",
     "foreign_flow": {
-      "score": 8.6,
+      "score": 8.3,
       "max": 15.0,
       "detail": {
-        "당일": "순매수 +32,408,000,000원, 평이한 수준(z=+0.49σ) → 1.8/3.0점",
-        "20일_누적": "순매도 우위 -15,938,248,000,000원(붕괴조건④ 충족), 평이한 수준(z=-0.92σ) → 2.8/8.0점",
-        "모멘텀(5일vs20일)": "최근 5일 일평균(-76,884,000,000원) > 20일 일평균(-796,912,400,000원) → 4/4점"
+        "당일": "순매수 -572,889,000,000원, 평이한 수준(z=-0.03σ) → 1.5/3.0점",
+        "20일_누적": "순매도 우위 -15,836,365,000,000원(붕괴조건④ 충족), 평이한 수준(z=-0.89σ) → 2.8/8.0점",
+        "모멘텀(5일vs20일)": "최근 5일 일평균(-175,444,600,000원) > 20일 일평균(-791,818,250,000원) → 4/4점"
       }
     },
     "foreign_holding": {
@@ -17100,33 +17104,33 @@
       "max": 15.0,
       "detail": {
         "전일대비": "+0.00%p, 평이한 수준(z=+0.24σ) → 5.4/10.0점",
-        "5일평균추세": "일평균 -0.010%p/일(하락/보합) → 0/5점"
+        "5일평균추세": "일평균 -0.020%p/일(하락/보합) → 0/5점"
       }
     }
   },
   "ma120_trend": {
     "data_status": "ok",
     "as_of": "2026-10-23",
-    "current_price": 1194000.0,
-    "current_ma120": 1855717,
+    "current_price": 1263000.0,
+    "current_ma120": 1856292,
     "slope_window_trading_days": 20,
-    "slope_per_trading_day": 3920.1,
+    "slope_per_trading_day": 3928.3,
     "prev_high": 2987000.0,
     "prev_high_date": "2026-06-25",
-    "trading_days_to_prev_high": 288.6,
-    "calendar_days_to_prev_high": 404.0,
-    "eta_date": "2027-12-01",
+    "trading_days_to_prev_high": 287.8,
+    "calendar_days_to_prev_high": 403.0,
+    "eta_date": "2027-11-30",
     "slope_positive": true,
     "tracking_window_trading_days": 20,
     "tracking_above_days": 4,
     "tracking_below_days": 16,
     "tracking_crossings": 3,
-    "tracking_avg_diff_pct": -15.11,
+    "tracking_avg_diff_pct": -14.92,
     "tracking_max_diff_pct": 4.09,
     "tracking_max_diff_date": "2026-09-23",
     "tracking_min_diff_pct": -35.88,
     "tracking_min_diff_date": "2026-10-20",
-    "current_diff_pct": -35.66,
+    "current_diff_pct": -31.96,
     "current_above": false
   },
   "hyperscaler_capex": {
@@ -17135,7 +17139,7 @@
       "end_date": "2026-06-30",
       "value_usd": 173028000000.0,
       "qoq_pct": 14.585802931067596,
-      "days_stale": 115,
+      "days_stale": 116,
       "is_stale": false,
       "note": "⚠ CONFLICT: 같은 end_date에 다른 값 발견, 가장 이른 filed 채택. 다른 값: $98,411,000,000(filed 2026-07-31), $54,208,000,000(filed 2026-07-31)"
     },
@@ -17144,7 +17148,7 @@
       "end_date": "2026-06-30",
       "value_usd": 80598000000.0,
       "qoq_pct": 125.92924819196054,
-      "days_stale": 115,
+      "days_stale": 116,
       "is_stale": false,
       "note": ""
     },
@@ -17153,7 +17157,7 @@
       "end_date": "2026-06-30",
       "value_usd": 49113000000.0,
       "qoq_pct": 158.53029425698796,
-      "days_stale": 115,
+      "days_stale": 116,
       "is_stale": false,
       "note": ""
     },
@@ -17162,7 +17166,7 @@
       "end_date": "2026-03-31",
       "value_usd": 80146000000.0,
       "qoq_pct": 62.66693728435153,
-      "days_stale": 206,
+      "days_stale": 207,
       "is_stale": true,
       "note": "⚠ CONFLICT: 같은 end_date에 다른 값 발견, 가장 이른 filed 채택. 다른 값: $30,876,000,000(filed 2026-04-29)"
     }
@@ -17176,7 +17180,7 @@
           "end_date": "2026-06-30",
           "value_usd": 392400000.0,
           "qoq_pct": 27.25344644750795,
-          "days_stale": 115,
+          "days_stale": 116,
           "is_stale": false,
           "note": ""
         }
@@ -17190,7 +17194,7 @@
           "end_date": "2021-09-30",
           "value_usd": 1681000000.0,
           "qoq_pct": 19.51355636368807,
-          "days_stale": 1849,
+          "days_stale": 1850,
           "is_stale": true,
           "note": ""
         }
@@ -17204,7 +17208,7 @@
           "end_date": "2026-03-31",
           "value_usd": 1805641000.0,
           "qoq_pct": 7.1197161415708905,
-          "days_stale": 206,
+          "days_stale": 207,
           "is_stale": true,
           "note": ""
         }
@@ -17218,7 +17222,7 @@
           "end_date": "2026-08-01",
           "value_usd": 479003000.0,
           "qoq_pct": 17.687684883983763,
-          "days_stale": 83,
+          "days_stale": 84,
           "is_stale": false,
           "note": ""
         }
@@ -17232,7 +17236,7 @@
           "end_date": "2026-06-30",
           "value_usd": 176284000000.0,
           "qoq_pct": 7.966878169479899,
-          "days_stale": 115,
+          "days_stale": 116,
           "is_stale": false,
           "note": ""
         },
@@ -17240,7 +17244,7 @@
           "end_date": "2026-06-30",
           "value_usd": 11104000000.0,
           "qoq_pct": 18.899239747296285,
-          "days_stale": 115,
+          "days_stale": 116,
           "is_stale": false,
           "note": ""
         }
@@ -17254,7 +17258,7 @@
           "end_date": "2021-04-03",
           "value_usd": 426600000.0,
           "qoq_pct": -10.715780661364589,
-          "days_stale": 2029,
+          "days_stale": 2030,
           "is_stale": true,
           "note": ""
         },
@@ -17262,7 +17266,7 @@
           "end_date": "2026-03-28",
           "value_usd": 808400000.0,
           "qoq_pct": 21.472577009767093,
-          "days_stale": 209,
+          "days_stale": 210,
           "is_stale": true,
           "note": ""
         }
@@ -17276,7 +17280,7 @@
           "end_date": "2026-03-31",
           "value_usd": 2135600000.0,
           "qoq_pct": 63.923856309487256,
-          "days_stale": 206,
+          "days_stale": 207,
           "is_stale": true,
           "note": ""
         },
@@ -17284,7 +17288,7 @@
           "end_date": "2026-03-31",
           "value_usd": 10243014000.0,
           "qoq_pct": -19.234998865759103,
-          "days_stale": 206,
+          "days_stale": 207,
           "is_stale": true,
           "note": ""
         }
@@ -17298,7 +17302,7 @@
           "end_date": "2026-04-03",
           "value_usd": 41600000000.0,
           "qoq_pct": null,
-          "days_stale": 203,
+          "days_stale": 204,
           "is_stale": true,
           "note": ""
         },
@@ -17306,7 +17310,7 @@
           "end_date": "2026-04-03",
           "value_usd": 5950000000.0,
           "qoq_pct": 96.69421487603306,
-          "days_stale": 203,
+          "days_stale": 204,
           "is_stale": true,
           "note": ""
         }
@@ -17320,7 +17324,7 @@
           "end_date": "2026-06-30",
           "value_usd": 3274300000.0,
           "qoq_pct": 23.581807888280807,
-          "days_stale": 115,
+          "days_stale": 116,
           "is_stale": false,
           "note": ""
         }
@@ -17329,109 +17333,109 @@
   },
   "sk_hynix_live": {
     "price_snapshot": {
-      "date": "2026-10-23",
+      "date": "2026-10-24",
       "ticker": "000660",
-      "price": "1194000",
-      "change": "-29000",
-      "change_pct": "-2.37",
-      "volume": "592659",
-      "foreign_hold_pct": "48.77",
-      "foreign_hold_qty": "356238104",
+      "price": "1263000",
+      "change": "40000",
+      "change_pct": "3.27",
+      "volume": "3941446",
+      "foreign_hold_pct": "48.69",
+      "foreign_hold_qty": "355705300",
       "day250_high": "2987000",
       "day250_high_date": "2026-06-25",
-      "day250_high_vrss_pct": "-60.03",
+      "day250_high_vrss_pct": "-57.72",
       "source": "kis_api",
-      "fetched_at": "2026-10-23T00:21:20+00:00"
+      "fetched_at": "2026-10-24T00:12:40+00:00"
     },
     "flow_summary": {
       "1": {
-        "foreign": 32408000000,
-        "inst": -262246000000,
-        "retail": 199490000000
+        "foreign": -572889000000,
+        "inst": 596387000000,
+        "retail": -5558000000
       },
       "5": {
-        "foreign": -384420000000,
-        "inst": -1072054000000,
-        "retail": -1021411000000
+        "foreign": -877223000000,
+        "inst": -94090000000,
+        "retail": -831090000000
       },
       "20": {
-        "foreign": -15938248000000,
-        "inst": -847598000000,
-        "retail": 1163538000000
+        "foreign": -15836365000000,
+        "inst": -432160000000,
+        "retail": 1772578000000
       },
       "60": {
-        "foreign": -30547216000000,
-        "inst": -2479434000000,
-        "retail": -6678054000000
+        "foreign": -29366850000000,
+        "inst": -1015656000000,
+        "retail": -9252138000000
       }
     },
-    "flow_latest_date": "2026-10-22",
+    "flow_latest_date": "2026-10-23",
     "credit_balance": {
-      "direction": "증가",
+      "direction": "감소",
       "streak_days": 1,
       "latest": {
-        "date": "2026-10-22",
+        "date": "2026-10-23",
         "ticker": "000660",
-        "loan_new_qty": "331413",
-        "loan_redeem_qty": "303878",
-        "loan_balance_qty": "2704428",
-        "loan_balance_amt": "383725306",
-        "loan_balance_rate": "0.36",
-        "short_new_qty": "2414",
-        "short_redeem_qty": "2650",
-        "short_balance_qty": "1729",
-        "short_balance_amt": "197589",
+        "loan_new_qty": "294999",
+        "loan_redeem_qty": "389853",
+        "loan_balance_qty": "2601651",
+        "loan_balance_amt": "371156964",
+        "loan_balance_rate": "0.34",
+        "short_new_qty": "3631",
+        "short_redeem_qty": "2930",
+        "short_balance_qty": "2430",
+        "short_balance_amt": "288408",
         "short_balance_rate": "0.00",
         "source": "kis_api",
-        "fetched_at": "2026-10-23T00:21:21+00:00"
+        "fetched_at": "2026-10-24T00:12:41+00:00"
       }
     },
     "short_sale": {
       "date": "2026-10-23",
       "ticker": "000660",
-      "short_qty": "0",
-      "short_vol_pct": "0.00",
-      "cum_short_qty": "21234117",
+      "short_qty": "156892",
+      "short_vol_pct": "3.98",
+      "cum_short_qty": "21391009",
       "cum_short_vol_pct": "4.24",
-      "short_amt": "0",
+      "short_amt": "193781143500",
       "source": "kis_api",
-      "fetched_at": "2026-10-23T00:21:23+00:00"
+      "fetched_at": "2026-10-24T00:12:43+00:00"
     },
     "adr": {
-      "date": "2026-10-22",
+      "date": "2026-10-23",
       "symbol": "SKHY",
-      "price": "131.69",
-      "change": "11.56",
-      "change_pct": "-8.069904013961606",
-      "prev_close": "120.13",
-      "crosscheck": "RESOLVED_2OF3",
-      "crosscheck_detail": "rate:-8.07|calc:+9.62|hist:-8.07",
+      "price": "137.02",
+      "change": "5.33",
+      "change_pct": "4.047384007897334",
+      "prev_close": "131.69",
+      "crosscheck": "OK",
+      "crosscheck_detail": "rate:+4.05|calc:+4.05|hist:+4.05",
       "source": "kis_api",
-      "fetched_at": "2026-10-23T00:21:20+00:00"
+      "fetched_at": "2026-10-24T00:12:39+00:00"
     }
   },
-  "real_estate_decision": "RealEstateDecision(signal='ENTER', confidence=75, rationale='완화 사이클 → 전세금 상승 기대 → 조기 진입 유리', event_triggers=[{'event': '플랫폼시티 공공/일반 청약공시', 'action': '당첨 가능성 분석 → 즉시 청약신청 (경쟁률 파악 후)', 'urgency': '최고'}, {'event': '기준금리 25bp 인하 발표', 'action': '전세 전환 고려 (기한 3개월 내)', 'urgency': '높음'}, {'event': '플랫폼시티 청약공시', 'action': '당첨 가능성 분석 후 즉시 청약', 'urgency': '최고'}], macro_linkage='완화 사이클 → 금융 유동성 ↑ → 전세금 상승기 → 조기 진입 유리', current_situation='수원 원천동(광교) 공공분양 (PENDING - 청약홈 미등록) (확인 중)', next_check='기준금리 발표 후 (매월 초); 주간 전세가 체크; 플랫폼시티 공시 소식', affordability={'deployable_cash': 289073918.0, 'cash_only': 27000000.0, 'from_liquidation': 262073918.0, 'locked': 79998000.0, 'jeonse_deposit': 462000000.0, 'jeonse_deposit_available_from': '2027-02-22', 'retirement_total': 56217779.0, 'housing_entry_funds_total': 807291697.0, 'buy_pyeong_price': 44720000.0, 'jeonse_pyeong_price': 26620000.0, 'buy_pyeong_equivalent': 6.464085822898032, 'jeonse_pyeong_equivalent': 10.85927565740045, 'buy_pyeong_equivalent_total': 18.052139915026835, 'semi_pct': 95.37687598196821, 'reference_month': '2026-09', 'coupling_note': '가용 현금 2.89억 중 현금성은 0.27억뿐이고 나머지는 주식 매각으로만 만들어진다. 그런데 그 매각은 반도체 집중도(95.4%)를 낮추는 행위와 같다 — 주택 자금 마련과 집중도 완화는 서로 다른 문제가 아니라 같은 실행이다.'})",
+  "real_estate_decision": "RealEstateDecision(signal='WAIT', confidence=60, rationale='금리 중립 → 진입 판단 유보', event_triggers=[{'event': '기준금리 추가 인하 신호', 'action': '진입 검토로 전환', 'urgency': '중간'}, {'event': '플랫폼시티 청약공시 (대기 중)', 'action': '공시 시 즉시 분석 후 진입 신호 재검토', 'urgency': '관심'}], macro_linkage='금리 중립 → 전세금 추이 모니터링 필요', current_situation='수원 원천동(광교) 공공분양 (PENDING - 청약홈 미등록) (확인 중)', next_check='기준금리 발표 후 (매월 초); 주간 전세가 체크; 플랫폼시티 공시 소식', affordability={'deployable_cash': 301562918.0, 'cash_only': 27000000.0, 'from_liquidation': 274562918.0, 'locked': 84621000.0, 'jeonse_deposit': 462000000.0, 'jeonse_deposit_available_from': '2027-02-22', 'retirement_total': 56217779.0, 'housing_entry_funds_total': 819780697.0, 'buy_pyeong_price': 44710000.0, 'jeonse_pyeong_price': 26630000.0, 'buy_pyeong_equivalent': 6.74486508611049, 'jeonse_pyeong_equivalent': 11.324180172737513, 'buy_pyeong_equivalent_total': 18.335511004249607, 'semi_pct': 95.59712776450085, 'reference_month': '2026-09', 'coupling_note': '가용 현금 3.02억 중 현금성은 0.27억뿐이고 나머지는 주식 매각으로만 만들어진다. 그런데 그 매각은 반도체 집중도(95.6%)를 낮추는 행위와 같다 — 주택 자금 마련과 집중도 완화는 서로 다른 문제가 아니라 같은 실행이다.'})",
   "rolling_windows": {
     "status": "ok",
-    "signals_count": 70,
+    "signals_count": 71,
     "monthly": {
       "current": {
         "period_name": "Month",
         "start_date": "2026-10-01",
-        "end_date": "2026-10-23",
-        "days_recorded": 23,
+        "end_date": "2026-10-24",
+        "days_recorded": 24,
         "sk_hynix_primary_signal": "HOLD",
         "sk_hynix_avg_confidence": 50.0,
         "sk_hynix_signal_counts": {
-          "HOLD": 23,
+          "HOLD": 24,
           "BUY": 0,
           "SELL": 0
         },
         "sk_hynix_confidence_trend": "→",
         "real_estate_primary_signal": "ENTER",
-        "real_estate_avg_confidence": 75.0,
+        "real_estate_avg_confidence": 74.4,
         "real_estate_signal_counts": {
-          "WAIT": 0,
+          "WAIT": 1,
           "ENTER": 23
         },
         "real_estate_confidence_trend": "→",
@@ -17470,20 +17474,20 @@
       "current": {
         "period_name": "Quarter",
         "start_date": "2026-10-01",
-        "end_date": "2026-10-23",
-        "days_recorded": 23,
+        "end_date": "2026-10-24",
+        "days_recorded": 24,
         "sk_hynix_primary_signal": "HOLD",
         "sk_hynix_avg_confidence": 50.0,
         "sk_hynix_signal_counts": {
-          "HOLD": 23,
+          "HOLD": 24,
           "BUY": 0,
           "SELL": 0
         },
         "sk_hynix_confidence_trend": "→",
         "real_estate_primary_signal": "ENTER",
-        "real_estate_avg_confidence": 75.0,
+        "real_estate_avg_confidence": 74.4,
         "real_estate_signal_counts": {
-          "WAIT": 0,
+          "WAIT": 1,
           "ENTER": 23
         },
         "real_estate_confidence_trend": "→",
@@ -17515,7 +17519,7 @@
       },
       "comparison": [
         "same",
-        "improved"
+        "same"
       ]
     },
     "ytd": {
@@ -17523,51 +17527,51 @@
     }
   },
   "weekly_analysis": {
-    "analysis_date": "2026-10-23",
-    "period_start": "2026-07-31",
-    "period_end": "2026-10-23",
+    "analysis_date": "2026-10-24",
+    "period_start": "2026-08-01",
+    "period_end": "2026-10-24",
     "indicators": {
       "us_10y": {
         "label": "미국 10년물 국채금리",
         "unit": "%",
-        "current_value": 5.13,
-        "value_12w_ago": 4.69,
-        "pct_change": 9.381663113006384,
-        "abs_change": 0.4399999999999995,
+        "current_value": 4.96,
+        "value_12w_ago": 4.65,
+        "pct_change": 6.666666666666658,
+        "abs_change": 0.3099999999999996,
         "trend": "상향",
-        "latest_date": "2026-10-21",
+        "latest_date": "2026-10-22",
         "data_points": [
           [
-            "2026-09-03",
-            4.77
+            "2026-09-04",
+            4.78
           ],
           [
-            "2026-09-10",
-            4.95
+            "2026-09-14",
+            4.97
           ],
           [
-            "2026-09-17",
-            4.94
+            "2026-09-21",
+            4.96
           ],
           [
-            "2026-09-24",
-            5.18
-          ],
-          [
-            "2026-10-01",
+            "2026-09-28",
             5.24
           ],
           [
-            "2026-10-08",
-            5.22
+            "2026-10-05",
+            5.31
           ],
           [
-            "2026-10-15",
-            5.1
+            "2026-10-09",
+            5.24
           ],
           [
-            "2026-10-21",
-            5.13
+            "2026-10-19",
+            5.15
+          ],
+          [
+            "2026-10-22",
+            4.96
           ]
         ]
       },
@@ -17594,28 +17598,28 @@
       "kr_usdkrw": {
         "label": "원/달러 환율",
         "unit": "원",
-        "current_value": 1325.5,
-        "value_12w_ago": 1424.8,
-        "pct_change": -6.969399213924758,
-        "abs_change": -99.29999999999995,
+        "current_value": 1324.6,
+        "value_12w_ago": 1418.8,
+        "pct_change": -6.63941358894841,
+        "abs_change": -94.20000000000005,
         "trend": "하향",
-        "latest_date": "2026-10-22",
+        "latest_date": "2026-10-23",
         "data_points": [
           [
-            "2026-09-03",
-            1369.4
+            "2026-09-07",
+            1355.2
           ],
           [
-            "2026-09-10",
-            1337.9
+            "2026-09-14",
+            1346.4
           ],
           [
-            "2026-09-17",
-            1368.3
+            "2026-09-21",
+            1383.8
           ],
           [
-            "2026-09-23",
-            1360.0
+            "2026-09-28",
+            1352.0
           ],
           [
             "2026-10-02",
@@ -17630,8 +17634,8 @@
             1342.4
           ],
           [
-            "2026-10-22",
-            1325.5
+            "2026-10-23",
+            1324.6
           ]
         ]
       },
@@ -17639,39 +17643,39 @@
         "label": "브렌트유",
         "unit": "$/배럴",
         "current_value": 115.22,
-        "value_12w_ago": 89.65,
-        "pct_change": 28.52203011712213,
-        "abs_change": 25.569999999999993,
+        "value_12w_ago": 87.62,
+        "pct_change": 31.49965761241725,
+        "abs_change": 27.599999999999994,
         "trend": "상향",
         "latest_date": "2026-10-20",
         "data_points": [
           [
-            "2026-09-03",
-            100.52
+            "2026-09-07",
+            104.47
           ],
           [
-            "2026-09-10",
-            120.98
+            "2026-09-14",
+            121.25
           ],
           [
-            "2026-09-17",
-            121.18
+            "2026-09-21",
+            116.15
           ],
           [
-            "2026-09-24",
-            120.92
+            "2026-09-28",
+            119.97
           ],
           [
-            "2026-10-01",
-            114.82
+            "2026-10-05",
+            125.51
           ],
           [
-            "2026-10-08",
-            130.18
+            "2026-10-12",
+            129.95
           ],
           [
-            "2026-10-15",
-            126.35
+            "2026-10-19",
+            118.82
           ],
           [
             "2026-10-20",
@@ -17742,8 +17746,8 @@
     ]
   },
   "fx_regime": {
-    "as_of": "2026-10-23",
-    "score": -2.4065404908824095,
+    "as_of": "2026-10-24",
+    "score": 0.6273865968535247,
     "coverage": 1.0,
     "label": "중립",
     "factors": [
@@ -17759,15 +17763,15 @@
         "key": "us_10y",
         "label": "미 10년물",
         "weight": 15,
-        "normalized": -0.8879999999999999,
-        "detail": "5.13% (3개월 +0.42%p)",
+        "normalized": -0.6719999999999994,
+        "detail": "4.96% (3개월 +0.27%p)",
         "available": true
       },
       {
         "key": "dollar_index",
         "label": "달러인덱스",
         "weight": 15,
-        "normalized": -0.4530663645438038,
+        "normalized": -0.45067186391912983,
         "detail": "121.4 (6개월 +2.3%)",
         "available": true
       },
@@ -17792,30 +17796,30 @@
         "label": "지정학·위기",
         "weight": 10,
         "normalized": -0.31499999999999995,
-        "detail": "위험 0.66/1.00 (최고 0.80) (geopolitical_risk=0.80, pandemic_risk=0.00, trade_policy_risk=0.40, financial_stress=0.10, 43일 전 판단)",
+        "detail": "위험 0.66/1.00 (최고 0.80) (geopolitical_risk=0.80, pandemic_risk=0.00, trade_policy_risk=0.40, financial_stress=0.10, 44일 전 판단)",
         "available": true
       },
       {
         "key": "oil",
         "label": "유가(브렌트)",
         "weight": 5,
-        "normalized": -0.05798381162619585,
-        "detail": "$115.2 (6개월 +1.7%)",
+        "normalized": -0.10012515644555704,
+        "detail": "$115.2 (6개월 +3.0%)",
         "available": true
       },
       {
         "key": "ma36_gap",
         "label": "MA36 이격",
         "weight": 5,
-        "normalized": -0.536611679405361,
-        "detail": "1,325.5원 vs MA36 1,400.7원 (-5.4%)",
+        "normalized": -0.5428684189128363,
+        "detail": "1,324.6원 vs MA36 1,400.6원 (-5.4%)",
         "available": true
       }
     ],
     "gap": {
-      "spot": 1325.5,
-      "ma36": 1400.6611111111113,
-      "pct": -5.36611679405361
+      "spot": 1324.6,
+      "ma36": 1400.6361111111112,
+      "pct": -5.428684189128363
     },
     "episode_months": 3,
     "warning_level": "🟡 전환주의",
@@ -17826,7 +17830,7 @@
         "key": "momentum_reversal",
         "label": "모멘텀 반전",
         "fired": true,
-        "detail": "FRS +9→+25→+9→-2 (최근 기울기 -11.5)",
+        "detail": "FRS +9→+25→+9→+1 (최근 기울기 -8.1)",
         "evidence": {
           "lift_3m": 0.3,
           "lift_6m": 0.85,
@@ -17882,7 +17886,7 @@
         "key": "long_rate_spike",
         "label": "미 장기금리 급등(2021형)",
         "fired": false,
-        "detail": "10년물 4.71→5.13% (3개월 +0.42%p, 임계 +0.50)"
+        "detail": "10년물 4.69→4.96% (3개월 +0.27%p, 임계 +0.50)"
       },
       {
         "key": "fuel_exhaustion",
@@ -17898,11 +17902,11 @@
       }
     ],
     "dollar_context": {
-      "cash_yield": 4.25,
-      "us_2y": 4.81,
-      "us_10y": 5.13,
-      "hy_oas": 3.27,
-      "vix": 16.68
+      "cash_yield": 4.22,
+      "us_2y": 4.65,
+      "us_10y": 4.96,
+      "hy_oas": 3.4,
+      "vix": 19.03
     }
   },
   "us_labor": {
