@@ -1,7 +1,7 @@
 ---
 title: 중간선거 역사 플레이북 — 성공·실패 공식과 트럼프 2026 판정
 created: 2026-09-25
-updated: 2026-09-25
+updated: 2026-10-25
 tags: [politics, us-midterm, trump, history, playbook, qualitative, checkpoint]
 ---
 
@@ -170,8 +170,40 @@ tags: [politics, us-midterm, trump, history, playbook, qualitative, checkpoint]
 - **자금 조달 계획 T2(11/04~)**: 선거 직후는 **결과 불복·관세 발표·12/11 예산 만료가
   겹칠 수 있는 구간**이다. 11/3 전에 T2 시점을 결정한다는 기존 판단을 유지한다.
 
+## 8. 중간선거 이후 코스피는 실제로 올랐나 — 실측 (2026-10-25)
+
+영상(`sources/tech-selloff-flows-anchor-briefing-2026-10-25.md`)은 "11/3 이후 정책 불확실성이
+걷히며 코스피가 반등한 과거 사례"를 언급했다. 저장소의 코스피 월간 종가
+(`sources/monthly-price-history.csv`, 1983~)로 미국 중간선거 10회(1986~2022)를 직접 계산했다.
+기준은 **선거 직전 10월 말 종가**, 비교 기준은 전체 월 무조건 평균이다.
+
+| 연도 | +1개월 | +3개월 | +6개월 |
+| --- | ---: | ---: | ---: |
+| 1986 | +11.7% | +28.8% | +48.9% |
+| 1990 | +1.0% | −7.9% | −6.5% |
+| 1994 | −2.8% | −16.3% | −18.9% |
+| 1998 | +12.0% | +41.6% | +86.5% |
+| 2002 | +10.0% | −10.2% | −9.0% |
+| 2006 | +5.0% | −0.3% | +13.0% |
+| 2010 | +1.2% | +9.9% | +16.4% |
+| 2014 | +0.8% | −0.8% | +8.3% |
+| 2018 | +3.3% | +8.6% | +8.6% |
+| 2022 | +7.8% | +5.7% | +9.1% |
+| **평균 / 중앙값** | **+5.0% / +4.1%** | **+5.9% / +2.7%** | **+15.6% / +8.8%** |
+| 상승 횟수 | 9/10 | 5/10 | 7/10 |
+| 전체 월 무조건 평균 / 중앙값 / 상승비율 | +1.0% / +0.6% / 54% | +3.3% / +1.7% / 59% | +6.9% / +3.1% / 59% |
+
+**판정**
+- **1개월은 지지된다**: 10회 중 9회 상승, 평균 +5.0%로 무조건 평균(+1.0%)보다 뚜렷하게 높다.
+- **3개월부터는 약하다**: 상승 5/10, 중앙값 +2.7%는 무조건 중앙값(+1.7%)과 큰 차이가 없다. 평균은 1986·1998 두 해가 끌어올린 것이다.
+- **한계**: 표본 10개. 1998(IMF 회복)·2002(IT 버블 붕괴 후)처럼 선거와 무관한 거대 요인이 섞여 있다. 선거 때문인지 우연인지 이 표본으로 가를 수 없다.
+- **이번 선거의 특수성**: 하원 민주당 전환이 이미 예측시장에 약 90% 반영돼 있다(§6). "불확실성 해소"가 새 정보가 아닐 수 있다. 이번에는 **선거 결과보다 종전 여부와 선거 후 관세 청구서**가 더 큰 변수라는 §7의 판단과 같은 결론이다.
+
+**내 판단과의 연결**: 11/3은 "반등 시점"으로 믿고 기다릴 일정이 아니라 **확인할 일정**이다. 주거 자금 매도 T1(10/31 하한선)은 선거 전에 도래하므로, 선거 후 반등을 전제로 일정을 늦추는 근거로는 쓰지 않는다.
+
 ## Sources
 
+- `sources/tech-selloff-flows-anchor-briefing-2026-10-25.md` — 영상 요약(2026-10-25), `sources/monthly-price-history.csv` — 코스피 월간 종가(실측 §8)
 - [Gallup — 지지율 50% 미만 평균 -36석](https://news.gallup.com/poll/141812/avg-midterm-seat-loss-presidents-below-approval.aspx), [Gallup — 평균 -37석](https://news.gallup.com/poll/242093/midterm-seat-loss-averages-unpopular-presidents.aspx), [The Conversation — 80년 패턴](https://theconversation.com/for-80-years-the-presidents-party-has-almost-always-lost-house-seats-in-midterm-elections-a-pattern-that-makes-the-2026-congressional-outlook-clear-271605)
 - [NPR — 전쟁권한 결의안 상원 부결(9/24)](https://www.npr.org/2026/09/24/nx-s1-5980318/senate-iran-war-powers-vote), [Detroit News — 공화당 후보 이탈](https://www.detroitnews.com/story/news/politics/2026/09/24/us-democrats-pre-election-war-powers-vote-some-republicans-break-with-trump-on-iran/91917113007/)
 - [Ballotpedia — 선거구 재획정](https://ballotpedia.org/Redistricting_ahead_of_the_2026_elections), [Cook Political — 재획정 지도](https://www.cookpolitical.com/redistricting/2025-26-mid-decade-map)
