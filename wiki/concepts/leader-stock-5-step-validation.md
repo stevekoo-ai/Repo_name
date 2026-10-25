@@ -1,7 +1,7 @@
 ---
 title: 주도주 5단계 검증 — 실적 추정치·현금흐름·이익 실현·가격결정력·자본수익률
 created: 2026-10-01
-updated: 2026-10-01
+updated: 2026-10-25
 tags: [leader-stock, bottleneck, validation, fundamentals, roic, framework]
 ---
 
@@ -65,6 +65,15 @@ tags: [leader-stock, bottleneck, validation, fundamentals, roic, framework]
 
 **읽는 법**: 하이닉스는 ④가 강하게 통과하지만, ①이 환율 때문에 내려가고 있다. 기업 체력이 아니라
 환율 요인이라는 점이 중요하다. 원/달러가 1,360원대에 머물면 4분기에 다시 하향될 수 있다.
+
+## 주도주 교체 논점 — 토론 영상 (2026-10-25)
+
+이효석·김단테·김광석 토론은 "주도주는 영원하지 않고 메모리 이후 AI 밸류체인 안에서 이동할 수 있다"고
+했다(`sources/market-correction-debate-lee-kimdante-kimkwangseok-2026-10-25.md`). 요약에 **후보 종목이
+없어** 5단계로 채점할 대상이 없다. 교체 논점이 구체화되면 다음 순서로 쓴다:
+1. 후보가 병목 지도([ai-bottleneck-rotation-map](ai-bottleneck-rotation-map.md))의 어느 병목에 서는가
+2. 5단계(실적 추정치·현금흐름·이익 실현·가격결정력·자본수익률) 중 **3·4단계(이익 실현·가격결정력)**에서 메모리와 어떻게 다른가
+3. 하이닉스를 파는 이유가 아니라 **쓸 날짜 없는 돈을 어디에 둘지**의 질문인지 먼저 구분(주거 자금은 이 논쟁과 무관, [돈의 심리학 체크 질문 1번](psychology-of-money-principles.md))
 
 ## 구현 계획 (제안 — 사용자 승인 후)
 
