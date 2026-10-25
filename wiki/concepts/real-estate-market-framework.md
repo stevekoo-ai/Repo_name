@@ -1,7 +1,7 @@
 ---
 title: Real Estate Market Entry Framework
 created: 2026-08-09
-updated: 2026-09-03
+updated: 2026-10-25
 tags: [housing, real-estate, decision-framework, personal, platform-city]
 ---
 
@@ -191,8 +191,29 @@ Unlike stock trading, real estate decisions are event-driven. These events are d
 - 전세가 trend: Real estate data collectors (when available)
 - Platform City news: SK E&C + 서울시 공식 소스 (이벤트 기반)
 
+## 삶의 질 기준 — "자산 가치"와 함께 보는 두 번째 축 (2026-10-25 INGEST)
+
+김지호 교수(실내건축) 대담 요약(`sources/livable-home-aging-kim-jiho-2026-10-25.md`)의 결론은
+"부동산의 기준이 자산의 미래 가치에서 **현재 나의 삶의 질**로 옮겨가야 한다"이다.
+이 프레임워크는 지금까지 금리·국면·자금(자산 가치 축)만 봤다. 아래를 **두 번째 축**으로
+더한다 — 대체가 아니라 병행이다(내 집 마련 자금은 여전히 자산이다).
+
+| 영상 기준 | 성격 | 내 상황 대입 |
+|---|---|---|
+| 노후엔 3~7층 저층, 병원·대중교통 도보 15분 이내(압축 도시) | 장기(노후) 기준 | 플랫폼시티는 구성역(GTX-A) 인접 개발이다([팩트 시트](yongin-platform-city-project-facts.md)). 공공분양 블록의 **층수·도보권 병원은 미확인 → 판단 불가**. 모집공고 때 확인 항목에 추가 |
+| 초고층 매력 하락(유지비·수요 감소) | 전문가 의견, 수치 근거 없음 | 저장소에 층수별 가격·관리비 실측이 없어 **채택 보류** |
+| 1~2인 가구 증가로 대형 평수 위주 공급은 한계 | 인구 구조(방향은 통계와 일치) | 사용자 선호 84㎡+는 4인 가구 기준 **표준 평형**이지 대형이 아니다. 다만 노후·자녀 독립 후 **처분·축소 유동성**은 대형일수록 불리할 수 있음 |
+| 문턱 제거·회전 반경 등 AI·로봇 친화 구조 | 장기 설계 기준 | 신축(플랫폼시티)이 구축보다 유리한 항목. 분양 평면 공개 시 확인 |
+| 요양원 대신 맞춤 주거 지원·커뮤니티 유지 | 정책 방향 | 직접 판단 항목 아님. 부모 세대 주거 논의 시 참고 |
+
+**지금 시점의 적용(2026-10-25)**: 노후 기준은 먼 미래이고, 당장의 "삶의 질" 제약은
+**자녀 통학**(문정중·풍천초, [사용자 프로필](../entities/user-profile.md))이다. 2027-02-22
+임시 거주(전세/월세) 선택에서는 자산 가치보다 이 제약이 우선한다 — 영상의 결론과 같은 방향.
+플랫폼시티 청약 판단에는 모집공고 시 **층수·도보권 의료·평면(무단차)**을 확인 항목으로 더한다.
+
 ## Sources
 
+- `sources/livable-home-aging-kim-jiho-2026-10-25.md` — 삶의 질 기준(김지호 교수 대담, 2026-10-25)
 - [주식시장의 본질 §13 — 최종 목표: 실물 자산으로의 전환](stock-market-essence.md#13-최종-목표--실물-자산으로의-전환-2026-09-03-ingest) — 이 프레임워크의 철학적 근거
 - [Position & Exposure Model (보고서 0절)](position-exposure-model.md) — `housing_entry_funds_total` 매일 계산
 - [Real Estate Decision Tracker](../monitoring/real-estate-decision-tracker.md) — daily decision log
