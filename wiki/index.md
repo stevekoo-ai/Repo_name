@@ -41,7 +41,7 @@ Catalog of every page in the wiki. See `../CLAUDE.md` for conventions.
 
 - [data-health-status.md](monitoring/data-health-status.md) — 🆕 2026-09-15. 58개 등록 소스 + 232개 정규화 시리즈 스윕의 일일 헬스 추적. 최초 점검 critical 22건(전부 장기 미갱신 경제지표, 최대 1,049일)
 
-- [ai-capex-slowdown-status.md](monitoring/ai-capex-slowdown-status.md) — 🆕 2026-09-14. AI 투자 속도조절론 추적. 핵심 질문은 "서사인가 숫자인가" — 업계 리더 발언(밸류에이션 재평가 압력)과 빅테크 CapEx 가이던스 실제 하향(수요 축소 확정)은 하이닉스에 전혀 다르게 작용한다. 2026-09-14 코스피 -3.26%를 만든 재료를 아침 브리핑이 놓친 사고에서 축으로 승격
+- [ai-capex-slowdown-status.md](monitoring/ai-capex-slowdown-status.md) — 🆕 2026-09-14. AI 투자 속도조절론 추적. 핵심 질문은 "서사인가 숫자인가" — 업계 리더 발언(밸류에이션 재평가 압력)과 빅테크 CapEx 가이던스 실제 하향(수요 축소 확정)은 하이닉스에 전혀 다르게 작용한다. 2026-09-14 코스피 -3.26%를 만든 재료를 아침 브리핑이 놓친 사고에서 축으로 승격 🔄 2026-10-25: 코어위브 부채 충격(10/14 −15.5%, 채권 15%) — 수요가 아니라 금리·신용 경로, 하이퍼스케일러 CapEx 하향은 미확인
 
 - [housing-funding-execution-status.md](monitoring/housing-funding-execution-status.md) — 🆕 2026-09-12. 자금 조달 진행률·CDP 발동 여부·판단 포스트 채점을 매일 추적 (브리핑 팩 블록 ⑧이 자동 갱신)
 
@@ -59,7 +59,7 @@ Catalog of every page in the wiki. See `../CLAUDE.md` for conventions.
 - [Real Estate Daily Decision Tracker](monitoring/real-estate-decision-tracker.md) — 🆕 2026-08-09, 부동산 시장 진입/대기 의사결정 일일 추적(append-only). WAIT/ENTER 신호, 신뢰도, 금리·거시·전세가 트렌드, 이벤트 트리거(기준금리·플랫폼시티 공시) 기록. Framework 정의는 concepts/real-estate-market-framework.md 참고
 - [Economic Calendar Status & Tracking](monitoring/economic-events-status.md) — 🆕 2026-08-09, 거시경제 이벤트 추적(append-only). 다음 14일 Critical 이벤트 테이블(미국CPI·한국은행기준금리·미국PPI)·Downside/Base/Upside 시나리오 확률·역사적 패턴 분석·신호변경이력·일일 모니터링 체크리스트. Framework 정의는 concepts/economic-events-framework.md 참고
 - [부동산 자동화 파이프라인 — 수집 현황 & 경기판단 데이터 갭 분석](monitoring/real-estate-automation-summary.md) — 🆕 2026-08-09, MOLIT 부동산 데이터 자동 수집 파이프라인 구축 완료 리포트. 현재 자동화 4개 지표(거래가·금리·통화·신용) + 미자동화 22개 항목 상세 분류(심리지수·신규공급·정책변수 등) + Phase 1~3 개발 로드맵. 경기판단 완성도 현재 31% (거래가+금리만으로는 부족), 우선 개발 순서 3단계 정의.
-- [금리 전망 3대 시나리오 — Latest Status](monitoring/rate-outlook-scenario-status.md) — 🆕 2026-09-12, 위 프레임의 실시간 판정. Check History 표로 진영별 실측 대조 누적.
+- [금리 전망 3대 시나리오 — Latest Status](monitoring/rate-outlook-scenario-status.md) — 🆕 2026-09-12, 위 프레임의 실시간 판정. Check History 표로 진영별 실측 대조 누적. 🔄 2026-10-25: 영상 대조 — 9월 CPI 3.74%(상회 확인)·Brent 10/9 약 130→10/23 선물 116.7 재상승·FOMC 10/27~28 인상 확률 45.9%, 10년물은 10/5 5.31 고점에서 4.96으로 하락(폭락 타이밍은 CPI+코어위브+청산 동시)
 - [KOSPI Forward PE 근사 추적 — 일일 상태](monitoring/kospi-valuation-tracker-status.md) — 🆕 2026-08-09, Goldman Sachs/Quantiwise 차트(앵커: 6.65배·-2.7SD @2026-07-02)를 기준으로 KOSPI 지수 변화율만으로 근사 forward PE를 매일 역산(`scripts/kospi_valuation_tracker.py`). EPS 불변가정 근사치라는 한계 명시. 2026-08-08 최신 5.36배(-1SD 완전 이탈, 앵커 대비 -19.44%) — 7/2 "GFC 이후 최저" 시점 이후에도 지수가 추가 하락해 밸류에이션이 더 저평가된 방향. Framework: concepts/rally-justification-analysis.md §일일 근사 추적 방법론.
 
 
