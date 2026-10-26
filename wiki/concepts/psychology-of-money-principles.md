@@ -1,7 +1,7 @@
 ---
 title: 돈의 심리학(모건 하우절) — 판단 원칙과 체크 질문
 created: 2026-10-19
-updated: 2026-10-19
+updated: 2026-10-26
 tags: [principle, behavior, risk, housing-funding, sk-hynix, book]
 ---
 
@@ -55,8 +55,17 @@ tags: [principle, behavior, risk, housing-funding, sk-hynix, book]
 - 반대로 주거 자금 밖의 보유분은 질문 1이 "쓸 날짜 없음"이라 답하므로, 변동성을 입장료로 볼 여지가 있다.
 - 이것은 판단 틀이지 매수·매도 지시가 아니다(R4).
 
+## 사례 — 버크셔의 레나 역발상 매수 (2026-10-26 INGEST)
+
+원문: `sources/berkshire-lennar-stake-2026-10-26.md`. 보도 확인: 10/1~2 약 240만 주($1.93억) 추가 매수, 지분 약 12%(약 2,900만 주, 약 $22억, Form 4). 직후 10/5 레나는 −7%로 52주 최저($74.44) — 3분기 실적 미달·Millrose 거래 의혹 보도.
+
+- **원칙 ⑨(변동성은 입장료)·④(복리는 시간)의 실례**: 버크셔는 매수 직후 −7%를 맞았지만 **쓸 날짜가 없는 돈**이라 견딜 수 있다. 역발상은 "용기"보다 **기다릴 수 있는 돈의 특권**이다.
+- **내 상황과의 차이**: 하이닉스 역발상 보유가 가능한 건 **주거 자금 밖의 몫**뿐이다(체크 질문 1). 주거 자금 몫은 날짜(2027-02-19)가 있어 같은 논리를 쓸 수 없다.
+- 미국 주택건설주는 내 보유와 직접 관련이 없다. 정책·금리 하락 시 주택 수요 회복 가설의 참고 사례로만 둔다.
+
 ## Sources
 
+- `sources/berkshire-lennar-stake-2026-10-26.md` — 버크셔 레나 매수 사례(2026-10-26)
 - 모건 하우절, 『돈의 심리학』(The Psychology of Money, 2020)
 - 2026-10-19 대화
 - [주거 자금 실행 계획](housing-funding-execution-framework.md), `report/decision/2026-10-15-hynix-cdp1-decision-pack.md`

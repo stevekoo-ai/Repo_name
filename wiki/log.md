@@ -87,3 +87,4 @@ Append-only. Newest entry at the bottom. 운영 규칙: [log-operating-policy.md
 2026-10-26 — USER(주거 자금) → 매수 주문 취소·CMA 복귀 완료(사용자 확인). 완충 원상(71주 매도 후 여유 약 408만 원).
 2026-10-26 — INGEST sources/physical-ai-strategy-lee-kyungsoo-2026-10-26.md(사용자 제공, 이경수 부의장 강연) → updated concepts/ai-bottleneck-rotation-map.md(정책 관점 절). HBM=부품 공급자론은 병목 이동 전제와 일치, 피지컬 AI는 다음 주도주 서사(후보 없음), 전력 축 보유 노출 약 0.7%.
 2026-10-26 — INGEST sources/bullwhip-effect-hwang-seungjin-2026-10-26.md(사용자 제공, 황승진 교수 채찍 효과) → updated monitoring/memory-price-hynix-guidance-status.md(채찍 효과 점검 절). 가격 주도 상승(출하 +7.1% vs ASP +17~20%)은 가수요 국면과 모양 일치, LTA는 양면, 최종 수요·고객 재고 수치 없어 증폭 비율 판단 불가. 10/28 B/G 가이던스·재고·주문 변경 언급을 채찍 효과 관점 체크 항목으로 추가.
+2026-10-26 — INGEST sources/berkshire-lennar-stake-2026-10-26.md(사용자 제공) → updated concepts/psychology-of-money-principles.md(사례 절). 보도 확인: 버크셔 레나 지분 약 12%(10/1~2 $1.93억 추가, Form 4), 직후 10/5 −7% 52주 최저. 역발상은 쓸 날짜 없는 돈의 특권 — 하이닉스 주거 자금 몫에는 적용 불가.
