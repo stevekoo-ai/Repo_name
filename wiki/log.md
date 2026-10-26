@@ -85,3 +85,4 @@ Append-only. Newest entry at the bottom. 운영 규칙: [log-operating-policy.md
 2026-10-26 — INGEST sources/imf-weo-korea-kim-kwangseok-2026-10-26.md(사용자 제공, 김광석 IMF WEO) → updated monitoring/sk-hynix-analyst-thesis-checkpoints-status.md. IMF 한국 2026 3.3%(+0.7%p)·2027 2.8% 확인, 잠재성장률 2년 반등은 IMF 발표가 아닌 언론 역산(1.94→2.14→2.20%), 에너지 집약도 주장 판단 불가. 거시 낙관 근거가 전부 반도체라 하이닉스 판단의 독립 근거 아님(역방향).
 2026-10-26 — INGEST sources/kospi-radio-lee-hyoseok-2026-10-26.md(사용자 제공, 이효석·손석희의 12시) → updated monitoring/market-cycles-leverage-risk-status.md. 5,500 공방 확인(10/26 장중 이탈 시도), 찐 반등 기준=기존 3신호(미충족), 중간선거 호재는 1개월만 지지, 골드만 코스피 목표 하향은 미확인(6월 상향·8월 12,000 유지만 확인, 하향은 국내 증권사), 유가 부담 지지.
 2026-10-26 — USER(주거 자금) → 매수 주문 취소·CMA 복귀 완료(사용자 확인). 완충 원상(71주 매도 후 여유 약 408만 원).
+2026-10-26 — INGEST sources/physical-ai-strategy-lee-kyungsoo-2026-10-26.md(사용자 제공, 이경수 부의장 강연) → updated concepts/ai-bottleneck-rotation-map.md(정책 관점 절). HBM=부품 공급자론은 병목 이동 전제와 일치, 피지컬 AI는 다음 주도주 서사(후보 없음), 전력 축 보유 노출 약 0.7%.
