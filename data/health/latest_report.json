@@ -1,5 +1,5 @@
 {
-  "checked_at": "2026-10-26T07:55:27.857114+00:00",
+  "checked_at": "2026-10-26T15:17:46.544456+00:00",
   "statuses": [
     {
       "slug": "macro-series",
@@ -8,7 +8,7 @@
       "severity": "critical",
       "state": "OK",
       "detail": "fetched_at=2026-10-26T01:21:58+00:00",
-      "age_hours": 6.558337797777777
+      "age_hours": 13.93018655222222
     },
     {
       "slug": "hynix-price-snapshot",
@@ -17,7 +17,7 @@
       "severity": "critical",
       "state": "OK",
       "detail": "fetched_at=2026-10-26T05:35:40+00:00",
-      "age_hours": 2.330032161944444
+      "age_hours": 9.701875371944444
     },
     {
       "slug": "hynix-investor-flow",
@@ -26,7 +26,7 @@
       "severity": "warning",
       "state": "OK",
       "detail": "마지막 성공=2026-10-26T05:35:37+00:00",
-      "age_hours": 2.330870712777778
+      "age_hours": 9.702712775833334
     },
     {
       "slug": "hynix-adr-quote",
@@ -35,7 +35,7 @@
       "severity": "warning",
       "state": "OK",
       "detail": "fetched_at=2026-10-26T05:35:39+00:00",
-      "age_hours": 2.33031621
+      "age_hours": 9.702158028055557
     },
     {
       "slug": "hynix-credit-balance",
@@ -44,7 +44,7 @@
       "severity": "warning",
       "state": "OK",
       "detail": "fetched_at=2026-10-26T05:35:40+00:00",
-      "age_hours": 2.330039523611111
+      "age_hours": 9.701881080000001
     },
     {
       "slug": "hynix-short-sale",
@@ -53,7 +53,7 @@
       "severity": "warning",
       "state": "OK",
       "detail": "fetched_at=2026-10-26T05:35:43+00:00",
-      "age_hours": 2.3292073227777776
+      "age_hours": 9.701048611944445
     },
     {
       "slug": "kr-index-quote",
@@ -62,7 +62,7 @@
       "severity": "warning",
       "state": "OK",
       "detail": "fetched_at=2026-10-26T05:35:42+00:00",
-      "age_hours": 2.3294862588888887
+      "age_hours": 9.701327263888889
     },
     {
       "slug": "portfolio-etf-nav",
@@ -71,7 +71,7 @@
       "severity": "warning",
       "state": "OK",
       "detail": "fetched_at=2026-10-26T05:35:44+00:00",
-      "age_hours": 2.3289318702777777
+      "age_hours": 9.700772572499998
     },
     {
       "slug": "portfolio-holdings",
@@ -80,7 +80,7 @@
       "severity": "critical",
       "state": "OK",
       "detail": "fetched_at=2026-10-25T14:17:17+00:00",
-      "age_hours": 17.63643464388889
+      "age_hours": 25.00827473833333
     },
     {
       "slug": "portfolio-bonds",
@@ -89,7 +89,7 @@
       "severity": "critical",
       "state": "OK",
       "detail": "fetched_at=2026-10-25T14:17:18+00:00",
-      "age_hours": 17.636158910000002
+      "age_hours": 25.007998515833336
     },
     {
       "slug": "hyperscaler-capex",
@@ -98,7 +98,7 @@
       "severity": "warning",
       "state": "OK",
       "detail": "마지막 성공=2026-10-20T00:06:50+00:00",
-      "age_hours": 151.8106048861111
+      "age_hours": 159.18244411027777
     },
     {
       "slug": "ai-periphery-fundamentals",
@@ -107,7 +107,7 @@
       "severity": "warning",
       "state": "OK",
       "detail": "fetched_at=2026-10-20T00:06:55+00:00",
-      "age_hours": 151.80921613416666
+      "age_hours": 159.18105530944445
     },
     {
       "slug": "bottleneck-prices",
@@ -116,7 +116,7 @@
       "severity": "warning",
       "state": "OK",
       "detail": "fetched_at=2026-10-26T00:18:24+00:00",
-      "age_hours": 7.617829623611112
+      "age_hours": 14.989668103333333
     },
     {
       "slug": "real-estate-apartment-sale",
@@ -125,7 +125,7 @@
       "severity": "warning",
       "state": "OK",
       "detail": "마지막 성공=2026-10-25T20:07:33+00:00",
-      "age_hours": 11.798664566666666
+      "age_hours": 19.170502635
     },
     {
       "slug": "real-estate-apartment-rent",
@@ -134,7 +134,7 @@
       "severity": "warning",
       "state": "OK",
       "detail": "마지막 성공=2026-10-25T20:08:46+00:00",
-      "age_hours": 11.778387300555554
+      "age_hours": 19.150225255833334
     },
     {
       "slug": "subscription-monitor",
@@ -142,7 +142,7 @@
       "workflow": "subscription-monitor.yml",
       "severity": "warning",
       "state": "OK",
-      "detail": "자체 감시 정상 (연속실패 0, 최근 심박 2026-10-26)",
+      "detail": "자체 감시 정상 (연속실패 1, 최근 심박 2026-10-26)",
       "age_hours": null
     },
     {
