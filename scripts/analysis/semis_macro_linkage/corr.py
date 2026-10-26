@@ -1,9 +1,10 @@
 import os, json, math, collections, statistics as st
 from datetime import date
 HERE = os.path.dirname(os.path.abspath(__file__))
-P = {tuple(k.split('|')): v for k, v in json.load(open(os.path.join(HERE, 'out', 'panel.json'))).items()}
+TAG = os.environ.get('LINKAGE_TAG', '6m')
+P = {tuple(k.split('|')): v for k, v in json.load(open(os.path.join(HERE, 'out', TAG, 'panel.json'))).items()}
 STK = ['삼성전자', '하이닉스', '마이크론']
-IND = 'us_2y us_10y us_30y us_3m kr_10y us_5y5y_infl usdkrw dxy usdjpy usdcny brent_fut brent_spot wti vix fear_greed hy_oas hy_tr ig_tr nasdaq sp500'.split()
+IND = 'us_2y us_10y us_30y us_3m kr_10y us_5y5y_infl usdkrw dxy usdjpy usdcny usdjpy_yf usdcny_yf brent_fut brent_spot wti wti_fut vix fear_greed hy_oas hy_tr ig_tr nasdaq sp500'.split()
 KRIND = {'kr_10y', 'usdkrw'}
 def mode_for(stock, ind):   # 결과를 보기 전에 정한 시차 규칙
     if stock == '마이크론': return 'same'
@@ -24,7 +25,7 @@ def pairs(stock, ind, mode, lo='0000', hi='9999', drop_stale=True):
 def tstat(r, n): return r*math.sqrt((n-2)/(1-r*r)) if r is not None and abs(r) < 1 else None
 
 # ---------- 3a. 일간 상관 (전체 6개월, 규칙 시차) ----------
-print('=== 3a. 일간 변화 상관 (2026-04-23~10-23, 시차 규칙 적용, 이월일 제외) ===')
+print(f'=== 3a. 일간 변화 상관 [{TAG}] (시차 규칙 적용, 이월일 제외) ===')
 res = {}
 for s in STK:
     res[s] = {}
@@ -78,6 +79,7 @@ for s in STK:
         for i in IND:
             ds, x, y = pairs(s, i, mode_for(s, i), lo, hi); r = corr(x, y)
             if r is not None: rr[i] = (r, len(ds))
+        if not rr: continue
         top = sorted(rr, key=lambda i: -abs(rr[i][0]))[:3]
         print(f'  {name:16} N≈{max(v[1] for v in rr.values()):>3}  ' + ', '.join(f'{i}({rr[i][0]:+.2f})' for i in top))
 # 폭락 4일 (기술통계)

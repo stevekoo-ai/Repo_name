@@ -1430,7 +1430,7 @@ def read_index_rows(index_code):
 
 def read_ticker_rows(ticker):
     """CSV에서 해당 종목 행만 날짜순으로 정렬해 반환 — 다른 스크립트에서도 재사용."""
-    rows = [r for (d, t), r in _read_csv().items() if t == ticker]
+    rows = [r for (d, t), r in _read_csv(ticker).items() if t == ticker]
     rows.sort(key=lambda r: r["date"])
     return rows
 
@@ -1451,20 +1451,29 @@ def summarize_flows(rows, windows=(1, 5, 20, 60)):
     return out
 
 
-def _read_csv():
-    if not CSV_PATH.exists():
+def flow_csv_path(ticker):
+    """000660은 기존 파일을 그대로 쓴다(engine/briefing·hbm_cycle_score 등 기존 소비자가
+    종목을 구분하지 않고 이 파일의 끝 N행을 읽는다). 다른 종목은 종목별 파일 —
+    같은 파일에 섞으면 그 소비자들이 삼성전자 행을 하이닉스로 읽는다. 2026-10-26 삼성전자 추가."""
+    return CSV_PATH if ticker == "000660" else CSV_PATH.parent / f"investor-flow-{ticker}.csv"
+
+
+def _read_csv(ticker="000660"):
+    path = flow_csv_path(ticker)
+    if not path.exists():
         return {}
     rows = {}
-    with CSV_PATH.open(newline="", encoding="utf-8") as f:
+    with path.open(newline="", encoding="utf-8") as f:
         for row in csv.DictReader(f):
             rows[(row["date"], row["ticker"])] = row
     return rows
 
 
-def _write_csv(rows_by_key):
-    CSV_PATH.parent.mkdir(parents=True, exist_ok=True)
+def _write_csv(rows_by_key, ticker="000660"):
+    path = flow_csv_path(ticker)
+    path.parent.mkdir(parents=True, exist_ok=True)
     ordered = sorted(rows_by_key.values(), key=lambda r: (r["date"], r["ticker"]))
-    with CSV_PATH.open("w", newline="", encoding="utf-8") as f:
+    with path.open("w", newline="", encoding="utf-8") as f:
         w = csv.DictWriter(f, fieldnames=CSV_FIELDS)
         w.writeheader()
         for r in ordered:
@@ -1472,10 +1481,12 @@ def _write_csv(rows_by_key):
 
 
 def upsert_rows(new_rows):
-    existing = _read_csv()
-    for r in new_rows:
-        existing[(r["date"], r["ticker"])] = {k: r.get(k, "") for k in CSV_FIELDS}
-    _write_csv(existing)
+    for ticker in sorted({r["ticker"] for r in new_rows}):
+        existing = _read_csv(ticker)
+        for r in new_rows:
+            if r["ticker"] == ticker:
+                existing[(r["date"], r["ticker"])] = {k: r.get(k, "") for k in CSV_FIELDS}
+        _write_csv(existing, ticker)
     return len(new_rows)
 
 
@@ -1486,7 +1497,7 @@ def cmd_fetch(args):
     if args.raw:
         return
     n = upsert_rows(rows)
-    print(f"{n}개 행을 {CSV_PATH}에 기록(중복 날짜는 갱신)했습니다.")
+    print(f"{n}개 행을 {flow_csv_path(args.ticker)}에 기록(중복 날짜는 갱신)했습니다.")
 
 
 def cmd_append(args):
@@ -1502,7 +1513,7 @@ def cmd_append(args):
         "note": args.note or "",
     }
     upsert_rows([row])
-    print(f"{args.date} {args.ticker} 수동 기록 완료 → {CSV_PATH}")
+    print(f"{args.date} {args.ticker} 수동 기록 완료 → {flow_csv_path(args.ticker)}")
 
 
 def cmd_quote(args):

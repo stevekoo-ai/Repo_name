@@ -6,15 +6,18 @@ REPO = os.path.abspath(os.path.join(HERE, "..", "..", ".."))
 sys.path.insert(0, os.path.join(REPO, "scripts")); sys.path.insert(0, REPO)
 import macro_data
 
-OUT = os.path.join(HERE, "out") + os.sep   # 생성물(커밋 제외, .gitignore)
+TAG = os.environ.get("LINKAGE_TAG", "6m")            # 6m(기본)·12m·24m — 기간만 다르고 방법은 같다
+OUT = os.path.join(HERE, "out", TAG) + os.sep         # 생성물(커밋 제외, .gitignore)
 os.makedirs(OUT, exist_ok=True)
-START, END = '2026-04-23', '2026-10-23'
+START = os.environ.get('LINKAGE_START', '2026-04-23')
+END = os.environ.get('LINKAGE_END', '2026-10-23')
+FETCH_FROM = (date.fromisoformat(START) - timedelta(days=45)).isoformat()
 
 # --- 종목 ---
 STOCKS = {'삼성전자': '005930.KS', '하이닉스': '000660.KS', '마이크론': 'MU'}
 px = {}
 for n, t in STOCKS.items():
-    bars, _ = macro_data.yahoo_chart(t, start='2026-04-01')
+    bars, _ = macro_data.yahoo_chart(t, start=FETCH_FROM)
     px[n] = {b[0]: float(b[1]) for b in bars if b[0] <= END}
 json.dump(px, open(OUT + 'px.json', 'w'))
 
@@ -31,6 +34,9 @@ IND = [
  ('dxy',          'us_dollar_index_dxy', 'lr', '달러·환율', 'Yahoo DXY(FRED 달러지수는 10/16까지)'),
  ('usdjpy',       'usd_jpy',             'lr', '달러·환율', 'FRED(10/16까지)'),
  ('usdcny',       'usd_cny',             'lr', '달러·환율', 'FRED(10/16까지)'),
+ ('usdjpy_yf',    'usd_jpy_yf',          'lr', '달러·환율', 'Yahoo(FRED와 기준 시각이 달라 별도 지표, 같은날 상관 0.58)'),
+ ('usdcny_yf',    'usd_cny_yf',          'lr', '달러·환율', 'Yahoo(같은날 상관 0.35)'),
+ ('wti_fut',      'us_wti_futures',      'lr', '유가', 'Yahoo CL=F(FRED WTI와 같은날 상관 0.94)'),
  ('brent_fut',    'us_brent_futures',    'lr', '유가', 'ICE 근월물'),
  ('brent_spot',   'us_brent',            'lr', '유가', 'FRED 현물(10/20까지)'),
  ('wti',          'us_wti',              'lr', '유가', 'FRED(10/20까지)'),
@@ -62,7 +68,7 @@ def minus1(ds): return (date.fromisoformat(ds) - timedelta(days=1)).isoformat()
 panel = {}   # (stock, ind, mode) -> {date: change}
 cov = []
 for sn in STOCKS:
-    days = sorted(d for d in px[sn] if d >= '2026-04-01')
+    days = sorted(d for d in px[sn] if d >= FETCH_FROM)
     pairs = [(days[i-1], days[i]) for i in range(1, len(days)) if START <= days[i] <= END]
     rets = {b: math.log(px[sn][b] / px[sn][a]) for a, b in pairs}
     panel[(sn, '_ret')] = rets

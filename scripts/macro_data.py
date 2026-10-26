@@ -177,6 +177,13 @@ PRESETS = {
     "in_nifty50": ("yahoo", "^NSEI", "인도 NIFTY 50 지수(일별)", "검증됨(2026-09-30 샌드박스 yahoo 조회)"),
     "in_usdinr": ("yahoo", "INR=X", "달러/루피 환율(일별, 오르면 루피 약세)", "검증됨(2026-09-30 샌드박스 yahoo 조회)"),
     "us_30y": ("fred", "DGS30", "미국 30년물 국채금리(일별)", "검증됨(2026-09-25 Actions 백필)"),
+    # 2026-10-26 — 반도체 3종목×거시 연동성 분석(wiki/concepts/semis-macro-linkage.md)에서
+    # 달러/엔·달러/위안(FRED DEXJPUS·DEXCHUS)이 10/16, WTI 현물(DCOILWTICO)이 10/20에서
+    # 끊겨 최근 5거래일(10/19~23)이 비었다. FRED는 약 1주 지연이라 같은 종목을 yahoo로
+    # 나란히 쌓는다(DXY·브렌트와 같은 원칙 — 정의가 달라 대체가 아니라 신선도 쌍둥이).
+    "usd_jpy_yf": ("yahoo", "JPY=X", "달러/엔(일별, yahoo — FRED DEXJPUS의 신선도 쌍둥이, 오르면 엔 약세. 기준 시각이 달라 같은 날 일간변화 상관 0.58·날짜 스탬프에 일요일/금요일 누락 있음 — 별도 지표로 쓸 것)", "검증됨(2026-10-26 샌드박스 yahoo 조회)"),
+    "usd_cny_yf": ("yahoo", "CNY=X", "달러/위안(일별, yahoo — FRED DEXCHUS의 신선도 쌍둥이, 오르면 위안 약세. 같은 날 일간변화 상관 0.35·값 이월 잦음 — 별도 지표로 쓸 것)", "검증됨(2026-10-26 샌드박스 yahoo 조회)"),
+    "us_wti_futures": ("yahoo", "CL=F", "WTI 선물 근월물(일별, 참고용·현물과 다른 정의)", "검증됨(2026-10-26 샌드박스 yahoo 조회)"),
 }
 
 DEFAULT_LOOKBACK_DAYS = 3652  # 최초 백필 시 과거 10년치

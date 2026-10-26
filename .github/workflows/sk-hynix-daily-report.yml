@@ -105,6 +105,17 @@ jobs:
           done
           python3 scripts/log_automation_run.py sk-hynix-daily-report investor_flow_fetch "$attempt" "$max_attempts" success
 
+      # 2026-10-26 사용자 "삼성전자 투자자별 수급" 추가. 하이닉스 고유 몫(삼성 대비 -26%)이
+      # 외국인 매도 때문인지 가르려면 삼성전자의 같은 자료가 필요하다(연동성 분석,
+      # wiki/concepts/semis-macro-linkage.md). 보조 자료라 실패해도 본 리포트를 막지 않는다
+      # (|| true) — 종목별 파일 sources/investor-flow-005930.csv(기존 소비자 보호).
+      - name: 삼성전자 투자자매매동향 fetch
+        if: ${{ github.event.inputs.debug_raw != 'true' }}
+        env:
+          KIS_APP_KEY: ${{ secrets.KIS_APP_KEY }}
+          KIS_APP_SECRET: ${{ secrets.KIS_APP_SECRET }}
+        run: python3 scripts/investor_flow.py fetch --ticker 005930 --days 30 || echo "::warning::삼성전자 투자자매매동향 fetch 실패(보조 자료, 본 리포트는 계속)"
+
       - name: ADR(SKHY, 나스닥) 시세 fetch
         if: ${{ github.event.inputs.debug_raw != 'true' }}
         env:
@@ -205,6 +216,7 @@ jobs:
           # 2026-09-07: 한 줄에 묶으면 글롭이 안 맞을 때 git add 전체가
           # 실패한다(real-estate-sync에서 실제로 그 사고가 났다). 분리.
           git add sources/sk-hynix-investor-flow.csv
+          [ -f sources/investor-flow-005930.csv ] && git add sources/investor-flow-005930.csv || true
           git add sources/sk-hynix-auto-report-*.md 2>/dev/null || true
           git add docs/reports-index.html
           [ -f sources/sk-hynix-adr-quote.csv ] && git add sources/sk-hynix-adr-quote.csv
