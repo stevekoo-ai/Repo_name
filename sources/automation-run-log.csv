@@ -1068,3 +1068,4 @@ timestamp_utc,workflow,step,attempts_used,max_attempts,result
 2026-10-26T23:50:36Z,macro-data-sync,macro_sync,1,36,success
 2026-10-26T23:50:39Z,macro-data-sync,bottleneck_prices,1,3,success
 2026-10-27T00:14:39Z,sec-edgar-capex,capex_fetch,1,36,success
+2026-10-27T00:41:25Z,core10-collect,core10,1,4,success
