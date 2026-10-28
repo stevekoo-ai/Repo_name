@@ -168,32 +168,39 @@ retirement_accounts:
     total_asset_krw: 31024481          # REAL 2026-09-12 (= 납입금 + 수익)
     as_of: "2026-09-12"
     cash_like_balance_krw: 11713956    # REAL 2026-09-12 (이전 11,617,659에서 갱신)
+    # 2026-10-28 사용자 앱 스크린샷(통합시세 기준)으로 종목별 갱신. 주식 평가금 합계 17,273,095원,
+    # 평가손익 +100,555원(+0.58%). 현금·총자산은 스크린샷에 없어 위 total_*(9/12)는 그대로 둔다.
+    holdings_as_of: "2026-10-28"
     holdings:
-      - name: "TIME 글로벌탑픽액티브"
-        balance_units: 300
-        valuation_krw: 3804000
-        purchase_principal_krw: 3380500
-        bucket: thematic_growth
-      - name: "TIME 코스피액티브"
-        balance_units: 203
-        valuation_krw: 5257700
-        purchase_principal_krw: 4289290
-        bucket: korea_equity
       - name: "TIME 미국S&P500액티브"
+        ticker: "426020"
         balance_units: 105
-        valuation_krw: 3644025
-        purchase_principal_krw: 2986250
+        valuation_krw: 3182550
+        gain_krw: 196300          # +6.57%
         bucket: us_equity
-      - name: "TIME Korea플러스배당액티브"
-        balance_units: 157
-        valuation_krw: 4644060
-        purchase_principal_krw: 4066500
-        bucket: korea_dividend
+      - name: "TIME 코스피액티브"
+        ticker: "385720"
+        balance_units: 203
+        valuation_krw: 4426415
+        gain_krw: 137125          # +3.19%
+        bucket: korea_equity
+      - name: "TIME 글로벌탑픽액티브"
+        ticker: "0113D0"
+        balance_units: 300
+        valuation_krw: 3427500
+        gain_krw: 47000           # +1.39%
+        bucket: thematic_growth
       - name: "TIME 코리아밸류업액티브"
         balance_units: 100
-        valuation_krw: 3070000
-        purchase_principal_krw: 2450000
+        valuation_krw: 2376000
+        gain_krw: -74000          # -3.02%
         bucket: korea_value_up
+      - name: "TIME Korea플러스배당액티브"
+        ticker: "441800"
+        balance_units: 157
+        valuation_krw: 3860630
+        gain_krw: -205870         # -5.06%
+        bucket: korea_dividend
 
 bonds:
   - name: "국고채 10년"

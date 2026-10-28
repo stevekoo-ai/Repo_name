@@ -100,3 +100,4 @@ Append-only. Newest entry at the bottom. 운영 규칙: [log-operating-policy.md
 2026-10-28 — INGEST sources/bear-market-mindset-park-seik-2026-10-28.md(사용자 제공, 박세익) → updated concepts/psychology-of-money-principles.md(하락 주기 실측). 2004~2026 −40% 이상 국면: 코스피 2회(약 11년 간격), 하이닉스 5회(약 4.4년), 마이크론 7회(약 3년) — "2년마다 40%"는 지수엔 과장, 메모리엔 근접. 2028-01 긍정론은 레벨 없어 채점 불가.
 2026-10-28 — USER(신용 여부) → 신용·대출 미사용 확인: 한국투자증권 계좌 총평가=순자산(10/27 실측), 하나증권 신용 없음(사용자 확인). 앞선 "신용 미사용" 표기는 확인 전 추측이었음 — 근거 문구 정정.
 2026-10-28 — CODE(수집 추가) → sk-hynix-daily-report.yml에 KODEX 인도Nifty50(453810) 투자자매매동향 단계 추가(sources/investor-flow-453810.csv, 최근 30영업일 되받음 → 10/12 포함). 계기: 10/12 거래량 8.4배가 한국 상장 ETF에서만 발생, 매수 주체 확인 목적.
+2026-10-28 — USER(DC 계좌 스크린샷) → config/portfolio.yaml DC 종목별 갱신(주식 1,727만 원, +0.58%), concepts/semis-macro-linkage.md DC 상관표. 하이닉스 상관: TIME 코스피 +0.93·배당 +0.90(한국 ETF 3종 약 1,066만 원=62%, 분산 아님), S&P500 +0.57, 글로벌탑픽 +0.45. 밸류업 티커 미확인.
