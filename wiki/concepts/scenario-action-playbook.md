@@ -76,7 +76,7 @@ tags: [scenario, playbook, action, sk-hynix, housing-funding, diversification]
 
 ## 점검 방법
 
-- 아침 브리핑에서 시나리오별 확인 신호를 점검해 "현재 우세 시나리오"를 한 줄로 쓴다(구현 제안).
+- **구현됨(2026-10-29)**: 브리핑 팩 블록 **⑫ 시나리오 점검**(`engine/briefing/scenario.py`) — AM·PM·WEEKEND·상황 보고·메일 부록에 자동으로 실린다. 우선순위 S4>S3>S1(2개 이상)>S2, 판단 불가 신호는 "안전"이 아님(R3).
 - 이미 자동으로 재는 것: 하이닉스 종가·외국인 수급·신용 잔고, 미 10년물, 브렌트, VIX, 하이일드 스프레드(⑪ W2), 선행지수(⑪ W1), 코스피 상승·하락 종목 수.
 - 수동 확인: 고객 재고·주문 조정 언급, 계약가, 빅테크 CapEx, 선거 결과.
 
@@ -84,3 +84,9 @@ tags: [scenario, playbook, action, sk-hynix, housing-funding, diversification]
 
 - 10/19~10/28 사용자 제공 영상 요약 `sources/*-2026-10-2*.md`(약 25편)
 - [하이닉스 3Q 보고](../../report/briefing/2026-10-28-SPECIAL.md), [주거 자금 실행 상태](../monitoring/housing-funding-execution-status.md), [연동성 분석](semis-macro-linkage.md), [중간선거 플레이북 §8·§9](midterm-history-playbook.md)
+
+## 판정 기록
+
+| 날짜 | 우세 | 근거 |
+| --- | --- | --- |
+| 2026-10-29 | S1/S2 사이 | FOMC 매파적 동결(3.75~4.00%, 12월 인상 열어둠) — 깜짝 인상·다회 인상 발언 없어 S4 아님. 10년물 4.99→5.04%, 브렌트 110.7, VIX 16.9. 하이닉스 10/28 종가 1,508,000(KIS), 외국인 10/28 +3,724억 첫 순매수(3일 연속까지 2일 남음), 상승 종목 우위 2일째. 연기분 기준선 1,387,360(최고 1,508,000 × 0.92) |

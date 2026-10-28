@@ -995,6 +995,17 @@ def build_macro_watch_block(as_of: date) -> Block:
                  MW.render_markdown(MW.evaluate(as_of, _series_map())))
 
 
+def build_scenario_block(as_of: date) -> Block:
+    """⑫ 시나리오 점검 — 우세 시나리오와 그때의 행동(2026-10-28, wiki/concepts/scenario-action-playbook.md)."""
+    from engine.briefing import scenario as SC
+
+    try:
+        body = SC.render_markdown(SC.collect(as_of, _series_map()))
+    except Exception as exc:  # noqa: BLE001
+        body = f"(시나리오 점검 실패: {exc})"
+    return Block("scenario", "⑫ 시나리오 점검 (어느 길이면 무엇을 하나)", body)
+
+
 def build_compass_block() -> Block:
     """🧭 나침반 — 새 세션이어도 이어지는 압축 누적 맥락(의도·추적 질문·쳐낸 곁가지·최근 결론).
     wiki/concepts/briefing-compass.md"""
@@ -1072,6 +1083,7 @@ def build_pack(slot: str, as_of: date | None = None) -> tuple[BriefingPack, Gate
             build_bottleneck_block(as_of, compact=True),
             build_midterm_block(as_of, compact=True),
             build_macro_watch_block(as_of),
+            build_scenario_block(as_of),
             build_weekend_news_block(as_of),
             build_weekly_outlook_block(as_of),
         ])
@@ -1097,6 +1109,7 @@ def build_pack(slot: str, as_of: date | None = None) -> tuple[BriefingPack, Gate
         build_bottleneck_block(as_of, compact=True),
         build_midterm_block(as_of, compact=True),
         build_macro_watch_block(as_of),
+        build_scenario_block(as_of),
     ]
     pack = BriefingPack(slot=slot, as_of=now, blocks=blocks)
     return pack, gate
