@@ -201,8 +201,23 @@ tags: [politics, us-midterm, trump, history, playbook, qualitative, checkpoint]
 
 **내 판단과의 연결**: 11/3은 "반등 시점"으로 믿고 기다릴 일정이 아니라 **확인할 일정**이다. 주거 자금 매도 T1(10/31 하한선)은 선거 전에 도래하므로, 선거 후 반등을 전제로 일정을 늦추는 근거로는 쓰지 않는다.
 
+## 9. 결과 시나리오별 섹터 영향 — 김광석 영상 대조 (2026-10-28)
+
+원문: `sources/midterm-scenarios-kim-kwangseok-2026-10-28.md`.
+
+| 주장 | 저장소 근거 | 판정 |
+| --- | --- | --- |
+| 선거 후 증시는 강한 랠리(불확실성 해소) | §8 실측: 코스피 선거 후 1개월 9/10 상승(평균 +5.0%), 3개월은 중앙값 +2.7%로 약함 | **1개월만 지지** |
+| 하원 민주·상원 공화(교착)가 가장 긍정적 | 예측시장 하원 민주 약 90%(§6) — 교착이 기본 시나리오라 **이미 가격에 반영**됐을 가능성 | 방향 동의, "새 호재"는 아님 |
+| 민주당 우세 시 데이터센터 속도 조절·전력 비용 분담 → AI CAPEX 둔화 | 하원이 **데이터센터 전기요금 소비자 보호법을 417:3**으로 이미 통과(초당적). 비용 분담 압력은 당과 무관하게 진행 중 | **지지** — 하이닉스에 닿는 경로는 "빅테크 CapEx 증가율 둔화"([AI 속도조절론](../monitoring/ai-capex-slowdown-status.md)). 10/28 하이닉스는 2029년까지 솔드아웃이라 단기 영향은 제한적 |
+| 전력 기기·ESS는 초당적 성장 | 위 417:3 법안과 같은 방향. K-GX(10/26)와도 일치 | 동의. 단 보유 중 전력 ETF는 하이닉스와 상관 +0.55([연동성](semis-macro-linkage.md)) — 분산 효과는 약함 |
+| 재생에너지·헬스케어(민주), 방산·화석연료·원전(공화) | 결과 확정 후 판단 | 시나리오 의존 — 보유 중 **비만치료제 ETF(헬스케어)**는 민주 우세 시 우호 |
+
+**내 계획과의 연결**: T2(11/4~11/30, "중간선거 통과 확인")는 바로 이 결과를 보고 실행하는 구간이다. 교착(기본 시나리오)이면 1개월 랠리 경향 + 문홍철 "11/15 전후 고통 종료"와 겹쳐 T2를 11월 중순 이후로 두는 근거가 되고, 블루 스윕이면 AI CapEx 규제 위험이 커져 T2를 앞당기는 쪽이다.
+
 ## Sources
 
+- `sources/midterm-scenarios-kim-kwangseok-2026-10-28.md` — 시나리오별 섹터 영향(§9)
 - `sources/tech-selloff-flows-anchor-briefing-2026-10-25.md` — 영상 요약(2026-10-25), `sources/monthly-price-history.csv` — 코스피 월간 종가(실측 §8)
 - [Gallup — 지지율 50% 미만 평균 -36석](https://news.gallup.com/poll/141812/avg-midterm-seat-loss-presidents-below-approval.aspx), [Gallup — 평균 -37석](https://news.gallup.com/poll/242093/midterm-seat-loss-averages-unpopular-presidents.aspx), [The Conversation — 80년 패턴](https://theconversation.com/for-80-years-the-presidents-party-has-almost-always-lost-house-seats-in-midterm-elections-a-pattern-that-makes-the-2026-congressional-outlook-clear-271605)
 - [NPR — 전쟁권한 결의안 상원 부결(9/24)](https://www.npr.org/2026/09/24/nx-s1-5980318/senate-iran-war-powers-vote), [Detroit News — 공화당 후보 이탈](https://www.detroitnews.com/story/news/politics/2026/09/24/us-democrats-pre-election-war-powers-vote-some-republicans-break-with-trump-on-iran/91917113007/)
