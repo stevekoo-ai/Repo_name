@@ -116,6 +116,16 @@ jobs:
           KIS_APP_SECRET: ${{ secrets.KIS_APP_SECRET }}
         run: python3 scripts/investor_flow.py fetch --ticker 005930 --days 30 || echo "::warning::삼성전자 투자자매매동향 fetch 실패(보조 자료, 본 리포트는 계속)"
 
+      # 2026-10-28 사용자 "인도 ETF 투자자별 수급 추가". 10/12 KODEX 인도Nifty50 거래량이
+      # 평소의 8.4배(인도 현지·미국 INDA는 평소 이하)로 한국 쪽 수요만 튀었는데 누가 샀는지
+      # 가를 자료가 없었다. 보유 종목(IRP 544주)이라 저가 매수 판단 근거로 쓴다. 보조 자료라 || true.
+      - name: KODEX 인도Nifty50 투자자매매동향 fetch
+        if: ${{ github.event.inputs.debug_raw != 'true' }}
+        env:
+          KIS_APP_KEY: ${{ secrets.KIS_APP_KEY }}
+          KIS_APP_SECRET: ${{ secrets.KIS_APP_SECRET }}
+        run: python3 scripts/investor_flow.py fetch --ticker 453810 --days 30 || echo "::warning::인도 ETF 투자자매매동향 fetch 실패(보조 자료, 본 리포트는 계속)"
+
       - name: ADR(SKHY, 나스닥) 시세 fetch
         if: ${{ github.event.inputs.debug_raw != 'true' }}
         env:
@@ -217,6 +227,7 @@ jobs:
           # 실패한다(real-estate-sync에서 실제로 그 사고가 났다). 분리.
           git add sources/sk-hynix-investor-flow.csv
           [ -f sources/investor-flow-005930.csv ] && git add sources/investor-flow-005930.csv || true
+          [ -f sources/investor-flow-453810.csv ] && git add sources/investor-flow-453810.csv || true
           git add sources/sk-hynix-auto-report-*.md 2>/dev/null || true
           git add docs/reports-index.html
           [ -f sources/sk-hynix-adr-quote.csv ] && git add sources/sk-hynix-adr-quote.csv
