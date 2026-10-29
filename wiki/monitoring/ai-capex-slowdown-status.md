@@ -41,6 +41,24 @@ CapEx 가이던스 하향이 아니다. 둘은 시장에 전혀 다르게 작용
 
 ---
 
+## Latest Status (2026-10-30 보강) — 10/29 뉴욕 장: 알파벳 −12%·인텔 가이던스 쇼크, 메타 기록 정정
+
+원문: `sources/ny-market-bigtech-alphabet-intel-2026-10-30.md`(영상 요약) + Yahoo·StockTitan·CNBC·Fortune 교차 확인.
+
+| 항목 | 영상 | 실측 | 판정 |
+| --- | --- | --- | --- |
+| 지수 | 상승세가 알파벳과 함께 꺾임 | 나스닥 −1.4~1.6%, S&P500 −0.3~0.5%, 다우 −0.25~0.5%(보도별). **동일가중 S&P(RSP) +1.2%** — 대형 기술주만 빠지고 나머지는 올랐다 | 확인. "시장 전체 하락"이 아니라 **빅테크 집중 하락·순환매** |
+| 알파벳 | −10% 이상, FCF 소진·검색 광고 둔화 | $324.89 → $283.82(약 −12.6%), 시총 약 $500B 감소 | 확인 |
+| PCE·GDP | 부합·금리 안정 / GDP 3.4% | [금리 페이지](rate-outlook-scenario-status.md) 참조, 12월 인상 확률 92→80~84% | 확인 |
+| 아마존 | 매출·EPS 모두 하회 | 매출은 사실상 부합, EPS만 하회(위 아마존 섹션) | **요약 오류 반복** |
+| 인텔 | 실적 부진, 시간외 급락 | 3Q는 상회(매출 $16.5B +21%). **4Q 가이던스 하회**(매출 $15~16B vs $16.45B, EPS $0.25 vs $0.39). CFO "PC 둔화 최소 내년 상반기까지". 시간외 −20.9%는 단일 보도 | 가이던스 쇼크로 정정 |
+| 메타 | AI 광고 수익으로 주가 상승 | **10/21 발표**: 매출 +26%($64.6B), 4Q 가이던스 상회, 시간외 +2.5~3.8%. CapEx $135~145B, 분기 FCF −$2.1B, 의결권 없는 C주 신설(AI 자금) | 상승 맞음(10/29 당일 움직임은 아님). **플레이북의 "메타 −6~8%"는 오기 → 정정** |
+
+- **메모리에 새로 걸리는 신호 — 인텔 "PC 둔화"**: 메모리 가격 급등이 PC 원가를 밀어 올린 상태(9/18 인텔 CEO "보급형 기기 원가의 70~80%가 메모리")에서 PC 수요가 내년 상반기까지 둔화하면, **범용 D램 수요 파괴** 경로다. HBM·서버는 별개지만 범용 가격 상승률 둔화(채찍 효과 꺾임 신호 ③)로 이어질 수 있다 — [메모리 가격 페이지](memory-price-hynix-guidance-status.md)에서 추적.
+- **빅테크 4사 공통 패턴 보강**: 메타도 FCF 마이너스·주식 발행 구조 신설 — 알파벳·아마존과 같은 "조달 압박" 경로.
+
+---
+
 ## Latest Status (2026-10-30) — 아마존 3Q: 수요는 가장 강하고, 돈을 대는 방식이 문제다
 
 원문: `sources/amazon-3q26-earnings-video-2026-10-30.md`(영상 요약) + 회사 실적 발표·GeekWire·CNBC·Yahoo 교차 확인.
@@ -223,6 +241,12 @@ pacing 제안은 **정책 지원을 잃었다**.
 
 ## Sources
 
+- `sources/ny-market-bigtech-alphabet-intel-2026-10-30.md` (영상 요약, 2026-10-30)
+- [Yahoo Finance — Alphabet sinks 12%, AI jitters return (10/29)](https://finance.yahoo.com/markets/live/stock-market-today-thursday-october-29-dow-sp-500-nasdaq-alphabet-microsoft-earnings-130305714.html)
+- [StockTitan — Nasdaq falls as Alphabet drops; Amazon and Intel slide after hours](https://www.stocktitan.net/articles/stock-market-today-live-october-29-2026)
+- [Intel — Q3 2026 results](https://www.intel.com/content/www/us/en/newsroom/news/corporate/intel-reports-third-quarter-2026-financial-results.html)
+- [CNBC — Meta Q3 2026 revenue beat, strong guidance](https://www.cnbc.com/2026/10/21/meta-earnings-q3-2026-live-updates.html)
+- [Fortune — Meta revenue +26%, capex squeezes FCF](https://fortune.com/2026/10/21/meta-q3-earnings-mark-zuckerberg-capex-muse/)
 - `sources/amazon-3q26-earnings-video-2026-10-30.md` (영상 요약, 2026-10-30)
 - [Amazon IR — Third Quarter 2026 Results](https://ir.aboutamazon.com/news-release/news-release-details/2026/Amazon-com-Announces-Third-Quarter-Results/default.aspx)
 - [GeekWire — AWS growth hits 39% as Amazon misses on earnings](https://www.geekwire.com/2026/aws-growth-hits-39-its-fastest-in-nearly-five-years-as-amazon-misses-on-earnings/)
