@@ -1102,3 +1102,4 @@ timestamp_utc,workflow,step,attempts_used,max_attempts,result
 2026-10-28T22:01:14Z,real-estate-sync,apartment_rent,1,36,success
 2026-10-28T22:01:54Z,real-estate-sync,villa_sale,1,36,success
 2026-10-28T22:03:06Z,real-estate-sync,officetel_sale,1,36,success
+2026-10-29T01:09:08Z,core10-collect,core10,1,4,success
