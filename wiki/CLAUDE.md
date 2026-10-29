@@ -141,10 +141,20 @@ YYYY-MM-DD HH:MM UTC — LINT → 2 issues found (see report)
 - CSV의 `fetched_at` 타임스탬프 기준으로 가장 최근 데이터를 사용
 - 같은 날짜에 중복 데이터가 있을 경우, `fetched_at` 기준 최신 행 선택 (github-data-pipeline-cautions.md 2-2 참조)
 
-### 7-3. 브랜치 분리 원칙
-- GitHub Actions 워크플로는 **main 브랜치**에서만 실행
-- 위키/리포트 서사는 **claude/ai-agent-impl-002tip 브랜치**에서 관리
-- 두 브랜치가 갈라져 있을 경우, 데이터 참조 시 반드시 브랜치 확인 필요
+### 7-3. 브랜치 분리 원칙 (2026-10-29 정정)
+- **위키/리포트 서사 포함 모든 작업은 main 브랜치에 직접 커밋·푸시한다.**
+  GitHub Actions 자동 수집도 전부 main에서 돈다 — **다른 터미널/세션과
+  내용을 공유하려면 반드시 main이어야 한다.** main이 아닌 브랜치에 쓴
+  내용은 다른 세션이 기본적으로 보지 못한다.
+- **과거 지침(`claude/ai-agent-impl-002tip`에서 위키 관리)은 폐기됐다.**
+  2026-10-15 이후 그 브랜치에 아무도 커밋하지 않았고, main에서 132개
+  커밋만큼 분기된 상태로 방치되어 있었다(2026-10-29 발견). 그 브랜치를
+  보고 있던 세션은 최신 위키 내용을 못 봤을 것 — 새 세션은 이 브랜치를
+  wiki 작업 대상으로 쓰지 않는다.
+- 작업 시작 전 `git fetch origin main && git log origin/main -1`로 로컬이
+  최신인지 확인하고, 매 ingest/update 후 즉시 `git push origin main`
+  한다(자동화 커밋이 수시로 들어오므로 push 실패 시 fetch→rebase 후
+  재시도 — wiki/log.md는 append-only라 충돌해도 두 줄 다 보존하면 됨).
 - (github-data-pipeline-cautions.md 1-1 참조)
 
 ### 7-4. 보고서 버저닝
@@ -202,10 +212,15 @@ YYYY-MM-DD HH:MM UTC — LINT → 2 issues found (see report)
 - 시크릿 이름만 `.claude/commands/ingest.md`나 설정 파일에 기록
 - GMAIL_ADDRESS, GMAIL_APP_PASSWORD, KIS_* 시크릿은 기존 워크플로가 이미 등록 완료
 
-### 9-3. 브랜치 전략
-- **main**: GitHub Actions 자동 수집 + 리포트 생성
-- **claude/ai-agent-impl-002tip**: 위키/엔티티/컨셉 정리 및 서사
-- wiki/log.md의 마지막 항목을 기준으로 브랜치 동기화 필요
+### 9-3. 브랜치 전략 (2026-10-29 정정 — §7-3과 동일 사안)
+- **main이 유일한 공유 브랜치다.** GitHub Actions 자동 수집·리포트
+  생성뿐 아니라 **위키/엔티티/컨셉 정리·서사도 main에 직접 커밋**한다.
+- `claude/ai-agent-impl-002tip`은 2026-10-15 이후 방치되어 main과
+  132개 커밋 분기된 죽은 브랜치다 — 더는 위키 작업 대상이 아니다.
+  (`log-archive/2026-09.md` 등 그 브랜치에만 있던 산출물은 필요시
+  개별 확인 후 main으로 포팅할 것, 자동으로 병합하지 않음)
+- wiki/log.md의 마지막 항목을 기준으로 **main 원격**과의 동기화 확인
+  (`git fetch origin main`)이 작업 시작 전 필수.
 
 ---
 
