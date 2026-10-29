@@ -41,7 +41,7 @@ Catalog of every page in the wiki. See `../CLAUDE.md` for conventions.
 
 - [data-health-status.md](monitoring/data-health-status.md) — 🆕 2026-09-15. 58개 등록 소스 + 232개 정규화 시리즈 스윕의 일일 헬스 추적. 최초 점검 critical 22건(전부 장기 미갱신 경제지표, 최대 1,049일)
 
-- [ai-capex-slowdown-status.md](monitoring/ai-capex-slowdown-status.md) — 🆕 2026-09-14. AI 투자 속도조절론 추적. 핵심 질문은 "서사인가 숫자인가" — 업계 리더 발언(밸류에이션 재평가 압력)과 빅테크 CapEx 가이던스 실제 하향(수요 축소 확정)은 하이닉스에 전혀 다르게 작용한다. 2026-09-14 코스피 -3.26%를 만든 재료를 아침 브리핑이 놓친 사고에서 축으로 승격 🔄 2026-10-25: 코어위브 부채 충격(10/14 −15.5%, 채권 15%) — 수요가 아니라 금리·신용 경로, 하이퍼스케일러 CapEx 하향은 미확인
+- [ai-capex-slowdown-status.md](monitoring/ai-capex-slowdown-status.md) — 🆕 2026-09-14. AI 투자 속도조절론 추적. 핵심 질문은 "서사인가 숫자인가" — 업계 리더 발언(밸류에이션 재평가 압력)과 빅테크 CapEx 가이던스 실제 하향(수요 축소 확정)은 하이닉스에 전혀 다르게 작용한다. 2026-09-14 코스피 -3.26%를 만든 재료를 아침 브리핑이 놓친 사고에서 축으로 승격 🔄 2026-10-25: 코어위브 부채 충격(10/14 −15.5%, 채권 15%) — 수요가 아니라 금리·신용 경로, 하이퍼스케일러 CapEx 하향은 미확인 🔄 2026-10-30: 아마존 3Q — EPS 하회(이자 비용)·12개월 FCF −$42.4B·AWS +39%·CapEx $220B 유지. 4사 모두 CapEx 유지/확대, 새 압력은 조달(FCF 마이너스·부채)
 
 - [housing-funding-execution-status.md](monitoring/housing-funding-execution-status.md) — 🆕 2026-09-12. 자금 조달 진행률·CDP 발동 여부·판단 포스트 채점을 매일 추적 (브리핑 팩 블록 ⑧이 자동 갱신)
 
