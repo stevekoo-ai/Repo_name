@@ -9,6 +9,25 @@ tags: [macro, rate, fomc, bok, monitoring, status]
 
 프레임: [wiki/concepts/rate-outlook-scenarios-2026.md](../concepts/rate-outlook-scenarios-2026.md)
 
+## Latest Status (2026-10-30) — 9월 PCE 3.6%·3Q GDP 3.4%: 숫자는 매파적인데 12월 인상 확률은 **내려갔다**
+
+원문: `sources/sep-pce-3q-gdp-kim-kwangseok-2026-10-30.md`(김광석 영상 요약). BEA 발표(10/29 8:30 ET)·CNBC·FXStreet로 교차 확인.
+
+| 항목 | 영상 | 실측 | 판정 |
+| --- | --- | --- | --- |
+| 헤드라인 PCE (전년비) | 3.6%, 전망 부합 | **3.6%**(8월 3.4%), 전월비 **+0.5%**(8월 +0.3%) — 5월 이후 최고 | 확인. 수준은 부합이나 **방향은 재가속** |
+| 근원 PCE (전년비) | 3.1%, 전망 부합 | **3.1%**(8월 3.0%), 전월비 +0.3%(예상 부합) | 확인 |
+| 3Q GDP 속보치 (연율) | 3.4%, 기대 3.2% 상회 | **3.4%**(2Q 2.2%), 기대치는 보도별 3.1~3.2% | 확인 — 서프라이즈 |
+| 12월 FOMC 인상 확률 | 약 83% | CME 10/28 **92% → 10/29 약 80~84%**(보도·시점별) | 수준 확인. 단 영상에 없는 사실: **지표 후 확률이 오히려 8%p 하락** |
+| 금리 인하 논의 단계 아님, 추가 인상 가능성 | — | 10월 동결(10-2, 2명 인상 주장), 10년물 **5.045%**(10/28, Yahoo) | 방향 일치 |
+
+- **해석**: 근원이 예상과 같아 "더 나쁠 것"이라는 꼬리 위험이 줄었고, 그래서 이미 92%까지 올라 있던 인상 확률이 일부 되돌려졌다. 인상 자체(기본 시나리오)는 그대로다.
+- **같은 날 다른 신호**: ECB 동결·유로 17개월 최저(달러 강세), 원/달러 1,324→**1,336.3**(10/29), 엔/달러 157.8. 브렌트 선물 110.77(10/29).
+- **시나리오 신호(⑫)**: S4 "미 10년물 ≥ 5.3%" 미충족(5.05%), S1 "≤ 4.8%" 미충족. 예측 장부 P0121(11/16 us_10y ≤ 4.8, 문홍철)은 현재 0.25%p 위.
+- **다음 판정**: 11/10(KST 22:30) 10월 CPI → 12/9 FOMC. 주거 자금 관점에서 금리 경로는 전세대출 금리·CMA 금리 양쪽에 걸린다.
+
+---
+
 ## Latest Status (2026-10-28 아침) — 이란 조건부 종전 신호·유가 급락, 하이닉스 실적 당일
 
 원문: `sources/closing-kick-2026-10-28.md`(미국 10/27 장). Yahoo 종가로 대조:
@@ -155,8 +174,14 @@ P0008·P0009는 상호 배타적 임계라 **둘 다 MISS도 가능**(4.3~4.5% �
 | 날짜 | 이벤트 | 판정 | 비고 |
 |---|---|---|---|
 | 2026-09-12 | 페이지 신설 + 실측 대조 | — | kr_base_rate 2회 인상 이미 실측 확인, us_10y 4.95%로 양쪽 임계 위 |
+| 2026-10-30 | 9월 PCE·3Q GDP | 매파 지표, 인상 확률 92→80~84% | PCE 3.6%(재가속)·근원 3.1% 부합·GDP 3.4% 서프라이즈, 10년물 5.045% |
 
 ## Sources
+
+- `sources/sep-pce-3q-gdp-kim-kwangseok-2026-10-30.md` (김광석, 2026-10-30)
+- [CNBC — Q3 GDP 3.4% as September inflation accelerates](https://www.cnbc.com/2026/10/29/pce-inflation-report-september-2026-.html)
+- [BEA — GDP 3Q26 advance estimate](https://www.bea.gov/sites/default/files/2026-10/gdp3q26-adv.pdf)
+- [Daily Economics — Growth surges as inflation reaccelerates](https://dailyeconomics.substack.com/p/growth-surges-as-inflation-reaccelerates)
 
 - [축 프레임](../concepts/rate-outlook-scenarios-2026.md)
 - `data/predictions/ledger.csv` (P0006~P0010)
