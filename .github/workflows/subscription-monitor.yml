@@ -37,6 +37,8 @@ jobs:
           playwright install --with-deps chromium
 
       - name: Fetch listings, check 플랫폼시티 alerts, render page
+        id: api
+        continue-on-error: true
         env:
           DATA_GO_KR_KEY: ${{ secrets.DATA_GO_KR_KEY }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -44,13 +46,28 @@ jobs:
           GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
           ALERT_EMAIL_TO: ${{ secrets.GMAIL_ADDRESS }}
           EXTRA_TEST_KEYWORD: ${{ github.event.inputs.test_keyword }}
+          NET_API_IDS_PATH: /tmp/api_ids.json
         run: python3 collectors/subscription_monitor/fetch_and_render.py
 
+      # 2026-10-30 — 광교 자연앤 센트레빌 누락(API 미동기화) 재발 방지 그물망.
+      # API 단계가 실패해도 반드시 돈다(경로끼리 독립). 청약Home 웹 목록 /
+      # GH 게시판 / 뉴스 RSS를 따로 확인하고, 경로가 연속 실패하면 그 자체를 알린다.
+      - name: Safety net (청약Home 웹 · GH 게시판 · 뉴스)
+        if: always()
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GMAIL_ADDRESS: ${{ secrets.GMAIL_ADDRESS }}
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+          ALERT_EMAIL_TO: ${{ secrets.GMAIL_ADDRESS }}
+          NET_API_IDS_PATH: /tmp/api_ids.json
+        run: python3 collectors/subscription_monitor/net_watch.py
+
       - name: Commit and push if changed
+        if: always()
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add docs/subscription-monitor.html collectors/subscription_monitor/alerted_state.json collectors/subscription_monitor/health_state.json collectors/subscription_monitor/income_review_state.json
+          git add docs/subscription-monitor.html collectors/subscription_monitor/alerted_state.json collectors/subscription_monitor/health_state.json collectors/subscription_monitor/income_review_state.json collectors/subscription_monitor/net_state.json
           if git diff --cached --quiet; then
             echo "no changes"
           else
@@ -74,3 +91,11 @@ jobs:
               sleep $((i * 3))
             done
           fi
+
+      # 그물망·커밋이 모두 끝난 뒤에만 실패로 표시 — 상태 파일 저장을 막지 않으면서
+      # 보고서 워치독(report-watchdog.yml)이 API 단계 실패를 볼 수 있게 한다.
+      - name: Fail the run if the API step failed
+        if: steps.api.outcome == 'failure'
+        run: |
+          echo "API 단계 실패 — 그물망과 상태 커밋은 이미 완료됨."
+          exit 1

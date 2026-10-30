@@ -361,6 +361,7 @@ def main() -> None:
     # closed. The HTML "접수중" table below intentionally still renders only
     # `rows` (currently-open) — catch-up entries don't belong on that table.
     since = (now_kst - timedelta(days=RECENT_CATCHUP_DAYS)).strftime("%Y-%m-%d")
+    recent_rows: list[dict] = []
     try:
         recent_rows = fetch_recent_announcements(service_key, since)
         recent_rows_sg = [r for r in recent_rows if r.get("SUBSCRPT_AREA_CODE_NM") in TARGET_REGIONS]
@@ -369,6 +370,12 @@ def main() -> None:
         print(f"catch-up fetch failed (non-fatal, skipping this round): {e}")
         recent_rows_sg = []
     review_rows = merge_catchup_rows(rows, recent_rows_sg)
+
+    # net_watch.py가 "웹엔 있는데 API엔 아직 없는" 공고를 표시할 수 있게 이번 실행의 API ID를 넘긴다.
+    ids_path = os.environ.get("NET_API_IDS_PATH")
+    if ids_path:
+        with open(ids_path, "w", encoding="utf-8") as f:
+            json.dump(sorted({r.get("HOUSE_MANAGE_NO") or r.get("PBLANC_NO") or "" for r in all_rows + recent_rows} - {""}), f)
 
     # Step 2 — judge every fetched row (deterministic verdicts), then Steps 3-5
     # (compose policy + send) in one call. EXTRA_TEST_KEYWORD flows through to

@@ -81,3 +81,23 @@ reports:
     days: [0, 1, 2, 3, 4, 5, 6]
     due: "08:00"
     grace_min: 300
+  # 2026-10-30 — 청약 감시 그물망(subscription-monitor.yml: API + 청약Home 웹 + GH + 뉴스)
+  # 자체가 멈추는 경우를 잡는 층. 예약은 30분 주기지만 GitHub가 70~80%를 건너뛰어
+  # 실측 하루 4~6회(3~7시간 간격) 실행되므로, 기준치는 "반나절 동안 한 번도 성공 못 함"으로
+  # 잡는다(오경보 방지). API 단계가 실패하면 그물망·커밋 후 잡이 실패로 끝나므로 여기서도 보인다.
+  - id: subscription_net_noon
+    name: 청약 감시 그물망 (오전 06~12시 1회 이상)
+    kind: workflow
+    workflow: subscription-monitor.yml
+    nth: 1
+    days: [0, 1, 2, 3, 4, 5, 6]
+    due: "12:00"
+    grace_min: 0
+  - id: subscription_net_night
+    name: 청약 감시 그물망 (06~23시 2회 이상)
+    kind: workflow
+    workflow: subscription-monitor.yml
+    nth: 2
+    days: [0, 1, 2, 3, 4, 5, 6]
+    due: "23:00"
+    grace_min: 0
