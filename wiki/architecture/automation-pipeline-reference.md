@@ -57,7 +57,7 @@ cron은 UTC 기준으로 저장돼 있다 — 아래 표의 KST는 이미 변환
 | `real-estate-sync.yml` | 부동산 실거래가 자동 수집 | 매일 03:00 | 국토부 실거래가 — 아파트 매매/전월세, 연립다세대(빌라) 매매, 오피스텔 매매 (4개 수집기) | `collectors.molit`, `molit_rent`, `molit_villa`, `molit_officetel` |
 | `sec-edgar-capex.yml` | SEC EDGAR CapEx & AI 변두리 | 매주 화요일 06:00 | 하이퍼스케일러(GOOGL/MSFT/AMZN/META) CapEx + AI 밸류체인 변두리 8개사(Vertiv·GE Vernova·Astera Labs 등) 매출·백로그 | `scripts/sec_edgar_capex.py`, `scripts/sec_edgar_periphery.py` |
 | `exports-price-correlation.yml` | 수출입동향×주가 상관관계 갱신 | 매일 19:30 | 관세청 총수출/총수입 실측(1990~) + KIS 월봉/일봉(하이닉스·코스피) → 상관관계 차트 재생성 | `collectors.customs_trade`, `scripts/investor_flow.py`, `scripts.correlation_analysis` |
-| `subscription-monitor.yml` | 청약(공공분양) 모니터 | **30분마다**(매시 07/37분) | 서울/경기 국민주택 청약공고 신규/변경 감지 | `collectors/subscription_monitor/fetch_and_render.py` |
+| `subscription-monitor.yml` | 청약(공공분양) 모니터 + **감시 그물망** | 예약은 30분마다(매시 07/37분)지만 **실측 하루 4~6회**(GitHub가 예약 실행 70~80% 생략, 2026-10-30 확인) | ① API: 서울/경기 국민주택 청약공고 신규/변경 감지 · ②③④ 그물망(2026-10-30~): 청약Home 웹 목록 / GH 분양공고 게시판 / 구글뉴스 RSS에서 관심 키워드 공고 감지 — API 미동기화 대비, 경로별 독립 실패, 6회 연속 실패 시 '그물 구멍' 경보 | `collectors/subscription_monitor/fetch_and_render.py`, `net_watch.py`(상태 `net_state.json`) — 워크플로 정지는 `report-watchdog.yml`이 감시(`report_schedule.yaml` subscription_net_*) |
 
 ## 2-2. 리포트 생성 (수집된 데이터를 조합해 리포트 산출)
 
