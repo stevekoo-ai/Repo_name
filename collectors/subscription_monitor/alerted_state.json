@@ -34,7 +34,7 @@
     "keyword": null
   },
   "2026000373": {
-    "priority": "MED",
+    "priority": "HIGH",
     "keyword": null
   },
   "2026000531": {
@@ -42,6 +42,24 @@
     "keyword": null
   },
   "2026820012": {
+    "priority": "LOW",
+    "keyword": null
+  },
+  "2026000528": {
+    "priority": "HIGH",
+    "keyword": "광교",
+    "notified": true
+  },
+  "2026000527": {
+    "priority": "HIGH",
+    "keyword": "광교",
+    "notified": true
+  },
+  "2026000533": {
+    "priority": "MED",
+    "keyword": null
+  },
+  "2026820013": {
     "priority": "LOW",
     "keyword": null
   }
