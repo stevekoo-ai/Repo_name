@@ -8,28 +8,36 @@
 # 추측/대체 데이터로 채우지 않음). 용인 플랫폼시티 실제 공고가 나오면 아래
 # notices 목록에 아래 원천동 항목과 같은 형식으로 추가한다.
 
-updated_at: "2026-09-01"
+updated_at: "2026-10-30"
 notices:
-  - name: "수원 원천동(광교) 공공분양 (PENDING - 청약홈 미등록)"
-    agency: null   # TODO: GH(경기주택도시공사) 또는 LH — 정식 공고 시 확인
-    region: "경기도 수원시 영통구 원천동 80번지 일원"
+  - name: "광교 자연앤 센트레빌 (A17BL) — 공공분양주택 [CONFIRMED]"
+    house_manage_no: "2026000528"
+    agency: "경기주택도시공사(GH) + 민간참여사업자(동부건설 등) — 민간참여 공공주택사업"
+    region: "경기도 수원시 영통구 원천동 633번지 일원"
     is_platform_city: false
-    housing_type: "국민주택"
-    supply_type: "일반공급"
-    size: null                    # TODO: 정식 공고 전까지 평형 미확정
-    household_count: 600
-    announce_date: null           # TODO: 2026-10 분양 예정 — 통상 입주자모집공고는 접수 시작 1개월 전 공개
-    application_start: null
-    application_end: null
-    expected_price_krw: null
+    housing_type: "국민주택 (공공분양, 민간참여형)"
+    supply_type: "특별공급 270세대 + 일반공급 90세대"
+    size: "전용 84.6192~84.8159㎡ (84A/84B/84C, 전 타입 60㎡ 초과 — 59㎡ 지분적립형은 별도 공고)"
+    household_count: 360          # 전체 600세대 중 공공분양분 (나머지 240세대는 지분적립형, 별도 공고)
+    announce_date: "2026-10-30"
+    application_start: "2026-11-09"   # 특별공급. 일반공급 1순위 11-10, 2순위 11-11
+    application_end: "2026-11-11"
+    winner_announce_date: "2026-11-17"
+    contract_date: "2026-12-21 ~ 2026-12-23"
+    expected_price_krw: 920000000     # 약 9.0~9.5억(층/타입별 상이, 84B 10층이상 기준 948,900,000원)
     expected_competition_ratio: null
-    source: "사용자 제보 (2026-07-23) — 청약홈 API 조회 결과 아직 미등록 확인 (adhoc-subscription-query.yml 실행 기록 참조)"
+    move_in_date: "2029-10 (예정, 공정에 따라 변동 가능)"
+    income_requirement: "일반공급(우선공급1순위자/추첨공급/신생아우선) 전부 소득·자산 요건 '해당없음' — 전 타입 60㎡ 초과라 소득무관 전략과 일치 (공고문 직접 확인, PDF원문 참고)"
+    region_priority: "수원시 2년이상 거주 30% / 경기도 2년이상 거주 20% / 기타지역(수도권) 50% — 사용자는 용인 수지구 거주로 경기도(20%) 물량 해당 추정"
+    source: "사용자가 공고 PDF를 직접 업로드 (2026-10-30) — 청약Home/광교 자연앤 센트레빌 공식 홈페이지(gwanggyo-centreville.com) 게재 입주자모집공고문 원문"
     note: >
-      2026-07-23 기준 scripts 및 adhoc 워크플로우로 HOUSE_NM/HSSPLY_ADRES(원천동, 영통구)
-      전체 검색했으나 매칭 없음. 통상 입주자모집공고는 접수 시작 약 1개월 전 공개되며,
-      2026-07-23 시점 기준 2026년 9월경 청약홈 등록이 예상되었음. subscription-monitor.yml이
-      "광교"/"원천동" 키워드로 5~30분마다 자동 감시 중 (2026-09-01 기준 alerted_state.json에
-      해당 키워드 매칭 이력 없음 — 아직 등록 전으로 판단).
+      2026-07-23부터 "수원 원천동(광교) 공공분양"으로 PENDING 추적해오던 바로 그
+      후보지가 2026-10-30 정식 공고로 전환됨. 자동감시(subscription-monitor.yml)가
+      아직 못 잡은 상태에서 사용자가 공고 PDF를 직접 업로드해 먼저 확인됨 — 근본원인은
+      wiki/concepts/public-housing-income-requirement-framework.md
+      "2026-10-30 자동감시 누락 근본원인" 절 참고(청약Home Open API 자체에 아직
+      미동기화, 필터 로직 버그 아님). 접수 시작이 2026-11-09로 임박 — 자동감시가
+      나중에 API 동기화 후 잡더라도 이 수동 등록이 우선한다.
 
   # 플랫폼시티가 발표될 경우, 아래 예시처럼 민영 주택으로 입력할 것
   # (역사적으로 라온프라이빗 아르디에·e편한세상 용인역 플랫폼시티 모두 민영 분류).
