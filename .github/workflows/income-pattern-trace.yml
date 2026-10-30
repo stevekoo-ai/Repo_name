@@ -37,4 +37,4 @@ jobs:
       - name: DEBUG 2026-10-30 광교 자연앤 센트레빌 누락 원인 확인 (throwaway branch only)
         env:
           DATA_GO_KR_KEY: ${{ secrets.DATA_GO_KR_KEY }}
-        run: python3 collectors/subscription_monitor/_debug_gwanggyo.py
+        run: python3 collectors/subscription_monitor/_debug_net_probe.py
