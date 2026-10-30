@@ -1,0 +1,93 @@
+{
+  "health": {
+    "applyhome": {
+      "consecutive_failures": 0,
+      "hole_alerted": false,
+      "last_note": "목록 10건 파싱",
+      "last_ok": "2026-10-30T20:19:18.862142+09:00"
+    },
+    "gh": {
+      "consecutive_failures": 0,
+      "hole_alerted": false,
+      "last_note": "공고 링크 26건 파싱",
+      "last_ok": "2026-10-30T20:19:18.862142+09:00"
+    },
+    "news": {
+      "consecutive_failures": 0,
+      "hole_alerted": false,
+      "last_note": "기사 200건 확인",
+      "last_ok": "2026-10-30T20:19:18.862142+09:00"
+    }
+  },
+  "last_run": "2026-10-30T20:19:18.862142+09:00",
+  "official_keyword_last_seen": {
+    "광교": "2026-10-30T20:19:18.862142+09:00",
+    "플랫폼시티": "2026-10-30T20:19:18.862142+09:00"
+  },
+  "seen": {
+    "gh:65302": {
+      "first_seen": "2026-10-30T20:19:18.862142+09:00",
+      "source": "gh",
+      "title": "광교 A17블록 자연&센트레빌 지분적립형 분양주택 및 공공분양주택 입주자 모집공고 2026-10-30"
+    },
+    "hm:2026000527": {
+      "first_seen": "2026-10-30T20:19:18.862142+09:00",
+      "source": "applyhome",
+      "title": "광교 자연앤 센트레빌(A17BL) 지분적립형 분양주택"
+    },
+    "hm:2026000528": {
+      "first_seen": "2026-10-30T20:19:18.862142+09:00",
+      "source": "applyhome",
+      "title": "광교 자연앤 센트레빌(A17BL) 공공분양주택"
+    },
+    "hm:2026000535": {
+      "first_seen": "2026-10-30T20:19:18.862142+09:00",
+      "source": "applyhome",
+      "title": "중앙하이츠 구성 플랫폼시티"
+    },
+    "news:https://news.google.com/rss/articles/CBMiWEFVX3lxTE1EVW5Eb0oydlVKY0cxVDNnaEF5X0xobW90Y1VlaVZmU1UyZ0xIZzNCbHh3eTVHSkk2WldOX04wYlNqZUxPTm5USWJRYXlmYm05NThPTGFxZ0jSAVhBVV95cUxNRFVuRG9KMnZVSmNHMVQzZ2hBeV9MaG1vdGNVZWlWZlNVMmdMSGczQmx4d3k1R0pJNlpXTl9OMGJTamVMT05uVEliUWF5ZmJtOTU4T0xhcWdI?oc=5": {
+      "first_seen": "2026-10-30T20:19:18.862142+09:00",
+      "suppressed": "official_recent"
+    },
+    "news:https://news.google.com/rss/articles/CBMiWEFVX3lxTFBPZWZpejNxWkNsdWRicTlSLWduUGc1VEtDODNKQTZlLVlDOUt1cjlVRTFjdXU3d0c5VDFoTUhjQ18zaXQtakN3OVh3YmZJZTMxZHo1dGh1MlI?oc=5": {
+      "first_seen": "2026-10-30T20:19:18.862142+09:00",
+      "suppressed": "official_recent"
+    },
+    "news:https://news.google.com/rss/articles/CBMiaEFVX3lxTE52cXZEVU9mU3c2bDdhOG01OGZMal9ZdlhlTjFkVFBRUTlNRi1zRnJxdjUtUDBDVmhhT3FBdkJqMmRwRjNfUzh6SmphQ0dTb1c4czlYQ2gzdUxYaHpIVnJXak53VndZNnBO?oc=5": {
+      "first_seen": "2026-10-30T20:19:18.862142+09:00",
+      "suppressed": "official_recent"
+    },
+    "news:https://news.google.com/rss/articles/CBMiakFVX3lxTE15aHhJQjI0R09zRVpaY2FzN083YU1wdEJuTlpCV1p3TVhlVFdpbEcwZ3I2TXUtdXM1UW1nei1mSmlIa2lJd28yM29qUXZsajRmNXlUZWRPNWwteXhMVl9FX2R4Ylh6N1dTRGc?oc=5": {
+      "first_seen": "2026-10-30T20:19:18.862142+09:00",
+      "suppressed": "official_recent"
+    },
+    "news:https://news.google.com/rss/articles/CBMiakFVX3lxTFBIRmE1Z1czcG9qR1kyTElsSU0xXzdLOXpRVTFtaUQwTUJUZjhuWWpEamE1Qk54NXhpMm5xV1FQRGF5OFZqSDBUU1Nhb0V3bFhadGhzWk5mZlVzcTE5UkNNMVhMRGpTajRkWkE?oc=5": {
+      "first_seen": "2026-10-30T20:19:18.862142+09:00",
+      "suppressed": "official_recent"
+    },
+    "news:https://news.google.com/rss/articles/CBMib0FVX3lxTE9uWnF5cnI2VDg1Q0hvMFB0U00yRWlOZlE0OW02VEtfWVlPME1BRm05WHNFTFRJN18yTGxvblBDZkJFN0tmdWJDT2ZUTDB0M08zU2t5QzVvWU9GekNHUDNSTUFRaWotdVBLVm82bnFfY9IBckFVX3lxTE9tanUxS1RiMjZNZUdIQjl3MEYwOE5JTDhrZVJybkZHSHctdTNlbllyUDF2YnhvbFN2RkpDelRSOGNEQlM3Q2M2QUM2RXEzc1ByYk1qUHdVNmp0dkFvMlRZNkZaYzduLXFDSGxPM3Q3a0lJZw?oc=5": {
+      "first_seen": "2026-10-30T20:19:18.862142+09:00",
+      "suppressed": "official_recent"
+    },
+    "news:https://news.google.com/rss/articles/CBMibEFVX3lxTE16aEQyT0tyb09QSGRXRGZLVkhOYVkzc211cDV5bVEtWE9mbEdqckxyZm1DWERYc0laclk0REhObHpiZlRLQzBIcEFzNWtabXpVX2F1NE9GUmFXaGxmc0hYTTVTaHdMSWRLclNrQg?oc=5": {
+      "first_seen": "2026-10-30T20:19:18.862142+09:00",
+      "suppressed": "official_recent"
+    },
+    "news:https://news.google.com/rss/articles/CBMibkFVX3lxTE44TDFPeE00dnB5VDFJUFJFQURGOG9wSk9vQ3Y4X0xBc2N6bVUxNHZtbHNSU2xFZGN0Rk9YSjNnZm5XQ01ZcFVKb2F2czgwSzRuM0xXanluOEwzZUZhNHBSdmhEbm92aUhRSlJQVkR3?oc=5": {
+      "first_seen": "2026-10-30T20:19:18.862142+09:00",
+      "suppressed": "official_recent"
+    },
+    "news:https://news.google.com/rss/articles/CBMicEFVX3lxTE4wWnZsbGxRQWlOTy1lWVBscFBBSl90WVRZNUlncnBtZFdJd2tBdk90NXZrWVlaLVhQdG5sdjU3ZmJ4SEtDWnd5S0dIMm9yNXRWYjN5MWRoQlhXRzc4Q0VPczA0a043dnhWVGxrLTktNEXSAXRBVV95cUxNUjdXaG12dVQ2X0xiSnFXamxRdU1ZU3lzOTNVdlZiNUQtXzZKR1BWekdKbmVMbWJOa0pKcFUtZ3d5cERUb09DNG1WaHdQcUxudlBVTnBWQTFUaTQ5eHVCZG5NNFQwd01mWUNfeFdoTHRPdVhBdg?oc=5": {
+      "first_seen": "2026-10-30T20:19:18.862142+09:00",
+      "suppressed": "official_recent"
+    },
+    "news:https://news.google.com/rss/articles/CBMieEFVX3lxTE9iR0Q2aXdtbDZSSmpsSC1yeVVVRDlNcHlfRm1aNmtJTWZyenpvblBIakRQMU5ZOXNBUlF3emh0OGJmY00xTzV0R1RUb2dTRWZaUWc1NktoMUlkaDk2YkZSX2lzTE5nZ0xEbHpDaUo0MGFiTHBZUlotRdIBeEFVX3lxTE9iR0Q2aXdtbDZSSmpsSC1yeVVVRDlNcHlfRm1aNmtJTWZyenpvblBIakRQMU5ZOXNBUlF3emh0OGJmY00xTzV0R1RUb2dTRWZaUWc1NktoMUlkaDk2YkZSX2lzTE5nZ0xEbHpDaUo0MGFiTHBZUlotRQ?oc=5": {
+      "first_seen": "2026-10-30T20:19:18.862142+09:00",
+      "suppressed": "official_recent"
+    },
+    "news:https://news.google.com/rss/articles/CBMifEFVX3lxTFBJMkF6eWN4NnlxZ1UzN09SejlkWTJONHBDLUNLNVJObTBEVEZ6eTlENFhPcHhOMG1RNFdrbDc3YWY5UElZNWZTV253QzNuTU10WWh5TER0UTNVams0TDBnUTNVVGZ6TEJWRlNoMGwzeWRmMWtqeko1OVZxd1c?oc=5": {
+      "first_seen": "2026-10-30T20:19:18.862142+09:00",
+      "suppressed": "official_recent"
+    }
+  }
+}
