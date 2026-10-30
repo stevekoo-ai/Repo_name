@@ -27,7 +27,14 @@ def fetch(params: dict, service_key: str) -> dict:
 def main():
     key = os.environ["DATA_GO_KR_KEY"]
 
-    print("=== 1. HOUSE_MANAGE_NO=2026000528 직접 조회 (필터 없음) ===")
+    print("=== 0. API 헬스체크 (필터 전혀 없음, perPage=1) ===")
+    data = fetch({"page": 1, "perPage": 1}, key)
+    print(f"totalCount={data.get('totalCount')}, matchCount={data.get('matchCount')}")
+    if data.get("data"):
+        print("sample row keys:", list(data["data"][0].keys())[:10])
+        print("sample row:", json.dumps(data["data"][0], ensure_ascii=False)[:500])
+
+    print("\n=== 1. HOUSE_MANAGE_NO=2026000528 직접 조회 (필터 없음) ===")
     data = fetch({"page": 1, "perPage": 10, "cond[HOUSE_MANAGE_NO::EQ]": "2026000528"}, key)
     rows = data.get("data", [])
     print(f"matchCount={data.get('matchCount')}, rows={len(rows)}")
@@ -44,10 +51,10 @@ def main():
             "SUBSCRPT_AREA_CODE_NM": r.get("SUBSCRPT_AREA_CODE_NM"),
         }, ensure_ascii=False, indent=2))
 
-    print("\n=== 2. HOUSE_NM에 '광교' 또는 '센트레빌' 포함 검색 (필터 없음, 오늘 공고일 기준) ===")
+    print("\n=== 2. HOUSE_NM에 '광교' 또는 '센트레빌' 포함 검색 (필터 없음, 날짜형식 YYYY-MM-DD로 수정) ===")
     for kw in ["광교", "센트레빌"]:
         data = fetch({"page": 1, "perPage": 20, "cond[HOUSE_NM::LIKE]": kw,
-                       "cond[RCRIT_PBLANC_DE::GTE]": "20261025"}, key)
+                       "cond[RCRIT_PBLANC_DE::GTE]": "2026-10-25"}, key)
         rows = data.get("data", [])
         print(f"keyword={kw}: matchCount={data.get('matchCount')}, rows={len(rows)}")
         for r in rows:
@@ -56,14 +63,36 @@ def main():
                   f"RCRIT_PBLANC_DE={r.get('RCRIT_PBLANC_DE')} | "
                   f"ADRES={r.get('HSSPLY_ADRES')}")
 
-    print("\n=== 3. 기존 fetch_all() 필터(국민, RCEPT_ENDDE>=오늘)로 이 건이 잡히는지 ===")
+    print("\n=== 2b. HOUSE_NM LIKE 검색, 날짜 필터 완전히 제거 (혹시 날짜 필터 자체가 전체를 죽이는지) ===")
+    for kw in ["광교", "센트레빌", "자연앤"]:
+        data = fetch({"page": 1, "perPage": 20, "cond[HOUSE_NM::LIKE]": kw}, key)
+        rows = data.get("data", [])
+        print(f"keyword={kw} (날짜필터 없음): matchCount={data.get('matchCount')}, rows={len(rows)}")
+        for r in rows[:5]:
+            print(f"  - {r.get('HOUSE_MANAGE_NO')} | {r.get('HOUSE_NM')} | "
+                  f"HOUSE_DTL_SECD_NM={r.get('HOUSE_DTL_SECD_NM')} | "
+                  f"RCRIT_PBLANC_DE={r.get('RCRIT_PBLANC_DE')}")
+
+    print("\n=== 3. 기존 fetch_all() 필터(국민, RCEPT_ENDDE>=오늘, YYYY-MM-DD)로 이 건이 잡히는지 ===")
     import datetime
-    today = datetime.datetime.now().strftime("%Y%m%d")
+    today = datetime.datetime.now().strftime("%Y-%m-%d")
     data = fetch({"page": 1, "perPage": 200, "cond[HOUSE_DTL_SECD_NM::EQ]": "국민",
                    "cond[RCEPT_ENDDE::GTE]": today}, key)
     rows = data.get("data", [])
+    print(f"국민 필터 matchCount={data.get('matchCount')}, rows={len(rows)}")
     found = [r for r in rows if r.get("HOUSE_MANAGE_NO") == "2026000528"]
-    print(f"국민 필터 결과 {len(rows)}건 중 2026000528 포함 여부: {bool(found)}")
+    print(f"2026000528 포함 여부: {bool(found)}")
+
+    print("\n=== 4. HOUSE_DTL_SECD_NM 필터 없이, RCEPT_ENDDE>=오늘만 (전체 유형 분포 확인) ===")
+    data = fetch({"page": 1, "perPage": 200, "cond[RCEPT_ENDDE::GTE]": today}, key)
+    rows = data.get("data", [])
+    print(f"matchCount={data.get('matchCount')}, rows={len(rows)}")
+    secd_counts = {}
+    for r in rows:
+        secd_counts[r.get("HOUSE_DTL_SECD_NM")] = secd_counts.get(r.get("HOUSE_DTL_SECD_NM"), 0) + 1
+    print("HOUSE_DTL_SECD_NM 분포:", secd_counts)
+    found = [r for r in rows if r.get("HOUSE_MANAGE_NO") == "2026000528"]
+    print(f"2026000528 포함 여부(유형필터 없음): {bool(found)}")
 
 
 if __name__ == "__main__":
