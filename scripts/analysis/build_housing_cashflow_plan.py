@@ -28,7 +28,7 @@ lines=[("주거·청약 월별 자금 계획 (2026-11 ~ 2031-12)",BOLD),
 ("",BLK),
 ("하이닉스 자동 매도 규칙(월별 시트 W~Y열)",BOLD),
 ("매달 '앞으로 N개월 확정 지출'을 현금으로 확보하도록 부족분만큼 판다. N = 주가 ≥ 가속가격이면 12, 손절가 미만이면 18, 그 외 6(가정 시트에서 변경).",BLK),
-("주식은 '자유 보유분'만 쓴다 — IRP·DC·하나증권 마크업 67주는 제외(사용자 지시 2026-10-31).",BLK),
+("주식은 '자유 보유분'만 쓴다 — IRP·DC 제외. 하나증권 마크업 67주는 2027-02 해제 후 매도 가능분에 더함(사용자 2026-10-31).",BLK),
 ("",BLK),
 ("주요 출처",BOLD),
 ("광교 A17BL 공고문(sources/gwanggyo-naturen-centreville-a17bl-public-housing-notice-2026-10-30.pdf) 84B 10층 이상 납부표",BLK),
@@ -67,7 +67,9 @@ hdr(r,"② 현재 자산 (2026-10-30 기준)"); r+=1
 inp(r,"cash0","시작 현금 (CMA)",42233169,WON,"KIS 수집 portfolio-cash.csv 2026-10-30"); r+=1
 inp(r,"other0","기타 투자자산 (ISA 내 채권·ETF·삼성전자 등 + 일반계좌 기타)",59760000,WON,"ISA 82.49백만 − ISA 하이닉스 28.36 + 일반 해외 등 약 5.6 (KIS 10/30). ISA 채권 포함(사용자 정정 10/31)"); r+=1
 inp(r,"other_month","기타 투자자산 현금화 월",dt.date(2027,2,1),"yyyy-mm","ISA 채권 만기 2027-01-18 이후 정리 가정"); r+=1
-inp(r,"shares0","하이닉스 자유 보유 주수",183,"#,##0","일반 120 + ISA 20 + 하나 자유분 43. 하나 마크업 67주·IRP·DC는 제외(사용자 지시)"); r+=1
+inp(r,"shares0","하이닉스 자유 보유 주수",183,"#,##0","일반 120 + ISA 20 + 하나 자유분 43. IRP·DC 제외(사용자 지시)"); r+=1
+inp(r,"lock_qty","하나증권 마크업 주수 (해제 후 매도 가능)",67,"#,##0","마크업 8,791,650원, 2027-02-11 해제 — 이후 매도 가능(사용자 10/31)"); r+=1
+inp(r,"lock_month","마크업 해제 월",dt.date(2027,2,1),"yyyy-mm","2027-02-11"); r+=1
 inp(r,"px0","하이닉스 시작 주가 (원)",1418000,WON,"2026-10-30 정규장 종가(한국경제·서울신문)"); r+=1
 inp(r,"deposit_now","현재 전세 보증금 (반환)",462000000,WON,"config/user.yaml, 반환 2027-02-20"); r+=1
 inp(r,"move_month","현재 집 반환·임시 거주 시작 월",dt.date(2027,2,1),"yyyy-mm","실제 이사일 2027-02-20(config/user.yaml)"); r+=1
@@ -260,12 +262,13 @@ for i in range(N):
     # 향후 U개월 지출: S열은 18개월 고정 합이라 U개월로 다시 계산
     fwd=f"SUM(R{r+1}:INDEX(R:R,MIN(ROW()+U{r},{last})))" if r<last else "0"
     m[f"S{r}"]=f"={fwd}"
-    avail=f"({prev_sh}+F{r}-V{r})"
+    rel=f"IF({D}={A['lock_month']},{A['lock_qty']},0)"
+    avail=f"({prev_sh}+F{r}+{rel}-V{r})"
     need=f"MAX(0,MAX({A['min_cash']},S{r})-(T{r}+V{r}*C{r}))"
     m[f"W{r}"]=f"=MIN({avail},ROUNDUP({need}/C{r},0))"
     m[f"X{r}"]=f"=(V{r}+W{r})*C{r}"
     m[f"Y{r}"]=f"=T{r}+X{r}"
-    m[f"Z{r}"]=f"={prev_sh}+F{r}-V{r}-W{r}"
+    m[f"Z{r}"]=f"={prev_sh}+F{r}+{rel}-V{r}-W{r}"
     m[f"AA{r}"]=f"=Z{r}*C{r}"
     prev_dc="0" if r==first else f"AB{p}"
     m[f"AB{r}"]=(f"={prev_dc}+(MONTH({D})=2)*(YEAR({D})=2027)*{A['salary']}*{A['ps26']}*{A['ps_now']}*{A['ps_dc']}"
@@ -284,7 +287,7 @@ for i in range(N):
                  f"+IF({A['sel_sub']}=2,SUMPRODUCT(({A['pf_dates']}>INDEX({A['pf_dates']},1))*({A['pf_dates']}<INDEX({A['pf_dates']},8))*({A['pf_dates']}<={D})*{A['pf_amts']}),0))*({D}<{jan})"
                  f"+IF(AND({A['sel_sub']}=1,{D}>={A['gg_jan']}),{A['gg_fund']},0)"
                  f"+IF(AND({A['sel_sub']}=1,{A['rent_out']}=1,{D}>={A['gg_jan']},{D}<{A['gg_move']}),{A['tenant_dep']},0)")
-    m[f"AF{r}"]=f"=Y{r}+AA{r}+AC{r}+AD{r}-AE{r}+IF({D}<{A['other_month']},{A['other0']},0)"
+    m[f"AF{r}"]=f"=Y{r}+AA{r}+AC{r}+AD{r}-AE{r}+IF({D}<{A['other_month']},{A['other0']},0)+IF({D}<{A['lock_month']},{A['lock_qty']}*C{r},0)"
     m[f"AG{r}"]=f'=IF(Y{r}<0,"현금 부족",IF(Y{r}<{A["min_cash"]},"최소현금 미달",""))'
     for col in range(3,33):
         cell=m.cell(row=r,column=col)
