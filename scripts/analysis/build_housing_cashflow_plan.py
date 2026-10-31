@@ -60,7 +60,7 @@ r=1
 a.cell(row=r,column=1,value="가정 — 파란 글씨는 입력, 노란 칸은 시나리오 선택").font=BOLD; r+=2
 hdr(r,"① 시나리오 선택 (노란 칸)"); r+=1
 inp(r,"sel_house","임시 거주 선택 (1~7, 아래 표)",1,None,"아래 ③ 표 번호",True); r+=1
-inp(r,"sel_sub","청약 시나리오 (1~3)",1,None,"1=광교 당첨, 2=광교 낙첨→플랫폼시티 당첨, 3=둘 다 낙첨",True); r+=1
+inp(r,"sel_sub","청약·매매 시나리오 (1~4)",1,None,"1=광교 당첨, 2=광교 낙첨→플랫폼시티 당첨, 3=둘 다 낙첨, 4=매매(2027-02, 청약 포기)",True); r+=1
 inp(r,"sel_px","하이닉스 주가 시나리오 (1~3)",2,None,"1=비관, 2=기준, 3=낙관 (④ 표)",True); r+=2
 
 hdr(r,"② 현재 자산 (2026-10-30 기준)"); r+=1
@@ -183,13 +183,25 @@ R["pf_dates"]=f"가정!$B${ps_}:$B${pe}"; R["pf_amts"]=f"가정!$C${ps_}:$C${pe}
 hdr(r,"⑧ 중도금 대출 (선택)"); r+=1
 inp(r,"mid_loan","중도금을 대출로 낼지 (1=예, 0=아니오)",0,None,"공고문: 대출 알선은 의무 아님 — GH 확인 필요"); r+=1
 inp(r,"mid_rate","중도금 대출 금리 (이자 후불, 잔금 때 일괄 상환)",0.045,"0.0%","⚠️ 가정"); r+=1
+r+=1
+hdr(r,"⑨ 매매안 (청약 시나리오 4) · 청약 당첨 시 시세"); r+=1
+inp(r,"buy_price","매수 가격 (84㎡)",1300000000,WON,"⚠️ 가정 — 진산푸르지오 호가 13.8~14.3억, 리치고 모델 12.6억(10/29) 사이"); r+=1
+inp(r,"buy_month","매수·입주 월",dt.date(2027,2,1),"yyyy-mm","현 전세 만기와 동시"); r+=1
+inp(r,"ltv","주담대 LTV",0.4,"0%","투기과열지구 무주택 40%(수지 2025-10·기흥 2026-07 지정)"); r+=1
+inp(r,"loan_cap","주담대 한도",600000000,WON,"수도권 주담대 6억 상한(2025-06 대책) — 현행 확인 필요"); r+=1
+inp(r,"mort_rate","주담대 금리",0.045,"0.0%","⚠️ 가정"); r+=1
+inp(r,"mort_years","상환 기간 (년)",30,None,"원리금 균등"); r+=1
+inp(r,"buy_cost","취득 부대비용 (취득세+중개 등)",0.038,"0.0%","취득세 약 3.3% + 중개·등기 약 0.5% — 추정"); r+=1
+inp(r,"house_g","매수 주택 연 상승률",0.02,"0.0%","⚠️ 가정 — 보수적"); r+=1
+inp(r,"gg_market","광교 84㎡ 시세 (잔금 이후 평가)",1500000000,WON,"⚠️ 가정 — 주변 84㎡ 14.8~19.3억 하단"); r+=1
+inp(r,"pf_market","플랫폼시티 84㎡ 시세 (잔금 이후 평가)",1200000000,WON,"⚠️ 가정 — e편한세상 용인역 플랫폼시티 분양 12억(2023)"); r+=1
 
 # ---------------- 월별 ----------------
 m=wb.create_sheet("월별")
 cols=["월","경과월","하이닉스 주가","급여 순저축","PS 현금(세후)","PS 자사주(주)","현재 보증금 반환","기타자산 현금화","청약통장 해지",
 "회사대출 실행","임시거주 보증금 지급/반환","월세","회사대출 이자","청약 납입","중도금 대출 상환·이자","광교 세입자 보증금(+수령/−반환)",
 "기금 이자","순 확정 지출(같은 달 확정 수입 차감)","향후 N개월 지출","현금(매도 전)","선확보 개월 N","T1 매도(주)","자동 매도(주)","매도 대금","현금(월말)",
-"자유 보유 주수(월말)","주식 평가액","DC 누적","임시거주 보증금 보유","청약 납입 누계","대출 잔액(회사+중도금+기금+세입자)","순자산(DC 제외)","경고"]
+"자유 보유 주수(월말)","주식 평가액","DC 누적","임시거주 보증금 보유","청약 납입 누계","대출 잔액(회사+중도금+기금+세입자)","순자산(DC 제외, 주택 시세 반영)","경고","매매 지출(구입·원리금)","매수 주택 평가액","주담대 잔액","청약 주택 시세 차익(잔금 후)"]
 for j,h in enumerate(cols,1):
     c=m.cell(row=1,column=j,value=h); c.font=HDR; c.fill=HFILL; c.alignment=Alignment(wrap_text=True,vertical="center")
     m.column_dimensions[L(j)].width=14
@@ -230,10 +242,10 @@ for i in range(N):
     endm=f"IF({A['sel_sub']}=1,{A['gg_move']},IF({A['sel_sub']}=2,{A['pf_move']},DATE(2099,1,1)))"
     k_since=f"(YEAR({D})*12+MONTH({D})-YEAR({A['move_month']})*12-MONTH({A['move_month']}))"
     dep_t=f"{A['h_dep']}*(1+{A['renew_up']})^INT({k_since}/24)"
-    m[f"K{r}"]=(f"=IF({D}={A['move_month']},-{A['h_dep']},0)"
+    m[f"K{r}"]=(f"=({A['sel_sub']}<>4)*(IF({D}={A['move_month']},-{A['h_dep']},0)"
                 f"+IF(AND({D}>{A['move_month']},{D}<{endm},MOD({k_since},24)=0),-({dep_t}-{A['h_dep']}*(1+{A['renew_up']})^(INT({k_since}/24)-1)),0)"
-                f"+IF({D}={endm},{A['h_dep']}*(1+{A['renew_up']})^INT(({k_since}-1)/24),0)")
-    m[f"L{r}"]=f"=IF(AND({D}>={A['move_month']},{D}<{endm}),-{A['h_rent']}*(1+{A['renew_up']})^INT({k_since}/24),0)"
+                f"+IF({D}={endm},{A['h_dep']}*(1+{A['renew_up']})^INT(({k_since}-1)/24),0))")
+    m[f"L{r}"]=f"=({A['sel_sub']}<>4)*IF(AND({D}>={A['move_month']},{D}<{endm}),-{A['h_rent']}*(1+{A['renew_up']})^INT({k_since}/24),0)"
     m[f"M{r}"]=f"=-({A['loan_old']}+IF(AND({D}>{A['loan_month']},{D}<={endm}),{A['loan_new']},0))*{A['loan_rate']}/12"
     sub_pay=(f"(IF({A['sel_sub']}=1,SUMIFS({A['gg_amts']},{A['gg_dates']},{D}),0)"
              f"+IF({A['sel_sub']}=2,SUMIFS({A['pf_amts']},{A['pf_dates']},{D}),0))")
@@ -252,10 +264,20 @@ for i in range(N):
                 f"IF({D}={A['gg_jan']},{A['tenant_dep']},0)-IF({D}={A['gg_move']},{A['tenant_dep']},0),0)")
     m[f"Q{r}"]=f"=IF(AND({A['sel_sub']}=1,{D}>{A['gg_jan']}),-{A['gg_fund']}*{A['fund_rate']}/12,0)"
     # 확정 지출(음수 항목 합, 양수는 제외) — 선확보 대상
-    m[f"R{r}"]=f"=MAX(0,-(E{r}+G{r}+H{r}+I{r}+J{r}+K{r}+L{r}+M{r}+N{r}+O{r}+P{r}+Q{r}))"
+    m[f"R{r}"]=f"=MAX(0,-(E{r}+G{r}+H{r}+I{r}+J{r}+K{r}+L{r}+M{r}+N{r}+O{r}+P{r}+Q{r}+AH{r}))"
     m[f"S{r}"]=f"=SUM(R{r+1}:R{min(r+18,last)})" if r<last else "=0"
     prev_cash=f"{A['cash0']}" if r==first else f"Y{p}"
-    m[f"T{r}"]=f"={prev_cash}+D{r}+E{r}+G{r}+H{r}+I{r}+J{r}+K{r}+L{r}+M{r}+N{r}+O{r}+P{r}+Q{r}-0"
+    LN=f"MIN({A['buy_price']}*{A['ltv']},{A['loan_cap']})"
+    PM=f"PMT({A['mort_rate']}/12,{A['mort_years']}*12,-{LN})"
+    KB=f"(YEAR({D})*12+MONTH({D})-YEAR({A['buy_month']})*12-MONTH({A['buy_month']}))"
+    m[f"AH{r}"]=(f"=IF({A['sel_sub']}=4,IF({D}={A['buy_month']},-({A['buy_price']}-{LN}+{A['buy_price']}*{A['buy_cost']}),0)"
+                 f"-IF({D}>{A['buy_month']},{PM},0),0)")
+    m[f"AI{r}"]=f"=IF(AND({A['sel_sub']}=4,{D}>={A['buy_month']}),{A['buy_price']}*(1+{A['house_g']})^({KB}/12),0)"
+    m[f"AJ{r}"]=(f"=IF(AND({A['sel_sub']}=4,{D}>={A['buy_month']}),"
+                 f"{LN}*(1+{A['mort_rate']}/12)^{KB}-{PM}*((1+{A['mort_rate']}/12)^{KB}-1)/({A['mort_rate']}/12),0)")
+    m[f"AK{r}"]=(f"=IF(AND({A['sel_sub']}=1,{D}>={A['gg_jan']}),{A['gg_market']}-{A['gg_price']},0)"
+                 f"+IF(AND({A['sel_sub']}=2,{D}>={A['pf_move']}),{A['pf_market']}-{A['pf_price']},0)")
+    m[f"T{r}"]=f"={prev_cash}+D{r}+E{r}+G{r}+H{r}+I{r}+J{r}+K{r}+L{r}+M{r}+N{r}+O{r}+P{r}+Q{r}+AH{r}"
     m[f"U{r}"]=f"=IF(C{r}>={A['px_accel']},{A['n_accel']},IF(C{r}<{A['px_stop']},{A['n_stop']},{A['n_base']}))"
     prev_sh=f"{A['shares0']}" if r==first else f"Z{p}"
     m[f"V{r}"]=f"=IF({D}={A['t1_month']},MIN({A['t1_qty']},{prev_sh}),0)"
@@ -287,9 +309,9 @@ for i in range(N):
                  f"+IF({A['sel_sub']}=2,SUMPRODUCT(({A['pf_dates']}>INDEX({A['pf_dates']},1))*({A['pf_dates']}<INDEX({A['pf_dates']},8))*({A['pf_dates']}<={D})*{A['pf_amts']}),0))*({D}<{jan})"
                  f"+IF(AND({A['sel_sub']}=1,{D}>={A['gg_jan']}),{A['gg_fund']},0)"
                  f"+IF(AND({A['sel_sub']}=1,{A['rent_out']}=1,{D}>={A['gg_jan']},{D}<{A['gg_move']}),{A['tenant_dep']},0)")
-    m[f"AF{r}"]=f"=Y{r}+AA{r}+AC{r}+AD{r}-AE{r}+IF({D}<{A['other_month']},{A['other0']},0)+IF({D}<{A['lock_month']},{A['lock_qty']}*C{r},0)"
+    m[f"AF{r}"]=f"=Y{r}+AA{r}+AC{r}+AD{r}-AE{r}+IF({D}<{A['other_month']},{A['other0']},0)+IF({D}<{A['lock_month']},{A['lock_qty']}*C{r},0)+AI{r}-AJ{r}+AK{r}"
     m[f"AG{r}"]=f'=IF(Y{r}<0,"현금 부족",IF(Y{r}<{A["min_cash"]},"최소현금 미달",""))'
-    for col in range(3,33):
+    for col in list(range(3,33))+[34,35,36,37]:
         cell=m.cell(row=r,column=col)
         if col in (6,21,22,23,26): cell.number_format="#,##0"
         else: cell.number_format=WON
@@ -306,7 +328,7 @@ s=wb.create_sheet("요약",1)
 s.column_dimensions["A"].width=40; s.column_dimensions["B"].width=22; s.column_dimensions["C"].width=50
 rng=lambda c: f"월별!${c}${first}:${c}${last}"
 rows=[("선택: 임시 거주",f"={A['h_name']}",""),
-("선택: 청약",f'=CHOOSE({A["sel_sub"]},"광교 당첨","광교 낙첨→플랫폼시티 당첨","둘 다 낙첨")',""),
+("선택: 청약",f'=CHOOSE({A["sel_sub"]},"광교 당첨","광교 낙첨→플랫폼시티 당첨","둘 다 낙첨","매매(2027-02)")',""),
 ("선택: 주가",f"=INDEX(가정!$D${px_top}:$D${px_top+2},{A['sel_px']})",""),
 ("최저 월말 현금",f"=MIN({rng('Y')})","0 미만이면 계획이 깨진다"),
 ("최저 현금 월",f"=INDEX({rng('A')},MATCH(MIN({rng('Y')}),{rng('Y')},0))",""),
@@ -317,7 +339,7 @@ rows=[("선택: 임시 거주",f"={A['h_name']}",""),
 ("2031-12 자유 보유 주수",f"=INDEX({rng('Z')},{N})",""),
 ("2031-12 하이닉스 주가",f"=INDEX({rng('C')},{N})",""),
 ("2031-12 현금",f"=INDEX({rng('Y')},{N})",""),
-("2031-12 순자산 (DC 제외)",f"=INDEX({rng('AF')},{N})",""),
+("2031-12 순자산 (DC 제외, 주택 시세 반영)",f"=INDEX({rng('AF')},{N})",""),
 ("2031-12 DC 누적 (PS 적립분)",f"=INDEX({rng('AB')},{N})",""),
 ("월세 총지출",f"=-SUM({rng('L')})",""),
 ("판정",f'=IF(MIN({rng("Y")})<0,"❌ 자금 부족 — 대출·매도·거주 선택 조정 필요","✅ 계획대로 가능")',"")]
