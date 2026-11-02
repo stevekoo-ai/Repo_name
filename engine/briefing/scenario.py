@@ -35,6 +35,14 @@ ACTIONS = {
 }
 
 
+def _weekday(iso: str) -> bool:
+    """수집 CSV는 주말에도 직전 거래일 값을 복제한 행이 있다 — 거래일 연속 판정에서 제외(2026-11-02 정정)."""
+    try:
+        return date.fromisoformat(iso).weekday() < 5
+    except ValueError:
+        return False
+
+
 def _last(rows, as_of):
     rows = [(d, v) for d, v in rows if d <= as_of.isoformat()]
     return rows[-1] if rows else None
@@ -56,7 +64,8 @@ def load_hynix_closes() -> list[tuple[str, float]]:
     if p.exists():
         for r in csv.DictReader(p.open(encoding="utf-8")):
             try:
-                out[r["date"]] = float(r["price"])
+                if _weekday(r["date"]):
+                    out[r["date"]] = float(r["price"])
             except (ValueError, KeyError):
                 continue
     return sorted(out.items())
@@ -67,7 +76,7 @@ def load_foreign_flows() -> list[tuple[str, float]]:
     out = {}
     if p.exists():
         for r in csv.DictReader(p.open(encoding="utf-8")):
-            if r.get("ticker") == "000660" and r.get("foreign_net_krw"):
+            if r.get("ticker") == "000660" and r.get("foreign_net_krw") and _weekday(r["date"]):
                 out[r["date"]] = float(r["foreign_net_krw"])
     return sorted(out.items())
 
@@ -82,7 +91,7 @@ def load_breadth() -> list[tuple[str, int, int]]:
                     a, d = int(r["advancers"]), int(r["decliners"])
                 except (ValueError, KeyError):
                     continue
-                if a + d:            # 휴장일 0:0 행은 건너뛴다
+                if a + d and _weekday(r["date"]):   # 휴장일 0:0 행·주말 복제 행은 건너뛴다
                     out[r["date"]] = (a, d)
     return [(k, *v) for k, v in sorted(out.items())]
 

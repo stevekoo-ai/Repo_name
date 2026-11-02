@@ -48,3 +48,17 @@ def test_missing_data_is_unknown_not_safe():
     r = SC.evaluate(D, {}, [], [], [], [])
     assert r["unknown"] >= 5
     assert "판단 불가" in SC.render_markdown(r)
+
+
+def test_loaders_skip_weekend_rows(tmp_path, monkeypatch):
+    """주말 복제 행이 '연속 거래일'·'3일 연속' 판정을 부풀리지 않는다(2026-11-02 정정)."""
+    from engine.briefing import scenario as S
+    (tmp_path / "sk-hynix-price-snapshot.csv").write_text(
+        "date,ticker,price\n2026-10-30,000660,1418000\n2026-10-31,000660,1418000\n"
+        "2026-11-01,000660,1418000\n2026-11-02,000660,1472000\n", encoding="utf-8")
+    (tmp_path / "kr-index-quote.csv").write_text(
+        "date,index_code,advancers,decliners\n2026-10-30,0001,234,656\n2026-10-31,0001,234,656\n"
+        "2026-11-02,0001,653,230\n", encoding="utf-8")
+    monkeypatch.setattr(S, "SOURCES", tmp_path)
+    assert [d for d, _ in S.load_hynix_closes()] == ["2026-10-30", "2026-11-02"]
+    assert [r[0] for r in S.load_breadth()] == ["2026-10-30", "2026-11-02"]
