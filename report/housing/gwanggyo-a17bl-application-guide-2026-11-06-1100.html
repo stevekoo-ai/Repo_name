@@ -1,0 +1,308 @@
+<title>광교 A17BL 청약 실행 가이드</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;700&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+/* Layout: 관공서 서식처럼 단계 번호를 왼쪽 축에 두고, 각 단계 안에 체크리스트와 입력값 표를 둔다. 도장 빨강은 '틀리면 부적격'에만 쓴다. */
+:root{
+  --bg:#f5f7f6; --paper:#ffffff; --ink:#18282a; --muted:#566467; --line:#d6dedd;
+  --accent:#0d6b5e; --accent-soft:#e3f0ed; --seal:#b3232c; --seal-soft:#fbe9ea; --note:#8a6a00; --note-soft:#fbf4dc;
+  --f-body:"IBM Plex Sans KR","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0f1716; --paper:#16211f; --ink:#e4ecea; --muted:#9aaaa7; --line:#2b3a38;
+  --accent:#4fbfa9; --accent-soft:#18302b; --seal:#f0727a; --seal-soft:#3a1c1f; --note:#e2c35a; --note-soft:#332b12; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0f1716; --paper:#16211f; --ink:#e4ecea; --muted:#9aaaa7; --line:#2b3a38;
+  --accent:#4fbfa9; --accent-soft:#18302b; --seal:#f0727a; --seal-soft:#3a1c1f; --note:#e2c35a; --note-soft:#332b12; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15.5px;line-height:1.65;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:28px 64px}
+.wrap{max-width:860px;margin:0 auto;display:flex;flex-direction:column;gap:28px}
+h1,h2,h3{text-wrap:balance;line-height:1.3;margin:0}
+h1{font-size:1.75rem;font-weight:700}
+h2{font-size:1.25rem;font-weight:700}
+h3{font-size:1.02rem;font-weight:700}
+p{margin:0}
+a{color:var(--accent);text-underline-offset:3px}
+a:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.mono{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+header.top{display:flex;flex-direction:column;gap:10px;border-bottom:2px solid var(--ink);padding-bottom:18px}
+.eyebrow{font-size:.78rem;letter-spacing:.08em;color:var(--muted);font-weight:500}
+.meta{display:flex;flex-wrap:wrap;gap:8px 18px;color:var(--muted);font-size:.9rem}
+.box{background:var(--paper);border:1px solid var(--line);border-radius:6px;padding:18px 18px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.seal{border:1.5px solid var(--seal);background:var(--seal-soft)}
+.seal h2,.seal h3{color:var(--seal)}
+.note{background:var(--note-soft);border-left:4px solid var(--note);padding:12px 14px;border-radius:0 6px 6px 0;font-size:.93rem}
+.ok{background:var(--accent-soft);border-left:4px solid var(--accent);padding:12px 14px;border-radius:0 6px 6px 0;font-size:.93rem}
+ol.timeline{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:22px;counter-reset:step}
+ol.timeline>li{display:grid;grid-template-columns:44px 1fr;gap:14px;counter-increment:step}
+ol.timeline>li::before{content:counter(step);display:flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:50%;
+  background:var(--ink);color:var(--paper);font-weight:700;font-family:var(--f-mono);font-size:1.05rem}
+ol.timeline>li>.box{grid-column:2}
+.when{font-family:var(--f-mono);font-size:.85rem;color:var(--accent);font-weight:500}
+ul.check{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+ul.check li{display:grid;grid-template-columns:22px 1fr;gap:8px;align-items:start}
+ul.check input{width:18px;height:18px;margin-top:4px;accent-color:var(--accent)}
+.tbl{overflow-x:auto;border:1px solid var(--line);border-radius:6px}
+table{border-collapse:collapse;width:100%;min-width:560px;font-size:.92rem;background:var(--paper)}
+th,td{border-bottom:1px solid var(--line);padding:9px 10px;text-align:left;vertical-align:top}
+th{background:var(--accent-soft);font-weight:700;white-space:nowrap}
+tr:last-child td{border-bottom:0}
+td.v{font-weight:700}
+td.bad{color:var(--seal);font-weight:500}
+.pill{display:inline-block;font-size:.75rem;font-weight:700;padding:1px 8px;border-radius:99px;border:1px solid currentColor;margin-right:4px}
+.pill.r{color:var(--seal)} .pill.g{color:var(--accent)} .pill.y{color:var(--note)}
+.flow{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:.9rem}
+.flow span{background:var(--accent-soft);padding:3px 9px;border-radius:4px}
+.flow b{color:var(--muted);font-weight:400}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}
+.contact{display:flex;flex-direction:column;gap:2px}
+.contact .mono{font-size:1.05rem}
+footer{color:var(--muted);font-size:.85rem;border-top:1px solid var(--line);padding-top:14px}
+@media (max-width:480px){ol.timeline>li{grid-template-columns:34px 1fr;gap:10px} ol.timeline>li::before{width:32px;height:32px;font-size:.9rem}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div class="wrap">
+<header class="top">
+  <span class="eyebrow">광교 자연앤 센트레빌(A17BL) · 공공분양 84㎡ · 주택관리번호 2026000528</span>
+  <h1>광교 A17BL 청약 실행 가이드</h1>
+  <p>처음 청약하는 Steve님을 위한 순서표입니다. 오늘(11/6 금)부터 계약(12/21)까지 무엇을, 언제, 어디서, 어떻게 하는지 단계별로 정리했습니다. 체크박스는 이 브라우저에만 저장됩니다.</p>
+  <div class="meta"><span>기준: 입주자모집공고 원문(2026-10-30)</span><span>작성: 2026-11-06</span><span>신청일: <b>11/10(화) 09:00~17:30</b></span></div>
+</header>
+
+<section class="box seal">
+  <h2>먼저 확인해야 할 두 가지</h2>
+  <p>둘 중 하나라도 아니면 1순위 자격이 없습니다. 오늘 정부24에서 등본과 초본을 떼서 확인하세요.</p>
+  <ul class="check">
+    <li><input type="checkbox" id="k1"><label for="k1"><b>공고일(2026-10-30) 기준 본인이 세대주</b>인가. 등본 맨 위 '세대주' 칸에 본인 이름이 있어야 합니다. 공고일이 지났으므로 지금 바꿔도 소용없습니다.</label></li>
+    <li><input type="checkbox" id="k2"><label for="k2"><b>2024-10-30 이전부터 경기도에 계속 거주</b>했는가. 초본의 주소 변동 이력에서 이 날짜 이후 경기도 밖으로 전출한 기록이 없어야 합니다.</label></li>
+  </ul>
+  <p>추가로 답이 필요한 것: <b>본인과 배우자 모두 3년 이상 무주택</b>이었는지입니다. 같은 1순위 안에서 이 조건이 우선 순차를 정합니다. 신청 화면에서 이 항목을 사실대로 고르셔야 합니다.</p>
+</section>
+
+<section class="box">
+  <h2>신청 자격 요약 (공고문 원문)</h2>
+  <div class="tbl"><table>
+    <tr><th>항목</th><th>기준</th><th>Steve님 상태</th></tr>
+    <tr><td>순위</td><td>1순위: 무주택 세대주 · 세대 전원 과거 5년 당첨 없음 · 통장 가입 2년 경과 · 24회 이상 납입</td><td>국민은행, 2005-11 가입, 250회 이상 납입 → 통장 요건 충족. 세대주 여부는 확인 필요</td></tr>
+    <tr><td>거주 구분</td><td>해당지역 = 수원시 2년 이상 / 기타경기 = 경기도 2년 이상(2024-10-30 이전부터) / 기타지역 = 경기 2년 미만·서울·인천</td><td class="v">기타경기</td></tr>
+    <tr><td>소득·자산</td><td>일반공급 1순위는 보지 않음</td><td>해당 없음</td></tr>
+    <tr><td>특별공급(11/9)</td><td>다자녀 4인 가구 월평균소득 120% = 10,562,642원 이하</td><td class="bad">소득 초과 → 신청하지 않음</td></tr>
+    <tr><td>당첨자 선정</td><td>1순위 안에서 경쟁 시 ① 3년 이상 무주택이면서 저축총액(월 25만원까지 인정)이 많은 순 ② 저축총액 순</td><td>저축총액 약 2,880만원(추정, 순위확인서로 확인)</td></tr>
+    <tr><td>제한</td><td>재당첨제한 10년 · 전매제한 3년 · 거주의무 5년</td><td>당첨되면 통장은 재사용 불가</td></tr>
+  </table></div>
+</section>
+
+<ol class="timeline">
+
+<li><div class="box">
+  <span class="when">1단계 · 11/6(금) 오늘 · 30분</span>
+  <h3>정부24에서 등본·초본 떼서 자격 확인</h3>
+  <div class="flow"><span>정부24 앱 또는 www.gov.kr</span><b>→</b><span>카카오·토스 인증서 로그인</span><b>→</b><span>주민등록표 등본(초본) 교부</span><b>→</b><span>발급 형태 '전체 포함'</span></div>
+  <ul class="check">
+    <li><input type="checkbox" id="s1a"><label for="s1a">등본 발급 시 <b>세대주 성명·관계, 주민번호 뒷자리, 세대 구성 사유와 일자</b>를 모두 '포함'으로 선택합니다.</label></li>
+    <li><input type="checkbox" id="s1b"><label for="s1b">초본 발급 시 <b>과거 주소 변동 사항 전체, 세대주 성명·관계</b>를 '포함'으로 선택합니다.</label></li>
+    <li><input type="checkbox" id="s1c"><label for="s1c">세대주가 본인인지, 2024-10-30 이전부터 경기도 계속 거주인지 확인합니다. 아니면 저에게 바로 알려 주세요.</label></li>
+  </ul>
+  <p class="note">오늘 뗀 등본·초본은 공고일(10/30) 이후 발급분이라 당첨 후 제출 서류로도 쓸 수 있습니다. PDF로 저장해 두세요. 제출은 원본 출력물로 합니다.</p>
+</div></li>
+
+<li><div class="box">
+  <span class="when">2단계 · 11/7(토) · 30분</span>
+  <h3>청약홈 앱 설치, 인증서 등록, PC 로그인 테스트</h3>
+  <ul class="check">
+    <li><input type="checkbox" id="s2a"><label for="s2a">휴대폰: 앱스토어에서 <b>"청약홈"</b>(한국부동산원) 설치</label></li>
+    <li><input type="checkbox" id="s2b"><label for="s2b">앱에서 <b>카카오 인증서</b>로 로그인. 실패하면 토스 인증서, 신한 인증서 순으로 시도합니다. 공고문상 사용 가능 인증서는 공동·금융·네이버·KB국민·토스·신한·카카오 7종입니다.</label></li>
+    <li><input type="checkbox" id="s2c"><label for="s2c">개인 PC에서 <a href="https://www.applyhome.co.kr" target="_blank" rel="noopener">www.applyhome.co.kr</a> 로그인도 시험합니다. 회사 PC는 보안 프로그램 때문에 막힐 수 있어 쓰지 않습니다.</label></li>
+  </ul>
+  <p class="note">공고문 안내: 모바일 청약은 "청약일 상당 기간 전에 앱을 설치하고 인증서를 미리 등록"하고, 당일 인증서 문제로 곤란하면 PC를 쓰라고 되어 있습니다. 둘 다 미리 되게 해 두는 것이 안전합니다.</p>
+</div></li>
+
+<li><div class="box">
+  <span class="when">3단계 · 11/7(토)~11/8(일) · 30분</span>
+  <h3>청약홈 '청약자격확인' 4가지 조회</h3>
+  <div class="flow"><span>청약홈 로그인</span><b>→</b><span>청약자격확인</span><b>→</b><span>아래 4개 메뉴</span></div>
+  <div class="tbl"><table>
+    <tr><th>메뉴</th><th>입력·선택</th><th>정상 결과</th></tr>
+    <tr><td>세대구성원 등록·조회</td><td>세대원(배우자, 자녀 2명) 확인 또는 등록</td><td>등본과 같은 구성</td></tr>
+    <tr><td>청약제한사항 확인</td><td>본인 조회</td><td>재당첨 제한, 특별공급 제한, 과거 당첨, 부적격 당첨 제한 모두 "없음"</td></tr>
+    <tr><td>주택소유확인</td><td>조회 기준일 <span class="mono">2026-10-30</span></td><td>소유 주택 없음</td></tr>
+    <tr><td>청약통장 순위확인서</td><td>국민은행 통장 선택, 주택 구분 '국민주택', 지역 경기도</td><td>1순위 · 납입 인정 금액 확인</td></tr>
+  </table></div>
+  <ul class="check">
+    <li><input type="checkbox" id="s3a"><label for="s3a">4개 모두 정상 확인</label></li>
+    <li><input type="checkbox" id="s3b"><label for="s3b">순위확인서의 <b>납입 인정 금액</b>을 적어 둡니다: ______________원 (당첨 확률을 다시 계산해 드립니다)</label></li>
+  </ul>
+  <p class="note">메뉴 이름은 사이트 개편으로 조금 다를 수 있습니다. 공고문은 이 4가지를 "청약 신청 전 확인 가능한 청약제한사항"으로 안내합니다.</p>
+</div></li>
+
+<li><div class="box">
+  <span class="when">4단계 · 11/8(일) · 20분</span>
+  <h3>청약 연습으로 실제 화면 미리 보기</h3>
+  <p>청약홈에는 실제와 같은 화면으로 연습해 보는 <b>청약 연습(모의 청약)</b> 메뉴가 있습니다. 아래 5단계 입력표를 옆에 두고 한 번 끝까지 눌러 보세요. 처음 보는 화면은 당일에 실수가 나는 곳입니다.</p>
+  <ul class="check">
+    <li><input type="checkbox" id="s4a"><label for="s4a">연습 화면에서 주택형, 거주 구분, 무주택 관련 질문이 어디에 나오는지 확인</label></li>
+    <li><input type="checkbox" id="s4b"><label for="s4b">배우자와 다시 합의: 11/17 발표되는 어떤 주택에도 배우자는 청약하지 않음(같은 단지 59㎡ 지분적립형 포함). 세대 내 2건이면 모두 부적격입니다.</label></li>
+  </ul>
+  <p class="note">연습 메뉴가 보이지 않으면 청약홈 콜센터 <span class="mono">1644-7445</span>에 "APT 청약 연습 메뉴 위치"를 물어보세요.</p>
+</div></li>
+
+<li><div class="box">
+  <span class="when">5단계 · 11/9(월) 특별공급일 · 10분</span>
+  <h3>신청하지 않고 최종 점검만</h3>
+  <ul class="check">
+    <li><input type="checkbox" id="s5a"><label for="s5a">특별공급은 신청하지 않습니다(소득 초과).</label></li>
+    <li><input type="checkbox" id="s5b"><label for="s5b">휴대폰 충전, 카카오톡 최신 업데이트, PC 로그인 한 번 더 확인</label></li>
+    <li><input type="checkbox" id="s5c"><label for="s5c">아래 6단계 입력표를 한 번 더 읽기</label></li>
+  </ul>
+</div></li>
+
+<li><div class="box seal">
+  <span class="when">6단계 · 11/10(화) 신청일 · 09:00~17:30</span>
+  <h2>일반공급 1순위 신청</h2>
+  <p>선착순이 아닙니다. 09:00에 몰릴 필요 없이 <b>10:00쯤</b> 차분히 하세요. 중간에 17:30이 지나면 접수되지 않으니 오후 늦게 시작하지 마세요.</p>
+  <div class="flow"><span>청약홈 접속</span><b>→</b><span>인증서 로그인</span><b>→</b><span>청약신청</span><b>→</b><span>APT</span><b>→</b><span>신청유형(일반공급 1순위)·주택명 선택</span><b>→</b><span>청약 자격 입력</span><b>→</b><span>인증서 전자서명</span><b>→</b><span>신청 완료</span></div>
+  <p class="eyebrow">위 경로는 공고문 원문 그대로입니다</p>
+
+  <h3>화면별로 무엇을 고르고 쓰나</h3>
+  <div class="tbl"><table>
+    <tr><th>화면·칸</th><th>선택·입력값</th><th>틀리면</th></tr>
+    <tr><td>신청 유형</td><td class="v">APT → 일반공급 → <b>1순위</b></td><td class="bad">특별공급·2순위 선택 금지</td></tr>
+    <tr><td>주택명</td><td class="v">광교 자연앤 센트레빌 <b>[공공분양주택]</b></td><td class="bad">같은 단지 '지분적립형 분양주택'(59㎡) 공고와 이름이 비슷함. 공공분양인지 확인</td></tr>
+    <tr><td>주택형</td><td class="v">전용 84㎡ <b>84B</b></td><td>84A·84C와 혼동 금지. 동·호수는 무작위 추첨이라 고르는 칸 없음</td></tr>
+    <tr><td>거주 구분(지역)</td><td class="v"><b>기타경기</b> (경기도 2년 이상 계속 거주)</td><td class="bad">'해당지역(수원시)'을 고르면 부적격</td></tr>
+    <tr><td>청약통장</td><td class="v">국민은행 (로그인 정보로 자동 조회되는 경우가 많음)</td><td>통장 정보가 안 뜨면 신청 중단 후 콜센터 문의</td></tr>
+    <tr><td>세대주 여부</td><td class="v">예 (1단계에서 확인한 경우에만)</td><td class="bad">사실과 다르면 부적격 · 1년 청약 제한</td></tr>
+    <tr><td>무주택 세대구성원 여부 · 과거 5년 당첨</td><td class="v">무주택 예 · 당첨 사실 없음</td><td class="bad">사실대로</td></tr>
+    <tr><td>3년 이상 무주택 여부</td><td class="v">사실대로 선택 (본인·배우자 기준, 만 30세 또는 혼인신고일부터 계산)</td><td>과장하면 부적격. 이 항목은 답을 알려 주시면 미리 계산해 드립니다</td></tr>
+    <tr><td>최하층 우선배정</td><td class="v">아니오</td><td>65세 이상·장애인 세대만 해당</td></tr>
+    <tr><td>연락처·주소</td><td class="v">본인 휴대폰, 등본상 주소</td><td>예비입주자 안내가 이 연락처로 옵니다</td></tr>
+    <tr><td>입력 내용 확인</td><td class="v">처음부터 끝까지 다시 읽고 <b>화면 캡처</b></td><td>캡처는 나중에 확인용</td></tr>
+    <tr><td>전자서명</td><td class="v">카카오 인증서로 서명</td><td>휴대폰으로 오는 서명 요청 확인</td></tr>
+  </table></div>
+  <p class="note">칸 이름과 순서는 실제 화면과 조금 다를 수 있습니다. 화면 표현이 다르면 위 '선택·입력값' 원칙을 따르세요. 공고문: 청약홈은 신청 시 자격을 검증하지 않고 입력한 내용만으로 당첨자를 정합니다. 그래서 입력 실수는 당첨 후 부적격으로 돌아옵니다.</p>
+
+  <h3>당일 시간표</h3>
+  <div class="tbl"><table>
+    <tr><th>시각</th><th>할 일</th></tr>
+    <tr><td class="mono">09:50</td><td>개인 PC 또는 휴대폰에서 청약홈 로그인</td></tr>
+    <tr><td class="mono">10:00</td><td>위 경로대로 신청 시작</td></tr>
+    <tr><td class="mono">10:15</td><td>입력 내용 확인 화면 캡처 → 전자서명 → 신청 완료 화면 캡처</td></tr>
+    <tr><td class="mono">10:20</td><td><b>청약조회(신청 내역 조회)</b>에서 접수됐는지 확인하고 캡처</td></tr>
+    <tr><td class="mono">오후</td><td>신청 내역을 한 번 더 열어 확인. 틀린 곳이 있으면 17:30 전에 취소 후 다시 신청</td></tr>
+    <tr><td class="mono">14:30</td><td>PC와 휴대폰 모두 실패했다면 청약홈 콜센터 <span class="mono">1644-7445</span>. 은행 창구 접수는 인터넷 청약이 불가능한 경우에 한해 국민은행 지점 09:00~16:00</td></tr>
+    <tr><td class="mono">17:30</td><td>마감. 이후 취소·수정 불가</td></tr>
+  </table></div>
+  <p class="ok"><b>취소 경로(공고문):</b> 청약홈 → 인증서 로그인 → 청약신청 → APT → 청약취소 → 신청 내역 선택 → 전자서명. 신청 당일 17:30까지만 가능합니다.</p>
+</div></li>
+
+<li><div class="box">
+  <span class="when">7단계 · 11/11(수)~11/16(월)</span>
+  <h3>기다리기 · 청약통장 해지 금지</h3>
+  <ul class="check">
+    <li><input type="checkbox" id="s7a"><label for="s7a">청약통장은 계약을 마칠 때까지 해지하지 않습니다.</label></li>
+    <li><input type="checkbox" id="s7b"><label for="s7b">회사 대출(1.5%)이 12월에 실행 가능한지, 서류와 소요 기간을 인사·복지 담당에 문의</label></li>
+  </ul>
+</div></li>
+
+<li><div class="box">
+  <span class="when">8단계 · 11/17(화) 당첨자 발표</span>
+  <h3>당첨 확인과 바로 할 일</h3>
+  <div class="flow"><span>청약홈 로그인</span><b>→</b><span>청약조회 / 당첨조회</span><b>→</b><span>당첨 · 예비입주자 · 낙첨 확인</span></div>
+  <ul class="check">
+    <li><input type="checkbox" id="s8a"><label for="s8a"><b>당첨이면 그날 바로</b> <a href="http://www.gwanggyo-centreville.com" target="_blank" rel="noopener">광교 자연앤 센트레빌 홈페이지</a>에서 서류 제출 <b>사전 방문 예약</b>. 11/19(목) 오전을 권합니다.</label></li>
+    <li><input type="checkbox" id="s8b"><label for="s8b">홈페이지에 게시된 개인정보 동의서 양식을 미리 확인</label></li>
+    <li><input type="checkbox" id="s8c"><label for="s8c">은행 신용대출·마이너스통장 사전 상담 예약(11/18~11/30). 계약금은 중도금 대출 대상이 아닙니다</label></li>
+  </ul>
+  <p class="note">예비입주자로 뽑히면 서류 접수와 동·호수 추첨 일정이 따로 안내됩니다. 기간 안에 서류를 내지 않으면 예비 지위를 잃습니다.</p>
+</div></li>
+
+<li><div class="box seal">
+  <span class="when">9단계 · 11/18(수) 서류 발급 · 11/19(목)~11/24(화) 제출</span>
+  <h2>당첨자 서류</h2>
+  <p>모든 서류는 <b>2026-10-30 이후 발급분</b>이어야 하고, 세대원 포함 <b>주민번호 뒷자리가 전부 보이게</b> 발급해야 합니다. 서류 기간 안에 내지 않으면 당첨과 계약을 포기한 것으로 봅니다. 제출 서류는 돌려받지 못합니다.</p>
+  <div class="tbl"><table>
+    <tr><th>서류</th><th>어디서</th><th>발급 조건</th><th>✓</th></tr>
+    <tr><td>신분증 실물</td><td>-</td><td>주민등록증·운전면허증. 모바일 신분증 불가. 2020-12-21 이후 여권은 여권정보증명서 추가</td><td><input type="checkbox" id="d1" aria-label="신분증"></td></tr>
+    <tr><td>인감증명서 + 인감도장</td><td>주민센터 방문</td><td>본인 발급, 용도 '주택공급신청 및 계약용'. 인감 미등록이면 등록부터. 대체: 본인서명사실확인서(대리 제출 불가). 전자본인서명확인서는 불인정</td><td><input type="checkbox" id="d2" aria-label="인감증명서"></td></tr>
+    <tr><td>주민등록표 등본</td><td>정부24·주민센터</td><td>'전체 포함'. 1단계에서 뗀 것 사용 가능</td><td><input type="checkbox" id="d3" aria-label="등본"></td></tr>
+    <tr><td>주민등록표 초본</td><td>정부24·주민센터</td><td>'전체 포함'(과거 주소 변동, 세대주 성명·관계, 인적사항 변경)</td><td><input type="checkbox" id="d4" aria-label="초본"></td></tr>
+    <tr><td>가족관계증명서(상세)</td><td>정부24(대법원 전자가족관계등록시스템 연결)</td><td>세대원 전원 주민번호 뒷자리 포함 '상세'</td><td><input type="checkbox" id="d5" aria-label="가족관계증명서"></td></tr>
+    <tr><td>혼인관계증명서(상세)</td><td>정부24</td><td>본인·배우자 주민번호 뒷자리 포함 '상세'</td><td><input type="checkbox" id="d6" aria-label="혼인관계증명서"></td></tr>
+    <tr><td>출입국에 관한 사실증명</td><td>정부24</td><td>기록 대조일: 본인 생년월일 ~ <span class="mono">2026-10-30</span>, 출입국 기록 출력 'Y', 주민번호 전체 표시</td><td><input type="checkbox" id="d7" aria-label="출입국사실증명"></td></tr>
+    <tr><td>서약서 · 개인정보 수집·이용 동의서</td><td>견본주택 비치</td><td>현장에서 작성</td><td><input type="checkbox" id="d8" aria-label="서약서"></td></tr>
+  </table></div>
+  <div class="grid2">
+    <div class="contact"><span class="eyebrow">제출 장소 (방문만 가능)</span><b>광교 자연앤 센트레빌 견본주택</b><span>경기도 용인시 수지구 동천동 898번지 일원</span><span>10:00~17:00 · 사전 방문 예약제</span></div>
+    <div class="contact"><span class="eyebrow">본인이 못 가면</span><span>대리인은 모두 제3자로 봅니다(배우자 포함). 위임장, 본인 인감도장과 인감증명서, 본인과 대리인 신분증이 추가로 필요합니다.</span></div>
+  </div>
+</div></li>
+
+<li><div class="box">
+  <span class="when">10단계 · 12/18(금)까지 준비 · 12/21(월)~12/23(수) 계약</span>
+  <h3>계약금 입금과 계약</h3>
+  <div class="tbl"><table>
+    <tr><th>항목</th><th>금액</th><th>방법</th></tr>
+    <tr><td>아파트 계약금</td><td class="mono v">94,890,000원</td><td>세대별 <b>아파트 분양대금 가상계좌</b>(우리은행, 예금주 경기주택도시공사)</td></tr>
+    <tr><td>발코니 확장 계약금(84B)</td><td class="mono v">801,200원</td><td>세대별 <b>발코니 가상계좌</b>(아파트 계좌와 다름)</td></tr>
+    <tr><td>전자수입인지</td><td class="mono v">150,000원</td><td><a href="https://www.e-revenuestamp.or.kr" target="_blank" rel="noopener">e-revenuestamp.or.kr</a> 또는 은행·우체국(우편취급소 불가)에서 종이문서용 구매, 사본 지참. 절반은 잔금에서 차감</td></tr>
+  </table></div>
+  <ul class="check">
+    <li><input type="checkbox" id="s10a"><label for="s10a">은행 1일 이체 한도를 1억 원 이상으로 상향(OTP 또는 창구)</label></li>
+    <li><input type="checkbox" id="s10b"><label for="s10b"><b>본인 명의 계좌</b>에서 입금. 타인 명의로 넣으면 미계약 처리될 수 있습니다. 입금 시 동·호수와 계약자 성명 기재</label></li>
+    <li><input type="checkbox" id="s10c"><label for="s10c">무통장 입금증 또는 이체 확인증 2장(아파트·발코니) 출력</label></li>
+    <li><input type="checkbox" id="s10d"><label for="s10d">홈페이지 양식으로 <b>주택취득 자금 조달 및 입주계획서</b> 작성. 증빙: 예금 잔고, 주식 매도 내역, 대출 계약서</label></li>
+    <li><input type="checkbox" id="s10e"><label for="s10e">계약일 지참: 신분증, 인감증명서와 인감도장, 입금증, 수입인지 사본, 자금조달계획서. 부동산거래계약신고서는 견본주택 비치</label></li>
+  </ul>
+  <p class="note">계약 기간 안에 계약금을 넣어도 계약을 체결하지 않으면 포기로 봅니다. 견본주택에서는 현금을 받지 않습니다. 중도금 1회차는 2027-05-20 94,890,000원이며, 중도금 대출 알선은 사업주체 의무가 아니므로 GH(<span class="mono">1588-0466</span>)에 확인하세요.</p>
+</div></li>
+</ol>
+
+<section class="box seal">
+  <h2>이것만은 하지 마세요</h2>
+  <ul class="check">
+    <li><input type="checkbox" id="x1"><label for="x1">수원시(해당지역)로 신청</label></li>
+    <li><input type="checkbox" id="x2"><label for="x2">지분적립형 59㎡ 공고에 신청하거나, 배우자가 같은 날 발표되는 주택에 신청</label></li>
+    <li><input type="checkbox" id="x3"><label for="x3">17:30 직전에 신청 시작</label></li>
+    <li><input type="checkbox" id="x4"><label for="x4">계약 전에 청약통장 해지</label></li>
+    <li><input type="checkbox" id="x5"><label for="x5">모바일 신분증만 들고 견본주택 방문</label></li>
+    <li><input type="checkbox" id="x6"><label for="x6">주민번호 뒷자리가 가려진(*) 서류 제출</label></li>
+  </ul>
+</section>
+
+<section class="box">
+  <h2>연결할 곳과 연락처</h2>
+  <div class="grid2">
+    <div class="contact"><span class="eyebrow">청약 신청</span><a href="https://www.applyhome.co.kr" target="_blank" rel="noopener">청약홈 www.applyhome.co.kr</a><span>콜센터 <span class="mono">1644-7445</span></span></div>
+    <div class="contact"><span class="eyebrow">서류 발급</span><a href="https://www.gov.kr" target="_blank" rel="noopener">정부24 www.gov.kr</a><span>인감증명서는 주민센터 방문</span></div>
+    <div class="contact"><span class="eyebrow">단지·사전 방문 예약</span><a href="http://www.gwanggyo-centreville.com" target="_blank" rel="noopener">www.gwanggyo-centreville.com</a><span>분양 상담 <span class="mono">031-261-1770</span></span></div>
+    <div class="contact"><span class="eyebrow">사업주체</span><span>경기주택도시공사(GH)</span><span><span class="mono">1588-0466</span></span></div>
+    <div class="contact"><span class="eyebrow">수입인지</span><a href="https://www.e-revenuestamp.or.kr" target="_blank" rel="noopener">www.e-revenuestamp.or.kr</a></div>
+    <div class="contact"><span class="eyebrow">청약통장 은행</span><span>KB국민은행 (현장 접수는 인터넷 불가 시에만)</span></div>
+  </div>
+  <p class="note">공고문: 콜센터와 분양 상담 내용은 법적 효력이 없고, 자격 착오의 책임은 신청자에게 있습니다. 애매하면 공고문 원문 기준으로 판단하세요.</p>
+</section>
+
+<footer>
+  <p>근거: 광교 자연앤 센트레빌(A17BL) 공공분양주택 입주자모집공고(2026-10-30) 원문. 청약홈 메뉴명과 입력 칸의 정확한 이름은 화면에서 직접 확인하지 못했으므로 4단계 청약 연습으로 확인하세요. 저장소: report/housing/gwanggyo-a17bl-application-guide-2026-11-06-1100.html</p>
+</footer>
+</div>
+
+<script>
+(function(){
+  var KEY='gwanggyo-guide-checks';
+  var state={};
+  try{state=JSON.parse(localStorage.getItem(KEY)||'{}')||{};}catch(e){state={};}
+  document.querySelectorAll('input[type=checkbox]').forEach(function(cb){
+    if(state[cb.id]) cb.checked=true;
+    cb.addEventListener('change',function(){
+      state[cb.id]=cb.checked;
+      try{localStorage.setItem(KEY,JSON.stringify(state));}catch(e){}
+    });
+  });
+})();
+</script>
