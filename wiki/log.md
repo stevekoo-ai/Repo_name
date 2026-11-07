@@ -190,3 +190,4 @@ Append-only. Newest entry at the bottom. 운영 규칙: [log-operating-policy.md
 2026-11-06 — QUERY("84A·C는 일반공급 아니야? 청약 시 타입 선택?") → updated monitoring/gwanggyo-a17bl-application-status.md(체크리스트 B). 세 타입 모두 일반공급(84A 10·84B 70·84C 10), 청약은 주택형별 신청(청약홈 표기 084.8159B 등), 변경·취소는 당일 마감 전까지 가능(공고문 p.6) — 직전 답변의 '한 번 신청하면 변경 불가'는 오류로 정정. 동·층·호는 무작위.
 2026-11-07 — USER(모델하우스 현장, "84A는 1705·1706·1709동") → updated monitoring/gwanggyo-a17bl-application-status.md(현장 메모 절 신설). 동·호는 주택형 안에서만 무작위 → 주택형 선택이 곧 동 선택. 84B·84C 동·배치도 대기.
 2026-11-07 — USER(현장, "84B는 1701·1702·1703·1704·1707·1708동") → updated monitoring/gwanggyo-a17bl-application-status.md(현장 메모). 9개 동이 84A(3)·84B(6)로 모두 배정 → 84C·지분적립형은 같은 동 안 라인 혼재. 84C 동·배치도 대기.
+2026-11-07 — QUERY("동·타입 정보는 이미 나와 있구나") → 공고문 원문 동별 유의사항 추출 → updated monitoring/gwanggyo-a17bl-application-status.md(현장 메모). 1705동 지목 항목 없음, 나머지는 쓰레기 보관소·놀이터·통신설비·주출입구 등 국지적. 방향 조건(서측 방음벽·동측 공원 석축·남측 드롭존)은 동 번호 없음 → 배치도 확인 필요. 잠정: 84B 유지.
