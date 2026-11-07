@@ -21,8 +21,10 @@
         "trend_stability": 100.0
       }
     },
-    "warning_active": false,
-    "warnings_kr": [],
+    "warning_active": true,
+    "warnings_kr": [
+      "장단기 금리 역전 심화"
+    ],
     "downgrade_signals": [
       "ppi_sustained_high"
     ],
@@ -51,7 +53,7 @@
           "qoq": 0.968
         },
         "note": null,
-        "last_fresh_at": "2026-11-06T02:36:48.190319+00:00"
+        "last_fresh_at": "2026-11-07T02:03:56.063502+00:00"
       },
       "industrial_production": {
         "value": 124.8,
@@ -64,7 +66,7 @@
           "mom": 12.737127371273708
         },
         "note": null,
-        "last_fresh_at": "2026-11-06T02:36:48.190319+00:00"
+        "last_fresh_at": "2026-11-07T02:03:56.063502+00:00"
       },
       "retail_sales": {
         "value": 58564407.0,
@@ -77,7 +79,7 @@
           "mom": 7.460841489387664
         },
         "note": null,
-        "last_fresh_at": "2026-11-06T02:36:48.190319+00:00"
+        "last_fresh_at": "2026-11-07T02:03:56.063502+00:00"
       },
       "exports": {
         "value": 68.7,
@@ -90,7 +92,7 @@
           "yoy": 68.7
         },
         "note": null,
-        "last_fresh_at": "2026-11-06T02:36:48.190319+00:00"
+        "last_fresh_at": "2026-11-07T02:03:56.063502+00:00"
       },
       "semiconductor_exports": {
         "value": 206.1,
@@ -103,7 +105,7 @@
           "yoy": 206.1
         },
         "note": null,
-        "last_fresh_at": "2026-11-06T02:36:48.190319+00:00"
+        "last_fresh_at": "2026-11-07T02:03:56.063502+00:00"
       },
       "current_account": {
         "value": 61457.5,
@@ -116,7 +118,7 @@
           "avg_3m": 49882.833333333336
         },
         "note": null,
-        "last_fresh_at": "2026-11-06T02:36:48.190319+00:00"
+        "last_fresh_at": "2026-11-07T02:03:56.063502+00:00"
       },
       "cpi": {
         "value": 120.73,
@@ -129,7 +131,7 @@
           "yoy": 2.818940555271676
         },
         "note": null,
-        "last_fresh_at": "2026-11-06T02:36:48.190319+00:00"
+        "last_fresh_at": "2026-11-07T02:03:56.063502+00:00"
       },
       "ppi": {
         "value": 129.78,
@@ -142,7 +144,7 @@
           "yoy": 7.665505226480832
         },
         "note": null,
-        "last_fresh_at": "2026-11-06T02:36:48.190319+00:00"
+        "last_fresh_at": "2026-11-07T02:03:56.063502+00:00"
       },
       "unemployment": {
         "value": 2.0,
@@ -155,7 +157,7 @@
           "avg_3m_change": -0.666666666666667
         },
         "note": null,
-        "last_fresh_at": "2026-11-06T02:36:48.190319+00:00"
+        "last_fresh_at": "2026-11-07T02:03:56.063502+00:00"
       },
       "us_global": {
         "value": 0.6666666666666666,
@@ -166,7 +168,7 @@
         "source": "FRED",
         "fields": {},
         "note": null,
-        "last_fresh_at": "2026-11-06T02:36:48.190319+00:00"
+        "last_fresh_at": "2026-11-07T02:03:56.063502+00:00"
       }
     },
     "us_investment_clock": {
@@ -210,13 +212,13 @@
     "downgrade_signals": [
       "cpi_reaccelerating",
       "ppi_sustained_high",
+      "yield_curve_inversion_deepening",
       "trade_balance_widening"
     ],
     "upgrade_signals": [
       "gdp_strong",
       "retail_sales_strong",
-      "industrial_production_strong",
-      "unemployment_improving"
+      "industrial_production_strong"
     ],
     "changes": [
       {
@@ -237,7 +239,7 @@
           "qoq": 3.4
         },
         "note": null,
-        "last_fresh_at": "2026-11-06T02:36:48.190319+00:00"
+        "last_fresh_at": "2026-11-07T02:03:56.063502+00:00"
       },
       "industrial_production": {
         "value": 103.9506,
@@ -250,7 +252,7 @@
           "mom": 0.6625581989882381
         },
         "note": null,
-        "last_fresh_at": "2026-11-06T02:36:48.190319+00:00"
+        "last_fresh_at": "2026-11-07T02:03:56.063502+00:00"
       },
       "retail_sales": {
         "value": 745021.0,
@@ -263,7 +265,7 @@
           "mom": 0.7708413925190919
         },
         "note": null,
-        "last_fresh_at": "2026-11-06T02:36:48.190319+00:00"
+        "last_fresh_at": "2026-11-07T02:03:56.063502+00:00"
       },
       "cpi": {
         "value": 336.298,
@@ -276,7 +278,7 @@
           "yoy": 4.023310268457831
         },
         "note": null,
-        "last_fresh_at": "2026-11-06T02:36:48.190319+00:00"
+        "last_fresh_at": "2026-11-07T02:03:56.063502+00:00"
       },
       "ppi": {
         "value": 295.708,
@@ -289,20 +291,20 @@
           "yoy": 12.842391262869507
         },
         "note": null,
-        "last_fresh_at": "2026-11-06T02:36:48.190319+00:00"
+        "last_fresh_at": "2026-11-07T02:03:56.063502+00:00"
       },
       "unemployment": {
-        "value": 4.2,
+        "value": 4.1,
         "score": 1,
         "weight": 0.8,
         "status": "ok",
         "label": "미국 실업률 (3개월 평균 변화, %p)",
         "source": "FRED",
         "fields": {
-          "avg_3m_change": -0.13333333333333375
+          "avg_3m_change": -0.06666666666666732
         },
         "note": null,
-        "last_fresh_at": "2026-11-06T02:36:48.190319+00:00"
+        "last_fresh_at": "2026-11-07T02:03:56.063502+00:00"
       },
       "trade_balance": {
         "value": -105047.0,
@@ -315,20 +317,20 @@
           "avg_3m": -101203.33333333333
         },
         "note": null,
-        "last_fresh_at": "2026-11-06T02:36:48.190319+00:00"
+        "last_fresh_at": "2026-11-07T02:03:56.063502+00:00"
       },
       "yield_curve": {
-        "value": 0.38,
+        "value": 0.35,
         "score": 0,
         "weight": 0.7,
         "status": "ok",
         "label": "미국 10년-2년 국채 금리차 (%p)",
         "source": "FRED",
         "fields": {
-          "spread": 0.38
+          "spread": 0.35
         },
         "note": null,
-        "last_fresh_at": "2026-11-06T02:36:48.190319+00:00"
+        "last_fresh_at": "2026-11-07T02:03:56.063502+00:00"
       }
     }
   },
@@ -391,7 +393,7 @@
         "kr_score": 1,
         "us_score": 1,
         "kr_value": 2.0,
-        "us_value": 4.2,
+        "us_value": 4.1,
         "relationship": "sync"
       },
       {
@@ -404,8 +406,8 @@
         "relationship": "diverge"
       }
     ],
-    "narrative": "미국은 현재 Recession 국면, 한국은 Early Expansion 국면입니다. 한국이 사이클상 미국보다 뒤처져 있어, 미국에서 먼저 나타난 흐름이 시차를 두고 한국에 파급될 가능성을 주시할 필요가 있습니다. 비교 가능한 6개 핵심 지표 중 83%가 미국과 같은 방향으로 움직이고 있습니다. 미국 쪽에 경고 신호가 있지만 한국은 아직 뚜렷한 경고 신호가 없어, 미국발 리스크가 한국에는 아직 본격적으로 옮겨오지 않은 것으로 보입니다 — 다만 선행 지표로 계속 관찰이 필요합니다. 방향이 엇갈린 지표: CPI — 이 부분이 한국이 미국과 다르게 가는 지점입니다."
+    "narrative": "미국은 현재 Recession 국면, 한국은 Early Expansion 국면입니다. 한국이 사이클상 미국보다 뒤처져 있어, 미국에서 먼저 나타난 흐름이 시차를 두고 한국에 파급될 가능성을 주시할 필요가 있습니다. 비교 가능한 6개 핵심 지표 중 83%가 미국과 같은 방향으로 움직이고 있습니다. 미국과 한국 모두 경고 신호가 있어, 이번 흐름은 한국만의 국지적 문제가 아니라 글로벌 사이클 자체의 위험 신호일 가능성이 있습니다. 방향이 엇갈린 지표: CPI — 이 부분이 한국이 미국과 다르게 가는 지점입니다."
   },
   "month": "2026-11",
-  "saved_at": "2026-11-06T02:37:19.158924+00:00"
+  "saved_at": "2026-11-07T02:04:19.753722+00:00"
 }
