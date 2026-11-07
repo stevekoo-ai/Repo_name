@@ -1,5 +1,5 @@
 {
-  "checked_at": "2026-11-07T16:32:17.326875+00:00",
+  "checked_at": "2026-11-07T22:01:35.714375+00:00",
   "statuses": [
     {
       "slug": "macro-series",
@@ -8,7 +8,7 @@
       "severity": "critical",
       "state": "OK",
       "detail": "fetched_at=2026-11-07T01:53:15+00:00",
-      "age_hours": 14.650683309722222
+      "age_hours": 20.13914662388889
     },
     {
       "slug": "hynix-price-snapshot",
@@ -17,7 +17,7 @@
       "severity": "critical",
       "state": "OK",
       "detail": "fetched_at=2026-11-07T16:08:02+00:00",
-      "age_hours": 0.40431682611111114
+      "age_hours": 5.892790215833333
     },
     {
       "slug": "hynix-investor-flow",
@@ -26,7 +26,7 @@
       "severity": "warning",
       "state": "OK",
       "detail": "마지막 성공=2026-11-07T16:07:59+00:00",
-      "age_hours": 0.40515424333333333
+      "age_hours": 5.893630255555556
     },
     {
       "slug": "hynix-adr-quote",
@@ -35,7 +35,7 @@
       "severity": "warning",
       "state": "OK",
       "detail": "fetched_at=2026-11-07T16:08:01+00:00",
-      "age_hours": 0.40459957694444443
+      "age_hours": 5.893076253611111
     },
     {
       "slug": "hynix-credit-balance",
@@ -44,7 +44,7 @@
       "severity": "warning",
       "state": "OK",
       "detail": "fetched_at=2026-11-07T16:08:03+00:00",
-      "age_hours": 0.4040449058333333
+      "age_hours": 5.892522283333333
     },
     {
       "slug": "hynix-short-sale",
@@ -53,7 +53,7 @@
       "severity": "warning",
       "state": "OK",
       "detail": "fetched_at=2026-11-07T16:08:06+00:00",
-      "age_hours": 0.403212475
+      "age_hours": 5.891690605833333
     },
     {
       "slug": "kr-index-quote",
@@ -62,7 +62,7 @@
       "severity": "warning",
       "state": "OK",
       "detail": "fetched_at=2026-11-07T16:08:04+00:00",
-      "age_hours": 0.40376896361111114
+      "age_hours": 5.892247857222222
     },
     {
       "slug": "portfolio-etf-nav",
@@ -71,7 +71,7 @@
       "severity": "warning",
       "state": "OK",
       "detail": "fetched_at=2026-11-07T16:08:07+00:00",
-      "age_hours": 0.4029365883333333
+      "age_hours": 5.891416250833333
     },
     {
       "slug": "portfolio-holdings",
@@ -80,7 +80,7 @@
       "severity": "critical",
       "state": "OK",
       "detail": "fetched_at=2026-11-07T16:18:50+00:00",
-      "age_hours": 0.22432782694444445
+      "age_hours": 5.712809156944444
     },
     {
       "slug": "portfolio-bonds",
@@ -89,7 +89,7 @@
       "severity": "critical",
       "state": "OK",
       "detail": "fetched_at=2026-11-07T16:18:52+00:00",
-      "age_hours": 0.22377407500000002
+      "age_hours": 5.712256716111111
     },
     {
       "slug": "hyperscaler-capex",
@@ -98,7 +98,7 @@
       "severity": "warning",
       "state": "OK",
       "detail": "마지막 성공=2026-11-03T02:45:59+00:00",
-      "age_hours": 109.77183093111111
+      "age_hours": 115.26031461722222
     },
     {
       "slug": "ai-periphery-fundamentals",
@@ -107,7 +107,7 @@
       "severity": "warning",
       "state": "OK",
       "detail": "fetched_at=2026-11-03T02:46:08+00:00",
-      "age_hours": 109.76933103388889
+      "age_hours": 115.25781479694444
     },
     {
       "slug": "bottleneck-prices",
@@ -116,7 +116,7 @@
       "severity": "warning",
       "state": "OK",
       "detail": "fetched_at=2026-11-07T01:53:17+00:00",
-      "age_hours": 14.650166195833334
+      "age_hours": 20.138651195833333
     },
     {
       "slug": "real-estate-apartment-sale",
@@ -124,8 +124,8 @@
       "workflow": "real-estate-sync.yml",
       "severity": "warning",
       "state": "OK",
-      "detail": "마지막 성공=2026-11-06T22:30:19+00:00",
-      "age_hours": 18.03294536888889
+      "detail": "마지막 성공=2026-11-07T21:12:37+00:00",
+      "age_hours": 0.8164312055555556
     },
     {
       "slug": "real-estate-apartment-rent",
@@ -133,8 +133,8 @@
       "workflow": "real-estate-sync.yml",
       "severity": "warning",
       "state": "OK",
-      "detail": "마지막 성공=2026-11-06T22:32:12+00:00",
-      "age_hours": 18.001556973055557
+      "detail": "마지막 성공=2026-11-07T21:14:28+00:00",
+      "age_hours": 0.7855986836111111
     },
     {
       "slug": "subscription-monitor",
