@@ -189,3 +189,4 @@ Append-only. Newest entry at the bottom. 운영 규칙: [log-operating-policy.md
 2026-11-06 03:20 UTC — USER CONFIRM 무주택 세대주 맞음·3년 이상 무주택 → 1순위 순차 ①(3년 이상 무주택+저축총액) 해당. 남은 확인: 2024-10-30 이전부터 경기 계속 거주, 순위확인서 납입인정금액 → updated monitoring/gwanggyo-a17bl-application-status.md, report/housing/gwanggyo-a17bl-application-guide-2026-11-06-1100.html(v2)
 2026-11-06 — QUERY("84A·C는 일반공급 아니야? 청약 시 타입 선택?") → updated monitoring/gwanggyo-a17bl-application-status.md(체크리스트 B). 세 타입 모두 일반공급(84A 10·84B 70·84C 10), 청약은 주택형별 신청(청약홈 표기 084.8159B 등), 변경·취소는 당일 마감 전까지 가능(공고문 p.6) — 직전 답변의 '한 번 신청하면 변경 불가'는 오류로 정정. 동·층·호는 무작위.
 2026-11-07 — USER(모델하우스 현장, "84A는 1705·1706·1709동") → updated monitoring/gwanggyo-a17bl-application-status.md(현장 메모 절 신설). 동·호는 주택형 안에서만 무작위 → 주택형 선택이 곧 동 선택. 84B·84C 동·배치도 대기.
+2026-11-07 — USER(현장, "84B는 1701·1702·1703·1704·1707·1708동") → updated monitoring/gwanggyo-a17bl-application-status.md(현장 메모). 9개 동이 84A(3)·84B(6)로 모두 배정 → 84C·지분적립형은 같은 동 안 라인 혼재. 84C 동·배치도 대기.
