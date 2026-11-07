@@ -18,6 +18,7 @@ Catalog of every page in the wiki. See `../CLAUDE.md` for conventions.
 
 ### summaries
 
+- [광교 자연앤 센트레빌(A17BL) 공공분양 입주자모집공고 — 전문 DB 요약](summaries/gwanggyo-a17bl-public-notice.md) — 🆕 2026-11-07. 43쪽 전체 정독 → 전문 텍스트(sources, 쪽별) + 구조화 DB(data/notices/gwanggyo-a17bl-2026000528.json: 공급표·층별 분양가 36행 검산·납부·옵션·자격 + 17~43쪽 항목 404개) + 주제별 요약·질문별 찾아보기. 광교 관련 질문은 이 페이지 → DB → 전문 grep 순으로 답한다
 - [SK하이닉스 반등 전망 분석 (2026-07-13)](summaries/sk-hynix-rebound-analysis-2026-07-13.md) — 7/13 급락 후 단기 반등 신호와 핵심 변수 정리
 - [SK하이닉스 본주·ADR 차트 비교 (2026-07-13)](summaries/sk-hynix-adr-krw-chart-comparison-2026-07-13.md) — 차트 실측: 본주 -16.15%, ADR은 고점 대비 -15.1%까지 낙폭 확대 (동반 급락 심화)
 - [계좌 현황 스냅샷 (2026-07-13)](summaries/portfolio-holdings-2026-07-13.md) — 4개 계좌 33개 보유 종목 전체 스냅샷, 총 손익 +157.83%
