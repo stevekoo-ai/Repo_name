@@ -1,5 +1,7 @@
 # LLM Wiki 운영 파일·소스 목록
 
+> ⚠️ 2026-11-07: 이 목록은 sources 154개 시점의 옛 기록이다. 최신 전체 지도는 [architecture/repository-map.md](architecture/repository-map.md)를 본다.
+
 이 저장소에는 **LLM Wiki 본체**와, 그 안에서 데이터 소스로만 참조되는
 **별도의 PEOS/Investment Clock 자동화 시스템**이 함께 있다. 헷갈리지
 않게 구분해서 정리한다.

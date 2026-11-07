@@ -156,6 +156,7 @@ See:
 - wiki/architecture/concept-lifecycle.md
 - wiki/architecture/entity-lifecycle.md
 - wiki/architecture/decision-intelligence.md
+- wiki/architecture/repository-map.md — 🆕 2026-11-07, **새 터미널 온보딩 단일 출처.** 저장소 전체 지도(폴더·파일 수·자동화 KST 시간표·진행 중 과제·규칙·알려진 버그). 스킬 `.claude/skills/steves-wiki-navigator/SKILL.md`가 이 문서를 읽게 한다.
 - wiki/architecture/automation-pipeline-reference.md — 🆕 2026-08-31, GitHub Actions 17개 워크플로 + Claude Routine 4개 전수 조사. 어떤 자동화가 무엇을 언제(KST) 수집해서 어디(sources/·data/·report/·docs/)에 저장하는지, 재시도/실패알림 메커니즘, 데이터 저장 위치 전체 맵을 한 문서로 정리 — 새 세션이 코드를 뒤지지 않고 자동화 구조를 파악하는 단일 출처.
 
 ---
