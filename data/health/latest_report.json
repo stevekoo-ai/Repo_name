@@ -1,5 +1,5 @@
 {
-  "checked_at": "2026-11-08T16:44:09.233775+00:00",
+  "checked_at": "2026-11-08T22:16:10.145003+00:00",
   "statuses": [
     {
       "slug": "macro-series",
@@ -8,7 +8,7 @@
       "severity": "critical",
       "state": "OK",
       "detail": "fetched_at=2026-11-08T01:24:29+00:00",
-      "age_hours": 15.327887452222221
+      "age_hours": 20.861486729444444
     },
     {
       "slug": "hynix-price-snapshot",
@@ -17,7 +17,7 @@
       "severity": "critical",
       "state": "OK",
       "detail": "fetched_at=2026-11-08T16:31:28+00:00",
-      "age_hours": 0.2115261838888889
+      "age_hours": 5.7451285258333336
     },
     {
       "slug": "hynix-investor-flow",
@@ -26,7 +26,7 @@
       "severity": "warning",
       "state": "OK",
       "detail": "마지막 성공=2026-11-08T16:31:24+00:00",
-      "age_hours": 0.21264239666666665
+      "age_hours": 5.746246148611111
     },
     {
       "slug": "hynix-adr-quote",
@@ -35,7 +35,7 @@
       "severity": "warning",
       "state": "OK",
       "detail": "fetched_at=2026-11-08T16:31:27+00:00",
-      "age_hours": 0.211810085
+      "age_hours": 5.745414317777778
     },
     {
       "slug": "hynix-credit-balance",
@@ -44,7 +44,7 @@
       "severity": "warning",
       "state": "OK",
       "detail": "fetched_at=2026-11-08T16:31:29+00:00",
-      "age_hours": 0.2112556113888889
+      "age_hours": 5.744860310833333
     },
     {
       "slug": "hynix-short-sale",
@@ -53,7 +53,7 @@
       "severity": "warning",
       "state": "OK",
       "detail": "fetched_at=2026-11-08T16:31:31+00:00",
-      "age_hours": 0.21070115333333334
+      "age_hours": 5.744306369722222
     },
     {
       "slug": "kr-index-quote",
@@ -62,7 +62,7 @@
       "severity": "warning",
       "state": "OK",
       "detail": "fetched_at=2026-11-08T16:31:30+00:00",
-      "age_hours": 0.21098008527777778
+      "age_hours": 5.744585811944445
     },
     {
       "slug": "portfolio-etf-nav",
@@ -71,7 +71,7 @@
       "severity": "warning",
       "state": "OK",
       "detail": "fetched_at=2026-11-08T16:31:32+00:00",
-      "age_hours": 0.21042594194444447
+      "age_hours": 5.744031935833333
     },
     {
       "slug": "portfolio-holdings",
@@ -80,7 +80,7 @@
       "severity": "critical",
       "state": "OK",
       "detail": "fetched_at=2026-11-08T16:37:16+00:00",
-      "age_hours": 0.11487336027777778
+      "age_hours": 5.648480235277778
     },
     {
       "slug": "portfolio-bonds",
@@ -89,7 +89,7 @@
       "severity": "critical",
       "state": "OK",
       "detail": "fetched_at=2026-11-08T16:37:18+00:00",
-      "age_hours": 0.11432000277777778
+      "age_hours": 5.647927587777778
     },
     {
       "slug": "hyperscaler-capex",
@@ -98,7 +98,7 @@
       "severity": "warning",
       "state": "OK",
       "detail": "마지막 성공=2026-11-03T02:45:59+00:00",
-      "age_hours": 133.96959934361112
+      "age_hours": 139.50320760527777
     },
     {
       "slug": "ai-periphery-fundamentals",
@@ -107,7 +107,7 @@
       "severity": "warning",
       "state": "OK",
       "detail": "fetched_at=2026-11-03T02:46:08+00:00",
-      "age_hours": 133.96709947666665
+      "age_hours": 139.50070777083334
     },
     {
       "slug": "bottleneck-prices",
@@ -116,7 +116,7 @@
       "severity": "warning",
       "state": "OK",
       "detail": "fetched_at=2026-11-08T01:24:31+00:00",
-      "age_hours": 15.327379513611112
+      "age_hours": 20.8609884175
     },
     {
       "slug": "real-estate-apartment-sale",
@@ -124,8 +124,8 @@
       "workflow": "real-estate-sync.yml",
       "severity": "warning",
       "state": "OK",
-      "detail": "마지막 성공=2026-11-07T21:12:37+00:00",
-      "age_hours": 19.525714632777778
+      "detail": "마지막 성공=2026-11-08T21:28:11+00:00",
+      "age_hours": 0.7998794797222223
     },
     {
       "slug": "real-estate-apartment-rent",
@@ -133,8 +133,8 @@
       "workflow": "real-estate-sync.yml",
       "severity": "warning",
       "state": "OK",
-      "detail": "마지막 성공=2026-11-07T21:14:28+00:00",
-      "age_hours": 19.494881883888887
+      "detail": "마지막 성공=2026-11-08T21:29:34+00:00",
+      "age_hours": 0.7768247233333333
     },
     {
       "slug": "subscription-monitor",
