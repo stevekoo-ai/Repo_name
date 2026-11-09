@@ -4,24 +4,24 @@
       "consecutive_failures": 0,
       "hole_alerted": false,
       "last_note": "목록 10건 파싱",
-      "last_ok": "2026-11-09T18:39:43.162930+09:00"
+      "last_ok": "2026-11-10T05:39:54.154215+09:00"
     },
     "gh": {
       "consecutive_failures": 0,
       "hole_alerted": false,
       "last_note": "공고 링크 26건 파싱",
-      "last_ok": "2026-11-09T18:39:43.162930+09:00"
+      "last_ok": "2026-11-10T05:39:54.154215+09:00"
     },
     "news": {
       "consecutive_failures": 0,
       "hole_alerted": false,
-      "last_note": "기사 151건 확인",
-      "last_ok": "2026-11-09T18:39:43.162930+09:00"
+      "last_note": "기사 153건 확인",
+      "last_ok": "2026-11-10T05:39:54.154215+09:00"
     }
   },
-  "last_run": "2026-11-09T18:39:43.162930+09:00",
+  "last_run": "2026-11-10T05:39:54.154215+09:00",
   "official_keyword_last_seen": {
-    "광교": "2026-11-09T18:39:43.162930+09:00",
+    "광교": "2026-11-10T05:39:54.154215+09:00",
     "플랫폼시티": "2026-11-06T11:18:53.070336+09:00"
   },
   "seen": {
@@ -135,6 +135,10 @@
     },
     "news:https://news.google.com/rss/articles/CBMickFVX3lxTE5CZjRjczNDWEQxeDJ1X0ZLbVRpMjRxWndfT2pGdWtORU5Wck5yVE5NWklnOWpiMlNBSXVYMm02NnNOQklXd216SHpuZEtxU3ZCWGtIUE1oSnFNM3dVa0pqQ1lPNUFyYThMNFRsb0NQNFdQdw?oc=5": {
       "first_seen": "2026-11-06T11:18:53.070336+09:00",
+      "suppressed": "official_recent"
+    },
+    "news:https://news.google.com/rss/articles/CBMidkFVX3lxTE1HUnR0VGQ5MTVCZ2IzdEcyU2JJX3VLaTlfZWcxQzBmakl2ZEl4aHNpQXQ0aUg1cWdWb29BN0puNjYtaW5iQU9zUjl5Ri14cE11Yk5NM2ktN0xsUl81TW5BNGRwb0VuWjB4UlM3akpXLWQ0bVNpNUHSAWZBVV95cUxNeG9wUFh1WXBDeEJRQ2l5MUFIMWNxN0ZtRVFrX2JQSFZvWXk5ak9hTHo3RFBfUjBWTVpFUTJhaDlmeFhFTXl5S0RLRjYtWllqeXlrYTdxb0FfSEFOcF9DeV81b0N1Snc?oc=5": {
+      "first_seen": "2026-11-10T05:39:54.154215+09:00",
       "suppressed": "official_recent"
     },
     "news:https://news.google.com/rss/articles/CBMieEFVX3lxTE9iR0Q2aXdtbDZSSmpsSC1yeVVVRDlNcHlfRm1aNmtJTWZyenpvblBIakRQMU5ZOXNBUlF3emh0OGJmY00xTzV0R1RUb2dTRWZaUWc1NktoMUlkaDk2YkZSX2lzTE5nZ0xEbHpDaUo0MGFiTHBZUlotRdIBeEFVX3lxTE9iR0Q2aXdtbDZSSmpsSC1yeVVVRDlNcHlfRm1aNmtJTWZyenpvblBIakRQMU5ZOXNBUlF3emh0OGJmY00xTzV0R1RUb2dTRWZaUWc1NktoMUlkaDk2YkZSX2lzTE5nZ0xEbHpDaUo0MGFiTHBZUlotRQ?oc=5": {
