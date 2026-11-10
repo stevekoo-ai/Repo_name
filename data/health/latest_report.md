@@ -1,29 +1,29 @@
-# 데이터 헬스 — 2026-11-09T20:51:18.974259+00:00
+# 데이터 헬스 — 2026-11-10T04:11:49.654189+00:00
 
 ⚠️ 26/44개 소스 이상
 - 🟠 **normalized-series-sweep** [ANOMALY] data/normalized/*.csv 전수 스윕 (237개 시리즈) — ok 210 / 이상 25 / 알려진 설계상 이상(비알림) 2 — 상세는 개별 normalized:* 항목 참고
-- 🟠 **normalized:fred_kr_retail_sales_mom_oecd** [STALE] 정규화 시리즈: fred_kr_retail_sales_mom_oecd (monthly) — STALE — 최신 2026-08-01, 100일 경과
-- 🟠 **normalized:fred_kr_unemployment_oecd** [STALE] 정규화 시리즈: fred_kr_unemployment_oecd (monthly) — STALE — 최신 2026-08-01, 100일 경과
-- 🟠 **normalized:imf_current_account_chn** [STALE] 정규화 시리즈: imf_current_account_chn (annual) — STALE — 최신 2025-01-01, 677일 경과
-- 🟠 **normalized:imf_current_account_jpn** [STALE] 정규화 시리즈: imf_current_account_jpn (annual) — STALE — 최신 2025-01-01, 677일 경과
-- 🟠 **normalized:imf_current_account_kor** [STALE] 정규화 시리즈: imf_current_account_kor (annual) — STALE — 최신 2025-01-01, 677일 경과
-- 🟠 **normalized:imf_current_account_usa** [STALE] 정규화 시리즈: imf_current_account_usa (annual) — STALE — 최신 2025-01-01, 677일 경과
-- 🟠 **normalized:imf_gdp_growth_chn** [STALE] 정규화 시리즈: imf_gdp_growth_chn (annual) — STALE — 최신 2025-01-01, 677일 경과
-- 🟠 **normalized:imf_gdp_growth_jpn** [STALE] 정규화 시리즈: imf_gdp_growth_jpn (annual) — STALE — 최신 2025-01-01, 677일 경과
-- 🟠 **normalized:imf_gdp_growth_kor** [STALE] 정규화 시리즈: imf_gdp_growth_kor (annual) — STALE — 최신 2025-01-01, 677일 경과
-- 🟠 **normalized:imf_gdp_growth_usa** [STALE] 정규화 시리즈: imf_gdp_growth_usa (annual) — STALE — 최신 2025-01-01, 677일 경과
-- 🟠 **normalized:imf_govt_debt_chn** [STALE] 정규화 시리즈: imf_govt_debt_chn (annual) — STALE — 최신 2025-01-01, 677일 경과
-- 🟠 **normalized:imf_govt_debt_jpn** [STALE] 정규화 시리즈: imf_govt_debt_jpn (annual) — STALE — 최신 2025-01-01, 677일 경과
-- 🟠 **normalized:imf_govt_debt_kor** [STALE] 정규화 시리즈: imf_govt_debt_kor (annual) — STALE — 최신 2025-01-01, 677일 경과
-- 🟠 **normalized:imf_govt_debt_usa** [STALE] 정규화 시리즈: imf_govt_debt_usa (annual) — STALE — 최신 2025-01-01, 677일 경과
-- 🟠 **normalized:imf_inflation_chn** [STALE] 정규화 시리즈: imf_inflation_chn (annual) — STALE — 최신 2025-01-01, 677일 경과
-- 🟠 **normalized:imf_inflation_jpn** [STALE] 정규화 시리즈: imf_inflation_jpn (annual) — STALE — 최신 2025-01-01, 677일 경과
-- 🟠 **normalized:imf_inflation_kor** [STALE] 정규화 시리즈: imf_inflation_kor (annual) — STALE — 최신 2025-01-01, 677일 경과
-- 🟠 **normalized:imf_inflation_usa** [STALE] 정규화 시리즈: imf_inflation_usa (annual) — STALE — 최신 2025-01-01, 677일 경과
-- 🟠 **normalized:imf_unemployment_chn** [STALE] 정규화 시리즈: imf_unemployment_chn (annual) — STALE — 최신 2025-01-01, 677일 경과
-- 🟠 **normalized:imf_unemployment_jpn** [STALE] 정규화 시리즈: imf_unemployment_jpn (annual) — STALE — 최신 2025-01-01, 677일 경과
-- 🟠 **normalized:imf_unemployment_kor** [STALE] 정규화 시리즈: imf_unemployment_kor (annual) — STALE — 최신 2025-01-01, 677일 경과
-- 🟠 **normalized:imf_unemployment_usa** [STALE] 정규화 시리즈: imf_unemployment_usa (annual) — STALE — 최신 2025-01-01, 677일 경과
-- 🟠 **normalized:motie_semiconductor_exports_usd_100m** [STALE] 정규화 시리즈: motie_semiconductor_exports_usd_100m (monthly) — STALE — 최신 2026-08-01, 100일 경과
-- 🟠 **normalized:motie_semiconductor_exports_yoy** [STALE] 정규화 시리즈: motie_semiconductor_exports_yoy (monthly) — STALE — 최신 2026-08-01, 100일 경과
-- 🟠 **normalized:motie_total_exports_yoy** [STALE] 정규화 시리즈: motie_total_exports_yoy (monthly) — STALE — 최신 2026-08-01, 100일 경과
+- 🟠 **normalized:fred_kr_retail_sales_mom_oecd** [STALE] 정규화 시리즈: fred_kr_retail_sales_mom_oecd (monthly) — STALE — 최신 2026-08-01, 101일 경과
+- 🟠 **normalized:fred_kr_unemployment_oecd** [STALE] 정규화 시리즈: fred_kr_unemployment_oecd (monthly) — STALE — 최신 2026-08-01, 101일 경과
+- 🟠 **normalized:imf_current_account_chn** [STALE] 정규화 시리즈: imf_current_account_chn (annual) — STALE — 최신 2025-01-01, 678일 경과
+- 🟠 **normalized:imf_current_account_jpn** [STALE] 정규화 시리즈: imf_current_account_jpn (annual) — STALE — 최신 2025-01-01, 678일 경과
+- 🟠 **normalized:imf_current_account_kor** [STALE] 정규화 시리즈: imf_current_account_kor (annual) — STALE — 최신 2025-01-01, 678일 경과
+- 🟠 **normalized:imf_current_account_usa** [STALE] 정규화 시리즈: imf_current_account_usa (annual) — STALE — 최신 2025-01-01, 678일 경과
+- 🟠 **normalized:imf_gdp_growth_chn** [STALE] 정규화 시리즈: imf_gdp_growth_chn (annual) — STALE — 최신 2025-01-01, 678일 경과
+- 🟠 **normalized:imf_gdp_growth_jpn** [STALE] 정규화 시리즈: imf_gdp_growth_jpn (annual) — STALE — 최신 2025-01-01, 678일 경과
+- 🟠 **normalized:imf_gdp_growth_kor** [STALE] 정규화 시리즈: imf_gdp_growth_kor (annual) — STALE — 최신 2025-01-01, 678일 경과
+- 🟠 **normalized:imf_gdp_growth_usa** [STALE] 정규화 시리즈: imf_gdp_growth_usa (annual) — STALE — 최신 2025-01-01, 678일 경과
+- 🟠 **normalized:imf_govt_debt_chn** [STALE] 정규화 시리즈: imf_govt_debt_chn (annual) — STALE — 최신 2025-01-01, 678일 경과
+- 🟠 **normalized:imf_govt_debt_jpn** [STALE] 정규화 시리즈: imf_govt_debt_jpn (annual) — STALE — 최신 2025-01-01, 678일 경과
+- 🟠 **normalized:imf_govt_debt_kor** [STALE] 정규화 시리즈: imf_govt_debt_kor (annual) — STALE — 최신 2025-01-01, 678일 경과
+- 🟠 **normalized:imf_govt_debt_usa** [STALE] 정규화 시리즈: imf_govt_debt_usa (annual) — STALE — 최신 2025-01-01, 678일 경과
+- 🟠 **normalized:imf_inflation_chn** [STALE] 정규화 시리즈: imf_inflation_chn (annual) — STALE — 최신 2025-01-01, 678일 경과
+- 🟠 **normalized:imf_inflation_jpn** [STALE] 정규화 시리즈: imf_inflation_jpn (annual) — STALE — 최신 2025-01-01, 678일 경과
+- 🟠 **normalized:imf_inflation_kor** [STALE] 정규화 시리즈: imf_inflation_kor (annual) — STALE — 최신 2025-01-01, 678일 경과
+- 🟠 **normalized:imf_inflation_usa** [STALE] 정규화 시리즈: imf_inflation_usa (annual) — STALE — 최신 2025-01-01, 678일 경과
+- 🟠 **normalized:imf_unemployment_chn** [STALE] 정규화 시리즈: imf_unemployment_chn (annual) — STALE — 최신 2025-01-01, 678일 경과
+- 🟠 **normalized:imf_unemployment_jpn** [STALE] 정규화 시리즈: imf_unemployment_jpn (annual) — STALE — 최신 2025-01-01, 678일 경과
+- 🟠 **normalized:imf_unemployment_kor** [STALE] 정규화 시리즈: imf_unemployment_kor (annual) — STALE — 최신 2025-01-01, 678일 경과
+- 🟠 **normalized:imf_unemployment_usa** [STALE] 정규화 시리즈: imf_unemployment_usa (annual) — STALE — 최신 2025-01-01, 678일 경과
+- 🟠 **normalized:motie_semiconductor_exports_usd_100m** [STALE] 정규화 시리즈: motie_semiconductor_exports_usd_100m (monthly) — STALE — 최신 2026-08-01, 101일 경과
+- 🟠 **normalized:motie_semiconductor_exports_yoy** [STALE] 정규화 시리즈: motie_semiconductor_exports_yoy (monthly) — STALE — 최신 2026-08-01, 101일 경과
+- 🟠 **normalized:motie_total_exports_yoy** [STALE] 정규화 시리즈: motie_total_exports_yoy (monthly) — STALE — 최신 2026-08-01, 101일 경과
