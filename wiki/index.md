@@ -4,6 +4,7 @@ Catalog of every page in the wiki. See `../CLAUDE.md` for conventions.
 
 ### ops (운영 — sync 전 가장 먼저 읽을 것)
 
+- [시장 거물 발언 추적](monitoring/market-voices-tracker-status.md) — 🆕 2026-11-11, 켄 그리핀(활성) 외 드러켄밀러·달리오·막스·버리·튜더 존스·다이먼·젠슨 황·메로트라 후보. AI·반도체·거시 공개 발언을 시간순으로 쌓고 하이닉스 함의를 붙인다. 매주 일 20:13 KST 예약 작업이 "활성" 대상만 자동 갱신
 - [저장소 지도 — 새 터미널 온보딩](architecture/repository-map.md) — 🆕 2026-11-07, **처음 여는 터미널은 이것부터.** 폴더별 역할과 파일 수(실측), wiki 하위 구조, sources CSV 목록과 주의점(NXT 덮어쓰기), GitHub Actions 26개와 Claude 루틴 4개의 KST 시간표, 진행 중인 사용자 과제, 지킬 규칙, 알려진 버그. 스킬 `.claude/skills/steves-wiki-navigator`가 이 문서를 가리킨다
 - [Log 운영 정책 — 다중 Agent 공유 규칙](concepts/log-operating-policy.md) — 🆕 2026-08-07, 모든 Agent가 `wiki/log.md`를 쓸 때 지킬 규칙(R1~R6) + 3-tier 구조(누가 갱신) + 3층 자동화가 하는 일 + "돌고 있는지" 확인 4곳 + 회사망 업로드 우회. **Agent는 회전을 건드리지 않고 `## 당일 log` 맨 아래에만 append.** 세션 시작 시 한 번 읽을 것 — log 운영 규칙·degradation 표의 단일 출처.
 - [로그 로테이션 3인 하이브리드 자동화 — 인프라](concepts/log-rotation-3hybrid-infra.md) — 🆕 2026-08-07, wiki/log.md를 매일 00:20 KST에 GitHub Actions(`.github/workflows/log-rotate.yml`, main 배포 완료)가 자동으로 일자별 cut → `log-archive/YYYY-MM/YYYY-MM-DD.md` 이관. 실배포 완료(2026-08-07 run id 31153363185 success, commit cbf80c2). 스크립트: `scripts/log_rotate.py`(deterministic, LLM 없음, dry-run 지원). Windows 층(`scripts/log_summarize_routine.bat`, 00:40 KST)은 스크립트 완성·수동검증 완료(빈 stdout 해결)했으나 **schtasks 미등록** — `## 당월 요약` 갱신은 아직 수동. 산출물·배포 이력은 이 페이지, 운영 규칙·degradation 표는 [log-operating-policy.md](concepts/log-operating-policy.md).
