@@ -4,24 +4,24 @@
       "consecutive_failures": 0,
       "hole_alerted": false,
       "last_note": "목록 10건 파싱",
-      "last_ok": "2026-11-12T19:56:05.679983+09:00"
+      "last_ok": "2026-11-13T03:51:04.997051+09:00"
     },
     "gh": {
       "consecutive_failures": 0,
       "hole_alerted": false,
       "last_note": "공고 링크 26건 파싱",
-      "last_ok": "2026-11-12T19:56:05.679983+09:00"
+      "last_ok": "2026-11-13T03:51:04.997051+09:00"
     },
     "news": {
       "consecutive_failures": 0,
       "hole_alerted": false,
-      "last_note": "기사 168건 확인",
-      "last_ok": "2026-11-12T19:56:05.679983+09:00"
+      "last_note": "기사 173건 확인",
+      "last_ok": "2026-11-13T03:51:04.997051+09:00"
     }
   },
-  "last_run": "2026-11-12T19:56:05.679983+09:00",
+  "last_run": "2026-11-13T03:51:04.997051+09:00",
   "official_keyword_last_seen": {
-    "광교": "2026-11-12T19:56:05.679983+09:00",
+    "광교": "2026-11-13T03:51:04.997051+09:00",
     "플랫폼시티": "2026-11-06T11:18:53.070336+09:00"
   },
   "seen": {
@@ -201,6 +201,10 @@
       "first_seen": "2026-10-30T20:19:18.862142+09:00",
       "suppressed": "official_recent"
     },
+    "news:https://news.google.com/rss/articles/CBMickFVX3lxTE1QYnhoSHNkZTNzcW5kU2M0ekpndGV1NzJxUzBWVDZKanBQaEN3b0ZqVk9wMHFVT1BJQnhkRTU2aTUzemp1Uk5veHJDci1xX3F5N0UzS1NXeU5qVXppRmlZUXRuRGhidDJGMjIwdlhKNU01UdIBdEFVX3lxTE9EQmJhZk1jQjVIME4xR042clVCeXJVQjBQaTF0RXV4NUF3d0ltMS1LYmhTRE50dXhCeGRhNUhjbE5KOWpmZkdocUpnR3J1alVMMG1PNE54SEZYU0IzVUJYd2ZaY0ZLR0M2WmYzMGMwRUxiWkFS?oc=5": {
+      "first_seen": "2026-11-13T03:51:04.997051+09:00",
+      "suppressed": "official_recent"
+    },
     "news:https://news.google.com/rss/articles/CBMickFVX3lxTE5CZjRjczNDWEQxeDJ1X0ZLbVRpMjRxWndfT2pGdWtORU5Wck5yVE5NWklnOWpiMlNBSXVYMm02NnNOQklXd216SHpuZEtxU3ZCWGtIUE1oSnFNM3dVa0pqQ1lPNUFyYThMNFRsb0NQNFdQdw?oc=5": {
       "first_seen": "2026-11-06T11:18:53.070336+09:00",
       "suppressed": "official_recent"
@@ -219,6 +223,10 @@
     },
     "news:https://news.google.com/rss/articles/CBMieEFVX3lxTE9iR0Q2aXdtbDZSSmpsSC1yeVVVRDlNcHlfRm1aNmtJTWZyenpvblBIakRQMU5ZOXNBUlF3emh0OGJmY00xTzV0R1RUb2dTRWZaUWc1NktoMUlkaDk2YkZSX2lzTE5nZ0xEbHpDaUo0MGFiTHBZUlotRdIBeEFVX3lxTE9iR0Q2aXdtbDZSSmpsSC1yeVVVRDlNcHlfRm1aNmtJTWZyenpvblBIakRQMU5ZOXNBUlF3emh0OGJmY00xTzV0R1RUb2dTRWZaUWc1NktoMUlkaDk2YkZSX2lzTE5nZ0xEbHpDaUo0MGFiTHBZUlotRQ?oc=5": {
       "first_seen": "2026-10-30T20:19:18.862142+09:00",
+      "suppressed": "official_recent"
+    },
+    "news:https://news.google.com/rss/articles/CBMifEFVX3lxTE5pR0lIci1VemRoMzlwZTdZUkQ3UXVwTm95c3I3UkR6bko3TE1BYnI4eWpEVVlQLTI3UlYxeDJYR2trZWFUWVpyZkZKRi1nNnNWZENXNlJFV0Z6R2RwUDdzVVloVUgyamhMQTU3MWg3cHZBdU1VSzU4UnBfYUw?oc=5": {
+      "first_seen": "2026-11-13T03:51:04.997051+09:00",
       "suppressed": "official_recent"
     },
     "news:https://news.google.com/rss/articles/CBMifEFVX3lxTFBJMkF6eWN4NnlxZ1UzN09SejlkWTJONHBDLUNLNVJObTBEVEZ6eTlENFhPcHhOMG1RNFdrbDc3YWY5UElZNWZTV253QzNuTU10WWh5TER0UTNVams0TDBnUTNVVGZ6TEJWRlNoMGwzeWRmMWtqeko1OVZxd1c?oc=5": {
