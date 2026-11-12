@@ -208,3 +208,4 @@ Append-only. Newest entry at the bottom. 운영 규칙: [log-operating-policy.md
 2026-11-11 01:00 UTC — ARCH 사용자 "켄 그리핀 계속 트레이스 + 비슷한 인물" → created monitoring/market-voices-tracker-status.md(그리핀 활성, 9명 후보), 주간 예약 작업 등록 예정; updated wiki/index.md
 2026-11-11 13:41 UTC — ARCH 예약 작업 등록 "시장 거물 발언 주간 추적"(trig_0129HYfq8eU3s2x95u4FeR4E, 매주 일 20:13 KST, 새 세션, 푸시 알림, 커넥터 없음) — 첫 실행 2026-11-15 → updated architecture/repository-map.md 7-2
 2026-11-12 KST — QUERY("A13 청약 관련 추가 내용 조사") → 위키·저장소 데이터(net_state.json 청약홈·GH 게시판 수집분)·웹검색 5회(광교 A13, 광교 A13BL GH, 플랫폼시티 A13, 경기 A13블록 2026, bizwatch 원문) 모두 A13 공고·계획 없음. GH는 "광교 A17을 시작으로 지분적립형을 3기 신도시 등으로 확대" 계획만 밝힘. 블록 지구명 확인 필요(사용자에게 질의).
+2026-11-12 KST — QUERY("광교 A17 청약 추가 내용 조사") → 1순위 전체 147.04:1(23,820건), 특공 지분형 71.34/공공 39.47, 수원 외 신청 12,676, 하남교산 263.28(당첨선 미공개), 호반베르디움 84㎡ 14.12억(차익 약 4.75억, 보수 기준). 커트라인 여전히 비공개. 예비입주자 500%·저축총액 순·홈페이지 공지 경로 강조(11/17 예비번호 확인). updated monitoring/gwanggyo-a17bl-application-status.md.
