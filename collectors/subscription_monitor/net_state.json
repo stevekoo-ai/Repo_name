@@ -4,24 +4,24 @@
       "consecutive_failures": 0,
       "hole_alerted": false,
       "last_note": "목록 10건 파싱",
-      "last_ok": "2026-11-13T09:12:36.317432+09:00"
+      "last_ok": "2026-11-13T16:12:46.589727+09:00"
     },
     "gh": {
       "consecutive_failures": 0,
       "hole_alerted": false,
       "last_note": "공고 링크 26건 파싱",
-      "last_ok": "2026-11-13T09:12:36.317432+09:00"
+      "last_ok": "2026-11-13T16:12:46.589727+09:00"
     },
     "news": {
       "consecutive_failures": 0,
       "hole_alerted": false,
-      "last_note": "기사 170건 확인",
-      "last_ok": "2026-11-13T09:12:36.317432+09:00"
+      "last_note": "기사 169건 확인",
+      "last_ok": "2026-11-13T16:12:46.589727+09:00"
     }
   },
-  "last_run": "2026-11-13T09:12:36.317432+09:00",
+  "last_run": "2026-11-13T16:12:46.589727+09:00",
   "official_keyword_last_seen": {
-    "광교": "2026-11-13T09:12:36.317432+09:00",
+    "광교": "2026-11-13T16:12:46.589727+09:00",
     "플랫폼시티": "2026-11-06T11:18:53.070336+09:00"
   },
   "seen": {
@@ -155,6 +155,10 @@
     },
     "news:https://news.google.com/rss/articles/CBMiakFVX3lxTE15aHhJQjI0R09zRVpaY2FzN083YU1wdEJuTlpCV1p3TVhlVFdpbEcwZ3I2TXUtdXM1UW1nei1mSmlIa2lJd28yM29qUXZsajRmNXlUZWRPNWwteXhMVl9FX2R4Ylh6N1dTRGc?oc=5": {
       "first_seen": "2026-10-30T20:19:18.862142+09:00",
+      "suppressed": "official_recent"
+    },
+    "news:https://news.google.com/rss/articles/CBMiakFVX3lxTE9yWHRtR2pDM2ZuUktTMzZDaVRkNjYtQ21nWDlwV2xfNnV0ZlZ2Vk5JZFJfUzUtOVBkbFhTTlUtQWd0VUZ5cm5DeEI1Unpqd0VlTnVCcXNJaGpxRW8xZ29ORFgwblRiLVZoakE?oc=5": {
+      "first_seen": "2026-11-13T16:12:46.589727+09:00",
       "suppressed": "official_recent"
     },
     "news:https://news.google.com/rss/articles/CBMiakFVX3lxTFBIRmE1Z1czcG9qR1kyTElsSU0xXzdLOXpRVTFtaUQwTUJUZjhuWWpEamE1Qk54NXhpMm5xV1FQRGF5OFZqSDBUU1Nhb0V3bFhadGhzWk5mZlVzcTE5UkNNMVhMRGpTajRkWkE?oc=5": {
