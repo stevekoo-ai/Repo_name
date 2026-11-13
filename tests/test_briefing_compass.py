@@ -31,7 +31,7 @@ def test_seventh_thread_is_refused_until_something_is_pruned():
 
 def test_verbose_status_is_refused():
     c = _c()
-    C.update(c, "T1", "가" * 200, None, "2026-09-25")
+    C.update(c, c["threads"][0]["id"], "가" * 200, None, "2026-09-25")
     with pytest.raises(C.CompassError):
         C.validate(c)
 
