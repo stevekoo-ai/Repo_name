@@ -1385,3 +1385,5 @@ timestamp_utc,workflow,step,attempts_used,max_attempts,result
 2026-11-12T23:00:37Z,real-estate-sync,apartment_rent,1,36,success
 2026-11-12T23:02:07Z,real-estate-sync,villa_sale,1,36,success
 2026-11-12T23:03:03Z,real-estate-sync,officetel_sale,1,36,success
+2026-11-13T01:03:55Z,macro-data-sync,macro_sync,1,36,success
+2026-11-13T01:03:59Z,macro-data-sync,bottleneck_prices,1,3,success
