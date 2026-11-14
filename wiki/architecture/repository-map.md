@@ -194,6 +194,7 @@ tags: [architecture, onboarding, repository-map, ops]
 | PEOS 주간 전망 v3 | 토 07:30 | WEEKEND |
 | 관세청 수출입 잠정치 | 매월 11일·21일 13:00~18:00 매시 | 웹검색 → `exports_preliminary.yaml` → 상관 차트 재생성 |
 | 시장 거물 발언 주간 추적 (2026-11-11 추가) | 일 20:13 | `wiki/monitoring/market-voices-tracker-status.md`의 "활성" 인물(켄 그리핀 등) 새 발언을 검색 → Check History 추가 → push. 새 발언이 없으면 조용히 종료 |
+| 엔비디아 3분기 실적 분석 (1회성, 2026-11-14 추가) | 2026-11-18 08:40 | 실적·가이던스·크레스 메시지 정리 → ai-capex 페이지 기록 → 푸시 알림 |
 
 브리핑 루틴은 팩(`data/briefing/pack_*.md`)만 근거로 쓰고, 매수·매도 지시를 금지한다(R4). 추적 질문은 [briefing-compass](../concepts/briefing-compass.md)가 이어 준다.
 
