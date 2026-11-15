@@ -1425,3 +1425,4 @@ timestamp_utc,workflow,step,attempts_used,max_attempts,result
 2026-11-14T21:51:14Z,real-estate-sync,officetel_sale,1,36,success
 2026-11-14T23:53:29Z,macro-data-sync,macro_sync,1,36,success
 2026-11-14T23:53:33Z,macro-data-sync,bottleneck_prices,1,3,success
+2026-11-15T01:11:45Z,core10-collect,core10,1,4,success
