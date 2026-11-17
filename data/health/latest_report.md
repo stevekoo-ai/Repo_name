@@ -1,15 +1,13 @@
-# 데이터 헬스 — 2026-11-17T02:59:31.762134+00:00
+# 데이터 헬스 — 2026-11-17T13:38:17.922319+00:00
 
-⚠️ 38/56개 소스 이상
-- 🟠 **normalized-series-sweep** [ANOMALY] data/normalized/*.csv 전수 스윕 (237개 시리즈) — ok 198 / 이상 37 / 알려진 설계상 이상(비알림) 2 — 상세는 개별 normalized:* 항목 참고
+⚠️ 36/54개 소스 이상
+- 🟠 **normalized-series-sweep** [ANOMALY] data/normalized/*.csv 전수 스윕 (237개 시리즈) — ok 200 / 이상 35 / 알려진 설계상 이상(비알림) 2 — 상세는 개별 normalized:* 항목 참고
 - 🟠 **normalized:bls_us_job_openings** [STALE] 정규화 시리즈: bls_us_job_openings (monthly) — STALE — 최신 2026-09-01, 77일 경과
 - 🟠 **normalized:ecos_current_account** [STALE] 정규화 시리즈: ecos_current_account (monthly) — STALE — 최신 2026-09-01, 77일 경과
 - 🟠 **normalized:ecos_ppi_yoy_level** [STALE] 정규화 시리즈: ecos_ppi_yoy_level (monthly) — STALE — 최신 2026-09-01, 77일 경과
-- 🟠 **normalized:fred_kr_retail_sales_mom_oecd** [STALE] 정규화 시리즈: fred_kr_retail_sales_mom_oecd (monthly) — STALE — 최신 2026-08-01, 108일 경과
-- 🟠 **normalized:fred_kr_unemployment_oecd** [STALE] 정규화 시리즈: fred_kr_unemployment_oecd (monthly) — STALE — 최신 2026-08-01, 108일 경과
-- 🟠 **normalized:fred_us_dollar_index** [STALE] 정규화 시리즈: fred_us_dollar_index (daily) — STALE — 최신 2026-11-06, 11일 경과
+- 🟠 **normalized:fred_kr_retail_sales_mom_oecd** [STALE] 정규화 시리즈: fred_kr_retail_sales_mom_oecd (monthly) — STALE — 최신 2026-09-01, 77일 경과
+- 🟠 **normalized:fred_kr_unemployment_oecd** [STALE] 정규화 시리즈: fred_kr_unemployment_oecd (monthly) — STALE — 최신 2026-09-01, 77일 경과
 - 🟠 **normalized:fred_us_industrial_production** [STALE] 정규화 시리즈: fred_us_industrial_production (monthly) — STALE — 최신 2026-09-01, 77일 경과
-- 🟠 **normalized:fred_us_oecd_cli** [STALE] 정규화 시리즈: fred_us_oecd_cli (monthly) — STALE — 최신 2026-09-01, 77일 경과
 - 🟠 **normalized:fred_us_retail_sales** [STALE] 정규화 시리즈: fred_us_retail_sales (monthly) — STALE — 최신 2026-09-01, 77일 경과
 - 🟠 **normalized:fred_us_trade_balance** [STALE] 정규화 시리즈: fred_us_trade_balance (monthly) — STALE — 최신 2026-09-01, 77일 경과
 - 🟠 **normalized:imf_current_account_chn** [STALE] 정규화 시리즈: imf_current_account_chn (annual) — STALE — 최신 2025-01-01, 685일 경과
