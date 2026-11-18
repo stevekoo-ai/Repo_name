@@ -4,24 +4,24 @@
       "consecutive_failures": 0,
       "hole_alerted": false,
       "last_note": "목록 10건 파싱",
-      "last_ok": "2026-11-18T10:16:07.705346+09:00"
+      "last_ok": "2026-11-18T18:03:39.598371+09:00"
     },
     "gh": {
       "consecutive_failures": 0,
       "hole_alerted": false,
       "last_note": "공고 링크 26건 파싱",
-      "last_ok": "2026-11-18T10:16:07.705346+09:00"
+      "last_ok": "2026-11-18T18:03:39.598371+09:00"
     },
     "news": {
       "consecutive_failures": 0,
       "hole_alerted": false,
-      "last_note": "기사 154건 확인",
-      "last_ok": "2026-11-18T10:16:07.705346+09:00"
+      "last_note": "기사 133건 확인",
+      "last_ok": "2026-11-18T18:03:39.598371+09:00"
     }
   },
-  "last_run": "2026-11-18T10:16:07.705346+09:00",
+  "last_run": "2026-11-18T18:03:39.598371+09:00",
   "official_keyword_last_seen": {
-    "광교": "2026-11-18T10:16:07.705346+09:00",
+    "광교": "2026-11-18T18:03:39.598371+09:00",
     "플랫폼시티": "2026-11-06T11:18:53.070336+09:00"
   },
   "seen": {
@@ -29,6 +29,11 @@
       "first_seen": "2026-10-30T20:19:18.862142+09:00",
       "source": "gh",
       "title": "광교 A17블록 자연&센트레빌 지분적립형 분양주택 및 공공분양주택 입주자 모집공고 2026-10-30"
+    },
+    "gh:65359": {
+      "first_seen": "2026-11-18T18:03:39.598371+09:00",
+      "source": "gh",
+      "title": "GH biz& 광교 공공지식산업센터 앵커기업 모집공고(분양) 2026-11-18"
     },
     "hm:2026000527": {
       "first_seen": "2026-10-30T20:19:18.862142+09:00",
@@ -149,6 +154,10 @@
       "first_seen": "2026-10-31T05:06:36.181355+09:00",
       "suppressed": "official_recent"
     },
+    "news:https://news.google.com/rss/articles/CBMiZ0FVX3lxTE5Db3QtT2JNUUZRWFR3R1Jtc2hndmJEdmlLd0lWS1NNU2VzSlZOYmpDQlhwVWdwcXVmNFNCNGpJZUd4Z0hkLTRqMHpSMnlDMDJlTDR1bDhpZF9ld0xZcGZkWmJuZEt3VEE?oc=5": {
+      "first_seen": "2026-11-18T18:03:39.598371+09:00",
+      "suppressed": "official_recent"
+    },
     "news:https://news.google.com/rss/articles/CBMiZEFVX3lxTFAwNDJlV0hwTjNqVWU2ckdRS1RkUjVhZTlmaldNY1lMall4WGpNT2VoTWlmSHY4ZmxBT3BsZndqcXRqdFhmREZEZjFNNW1KdFQ5aHRRcnZKcFA3RW51bGpXYnJUWms?oc=5": {
       "first_seen": "2026-11-07T18:11:55.918091+09:00",
       "suppressed": "official_recent"
@@ -213,8 +222,16 @@
       "first_seen": "2026-10-30T20:19:18.862142+09:00",
       "suppressed": "official_recent"
     },
+    "news:https://news.google.com/rss/articles/CBMic0FVX3lxTE9qeXctMXZQY2RwSTkxVy1uOWl5QmdLNDdXYURBTHJoVGM2N3NPZ20yNkRuVnJhcE5SaFgzbE5UWmVWeUFaaHlfQ2U5am5aeFlxSnBKMkhKdV9wdGlHbjB0VThJWEg0RUZMdGg2RUsxQXdlX2fSAXNBVV95cUxPanl3LTF2UGNkcEk5MVctbjlpeUJnSzQ3V2FEQUxyaFRjNjdzT2dtMjZEblZyYXBOUmhYM2xOVFplVnlBWmh5X0NlOWpuWnhZcUpwSjJISnVfcHRpR24wdFU4SVhINEVGTHRoNkVLMUF3ZV9n?oc=5": {
+      "first_seen": "2026-11-18T18:03:39.598371+09:00",
+      "suppressed": "official_recent"
+    },
     "news:https://news.google.com/rss/articles/CBMicEFVX3lxTE4wWnZsbGxRQWlOTy1lWVBscFBBSl90WVRZNUlncnBtZFdJd2tBdk90NXZrWVlaLVhQdG5sdjU3ZmJ4SEtDWnd5S0dIMm9yNXRWYjN5MWRoQlhXRzc4Q0VPczA0a043dnhWVGxrLTktNEXSAXRBVV95cUxNUjdXaG12dVQ2X0xiSnFXamxRdU1ZU3lzOTNVdlZiNUQtXzZKR1BWekdKbmVMbWJOa0pKcFUtZ3d5cERUb09DNG1WaHdQcUxudlBVTnBWQTFUaTQ5eHVCZG5NNFQwd01mWUNfeFdoTHRPdVhBdg?oc=5": {
       "first_seen": "2026-10-30T20:19:18.862142+09:00",
+      "suppressed": "official_recent"
+    },
+    "news:https://news.google.com/rss/articles/CBMicEFVX3lxTFBJUDNsaFV3WXF6aUtLbVF5RmxXU3M1N0R1cUpmanhjUmRGNk52LXpMbWREX243ci1vc1c2QTVBWGxlcTE4OEtvVnA5d1hLSHhKWUVUUG5zOS1EU2VqQ1JhSVVXV29EWENpLTg1eEQwbWc?oc=5": {
+      "first_seen": "2026-11-18T18:03:39.598371+09:00",
       "suppressed": "official_recent"
     },
     "news:https://news.google.com/rss/articles/CBMickFVX3lxTE1QYnhoSHNkZTNzcW5kU2M0ekpndGV1NzJxUzBWVDZKanBQaEN3b0ZqVk9wMHFVT1BJQnhkRTU2aTUzemp1Uk5veHJDci1xX3F5N0UzS1NXeU5qVXppRmlZUXRuRGhidDJGMjIwdlhKNU01UdIBdEFVX3lxTE9EQmJhZk1jQjVIME4xR042clVCeXJVQjBQaTF0RXV4NUF3d0ltMS1LYmhTRE50dXhCeGRhNUhjbE5KOWpmZkdocUpnR3J1alVMMG1PNE54SEZYU0IzVUJYd2ZaY0ZLR0M2WmYzMGMwRUxiWkFS?oc=5": {
