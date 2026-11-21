@@ -1,5 +1,5 @@
 {
-  "checked_at": "2026-11-21T03:17:07.425011+00:00",
+  "checked_at": "2026-11-21T12:49:45.021130+00:00",
   "statuses": [
     {
       "slug": "macro-series",
@@ -8,7 +8,7 @@
       "severity": "critical",
       "state": "OK",
       "detail": "fetched_at=2026-11-21T03:11:16+00:00",
-      "age_hours": 0.0976782063888889
+      "age_hours": 9.641452738055555
     },
     {
       "slug": "hynix-price-snapshot",
@@ -16,8 +16,8 @@
       "workflow": "sk-hynix-daily-report.yml",
       "severity": "critical",
       "state": "OK",
-      "detail": "fetched_at=2026-11-21T02:57:28+00:00",
-      "age_hours": 0.32771029555555553
+      "detail": "fetched_at=2026-11-21T07:51:21+00:00",
+      "age_hours": 4.973428246111111
     },
     {
       "slug": "hynix-investor-flow",
@@ -25,8 +25,8 @@
       "workflow": "sk-hynix-daily-report.yml",
       "severity": "warning",
       "state": "OK",
-      "detail": "마지막 성공=2026-11-21T02:57:25+00:00",
-      "age_hours": 0.3285505355555556
+      "detail": "마지막 성공=2026-11-21T07:51:17+00:00",
+      "age_hours": 4.974546233055556
     },
     {
       "slug": "hynix-adr-quote",
@@ -34,8 +34,8 @@
       "workflow": "sk-hynix-daily-report.yml",
       "severity": "warning",
       "state": "OK",
-      "detail": "fetched_at=2026-11-21T02:57:27+00:00",
-      "age_hours": 0.3279964888888889
+      "detail": "fetched_at=2026-11-21T07:51:20+00:00",
+      "age_hours": 4.973714463888889
     },
     {
       "slug": "hynix-credit-balance",
@@ -43,8 +43,8 @@
       "workflow": "sk-hynix-daily-report.yml",
       "severity": "warning",
       "state": "OK",
-      "detail": "fetched_at=2026-11-21T02:57:29+00:00",
-      "age_hours": 0.32744252166666665
+      "detail": "fetched_at=2026-11-21T07:51:21+00:00",
+      "age_hours": 4.973438295555555
     },
     {
       "slug": "hynix-short-sale",
@@ -52,8 +52,8 @@
       "workflow": "sk-hynix-daily-report.yml",
       "severity": "warning",
       "state": "OK",
-      "detail": "fetched_at=2026-11-21T02:57:31+00:00",
-      "age_hours": 0.32688859416666666
+      "detail": "fetched_at=2026-11-21T07:51:24+00:00",
+      "age_hours": 4.972606607222222
     },
     {
       "slug": "kr-index-quote",
@@ -61,8 +61,8 @@
       "workflow": "sk-hynix-daily-report.yml",
       "severity": "warning",
       "state": "OK",
-      "detail": "fetched_at=2026-11-21T02:57:30+00:00",
-      "age_hours": 0.3271681088888889
+      "detail": "fetched_at=2026-11-21T07:51:23+00:00",
+      "age_hours": 4.972886085277778
     },
     {
       "slug": "portfolio-etf-nav",
@@ -70,8 +70,8 @@
       "workflow": "sk-hynix-daily-report.yml",
       "severity": "warning",
       "state": "OK",
-      "detail": "fetched_at=2026-11-21T02:57:32+00:00",
-      "age_hours": 0.32661425944444444
+      "detail": "fetched_at=2026-11-21T07:51:25+00:00",
+      "age_hours": 4.972332288888889
     },
     {
       "slug": "portfolio-holdings",
@@ -80,7 +80,7 @@
       "severity": "critical",
       "state": "OK",
       "detail": "fetched_at=2026-11-20T18:30:59+00:00",
-      "age_hours": 8.76911839111111
+      "age_hours": 18.312892019166668
     },
     {
       "slug": "portfolio-bonds",
@@ -89,7 +89,7 @@
       "severity": "critical",
       "state": "OK",
       "detail": "fetched_at=2026-11-20T18:30:59+00:00",
-      "age_hours": 8.769121494444445
+      "age_hours": 18.312895233055556
     },
     {
       "slug": "hyperscaler-capex",
@@ -98,7 +98,7 @@
       "severity": "warning",
       "state": "OK",
       "detail": "마지막 성공=2026-11-17T03:25:12+00:00",
-      "age_hours": 95.86551273638888
+      "age_hours": 105.40928659472222
     },
     {
       "slug": "ai-periphery-fundamentals",
@@ -107,7 +107,7 @@
       "severity": "warning",
       "state": "OK",
       "detail": "fetched_at=2026-11-17T03:25:18+00:00",
-      "age_hours": 95.86384624083334
+      "age_hours": 105.40762011472222
     },
     {
       "slug": "bottleneck-prices",
@@ -116,7 +116,7 @@
       "severity": "warning",
       "state": "OK",
       "detail": "fetched_at=2026-11-21T03:11:19+00:00",
-      "age_hours": 0.09690486000000001
+      "age_hours": 9.640678805
     },
     {
       "slug": "real-estate-apartment-sale",
@@ -125,7 +125,7 @@
       "severity": "warning",
       "state": "OK",
       "detail": "마지막 성공=2026-11-20T23:29:10+00:00",
-      "age_hours": 3.7994071566666667
+      "age_hours": 13.3431812225
     },
     {
       "slug": "real-estate-apartment-rent",
@@ -134,7 +134,7 @@
       "severity": "warning",
       "state": "OK",
       "detail": "마지막 성공=2026-11-20T23:30:25+00:00",
-      "age_hours": 3.778574724722222
+      "age_hours": 13.322348872777779
     },
     {
       "slug": "subscription-monitor",
@@ -142,7 +142,7 @@
       "workflow": "subscription-monitor.yml",
       "severity": "warning",
       "state": "OK",
-      "detail": "자체 감시 정상 (연속실패 0, 최근 심박 2026-11-20)",
+      "detail": "자체 감시 정상 (연속실패 0, 최근 심박 2026-11-21)",
       "age_hours": null
     },
     {
@@ -151,8 +151,8 @@
       "workflow": "daily-peos-report.yml",
       "severity": "critical",
       "state": "OK",
-      "detail": "report/2026-11-20.md 존재 (1일 전 날짜)",
-      "age_hours": 24.0
+      "detail": "report/2026-11-21.md 존재 (0일 전 날짜)",
+      "age_hours": 0.0
     },
     {
       "slug": "subscription-daily-report",
@@ -160,8 +160,8 @@
       "workflow": "subscription-daily-report.yml",
       "severity": "warning",
       "state": "OK",
-      "detail": "report/subscription-report-2026-11-20.md 존재 (1일 전 날짜)",
-      "age_hours": 24.0
+      "detail": "report/subscription-report-2026-11-21.md 존재 (0일 전 날짜)",
+      "age_hours": 0.0
     },
     {
       "slug": "normalized:bls_us_job_openings",
